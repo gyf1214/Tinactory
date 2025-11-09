@@ -3,8 +3,11 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -14,9 +17,12 @@ import org.shsts.tinactory.content.machine.BoilerProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.content.multiblock.FixedBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -44,6 +50,7 @@ public class LargeBoiler extends Multiblock {
 
     private final Processor processor;
     private final LazyOptional<IProcessor> processorCap;
+    private final List<BlockPos> fireboxes = new ArrayList<>();
 
     private int boilParallel = 1;
 
@@ -59,6 +66,13 @@ public class LargeBoiler extends Multiblock {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             boilParallel = (int) ctx.getProperty("height") - 1;
+            fireboxes.clear();
+            for (var pos : ctx.blocks) {
+                var block = ctx.getBlock(pos);
+                if (block.isPresent() && block.get().getBlock() instanceof FixedBlock) {
+                    fireboxes.add(pos);
+                }
+            }
         }
     }
 
@@ -74,6 +88,21 @@ public class LargeBoiler extends Multiblock {
         super.updateMultiblockInterface();
         if (multiblockInterface != null) {
             processor.setContainer(multiblockInterface.container().orElseThrow());
+        }
+    }
+
+    @Override
+    public void setWorkBlock(Level world, BlockState state) {
+        super.setWorkBlock(world, state);
+        var working = (boolean) state.getValue(WORKING);
+        for (var pos : fireboxes) {
+            if (!world.isLoaded(pos)) {
+                continue;
+            }
+            var state1 = world.getBlockState(pos);
+            if (state1.hasProperty(WORKING) && state1.getValue(WORKING) != working) {
+                world.setBlock(pos, state1.setValue(WORKING, true), 19);
+            }
         }
     }
 

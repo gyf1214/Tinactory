@@ -31,6 +31,7 @@ import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
+import org.shsts.tinactory.content.multiblock.FixedBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.PowerBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
@@ -129,6 +130,14 @@ public class MiscMeta extends MetaConsumer {
         var capacity = GsonHelper.getAsLong(jo, "capacity");
         var materialColor = parseMaterialColor(jo, "materialColor");
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
+            .material(Material.HEAVY_METAL, materialColor)
+            .properties(CASING_PROPERTY)
+            .register();
+    }
+
+    private void fixed(String id, JsonObject jo) {
+        var materialColor = parseMaterialColor(jo, "materialColor");
+        REGISTRATE.block(id, FixedBlock::new)
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
             .register();
@@ -239,6 +248,7 @@ public class MiscMeta extends MetaConsumer {
             case "glass" -> glass(id);
             case "lens" -> lens(id, jo);
             case "power" -> power(name, id, jo);
+            case "fixed" -> fixed(id, jo);
             case "coal_block" -> coalBlock(id, jo);
             case "item" -> item(id, jo);
             case "me_storage_interface" -> meStorageInterface(id, jo);

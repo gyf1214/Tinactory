@@ -17,7 +17,7 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.content.network.FixedBlock;
+import org.shsts.tinactory.content.network.FixedMachineBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.network.SidedMachineBlock;
@@ -267,7 +267,7 @@ public class MachineModel {
                 staticMachine(ctx);
             } else if (ctx.object() instanceof MachineBlock) {
                 machine(ctx);
-            } else if (ctx.object() instanceof FixedBlock) {
+            } else if (ctx.object() instanceof FixedMachineBlock) {
                 fixed(ctx);
             } else {
                 throw new IllegalArgumentException();

@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.machine.BoilerProcessor;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
-import org.shsts.tinactory.content.network.FixedBlock;
+import org.shsts.tinactory.content.network.FixedMachineBlock;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
@@ -238,7 +238,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var layout = parseLayout().buildLayout();
 
-            return BlockEntityBuilder.builder("multiblock/" + id, FixedBlock::new)
+            return BlockEntityBuilder.builder("multiblock/" + id, FixedMachineBlock::new)
                 .blockEntity()
                 .child(Multiblock.builder((be, $) -> new Cleanroom(be, $, properties)))
                 .layout(layout)

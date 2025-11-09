@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
+import net.minecraftforge.client.model.generators.ConfiguredModel
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.content.AllBlockEntities.getMachine
 import org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS
@@ -28,10 +29,13 @@ import org.shsts.tinactory.core.util.LocHelper.ic2
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.name
+import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.cubeCasing
+import org.shsts.tinactory.datagen.content.Models.cubeCasingModel
 import org.shsts.tinactory.datagen.content.Models.cubeColumn
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
+import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
@@ -170,6 +174,24 @@ object Multiblocks {
                 misc("power_block/${v.id}") {
                     blockState(cubeColumn("casings/battery/$texName"))
                     tag(POWER_BLOCK)
+                }
+            }
+
+            misc("firebox_casing") {
+                blockState { ctx ->
+                    val provider = ctx.provider()
+                    val models = provider.models()
+                    val casing = gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")
+                    val overlay = gregtech("blocks/casings/firebox/machine_casing_firebox_tungstensteel")
+                    val working = suffix(overlay, "_active")
+                    val baseModel = models.cubeColumn(ctx.id(), overlay, casing)
+                    val workingModel = models.cubeColumn(ctx.id() + "_active", working, casing)
+                    provider.getVariantBuilder(ctx.`object`()).forAllStates { state ->
+                        val model = if (state.getValue(MachineBlock.WORKING)) workingModel else baseModel
+                        ConfiguredModel.builder()
+                            .modelFile(model)
+                            .build()
+                    }
                 }
             }
         }
@@ -471,12 +493,11 @@ object Multiblocks {
                         val modelId = "block/multiblock/misc/turbine_blade_$CENTER_BLADE"
                         val idle = models.withExistingParent(id, modLoc(modelId))
                         val spin = models.withExistingParent("${id}_active", modLoc("${modelId}_active"))
-                        prov.getVariantBuilder(ctx.`object`())
-                            .forAllStates { state ->
-                                val dir = state.getValue(PrimitiveBlock.FACING)
-                                val model = if (state.getValue(MachineBlock.WORKING)) spin else idle
-                                Models.rotateModel(model, dir)
-                            }
+                        prov.getVariantBuilder(ctx.`object`()).forAllStates { state ->
+                            val dir = state.getValue(PrimitiveBlock.FACING)
+                            val model = if (state.getValue(MachineBlock.WORKING)) spin else idle
+                            rotateModel(model, dir)
+                        }
                     }
                     for (type in types) {
                         itemTag(machine(type))
@@ -487,6 +508,22 @@ object Multiblocks {
                 machineModel {
                     casing(ic2("blocks/wiring/storage/mfe_bottomtop"))
                     overlay("multiblock/power_substation")
+                }
+            }
+            block("multiblock/large_boiler") {
+                blockState { ctx ->
+                    val prov = ctx.provider()
+                    val models = prov.models()
+                    val casing = "casings/firebox/overlay/tungstensteel"
+                    val overlay = "multiblock/blast_furnace/overlay_front"
+                    val baseModel = cubeCasingModel(models, ctx.id(), casing, overlay)
+                    val workingModel = cubeCasingModel(models, ctx.id() + "_active",
+                        "${casing}/active", "${overlay}_active")
+                    prov.getVariantBuilder(ctx.`object`()).forAllStates { state ->
+                        val dir = state.getValue(PrimitiveBlock.FACING)
+                        val model = if (state.getValue(MachineBlock.WORKING)) workingModel else baseModel
+                        rotateModel(model, dir)
+                    }
                 }
             }
         }

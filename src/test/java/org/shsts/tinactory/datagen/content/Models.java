@@ -10,6 +10,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -182,21 +183,24 @@ public final class Models {
         return cubeColumn(tex + "/side", tex + "/top");
     }
 
+    public static BlockModelBuilder cubeCasingModel(BlockModelProvider models, String id,
+        String casing, String overlay) {
+        var baseModel = modLoc(CASING_MODEL);
+        var casingTex = gregtech("blocks/" + casing);
+        var overlayTex = gregtech("blocks/" + overlay);
+        return applyCasing(models.withExistingParent(id, baseModel), casingTex, models.existingFileHelper)
+            .texture("front_overlay", overlayTex)
+            .texture("back_overlay", overlayTex)
+            .texture("left_overlay", overlayTex)
+            .texture("right_overlay", overlayTex);
+    }
+
     public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> cubeCasing(String casing, String overlay) {
         return ctx -> {
             var provider = ctx.provider();
-            var models = provider.models();
-            var existingHelper = models.existingFileHelper;
-            var baseModel = modLoc(CASING_MODEL);
-            var casingTex = gregtech("blocks/" + casing);
-            var overlayTex = gregtech("blocks/" + overlay);
-            var model = applyCasing(models.withExistingParent(ctx.id(), baseModel), casingTex, existingHelper)
-                .texture("front_overlay", overlayTex)
-                .texture("back_overlay", overlayTex)
-                .texture("left_overlay", overlayTex)
-                .texture("right_overlay", overlayTex);
-            provider.simpleBlock(ctx.object(), model);
+            provider.simpleBlock(ctx.object(), cubeCasingModel(
+                provider.models(), ctx.id(), casing, overlay));
         };
     }
 

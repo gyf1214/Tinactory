@@ -1,0 +1,59 @@
+{
+  "recipes": {},
+  "machine": "large_boiler",
+  "baseHeat": 20,
+  "baseDecay": 0.0002,
+  "burnSpeed": 45,
+  "burnHeat": 1,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 19
+      }
+    ]
+  },
+  "appearance": "tinactory:multiblock/misc/firebox_casing",
+  "layers": [
+    [
+      "BBB",
+      "BBB",
+      "B$B"
+    ],
+    {
+      "rows": [
+        "CCC",
+        "CPC",
+        "CCC"
+      ],
+      "height": "1-6"
+    },
+    [
+      "CCC",
+      "CCC",
+      "CCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/misc/firebox_casing"
+    },
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing"
+  }
+}

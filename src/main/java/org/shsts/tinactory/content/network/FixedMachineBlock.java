@@ -17,20 +17,20 @@ import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FixedBlock extends SmartEntityBlock {
-    public FixedBlock(Properties properties, Supplier<IBlockEntityType> entityType,
+public class FixedMachineBlock extends SmartEntityBlock {
+    public FixedMachineBlock(Properties properties, Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu) {
         super(properties.requiresCorrectToolForDrops().isValidSpawn(AllItems::never), entityType, menu);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(WORKING);
     }
 
     @Override
     protected BlockState createDefaultBlockState() {
         return super.createDefaultBlockState()
             .setValue(WORKING, false);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WORKING);
     }
 }

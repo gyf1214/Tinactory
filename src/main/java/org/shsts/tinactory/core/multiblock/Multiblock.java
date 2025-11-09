@@ -89,11 +89,11 @@ public class Multiblock extends MultiblockBase {
     }
 
     protected static class CheckContext implements IMultiblockCheckCtx {
-        protected boolean failed = false;
-        protected final Level world;
-        protected final BlockPos center;
-        protected final List<BlockPos> blocks = new ArrayList<>();
-        protected final Map<String, Object> properties = new HashMap<>();
+        private boolean failed = false;
+        private final Level world;
+        private final BlockPos center;
+        public final List<BlockPos> blocks = new ArrayList<>();
+        private final Map<String, Object> properties = new HashMap<>();
 
         protected CheckContext(Level world, BlockPos center) {
             this.world = world;
