@@ -104,7 +104,7 @@ public class MultiblockInterface extends Machine {
         LOGGER.debug("{} set multiblock = {}", this, target);
         multiblock = target;
         processor = target.processor();
-        electricMachine = target.electric();
+        electricMachine = target.electric().orElse(null);
         setLayout(target.getLayout());
         setJoined(world(), true);
         onMultiblockUpdate();

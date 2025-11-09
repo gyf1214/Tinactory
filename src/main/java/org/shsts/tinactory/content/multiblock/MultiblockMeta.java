@@ -11,7 +11,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.AllTags;
-import org.shsts.tinactory.content.machine.BoilerProcessor;
+import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -82,7 +82,7 @@ public class MultiblockMeta extends MachineMeta {
                 case "large_turbine" -> builder.child(Multiblock.builder(LargeTurbine::new));
                 case "power_substation" -> builder.child(Multiblock.builder(PowerSubstation::new));
                 case "large_boiler" -> {
-                    var properties = BoilerProcessor.Properties.fromJson(jo);
+                    var properties = FireBoiler.Properties.fromJson(jo);
                     yield builder.child(Multiblock.builder((be, $) -> new LargeBoiler(be, $, properties)));
                 }
                 default -> {

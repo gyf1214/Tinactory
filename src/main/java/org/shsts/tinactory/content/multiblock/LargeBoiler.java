@@ -5,15 +5,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.AllMenus;
-import org.shsts.tinactory.content.machine.BoilerProcessor;
+import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -26,39 +28,38 @@ import static org.shsts.tinactory.content.multiblock.FixedBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LargeBoiler extends Multiblock {
-    private class Processor extends BoilerProcessor {
-        public Processor(Properties properties) {
-            super(blockEntity, properties);
-        }
-
-        @Override
-        protected Optional<IMachine> machine() {
-            return Optional.ofNullable(multiblockInterface);
-        }
-
-        @Override
-        protected double boilParallel() {
-            return boilParallel;
-        }
-
-        @Override
-        protected int burnParallel() {
-            return multiblockInterface == null ? 1 : multiblockInterface.maxParallel();
-        }
-    }
-
-    private final Processor processor;
+public class LargeBoiler extends Multiblock implements INBTSerializable<CompoundTag> {
+    private final FireBoiler boiler;
     private final LazyOptional<IProcessor> processorCap;
     private final List<BlockPos> fireboxes = new ArrayList<>();
 
     private int boilParallel = 1;
 
     public LargeBoiler(BlockEntity blockEntity, Builder<?> builder,
-        BoilerProcessor.Properties properties) {
+        FireBoiler.Properties properties) {
         super(blockEntity, builder);
-        this.processor = new Processor(properties);
-        this.processorCap = LazyOptional.of(() -> processor);
+        this.boiler = new FireBoiler(properties) {
+            @Override
+            protected Optional<IMachine> machine() {
+                return Optional.ofNullable(multiblockInterface);
+            }
+
+            @Override
+            protected double boilParallel() {
+                return boilParallel;
+            }
+
+            @Override
+            protected int burnParallel() {
+                return multiblockInterface == null ? 1 : multiblockInterface.maxParallel();
+            }
+
+            @Override
+            protected void setChanged() {
+                blockEntity.setChanged();
+            }
+        };
+        this.processorCap = LazyOptional.of(() -> boiler);
     }
 
     @Override
@@ -80,14 +81,14 @@ public class LargeBoiler extends Multiblock {
     protected void onRegister() {
         super.onRegister();
         assert multiblockInterface != null;
-        processor.setContainer(multiblockInterface.container().orElseThrow());
+        boiler.setContainer(multiblockInterface.container().orElseThrow());
     }
 
     @Override
     protected void updateMultiblockInterface() {
         super.updateMultiblockInterface();
         if (multiblockInterface != null) {
-            processor.setContainer(multiblockInterface.container().orElseThrow());
+            boiler.setContainer(multiblockInterface.container().orElseThrow());
         }
     }
 
@@ -117,5 +118,15 @@ public class LargeBoiler extends Multiblock {
             return processorCap.cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        return boiler.serializeNBT();
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag tag) {
+        boiler.deserializeNBT(tag);
     }
 }

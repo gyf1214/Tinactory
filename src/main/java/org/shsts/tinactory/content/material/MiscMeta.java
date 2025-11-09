@@ -27,6 +27,7 @@ import org.shsts.tinactory.content.logistics.MEStorageDetector;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.machine.BoilerProcessor;
+import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
@@ -209,7 +210,7 @@ public class MiscMeta extends MetaConsumer {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
 
-        var properties = BoilerProcessor.Properties.fromJson(jo);
+        var properties = FireBoiler.Properties.fromJson(jo);
         BlockEntityBuilder.builder(id, MachineBlock.factory(Voltage.PRIMITIVE))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)

@@ -32,7 +32,6 @@ import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.cubeCasing
-import org.shsts.tinactory.datagen.content.Models.cubeCasingModel
 import org.shsts.tinactory.datagen.content.Models.cubeColumn
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.rotateModel
@@ -510,22 +509,7 @@ object Multiblocks {
                     overlay("multiblock/power_substation")
                 }
             }
-            block("multiblock/large_boiler") {
-                blockState { ctx ->
-                    val prov = ctx.provider()
-                    val models = prov.models()
-                    val casing = "casings/firebox/overlay/tungstensteel"
-                    val overlay = "multiblock/blast_furnace/overlay_front"
-                    val baseModel = cubeCasingModel(models, ctx.id(), casing, overlay)
-                    val workingModel = cubeCasingModel(models, ctx.id() + "_active",
-                        "${casing}/active", "${overlay}_active")
-                    prov.getVariantBuilder(ctx.`object`()).forAllStates { state ->
-                        val dir = state.getValue(PrimitiveBlock.FACING)
-                        val model = if (state.getValue(MachineBlock.WORKING)) workingModel else baseModel
-                        rotateModel(model, dir)
-                    }
-                }
-            }
+            multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
         }
     }
 

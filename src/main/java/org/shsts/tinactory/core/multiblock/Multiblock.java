@@ -211,8 +211,8 @@ public class Multiblock extends MultiblockBase {
         return AllCapabilities.PROCESSOR.get(blockEntity);
     }
 
-    public IElectricMachine electric() {
-        return AllCapabilities.ELECTRIC_MACHINE.get(blockEntity);
+    public Optional<IElectricMachine> electric() {
+        return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
     }
 
     public IMenuType menu(IMachine machine) {

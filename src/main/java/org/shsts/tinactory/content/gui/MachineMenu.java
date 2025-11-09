@@ -16,6 +16,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
+import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -26,7 +27,6 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.machine.BoilerProcessor.getHeat;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
@@ -163,14 +163,14 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    public static class Boiler extends MachineMenu {
-        public Boiler(Properties properties) {
+    public static class BoilerMenu extends MachineMenu {
+        public BoilerMenu(Properties properties) {
             super(properties);
             addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity())
                 .map(this::getBurn)
                 .orElse(0d)));
             addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity())
-                .map($ -> getHeat($) / 600d)
+                .map($ -> ((Boiler) $).getHeat() / 600d)
                 .orElse(0d)));
         }
 
@@ -189,7 +189,7 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static ProcessingMenu boiler(Properties properties) {
-        return new Boiler(properties);
+        return new BoilerMenu(properties);
     }
 
     public static ProcessingMenu digitalInterface(Properties properties) {
