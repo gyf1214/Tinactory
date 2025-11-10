@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.DoublePredicate;
 
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_SCHEDULING;
 
 @ParametersAreNonnullByDefault
@@ -75,50 +73,8 @@ public class ElectricComponent extends NetworkComponent {
         }
     }
 
-    public record Metrics(double workSpeed, double gen, double workCons, double buffer) {
-        public Metrics() {
-            this(0d, 0d, 0d, 0d);
-        }
-
-        public double efficiency() {
-            var comp = MathUtil.compare(buffer);
-            if (comp == 0) {
-                return workCons / gen;
-            } else if (comp > 0) {
-                return (workCons + buffer) / gen;
-            } else {
-                return workCons / (gen - buffer);
-            }
-        }
-
-        public void writeToBuf(FriendlyByteBuf buf) {
-            buf.writeDouble(workSpeed);
-            buf.writeDouble(gen);
-            buf.writeDouble(workCons);
-            buf.writeDouble(buffer);
-        }
-
-        public static Metrics readFromBuf(FriendlyByteBuf buf) {
-            var workFactor = buf.readDouble();
-            var gen = buf.readDouble();
-            var workCons = buf.readDouble();
-            var buffer = buf.readDouble();
-            return new Metrics(workFactor, gen, workCons, buffer);
-        }
-
-        public void report(String team) {
-            var label = List.of(team);
-            MetricsManager.report("electric_consumed", label, workCons);
-            MetricsManager.report("electric_generated", label, gen);
-            var sign = MathUtil.compare(buffer);
-            MetricsManager.report("electric_buffer_charged", label, sign > 0 ? buffer : 0);
-            MetricsManager.report("electric_buffer_discharged", label, sign < 0 ? -buffer : 0);
-        }
-    }
-
     private final Map<BlockPos, Subnet> subnets = new HashMap<>();
     private final List<Subnet> solveOrder = new ArrayList<>();
-    private Metrics metrics = new Metrics();
 
     private double workFactor;
     private double bufferFactor;
@@ -192,6 +148,15 @@ public class ElectricComponent extends NetworkComponent {
         return reverse ? ed : st;
     }
 
+    private void reportMetrics(String team, double gen, double workCons, double buffer) {
+        var label = List.of(team);
+        MetricsManager.report("electric_consumed", label, workCons);
+        MetricsManager.report("electric_generated", label, gen);
+        var sign = MathUtil.compare(buffer);
+        MetricsManager.report("electric_buffer_charged", label, sign > 0 ? buffer : 0);
+        MetricsManager.report("electric_buffer_discharged", label, sign < 0 ? -buffer : 0);
+    }
+
     private void solveNetwork() {
         for (var sub : subnets.values()) {
             sub.reset();
@@ -241,9 +206,8 @@ public class ElectricComponent extends NetworkComponent {
             buffer = bufferGen * bufferFactor;
         }
 
-        var workSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
-        metrics = new Metrics(workSpeed, gen, workCons, buffer);
-        metrics.report(network.owner().getName());
+        var team = network.owner().getName();
+        reportMetrics(team, gen, workCons, buffer);
     }
 
     public double getWorkFactor() {
@@ -252,10 +216,6 @@ public class ElectricComponent extends NetworkComponent {
 
     public double getBufferFactor() {
         return bufferFactor;
-    }
-
-    public Metrics getMetrics() {
-        return metrics;
     }
 
     @Override
