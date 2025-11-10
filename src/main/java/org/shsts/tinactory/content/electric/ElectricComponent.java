@@ -50,7 +50,7 @@ public class ElectricComponent extends NetworkComponent {
 
         @Override
         public String toString() {
-            return "Subnet{" + center + '}';
+            return "Subnet[" + center + "]";
         }
 
         public void solve(double wFactor, double bFactor, boolean isBGen) {

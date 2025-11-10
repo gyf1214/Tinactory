@@ -195,6 +195,6 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public String toString() {
-        return "%s{%s}".formatted(getClass().getSimpleName(), playerTeam.getName());
+        return getClass().getSimpleName() + "[" + playerTeam.getName() + "]";
     }
 }

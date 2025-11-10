@@ -52,7 +52,7 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
     protected void onInvalidate() {}
 
     public void markPreInvalid() {
-        LOGGER.debug("{} mark pre invalid", this);
+        LOGGER.trace("{} mark pre invalid", this);
         preInvalid = true;
     }
 
@@ -103,6 +103,6 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
 
     @Override
     public String toString() {
-        return "%s{%s}".formatted(getClass().getSimpleName(), blockEntity);
+        return getClass().getSimpleName() + "[" + blockEntity + "]";
     }
 }

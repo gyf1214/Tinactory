@@ -120,7 +120,7 @@ public class Technology implements ITechnology {
 
     @Override
     public String toString() {
-        return "Technology{%s}".formatted(loc);
+        return "Technology[" + loc + "]";
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(

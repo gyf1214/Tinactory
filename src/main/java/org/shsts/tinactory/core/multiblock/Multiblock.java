@@ -46,6 +46,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -53,10 +54,15 @@ public class Multiblock extends MultiblockBase {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "multiblock";
 
-    private Layout layout;
+    @Nullable
+    protected Layout layout;
     private final Consumer<IMultiblockCheckCtx> checker;
     private final Supplier<BlockState> appearance;
 
+    /**
+     * BlockEntity update may be before client load. If so, the update event needs to be delayed until the first tick.
+     * This variable is to distinguish these two scenarios.
+     */
     private boolean firstTick = false;
     @Nullable
     protected BlockPos multiblockInterfacePos = null;
@@ -68,24 +74,22 @@ public class Multiblock extends MultiblockBase {
 
     public Multiblock(BlockEntity blockEntity, Builder<?> builder) {
         super(blockEntity);
-        this.layout = Objects.requireNonNull(builder.layout);
+        this.layout = builder.layout;
         this.checker = Objects.requireNonNull(builder.checker);
         this.appearance = Objects.requireNonNull(builder.appearance);
     }
 
     public BlockState getAppearanceBlock() {
-        return appearance.get();
-    }
-
-    public Layout getLayout() {
-        return layout;
-    }
-
-    protected void setLayout(Layout val) {
-        layout = val;
-        if (multiblockInterface != null) {
-            multiblockInterface.setLayout(val);
+        var state = appearance.get();
+        var state1 = blockEntity.getBlockState();
+        if (state.hasProperty(WORKING) && state1.hasProperty(WORKING)) {
+            return state.setValue(WORKING, state1.getValue(WORKING));
         }
+        return state;
+    }
+
+    public Optional<Layout> getLayout() {
+        return Optional.ofNullable(layout);
     }
 
     protected static class CheckContext implements IMultiblockCheckCtx {
@@ -165,7 +169,7 @@ public class Multiblock extends MultiblockBase {
 
     @Override
     protected Optional<Collection<BlockPos>> checkMultiblock() {
-        LOGGER.debug("{}: check multiblock", this.blockEntity);
+        LOGGER.trace("{}: check multiblock", this.blockEntity);
 
         var world = blockEntity.getLevel();
         assert world != null;
@@ -181,6 +185,11 @@ public class Multiblock extends MultiblockBase {
         }
     }
 
+    /**
+     * Called only on Server.
+     * Multiblock check and registration is only performed on server. The client relies on BlockEntity update to
+     * connect between Multiblock and MultiblockInterface.
+     */
     @Override
     protected void onRegister() {
         assert multiblockInterface != null;
@@ -207,8 +216,8 @@ public class Multiblock extends MultiblockBase {
         return getInterface().flatMap(MultiblockInterface::container);
     }
 
-    public IProcessor processor() {
-        return AllCapabilities.PROCESSOR.get(blockEntity);
+    public Optional<IProcessor> processor() {
+        return AllCapabilities.PROCESSOR.tryGet(blockEntity);
     }
 
     public Optional<IElectricMachine> electric() {
@@ -221,14 +230,16 @@ public class Multiblock extends MultiblockBase {
     }
 
     /**
-     * Should only be called on Client
+     * Called only on Client during BlockEntity update.
+     * It is important to note that Multiblock and MultiblockInterface update are separate and their order is not
+     * guaranteed.
      */
     protected void updateMultiblockInterface() {
         var world = blockEntity.getLevel();
         assert world != null && world.isClientSide;
 
-        LOGGER.debug("update multiblockInterface current={}, pos={}, firstTick={}",
-            multiblockInterface, multiblockInterfacePos, firstTick);
+        LOGGER.debug("{}: update multiblockInterface current={}, pos={}, firstTick={}",
+            this, multiblockInterface, multiblockInterfacePos, firstTick);
 
         if (multiblockInterfacePos != null) {
             var be1 = world.getBlockEntity(multiblockInterfacePos);
@@ -244,6 +255,12 @@ public class Multiblock extends MultiblockBase {
         }
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
+
+    /**
+     * This is called on Client by MultiblockInterface when the container is ready.
+     * Note that it is possible that this is called before updateMultiblockInterface.
+     */
+    public void onContainerReady() {}
 
     public void setWorkBlock(Level world, BlockState state) {
         // prevent updateShape on neighbor

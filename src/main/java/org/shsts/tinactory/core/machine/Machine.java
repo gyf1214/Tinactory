@@ -413,6 +413,6 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public String toString() {
-        return "Machine[uuid=" + uuid + "]";
+        return getClass().getSimpleName() + "[" + blockEntity + ", uuid=" + uuid + "]";
     }
 }

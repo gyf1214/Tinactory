@@ -291,7 +291,7 @@ public class MultiblockMeta extends MachineMeta {
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
                 .blockEntity()
                 .child(this::multiblock)
-                .layout(layout)
+                .transform(machineType.equals("distillation") ? $ -> $ : $ -> $.layout(layout))
                 .appearanceBlock(getBlock(jo, "appearance"))
                 .transform(this::buildSpec)
                 .build()

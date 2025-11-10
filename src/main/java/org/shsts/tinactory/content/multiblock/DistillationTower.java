@@ -14,7 +14,7 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class DistillationTower extends Multiblock {
     private final List<Layout> layouts;
-    private int height = 0;
+    private int slots = 0;
 
     public DistillationTower(BlockEntity blockEntity, Builder<?> builder, List<Layout> layouts) {
         super(blockEntity, builder);
@@ -22,15 +22,15 @@ public class DistillationTower extends Multiblock {
     }
 
     public int getSlots() {
-        return height - 2;
+        return slots;
     }
 
     @Override
     protected void doCheckMultiblock(CheckContext ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
-            height = (int) ctx.getProperty("height");
-            setLayout(layouts.get(height - 3));
+            slots = (int) ctx.getProperty("height") - 2;
+            layout = layouts.get(slots - 1);
         }
     }
 
@@ -38,7 +38,7 @@ public class DistillationTower extends Multiblock {
     public CompoundTag serializeOnUpdate() {
         var tag = super.serializeOnUpdate();
         if (multiblockInterface != null) {
-            tag.putInt("height", height);
+            tag.putInt("slots", slots);
         }
         return tag;
     }
@@ -46,15 +46,16 @@ public class DistillationTower extends Multiblock {
     @Override
     protected void updateMultiblockInterface() {
         super.updateMultiblockInterface();
-        if (multiblockInterface != null) {
-            setLayout(layouts.get(height - 3));
+        if (multiblockInterface != null && layout != null) {
+            multiblockInterface.setContainerLayout(layout);
         }
     }
 
     @Override
     public void deserializeOnUpdate(CompoundTag tag) {
-        if (tag.contains("height", Tag.TAG_INT)) {
-            height = tag.getInt("height");
+        if (tag.contains("slots", Tag.TAG_INT)) {
+            slots = tag.getInt("slots");
+            layout = layouts.get(slots - 1);
         }
         super.deserializeOnUpdate(tag);
     }

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.machine;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -25,6 +26,7 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
     private final double burnSpeed;
     private final double burnHeat;
 
+    @Nullable
     private IItemCollection fuelPort;
     private long maxBurn = 0L;
     private int parallelBurn = 1;
@@ -58,6 +60,16 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
         setContainer(inputPort, outputPort);
     }
 
+    @Override
+    public void resetContainer() {
+        super.resetContainer();
+        fuelPort = null;
+    }
+
+    public boolean hasContainer() {
+        return fuelPort != null;
+    }
+
     protected abstract Optional<IMachine> machine();
 
     protected abstract double boilParallel();
@@ -78,7 +90,7 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
 
     @Override
     public void onPreWork() {
-        if (maxBurn > 0 || !needUpdate) {
+        if (fuelPort == null || maxBurn > 0 || !needUpdate) {
             return;
         }
 

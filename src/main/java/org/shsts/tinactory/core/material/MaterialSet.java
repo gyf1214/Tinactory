@@ -326,6 +326,6 @@ public class MaterialSet {
 
     @Override
     public String toString() {
-        return "MaterialSet{%s}".formatted(name);
+        return "MaterialSet[" + name + "]";
     }
 }

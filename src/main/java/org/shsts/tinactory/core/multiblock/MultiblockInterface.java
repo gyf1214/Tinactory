@@ -50,7 +50,12 @@ public class MultiblockInterface extends Machine {
     private static final String PARALLEL_KEY = "parallel";
 
     public final Voltage voltage;
+
     protected IFlexibleContainer container;
+    /**
+     * BlockEntity update may be before client load. If so, the update event needs to be delayed until the first tick.
+     * This variable is to distinguish these two scenarios.
+     */
     private boolean firstTick = false;
     @Nullable
     private BlockPos multiblockPos = null;
@@ -60,6 +65,8 @@ public class MultiblockInterface extends Machine {
     private IProcessor processor = null;
     @Nullable
     private IElectricMachine electricMachine = null;
+    @Nullable
+    private Layout layout = null;
 
     public MultiblockInterface(BlockEntity be) {
         super(be);
@@ -93,8 +100,25 @@ public class MultiblockInterface extends Machine {
         });
     }
 
-    public void setLayout(Layout val) {
-        container.setLayout(val);
+    public void setContainerLayout(Layout val) {
+        if (layout != val) {
+            LOGGER.debug("{}: set container layout={}", this, val);
+            container.setLayout(val);
+            layout = val;
+            if (multiblock != null) {
+                multiblock.onContainerReady();
+            }
+        }
+    }
+
+    public void resetContainerLayout() {
+        LOGGER.debug("{}: reset container layout", this);
+        container.resetLayout();
+        layout = null;
+    }
+
+    public boolean isContainerReady() {
+        return layout != null;
     }
 
     public void setMultiblock(Multiblock target) {
@@ -103,10 +127,12 @@ public class MultiblockInterface extends Machine {
         }
         LOGGER.debug("{} set multiblock = {}", this, target);
         multiblock = target;
-        processor = target.processor();
+        processor = target.processor().orElse(null);
         electricMachine = target.electric().orElse(null);
-        setLayout(target.getLayout());
-        setJoined(world(), true);
+        target.getLayout().ifPresent(this::setContainerLayout);
+        if (!world().isClientSide) {
+            setJoined(world(), true);
+        }
         onMultiblockUpdate();
     }
 
@@ -116,12 +142,14 @@ public class MultiblockInterface extends Machine {
         }
         LOGGER.debug("{} reset multiblock", this);
         var world = world();
-        updateWorkBlock(world, false);
-        setJoined(world, false);
+        if (!world.isClientSide) {
+            updateWorkBlock(world, false);
+            setJoined(world, false);
+        }
         multiblock = null;
         processor = null;
         electricMachine = null;
-        container.resetLayout();
+        resetContainerLayout();
         onMultiblockUpdate();
     }
 
@@ -154,12 +182,17 @@ public class MultiblockInterface extends Machine {
         return super.canPlayerInteract(player) && multiblock != null;
     }
 
+    /**
+     * Called only on Client during BlockEntity update.
+     * It is important to note that Multiblock and MultiblockInterface update are separate and their order is not
+     * guaranteed.
+     */
     private void updateMultiblock() {
         var world = world();
         assert world.isClientSide;
 
-        LOGGER.debug("update multiblock current={}, pos={}, firstTick={}",
-            multiblock, multiblockPos, firstTick);
+        LOGGER.debug("{}: update multiblock current={}, pos={}, firstTick={}",
+            this, multiblock, multiblockPos, firstTick);
 
         if (multiblockPos != null) {
             var be1 = world.getBlockEntity(multiblockPos);

@@ -20,9 +20,11 @@ import static org.shsts.tinactory.content.AllRecipes.BOILER;
 public class Boiler implements INBTSerializable<CompoundTag> {
     private final double baseHeat;
     private final double baseDecay;
-    private IFluidCollection input;
-    private IFluidCollection output;
 
+    @Nullable
+    private IFluidCollection input;
+    @Nullable
+    private IFluidCollection output;
     private double heat;
     // we don't serialize these two, so on reload, hiddenProgress is lost, but it's negligible.
     @Nullable
@@ -40,16 +42,25 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         this.output = output;
     }
 
+    public void resetContainer() {
+        input = null;
+        output = null;
+    }
+
     public double getHeat() {
         return heat;
     }
 
     public IFluidCollection getInput() {
+        assert input != null;
         return input;
     }
 
     private double absorbHeat(BoilerRecipe recipe, double parallel,
         BiConsumer<FluidStack, FluidStack> callback) {
+        if (input == null || output == null) {
+            return 0;
+        }
         if (lastRecipe != recipe) {
             lastRecipe = recipe;
             hiddenProgress = 0;

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.multiblock;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -17,10 +18,13 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.machine.FireBoiler;
+import org.shsts.tinactory.content.network.MachineBlock;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +33,12 @@ import java.util.Optional;
 import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.content.multiblock.FixedBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LargeBoiler extends Multiblock implements INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private final FireBoiler boiler;
     private final List<BlockPos> fireboxes = new ArrayList<>();
     private final LazyOptional<IProcessor> processorCap;
@@ -82,34 +87,60 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
         }
     }
 
+    private void setBoilerContainer(IMachine machine) {
+        LOGGER.debug("{}: set boiler container", this);
+        boiler.setContainer(machine.container().orElseThrow());
+    }
+
     @Override
-    protected void onRegister() {
-        super.onRegister();
-        assert multiblockInterface != null;
-        boiler.setContainer(multiblockInterface.container().orElseThrow());
+    protected void onInvalidate() {
+        super.onInvalidate();
+        boiler.resetContainer();
+        var world = blockEntity.getLevel();
+        if (world != null) {
+            setFireboxBlock(world, false);
+        }
     }
 
     @Override
     protected void updateMultiblockInterface() {
         super.updateMultiblockInterface();
         if (multiblockInterface != null) {
-            boiler.setContainer(multiblockInterface.container().orElseThrow());
+            if (multiblockInterface.isContainerReady()) {
+                setBoilerContainer(multiblockInterface);
+            }
+        } else {
+            boiler.resetContainer();
+        }
+    }
+
+    /**
+     * We don't need to call {@link #setBoilerContainer} in {@link #onRegister}. This is because
+     * {@link MultiblockInterface#setMultiblock} is always called before {@link #onRegister} on server.
+     */
+    @Override
+    public void onContainerReady() {
+        if (multiblockInterface != null && !boiler.hasContainer()) {
+            setBoilerContainer(multiblockInterface);
+        }
+    }
+
+    private void setFireboxBlock(Level world, boolean working) {
+        for (var pos : fireboxes) {
+            if (!world.isLoaded(pos)) {
+                continue;
+            }
+            var state1 = world.getBlockState(pos);
+            if (state1.hasProperty(FixedBlock.WORKING) && state1.getValue(FixedBlock.WORKING) != working) {
+                world.setBlock(pos, state1.setValue(FixedBlock.WORKING, working), 19);
+            }
         }
     }
 
     @Override
     public void setWorkBlock(Level world, BlockState state) {
         super.setWorkBlock(world, state);
-        var working = (boolean) state.getValue(WORKING);
-        for (var pos : fireboxes) {
-            if (!world.isLoaded(pos)) {
-                continue;
-            }
-            var state1 = world.getBlockState(pos);
-            if (state1.hasProperty(WORKING) && state1.getValue(WORKING) != working) {
-                world.setBlock(pos, state1.setValue(WORKING, true), 19);
-            }
-        }
+        setFireboxBlock(world, state.getValue(MachineBlock.WORKING));
     }
 
     @Override
