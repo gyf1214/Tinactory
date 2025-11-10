@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -59,7 +59,7 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseList;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineProcessor extends CapabilityProvider implements
-    IProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+    IMachineProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final BlockEntity blockEntity;
@@ -248,6 +248,7 @@ public class MachineProcessor extends CapabilityProvider implements
         }
     }
 
+    @Override
     public Optional<IProcessingObject> getInfo(int port, int index) {
         var list = infoMap.get(port);
         return index >= 0 && index < list.size() ? Optional.ofNullable(list.get(index)) :

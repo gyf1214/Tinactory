@@ -10,6 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.Tinactory.CORE;
@@ -28,7 +29,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
     private double heat;
     // we don't serialize these two, so on reload, hiddenProgress is lost, but it's negligible.
     @Nullable
-    private BoilerRecipe lastRecipe = null;
+    protected BoilerRecipe lastRecipe = null;
     private double hiddenProgress = 0;
 
     public Boiler(double baseHeat, double baseDecay) {
@@ -51,9 +52,8 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         return heat;
     }
 
-    public IFluidCollection getInput() {
-        assert input != null;
-        return input;
+    public Optional<IFluidCollection> getInput() {
+        return Optional.ofNullable(input);
     }
 
     private double absorbHeat(BoilerRecipe recipe, double parallel,
@@ -78,6 +78,11 @@ public class Boiler implements INBTSerializable<CompoundTag> {
 
         var recipeManager = CORE.recipeManager(world);
         var recipe = recipeManager.getRecipeFor(BOILER, this, world);
+        // hidden progress is lost if the recipe is interrupted
+        if (recipe.isEmpty()) {
+            lastRecipe = null;
+            hiddenProgress = 0;
+        }
         var absorb = (double) recipe.map($ -> absorbHeat($, parallel, callback)).orElse(0d);
 
         heat += heatInput - decay - absorb;

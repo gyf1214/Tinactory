@@ -8,11 +8,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 
@@ -105,29 +106,38 @@ public class DigitalInterfaceMenu extends MachineMenu {
     @Override
     protected void addFluidSlots() {}
 
-    private ItemStack getInfoItem(int port, int index) {
+    private Optional<IProcessingObject> getInfo(int port, int index) {
         return digitalInterface.processor()
-            .flatMap($ -> ((MachineProcessor) $).getInfo(port, index))
-            .flatMap(object -> {
-                if (object instanceof ProcessingIngredients.ItemIngredient ingredient) {
-                    return Optional.of(ingredient.stack());
-                } else if (object instanceof ProcessingResults.ItemResult result) {
-                    return Optional.of(result.stack);
-                }
-                return Optional.empty();
-            }).orElse(ItemStack.EMPTY);
+            .flatMap($ -> $ instanceof IMachineProcessor processor ?
+                processor.getInfo(port, index) : Optional.empty());
+    }
+
+    private ItemStack getInfoItem(int port, int index) {
+        return getInfo(port, index).flatMap(object -> {
+            if (object instanceof ProcessingIngredients.ItemIngredient ingredient) {
+                return Optional.of(ingredient.stack());
+            } else if (object instanceof ProcessingResults.ItemResult result) {
+                return Optional.of(result.stack);
+            }
+            return Optional.empty();
+        }).orElse(ItemStack.EMPTY);
     }
 
     private FluidStack getInfoFluid(int port, int index) {
-        return digitalInterface.processor()
-            .flatMap($ -> ((MachineProcessor) $).getInfo(port, index))
-            .flatMap(object -> {
-                if (object instanceof ProcessingIngredients.FluidIngredient ingredient) {
-                    return Optional.of(ingredient.fluid());
-                } else if (object instanceof ProcessingResults.FluidResult result) {
-                    return Optional.of(result.stack);
-                }
-                return Optional.empty();
-            }).orElse(FluidStack.EMPTY);
+        return getInfo(port, index).flatMap(object -> {
+            if (object instanceof ProcessingIngredients.FluidIngredient ingredient) {
+                return Optional.of(ingredient.fluid());
+            } else if (object instanceof ProcessingResults.FluidResult result) {
+                return Optional.of(result.stack);
+            }
+            return Optional.empty();
+        }).orElse(FluidStack.EMPTY);
+    }
+
+    public static class BoilerMenu extends DigitalInterfaceMenu {
+        public BoilerMenu(Properties properties) {
+            super(properties);
+            MachineMenu.BoilerMenu.addProgressSlots(this);
+        }
     }
 }

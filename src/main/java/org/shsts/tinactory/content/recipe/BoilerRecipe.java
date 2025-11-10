@@ -26,8 +26,8 @@ import java.util.function.BiConsumer;
 @MethodsReturnNonnullByDefault
 public class BoilerRecipe implements IRecipe<Boiler> {
     private final ResourceLocation loc;
-    private final FluidStack input;
-    private final FluidStack output;
+    public final FluidStack input;
+    public final FluidStack output;
     private final double minHeat;
     private final double optimalHeat;
     private final double maxHeat;
@@ -55,8 +55,9 @@ public class BoilerRecipe implements IRecipe<Boiler> {
 
     @Override
     public boolean matches(Boiler boiler, Level world) {
-        return boiler.getHeat() > minHeat &&
-            boiler.getInput().drain(input, true).getAmount() >= input.getAmount();
+        return boiler.getHeat() > minHeat && boiler.getInput()
+            .filter($ -> $.drain(input, true).getAmount() >= input.getAmount())
+            .isPresent();
     }
 
     public double getReaction(double heat, double parallel) {

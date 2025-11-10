@@ -164,19 +164,26 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static class BoilerMenu extends MachineMenu {
+        public static final String BURN_SYNC = "burn";
+        public static final String HEAT_SYNC = "heat";
+
         public BoilerMenu(Properties properties) {
             super(properties);
-            addSyncSlot("burn", () -> doublePacket(getProcessor(blockEntity())
-                .map(this::getBurn)
-                .orElse(0d)));
-            addSyncSlot("heat", () -> doublePacket(getProcessor(blockEntity())
-                .map($ -> ((Boiler) $).getHeat() / 600d)
-                .orElse(0d)));
+            addProgressSlots(this);
         }
 
-        private double getBurn(IProcessor processor) {
+        private static double getBurn(IProcessor processor) {
             var progress = processor.getProgress();
             return progress <= 0 ? 0 : 1 - progress;
+        }
+
+        public static void addProgressSlots(MachineMenu menu) {
+            menu.addSyncSlot(BURN_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
+                .map(BoilerMenu::getBurn)
+                .orElse(0d)));
+            menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
+                .map($ -> ((Boiler) $).getHeat() / 600d)
+                .orElse(0d)));
         }
     }
 
@@ -194,5 +201,9 @@ public class MachineMenu extends ProcessingMenu {
 
     public static ProcessingMenu digitalInterface(Properties properties) {
         return new DigitalInterfaceMenu(properties);
+    }
+
+    public static ProcessingMenu boilerDigitalInterface(Properties properties) {
+        return new DigitalInterfaceMenu.BoilerMenu(properties);
     }
 }

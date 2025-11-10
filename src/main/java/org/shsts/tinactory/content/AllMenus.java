@@ -72,6 +72,7 @@ public final class AllMenus {
     public static final IMenuType RESEARCH_BENCH;
     public static final IMenuType DIGITAL_INTERFACE;
     public static final IMenuType RESEARCH_DIGITAL_INTERFACE;
+    public static final IMenuType BOILER_DIGITAL_INTERFACE;
 
     static {
         CHANNEL
@@ -175,6 +176,11 @@ public final class AllMenus {
                 MachineMenu::digitalInterface)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ResearchBenchScreen::new)
+            .register();
+
+        BOILER_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/boiler_digital_interface",
+                MachineMenu::boilerDigitalInterface)
+            .screen(() -> () -> MachineScreen.Boiler::new)
             .register();
     }
 

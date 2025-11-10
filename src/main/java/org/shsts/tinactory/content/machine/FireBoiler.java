@@ -6,14 +6,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.metrics.MetricsManager;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,14 +26,14 @@ import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TI
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class FireBoiler extends Boiler implements IProcessor {
+public abstract class FireBoiler extends Boiler implements IMachineProcessor {
     private final double burnSpeed;
     private final double burnHeat;
 
     @Nullable
     private IItemCollection fuelPort;
     private long maxBurn = 0L;
-    private int parallelBurn = 1;
+    private ItemStack burningItem = ItemStack.EMPTY;
     private long currentBurn = 0L;
     private boolean needUpdate = true;
     private boolean stopped = false;
@@ -106,6 +110,7 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
         var machine1 = machine.get();
 
         var maxParallel = burnParallel();
+        burningItem = ItemStack.EMPTY;
         for (var stack : fuelPort.getAllItems()) {
             if (ForgeHooks.getBurnTime(stack, null) > 0) {
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
@@ -113,7 +118,7 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
                 if (!extracted.isEmpty()) {
                     MetricsManager.reportItem("item_consumed", machine1, extracted);
                     maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;
-                    parallelBurn = extracted.getCount();
+                    burningItem = extracted;
                     break;
                 }
             }
@@ -138,7 +143,7 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
                 maxBurn = 0;
                 needUpdate = true;
             }
-            heatInput = burnHeat * parallelBurn;
+            heatInput = burnHeat * burningItem.getCount();
         }
 
         var world = machine1.world();
@@ -160,11 +165,23 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
     }
 
     @Override
+    public Optional<IProcessingObject> getInfo(int port, int index) {
+        return switch (port) {
+            case 0 -> Optional.of(new ProcessingIngredients.ItemIngredient(burningItem));
+            case 1 -> lastRecipe == null ? Optional.empty() :
+                Optional.of(new ProcessingIngredients.FluidIngredient(lastRecipe.input));
+            case 2 -> lastRecipe == null ? Optional.empty() :
+                Optional.of(new ProcessingResults.FluidResult(1d, lastRecipe.output));
+            default -> Optional.empty();
+        };
+    }
+
+    @Override
     public CompoundTag serializeNBT() {
         var tag = super.serializeNBT();
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
-        tag.putInt("parallelBurn", parallelBurn);
+        tag.put("burningItem", burningItem.serializeNBT());
         return tag;
     }
 
@@ -173,6 +190,6 @@ public abstract class FireBoiler extends Boiler implements IProcessor {
         super.deserializeNBT(tag);
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
-        parallelBurn = tag.getInt("parallelBurn");
+        burningItem = ItemStack.of(tag.getCompound("burningItem"));
     }
 }
