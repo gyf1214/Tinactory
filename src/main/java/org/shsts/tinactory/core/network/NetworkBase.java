@@ -22,7 +22,7 @@ import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NetworkBase {
+public abstract class NetworkBase {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Level world;
@@ -158,6 +158,8 @@ public class NetworkBase {
             world.dimension(), pos, subnet);
     }
 
+    protected abstract boolean comparePriority(NetworkBase another);
+
     private boolean connectNextBlock() {
         var nextPos = bfsContext.next();
         if (nextPos.isEmpty()) {
@@ -166,8 +168,15 @@ public class NetworkBase {
         }
         var pos = nextPos.get();
         if (manager.hasNetworkAtPos(pos)) {
-            LOGGER.debug("{}: invalidate conflict network at {}", this, pos);
-            manager.invalidatePos(pos);
+            var network1 = manager.getNetworkAtPos(pos).orElseThrow();
+            if (comparePriority(network1)) {
+                LOGGER.debug("{}: invalidate conflict network at {}", this, pos);
+                network1.invalidate();
+            } else {
+                LOGGER.debug("{}: invalidate myself because of conflict at {}", this, pos);
+                invalidate();
+                return false;
+            }
         }
         manager.putNetworkAtPos(pos, this);
         var info = bfsContext.visited.get(pos);

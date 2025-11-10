@@ -46,6 +46,11 @@ public class Network extends NetworkBase implements INetwork {
     }
 
     @Override
+    protected boolean comparePriority(NetworkBase another) {
+        return uuid.compareTo(((Network) another).uuid) < 0;
+    }
+
+    @Override
     public ITeamProfile owner() {
         return team;
     }
