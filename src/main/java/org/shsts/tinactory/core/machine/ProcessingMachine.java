@@ -118,8 +118,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     private void setFilters(ProcessingRecipe recipe, IContainer container) {
+        // TODO: do not mark output filter for now
         var skipInputs = recipe instanceof MarkerRecipe && recipe.inputs.isEmpty();
-        var skipOutputs = recipe instanceof MarkerRecipe && recipe.outputs.isEmpty();
 
         var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
         var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
@@ -143,30 +143,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             }
         }
 
-        if (!skipOutputs) {
-            for (var output : recipe.outputs) {
-                var idx = output.port();
-                var result = output.result();
-                if (!container.hasPort(idx)) {
-                    continue;
-                }
-                if (result instanceof ProcessingResults.ItemResult item) {
-                    var stack1 = item.stack;
-                    itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
-                } else if (result instanceof ProcessingResults.FluidResult fluid) {
-                    var stack1 = fluid.stack;
-                    fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
-                }
-            }
-        }
-
         for (var i = 0; i < container.portSize(); i++) {
             if (!container.hasPort(i)) {
                 continue;
             }
             var dir = container.portDirection(i);
-            if ((skipInputs && dir == PortDirection.INPUT) ||
-                (skipOutputs && dir == PortDirection.OUTPUT)) {
+            if ((skipInputs && dir == PortDirection.INPUT) || dir == PortDirection.OUTPUT) {
                 continue;
             }
             var port = container.getPort(i, ContainerAccess.INTERNAL);
