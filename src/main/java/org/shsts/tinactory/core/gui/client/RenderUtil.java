@@ -6,21 +6,32 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
@@ -31,6 +42,7 @@ import org.shsts.tinactory.core.util.ClientUtil;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
@@ -190,6 +202,53 @@ public final class RenderUtil {
     public static void popModelViewStack(PoseStack poseStack) {
         poseStack.popPose();
         RenderSystem.applyModelViewMatrix();
+    }
+
+    /**
+     * Wrap blockRenderer with push and pop pose.
+     */
+    public static void renderBlockInWorld(ModelBlockRenderer renderer, Level world, BakedModel model,
+        BlockState blockState, BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
+        boolean checkSides, Random random, long seed, int packedOverlay, IModelData modelData) {
+        poseStack.pushPose();
+        renderer.tesselateBlock(world, model, blockState, pos, poseStack, vertexConsumer,
+            checkSides, random, seed, packedOverlay, modelData);
+        poseStack.popPose();
+    }
+
+    private static void renderBlockQuad(BakedQuad quad, BlockColors blockColors, BlockState blockState,
+        PoseStack.Pose pose, VertexConsumer vertexConsumer, int packedLight, int packedOverlay) {
+        var color = quad.isTinted() ? blockColors.getColor(blockState, null, null, quad.getTintIndex()) :
+            0xFFFFFFFF;
+        var r = (float) (color >> 16 & 255) / 255.0F;
+        var g = (float) (color >> 8 & 255) / 255.0F;
+        var b = (float) (color & 255) / 255.0F;
+        vertexConsumer.putBulkData(pose, quad, r, g, b, packedLight, packedOverlay);
+    }
+
+    /**
+     * Render a block model without regard to a world.
+     */
+    public static void renderBlockModel(BakedModel model, BlockState blockState,
+        PoseStack poseStack, VertexConsumer vertexConsumer, Random random,
+        int packedLight, int packedOverlay) {
+        // modelData requires a world, we just ignore that.
+        var modelData = EmptyModelData.INSTANCE;
+        var blockColors = Minecraft.getInstance().getBlockColors();
+        var pose = poseStack.last();
+
+        // we don't consider cull
+        for (var dir : Direction.values()) {
+            var quads = model.getQuads(blockState, dir, random, modelData);
+            for (var quad : quads) {
+                renderBlockQuad(quad, blockColors, blockState, pose, vertexConsumer,
+                    packedLight, packedOverlay);
+            }
+        }
+        for (var quad : model.getQuads(blockState, null, random, modelData)) {
+            renderBlockQuad(quad, blockColors, blockState, pose, vertexConsumer,
+                packedLight, packedOverlay);
+        }
     }
 
     public static void renderItem(ItemStack stack, int x, int y) {
