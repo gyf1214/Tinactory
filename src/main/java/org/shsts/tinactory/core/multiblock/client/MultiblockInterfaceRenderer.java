@@ -52,6 +52,7 @@ public class MultiblockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
             EmptyModelData.INSTANCE);
         var vertexConsumer = bufferSource.getBuffer(RenderType.cutoutMipped());
 
+        poseStack.pushPose();
         if (appearanceBlock.isPresent()) {
             var appearanceModel = blockRenderDispatcher.getBlockModel(appearanceBlock.get());
             var overlayModel = blockRenderDispatcher.getBlockModel(blockState);
@@ -67,5 +68,6 @@ public class MultiblockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
             blockRenderer.tesselateBlock(world, model, blockState, pos,
                 poseStack, vertexConsumer, true, random, seed, packedOverlay, modelData);
         }
+        poseStack.popPose();
     }
 }
