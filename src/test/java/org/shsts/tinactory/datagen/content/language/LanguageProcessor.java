@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.content;
+package org.shsts.tinactory.datagen.content.language;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

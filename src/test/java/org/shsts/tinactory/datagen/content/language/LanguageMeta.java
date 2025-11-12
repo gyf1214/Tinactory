@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.content;
+package org.shsts.tinactory.datagen.content.language;
 
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -17,7 +17,7 @@ import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageMeta extends MetaConsumer {
-    protected LanguageMeta() {
+    public LanguageMeta() {
         super("Language");
     }
 

@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.HashCache;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
-import org.shsts.tinactory.datagen.content.LanguageProcessor;
+import org.shsts.tinactory.datagen.content.language.LanguageProcessor;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.io.IOException;
