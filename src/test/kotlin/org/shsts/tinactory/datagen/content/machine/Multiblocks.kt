@@ -88,6 +88,7 @@ object Multiblocks {
                         .cubeAll(ctx.id(), ic2("blocks/wiring/storage/mfe_bottomtop"))
                     ctx.provider().simpleBlock(ctx.`object`(), model)
                 }
+                noDrop()
             }
 
             coil("cupronickel")
