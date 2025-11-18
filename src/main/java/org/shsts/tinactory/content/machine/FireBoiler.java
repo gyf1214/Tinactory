@@ -100,6 +100,7 @@ public abstract class FireBoiler extends Boiler implements IMachineProcessor {
 
         currentBurn = 0;
         if (stopped) {
+            stopped = false;
             return;
         }
 
@@ -152,7 +153,6 @@ public abstract class FireBoiler extends Boiler implements IMachineProcessor {
             MetricsManager.reportFluid("fluid_produced", machine1, output);
         });
 
-        stopped = false;
         setChanged();
     }
 

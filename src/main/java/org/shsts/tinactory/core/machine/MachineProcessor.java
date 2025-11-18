@@ -275,6 +275,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
         if (stopped) {
             workProgress = 0;
+            stopped = false;
             return;
         }
 
@@ -321,7 +322,6 @@ public class MachineProcessor extends CapabilityProvider implements
             infoMap.clear();
             needUpdate = true;
         }
-        stopped = false;
         blockEntity.setChanged();
     }
 

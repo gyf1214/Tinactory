@@ -39,7 +39,6 @@ import static org.shsts.tinactory.content.AllEvents.CONNECT;
 import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.content.AllNetworks.POST_WORK_SCHEDULING;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
@@ -221,7 +220,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (needRevalidate) {
             validateConfigs();
         }
-        if (noValidSlot || stopped) {
+        if (stopped) {
+            stopped = false;
+            return;
+        }
+        if (noValidSlot) {
             return;
         }
         if (tick < workerInterval) {
@@ -265,10 +268,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private void onPostWork(Level world, INetwork network) {
-        stopped = false;
-    }
-
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CONNECT.get(), this::onConnect);
@@ -278,7 +277,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
         builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
-        builder.add(POST_WORK_SCHEDULING.get(), this::onPostWork);
     }
 
     @Override
