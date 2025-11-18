@@ -258,7 +258,7 @@ object MiscMaterials {
                 output("flint", "primary", rate = 0.35)
                 output(Items.SAND, rate = 0.65)
                 voltage(Voltage.LV)
-                workTicks(400)
+                workTicks(64)
             }
         }
     }

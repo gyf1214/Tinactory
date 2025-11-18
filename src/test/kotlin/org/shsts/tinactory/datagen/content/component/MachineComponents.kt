@@ -214,7 +214,7 @@ object MachineComponents {
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, sub, plates)
-            voltage(v)
+            voltage(Voltage.fromRank(v.rank - 1))
         }
     }
 
