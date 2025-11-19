@@ -1,0 +1,262 @@
+{
+	id: "3B5374D34DFEC6AF"
+	group: ""
+	order_index: 2
+	filename: "3B5374D34DFEC6AF"
+	title: "寻迹深层之脉动"
+	icon: "minecraft:raw_iron"
+	subtitle: ["用科研解锁多种矿脉，让矿石分析仪从普通石头中读出大地的秘密"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			title: "褐铁矿脉"
+			icon: "tinactory:material/raw/limonite"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "研究圆石矿脉科技，解锁褐铁矿脉"
+			description: [
+				"褐铁矿脉可以得到褐铁矿、带状铁矿和硅镁石。这也是研究圆石矿脉科技能解锁的第一个矿脉。"
+				""
+				"你需要超低压科研和矿石分析仪。"
+			]
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
+			size: 2.0d
+			id: "6CBAE7AF9D17A28D"
+			tasks: [
+				{
+					id: "24C335B04D01BAF9"
+					type: "item"
+					item: "tinactory:material/raw/limonite"
+				}
+				{
+					id: "3513D11929FD3F9E"
+					type: "item"
+					item: "tinactory:material/raw/banded_iron"
+				}
+				{
+					id: "65EB78F293BEB670"
+					type: "item"
+					item: "tinactory:material/raw/garnierite"
+				}
+			]
+		}
+		{
+			title: "锡矿脉"
+			x: 2.0d
+			y: 0.0d
+			subtitle: "解锁锡矿脉"
+			description: ["锡矿脉可以得到锡和锡石。"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "38AD236D90FE95DD"
+			tasks: [
+				{
+					id: "5F7E8CC3336E56D5"
+					type: "item"
+					item: "tinactory:material/raw/tin"
+				}
+				{
+					id: "3DE6AEBA00EAFBAB"
+					type: "item"
+					item: "tinactory:material/raw/cassiterite"
+				}
+			]
+		}
+		{
+			title: "红石矿脉"
+			icon: "tinactory:material/raw/redstone"
+			x: 0.0d
+			y: 2.0d
+			subtitle: "解锁红石矿脉"
+			description: ["红石矿脉可以得到红石、红宝石和朱砂。"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "45183BF83F5A72B0"
+			tasks: [
+				{
+					id: "75511E24A6827A6E"
+					type: "item"
+					item: "tinactory:material/raw/redstone"
+				}
+				{
+					id: "36556D8D2AAF0FEF"
+					type: "item"
+					item: "tinactory:material/raw/ruby"
+				}
+				{
+					id: "45A36342CB243025"
+					type: "item"
+					item: "tinactory:material/raw/cinnabar"
+				}
+			]
+		}
+		{
+			title: "煤矿脉"
+			x: -2.0d
+			y: 0.0d
+			subtitle: "解锁煤矿脉"
+			description: ["煤矿脉可以得到煤。"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "2CF3758FBEB5EA41"
+			tasks: [{
+				id: "16854437B5D5BD30"
+				type: "item"
+				item: "tinactory:material/raw/coal"
+			}]
+		}
+		{
+			title: "磁铁矿脉"
+			icon: "tinactory:material/raw/magnetite"
+			x: 8.0d
+			y: 0.0d
+			subtitle: "研究深板岩矿脉科技，解锁磁铁矿脉"
+			description: [
+				"磁铁矿脉可以得到磁铁矿和金。这也是研究深板岩矿脉科技能解锁的第一个矿脉。"
+				""
+				"你需要低压科研和矿石分析仪。"
+			]
+			dependencies: [
+				"3C6F611AD202962D"
+				"0A1EE54892C444A8"
+				"079709D94E4A69A5"
+			]
+			size: 2.0d
+			id: "3CD314088812FBB4"
+			tasks: [
+				{
+					id: "18AAF579D5B448FE"
+					type: "item"
+					item: "tinactory:material/raw/magnetite"
+				}
+				{
+					id: "71F46C460CD98051"
+					type: "item"
+					item: "minecraft:raw_gold"
+				}
+			]
+		}
+		{
+			title: "石墨矿脉"
+			icon: "tinactory:material/raw/graphite"
+			x: 6.0d
+			y: 0.0d
+			subtitle: "解锁石墨矿脉"
+			description: ["石墨矿脉可以得到石墨和钻石。"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "7F86524AF19D5E4C"
+			tasks: [
+				{
+					id: "7FD4FDFAC01C7B6F"
+					type: "item"
+					item: "tinactory:material/raw/graphite"
+				}
+				{
+					id: "2848E6562DDF83D6"
+					type: "item"
+					item: "tinactory:material/raw/diamond"
+				}
+			]
+		}
+		{
+			title: "铝土矿脉"
+			icon: "tinactory:material/raw/bauxite"
+			x: 6.5d
+			y: 2.0d
+			subtitle: "解锁铝土矿脉"
+			description: ["铝土矿脉可以得到铝土矿和钛铁矿。"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "681E37422C8CADA2"
+			tasks: [
+				{
+					id: "52106B157F631AE5"
+					type: "item"
+					item: "tinactory:material/raw/bauxite"
+				}
+				{
+					id: "02D3278B3C2BA43B"
+					type: "item"
+					item: "tinactory:material/raw/ilmenite"
+				}
+			]
+		}
+		{
+			title: "硫矿脉"
+			icon: "tinactory:material/raw/galena"
+			x: 10.0d
+			y: 0.0d
+			subtitle: "解锁硫矿脉"
+			description: ["硫矿脉可以得到闪锌矿、方铅矿和银。"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "190125F22C1A5EE0"
+			tasks: [
+				{
+					id: "02ACFA9EA5FF5624"
+					type: "item"
+					item: "tinactory:material/raw/galena"
+				}
+				{
+					id: "12A3073920F4F5E4"
+					type: "item"
+					item: "tinactory:material/raw/sphalerite"
+				}
+				{
+					id: "78079F160BF5B442"
+					type: "item"
+					item: "tinactory:material/raw/silver"
+				}
+			]
+		}
+		{
+			title: "宝石矿脉"
+			icon: "tinactory:material/raw/emerald"
+			x: 8.0d
+			y: -2.0d
+			subtitle: "解锁宝石矿脉"
+			description: ["宝石矿脉可以得到绿宝石和蓝宝石。"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "2A3A2EF77EBB6998"
+			tasks: [
+				{
+					id: "51B31F3D73ADA959"
+					type: "item"
+					item: "tinactory:material/raw/emerald"
+				}
+				{
+					id: "0E5A2F702F2E4F1B"
+					type: "item"
+					item: "tinactory:material/raw/sapphire"
+				}
+			]
+		}
+		{
+			title: "石油矿脉"
+			icon: "tinactory:material/raw_fluid/natural_gas"
+			x: 9.5d
+			y: 2.0d
+			subtitle: "解锁石油矿脉"
+			description: ["石油矿脉可以得到天然气、轻原油和重原油。"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "29D02376CFF086C1"
+			tasks: [
+				{
+					id: "7FDA06CAE94E5C58"
+					type: "item"
+					item: "tinactory:material/raw_fluid/natural_gas"
+				}
+				{
+					id: "3D19EA7A300F4B53"
+					type: "item"
+					item: "tinactory:material/raw_fluid/light_oil"
+				}
+				{
+					id: "1B36F3CE0A998E8C"
+					type: "item"
+					item: "tinactory:material/raw_fluid/heavy_oil"
+				}
+			]
+		}
+	]
+	quest_links: [ ]
+}

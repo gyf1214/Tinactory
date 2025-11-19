@@ -1,0 +1,820 @@
+{
+	id: "4E10B8DB9F33643B"
+	group: ""
+	order_index: 0
+	filename: "4E10B8DB9F33643B"
+	title: "从零开始的工业梦"
+	icon: "minecraft:oak_sapling"
+	subtitle: ["你孤身站在一座漂浮于虚空的小岛上，脚下是有限的方块，面前是无限的可能。"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			title: "要致富先种树"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "开始你的工业征程"
+			description: [
+				"欢迎来到 Tinactory！"
+				"这里没有广阔的大陆，只有你、一个黑曜石平台，以及一箱起始物资。别担心，工业帝国都是从几根木头起步的。"
+				""
+				"打开你的起始箱，取出树苗，把它种在岛上唯一平坦的角落。等它长大后，用手中的工具砍下第一根木头。木头是你通往机械化的第一步：它能做成木板、工具、燃料，也能为未来的机器提供支撑。"
+				""
+				"当你第一次合成出木板时，你就正式开始了你的工业之旅。从现在起，虚空不再空无一物——它将充满你的创造力与机器的轰鸣。"
+			]
+			size: 2.0d
+			id: "1E3576759FC89A54"
+			tasks: [{
+				id: "53A27D5233E299A8"
+				type: "item"
+				item: "minecraft:oak_log"
+			}]
+		}
+		{
+			icon: "minecraft:creeper_head"
+			x: -2.0d
+			y: 0.0d
+			shape: "pentagon"
+			subtitle: "学会创建或加入一个队伍"
+			description: [
+				"工业化的道路虽然伟大，但一个人造梦终究太累。Tinactory拥有自己的组队系统，让你能与伙伴共享机器、科技与成果。"
+				""
+				"如果你是在单机世界或想自己单独玩，也没问题：按下 ～（波浪号）键 打开科研面板，输入任意名称即可创建一个单人队伍。这能让你的科技与机器绑定到队伍。"
+				""
+				"在服务器上，你还可以使用指令："
+				""
+				"/tinactory addPlayerToTeam <玩家名>"
+				""
+				"来邀请其他玩家加入你的队伍。"
+				"如果服务器开启了出生点管理功能，这两个操作还会自动创建空岛并设置出生点，方便团队合作开荒。"
+				""
+				"请注意：由于FTBQuests无法直接使用原版队伍系统，Tinactory的队伍不会自动同步任务进度。"
+				"若你想和队友共享任务进度，请记得在FTBTeams里创建一个同名队伍。"
+			]
+			id: "5CA02C19E0D43DB9"
+			tasks: [{
+				id: "4919C4842FF1F786"
+				type: "checkmark"
+				title: "一个人太孤单了"
+			}]
+		}
+		{
+			title: "石头从虚空中诞生"
+			icon: "minecraft:cobblestone"
+			x: 0.0d
+			y: 2.0d
+			subtitle: "制作原始刷石机，获得第一块圆石"
+			description: [
+				"木头已经不再满足你对工业的野心。是时候从虚空中召唤更坚固的材料——圆石。"
+				""
+				"制作一台原始刷石机。这台机器不需要复杂的动力，只需一点木头与智慧，就能从虚空中“挤”出圆石。"
+			]
+			dependencies: ["1E3576759FC89A54"]
+			id: "11E5FCB1DF1477FD"
+			tasks: [
+				{
+					id: "0E15862A4CF7D517"
+					type: "item"
+					item: "tinactory:primitive/stone_generator"
+				}
+				{
+					id: "69098CD79DB53833"
+					type: "item"
+					item: "minecraft:cobblestone"
+				}
+			]
+		}
+		{
+			title: "矿物的起点"
+			icon: "tinactory:material/raw/chalcopyrite"
+			x: -1.5d
+			y: 3.5d
+			subtitle: "分析圆石，清洗矿物"
+			description: [
+				"有了圆石，你就能开始探索其中隐藏的矿物。制作原始矿石分析仪和原始矿石清洗仪，开启你的采矿科技时代。"
+				""
+				"将圆石投入分析仪，有概率发现其中的矿物结晶。别惊讶——这是Tinactory的核心机制之一。在这个阶段，你只能分析出铁和铜，但随着科技进步，新的矿物将不断出现。"
+				""
+				"分析得到的矿石原石还不能直接使用，需要清洗。制作原始矿石清洗仪并给它供水，就能得到干净的矿石样本。"
+				""
+				"提示：利用起始箱里的两桶水建立一个无限水源，保证你的清洗仪源源不断运作。"
+			]
+			dependencies: ["11E5FCB1DF1477FD"]
+			id: "70A3BD39E2350A91"
+			tasks: [
+				{
+					id: "473E482E21997F8C"
+					type: "item"
+					item: "tinactory:primitive/ore_analyzer"
+				}
+				{
+					id: "51D2A9E4E3F8041A"
+					type: "item"
+					item: "tinactory:primitive/ore_washer"
+				}
+			]
+		}
+		{
+			title: "敲敲打打的开始"
+			icon: "tinactory:primitive/workbench"
+			x: 1.5d
+			y: 3.5d
+			subtitle: "制作工作站、石锤与燧石磨"
+			description: [
+				"你已经不再是只靠双手劳作的原始人了。要让工业真正运转起来，就得学会使用工具和工作站。"
+				""
+				"首先，制作一个工作站。"
+				"它看起来像是强化版的工作台，但用途更广——某些配方需要特定的工具才能完成，并会消耗工具的耐久。将工具放在工作站下方的工具槽中，就能用于合成。"
+				"当然，如果你只是想做些普通物品，它也能像原版工作台一样使用。"
+				""
+				"接着，制作两件最开始的工具："
+				"石锤：用于粉碎矿石，是前期处理矿石的关键工具。"
+				"燧石磨：用来将部分材料研磨成粉末，为后续的冶炼工艺打下基础。"
+				""
+				"小贴士："
+				"如果在工作站中放入了多种工具，部分配方可能会出现冲突，导致无法显示想要的结果。只要把暂时不用的工具取出，就能顺利进行合成。"
+			]
+			dependencies: ["11E5FCB1DF1477FD"]
+			id: "01653617B5B3450E"
+			tasks: [
+				{
+					id: "7B0E27B01D1CB7C4"
+					type: "item"
+					item: "tinactory:primitive/workbench"
+				}
+				{
+					id: "7D1236B774D8D04A"
+					type: "item"
+					item: {
+						id: "tinactory:tool/hammer/stone"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "49C9B3755FBF5F8B"
+					type: "item"
+					item: {
+						id: "tinactory:tool/mortar/flint"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+			]
+		}
+		{
+			title: "金属的诞生"
+			icon: "minecraft:iron_ingot"
+			x: 0.0d
+			y: 5.0d
+			subtitle: "从圆石中提炼出铁与铜"
+			description: [
+				"终于到了真正的金属时代。利用你手中的工具与机器，将石头变成闪闪发光的金属吧。"
+				""
+				"通过矿石分析仪，你有概率从圆石中获得黄铁矿矿石与硫铁铜矿石。这些原矿并不能直接使用，需要经过多道工序提炼。"
+				""
+				"首先，用锤连续粉碎两次矿石，将其转化为细碎的粉末。然后把粉末放入矿石清洗仪中，用水清洗杂质，就能得到铁粉和铜粉。"
+				"最后，将这些粉放入熔炉中烧炼，得到属于你的第一块铁锭与铜锭。"
+				""
+				"这一步标志着你正式迈入金属时代，从此，机械的心脏开始跳动。"
+			]
+			dependencies: [
+				"70A3BD39E2350A91"
+				"01653617B5B3450E"
+			]
+			size: 2.0d
+			id: "34D0991E0CCF5EEC"
+			tasks: [
+				{
+					id: "75033FD840BE757C"
+					type: "item"
+					item: "minecraft:iron_ingot"
+				}
+				{
+					id: "62EC3912A8455EE5"
+					type: "item"
+					item: "minecraft:copper_ingot"
+				}
+			]
+		}
+		{
+			title: "层层锻烧"
+			x: 0.0d
+			y: 7.0d
+			subtitle: "提炼锻铁"
+			description: [
+				"是时候制造出你的第一块锻铁了——这是你能亲手打造全套工具的关键材料，也是迈向精密机械的重要一步。"
+				"当前阶段，获得锻铁的唯一方法是通过锻烧铁粒。不过这个过程并不简单，你需要耐心完成一系列步骤："
+				""
+				"1. 研磨铁锭，得到铁粉。"
+				"2. 将铁粉分成小堆铁粉。"
+				"3. 烧炼小堆铁粉，得到铁粒。"
+				"4. 再烧一次铁粒，得到锻铁粒。"
+				"5. 研磨锻铁粒，得到小堆锻铁粉。"
+				"6. 将小堆锻铁粉重新组合成锻铁粉。"
+				"7. 最后再烧炼一次，得到真正的锻铁。"
+				""
+				"好在目前锻铁只用于制作工具，不需要大量消耗。但正是这些工具，将带你走向更高的电压与更复杂的机械时代。"
+			]
+			dependencies: ["34D0991E0CCF5EEC"]
+			id: "1E5E7333A9D920E1"
+			tasks: [{
+				id: "5F139379566C7F48"
+				type: "item"
+				item: "tinactory:material/ingot/wrought_iron"
+			}]
+		}
+		{
+			title: "锻铁工具"
+			icon: {
+				id: "tinactory:tool/file/wrought_iron"
+				Count: 1b
+				tag: {
+					Damage: 0
+				}
+			}
+			x: 2.0d
+			y: 7.0d
+			subtitle: "打造你的第一套金属工具"
+			description: [
+				"现在，你拥有了锻铁——是时候制作全套锻铁工具了。"
+				""
+				"这些工具将成为你加工金属的好帮手，虽然你不需要一次性制作所有工具，但建议逐步完成，因为后续机器的制作会依赖它们。"
+				""
+				"可制作的工具包括：锉刀、锤、磨、锯、螺丝刀、剪线钳、扳手。"
+				"使用这些工具，你将能够更高效地处理矿物和金属零件，为工业发展奠定坚实基础。"
+			]
+			dependencies: ["1E5E7333A9D920E1"]
+			id: "312DEB1E14FF9588"
+			tasks: [
+				{
+					id: "6B9ABB6522F87014"
+					type: "item"
+					item: {
+						id: "tinactory:tool/file/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "52F16B3DAD9ECD3F"
+					type: "item"
+					item: {
+						id: "tinactory:tool/hammer/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "128A69EB13C648C0"
+					type: "item"
+					item: {
+						id: "tinactory:tool/mortar/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "028A57CB20BD7787"
+					type: "item"
+					item: {
+						id: "tinactory:tool/saw/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "438E65747A63A25D"
+					type: "item"
+					item: {
+						id: "tinactory:tool/screwdriver/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "70F6DC1A66FD0E07"
+					type: "item"
+					item: {
+						id: "tinactory:tool/wire_cutter/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+				{
+					id: "4D4FFAEBAE478796"
+					type: "item"
+					item: {
+						id: "tinactory:tool/wrench/wrought_iron"
+						Count: 1b
+						tag: {
+							Damage: 0
+						}
+					}
+				}
+			]
+		}
+		{
+			title: "超低压基础组件"
+			icon: "tinactory:component/ulv/machine_hull"
+			x: 0.0d
+			y: 9.0d
+			subtitle: "制作超低压机械外壳、线缆与真空管"
+			description: [
+				"你即将进入超低压（ULV）阶段——这是迈向电气化之前的重要过渡期。在这个阶段，许多材料的加工仍然依赖你的锻铁工具。"
+				""
+				"在Tinactory中，每个电压等级都会需要三类核心组件：机械外壳、线缆、电路。不同电压等级所使用的材料不同，但功能相似。"
+				""
+				"其中，超低压机械外壳与线缆都需要使用铁来加工，它们是你电气化机器的第一层结构。而超低压电路则暂时依赖真空管来完成控制功能。"
+				""
+				"随着科技提升，真空管会逐渐被更先进的电路替代，但现在，它就是你开启工业电气时代的钥匙。"
+			]
+			dependencies: ["1E5E7333A9D920E1"]
+			size: 2.0d
+			id: "0B73A7F9E0645551"
+			tasks: [
+				{
+					id: "6E8B21C6AA52C1D7"
+					type: "item"
+					item: "tinactory:component/ulv/machine_hull"
+				}
+				{
+					id: "28CFC6971BD56024"
+					type: "item"
+					item: "tinactory:network/ulv/cable"
+				}
+				{
+					id: "5FE9F4CB6CA9994E"
+					type: "item"
+					item: "tinactory:circuit/vacuum_tube"
+				}
+			]
+		}
+		{
+			title: "蒸汽动力"
+			icon: "tinactory:machine/ulv/steam_turbine"
+			x: 2.0d
+			y: 9.0d
+			subtitle: "使用蒸汽锅炉与蒸汽涡轮发电"
+			description: [
+				"要让你的工厂真正运转起来，就必须拥有自己的电力来源。现在，你将制作小型蒸汽锅炉和超低压蒸汽涡轮，开启属于你的第一条发电线。"
+				""
+				"给蒸汽锅炉投入燃料和水，锅炉就会开始加热并产生蒸汽。注意锅炉有温度，如果温度过高将无法继续产生蒸汽，因此你需要持续不断为锅炉补充水来保持适宜温度。"
+				""
+				"将锅炉产生的蒸汽导入超低压蒸汽涡轮，涡轮就会开始工作并输出电力。"
+				"传输蒸汽有两种方式："
+				"制作一个铁流体储罐，手动舀取与倒入蒸汽。"
+				"使用物流工作站实现自动化蒸汽传输（在另一个任务中有详细介绍）。"
+				""
+			]
+			dependencies: ["0B73A7F9E0645551"]
+			id: "16BF47CD29F96F57"
+			tasks: [
+				{
+					id: "2AF36D71FC53DEB3"
+					type: "item"
+					item: "tinactory:machine/boiler/low"
+				}
+				{
+					id: "6F8DA5F7379D5997"
+					type: "item"
+					item: "tinactory:machine/ulv/steam_turbine"
+				}
+			]
+		}
+		{
+			title: "组装未来"
+			x: 0.0d
+			y: 11.0d
+			subtitle: "制作超低压组装机，迈入机械制造核心"
+			description: [
+				"现在，请制作你的第一台关键设备：超低压组装机。这台机器是整个工厂系统的核心，它能自动完成许多复杂的合成，是制作绝大多数组件与机器所必需的设备。"
+				""
+				"在超低压阶段，虽然还有很多组件和机器可以在工作站中用工具完成合成，但这只是暂时的。进入更高电压等级后，所有组件与机器几乎都必须使用组装机才能制造。"
+				""
+				"组装机将成为你迈向自动化与规模化生产的第一步。越早熟悉它的运作方式，你的工厂就能越快走向高效运转。"
+			]
+			dependencies: ["0B73A7F9E0645551"]
+			id: "6F6EE8943B6B06BC"
+			tasks: [{
+				id: "2165D6BBA2D46650"
+				type: "item"
+				item: "tinactory:machine/ulv/assembler"
+			}]
+		}
+		{
+			title: "漫长科研路"
+			icon: "tinactory:component/ulv/research_equipment"
+			x: 2.0d
+			y: 11.0d
+			subtitle: "制作研究设备，解锁更多配方"
+			description: [
+				"你已经发现，组装机中并没有包含所有配方。除了电压等级的限制，很多配方还需要你研究相应的科技才能解锁。"
+				""
+				"按下～键打开科研界面，你可以看到所有科技。每项科技都代表着一个新的阶段，例如接下来的合金冶炼，能解锁合金炉的组装配方。"
+				""
+				"要进行科技研究，你需要两样东西："
+				"研究工作台，用于放置科技所需的材料"
+				"研究设备，会在研究过程中被消耗"
+				""
+				"每个电压等级的研究设备都有不同的材料要求，因此记得随科技进度持续升级你的研究能力。通过研究不断解锁配方与新功能，你的工厂才能持续发展，不被卡在原地。"
+			]
+			dependencies: [
+				"6F6EE8943B6B06BC"
+				"16BF47CD29F96F57"
+			]
+			size: 2.0d
+			id: "1DF1F6516600868F"
+			tasks: [
+				{
+					id: "56F55824D0761E28"
+					type: "item"
+					item: "tinactory:machine/ulv/research_bench"
+				}
+				{
+					id: "22E255C03F85B2E4"
+					type: "item"
+					item: "tinactory:component/ulv/research_equipment"
+				}
+			]
+		}
+		{
+			title: "矿物处理2.0"
+			icon: "tinactory:material/crushed_purified/chalcopyrite"
+			x: -2.0d
+			y: 11.0d
+			subtitle: "升级矿石处理设备"
+			description: [
+				"是时候升级你的矿石处理系统了。将原始矿石分析仪和原始矿石清洗仪替换为更先进的超低压版本，不仅可以提升效率，还能获取额外资源。"
+				""
+				"超低压矿石分析仪能够分析出更多种类的矿石，不再局限于黄铁矿和硫铁铜矿。不过要解锁新的矿物种类，还需要在科研面板中研究相关科技。"
+				"例如，研究“圆石矿物”科技后，可以从圆石中发现并提取褐铁矿脉。"
+				""
+				"超低压矿石清洗仪除了清洗出目标矿物之外，还有概率产出副产物，这些副产是Tinactory中许多稀有材料的主要来源。"
+			]
+			dependencies: ["0B73A7F9E0645551"]
+			id: "070F82ED30238005"
+			tasks: [
+				{
+					id: "3BE38EF75C2BC9B0"
+					type: "item"
+					item: "tinactory:machine/ulv/ore_analyzer"
+				}
+				{
+					id: "482622842F504ADD"
+					type: "item"
+					item: "tinactory:machine/ulv/ore_washer"
+				}
+			]
+		}
+		{
+			title: "耐热金属的起点"
+			x: 0.0d
+			y: 13.0d
+			subtitle: "获取合金材料镍"
+			description: [
+				"在你探索矿石的过程中，镍将成为一个新的关键目标材料。它是制造多种耐热合金（如殷钢和白铜）的重要金属，在未来的高温加工与高级部件中不可或缺。"
+				""
+				"镍可以通过褐铁矿、带状铁矿的副产得到，或者直接处理硅镁石。这些矿石都需要使用超低压矿石分析仪并且研究科技解锁褐铁矿脉才能获得。"
+				""
+				"你将很快需要用它来合成更复杂、能耐高温的金属材料，为更高电压等级的工业机器做好准备。"
+			]
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
+			id: "6EBA694D07E58E72"
+			tasks: [{
+				id: "65AF8B4B6ABA164C"
+				type: "item"
+				item: "tinactory:material/dust/nickel"
+			}]
+		}
+		{
+			title: "金属的融合之炉"
+			x: 2.0d
+			y: 13.0d
+			subtitle: "制作合金炉"
+			description: [
+				"你已经掌握了单一金属的提取与加工，但更复杂的工业结构需要性能更强的合金材料。现在，是时候踏出这关键一步：制作你的第一台合金炉。"
+				""
+				"在科研界面中，解锁合金冶炼科技后，就可以在组装机中制造合金炉。合金炉能够直接将不同种类的金属粉末熔炼成合金锭，不过你必须先将金属研磨成粉末再投入炉中。"
+				""
+				"通过合金的多样性，你将大幅扩展机器与组件的种类。"
+			]
+			dependencies: ["1DF1F6516600868F"]
+			id: "36F6E91079CD47B2"
+			tasks: [{
+				id: "51CF4D42AEBC55B6"
+				type: "item"
+				item: "tinactory:machine/ulv/alloy_smelter"
+			}]
+		}
+		{
+			title: "提取硫元素"
+			x: -4.0d
+			y: 13.0d
+			subtitle: "从副产中获取制作橡胶的关键原料"
+			description: [
+				"你已经注意到清洗黄铁矿和硫铁铜矿时产生的一种副产物：硫。硫是制作橡胶的必要原料，橡胶将用于制作线缆、机械部件等，是进入低压时代不可或缺的材料。"
+				""
+				"不过在超低压阶段，还不用急着开始种橡胶。"
+			]
+			dependencies: ["070F82ED30238005"]
+			id: "5B60F443F822A96F"
+			tasks: [{
+				id: "20B43EE906163E08"
+				type: "item"
+				item: "tinactory:material/dust/sulfur"
+			}]
+		}
+		{
+			title: "电高炉"
+			icon: "tinactory:multiblock/blast_furnace"
+			x: 0.0d
+			y: 17.0d
+			subtitle: "搭建你的第一个多方块机器"
+			description: [
+				"你即将建造第一台多方块机器——电高炉，它是生产低压材料钢的核心设备，也是你真正进入机械化冶炼时代的标志。"
+				""
+				"电高炉不是一个单独的方块，而是由多个组件组合而成的结构。你需要准备以下材料："
+				"1个电高炉主方块"
+				"16个隔热殷钢机壳"
+				"16个白铜电热线圈"
+				"1个超低压多方块接口"
+				""
+				"多方块结构必须按照指定形状正确摆放，否则不会生效。构建完成后，通过多方块接口将机器连接到电力网络，并且可以直接右键多方块接口打开机器GUI界面进行操作。"
+				""
+				"小贴士：Tinactory内置了所有多方块机器的litematica图纸，你可以直接加载图纸查看每个方块应摆放的位置，帮助你快速完成结构搭建。"
+			]
+			dependencies: [
+				"7AE6BC52B1A42AE8"
+				"04F63737063FFA5E"
+			]
+			size: 2.0d
+			id: "1E207E3075739472"
+			tasks: [
+				{
+					id: "6B8FF60AFCD0E05D"
+					type: "item"
+					item: "tinactory:multiblock/blast_furnace"
+				}
+				{
+					id: "238075606372E15B"
+					type: "item"
+					item: "tinactory:multiblock/coil/cupronickel"
+					count: 16L
+				}
+				{
+					id: "4E5DC538BE3D3E69"
+					type: "item"
+					item: "tinactory:multiblock/solid/heatproof"
+					count: 16L
+				}
+				{
+					id: "642EBCEBAE64CA52"
+					type: "item"
+					item: "tinactory:multiblock/ulv/interface"
+				}
+			]
+		}
+		{
+			title: "耐热金属"
+			icon: "tinactory:material/ingot/invar"
+			x: 0.0d
+			y: 15.0d
+			subtitle: "合成殷钢与白铜，为高温设备做准备"
+			description: [
+				"为了制造更高阶的工业设备，你需要用到两种关键的耐热合金：殷钢与白铜。它们都是你迈向高温工业的基础材料，特别是即将建造的电高炉。"
+				""
+				"殷钢由铁粉与镍粉按照特定比例混合后，在合金炉中熔炼得到。它拥有优异的耐热性能，被用于制作电高炉的隔热外壳。"
+				""
+				"白铜由铜粉与镍粉合成，是良好的导热合金材料，用于制造电高炉的加热线圈。"
+			]
+			dependencies: [
+				"6EBA694D07E58E72"
+				"36F6E91079CD47B2"
+			]
+			id: "7AE6BC52B1A42AE8"
+			tasks: [
+				{
+					id: "6D4E7912C5BC638E"
+					type: "item"
+					item: "tinactory:material/ingot/invar"
+				}
+				{
+					id: "50E169B96982299A"
+					type: "item"
+					item: "tinactory:material/ingot/cupronickel"
+				}
+			]
+		}
+		{
+			title: "解放双手"
+			x: -3.0d
+			y: 9.0d
+			subtitle: "使用简单物流工作站实现物流连接"
+			description: [
+				"随着机器数量的增加，手动搬运物品和流体已经开始变得低效。是时候使用物流工作站建立起你的第一条自动物流网络了。"
+				""
+				"物流工作站是Tinactory物流系统的重要机器，共有三个等级，而你现在可以制作的是最基础的：简单物流工作站。它可以将一台机器的物品或流体传输到另一台机器，为实现自动化打下基础。"
+				""
+				"将物流工作站连接到电网后，右键打开其GUI界面。界面分为三部分："
+				"左侧：显示已配置的任务列表"
+				"中间：列出工作站能访问到的所有机器"
+				"右侧：显示选中机器的所有端口"
+				""
+				"一台物流工作站可以配置多个任务，并会循环执行这些任务，想要配置任务："
+				"在左侧选择一个任务格子，点击源或目标的配置按钮"
+				"在中间面板中选择要连接的机器"
+				"在右侧面板中选择该机器的一个输入或输出端口"
+				"可选：点击任务中间格子设置过滤条件，指定只传输特定物品或流体"
+				"最后，点击中间的按钮启用任务"
+				""
+				"更高级的物流工作站可以配置更多任务，执行速度也更快。从现在开始，放下手中的水桶与背包，让机器帮你完成搬运。"
+			]
+			dependencies: ["0B73A7F9E0645551"]
+			size: 2.0d
+			id: "35AFA1FBD784B4D2"
+			tasks: [{
+				id: "7B774713F00DB381"
+				type: "item"
+				item: "tinactory:logistics/ulv/logistic_worker"
+			}]
+		}
+		{
+			icon: "tinactory:network/lv/cable"
+			x: 4.0d
+			y: 9.0d
+			shape: "pentagon"
+			subtitle: "理解电压、功率与电网运作"
+			description: [
+				"在Tinactory中，电力系统是支撑自动化工厂的核心。掌握它的基本原理，将帮助你更稳定地构建和扩展工业网络。"
+				""
+				"基本单位："
+				"EU：电量单位"
+				"EU/t：功率单位，t代表游戏中的一个刻（tick）"
+				"V：电压单位"
+				""
+				"每台机器和配方都有对应电压需求，当前的超低压（ULV）为8V。相邻电压等级之间相差4倍，下一级低压（LV）为32V。机器的工作电压必须不低于配方所需电压，否则无法运行。"
+				""
+				"线缆与连接："
+				"每种电压有对应的线缆；"
+				"机器只能连接与自身电压相同的线缆；"
+				"不同电压的线缆无法互相连接，若需要跨电压连接，必须使用变压器；"
+				"一些机器（如蒸汽锅炉）无电压限制，可以连接任意线缆。"
+				""
+				"线缆在传输电力时会有损耗，但在相同功率下，电压越高损耗越低。因此提升电压可以降低能量损失。"
+				""
+				"如果你熟悉格雷科技，你会注意到Tinactory的电网系统更加智能：所有发电与耗电机器接入同一电网后，系统会自动统一计算供需，不再需要机器“请求电力”或拥有“电力缓存”。如果电力不足，机器不会跳电，而是自动降低运行速度。"
+				""
+				"这意味着你可以更专注于机器布局与供电规划，而不用担心复杂的能量分配逻辑。"
+			]
+			dependencies: ["16BF47CD29F96F57"]
+			id: "61E3BD587521AAF2"
+			tasks: [{
+				id: "3ED71FF0218E2F8B"
+				type: "checkmark"
+				title: "电力网络"
+			}]
+		}
+		{
+			icon: "tinactory:component/lv/conveyor_module"
+			x: -5.0d
+			y: 9.0d
+			shape: "pentagon"
+			subtitle: "查看机器的输入输出端口"
+			description: [
+				"在Tinactory中，端口是机器物流交互的关键单位。无论是物流工作站搬运物品，还是手动输入流体，都必须通过端口进行传输。"
+				""
+				"一个端口是机器内多个格子的逻辑组合，每个端口可以代表输入或输出。"
+				"可以通过机器的GUI界面查看一台机器的所有端口。点击界面右下角的端口按钮，打开端口面板。在端口面板中，你将看到这台机器拥有的所有输入输出端口。将鼠标移动到某个端口名称上，右侧会高亮显示这个端口对应的格子位置。"
+				""
+				"通过了解端口结构，你可以更精准地配置物流任务，确保每个任务都连接到正确的输入或输出位置。"
+			]
+			dependencies: ["35AFA1FBD784B4D2"]
+			id: "7AD47A6D95AD744E"
+			tasks: [{
+				id: "34D72055101DD93B"
+				type: "checkmark"
+				title: "我的机器有哪些端口？"
+			}]
+		}
+		{
+			icon: "minecraft:book"
+			x: 4.0d
+			y: 11.0d
+			shape: "pentagon"
+			subtitle: "设定配方，让机器按你想要的方式工作"
+			description: [
+				"你已经拥有了像组装机这样的自动化设备，但它们不会自动开始工作，需要你进行正确的设置。"
+				""
+				"每台机器的左下角都有一个按钮，点击它可以打开这台机器支持的配方书界面。你可以在里面浏览所有可用配方，并选择一个目标配方。"
+				""
+				"当你选择了某个配方之后，机器只会执行该配方，同时也只会接受该配方需要的原材料。"
+				""
+				"因此，合理地选择和管理配方，是实现稳定自动化生产的关键一步。"
+				""
+				"小贴士：鼠标移动到配方书里的按钮上按R键还能打开JEI看到配方的具体内容。"
+			]
+			dependencies: ["6F6EE8943B6B06BC"]
+			id: "5557C2511290CA78"
+			tasks: [{
+				id: "14ADA78EDD6D41C2"
+				type: "checkmark"
+				title: "我的组装机怎么不工作？"
+			}]
+		}
+		{
+			icon: "tinactory:machine/ulv/research_bench"
+			x: 4.0d
+			y: 13.0d
+			shape: "pentagon"
+			subtitle: "了解科研界面"
+			description: [
+				"科技研究是解锁配方与推进工业发展的关键系统，掌握科研界面的使用方法能帮助你高效规划科技路线。"
+				""
+				"打开科研界面（按下～键），你会看到如下区域："
+				"左上角：显示你当前正在研究的科技"
+				"左下角：显示所有科技"
+				"右侧面板：显示选中科技的说明、前置要求与研究进度"
+				""
+				"科技有三种颜色表示状态："
+				"黄色：当前可以研究的科技"
+				"红色：尚未解锁的科技，需要先完成前置科技"
+				"绿色：已完成研究的科技"
+				""
+				"小贴士：将鼠标移动到科技按钮上时，按下R键可以在JEI中查看哪些配方依赖该科技解锁以及完成该科技研究所需的材料。"
+			]
+			dependencies: ["1DF1F6516600868F"]
+			id: "361089D5DBD02A97"
+			tasks: [{
+				id: "101389EE911902B9"
+				type: "checkmark"
+				title: "科研指南"
+			}]
+		}
+		{
+			icon: "minecraft:water_bucket"
+			x: -3.0d
+			y: 3.5d
+			shape: "pentagon"
+			subtitle: "向机器输入与输出流体"
+			description: [
+				"除了物品和电力，很多机器还需要处理流体。掌握流体的输入与输出方式，将帮助你运行如矿石清洗仪、锅炉等需要水或蒸汽的设备。"
+				""
+				"在机器的GUI界面中，你会看到一些颜色较深的格子。这些并不是用来放物品的，而是流体格子，用于输入或输出液体。"
+				""
+				"手持原版水桶、熔岩桶等容器，点击流体格子即可直接注入或取出液体。"
+				"若需要存取其他类型的液体，可以制作流体储罐来转移与中转流体。"
+			]
+			dependencies: ["70A3BD39E2350A91"]
+			id: "5D3D592F154FE900"
+			tasks: [{
+				id: "25F798FEF2D03B2F"
+				type: "checkmark"
+				title: "往机器里灌水？"
+			}]
+		}
+		{
+			title: "亮闪闪的新朋友"
+			x: -2.0d
+			y: 15.0d
+			subtitle: "提取锡，为未来做好准备"
+			description: [
+				"在你着手建造电高炉之前，有一种金属你一定得先搞到手——锡。虽然你还没正式进入低压（LV）阶段，但别被迷惑：锡在你眼前就已经是必需品了。电高炉的材料需要青铜，而青铜又离不开锡，所以这一步可以说是整个电气化时代的前置大门。"
+				""
+				"要获得锡，你需要先通过研究科技来解锁锡石矿脉。研究完成后，你的圆石处理系统里会开始出现锡矿石和锡石。它们的处理方式和之前的铁、铜如出一辙：清洗、研磨、熔炼，最终得到可用的锡锭。"
+				""
+				"虽然现在主要是为了合成青铜，但你会在很快到来的低压时代意识到，锡线缆是低压电力系统的绝对核心材料，你的工厂会在LV阶段疯狂消耗锡。"
+			]
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
+			id: "04F63737063FFA5E"
+			tasks: [{
+				id: "2BE074EE34626987"
+				type: "item"
+				item: "tinactory:material/dust/tin"
+			}]
+		}
+	]
+	quest_links: [ ]
+}

@@ -1,0 +1,256 @@
+{
+	id: "7F7BFA5025452CE4"
+	group: "5D26E55DB14C5F98"
+	order_index: 0
+	filename: "7F7BFA5025452CE4"
+	title: "第三章：MV"
+	icon: "tinactory:material/sheet/polyethylene"
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			x: 0.0d
+			y: -2.0d
+			dependencies: [
+				"46FCACEBA4A9CB75"
+				"5E19A5F390FE2633"
+			]
+			id: "39307419A9E65EA7"
+			tasks: [{
+				id: "50AD52D2E362D0AF"
+				type: "item"
+				item: "tinactory:material/ingot/aluminium"
+			}]
+		}
+		{
+			icon: "tinactory:component/mv/machine_hull"
+			x: 0.0d
+			y: 2.0d
+			dependencies: [
+				"39307419A9E65EA7"
+				"5088C6076EA6DD18"
+			]
+			id: "3375F9C747DB6DD4"
+			tasks: [
+				{
+					id: "6F8D5985FBC24E3A"
+					type: "item"
+					item: "tinactory:component/mv/machine_hull"
+				}
+				{
+					id: "1714CFE3D7F0AB97"
+					type: "item"
+					item: "tinactory:network/mv/cable"
+				}
+				{
+					id: "5DCF95CDD1206894"
+					type: "item"
+					title: "Any #tinactory:circuit/mv"
+					item: {
+						id: "itemfilters:tag"
+						Count: 1b
+						tag: {
+							value: "tinactory:circuit/mv"
+						}
+					}
+				}
+			]
+		}
+		{
+			x: 4.0d
+			y: 2.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			size: 2.0d
+			id: "0366D252F6B6B37E"
+			tasks: [{
+				id: "367F362EE2F7159F"
+				type: "item"
+				item: "tinactory:machine/mv/chemical_reactor"
+			}]
+		}
+		{
+			x: -4.0d
+			y: 2.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			size: 2.0d
+			id: "49E74949BB1168BC"
+			tasks: [{
+				id: "045C175A8A65132C"
+				type: "item"
+				item: "tinactory:machine/mv/electrolyzer"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 0.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			id: "193B6542AAD430D3"
+			tasks: [{
+				id: "18D3D933742405ED"
+				type: "item"
+				item: "tinactory:machine/mv/extruder"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 0.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			id: "40147EDDF5556495"
+			tasks: [{
+				id: "2E13F52717BEC149"
+				type: "item"
+				item: "tinactory:machine/mv/stone_generator"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 6.0d
+			dependencies: ["42B0CA004A0D914B"]
+			id: "2DF7B5D218636018"
+			tasks: [{
+				id: "381776E8BA827E78"
+				type: "item"
+				item: "tinactory:material/ingot/stainless_steel"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 4.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			id: "42B0CA004A0D914B"
+			tasks: [{
+				id: "40B5B7FC14438487"
+				type: "item"
+				item: "tinactory:machine/mv/mixer"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 4.0d
+			dependencies: ["3375F9C747DB6DD4"]
+			id: "23460DBF1A586926"
+			tasks: [{
+				id: "20B4737055202F46"
+				type: "item"
+				item: "tinactory:machine/mv/assembler"
+			}]
+		}
+		{
+			icon: "tinactory:chip/ram"
+			x: 2.0d
+			y: 12.0d
+			dependencies: ["062113D36F9444CD"]
+			id: "4CB55DF729A035A0"
+			tasks: [
+				{
+					id: "4C378B75CC267CB7"
+					type: "item"
+					item: "tinactory:material/lens/sapphire"
+				}
+				{
+					id: "562AAEFB435415FC"
+					type: "item"
+					item: "tinactory:chip/ram"
+				}
+			]
+		}
+		{
+			x: -2.0d
+			y: 12.0d
+			dependencies: ["0A1EE54892C444A8"]
+			id: "6B8F14E71AA1CA43"
+			tasks: [{
+				id: "3615BBD26F299EBA"
+				type: "item"
+				item: "tinactory:material/ingot/electrum"
+			}]
+		}
+		{
+			x: 0.0d
+			y: 10.0d
+			dependencies: [
+				"4CB55DF729A035A0"
+				"6B8F14E71AA1CA43"
+			]
+			id: "0540D3B8052B479D"
+			tasks: [{
+				id: "29716427FB89FF82"
+				type: "item"
+				item: "tinactory:circuit/advanced_integrated"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 8.0d
+			dependencies: [
+				"2DF7B5D218636018"
+				"0540D3B8052B479D"
+				"23460DBF1A586926"
+			]
+			size: 2.0d
+			id: "741B39FABC429FFC"
+			tasks: [{
+				id: "189B8B7C44EAFB25"
+				type: "item"
+				item: "tinactory:multiblock/distillation_tower"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 8.0d
+			dependencies: [
+				"23460DBF1A586926"
+				"0540D3B8052B479D"
+			]
+			size: 2.0d
+			id: "4BC5CC00BBABBC80"
+			tasks: [{
+				id: "43BAE95D956BD0FA"
+				type: "item"
+				item: "tinactory:multiblock/vacuum_freezer"
+			}]
+		}
+		{
+			x: -4.0d
+			y: 0.0d
+			dependencies: ["49E74949BB1168BC"]
+			id: "7D54F712F6C6E8DF"
+			tasks: [{
+				id: "5FD8200669AB03D4"
+				type: "item"
+				item: "tinactory:material/dust/rutile"
+			}]
+		}
+		{
+			x: -4.0d
+			y: 4.0d
+			dependencies: ["49E74949BB1168BC"]
+			id: "500AD8E2A926B356"
+			tasks: [{
+				id: "49C2D6630788F104"
+				type: "item"
+				item: "tinactory:material/dust/sodium_hydroxide"
+			}]
+		}
+		{
+			icon: "tinactory:material/dust/sodium_chloride"
+			x: -4.0d
+			y: 8.0d
+			dependencies: ["741B39FABC429FFC"]
+			id: "245CDFDE257E9DB5"
+			tasks: [
+				{
+					id: "3D30EB11460AACA4"
+					type: "item"
+					item: "tinactory:material/dust/sodium_chloride"
+				}
+				{
+					id: "15C51A49B5FC6834"
+					type: "item"
+					item: "tinactory:material/dust/potassium_chloride"
+				}
+			]
+		}
+	]
+	quest_links: [ ]
+}
