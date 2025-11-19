@@ -97,9 +97,9 @@ object OrganicChemistry {
             input("creosote_oil", amount = 4) {
                 output("carbon")
                 output("ammonia", amount = 1.2)
-                output("benzene", amount = 1.4)
-                output("toluene", amount = 0.3)
-                output("phenol", amount = 0.3)
+                output("benzene", amount = 3.6)
+                output("toluene", amount = 4.6)
+                output("phenol", amount = 0.6)
                 workTicks(1200)
             }
             input("biomass") {
@@ -150,6 +150,13 @@ object OrganicChemistry {
                 workTicks(200)
             }
             output("ethylene", suffix = "_from_ethanol") {
+                input("ethanol")
+                input("sulfuric_acid")
+                output("sulfuric_acid", "dilute", 2)
+                workTicks(240)
+            }
+            output("toluene") {
+                input("benzene")
                 input("ethanol")
                 input("sulfuric_acid")
                 output("sulfuric_acid", "dilute", 2)

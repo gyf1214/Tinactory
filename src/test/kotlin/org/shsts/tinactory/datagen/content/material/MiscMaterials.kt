@@ -96,6 +96,10 @@ object MiscMaterials {
                 input(Items.PACKED_ICE, 5)
                 workTicks(160)
             }
+            output("coolant") {
+                input("coolant", "gas")
+                workTicks(32)
+            }
             output("oxygen", "liquid") {
                 input("oxygen")
                 workTicks(200)

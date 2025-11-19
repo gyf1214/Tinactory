@@ -121,6 +121,7 @@
     "fluid.tinactory.material.gas.nitric_acid": "Nitrogen Dioxide",
     "fluid.tinactory.material.fluid.lpg": "LPG",
     "fluid.tinactory.material.gas.coolant": "Hot Coolant",
+    "fluid.tinactory.material.liquid.oxygen": "Liquid Oxygen",
     "tinactory.tooltip.openRecipeBook": "Open recipe book",
     "tinactory.tooltip.unselectRecipe": "Clear recipe",
     "tinactory.tooltip.openPortPanel": "Show ports",
