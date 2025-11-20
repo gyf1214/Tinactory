@@ -7,8 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -35,8 +37,13 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -157,6 +164,13 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
         return getRealShape(state);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
+        List<Component> tooltip, TooltipFlag isAdvanced) {
+        addTooltip(tooltip, "cable.1", NUMBER_FORMAT.format(voltage.value), voltage.displayName());
+        addTooltip(tooltip, "cable.2", DOUBLE_FORMAT.format(resistance));
     }
 
     @Override

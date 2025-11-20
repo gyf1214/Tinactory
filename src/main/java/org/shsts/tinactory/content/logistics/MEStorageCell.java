@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -22,7 +21,6 @@ import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
 import org.shsts.tinactory.core.logistics.DigitalItemStorage;
 import org.shsts.tinactory.core.logistics.DigitalProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 import java.util.function.Function;
@@ -31,6 +29,7 @@ import static org.shsts.tinactory.content.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
 import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -57,14 +56,10 @@ public class MEStorageCell extends CapabilityItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world,
-        List<Component> components, TooltipFlag isAdvanced) {
+        List<Component> tooltip, TooltipFlag isAdvanced) {
         stack.getCapability(DIGITAL_PROVIDER.get())
-            .ifPresent(provider -> {
-                var amount = I18n.tr("tinactory.tooltip.meStorageCell",
-                    NUMBER_FORMAT.format(provider.bytesUsed()),
-                    NUMBER_FORMAT.format(bytesLimit));
-                components.add(amount.withStyle(ChatFormatting.GRAY));
-            });
+            .ifPresent(provider -> addTooltip(tooltip, "meStorageCell",
+                NUMBER_FORMAT.format(provider.bytesUsed()), NUMBER_FORMAT.format(bytesLimit)));
     }
 
     private static class ItemCapability extends ItemCapabilityProvider {

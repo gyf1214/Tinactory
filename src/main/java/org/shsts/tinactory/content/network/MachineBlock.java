@@ -5,8 +5,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -29,10 +32,14 @@ import org.shsts.tinactory.core.tool.IWrenchable;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.TinactoryConfig.listConfig;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -56,14 +63,26 @@ public class MachineBlock extends SmartEntityBlock
             new MachineBlock(properties, entityType, menu, voltage);
     }
 
-    public static MachineBlock simple(Properties properties,
-        Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        return new StaticMachineBlock(properties, entityType, menu, Voltage.PRIMITIVE);
+    public static Factory<MachineBlock> simple(Consumer<List<Component>> tooltipBuilder) {
+        return (properties, entityType, menu) -> new StaticMachineBlock(properties, entityType, menu) {
+            @Override
+            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
+                List<Component> tooltip, TooltipFlag isAdvanced) {
+                super.appendHoverText(stack, world, tooltip, isAdvanced);
+                tooltipBuilder.accept(tooltip);
+            }
+        };
     }
 
-    public static Factory<MachineBlock> sided(Voltage voltage) {
-        return (properties, entityType, menu) ->
-            new SidedMachineBlock(properties, entityType, menu, voltage);
+    public static Factory<MachineBlock> batteryBox(Voltage voltage, Consumer<List<Component>> tooltipBuilder) {
+        return (properties, entityType, menu) -> new SidedMachineBlock(properties, entityType, menu, voltage) {
+            @Override
+            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
+                List<Component> tooltip, TooltipFlag isAdvanced) {
+                super.appendHoverText(stack, world, tooltip, isAdvanced);
+                tooltipBuilder.accept(tooltip);
+            }
+        };
     }
 
     public static Factory<MachineBlock> multiblockInterface(Voltage voltage) {
@@ -71,9 +90,8 @@ public class MachineBlock extends SmartEntityBlock
             new MultiblockInterfaceBlock(properties, entityType, menu, voltage);
     }
 
-    public static MachineBlock signal(Properties properties,
-        Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        return new SignalMachineBlock(properties, entityType, menu, Voltage.PRIMITIVE);
+    public static Factory<MachineBlock> signal(double power) {
+        return (properties, entityType, menu) -> new SignalMachineBlock(properties, entityType, menu, power);
     }
 
     public static Voltage getBlockVoltage(BlockEntity be) {
@@ -99,6 +117,14 @@ public class MachineBlock extends SmartEntityBlock
         return defaultBlockState()
             .setValue(FACING, ctx.getHorizontalDirection().getOpposite())
             .setValue(IO_FACING, ctx.getHorizontalDirection());
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
+        List<Component> tooltip, TooltipFlag isAdvanced) {
+        if (voltage != Voltage.PRIMITIVE) {
+            addTooltip(tooltip, "machineVoltage", NUMBER_FORMAT.format(voltage.value), voltage.displayName());
+        }
     }
 
     @Override

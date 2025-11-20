@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.tool;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.network.chat.Component;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.I18n.tr;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -75,12 +74,9 @@ public class BatteryItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltips,
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        var line = tr("tinactory.tooltip.battery",
-            NUMBER_FORMAT.format(getPower(stack)),
-            NUMBER_FORMAT.format(capacity),
-            voltage.displayName());
-        tooltips.add(line.withStyle(ChatFormatting.GRAY));
+        addTooltip(tooltip, "battery", NUMBER_FORMAT.format(getPower(stack)),
+            NUMBER_FORMAT.format(capacity), voltage.displayName());
     }
 }

@@ -2,7 +2,6 @@ package org.shsts.tinactory.core.tool;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.I18n.tr;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -61,10 +60,9 @@ public class ToolItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltips,
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        var line = tr("tinactory.tooltip.tool", NUMBER_FORMAT.format(
-            stack.getMaxDamage() - stack.getDamageValue()));
-        tooltips.add(line.withStyle(ChatFormatting.GRAY));
+        var remaining = stack.getMaxDamage() - stack.getDamageValue();
+        addTooltip(tooltip, "tool", NUMBER_FORMAT.format(remaining));
     }
 }

@@ -64,6 +64,9 @@ import java.util.function.BiConsumer;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.content.AllRecipes.putTypeInfo;
+import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -329,11 +332,13 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> batteryBox(Voltage v) {
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock.sided(v))
+            var layout = getLayout(v);
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.batteryBox(v, tooltip ->
+                    addTooltip(tooltip, "batteryBox", NUMBER_FORMAT.format(layout.slots.size()))))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.BATTERY_BOX)
                 .blockEntity()
-                .transform(BatteryBox.factory(getLayout(v)))
+                .transform(BatteryBox.factory(layout))
                 .end()
                 .block()
                 .tint(i -> i == 0 ? v.color : 0xFFFFFFFF)
@@ -350,23 +355,33 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
-                .transform(MachineSet::baseMachine)
+            var layout = getLayout(v);
+            var slotSize = GsonHelper.getAsInt(jo, "slotSize");
+            var power = getPower(v, jo);
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.simple(tooltip -> {
+                    addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(slotSize),
+                        NUMBER_FORMAT.format(layout.slots.size()));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                })).transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
-                .transform(ElectricChest.factory(getLayout(v),
-                    GsonHelper.getAsInt(jo, "slotSize"), getPower(v, jo)))
+                .transform(ElectricChest.factory(layout, slotSize, power))
                 .end()
                 .buildObject();
         }
 
         private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
-                .transform(MachineSet::baseMachine)
+            var layout = getLayout(v);
+            var slotSize = GsonHelper.getAsInt(jo, "slotSize");
+            var power = getPower(v, jo);
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.simple(tooltip -> {
+                    addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(slotSize),
+                        NUMBER_FORMAT.format(layout.slots.size()));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                })).transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
-                .transform(ElectricTank.factory(getLayout(v),
-                    GsonHelper.getAsInt(jo, "slotSize"), getPower(v, jo)))
+                .transform(ElectricTank.factory(layout, slotSize, power))
                 .end()
                 .buildObject();
         }
@@ -379,8 +394,13 @@ public class MachineMeta extends MetaConsumer {
                 GsonHelper.getAsInt(jo, "fluidStack"),
                 getPower(v, jo));
 
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock::simple)
-                .transform(MachineSet::baseMachine)
+            return BlockEntityBuilder.builder(machineId(v), MachineBlock.simple(tooltip -> {
+                    addTooltip(tooltip, "logisticWorker.1", NUMBER_FORMAT.format(properties.slots()));
+                    addTooltip(tooltip, "logisticWorker.2", DOUBLE_FORMAT.format(properties.interval() / 20d));
+                    addTooltip(tooltip, "logisticWorker.3", NUMBER_FORMAT.format(properties.stack()),
+                        NUMBER_FORMAT.format(properties.fluidStack()));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(properties.power()));
+                })).transform(MachineSet::baseMachine)
                 .menu(AllMenus.LOGISTIC_WORKER)
                 .blockEntity()
                 .transform(LogisticWorker.factory(properties))

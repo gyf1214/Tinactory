@@ -1,11 +1,15 @@
 package org.shsts.tinactory.content.network;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -19,11 +23,14 @@ import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tool.IWrenchable;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.content.network.MachineBlock.IO_FACING;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -64,6 +71,17 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
             manager.invalidatePosDir(pos, oldDir);
             manager.invalidatePosDir(pos, oldDir.getOpposite());
         });
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world, List<Component> tooltip,
+        TooltipFlag isAdvanced) {
+        if (voltage == subVoltage) {
+            addTooltip(tooltip, "machineVoltage", NUMBER_FORMAT.format(voltage.value), voltage.displayName());
+        } else {
+            addTooltip(tooltip, "transformer.1", NUMBER_FORMAT.format(voltage.value), voltage.displayName());
+            addTooltip(tooltip, "transformer.2", NUMBER_FORMAT.format(subVoltage.value), subVoltage.displayName());
+        }
     }
 
     @Override

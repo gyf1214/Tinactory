@@ -53,6 +53,8 @@ import static org.shsts.tinactory.content.AllMaterials.getMaterial;
 import static org.shsts.tinactory.content.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.content.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.content.material.MaterialMeta.parseColor;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -170,11 +172,13 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void meStorageInterface(String id, JsonObject jo) {
-        BlockEntityBuilder.builder(id, MachineBlock::simple)
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id, MachineBlock.simple(tooltip ->
+                addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_INTERFACE)
             .blockEntity()
-            .transform(MEStorageInterface.factory(GsonHelper.getAsDouble(jo, "power")))
+            .transform(MEStorageInterface.factory(power))
             .end()
             .build();
     }
@@ -182,11 +186,14 @@ public class MiscMeta extends MetaConsumer {
     private void meDrive(String id, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
-        BlockEntityBuilder.builder(id, MachineBlock::simple)
-            .transform(MachineSet::baseMachine)
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id, MachineBlock.simple(tooltip -> {
+                addTooltip(tooltip, "meDrive", NUMBER_FORMAT.format(layout.slots.size()));
+                addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+            })).transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_DRIVE)
             .blockEntity()
-            .transform(MEDrive.factory(layout, GsonHelper.getAsDouble(jo, "power")))
+            .transform(MEDrive.factory(layout, power))
             .end()
             .build();
     }
@@ -222,21 +229,23 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void meSignalController(String id, JsonObject jo) {
-        BlockEntityBuilder.builder(id, MachineBlock::signal)
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id, MachineBlock.signal(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_SIGNAL_CONTROLLER)
             .blockEntity()
-            .transform(MESignalController.factory(GsonHelper.getAsDouble(jo, "power")))
+            .transform(MESignalController.factory(power))
             .end()
             .build();
     }
 
     private void meStorageDetector(String id, JsonObject jo) {
-        BlockEntityBuilder.builder(id, MachineBlock::signal)
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id, MachineBlock.signal(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_DETECTOR)
             .blockEntity()
-            .transform(MEStorageDetector.factory(GsonHelper.getAsDouble(jo, "power")))
+            .transform(MEStorageDetector.factory(power))
             .end()
             .build();
     }

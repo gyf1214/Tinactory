@@ -26,7 +26,6 @@ import java.util.List;
 public final class ClientUtil {
     public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
     public static final NumberFormat DOUBLE_FORMAT = new DecimalFormat("0.00");
-    public static final NumberFormat INTEGER_FORMAT = new DecimalFormat("0");
     public static final NumberFormat PERCENTAGE_FORMAT = new DecimalFormat("0%");
 
     public static RecipeManager getRecipeManager() {
@@ -103,6 +102,14 @@ public final class ClientUtil {
         var line1 = fluidName(stack);
         return showAmount ? List.of(line1, fluidAmount(stack)
             .withStyle(ChatFormatting.GRAY)) : List.of(line1);
+    }
+
+    public static void addTooltip(List<Component> tooltip, MutableComponent line) {
+        tooltip.add(line.withStyle(ChatFormatting.GRAY));
+    }
+
+    public static void addTooltip(List<Component> tooltip, String id, Object... args) {
+        addTooltip(tooltip, I18n.tr("tinactory.tooltip." + id, args));
     }
 
     public static boolean keyDown(int key) {

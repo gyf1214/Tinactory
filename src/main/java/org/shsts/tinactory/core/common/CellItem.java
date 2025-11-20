@@ -2,7 +2,6 @@ package org.shsts.tinactory.core.common;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -12,12 +11,13 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
-import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.List;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.core.util.ClientUtil.fluidAmount;
+import static org.shsts.tinactory.core.util.ClientUtil.fluidName;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -56,12 +56,10 @@ public class CellItem extends CapabilityItem {
 
     @Override
     public void appendHoverText(ItemStack item, @Nullable Level world,
-        List<Component> components, TooltipFlag flag) {
+        List<Component> tooltip, TooltipFlag flag) {
         var fluid = getFluid(item);
-        var amount = I18n.tr("tinactory.tooltip.fluidCell",
-            ClientUtil.fluidAmount(fluid), ClientUtil.fluidAmount(capacity));
-        components.add(ClientUtil.fluidName(fluid).withStyle(ChatFormatting.GRAY));
-        components.add(amount.withStyle(ChatFormatting.GRAY));
+        addTooltip(tooltip, fluidName(fluid));
+        addTooltip(tooltip, "fluidCell", fluidAmount(fluid), fluidAmount(capacity));
     }
 
     @Override

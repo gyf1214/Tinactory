@@ -16,10 +16,9 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StaticMachineBlock extends MachineBlock {
-    public StaticMachineBlock(Properties properties,
-        Supplier<IBlockEntityType> entityType,
-        @Nullable IMenuType menu, Voltage voltage) {
-        super(properties, entityType, menu, voltage);
+    public StaticMachineBlock(Properties properties, Supplier<IBlockEntityType> entityType,
+        @Nullable IMenuType menu) {
+        super(properties, entityType, menu, Voltage.PRIMITIVE);
     }
 
     @Override

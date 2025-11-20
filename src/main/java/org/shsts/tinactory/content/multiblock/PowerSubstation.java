@@ -42,7 +42,7 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
         if (ctx.hasProperty("height") && ctx.hasProperty("power") &&
             ctx.getProperty("power") instanceof PowerBlock block) {
             var height = (int) ctx.getProperty("height") - 2;
-            output = block.voltage * 3 * height;
+            output = block.voltage.value * 3 * height;
             capacity = block.capacity * 9 * height;
         } else {
             ctx.setFailed();
