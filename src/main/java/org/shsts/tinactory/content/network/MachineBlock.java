@@ -85,9 +85,16 @@ public class MachineBlock extends SmartEntityBlock
         };
     }
 
-    public static Factory<MachineBlock> multiblockInterface(Voltage voltage) {
-        return (properties, entityType, menu) ->
-            new MultiblockInterfaceBlock(properties, entityType, menu, voltage);
+    public static Factory<MachineBlock> multiblockInterface(Voltage voltage,
+        Consumer<List<Component>> tooltipBuilder) {
+        return (properties, entityType, menu) -> new MultiblockInterfaceBlock(properties, entityType, menu, voltage) {
+            @Override
+            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
+                List<Component> tooltip, TooltipFlag isAdvanced) {
+                super.appendHoverText(stack, world, tooltip, isAdvanced);
+                tooltipBuilder.accept(tooltip);
+            }
+        };
     }
 
     public static Factory<MachineBlock> signal(double power) {

@@ -187,10 +187,12 @@ public class MiscMeta extends MetaConsumer {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id, MachineBlock.simple(tooltip -> {
-                addTooltip(tooltip, "meDrive", NUMBER_FORMAT.format(layout.slots.size()));
-                addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
-            })).transform(MachineSet::baseMachine)
+        BlockEntityBuilder.builder(id,
+                MachineBlock.simple(tooltip -> {
+                    addTooltip(tooltip, "meDrive", NUMBER_FORMAT.format(layout.slots.size()));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                }))
+            .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_DRIVE)
             .blockEntity()
             .transform(MEDrive.factory(layout, power))
