@@ -8,7 +8,8 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forgegradle_version}", changing: false
         classpath "org.parchmentmc:librarian:${librarian_version}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.spongepowered:mixingradle:${mixingradle_version}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
     }
 }
 
@@ -20,7 +21,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'kotlin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'maven-publish'
+apply plugin: 'org.spongepowered.mixin'
 
 group = 'org.shsts.tinactory'
 archivesBaseName = "tinactory"
@@ -113,16 +114,17 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+    // kotlin
+    minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
+        exclude group: "org.jetbrains", module: "annotations"
+    }
 
+    // extra resources
     compileOnly files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
 
-    runtimeOnly fg.deobf("curse.maven:ctm-267602:${ctm_id}")
-    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
-
+    // tinycorelib
     compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
     runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
     testCompileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
@@ -130,9 +132,19 @@ dependencies {
     testRuntimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
     testRuntimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
 
-    minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
-        exclude group: "org.jetbrains", module: "annotations"
-    }
+    // JEI
+    implementation fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+
+    // CTM
+    runtimeOnly fg.deobf("curse.maven:ctm-267602:${ctm_id}")
+
+    // waila
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+}
+
+mixin {
+    add sourceSets.main, 'mixins.tinactory.refmap.json'
+    config 'mixins.tinactory.jei.json'
 }
 
 sourceSets.main.resources {

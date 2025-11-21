@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.common;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -23,7 +24,7 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CellItem extends CapabilityItem {
-    private final int capacity;
+    public final int capacity;
 
     public CellItem(Properties properties, int capacity) {
         super(properties);
@@ -52,6 +53,16 @@ public class CellItem extends CapabilityItem {
         } else {
             return fluid.getFluid().getAttributes().getColor();
         }
+    }
+
+    public ItemStack create(FluidStack fluid) {
+        var tag = new CompoundTag();
+        var tag1 = new CompoundTag();
+        fluid.writeToNBT(tag1);
+        tag.put(FluidHandlerItemStack.FLUID_NBT_KEY, tag1);
+        var ret = new ItemStack(this);
+        ret.setTag(tag);
+        return ret;
     }
 
     @Override

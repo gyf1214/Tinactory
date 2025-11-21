@@ -36,7 +36,7 @@ import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ResearchCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
-import org.shsts.tinactory.integration.jei.gui.FluidHandler;
+import org.shsts.tinactory.integration.jei.gui.FluidScreenHandler;
 import org.shsts.tinactory.integration.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.integration.jei.gui.ResearchHandler;
 import org.shsts.tinactory.integration.jei.gui.TechMenuHandler;
@@ -144,7 +144,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new FluidHandler());
+        registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new FluidScreenHandler());
         registration.addGuiContainerHandler(TechScreen.class, new TechMenuHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());

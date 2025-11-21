@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidHandler implements IGuiContainerHandler<AbstractContainerScreen<?>> {
+public class FluidScreenHandler implements IGuiContainerHandler<AbstractContainerScreen<?>> {
     private @Nullable Object getIngredientHovered(Widget hovered) {
         if (hovered instanceof FluidSlot slot) {
             var stack = slot.getFluidStack();

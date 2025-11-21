@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
-import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
 
@@ -29,9 +28,6 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 @MethodsReturnNonnullByDefault
 public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
     private Object getRecipeBookIngredient(IRecipeBookItem item) {
-        if (item instanceof SmeltingRecipeBookItem smelting) {
-            return smelting.recipe().getResultItem();
-        }
         return new RecipeMarker(item.loc());
     }
 
