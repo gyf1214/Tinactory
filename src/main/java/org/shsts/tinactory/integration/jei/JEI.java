@@ -12,6 +12,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -24,7 +25,6 @@ import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.integration.jei.category.AssemblyCategory;
@@ -36,7 +36,7 @@ import org.shsts.tinactory.integration.jei.category.ProcessingCategory;
 import org.shsts.tinactory.integration.jei.category.RecipeCategory;
 import org.shsts.tinactory.integration.jei.category.ResearchCategory;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
-import org.shsts.tinactory.integration.jei.gui.MenuScreenHandler;
+import org.shsts.tinactory.integration.jei.gui.FluidHandler;
 import org.shsts.tinactory.integration.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.integration.jei.gui.ResearchHandler;
 import org.shsts.tinactory.integration.jei.gui.TechMenuHandler;
@@ -144,7 +144,7 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGenericGuiContainerHandler(MenuScreen.class, MenuScreenHandler.fluid());
+        registration.addGenericGuiContainerHandler(AbstractContainerScreen.class, new FluidHandler());
         registration.addGuiContainerHandler(TechScreen.class, new TechMenuHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());

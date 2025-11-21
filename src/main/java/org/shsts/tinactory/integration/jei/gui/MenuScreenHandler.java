@@ -5,7 +5,6 @@ import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Widget;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 
 @ParametersAreNonnullByDefault
@@ -18,19 +17,5 @@ public abstract class MenuScreenHandler<M extends MenuScreen<?>> implements IGui
         return screen.getHovered((int) mouseX, (int) mouseY)
             .map(widget -> getIngredientHovered(widget, mouseX, mouseY))
             .orElse(null);
-    }
-
-    public static MenuScreenHandler<MenuScreen<?>> fluid() {
-        return new MenuScreenHandler<>() {
-            @Override
-            protected @Nullable Object getIngredientHovered(Widget hovered,
-                double mouseX, double mouseY) {
-                if (hovered instanceof FluidSlot slot) {
-                    var stack = slot.getFluidStack();
-                    return stack.isEmpty() ? null : stack;
-                }
-                return null;
-            }
-        };
     }
 }
