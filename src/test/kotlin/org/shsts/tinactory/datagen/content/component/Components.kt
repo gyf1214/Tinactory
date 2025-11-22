@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.content.AllItems.componentEntry
@@ -238,7 +239,10 @@ object Components {
                     Voltage.IV -> "metaitems/large_fluid_cell.tungstensteel"
                     else -> "metaitems/large_fluid_cell.${name(entry.id(), -1)}"
                 }
-                item(entry) { model(basicItem("$texKey/base", "$texKey/overlay")) }
+                item(entry) {
+                    model(basicItem("$texKey/base", "$texKey/overlay"))
+                    tag(AllTags.item(ResourceLocation("itemfilters", "match_nbt")))
+                }
             }
         }
     }
