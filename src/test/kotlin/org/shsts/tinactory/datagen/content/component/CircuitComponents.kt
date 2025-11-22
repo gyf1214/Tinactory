@@ -324,22 +324,22 @@ object CircuitComponents {
                 component("inductor", 4) {
                     input("nickel_zinc_ferrite", "ring")
                     input("copper", "wire_fine", 2)
-                    input("pe", amount = 0.25)
+                    input("pe", amount = 0.5)
                 }
-                component("diode", 8, suffix = "_from_wafer") {
+                component("diode", 16, suffix = "_from_wafer") {
                     input(WAFER_RAW.item("silicon"))
-                    input("copper", "wire_fine", 4)
-                    input("pe")
+                    input("copper", "wire_fine", 8)
+                    input("pe", amount = 2)
                 }
                 component("transistor", 4) {
                     input("gallium_arsenide", "dust")
                     input("tin", "wire_fine", 6)
                     input("rubber", amount = 2)
                 }
-                component("transistor", 8, suffix = "_from_wafer") {
+                component("transistor", 16, suffix = "_from_wafer") {
                     input(WAFER_RAW.item("silicon"))
-                    input("tin", "wire_fine", 6)
-                    input("pe")
+                    input("tin", "wire_fine", 12)
+                    input("pe", amount = 2)
                 }
             }
         }

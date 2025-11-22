@@ -432,6 +432,7 @@ object MiscMachines {
                 Items.COMPASS,
                 Items.CROSSBOW,
                 Items.CLOCK,
+                Items.REDSTONE_TORCH,
                 Items.TARGET,
                 Items.NOTE_BLOCK,
                 Items.JUKEBOX,
