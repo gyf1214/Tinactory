@@ -1,7 +1,7 @@
 {
 	id: "3B5374D34DFEC6AF"
 	group: ""
-	order_index: 2
+	order_index: 3
 	filename: "3B5374D34DFEC6AF"
 	title: "寻迹深层之脉动"
 	icon: "minecraft:raw_iron"
@@ -256,6 +256,123 @@
 					item: "tinactory:material/raw_fluid/heavy_oil"
 				}
 			]
+		}
+		{
+			title: "金矿脉"
+			icon: "minecraft:raw_gold"
+			x: 0.0d
+			y: 8.0d
+			subtitle: "研究地狱岩矿脉科技，解锁金矿脉"
+			description: [
+				"金矿脉可以得到金矿、黄玉和蓝黄玉。这也是研究地狱岩矿脉科技能解锁的第一个矿脉。"
+				""
+				"你需要高压科研和矿石分析仪，同时需要先解锁一阶火箭。"
+			]
+			dependencies: ["21D9FC2113E23F69"]
+			size: 2.0d
+			id: "41CAE47DBA5E2C33"
+			tasks: [
+				{
+					id: "6273F39868D3AEAC"
+					type: "item"
+					item: "minecraft:raw_gold"
+				}
+				{
+					id: "17EFE3975AEA4672"
+					type: "item"
+					item: "tinactory:material/raw/topaz"
+				}
+				{
+					id: "450876595F2501F4"
+					type: "item"
+					item: "tinactory:material/raw/blue_topaz"
+				}
+			]
+		}
+		{
+			title: "石英矿脉"
+			icon: "tinactory:material/raw/nether_quartz"
+			x: -2.0d
+			y: 8.0d
+			subtitle: "解锁石英矿脉"
+			description: ["石英矿脉可以得到下界石英、塞特斯石英和青金石。"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "02DDF396D6BCCE5E"
+			tasks: [
+				{
+					id: "5A3E7A47CB4C47E0"
+					type: "item"
+					item: "tinactory:material/raw/nether_quartz"
+				}
+				{
+					id: "0C4E927E1DFB1ACF"
+					type: "item"
+					item: "tinactory:material/raw/certus_quartz"
+				}
+				{
+					id: "4747BF4202BE8FCF"
+					type: "item"
+					item: "tinactory:material/raw/lapis"
+				}
+			]
+		}
+		{
+			title: "钨酸锂矿脉"
+			icon: "tinactory:material/raw/tungstate"
+			x: 2.0d
+			y: 8.0d
+			subtitle: "解锁钨酸锂矿脉"
+			description: ["钨酸锂矿脉可以得到钨酸锂矿和钼酸钙矿。"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "7363E5AC14AECA75"
+			tasks: [
+				{
+					id: "761973CC6B103DC9"
+					type: "item"
+					item: "tinactory:material/raw/tungstate"
+				}
+				{
+					id: "12269B518E613342"
+					type: "item"
+					item: "tinactory:material/raw/molybdate"
+				}
+			]
+		}
+		{
+			title: "沥青铀矿脉"
+			icon: "tinactory:material/raw/pitchblende"
+			x: 0.0d
+			y: 10.0d
+			subtitle: "解锁沥青铀矿脉"
+			description: ["沥青铀矿脉可以得到沥青铀矿和钍。"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "642B670E0BD087C2"
+			tasks: [
+				{
+					id: "1EE4BA004E450308"
+					type: "item"
+					item: "tinactory:material/raw/pitchblende"
+				}
+				{
+					id: "367600507AABB5ED"
+					type: "item"
+					item: "tinactory:material/raw/thorium"
+				}
+			]
+		}
+		{
+			title: "岩浆矿脉"
+			x: 0.0d
+			y: 6.0d
+			subtitle: "解锁岩浆矿脉"
+			description: ["岩浆矿脉可以得到岩浆块。"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "7B6DDB0F8DA8568C"
+			tasks: [{
+				id: "43CB0E545147ABCA"
+				type: "item"
+				item: "minecraft:magma_block"
+			}]
 		}
 	]
 	quest_links: [ ]

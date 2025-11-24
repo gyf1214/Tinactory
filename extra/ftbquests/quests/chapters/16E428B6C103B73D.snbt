@@ -1,0 +1,51 @@
+{
+	id: "16E428B6C103B73D"
+	group: "5D26E55DB14C5F98"
+	order_index: 0
+	filename: "16E428B6C103B73D"
+	title: "第四章：HV"
+	icon: "tinactory:component/mixed_metal_ingot"
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			icon: "tinactory:component/hv/machine_hull"
+			x: 0.0d
+			y: 0.0d
+			dependencies: [
+				"2DF7B5D218636018"
+				"0540D3B8052B479D"
+				"0623B327BA00512F"
+			]
+			id: "21D9FC2113E23F69"
+			tasks: [
+				{
+					id: "7B7657EE71111FFB"
+					type: "item"
+					item: "tinactory:component/hv/machine_hull"
+				}
+				{
+					id: "4FA7E5F6C9E48EC3"
+					type: "item"
+					item: "tinactory:network/hv/cable"
+				}
+			]
+		}
+		{
+			x: -4.0d
+			y: 0.0d
+			dependencies: [
+				"21D9FC2113E23F69"
+				"16072DE55220A84E"
+			]
+			size: 2.0d
+			id: "7F321A366176BDA1"
+			tasks: [{
+				id: "643382A79DD56C25"
+				type: "item"
+				item: "tinactory:machine/hv/arc_furnace"
+			}]
+		}
+	]
+	quest_links: [ ]
+}

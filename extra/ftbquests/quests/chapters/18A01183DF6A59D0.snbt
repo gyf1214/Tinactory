@@ -1,0 +1,212 @@
+{
+	id: "18A01183DF6A59D0"
+	group: "5D26E55DB14C5F98"
+	order_index: 1
+	filename: "18A01183DF6A59D0"
+	title: "发电方式"
+	icon: "tinactory:chip/low_pic"
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			x: 0.0d
+			y: 0.0d
+			dependencies: ["60E67F1969C46975"]
+			id: "3B814E5A86CB22E7"
+			tasks: [{
+				id: "6B114C4A516F657F"
+				type: "item"
+				item: "tinactory:machine/lv/steam_turbine"
+			}]
+		}
+		{
+			x: 0.0d
+			y: 2.0d
+			dependencies: [
+				"3B814E5A86CB22E7"
+				"3375F9C747DB6DD4"
+			]
+			id: "7890894D11E55E47"
+			tasks: [{
+				id: "1878D3D3969E143A"
+				type: "item"
+				item: "tinactory:machine/boiler/high"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 0.0d
+			dependencies: ["1B76C2DFABED3E63"]
+			id: "363746D1E8189E50"
+			tasks: [{
+				id: "5FEE8F9C72FE10C3"
+				type: "item"
+				item: "tinactory:machine/lv/gas_turbine"
+			}]
+		}
+		{
+			title: "LPG"
+			x: 2.0d
+			y: 2.0d
+			dependencies: [
+				"363746D1E8189E50"
+				"13E4096767FAA495"
+			]
+			id: "7FC43799DC08AC4E"
+			tasks: [{
+				id: "57FB78E31B79AC5E"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/fluid/lpg"
+							Amount: 4000
+						}
+					}
+				}
+			}]
+		}
+		{
+			title: "Rocket Fuel"
+			x: 2.0d
+			y: 4.0d
+			dependencies: [
+				"7FC43799DC08AC4E"
+				"21D9FC2113E23F69"
+			]
+			id: "7754C6016593C2B8"
+			tasks: [{
+				id: "2BFC051A13D24AAC"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/rocket_fuel"
+							Amount: 4000
+						}
+					}
+				}
+			}]
+		}
+		{
+			x: 4.0d
+			y: 0.0d
+			dependencies: ["1B76C2DFABED3E63"]
+			id: "1213D571D21C3386"
+			tasks: [{
+				id: "77FD7302A77D71E3"
+				type: "item"
+				item: "tinactory:machine/lv/combustion_generator"
+			}]
+		}
+		{
+			title: "Diesel"
+			x: 4.0d
+			y: 2.0d
+			dependencies: [
+				"1213D571D21C3386"
+				"13E4096767FAA495"
+			]
+			id: "7902ED312A19F27B"
+			tasks: [{
+				id: "2A523B6BE50429B6"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/fluid/diesel"
+							Amount: 4000
+						}
+					}
+				}
+			}]
+		}
+		{
+			title: "Boosted Diesel"
+			x: 4.0d
+			y: 4.0d
+			dependencies: [
+				"7902ED312A19F27B"
+				"21D9FC2113E23F69"
+			]
+			id: "5CD1BF9CBC8CB89F"
+			tasks: [{
+				id: "128300FA7CB727A4"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/fluid/cetane_boosted_diesel"
+							Amount: 4000
+						}
+					}
+				}
+			}]
+		}
+		{
+			x: 2.0d
+			y: -2.0d
+			dependencies: [
+				"3B814E5A86CB22E7"
+				"363746D1E8189E50"
+				"1213D571D21C3386"
+				"21D9FC2113E23F69"
+			]
+			size: 2.0d
+			id: "4DB9BF0E510E3E9C"
+			tasks: [{
+				id: "3BDE5A3BA22AD3C7"
+				type: "item"
+				item: "tinactory:multiblock/large_turbine"
+			}]
+		}
+		{
+			x: 0.0d
+			y: 4.0d
+			dependencies: [
+				"7890894D11E55E47"
+				"21D9FC2113E23F69"
+			]
+			size: 2.0d
+			id: "24366ACA10086991"
+			tasks: [{
+				id: "2A1E374E7EBFF915"
+				type: "item"
+				item: "tinactory:multiblock/large_boiler"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 0.0d
+			dependencies: [
+				"3B814E5A86CB22E7"
+				"4BC5CC00BBABBC80"
+				"21D9FC2113E23F69"
+			]
+			id: "180A7F8DD9AD0580"
+			tasks: [{
+				id: "7E996DDA0AEF09EF"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/gas/coolant"
+							Amount: 4000
+						}
+					}
+				}
+			}]
+		}
+	]
+	quest_links: [ ]
+}

@@ -1,0 +1,305 @@
+{
+	id: "021730EB05578B09"
+	group: "5D26E55DB14C5F98"
+	order_index: 2
+	filename: "021730EB05578B09"
+	title: "物流"
+	icon: "tinactory:component/hv/conveyor_module"
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			x: 0.0d
+			y: 0.0d
+			dependencies: ["1DF1F6516600868F"]
+			id: "4BE9B26C04647BD8"
+			tasks: [{
+				id: "7A74D28C27706858"
+				type: "item"
+				item: "tinactory:logistics/ulv/electric_chest"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 0.0d
+			dependencies: ["1DF1F6516600868F"]
+			id: "7A00FA0C45702638"
+			tasks: [{
+				id: "06A8D0B166EE238E"
+				type: "item"
+				item: "tinactory:logistics/ulv/electric_tank"
+			}]
+		}
+		{
+			x: 0.0d
+			y: 2.0d
+			dependencies: [
+				"4BE9B26C04647BD8"
+				"3375F9C747DB6DD4"
+			]
+			id: "7A85227BDB6CB5A2"
+			tasks: [{
+				id: "79CD6E3DF40ED430"
+				type: "item"
+				item: "tinactory:logistics/mv/electric_chest"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 2.0d
+			dependencies: [
+				"7A00FA0C45702638"
+				"3375F9C747DB6DD4"
+			]
+			id: "69A0DE7834E046EF"
+			tasks: [{
+				id: "046467BEAD2A7F6D"
+				type: "item"
+				item: "tinactory:logistics/mv/electric_tank"
+			}]
+		}
+		{
+			x: 5.0d
+			y: 2.0d
+			dependencies: [
+				"35AFA1FBD784B4D2"
+				"3375F9C747DB6DD4"
+			]
+			size: 2.0d
+			id: "2463E4F002BC25EE"
+			tasks: [{
+				id: "1937D4E89BCBCE47"
+				type: "item"
+				item: "tinactory:logistics/mv/logistic_worker"
+			}]
+		}
+		{
+			x: 8.0d
+			y: 2.0d
+			dependencies: ["2463E4F002BC25EE"]
+			size: 2.0d
+			id: "2E0C38684C061101"
+			tasks: [{
+				id: "5E2579053D3B7EA3"
+				type: "item"
+				item: "tinactory:logistics/ev/logistic_worker"
+			}]
+		}
+		{
+			x: 2.0d
+			y: 4.0d
+			dependencies: ["69A0DE7834E046EF"]
+			id: "1378262C4553AE71"
+			tasks: [{
+				id: "5B510765A5FED29C"
+				type: "item"
+				item: "tinactory:logistics/ev/electric_tank"
+			}]
+		}
+		{
+			x: 0.0d
+			y: 4.0d
+			dependencies: ["7A85227BDB6CB5A2"]
+			id: "011CB57C780EE663"
+			tasks: [{
+				id: "36D47CAD42C9D33B"
+				type: "item"
+				item: "tinactory:logistics/ev/electric_chest"
+			}]
+		}
+		{
+			x: 1.0d
+			y: 6.0d
+			dependencies: ["21D9FC2113E23F69"]
+			size: 2.0d
+			id: "61C306A510164241"
+			tasks: [{
+				id: "77A95FD01A15AA43"
+				type: "item"
+				item: "tinactory:logistics/me_storage_interface"
+			}]
+		}
+		{
+			x: 4.0d
+			y: 12.0d
+			dependencies: ["4034E621C42EBF60"]
+			size: 2.0d
+			id: "1E73498504A1B6C4"
+			tasks: [{
+				id: "78515AB8B77327B6"
+				type: "item"
+				item: "tinactory:component/storage_component/1m"
+			}]
+		}
+		{
+			x: 1.0d
+			y: 8.0d
+			dependencies: ["21D9FC2113E23F69"]
+			id: "4034E621C42EBF60"
+			tasks: [{
+				id: "018ABCD56E6CDF11"
+				type: "item"
+				item: "tinactory:material/gem/certus_quartz"
+			}]
+		}
+		{
+			x: 1.0d
+			y: 11.0d
+			dependencies: [
+				"1B073B0E13E0484E"
+				"1E73498504A1B6C4"
+			]
+			id: "4F97D1CF666FB365"
+			tasks: [{
+				id: "46612088A2590B00"
+				type: "item"
+				item: "tinactory:logistics/item_storage_cell/1m"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 10.0d
+			dependencies: ["21D9FC2113E23F69"]
+			id: "3EDE299FA6EF6A78"
+			tasks: [{
+				id: "54401F085EBBA288"
+				type: "item"
+				item: "tinactory:material/dust/fluix"
+			}]
+		}
+		{
+			icon: "tinactory:component/annihilation_core"
+			x: -2.0d
+			y: 12.0d
+			dependencies: [
+				"3EDE299FA6EF6A78"
+				"4034E621C42EBF60"
+			]
+			size: 2.0d
+			id: "1B073B0E13E0484E"
+			tasks: [
+				{
+					id: "1C0BC68DF8FF932B"
+					type: "item"
+					item: "tinactory:component/annihilation_core"
+				}
+				{
+					id: "3F6467B8A53C304A"
+					type: "item"
+					item: "tinactory:component/formation_core"
+				}
+			]
+		}
+		{
+			x: 1.0d
+			y: 13.0d
+			dependencies: [
+				"1B073B0E13E0484E"
+				"1E73498504A1B6C4"
+			]
+			id: "6017FD3A9A7ADBFC"
+			tasks: [{
+				id: "76640E908F83E787"
+				type: "item"
+				item: "tinactory:logistics/fluid_storage_cell/1m"
+			}]
+		}
+		{
+			x: 4.0d
+			y: 14.0d
+			dependencies: ["1E73498504A1B6C4"]
+			id: "340A59CCBC050E4A"
+			tasks: [{
+				id: "7BAE68761D1A1DCA"
+				type: "item"
+				item: "tinactory:component/storage_component/4m"
+			}]
+		}
+		{
+			x: 4.0d
+			y: 16.0d
+			dependencies: ["340A59CCBC050E4A"]
+			id: "41B2E83E7E86A9A6"
+			tasks: [{
+				id: "6F81858A92A85A94"
+				type: "item"
+				item: "tinactory:component/storage_component/16m"
+			}]
+		}
+		{
+			x: 4.0d
+			y: 18.5d
+			dependencies: ["41B2E83E7E86A9A6"]
+			id: "2669AE71AD768BC1"
+			tasks: [{
+				id: "13A65F1E77DE3E44"
+				type: "item"
+				item: "tinactory:component/storage_component/64m"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 14.0d
+			dependencies: ["1B073B0E13E0484E"]
+			id: "76896CF4A26C08CD"
+			tasks: [{
+				id: "2B366A0DAB8EECA7"
+				type: "item"
+				item: "tinactory:logistics/me_drive"
+			}]
+		}
+		{
+			x: 8.0d
+			y: 8.0d
+			dependencies: [
+				"4D7BE161FBFBB80C"
+				"062113D36F9444CD"
+			]
+			size: 2.0d
+			id: "5EDD9D5E4EE9487D"
+			tasks: [{
+				id: "30ABF7B962DCE800"
+				type: "item"
+				item: "tinactory:logistics/me_signal_controller"
+			}]
+		}
+		{
+			x: 8.0d
+			y: 6.0d
+			dependencies: ["1DF1F6516600868F"]
+			id: "4D7BE161FBFBB80C"
+			tasks: [{
+				id: "24E0261762CDEB46"
+				type: "item"
+				item: "minecraft:redstone_torch"
+			}]
+		}
+		{
+			x: 8.0d
+			y: 10.0d
+			dependencies: ["5EDD9D5E4EE9487D"]
+			id: "51A3CD15BE4A96D2"
+			tasks: [{
+				id: "4989E371941CFD39"
+				type: "item"
+				item: "tinactory:logistics/me_storage_detector"
+			}]
+		}
+		{
+			x: 1.0d
+			y: 16.0d
+			dependencies: [
+				"1B073B0E13E0484E"
+				"1E73498504A1B6C4"
+			]
+			size: 2.0d
+			id: "247F2D17E69312E2"
+			tasks: [{
+				id: "512E697EC1750715"
+				type: "item"
+				item: "tinactory:multiblock/ev/digital_interface"
+			}]
+		}
+	]
+	quest_links: [ ]
+}
