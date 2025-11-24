@@ -241,7 +241,7 @@ object Components {
                 }
                 item(entry) {
                     model(basicItem("$texKey/base", "$texKey/overlay"))
-                    tag(AllTags.item(ResourceLocation("itemfilters", "match_nbt")))
+                    tag(AllTags.item(ResourceLocation("itemfilters", "check_nbt")))
                 }
             }
         }
