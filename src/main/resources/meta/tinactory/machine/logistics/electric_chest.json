@@ -1,16 +1,18 @@
 {
   "recipe": "none",
   "machine": "electric_chest",
-  "slotSize": 1024,
   "voltages": {
     "ulv": {
-      "power": 1
+      "power": 1,
+      "slotSize": 1024
     },
     "mv": {
-      "power": 2
+      "power": 2,
+      "slotSize": 4096
     },
     "ev": {
-      "power": 4
+      "power": 4,
+      "slotSize": 16384
     }
   },
   "layout": {
