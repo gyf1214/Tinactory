@@ -14,9 +14,7 @@ import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -29,15 +27,13 @@ import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
-import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineMenu extends ProcessingMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final IMachine machine;
+    protected final IMachine machine;
 
     public MachineMenu(Properties properties) {
         super(properties, SLOT_SIZE + SPACING);
@@ -163,30 +159,6 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    public static class BoilerMenu extends MachineMenu {
-        public static final String BURN_SYNC = "burn";
-        public static final String HEAT_SYNC = "heat";
-
-        public BoilerMenu(Properties properties) {
-            super(properties);
-            addProgressSlots(this);
-        }
-
-        private static double getBurn(IProcessor processor) {
-            var progress = processor.getProgress();
-            return progress <= 0 ? 0 : 1 - progress;
-        }
-
-        public static void addProgressSlots(MachineMenu menu) {
-            menu.addSyncSlot(BURN_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
-                .map(BoilerMenu::getBurn)
-                .orElse(0d)));
-            menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
-                .map($ -> ((Boiler) $).getHeat() / 600d)
-                .orElse(0d)));
-        }
-    }
-
     public static LayoutMenu simpleConfig(Properties properties) {
         return new Simple(properties, SLOT_SIZE + SPACING);
     }
@@ -199,11 +171,19 @@ public class MachineMenu extends ProcessingMenu {
         return new BoilerMenu(properties);
     }
 
+    public static ProcessingMenu nuclearReactor(Properties properties) {
+        return new NuclearReactorMenu(properties);
+    }
+
     public static ProcessingMenu digitalInterface(Properties properties) {
         return new DigitalInterfaceMenu(properties);
     }
 
     public static ProcessingMenu boilerDigitalInterface(Properties properties) {
         return new DigitalInterfaceMenu.BoilerMenu(properties);
+    }
+
+    public static ProcessingMenu nuclearReactorDigitalInterface(Properties properties) {
+        return new NuclearReactorMenu.DigitalInterface(properties);
     }
 }

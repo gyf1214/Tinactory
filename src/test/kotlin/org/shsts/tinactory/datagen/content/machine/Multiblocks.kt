@@ -75,19 +75,21 @@ object Multiblocks {
                 block(entry) {
                     blockState { ctx ->
                         val existingHelper = ctx.provider().models().existingFileHelper
-                        if (existingHelper.exists(gregtech("blocks/$tex"), Models.TEXTURE_TYPE)) {
-                            solidBlock(ctx, tex)
+                        val texLoc = gregtech("blocks/$tex")
+                        if (existingHelper.exists(texLoc, Models.TEXTURE_TYPE)) {
+                            solidBlock(ctx, texLoc)
                         }
                     }
                 }
             }
 
             block("multiblock/solid/insulated_battery") {
-                blockState { ctx ->
-                    val model = ctx.provider().models()
-                        .cubeAll(ctx.id(), ic2("blocks/wiring/storage/mfe_bottomtop"))
-                    ctx.provider().simpleBlock(ctx.`object`(), model)
-                }
+                blockState { ctx -> solidBlock(ctx, ic2("blocks/wiring/storage/mfe_bottomtop")) }
+                noDrop()
+            }
+
+            block("multiblock/solid/reinforced_alloy") {
+                blockState { ctx -> solidBlock(ctx, ic2("blocks/generator/reactor/reactor_vessel")) }
                 noDrop()
             }
 
@@ -504,27 +506,27 @@ object Multiblocks {
                     }
                 }
             }
-            block("multiblock/power_substation") {
-                machineModel {
-                    casing(ic2("blocks/wiring/storage/mfe_bottomtop"))
-                    overlay("multiblock/power_substation")
-                }
-            }
+            multiblock("power_substation", ic2("blocks/wiring/storage/mfe_bottomtop"), "power_substation")
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
+            multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"), "blast_furnace")
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
+    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: String = name) {
         val set = getMultiblock(name)
         block(set.block) {
             machineModel {
-                casing("casings/solid/machine_casing_$casing")
+                casing(casing)
                 overlay("multiblock/$overlay")
             }
             for (type in set.types) {
                 itemTag(machine(type))
             }
         }
+    }
+
+    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
+        multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"), overlay)
     }
 
     private fun machineRecipes() {

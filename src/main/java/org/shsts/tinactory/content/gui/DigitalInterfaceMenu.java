@@ -137,7 +137,7 @@ public class DigitalInterfaceMenu extends MachineMenu {
     public static class BoilerMenu extends DigitalInterfaceMenu {
         public BoilerMenu(Properties properties) {
             super(properties);
-            MachineMenu.BoilerMenu.addProgressSlots(this);
+            org.shsts.tinactory.content.gui.BoilerMenu.addProgressSlots(this);
         }
     }
 }

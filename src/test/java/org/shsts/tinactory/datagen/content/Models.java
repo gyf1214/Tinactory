@@ -215,15 +215,14 @@ public final class Models {
     }
 
     public static <U extends Block> void solidBlock(IEntryDataContext<Block,
-        U, BlockStateProvider> ctx, String tex) {
-        var model = ctx.provider().models()
-            .cubeAll(ctx.id(), gregtech("blocks/" + tex));
+        U, BlockStateProvider> ctx, ResourceLocation tex) {
+        var model = ctx.provider().models().cubeAll(ctx.id(), tex);
         ctx.provider().simpleBlock(ctx.object(), model);
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
         U, BlockStateProvider>> solidBlock(String tex) {
-        return ctx -> solidBlock(ctx, tex);
+        return ctx -> solidBlock(ctx, gregtech("blocks/" + tex));
     }
 
     public static void cableBlock(IEntryDataContext<Block,

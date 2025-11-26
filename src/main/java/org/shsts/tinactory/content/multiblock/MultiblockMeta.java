@@ -75,9 +75,11 @@ public class MultiblockMeta extends MachineMeta {
                     yield builder.child(Multiblock.builder((be, $) -> new Lithography(be, $, factor)));
                 }
                 case "distillation" -> {
+                    var minHeight = GsonHelper.getAsInt(jo, "minHeight");
                     var maxHeight = GsonHelper.getAsInt(jo, "maxHeight");
-                    var layouts = parseLayout().buildList(maxHeight - 2);
-                    yield builder.child(Multiblock.builder((be, $) -> new DistillationTower(be, $, layouts)));
+                    var layouts = parseLayout().buildList(maxHeight - minHeight + 1);
+                    yield builder.child(Multiblock.builder((be, $) ->
+                        new DistillationTower(be, $, layouts, minHeight)));
                 }
                 case "large_turbine" -> builder.child(Multiblock.builder(LargeTurbine::new));
                 case "power_substation" -> builder.child(Multiblock.builder(PowerSubstation::new));
@@ -86,6 +88,10 @@ public class MultiblockMeta extends MachineMeta {
                     var baseBoilerParallel = GsonHelper.getAsDouble(jo, "baseBoilerParallel");
                     yield builder.child(Multiblock.builder((be, $) ->
                         new LargeBoiler(be, $, properties, baseBoilerParallel)));
+                }
+                case "nuclear_reactor" -> {
+                    var properties = NuclearReactor.Properties.fromJson(jo);
+                    yield builder.child(Multiblock.builder((be, $) -> new NuclearReactor(be, $, properties)));
                 }
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {

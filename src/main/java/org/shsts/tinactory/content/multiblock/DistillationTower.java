@@ -14,11 +14,14 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class DistillationTower extends Multiblock {
     private final List<Layout> layouts;
+    private final int minHeight;
     private int slots = 0;
 
-    public DistillationTower(BlockEntity blockEntity, Builder<?> builder, List<Layout> layouts) {
+    public DistillationTower(BlockEntity blockEntity, Builder<?> builder,
+        List<Layout> layouts, int minHeight) {
         super(blockEntity, builder);
         this.layouts = layouts;
+        this.minHeight = minHeight;
     }
 
     public int getSlots() {
@@ -29,7 +32,7 @@ public class DistillationTower extends Multiblock {
     protected void doCheckMultiblock(CheckContext ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
-            slots = (int) ctx.getProperty("height") - 2;
+            slots = (int) ctx.getProperty("height") - minHeight + 1;
             layout = layouts.get(slots - 1);
         }
     }

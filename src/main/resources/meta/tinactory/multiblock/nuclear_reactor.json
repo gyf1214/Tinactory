@@ -1,0 +1,74 @@
+{
+  "recipes": {},
+  "machine": "nuclear_reactor",
+  "baseHeat": 20,
+  "baseDecay": 0.0002,
+  "minHeight": 3,
+  "rows": [2, 3, 4, 4, 5],
+  "columns": [2, 3, 4, 5, 5],
+  "layout": {
+    "slots": [
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 108,
+        "y": 9
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 63
+      }
+    ],
+    "images": [
+      {
+        "texture": "tinactory:gui/arrow_crafting_down",
+        "x": 110,
+        "y": 34,
+        "width": 15,
+        "height": 22
+      }
+    ]
+  },
+  "appearance": "tinactory:multiblock/solid/reinforced_alloy",
+  "layers": [
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
+    ],
+    {
+      "rows": [
+        "CWWWC",
+        "WAAAW",
+        "WAAAW",
+        "WAAAW",
+        "CWWWC"
+      ],
+      "height": "1-5"
+    },
+    [
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/reinforced_alloy"
+    },
+    "C": "tinactory:multiblock/solid/reinforced_alloy",
+    "W": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/reinforced_alloy"
+    },
+    "A": "air"
+  }
+}

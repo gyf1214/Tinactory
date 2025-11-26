@@ -1,6 +1,7 @@
 {
   "recipe": "distillation",
   "recipeTypeId": "distillation",
+  "minHeight": 3,
   "maxHeight": 8,
   "layout": {
     "slots": [

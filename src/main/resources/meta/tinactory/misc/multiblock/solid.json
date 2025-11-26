@@ -24,6 +24,9 @@
     },
     "insulated_battery": {
       "materialColor": 14
+    },
+    "reinforced_alloy": {
+      "materialColor": 41
     }
   }
 }

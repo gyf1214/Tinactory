@@ -13,7 +13,10 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
+
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -53,6 +56,16 @@ public class InventoryMenu extends MenuBase {
 
     public InventoryMenu(Properties properties, int beginY) {
         this(properties, 0, beginY);
+    }
+
+    @Override
+    public <P extends IPacket> void addSyncSlot(String name, Supplier<P> factory) {
+        super.addSyncSlot(name, factory);
+    }
+
+    @Override
+    public Slot addSlot(Slot pSlot) {
+        return super.addSlot(pSlot);
     }
 
     public int endY() {

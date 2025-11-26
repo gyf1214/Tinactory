@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.util;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Decoder;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.GsonHelper;
 
 import java.io.Reader;
 import java.util.List;
@@ -87,5 +89,15 @@ public final class CodecHelper {
 
     public static <T> void parseList(ListTag tag, Function<Tag, T> decoder, Consumer<T> cons) {
         tag.forEach($ -> cons.accept(decoder.apply($)));
+    }
+
+    public static int[] parseIntArray(JsonArray ja) {
+        var ret = new int[ja.size()];
+        var i = 0;
+        for (var je : ja) {
+            var x = GsonHelper.convertToInt(je, "element");
+            ret[i++] = x;
+        }
+        return ret;
     }
 }
