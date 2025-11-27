@@ -164,6 +164,7 @@
     "tinactory.tooltip.list": "- %s",
     "tinactory.tooltip.digitalInterface.1": "Storage: %s B",
     "tinactory.tooltip.digitalInterface.2": "Max Parallel: %s",
+    "tinactory.tooltip.fuelRod": "Remaining Reactions: %s",
     "tinactory.gui.techMenu.title": "Technologies",
     "tinactory.gui.techMenu.welcome": "New Team Name: ",
     "tinactory.gui.techMenu.welcomeButton": "Create Team",

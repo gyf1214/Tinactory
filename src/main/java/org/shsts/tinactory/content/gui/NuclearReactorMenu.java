@@ -40,7 +40,7 @@ public class NuclearReactorMenu extends MachineMenu {
             }
         }
 
-        menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(nuclearReactor.getHeat() / 2000d));
+        menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(nuclearReactor.getHeat() / 1000d));
     }
 
     public static class DigitalInterface extends DigitalInterfaceMenu {

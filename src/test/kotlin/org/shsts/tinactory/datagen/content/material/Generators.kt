@@ -16,7 +16,7 @@ object Generators {
                 reaction(0.01, 0.1)
             }
             recipe("coolant") {
-                heat(150.0, 550.0, 600.0)
+                heat(150.0, 1000.0, 2000.0)
                 reaction(0.003, 1.0)
             }
         }

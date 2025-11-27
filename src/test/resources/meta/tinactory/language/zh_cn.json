@@ -540,6 +540,7 @@
     "tinactory.tooltip.list": "• %s",
     "tinactory.tooltip.digitalInterface.1": "存储空间：%s B",
     "tinactory.tooltip.digitalInterface.2": "最大并行：%s",
+    "tinactory.tooltip.fuelRod": "剩余反应: %s",
     "tinactory.gui.techMenu.title": "科研",
     "tinactory.gui.techMenu.welcome": "新队伍名称：",
     "tinactory.gui.techMenu.welcomeButton": "创建队伍",

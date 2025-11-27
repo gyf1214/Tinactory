@@ -257,7 +257,7 @@ public class Multiblock extends MultiblockBase {
     }
 
     /**
-     * This is called on Client by MultiblockInterface when the container is ready.
+     * This is called on Server and Client by MultiblockInterface when the container is ready.
      * Note that it is possible that this is called before updateMultiblockInterface.
      */
     public void onContainerReady() {}

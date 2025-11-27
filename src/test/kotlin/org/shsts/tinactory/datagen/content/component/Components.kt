@@ -141,6 +141,16 @@ object Components {
                     tag(AllTags.FLUID_STORAGE_CELL)
                 }
             }
+
+            component("uranium_fuel_rod") {
+                model(basicItem(ic2("items/reactor/fuel_rod/uranium")))
+                tag(AllTags.NUCLEAR_ITEM)
+            }
+
+            component("moderator_rod") {
+                model(basicItem(ic2("items/reactor/component_heat_vent")))
+                tag(AllTags.NUCLEAR_ITEM)
+            }
         }
     }
 

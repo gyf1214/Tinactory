@@ -1,0 +1,7 @@
+{
+  "type": "moderator_rod",
+  "fastAbsorb": 0.6,
+  "slowAbsorb": 0,
+  "slowEmission": 1,
+  "heatEmission": 5
+}
