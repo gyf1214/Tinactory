@@ -36,8 +36,7 @@ import org.shsts.tinactory.content.multiblock.FixedBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.PowerBlock;
 import org.shsts.tinactory.content.network.MachineBlock;
-import org.shsts.tinactory.content.tool.FuelRod;
-import org.shsts.tinactory.content.tool.ModeratorRod;
+import org.shsts.tinactory.content.tool.NuclearRod;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -173,13 +172,8 @@ public class MiscMeta extends MetaConsumer {
         builder.register();
     }
 
-    private void fuelRod(String id, JsonObject jo) {
-        REGISTRATE.item(id, prop -> new FuelRod(prop, FuelRod.Properties.fromJson(jo)))
-            .register();
-    }
-
-    private void moderatorRod(String id, JsonObject jo) {
-        REGISTRATE.item(id, prop -> new ModeratorRod(prop, ModeratorRod.Properties.fromJson(jo)))
+    private void nuclearRod(String id, JsonObject jo) {
+        REGISTRATE.item(id, prop -> new NuclearRod(prop, NuclearRod.Properties.fromJson(jo)))
             .register();
     }
 
@@ -275,8 +269,7 @@ public class MiscMeta extends MetaConsumer {
             case "fixed" -> fixed(id, jo);
             case "coal_block" -> coalBlock(id, jo);
             case "item" -> item(id, jo);
-            case "fuel_rod" -> fuelRod(id, jo);
-            case "moderator_rod" -> moderatorRod(id, jo);
+            case "nuclear_rod" -> nuclearRod(id, jo);
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);

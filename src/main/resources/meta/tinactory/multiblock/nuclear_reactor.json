@@ -6,7 +6,7 @@
   "minHeight": 3,
   "rows": [2, 3, 4, 4, 5],
   "columns": [2, 3, 4, 5, 5],
-  "fastDiffusion": 0.6,
+  "fastDiffusion": 0.8,
   "slowDiffusionRate": 2e-4,
   "maxSlowDiffusion": 0.4,
   "fastReflection": 0,

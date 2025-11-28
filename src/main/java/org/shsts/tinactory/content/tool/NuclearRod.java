@@ -23,11 +23,11 @@ import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FuelRod extends Item implements INuclearItem {
+public class NuclearRod extends Item implements INuclearItem {
     private static final double REACTION_SCALE = 2048d;
 
     public record Properties(double fastRate, double slowRate, double constantRate,
-        double fastEmission, double slowEmission, double heatEmission,
+        double fastEmission, double slowEmission, double heatEmission, double heatFast,
         double maxReactions, ResourceLocation depletedItem) {
         public static Properties fromJson(JsonObject jo) {
             return new Properties(
@@ -37,6 +37,7 @@ public class FuelRod extends Item implements INuclearItem {
                 GsonHelper.getAsDouble(jo, "fastEmission"),
                 GsonHelper.getAsDouble(jo, "slowEmission"),
                 GsonHelper.getAsDouble(jo, "heatEmission"),
+                GsonHelper.getAsDouble(jo, "heatFast"),
                 GsonHelper.getAsDouble(jo, "maxReactions"),
                 new ResourceLocation(GsonHelper.getAsString(jo, "depletedItem")));
         }
@@ -47,7 +48,7 @@ public class FuelRod extends Item implements INuclearItem {
     @Nullable
     private Item depletedItem = null;
 
-    public FuelRod(Item.Properties properties, Properties prop) {
+    public NuclearRod(Item.Properties properties, Properties prop) {
         super(properties.stacksTo(1));
         this.properties = prop;
         this.maxReactions = (long) Math.floor(prop.maxReactions * REACTION_SCALE);
@@ -62,7 +63,7 @@ public class FuelRod extends Item implements INuclearItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return true;
+        return maxReactions > 0;
     }
 
     @Override
@@ -78,8 +79,10 @@ public class FuelRod extends Item implements INuclearItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        var remaining = (double) (maxReactions - getReactions(stack)) / REACTION_SCALE;
-        addTooltip(tooltip, "fuelRod", DOUBLE_FORMAT.format(remaining));
+        if (maxReactions > 0) {
+            var remaining = (double) (maxReactions - getReactions(stack)) / REACTION_SCALE;
+            addTooltip(tooltip, "fuelRod", DOUBLE_FORMAT.format(remaining));
+        }
     }
 
     private void react(ItemStack stack, long reacts) {
@@ -108,25 +111,30 @@ public class FuelRod extends Item implements INuclearItem {
         var slowReaction = slow * properties.slowRate;
 
         var react0 = fastReaction + slowReaction + properties.constantRate;
-        var remaining = maxReactions - getReactions(stack);
-        var react1 = (long) Math.floor(react0 * REACTION_SCALE);
         double react2;
         ItemStack ret;
-
-        if (react1 >= remaining) {
-            react2 = remaining / REACTION_SCALE;
-            ret = getDepleted();
+        if (maxReactions > 0) {
+            var react1 = Math.max(1, (long) Math.ceil(react0 * REACTION_SCALE));
+            var remaining = maxReactions - getReactions(stack);
+            if (react1 >= remaining) {
+                react2 = remaining / REACTION_SCALE;
+                ret = getDepleted();
+            } else {
+                react2 = react0;
+                react(stack, react1);
+                ret = stack;
+            }
         } else {
-            react2 = react1 / REACTION_SCALE;
-            react(stack, react1);
+            react2 = react0;
             ret = stack;
         }
 
         var fastEmission = react2 * properties.fastEmission;
         var slowEmission = react2 * properties.slowEmission;
+        var heat = react2 * properties.heatEmission + fastReaction * properties.heatFast;
         cell.incFastNeutron(fastEmission - fastReaction);
         cell.incSlowNeutron(slowEmission - slowReaction);
-        cell.incHeat(react2 * properties.heatEmission);
+        cell.incHeat(heat);
 
         return ret;
     }

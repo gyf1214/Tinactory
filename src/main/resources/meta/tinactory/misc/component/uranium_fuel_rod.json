@@ -1,11 +1,12 @@
 {
-  "type": "fuel_rod",
+  "type": "nuclear_rod",
   "fastRate": 0,
   "slowRate": 0.2,
   "constantRate": 0.001,
   "fastEmission": 2,
   "slowEmission": 0,
   "heatEmission": 10,
-  "maxReactions": 16384,
+  "heatFast": 0,
+  "maxReactions": 4096,
   "depletedItem": "minecraft:air"
 }
