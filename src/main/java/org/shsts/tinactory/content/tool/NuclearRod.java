@@ -28,17 +28,18 @@ public class NuclearRod extends Item implements INuclearItem {
 
     public record Properties(double fastRate, double slowRate, double constantRate,
         double fastEmission, double slowEmission, double heatEmission, double heatFast,
-        double maxReactions, ResourceLocation depletedItem) {
+        boolean reactionOut, double maxReactions, ResourceLocation depletedItem) {
         public static Properties fromJson(JsonObject jo) {
             return new Properties(
-                GsonHelper.getAsDouble(jo, "fastRate"),
-                GsonHelper.getAsDouble(jo, "slowRate"),
-                GsonHelper.getAsDouble(jo, "constantRate"),
-                GsonHelper.getAsDouble(jo, "fastEmission"),
-                GsonHelper.getAsDouble(jo, "slowEmission"),
-                GsonHelper.getAsDouble(jo, "heatEmission"),
-                GsonHelper.getAsDouble(jo, "heatFast"),
-                GsonHelper.getAsDouble(jo, "maxReactions"),
+                GsonHelper.getAsDouble(jo, "fastRate", 0d),
+                GsonHelper.getAsDouble(jo, "slowRate", 0d),
+                GsonHelper.getAsDouble(jo, "constantRate", 0d),
+                GsonHelper.getAsDouble(jo, "fastEmission", 0d),
+                GsonHelper.getAsDouble(jo, "slowEmission", 0d),
+                GsonHelper.getAsDouble(jo, "heatEmission", 0d),
+                GsonHelper.getAsDouble(jo, "heatFast", 0d),
+                GsonHelper.getAsBoolean(jo, "reactionOut", false),
+                GsonHelper.getAsDouble(jo, "maxReactions", 0d),
                 new ResourceLocation(GsonHelper.getAsString(jo, "depletedItem")));
         }
     }
@@ -134,6 +135,9 @@ public class NuclearRod extends Item implements INuclearItem {
         var heat = react2 * properties.heatEmission + fastReaction * properties.heatFast;
         cell.incFastNeutron(fastEmission - fastReaction);
         cell.incSlowNeutron(slowEmission - slowReaction);
+        if (properties.reactionOut) {
+            cell.incReaction(react2);
+        }
         cell.incHeat(heat);
 
         return ret;

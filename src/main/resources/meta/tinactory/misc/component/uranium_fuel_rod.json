@@ -1,12 +1,10 @@
 {
   "type": "nuclear_rod",
-  "fastRate": 0,
   "slowRate": 0.2,
   "constantRate": 0.001,
   "fastEmission": 2,
-  "slowEmission": 0,
   "heatEmission": 10,
-  "heatFast": 0,
+  "reactionOut": true,
   "maxReactions": 4096,
   "depletedItem": "minecraft:air"
 }

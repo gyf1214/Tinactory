@@ -80,6 +80,11 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
         public void incHeat(double val) {
             heatInc += val;
         }
+
+        @Override
+        public void incReaction(double val) {
+            reactions += val;
+        }
     }
 
     private final Properties properties;
@@ -90,6 +95,7 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
     private int rows;
     private int columns;
     private double heatInc;
+    private double reactions;
 
     public record Properties(double baseHeat, double baseDecay,
         int minHeight, int[] rows, int[] columns,
@@ -188,8 +194,9 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
         }
 
         heatInc = 0d;
-        var size = rows * columns;
+        reactions = 0d;
 
+        var size = rows * columns;
         for (var i = 0; i < size; i++) {
             var stack = reactorItems.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof INuclearItem item) {
@@ -241,7 +248,7 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
 
     @Override
     public double getProgress() {
-        return 0;
+        return reactions > 0 ? 1 : 0;
     }
 
     @Override

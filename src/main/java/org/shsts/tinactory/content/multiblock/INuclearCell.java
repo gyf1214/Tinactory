@@ -17,4 +17,6 @@ public interface INuclearCell {
     void incSlowNeutron(double val);
 
     void incHeat(double val);
+
+    void incReaction(double val);
 }

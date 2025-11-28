@@ -506,18 +506,20 @@ object Multiblocks {
                     }
                 }
             }
-            multiblock("power_substation", ic2("blocks/wiring/storage/mfe_bottomtop"), "power_substation")
+            multiblock("power_substation", ic2("blocks/wiring/storage/mfe_bottomtop"),
+                gregtech("blocks/multiblock/power_substation"))
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
-            multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"), "blast_furnace")
+            multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"),
+                modLoc("blocks/multiblock/nuclear_reactor"))
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: String = name) {
+    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation) {
         val set = getMultiblock(name)
         block(set.block) {
             machineModel {
                 casing(casing)
-                overlay("multiblock/$overlay")
+                overlay(overlay)
             }
             for (type in set.types) {
                 itemTag(machine(type))
@@ -526,7 +528,8 @@ object Multiblocks {
     }
 
     private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
-        multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"), overlay)
+        multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"),
+            gregtech("blocks/multiblock/$overlay"))
     }
 
     private fun machineRecipes() {
