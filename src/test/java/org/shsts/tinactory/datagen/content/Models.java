@@ -168,14 +168,17 @@ public final class Models {
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeColumn(String side, String end) {
+        U, BlockStateProvider>> cubeColumn(ResourceLocation side, ResourceLocation end) {
         return ctx -> {
             var provider = ctx.provider();
             provider.simpleBlock(ctx.object(), provider.models().cubeColumn(
-                ctx.id(),
-                gregtech("blocks/" + side),
-                gregtech("blocks/" + end)));
+                ctx.id(), side, end));
         };
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<Block,
+        U, BlockStateProvider>> cubeColumn(String side, String end) {
+        return cubeColumn(gregtech("blocks/" + side), gregtech("blocks/" + end));
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<Block,

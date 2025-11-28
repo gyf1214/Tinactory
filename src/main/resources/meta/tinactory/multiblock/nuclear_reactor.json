@@ -49,9 +49,9 @@
     {
       "rows": [
         "CWWWC",
-        "WAAAW",
-        "WAAAW",
-        "WAAAW",
+        "WRRRW",
+        "WRPRW",
+        "WRRRW",
         "CWWWC"
       ],
       "height": "1-5"
@@ -75,6 +75,7 @@
       "tag": "tinactory:multiblock/glass_casing",
       "block": "tinactory:multiblock/solid/reinforced_alloy"
     },
-    "A": "air"
+    "R": "tinactory:multiblock/misc/nuclear_chamber",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing"
   }
 }

@@ -733,5 +733,6 @@ object Materials {
                 component("radon")
             }
         }
+        material("nuclear_waste", DULL)
     }
 }

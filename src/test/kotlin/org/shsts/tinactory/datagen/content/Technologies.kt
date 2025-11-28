@@ -83,11 +83,13 @@ object Technologies {
     val ROCKET_T1: ResourceLocation
     val MULTI_SMELTER: ResourceLocation
     val POWER_SUBSTATION: ResourceLocation
+    val LARGE_TURBINE: ResourceLocation
 
     // EV
     val NUCLEAR_PHYSICS: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
+    val LARGE_BOILER: ResourceLocation
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
@@ -337,6 +339,11 @@ object Technologies {
                 displayItem(getMultiblock("power_substation").block)
             }
 
+            LARGE_TURBINE = tech("large_turbine") {
+                maxProgress(220)
+                displayItem(getMultiblock("large_turbine").block)
+            }
+
             voltage = Voltage.EV
 
             NUCLEAR_PHYSICS = child("nuclear_physics") {
@@ -351,8 +358,13 @@ object Technologies {
             }
 
             METAL_FORMER = tech("metal_former") {
-                maxProgress(120)
+                maxProgress(140)
                 displayItem(getMultiblock("metal_former").block)
+            }
+
+            LARGE_BOILER = tech("large_boiler") {
+                maxProgress(140)
+                displayItem(getMultiblock("large_boiler").block)
             }
 
             ROCKET_T2 = child("rocket_t2") {

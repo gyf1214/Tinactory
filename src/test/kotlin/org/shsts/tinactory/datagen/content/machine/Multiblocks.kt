@@ -196,6 +196,11 @@ object Multiblocks {
                     }
                 }
             }
+
+            misc("nuclear_chamber") {
+                blockState(cubeColumn(ic2("blocks/generator/reactor/reactor_chamber_sides"),
+                    ic2("blocks/generator/reactor/reactor_chamber_top")))
+            }
         }
 
         dataGen {
@@ -256,7 +261,7 @@ object Multiblocks {
                 input(Items.PODZOL, 2)
                 input("steel", "plate", 3)
                 input("soldering_alloy", amount = 2)
-                workTicks(200)
+                workTicks(MACHINE_TICKS)
                 tech(Technologies.AUTOFARM)
             }
         }
@@ -264,7 +269,7 @@ object Multiblocks {
         assembler {
             defaults {
                 voltage(Voltage.MV)
-                workTicks(200)
+                workTicks(MACHINE_TICKS)
             }
 
             componentVoltage = Voltage.MV
@@ -328,6 +333,16 @@ object Multiblocks {
                 workTicks(320)
                 tech(Technologies.LITHOGRAPHY)
             }
+            misc("turbine_blade") {
+                solid("stable_titanium")
+                pic(1)
+                component("electric_motor", 4)
+                input("stainless_steel", "rotor", 8)
+                component("cable", 4)
+                input("soldering_alloy", amount = 2)
+                workTicks(MACHINE_TICKS)
+                tech(Technologies.LARGE_TURBINE)
+            }
         }
 
         arcFurnace {
@@ -363,6 +378,31 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.POWER_SUBSTATION)
                 workTicks(140)
+            }
+            misc("firebox_casing") {
+                solid("robust_tungstensteel")
+                circuit(1)
+                machine("electric_furnace")
+                input(getItem("component/advanced_alloy"), 4)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.LARGE_BOILER)
+            }
+            solid("reinforced_alloy") {
+                solid("stable_titanium")
+                input(getItem("component/advanced_alloy"), 6)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.NUCLEAR_PHYSICS)
+                workTicks(140)
+            }
+            misc("nuclear_chamber") {
+                solid("reinforced_alloy")
+                circuit(2)
+                component("robot_arm")
+                component("electric_pump")
+                input("lead", "plate", 24)
+                input(getItem("component/advanced_alloy"), 6)
+                input("soldering_alloy", amount = 3)
+                tech(Technologies.NUCLEAR_PHYSICS)
             }
 
             componentVoltage = Voltage.IV
@@ -695,6 +735,17 @@ object Multiblocks {
                 component("cable", 4)
                 tech(Technologies.MULTI_SMELTER)
             }
+            multiblock("large_turbine") {
+                misc("turbine_blade")
+                circuit(4)
+                pic(4)
+                machine("steam_turbine", voltage = Voltage.HV)
+                machine("gas_turbine", voltage = Voltage.HV)
+                machine("combustion_generator", voltage = Voltage.HV)
+                component("electric_pump", 4)
+                component("cable", 16)
+                tech(Technologies.LARGE_TURBINE)
+            }
         }
 
         assembler {
@@ -721,6 +772,24 @@ object Multiblocks {
                 component("electric_pump", 2)
                 component("cable", 16)
                 tech(Technologies.POWER_SUBSTATION)
+            }
+            multiblock("large_boiler") {
+                misc("firebox_casing")
+                circuit(2)
+                component("conveyor_module", 4)
+                component("electric_pump", 4)
+                component("cable", 4)
+                input(getItem("component/advanced_alloy"), 8)
+                tech(Technologies.LARGE_BOILER)
+            }
+            multiblock("nuclear_reactor") {
+                misc("nuclear_chamber")
+                circuit(4)
+                component("field_generator", 4)
+                component("electric_pump", 4)
+                component("cable", 8)
+                input(getItem("component/advanced_alloy"), 12)
+                tech(Technologies.NUCLEAR_PHYSICS)
             }
         }
     }

@@ -142,14 +142,27 @@ object Components {
                 }
             }
 
+            component("empty_nuclear_rod") {
+                model(basicItem(ic2("items/crafting/fuel_rod")))
+            }
+
             component("uranium_fuel_rod") {
                 model(basicItem(ic2("items/reactor/fuel_rod/uranium")))
                 tag(AllTags.NUCLEAR_ITEM)
             }
 
             component("moderator_rod") {
-                model(basicItem(ic2("items/reactor/component_heat_vent")))
+                model(basicItem(ic2("items/reactor/heat_exchanger")))
                 tag(AllTags.NUCLEAR_ITEM)
+            }
+
+            component("control_rod") {
+                model(basicItem(ic2("items/reactor/advanced_heat_vent")))
+                tag(AllTags.NUCLEAR_ITEM)
+            }
+
+            component("nuclear_waste_rod") {
+                model(basicItem(ic2("items/reactor/fuel_rod/tritium")))
             }
         }
     }

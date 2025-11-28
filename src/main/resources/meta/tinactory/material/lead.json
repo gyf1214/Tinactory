@@ -2,7 +2,8 @@
   "color": "0xFF8C648C",
   "items": [
     "dust",
-    "ingot"
+    "ingot",
+    "plate"
   ],
   "fluids": {
     "molten": {

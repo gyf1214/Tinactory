@@ -54,7 +54,7 @@
       "type": "block_or_interface",
       "block": "tinactory:multiblock/misc/firebox_casing"
     },
-    "C": "tinactory:multiblock/solid/stable_titanium",
+    "C": "tinactory:multiblock/solid/robust_tungstensteel",
     "P": "tinactory:multiblock/misc/ptfe_pipe_casing"
   }
 }

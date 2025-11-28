@@ -23,6 +23,7 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
@@ -149,6 +150,7 @@ object MiscComponents {
         researches()
         ae()
         rockets()
+        nuclear()
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.misc(
@@ -231,12 +233,12 @@ object MiscComponents {
 
         research(Voltage.HV) {
             input(getComponent("conveyor_module").item(Voltage.HV))
-            input(getItem("component/advanced_alloy"))
+            misc("advanced_alloy")
         }
 
         research(Voltage.EV) {
             input(getComponent("robot_arm").item(Voltage.EV))
-            input(getItem("component/carbon_plate"))
+            misc("carbon_plate")
         }
 
         research(Voltage.IV) {
@@ -351,7 +353,7 @@ object MiscComponents {
             rocket(Technologies.ROCKET_T1) {
                 input(AllTags.circuit(Voltage.EV))
                 input(getComponent("electric_pump").item(Voltage.HV), 4)
-                input(getItem("component/advanced_alloy"), 16)
+                misc("advanced_alloy", 16)
                 input("cetane_boosted_diesel")
                 voltage(Voltage.HV)
             }
@@ -359,8 +361,8 @@ object MiscComponents {
                 input(AllTags.circuit(Voltage.IV))
                 input(STORAGE_CELLS[0].component.get(), 2)
                 input(getComponent("electric_pump").item(Voltage.IV), 4)
-                input(getItem("component/advanced_alloy"), 8)
-                input(getItem("component/carbon_plate"), 16)
+                misc("advanced_alloy", 8)
+                misc("carbon_plate", 16)
                 input("soldering_alloy", amount = 4)
                 input("rocket_fuel")
                 voltage(Voltage.EV)
@@ -375,6 +377,43 @@ object MiscComponents {
                 target(loc)
             }
             block()
+        }
+    }
+
+    private fun nuclear() {
+        assembler {
+            defaults {
+                voltage(Voltage.HV)
+                workTicks(COMPONENT_TICKS)
+            }
+            misc("empty_nuclear_rod") {
+                input("titanium", "stick", 2)
+                misc("advanced_alloy", 3)
+                input("soldering_alloy", amount = 2)
+            }
+            misc("uranium_fuel_rod") {
+                misc("empty_nuclear_rod")
+                input("enriched_uranium_fuel", "dust")
+            }
+            misc("moderator_rod") {
+                misc("empty_nuclear_rod")
+                input("carbon", "ingot", 16)
+            }
+            misc("control_rod") {
+                misc("empty_nuclear_rod")
+                input("silver", "ingot", 16)
+            }
+        }
+
+        centrifuge {
+            defaults {
+                voltage(Voltage.HV)
+                workTicks(320)
+            }
+            input(getItem("component/nuclear_waste_rod")) {
+                output(getItem("component/empty_nuclear_rod"))
+                output("nuclear_waste", "dust")
+            }
         }
     }
 }

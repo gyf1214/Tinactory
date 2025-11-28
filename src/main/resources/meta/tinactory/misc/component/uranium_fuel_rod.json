@@ -6,5 +6,5 @@
   "heatEmission": 10,
   "reactionOut": true,
   "maxReactions": 4096,
-  "depletedItem": "minecraft:air"
+  "depletedItem": "tinactory:component/nuclear_waste_rod"
 }
