@@ -31,6 +31,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
@@ -178,53 +179,83 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack selectTransmittedItem(IItemCollection from, LogisticWorkerConfig config) {
-        return switch (config.filterType()) {
-            case ITEM -> from.extractItem(StackHelper.copyWithCount(config.itemFilter(), workerStack), true);
-            case TAG -> {
-                var filter = config.tagFilter();
-                for (var stack : from.getAllItems()) {
-                    if (stack.is(filter)) {
-                        yield from.extractItem(StackHelper.copyWithCount(stack, workerStack), true);
-                    }
-                }
-                yield ItemStack.EMPTY;
+    private ItemStack testTransmitItem(IItemCollection from, IItemCollection to, ItemStack stack) {
+        var stack1 = StackHelper.copyWithCount(stack, workerStack);
+        var stack2 = from.extractItem(stack1, true);
+        var remaining = to.insertItem(stack2, true);
+        var limit = stack2.getCount() - remaining.getCount();
+        if (limit > 0) {
+            stack2.setCount(limit);
+            return stack2;
+        } else {
+            return ItemStack.EMPTY;
+        }
+    }
+
+    private ItemStack selectTransmittedItem(IItemCollection from, IItemCollection to, LogisticWorkerConfig config) {
+        var filterType = config.filterType();
+        if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
+            return testTransmitItem(from, to, config.itemFilter());
+        }
+
+        Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
+            stack -> stack.is(config.tagFilter()) : StackHelper.TRUE_FILTER;
+        for (var stack : from.getAllItems()) {
+            if (!filter.test(stack)) {
+                continue;
             }
-            default -> from.extractItem(workerStack, true);
-        };
+            var stack1 = testTransmitItem(from, to, stack);
+            if (!stack1.isEmpty()) {
+                return stack1;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private void transmitItem(IItemCollection from, IItemCollection to, LogisticWorkerConfig config) {
-        var stack = selectTransmittedItem(from, config);
+        var stack = selectTransmittedItem(from, to, config);
         if (stack.isEmpty()) {
             return;
         }
-        var remaining = to.insertItem(stack, true);
-        var limit = stack.getCount() - remaining.getCount();
-        if (limit > 0) {
-            stack.setCount(limit);
-            var stack2 = from.extractItem(stack, false);
-            var remaining1 = to.insertItem(stack2, false);
-            if (!remaining1.isEmpty()) {
-                LOGGER.warn("transmit item failed from={} to={} content={}", from, to, stack);
-            }
+        var stack1 = from.extractItem(stack, false);
+        var remaining = to.insertItem(stack1, false);
+        if (!remaining.isEmpty()) {
+            LOGGER.warn("transmit item failed from={} to={} content={}", from, to, stack);
         }
     }
 
-    private void transmitFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
-        var stack = filter.isEmpty() ? from.drain(workerFluidStack, true) :
-            from.drain(StackHelper.copyWithAmount(filter, workerFluidStack), true);
-        if (stack.isEmpty()) {
-            return;
-        }
-        var limit = to.fill(stack, true);
+    private FluidStack testTransmitFluid(IFluidCollection from, IFluidCollection to, FluidStack stack) {
+        var stack1 = StackHelper.copyWithAmount(stack, workerFluidStack);
+        var stack2 = from.drain(stack1, true);
+        var limit = to.fill(stack2, true);
         if (limit > 0) {
-            stack.setAmount(limit);
-            var stack2 = from.drain(stack, false);
-            var remaining1 = to.fill(stack2, false);
-            if (remaining1 != stack2.getAmount()) {
-                LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
+            stack2.setAmount(limit);
+            return stack2;
+        } else {
+            return FluidStack.EMPTY;
+        }
+    }
+
+    private FluidStack selectTransmittedFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
+        if (!filter.isEmpty()) {
+            return testTransmitFluid(from, to, filter);
+        }
+
+        for (var stack : from.getAllFluids()) {
+            var stack1 = testTransmitFluid(from, to, stack);
+            if (!stack1.isEmpty()) {
+                return stack1;
             }
+        }
+        return FluidStack.EMPTY;
+    }
+
+    private void transmitFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
+        var stack = selectTransmittedFluid(from, to, filter);
+        var stack1 = from.drain(stack, false);
+        var inserted = to.fill(stack1, false);
+        if (inserted != stack1.getAmount()) {
+            LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
         }
     }
 
