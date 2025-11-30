@@ -113,7 +113,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         var from1 = getPort(logistic, subnet, from.get());
         var to1 = getPort(logistic, subnet, to.get());
         return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type() &&
-            (entry.filterType() == PortType.NONE || entry.filterType() == from1.get().type());
+            (entry.filterType() == LogisticWorkerConfig.FilterType.NONE ||
+                entry.filterType().portType == from1.get().type());
     }
 
     private void validateConfigs() {
@@ -177,9 +178,24 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private void transmitItem(IItemCollection from, IItemCollection to, ItemStack filter) {
-        var stack = filter.isEmpty() ? from.extractItem(workerStack, true) :
-            from.extractItem(StackHelper.copyWithCount(filter, workerStack), true);
+    private ItemStack selectTransmittedItem(IItemCollection from, LogisticWorkerConfig config) {
+        return switch (config.filterType()) {
+            case ITEM -> from.extractItem(StackHelper.copyWithCount(config.itemFilter(), workerStack), true);
+            case TAG -> {
+                var filter = config.tagFilter();
+                for (var stack : from.getAllItems()) {
+                    if (stack.is(filter)) {
+                        yield from.extractItem(StackHelper.copyWithCount(stack, workerStack), true);
+                    }
+                }
+                yield ItemStack.EMPTY;
+            }
+            default -> from.extractItem(workerStack, true);
+        };
+    }
+
+    private void transmitItem(IItemCollection from, IItemCollection to, LogisticWorkerConfig config) {
+        var stack = selectTransmittedItem(from, config);
         if (stack.isEmpty()) {
             return;
         }
@@ -252,7 +268,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
-                transmitItem(from.asItem(), to.asItem(), entry1.itemFilter());
+                transmitItem(from.asItem(), to.asItem(), entry1);
             } else {
                 transmitFluid(from.asFluid(), to.asFluid(), entry1.fluidFilter());
             }

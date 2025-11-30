@@ -12,6 +12,8 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -60,6 +62,10 @@ public final class ClientUtil {
 
     public static List<Component> itemTooltip(ItemStack stack, TooltipFlag tooltipFlag) {
         return stack.getTooltipLines(getPlayer(), tooltipFlag);
+    }
+
+    public static List<Component> tagTooltip(TagKey<Item> tag) {
+        return List.of(I18n.tr("tinactory.tooltip.tag", tag.location()));
     }
 
     public static String getItemCountString(int count) {

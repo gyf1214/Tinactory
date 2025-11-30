@@ -3,8 +3,12 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
@@ -24,6 +28,8 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
     private LogisticComponent.PortKey from = null;
     @Nullable
     private LogisticComponent.PortKey to = null;
+    @Nullable
+    private TagKey<Item> tagFilter = null;
     private ItemStack itemFilter = ItemStack.EMPTY;
     private FluidStack fluidFilter = FluidStack.EMPTY;
 
@@ -39,18 +45,38 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         return Optional.ofNullable(to);
     }
 
-    public PortType filterType() {
-        if (!itemFilter.isEmpty()) {
-            return PortType.ITEM;
+    public enum FilterType {
+        NONE(PortType.NONE),
+        ITEM(PortType.ITEM),
+        TAG(PortType.ITEM),
+        FLUID(PortType.FLUID);
+
+        public final PortType portType;
+
+        FilterType(PortType portType) {
+            this.portType = portType;
+        }
+    }
+
+    public FilterType filterType() {
+        if (tagFilter != null) {
+            return FilterType.TAG;
+        } else if (!itemFilter.isEmpty()) {
+            return FilterType.ITEM;
         } else if (!fluidFilter.isEmpty()) {
-            return PortType.FLUID;
+            return FilterType.FLUID;
         } else {
-            return PortType.NONE;
+            return FilterType.NONE;
         }
     }
 
     public ItemStack itemFilter() {
         return itemFilter;
+    }
+
+    public TagKey<Item> tagFilter() {
+        assert tagFilter != null;
+        return tagFilter;
     }
 
     public FluidStack fluidFilter() {
@@ -70,16 +96,25 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
     }
 
     public void setFilter(ItemStack val) {
+        tagFilter = null;
         itemFilter = val;
         fluidFilter = FluidStack.EMPTY;
     }
 
+    public void setFilter(TagKey<Item> val) {
+        tagFilter = val;
+        itemFilter = ItemStack.EMPTY;
+        fluidFilter = FluidStack.EMPTY;
+    }
+
     public void setFilter(FluidStack val) {
+        tagFilter = null;
         fluidFilter = val;
         itemFilter = ItemStack.EMPTY;
     }
 
     public void clearFilter() {
+        tagFilter = null;
         itemFilter = ItemStack.EMPTY;
         fluidFilter = FluidStack.EMPTY;
     }
@@ -96,7 +131,9 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
             tag.putUUID("toMachine", to.machineId());
             tag.putInt("toPortIndex", to.portIndex());
         }
-        if (!itemFilter.isEmpty()) {
+        if (tagFilter != null) {
+            tag.putString("tagFilter", tagFilter.location().toString());
+        } else if (!itemFilter.isEmpty()) {
             tag.put("itemFilter", itemFilter.serializeNBT());
         } else if (!fluidFilter.isEmpty()) {
             tag.put("fluidFilter", StackHelper.serializeFluidStack(fluidFilter));
@@ -117,9 +154,12 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         } else {
             to = null;
         }
+        tagFilter = null;
         itemFilter = ItemStack.EMPTY;
         fluidFilter = FluidStack.EMPTY;
-        if (tag.contains("itemFilter", Tag.TAG_COMPOUND)) {
+        if (tag.contains("tagFilter", Tag.TAG_STRING)) {
+            tagFilter = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tag.getString("tagFilter")));
+        } else if (tag.contains("itemFilter", Tag.TAG_COMPOUND)) {
             itemFilter = ItemStack.of(tag.getCompound("itemFilter"));
         } else if (tag.contains("fluidFilter", Tag.TAG_COMPOUND)) {
             fluidFilter = FluidStack.loadFluidStackFromNBT(tag.getCompound("fluidFilter"));
