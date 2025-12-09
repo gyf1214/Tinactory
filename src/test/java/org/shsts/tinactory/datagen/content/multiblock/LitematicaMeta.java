@@ -23,6 +23,8 @@ import org.shsts.tinactory.core.util.LocHelper;
 import org.slf4j.Logger;
 
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -272,7 +274,7 @@ public class LitematicaMeta extends MetaConsumer {
             }
 
             assert hasInterface;
-            assert w > 0 && d > 0 && h > 0;
+            assert d > 0 && h > 0;
 
             var id = loc.getPath();
 
@@ -297,8 +299,13 @@ public class LitematicaMeta extends MetaConsumer {
                 LOGGER.warn("skip cleanroom {}", loc);
                 return;
             }
-
             var tag = getTag();
+
+            var dir = Path.of("schematics");
+            if (!Files.isDirectory(dir)) {
+                Files.createDirectories(dir);
+            }
+
             try (var fos = new FileOutputStream("schematics/" + loc.getPath() + ".litematic")) {
                 NbtIo.writeCompressed(tag, fos);
             }
