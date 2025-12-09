@@ -30,6 +30,9 @@ public final class AllTags {
     public static final TagKey<Item> TOOL_HANDLE = modItem("tool_handle");
     public static final TagKey<Item> TOOL_SCREW = modItem("tool_screw");
 
+    public static final TagKey<Item> EXTRUDER_INPUT = modItem("extruder_input");
+    public static final TagKey<Item> ORE_BASE_DUST = modItem("ore_base_dust");
+
     public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
     public static final TagKey<Block> MINEABLE_WITH_WIRE_CUTTER = modBlock("mineable/wire_cutter");
 
@@ -46,7 +49,6 @@ public final class AllTags {
     public static final TagKey<Item> STORAGE_CELL = modItem("storage_cell");
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
-    public static final TagKey<Item> EXTRUDER_INPUT = modItem("extruder_input");
     public static final TagKey<Item> NUCLEAR_ITEM = modItem("nuclear");
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {

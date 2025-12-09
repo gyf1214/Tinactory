@@ -35,9 +35,12 @@ object Markers {
             baseMarker("bender")
             baseMarker("wiremill")
 
-            wash("crushed")
-            wash("dust_impure")
-            wash("dust_pure")
+            wash("crushed", "crushed_purified") {
+                output(AllTags.ORE_BASE_DUST, port = 2)
+                output(AllTags.material("dust"), port = 2)
+            }
+            wash("dust_impure", "dust")
+            wash("dust_pure", "dust")
             oreProcess("macerator", "raw")
             oreProcess("macerator", "crushed")
             oreProcess("macerator", "crushed_purified")
@@ -127,9 +130,11 @@ object Markers {
         }
     }
 
-    private fun MarkerFactory.wash(sub: String) {
+    private fun MarkerFactory.wash(sub: String, output: String, block: MarkerBuilder.() -> Unit = {}) {
         oreProcess("ore_washer", sub) {
             input("water", port = 1)
+            output(AllTags.material(output), port = 2)
+            block()
         }
     }
 

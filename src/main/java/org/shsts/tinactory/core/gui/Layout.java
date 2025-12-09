@@ -6,7 +6,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
@@ -114,7 +115,11 @@ public class Layout {
         return getSlotWithInfo(recipe.inputs, ProcessingRecipe.Input::port, ProcessingRecipe.Input::ingredient);
     }
 
-    public List<SlotWith<IProcessingResult>> getProcessingOutputs(ProcessingRecipe recipe) {
+    public List<SlotWith<IProcessingObject>> getProcessingOutputs(ProcessingRecipe recipe) {
+        if (recipe instanceof MarkerRecipe marker) {
+            return getSlotWithInfo(marker.markerOutputs, ProcessingRecipe.Input::port,
+                ProcessingRecipe.Input::ingredient);
+        }
         return getSlotWithInfo(recipe.outputs, ProcessingRecipe.Output::port, ProcessingRecipe.Output::result);
     }
 

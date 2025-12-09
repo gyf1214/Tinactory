@@ -5,6 +5,7 @@ import net.minecraft.world.item.Items
 import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.content.AllTags.ITEM_STORAGE_CELL
+import org.shsts.tinactory.content.AllTags.ORE_BASE_DUST
 import org.shsts.tinactory.content.AllTags.STORAGE_CELL
 import org.shsts.tinactory.content.AllTags.TOOL
 import org.shsts.tinactory.content.AllTags.TOOL_FILE
@@ -18,6 +19,7 @@ import org.shsts.tinactory.content.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.cubeTint
 import org.shsts.tinactory.datagen.content.Technologies
@@ -278,8 +280,12 @@ object MiscMaterials {
             tag(TOOL_WIRE_CUTTER, TOOL)
             tag({ Items.SHEARS }, TOOL_SHEARS)
             tag({ Items.STICK }, TOOL_HANDLE)
-            tag(getMaterial("wrought_iron").tag("stick"), TOOL_HANDLE)
             tag(getMaterial("iron").tag("screw"), TOOL_SCREW)
+
+            for (base in OreVariant.entries) {
+                tag(getMaterial(base.material).tag("dust"), ORE_BASE_DUST)
+            }
+
             tag(ITEM_STORAGE_CELL, STORAGE_CELL)
             tag(FLUID_STORAGE_CELL, STORAGE_CELL)
         }
