@@ -1,5 +1,8 @@
 package org.shsts.tinactory.content.recipe;
 
+import com.google.common.collect.Streams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,6 +30,8 @@ import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -40,6 +45,8 @@ public class MarkerRecipe extends ProcessingRecipe {
     @Nullable
     private final Texture displayTex;
 
+    public final List<Input> markerOutputs;
+
     private MarkerRecipe(Builder builder) {
         super(builder);
         this.baseType = builder.getBaseType();
@@ -47,6 +54,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         this.requireMultiblock = builder.requireMultiblock;
         this.displayIngredient = builder.displayIngredient;
         this.displayTex = builder.displayTex != null ? new Texture(builder.displayTex, 16, 16) : null;
+        this.markerOutputs = builder.markerOutputs;
     }
 
     @Override
@@ -107,6 +115,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         private IProcessingIngredient displayIngredient = null;
         @Nullable
         private ResourceLocation displayTex = null;
+        private final List<Input> markerOutputs = new ArrayList<>();
 
         public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
             super(parent, loc);
@@ -145,6 +154,11 @@ public class MarkerRecipe extends ProcessingRecipe {
             return this;
         }
 
+        public Builder output(int port, IProcessingIngredient ingredient) {
+            markerOutputs.add(new Input(port, ingredient));
+            return this;
+        }
+
         public RecipeType<?> getBaseType() {
             assert baseType != null;
             var type = Registry.RECIPE_TYPE.get(baseType);
@@ -177,6 +191,11 @@ public class MarkerRecipe extends ProcessingRecipe {
                     builder.display(tex);
                 }
             }
+            Streams.stream(GsonHelper.getAsJsonArray(jo, "marker_outputs"))
+                .map(JsonElement::getAsJsonObject)
+                .forEach(je -> builder.output(
+                    GsonHelper.getAsInt(je, "port"),
+                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
             return builder;
         }
 
@@ -191,6 +210,15 @@ public class MarkerRecipe extends ProcessingRecipe {
             } else if (recipe.displayIngredient != null) {
                 jo.add("display", ProcessingIngredients.toJson(recipe.displayIngredient));
             }
+            var markerOutputs = new JsonArray();
+            recipe.markerOutputs.stream()
+                .map(output -> {
+                    var je = new JsonObject();
+                    je.addProperty("port", output.port());
+                    je.add("result", ProcessingIngredients.toJson(output.ingredient()));
+                    return je;
+                }).forEach(markerOutputs::add);
+            jo.add("marker_outputs", markerOutputs);
         }
     }
 

@@ -19,6 +19,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.network.INetwork;
@@ -187,12 +188,28 @@ public class MachineProcessor extends CapabilityProvider implements
         };
     }
 
+    private void clearFilters(PortDirection direction) {
+        container().ifPresent(container -> {
+            var portSize = container.portSize();
+            for (var i = 0; i < portSize; i++) {
+                if (!container.hasPort(i) || container.portDirection(i) != direction) {
+                    continue;
+                }
+                var port = container.getPort(i, ContainerAccess.INTERNAL);
+                switch (port.type()) {
+                    case ITEM -> port.asItemFilter().resetFilters();
+                    case FLUID -> port.asFluidFilter().resetFilters();
+                }
+            }
+        });
+    }
+
     private void setTargetRecipe(ResourceLocation loc) {
         var world = world();
         var machine = machine().orElseThrow();
 
         // first clear the filter
-        doResetTargetRecipe();
+        clearFilters(PortDirection.INPUT);
         for (var processor : processors) {
             if (processor.allowTargetRecipe(world, loc, machine)) {
                 LOGGER.debug("{}: update target recipe = {}", blockEntity, loc);
@@ -205,23 +222,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
     private void resetTargetRecipe() {
         LOGGER.debug("{}: update target recipe = <null>", blockEntity);
-        doResetTargetRecipe();
-    }
-
-    private void doResetTargetRecipe() {
-        container().ifPresent(container -> {
-            var portSize = container.portSize();
-            for (var i = 0; i < portSize; i++) {
-                if (!container.hasPort(i)) {
-                    continue;
-                }
-                var port = container.getPort(i, ContainerAccess.INTERNAL);
-                switch (port.type()) {
-                    case ITEM -> port.asItemFilter().resetFilters();
-                    case FLUID -> port.asFluidFilter().resetFilters();
-                }
-            }
-        });
+        clearFilters(PortDirection.INPUT);
     }
 
     private void updateTargetRecipe() {
@@ -317,6 +318,8 @@ public class MachineProcessor extends CapabilityProvider implements
         workProgress += progress;
         if (workProgress >= currentRecipe.maxProcess()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
+            // clear output filters
+            clearFilters(PortDirection.OUTPUT);
             currentRecipe = null;
             infoList.clear();
             infoMap.clear();

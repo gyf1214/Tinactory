@@ -1,9 +1,12 @@
 package org.shsts.tinactory.core.machine;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -50,6 +53,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     protected int parallel = 1;
     protected double workFactor = 1d;
     protected double energyFactor = 1d;
+    @Nullable
+    private ResourceLocation filterRecipeLoc = null;
+    @Nullable
+    private ProcessingRecipe filterRecipe = null;
 
     public ProcessingMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
         this.recipeType = recipeType;
@@ -117,38 +124,15 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         return false;
     }
 
-    private void setFilters(ProcessingRecipe recipe, IContainer container) {
-        // TODO: do not mark output filter for now
-        var skipInputs = recipe instanceof MarkerRecipe && recipe.inputs.isEmpty();
-
-        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
-
-        if (!skipInputs) {
-            for (var input : recipe.inputs) {
-                var idx = input.port();
-                var ingredient = input.ingredient();
-                if (!container.hasPort(idx)) {
-                    continue;
-                }
-                if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                    itemFilters.put(idx, item.ingredient);
-                } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    var stack1 = item.stack();
-                    itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    var stack1 = fluid.fluid();
-                    fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
-                }
-            }
-        }
-
+    private void setFilters(IContainer container, PortDirection direction,
+        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
+        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
         for (var i = 0; i < container.portSize(); i++) {
             if (!container.hasPort(i)) {
                 continue;
             }
             var dir = container.portDirection(i);
-            if ((skipInputs && dir == PortDirection.INPUT) || dir == PortDirection.OUTPUT) {
+            if (dir != direction) {
                 continue;
             }
             var port = container.getPort(i, ContainerAccess.INTERNAL);
@@ -159,21 +143,86 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         }
     }
 
-    @Override
-    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+    private void addFiltersFromInput(List<ProcessingRecipe.Input> inputs,
+        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
+        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
+        for (var input : inputs) {
+            var idx = input.port();
+            var ingredient = input.ingredient();
+
+            if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+                itemFilters.put(idx, item.ingredient);
+            } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
+                var stack1 = item.stack();
+                itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
+            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
+                var stack1 = fluid.fluid();
+                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
+            }
+        }
+    }
+
+    private void addFiltersFromOutput(List<ProcessingRecipe.Output> outputs,
+        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
+        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
+        for (var output : outputs) {
+            var idx = output.port();
+            var result = output.result();
+
+            if (result instanceof ProcessingResults.ItemResult item) {
+                var stack1 = item.stack;
+                itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
+            } else if (result instanceof ProcessingResults.FluidResult fluid) {
+                var stack1 = fluid.stack;
+                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
+            }
+        }
+    }
+
+    private void setInputFilters(ProcessingRecipe recipe, IContainer container) {
+        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
+        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+
+        addFiltersFromInput(recipe.inputs, itemFilters, fluidFilters);
+        setFilters(container, PortDirection.INPUT, itemFilters, fluidFilters);
+    }
+
+    private void setOutputFilters(ProcessingRecipe recipe, IContainer container) {
+        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
+        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+
+        if (recipe instanceof MarkerRecipe marker) {
+            // if marker does not have markerOutputs, don't set filter at all
+            if (marker.markerOutputs.isEmpty()) {
+                return;
+            }
+            addFiltersFromInput(marker.markerOutputs, itemFilters, fluidFilters);
+        } else {
+            addFiltersFromOutput(recipe.outputs, itemFilters, fluidFilters);
+        }
+        setFilters(container, PortDirection.OUTPUT, itemFilters, fluidFilters);
+    }
+
+    private Optional<ProcessingRecipe> getTargetRecipe(Level world, ResourceLocation loc) {
         var recipeManager = CORE.recipeManager(world);
-        var recipe = recipeManager.byLoc(MARKER, loc)
+        return recipeManager.byLoc(MARKER, loc)
             .map($ -> (ProcessingRecipe) $)
             .or(() -> recipeManager.byLoc(recipeType, loc));
+    }
+
+    @Override
+    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+        var recipe = getTargetRecipe(world, loc);
         if (recipe.isEmpty()) {
             return;
         }
-        machine.container().ifPresent(container -> setFilters(recipe.get(), container));
+        machine.container().ifPresent(container -> setInputFilters(recipe.get(), container));
     }
 
     @Override
     public Optional<R> newRecipe(Level world, IMachine machine) {
         var recipeManager = CORE.recipeManager(world);
+        filterRecipe = null;
         return recipeManager.getRecipeFor(recipeType, machine, world);
     }
 
@@ -183,12 +232,14 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
         var processing = recipeManager.byLoc(recipeType, target);
         if (processing.isPresent()) {
+            filterRecipe = processing.get();
             return processing.filter($ -> $.matches(machine, world));
         }
 
         var marker = recipeManager.byLoc(MARKER, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
+            filterRecipe = recipe;
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager.getRecipesFor(recipeType, machine, world)
                     .stream().filter(marker.get()::matches)
@@ -250,10 +301,20 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         recipe.consumeInputs(machine.container().orElseThrow(), parallel, callback);
         addOutputInfo(recipe, parallel, callback);
         calculateFactors(recipe, machine, parallel);
+        filterRecipeLoc = filterRecipe == null ? null : filterRecipe.loc();
     }
 
     @Override
-    public void onWorkContinue(R recipe, IMachine machine) {}
+    public void onWorkContinue(R recipe, IMachine machine) {
+        if (filterRecipeLoc != null) {
+            filterRecipe = getTargetRecipe(machine.world(), filterRecipeLoc).orElse(null);
+            if (filterRecipe == null) {
+                filterRecipeLoc = null;
+            }
+        } else {
+            filterRecipe = null;
+        }
+    }
 
     @Override
     public long onWorkProgress(R recipe, double partial) {
@@ -262,7 +323,14 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public void onWorkDone(R recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback) {
+        machine.container().ifPresent(container -> {
+            if (filterRecipe != null) {
+                setOutputFilters(filterRecipe, container);
+            }
+        });
         recipe.insertOutputs(machine, parallel, random, callback);
+        filterRecipe = null;
+        filterRecipeLoc = null;
     }
 
     @Override
@@ -291,6 +359,9 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         tag.putInt("parallel", parallel);
         tag.putDouble("workFactor", workFactor);
         tag.putDouble("energyFactor", energyFactor);
+        if (filterRecipeLoc != null) {
+            tag.putString("filterRecipe", filterRecipeLoc.toString());
+        }
         return tag;
     }
 
@@ -299,5 +370,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         parallel = tag.getInt("parallel");
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");
+        if (tag.contains("filterRecipe", Tag.TAG_STRING)) {
+            filterRecipeLoc = new ResourceLocation(tag.getString("filterRecipe"));
+        } else {
+            filterRecipeLoc = null;
+        }
     }
 }
