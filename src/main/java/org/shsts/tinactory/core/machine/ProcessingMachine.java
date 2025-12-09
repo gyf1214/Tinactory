@@ -233,6 +233,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         var processing = recipeManager.byLoc(recipeType, target);
         if (processing.isPresent()) {
             filterRecipe = processing.get();
+            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
             return processing.filter($ -> $.matches(machine, world));
         }
 
@@ -240,6 +241,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         if (marker.isPresent()) {
             var recipe = marker.get();
             filterRecipe = recipe;
+            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager.getRecipesFor(recipeType, machine, world)
                     .stream().filter(marker.get()::matches)

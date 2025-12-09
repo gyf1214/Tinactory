@@ -235,6 +235,8 @@ public class MachineProcessor extends CapabilityProvider implements
             return false;
         }
         var recipe = processor.newRecipe(world, machine, target);
+        // newRecipe may set outputFilters, we clear it now.
+        clearFilters(PortDirection.OUTPUT);
         if (recipe.isPresent()) {
             currentRecipe = new ProcessorRecipe<>(index, processor, recipe.get());
             return true;
@@ -318,7 +320,7 @@ public class MachineProcessor extends CapabilityProvider implements
         workProgress += progress;
         if (workProgress >= currentRecipe.maxProcess()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
-            // clear output filters
+            // onWorkDone may set outputFilters, we clear it now.
             clearFilters(PortDirection.OUTPUT);
             currentRecipe = null;
             infoList.clear();
