@@ -422,6 +422,7 @@ object MiscMachines {
                 Items.SMITHING_TABLE,
                 Items.CAULDRON,
                 Items.BREWING_STAND,
+                Items.COMPOSTER,
                 Items.RESPAWN_ANCHOR,
                 Items.GLOWSTONE,
                 Items.BUCKET,

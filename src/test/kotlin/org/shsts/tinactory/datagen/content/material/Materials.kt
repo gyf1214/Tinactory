@@ -3,7 +3,6 @@ package org.shsts.tinactory.datagen.content.material
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder.Companion.material
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT
 import org.shsts.tinactory.datagen.content.model.IconSet.CERTUS
 import org.shsts.tinactory.datagen.content.model.IconSet.DULL
@@ -20,30 +19,11 @@ import org.shsts.tinactory.datagen.content.model.IconSet.SHINY
 
 object Materials {
     fun init() {
-        woods()
         elements()
         firstDegrees()
         higherDegrees()
         ores()
         misc()
-    }
-
-    private fun woods() {
-        // disable iron and wood tools
-        vanilla {
-            nullRecipe(
-                Items.WOODEN_AXE,
-                Items.WOODEN_HOE,
-                Items.WOODEN_PICKAXE,
-                Items.WOODEN_SHOVEL,
-                Items.WOODEN_SWORD,
-                Items.IRON_AXE,
-                Items.IRON_HOE,
-                Items.IRON_PICKAXE,
-                Items.IRON_SHOVEL,
-                Items.IRON_SWORD,
-                Items.COMPOSTER)
-        }
     }
 
     private fun elements() {
