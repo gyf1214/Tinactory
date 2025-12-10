@@ -66,6 +66,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     @Override
     public Optional<OreAnalyzerRecipe> newRecipe(Level world, IMachine machine) {
         var recipeManager = CORE.recipeManager(world);
+        setFilterRecipe(machine, null);
         var matches = recipeManager.getRecipesFor(recipeType, machine, world);
         return newRecipe(matches, world);
     }
@@ -75,17 +76,23 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         var recipeManager = CORE.recipeManager(world);
         var marker = recipeManager.byLoc(MARKER, target);
         if (marker.isPresent()) {
+            var recipe = marker.get();
+            setFilterRecipe(machine, recipe);
             var matches = recipeManager.getRecipesFor(recipeType, machine, world)
-                .stream().filter(marker.get()::matches)
+                .stream().filter(recipe::matches)
                 .toList();
             return newRecipe(matches, world);
         }
 
-        var recipe = recipeManager.byLoc(recipeType, target);
-        if (recipe.isPresent() && recipe.get().matches(machine, world)) {
-            var random = world.random;
-            emptyRecipe = random.nextDouble() > recipe.get().rate;
-            return recipe;
+        var processing = recipeManager.byLoc(recipeType, target);
+        if (processing.isPresent()) {
+            var recipe = processing.get();
+            setFilterRecipe(machine, recipe);
+            if (recipe.matches(machine, world)) {
+                var random = world.random;
+                emptyRecipe = random.nextDouble() > recipe.rate;
+                return processing;
+            }
         }
 
         return Optional.empty();

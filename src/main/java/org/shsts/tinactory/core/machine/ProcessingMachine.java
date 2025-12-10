@@ -219,10 +219,17 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         machine.container().ifPresent(container -> setInputFilters(recipe.get(), container));
     }
 
+    protected void setFilterRecipe(IMachine machine, @Nullable ProcessingRecipe recipe) {
+        filterRecipe = recipe;
+        if (recipe != null) {
+            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
+        }
+    }
+
     @Override
     public Optional<R> newRecipe(Level world, IMachine machine) {
         var recipeManager = CORE.recipeManager(world);
-        filterRecipe = null;
+        setFilterRecipe(machine, null);
         return recipeManager.getRecipeFor(recipeType, machine, world);
     }
 
@@ -232,16 +239,14 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
         var processing = recipeManager.byLoc(recipeType, target);
         if (processing.isPresent()) {
-            filterRecipe = processing.get();
-            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
+            setFilterRecipe(machine, processing.get());
             return processing.filter($ -> $.matches(machine, world));
         }
 
         var marker = recipeManager.byLoc(MARKER, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
-            filterRecipe = recipe;
-            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
+            setFilterRecipe(machine, recipe);
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager.getRecipesFor(recipeType, machine, world)
                     .stream().filter(marker.get()::matches)
