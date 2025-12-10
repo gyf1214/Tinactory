@@ -434,8 +434,8 @@ object CircuitComponents {
         }
 
         engraving("integrated_circuit", "ruby", 0, Voltage.LV, -1.0, 0.0)
+        engraving("ram", "sapphire", 0, Voltage.LV, -0.5, 0.5)
         engraving("cpu", "diamond", 0, Voltage.MV, 0.0, 1.0)
-        engraving("ram", "sapphire", 0, Voltage.MV, -0.5, 0.5)
         engraving("low_pic", "emerald", 0, Voltage.MV, -0.3, 0.7)
         engraving("nano_cpu", "emerald", 1, Voltage.HV, 0.25, 1.25, "cpu")
         engraving("nor", "diamond", 1, Voltage.HV, 0.1, 1.1, "ram")
