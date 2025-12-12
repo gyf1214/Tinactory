@@ -20,6 +20,7 @@ import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;

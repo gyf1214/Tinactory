@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.multiblock;
+package org.shsts.tinactory.core.multiblock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -9,8 +9,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.network.PrimitiveBlock;
 
 import java.util.ArrayList;

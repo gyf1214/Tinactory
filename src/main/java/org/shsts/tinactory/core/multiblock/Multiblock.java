@@ -21,7 +21,6 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
-import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;

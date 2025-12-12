@@ -27,6 +27,7 @@ import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
+import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
