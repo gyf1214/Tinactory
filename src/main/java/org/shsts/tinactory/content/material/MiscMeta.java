@@ -35,7 +35,7 @@ import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.FixedBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.PowerBlock;
-import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.content.network.MachineBlocks;
 import org.shsts.tinactory.content.tool.NuclearRod;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
@@ -179,7 +179,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void meStorageInterface(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id, MachineBlock.simple(tooltip ->
+        BlockEntityBuilder.builder(id, MachineBlocks.simple(tooltip ->
                 addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_INTERFACE)
@@ -194,7 +194,7 @@ public class MiscMeta extends MetaConsumer {
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
         var power = GsonHelper.getAsDouble(jo, "power");
         BlockEntityBuilder.builder(id,
-                MachineBlock.simple(tooltip -> {
+                MachineBlocks.simple(tooltip -> {
                     addTooltip(tooltip, "meDrive", NUMBER_FORMAT.format(layout.slots.size()));
                     addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
                 }))
@@ -226,7 +226,7 @@ public class MiscMeta extends MetaConsumer {
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
 
         var properties = FireBoiler.Properties.fromJson(jo);
-        BlockEntityBuilder.builder(id, MachineBlock.factory(Voltage.PRIMITIVE))
+        BlockEntityBuilder.builder(id, MachineBlocks.processing(Voltage.PRIMITIVE))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
@@ -238,7 +238,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void meSignalController(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id, MachineBlock.signal(power))
+        BlockEntityBuilder.builder(id, MachineBlocks.signal(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_SIGNAL_CONTROLLER)
             .blockEntity()
@@ -249,7 +249,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void meStorageDetector(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id, MachineBlock.signal(power))
+        BlockEntityBuilder.builder(id, MachineBlocks.signal(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_DETECTOR)
             .blockEntity()

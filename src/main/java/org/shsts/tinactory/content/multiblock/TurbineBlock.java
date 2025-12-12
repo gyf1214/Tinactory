@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.core.network.MachineBlock;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

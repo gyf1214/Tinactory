@@ -53,7 +53,7 @@ import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
 

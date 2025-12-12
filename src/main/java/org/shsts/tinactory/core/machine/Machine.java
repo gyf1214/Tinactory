@@ -29,8 +29,8 @@ import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -65,7 +65,7 @@ import static org.shsts.tinactory.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.WORK_SCHEDULING;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

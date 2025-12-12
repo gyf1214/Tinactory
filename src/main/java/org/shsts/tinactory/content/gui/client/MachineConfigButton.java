@@ -1,8 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
 import org.shsts.tinactory.api.machine.IMachineConfig;
-import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;

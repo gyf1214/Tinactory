@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.sync;
+package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

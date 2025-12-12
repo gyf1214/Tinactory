@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.core.network;
 
 import com.google.common.collect.ImmutableMap;
 import javax.annotation.Nullable;
@@ -29,8 +29,6 @@ import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.material.MaterialSet;
-import org.shsts.tinactory.core.network.IConnector;
-import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tool.IWrenchable;
 import org.shsts.tinactory.core.tool.UsableToolItem;
 import org.shsts.tinycorelib.api.core.Transformer;

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.core.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -25,15 +25,11 @@ import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
-import org.shsts.tinactory.core.network.IConnector;
-import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tool.IWrenchable;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -56,49 +52,6 @@ public class MachineBlock extends SmartEntityBlock
         @Nullable IMenuType menu, Voltage voltage) {
         super(properties.requiresCorrectToolForDrops().isValidSpawn(AllItems::never), entityType, menu);
         this.voltage = voltage;
-    }
-
-    public static Factory<MachineBlock> factory(Voltage voltage) {
-        return (properties, entityType, menu) ->
-            new MachineBlock(properties, entityType, menu, voltage);
-    }
-
-    public static Factory<MachineBlock> simple(Consumer<List<Component>> tooltipBuilder) {
-        return (properties, entityType, menu) -> new StaticMachineBlock(properties, entityType, menu) {
-            @Override
-            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-                List<Component> tooltip, TooltipFlag isAdvanced) {
-                super.appendHoverText(stack, world, tooltip, isAdvanced);
-                tooltipBuilder.accept(tooltip);
-            }
-        };
-    }
-
-    public static Factory<MachineBlock> batteryBox(Voltage voltage, Consumer<List<Component>> tooltipBuilder) {
-        return (properties, entityType, menu) -> new SidedMachineBlock(properties, entityType, menu, voltage) {
-            @Override
-            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-                List<Component> tooltip, TooltipFlag isAdvanced) {
-                super.appendHoverText(stack, world, tooltip, isAdvanced);
-                tooltipBuilder.accept(tooltip);
-            }
-        };
-    }
-
-    public static Factory<MachineBlock> multiblockInterface(Voltage voltage,
-        Consumer<List<Component>> tooltipBuilder) {
-        return (properties, entityType, menu) -> new MultiblockInterfaceBlock(properties, entityType, menu, voltage) {
-            @Override
-            public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-                List<Component> tooltip, TooltipFlag isAdvanced) {
-                super.appendHoverText(stack, world, tooltip, isAdvanced);
-                tooltipBuilder.accept(tooltip);
-            }
-        };
-    }
-
-    public static Factory<MachineBlock> signal(double power) {
-        return (properties, entityType, menu) -> new SignalMachineBlock(properties, entityType, menu, power);
     }
 
     public static Voltage getBlockVoltage(BlockEntity be) {

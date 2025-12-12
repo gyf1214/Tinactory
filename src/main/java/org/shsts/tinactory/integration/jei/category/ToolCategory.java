@@ -12,7 +12,7 @@ import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.logistics.SlotType;
-import org.shsts.tinactory.core.recipe.ToolRecipe;
+import org.shsts.tinactory.content.recipe.ToolRecipe;
 
 import java.util.Collections;
 import java.util.List;

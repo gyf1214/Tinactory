@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.recipe;
+package org.shsts.tinactory.content.recipe;
 
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;

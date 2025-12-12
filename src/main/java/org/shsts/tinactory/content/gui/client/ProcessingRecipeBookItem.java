@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
@@ -15,6 +16,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -31,9 +33,9 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
     }
 
     @Override
-    public void select(Layout layout, GhostRecipe ghostRecipe) {
-        layout.getProcessingInputs(recipe).forEach(ghostRecipe::addIngredient);
-        layout.getProcessingOutputs(recipe).forEach(ghostRecipe::addIngredient);
+    public void select(Layout layout, BiConsumer<Layout.SlotInfo, IProcessingObject> ingredientCons) {
+        layout.getProcessingInputs(recipe).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
+        layout.getProcessingOutputs(recipe).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
     }
 
     @Override

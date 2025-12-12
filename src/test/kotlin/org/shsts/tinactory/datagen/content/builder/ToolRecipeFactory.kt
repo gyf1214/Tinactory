@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.TOOL_CRAFTING
-import org.shsts.tinactory.core.recipe.ToolRecipe
+import org.shsts.tinactory.content.recipe.ToolRecipe
 import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 class ToolRecipeFactory {

@@ -46,7 +46,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

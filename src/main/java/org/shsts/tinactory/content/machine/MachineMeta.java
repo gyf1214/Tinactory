@@ -23,7 +23,7 @@ import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.StackProcessingContainer;
 import org.shsts.tinactory.content.material.ComponentMeta;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
-import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.content.network.MachineBlocks;
 import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
@@ -42,6 +42,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
+import org.shsts.tinactory.core.network.MachineBlock;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -277,7 +278,7 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private BlockEntityBuilder<MachineBlock, ?> baseMachine(Voltage v) {
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock.factory(v))
+            return BlockEntityBuilder.builder(machineId(v), MachineBlocks.processing(v))
                 .transform(MachineSet::baseMachine)
                 .block()
                 .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
@@ -296,7 +297,7 @@ public class MachineMeta extends MetaConsumer {
 
         private BlockEntityBuilder<MachineBlock, ?> baseInterface(Voltage v,
             Consumer<List<Component>> tooltipBuilder) {
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock.multiblockInterface(v, tooltipBuilder))
+            return BlockEntityBuilder.builder(machineId(v), MachineBlocks.multiblockInterface(v, tooltipBuilder))
                 .blockEntity()
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
@@ -340,7 +341,7 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<MachineBlock> batteryBox(Voltage v) {
             var layout = getLayout(v);
-            return BlockEntityBuilder.builder(machineId(v), MachineBlock.batteryBox(v, tooltip ->
+            return BlockEntityBuilder.builder(machineId(v), MachineBlocks.batteryBox(v, tooltip ->
                     addTooltip(tooltip, "batteryBox", NUMBER_FORMAT.format(layout.slots.size()))))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.BATTERY_BOX)
@@ -366,7 +367,7 @@ public class MachineMeta extends MetaConsumer {
             var slotSize = GsonHelper.getAsInt(jo, "slotSize");
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
-                    MachineBlock.simple(tooltip -> {
+                    MachineBlocks.simple(tooltip -> {
                         addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(slotSize),
                             NUMBER_FORMAT.format(layout.slots.size()));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
@@ -384,7 +385,7 @@ public class MachineMeta extends MetaConsumer {
             var slotSize = GsonHelper.getAsInt(jo, "slotSize");
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
-                    MachineBlock.simple(tooltip -> {
+                    MachineBlocks.simple(tooltip -> {
                         addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(slotSize),
                             NUMBER_FORMAT.format(layout.slots.size()));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
@@ -406,7 +407,7 @@ public class MachineMeta extends MetaConsumer {
                 getPower(v, jo));
 
             return BlockEntityBuilder.builder(machineId(v),
-                    MachineBlock.simple(tooltip -> {
+                    MachineBlocks.simple(tooltip -> {
                         addTooltip(tooltip, "logisticWorker.1", NUMBER_FORMAT.format(properties.slots()));
                         addTooltip(tooltip, "logisticWorker.2", DOUBLE_FORMAT.format(properties.interval() / 20d));
                         addTooltip(tooltip, "logisticWorker.3", NUMBER_FORMAT.format(properties.stack()),

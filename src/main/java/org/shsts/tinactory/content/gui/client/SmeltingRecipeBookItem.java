@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -48,7 +50,7 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
     }
 
     @Override
-    public void select(Layout layout, GhostRecipe ghostRecipe) {
+    public void select(Layout layout, BiConsumer<Layout.SlotInfo, IProcessingObject> ingredientCons) {
         var inputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == inputPort)
             .findFirst().orElseThrow();
@@ -57,8 +59,8 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
             .findFirst().orElseThrow();
         var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
         var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());
-        ghostRecipe.addIngredient(inputSlot, ingredient);
-        ghostRecipe.addIngredient(outputSlot, result);
+        ingredientCons.accept(inputSlot, ingredient);
+        ingredientCons.accept(outputSlot, result);
     }
 
     @Override

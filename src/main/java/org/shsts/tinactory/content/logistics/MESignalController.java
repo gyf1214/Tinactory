@@ -29,8 +29,8 @@ import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_READ_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_WRITE_SCHEDULING;
-import static org.shsts.tinactory.content.network.MachineBlock.FACING;
-import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.core.network.MachineBlock.FACING;
+import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

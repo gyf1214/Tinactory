@@ -13,7 +13,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import org.shsts.tinactory.content.network.MachineBlock;
+import org.shsts.tinactory.core.network.MachineBlock;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
