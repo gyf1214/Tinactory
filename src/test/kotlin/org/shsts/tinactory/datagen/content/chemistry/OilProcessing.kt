@@ -1,6 +1,6 @@
 package org.shsts.tinactory.datagen.content.chemistry
 
-import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.datagen.content.Technologies

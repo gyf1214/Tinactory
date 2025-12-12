@@ -9,9 +9,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -21,12 +21,12 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
-import static org.shsts.tinactory.content.AllEvents.CONNECT;
-import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

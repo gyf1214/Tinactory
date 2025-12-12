@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.PORT_CLICK;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 

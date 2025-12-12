@@ -2,13 +2,13 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
-import org.shsts.tinactory.content.AllItems.getComponent
-import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.AllTags.TOOL_HAMMER
-import org.shsts.tinactory.content.AllTags.TOOL_HANDLE
-import org.shsts.tinactory.content.AllTags.TOOL_WRENCH
+import org.shsts.tinactory.AllItems.STORAGE_CELLS
+import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllTags
+import org.shsts.tinactory.AllTags.TOOL_HAMMER
+import org.shsts.tinactory.AllTags.TOOL_HANDLE
+import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard

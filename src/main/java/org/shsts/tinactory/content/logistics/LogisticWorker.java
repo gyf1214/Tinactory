@@ -33,13 +33,13 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
-import static org.shsts.tinactory.content.AllEvents.CONNECT;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.AllNetworks.LOGISTICS_SCHEDULING;
-import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 

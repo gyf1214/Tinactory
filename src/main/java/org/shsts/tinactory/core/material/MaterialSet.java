@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.tool.ToolItem;
 import org.shsts.tinactory.core.tool.UsableToolItem;
@@ -23,9 +23,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllRegistries.simpleFluid;
+import static org.shsts.tinactory.AllTags.extend;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRegistries.simpleFluid;
-import static org.shsts.tinactory.content.AllTags.extend;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault

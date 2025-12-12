@@ -28,14 +28,14 @@ import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault

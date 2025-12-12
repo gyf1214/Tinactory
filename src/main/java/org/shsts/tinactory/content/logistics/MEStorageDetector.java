@@ -18,8 +18,8 @@ import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
-import static org.shsts.tinactory.content.AllCapabilities.SIGNAL_MACHINE;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.OptionalInt;
 
-import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

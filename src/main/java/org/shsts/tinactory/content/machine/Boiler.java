@@ -13,8 +13,8 @@ import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import static org.shsts.tinactory.AllRecipes.BOILER;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllRecipes.BOILER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

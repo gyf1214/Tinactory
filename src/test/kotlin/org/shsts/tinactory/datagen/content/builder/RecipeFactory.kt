@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.ItemLike
-import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.suffix

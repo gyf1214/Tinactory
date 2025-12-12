@@ -8,8 +8,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.core.common.MetaConsumer;
 
+import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault

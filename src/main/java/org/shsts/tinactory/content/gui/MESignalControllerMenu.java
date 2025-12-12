@@ -16,9 +16,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.MACHINE_COMPARATOR;
 
 @ParametersAreNonnullByDefault

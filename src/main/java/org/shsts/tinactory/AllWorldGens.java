@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -15,9 +15,9 @@ import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
 import org.shsts.tinactory.content.worldgen.VoidPreset;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import static org.shsts.tinactory.AllRegistries.FEATURES;
+import static org.shsts.tinactory.AllRegistries.WORLD_TYPES;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRegistries.FEATURES;
-import static org.shsts.tinactory.content.AllRegistries.WORLD_TYPES;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault

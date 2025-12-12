@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.slf4j.Logger;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.core.gui.client.RenderUtil.renderBlockInWorld;
 import static org.shsts.tinactory.core.gui.client.RenderUtil.renderBlockModel;
 

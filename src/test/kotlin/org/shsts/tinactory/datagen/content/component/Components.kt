@@ -2,10 +2,10 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
-import org.shsts.tinactory.content.AllItems.componentEntry
-import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.AllTags.MINEABLE_WITH_WIRE_CUTTER
+import org.shsts.tinactory.AllItems.STORAGE_CELLS
+import org.shsts.tinactory.AllItems.componentEntry
+import org.shsts.tinactory.AllTags
+import org.shsts.tinactory.AllTags.MINEABLE_WITH_WIRE_CUTTER
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.CircuitTier.CRYSTAL

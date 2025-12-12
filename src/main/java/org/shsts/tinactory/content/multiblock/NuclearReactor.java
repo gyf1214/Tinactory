@@ -14,11 +14,11 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import org.shsts.tinactory.AllMenus;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllMenus;
-import org.shsts.tinactory.content.AllTags;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -29,7 +29,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.Arrays;
 
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.core.util.CodecHelper.parseIntArray;
 
 @ParametersAreNonnullByDefault

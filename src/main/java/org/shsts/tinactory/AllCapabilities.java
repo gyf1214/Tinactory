@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;

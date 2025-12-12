@@ -6,7 +6,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.LayoutScreen;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;

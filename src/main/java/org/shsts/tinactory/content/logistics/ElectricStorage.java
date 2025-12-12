@@ -19,15 +19,15 @@ import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
-import static org.shsts.tinactory.content.AllEvents.CONNECT;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault

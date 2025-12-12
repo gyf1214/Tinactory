@@ -2,12 +2,12 @@ package org.shsts.tinactory.datagen.content
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
-import org.shsts.tinactory.content.AllItems.getComponent
-import org.shsts.tinactory.content.AllMaterials.getMaterial
-import org.shsts.tinactory.content.AllMultiblocks
-import org.shsts.tinactory.content.AllMultiblocks.getMultiblock
+import org.shsts.tinactory.AllBlockEntities.getMachine
+import org.shsts.tinactory.AllItems.STORAGE_CELLS
+import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllMultiblocks
+import org.shsts.tinactory.AllMultiblocks.getMultiblock
 import org.shsts.tinactory.content.electric.CircuitComponentTier
 import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent

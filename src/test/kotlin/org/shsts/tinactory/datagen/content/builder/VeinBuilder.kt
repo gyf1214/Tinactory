@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.Tinactory.REGISTRATE
-import org.shsts.tinactory.content.AllMaterials.getMaterial
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet

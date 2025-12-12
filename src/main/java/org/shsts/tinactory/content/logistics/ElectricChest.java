@@ -27,8 +27,8 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

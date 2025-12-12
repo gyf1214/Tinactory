@@ -24,10 +24,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.shsts.tinactory.AllItems.COMPONENTS;
+import static org.shsts.tinactory.AllMaterials.getMaterial;
+import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllItems.COMPONENTS;
-import static org.shsts.tinactory.content.AllMaterials.getMaterial;
-import static org.shsts.tinactory.content.AllRegistries.ITEMS;
 import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
 
 @ParametersAreNonnullByDefault

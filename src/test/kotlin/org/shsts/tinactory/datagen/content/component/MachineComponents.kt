@@ -1,8 +1,8 @@
 package org.shsts.tinactory.datagen.content.component
 
-import org.shsts.tinactory.content.AllItems.getComponent
-import org.shsts.tinactory.content.AllTags
-import org.shsts.tinactory.content.AllTags.TOOL_WIRE_CUTTER
+import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.AllTags
+import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.content.network.CableBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies

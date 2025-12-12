@@ -6,7 +6,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraftforge.common.world.ForgeWorldPreset;
-import org.shsts.tinactory.content.AllWorldGens;
+import org.shsts.tinactory.AllWorldGens;
 
 import java.util.Optional;
 

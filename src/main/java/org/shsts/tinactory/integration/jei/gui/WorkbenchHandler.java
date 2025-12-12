@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.jei.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.content.AllLayouts;
+import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.integration.jei.category.ToolCategory;
 

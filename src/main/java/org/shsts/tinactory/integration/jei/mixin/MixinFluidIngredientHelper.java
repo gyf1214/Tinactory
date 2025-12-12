@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static org.shsts.tinactory.content.AllRegistries.ITEMS;
+import static org.shsts.tinactory.AllRegistries.ITEMS;
 
 @Mixin(FluidIngredientHelper.class)
 @ParametersAreNonnullByDefault

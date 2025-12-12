@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;

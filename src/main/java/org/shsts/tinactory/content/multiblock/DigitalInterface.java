@@ -33,9 +33,9 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
-import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

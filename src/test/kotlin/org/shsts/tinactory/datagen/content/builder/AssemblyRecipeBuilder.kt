@@ -1,9 +1,9 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
-import org.shsts.tinactory.content.AllBlockEntities.getMachine
-import org.shsts.tinactory.content.AllItems.getComponent
-import org.shsts.tinactory.content.AllTags
+import org.shsts.tinactory.AllBlockEntities.getMachine
+import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe

@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_AMOUNT_KEY;
 import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_FLUID_KEY;
 import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_ITEM_KEY;

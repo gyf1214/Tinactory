@@ -5,7 +5,7 @@ import org.shsts.tinactory.content.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 
 class MachineConfigButton extends SwitchButton {
     private final IMachineConfig config;

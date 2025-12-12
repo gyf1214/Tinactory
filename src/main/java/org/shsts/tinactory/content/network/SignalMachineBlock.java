@@ -19,7 +19,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllCapabilities.SIGNAL_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 

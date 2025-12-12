@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -12,8 +12,8 @@ import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import static org.shsts.tinactory.AllRegistries.COMPONENT_TYPES;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllRegistries.COMPONENT_TYPES;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

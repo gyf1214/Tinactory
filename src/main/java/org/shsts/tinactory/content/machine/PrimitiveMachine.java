@@ -31,11 +31,11 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
-import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 /**

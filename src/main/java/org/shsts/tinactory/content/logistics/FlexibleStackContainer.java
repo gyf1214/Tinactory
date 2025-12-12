@@ -33,15 +33,15 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllCapabilities.CONTAINER;
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

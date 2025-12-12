@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
-import org.shsts.tinactory.content.AllMaterials.getMaterial
+import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingIngredients

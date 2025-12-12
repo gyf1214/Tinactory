@@ -15,13 +15,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.AllCapabilities;
+import org.shsts.tinactory.AllEvents;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllEvents;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
@@ -35,12 +35,12 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllEvents.CLIENT_LOAD;
-import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
-import static org.shsts.tinactory.content.AllEvents.CONNECT;
-import static org.shsts.tinactory.content.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
+import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault

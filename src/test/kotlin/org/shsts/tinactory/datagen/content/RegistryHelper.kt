@@ -3,8 +3,8 @@ package org.shsts.tinactory.datagen.content
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
-import org.shsts.tinactory.content.AllRegistries.BLOCKS
-import org.shsts.tinactory.content.AllRegistries.ITEMS
+import org.shsts.tinactory.AllRegistries.BLOCKS
+import org.shsts.tinactory.AllRegistries.ITEMS
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 
 object RegistryHelper {

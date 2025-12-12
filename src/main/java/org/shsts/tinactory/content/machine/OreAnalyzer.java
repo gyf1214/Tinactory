@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

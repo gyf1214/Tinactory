@@ -12,7 +12,7 @@ import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllCapabilities.EVENT_MANAGER;
+import static org.shsts.tinactory.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault

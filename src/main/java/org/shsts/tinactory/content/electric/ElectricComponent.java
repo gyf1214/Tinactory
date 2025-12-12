@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.DoublePredicate;
 
-import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_SCHEDULING;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

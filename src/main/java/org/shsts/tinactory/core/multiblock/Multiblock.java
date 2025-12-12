@@ -14,12 +14,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.AllCapabilities;
+import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllCapabilities;
-import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
@@ -43,9 +43,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllEvents.CLIENT_TICK;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault

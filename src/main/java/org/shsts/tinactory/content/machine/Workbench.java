@@ -19,7 +19,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllRecipes.TOOL_CRAFTING;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllRecipes.TOOL_CRAFTING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

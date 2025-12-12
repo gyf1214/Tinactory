@@ -20,15 +20,15 @@ import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.SIGNAL_MACHINE;
-import static org.shsts.tinactory.content.AllEvents.BUILD_SCHEDULING;
-import static org.shsts.tinactory.content.AllEvents.CONNECT;
-import static org.shsts.tinactory.content.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.AllNetworks.SIGNAL_COMPONENT;
-import static org.shsts.tinactory.content.AllNetworks.SIGNAL_READ_SCHEDULING;
-import static org.shsts.tinactory.content.AllNetworks.SIGNAL_WRITE_SCHEDULING;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
+import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_READ_SCHEDULING;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_WRITE_SCHEDULING;
 import static org.shsts.tinactory.content.network.MachineBlock.FACING;
 import static org.shsts.tinactory.content.network.MachineBlock.getBlockVoltage;
 

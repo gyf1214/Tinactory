@@ -25,7 +25,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllMenus.PORT_CLICK;
+import static org.shsts.tinactory.AllMenus.PORT_CLICK;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.BUTTON_TOP_MARGIN;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;

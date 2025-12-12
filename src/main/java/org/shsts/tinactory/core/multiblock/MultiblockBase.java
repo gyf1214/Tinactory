@@ -16,11 +16,11 @@ import org.slf4j.Logger;
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_BY_CHUNK;
-import static org.shsts.tinactory.content.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_LOAD;
-import static org.shsts.tinactory.content.AllEvents.SERVER_TICK;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

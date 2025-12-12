@@ -25,9 +25,9 @@ import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.content.AllCapabilities.DIGITAL_PROVIDER;
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_COLLECTION;
-import static org.shsts.tinactory.content.AllCapabilities.ITEM_COLLECTION;
+import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.FLUID_COLLECTION;
+import static org.shsts.tinactory.AllCapabilities.ITEM_COLLECTION;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;

@@ -11,7 +11,7 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;

@@ -17,7 +17,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.util.I18n.tr;
 

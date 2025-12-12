@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.content.AllItems.getComponent;
-import static org.shsts.tinactory.content.AllMenus.RENAME;
+import static org.shsts.tinactory.AllItems.getComponent;
+import static org.shsts.tinactory.AllMenus.RENAME;
 import static org.shsts.tinactory.content.gui.TechMenu.HEIGHT;
 import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_MARGIN;
 import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_WIDTH;

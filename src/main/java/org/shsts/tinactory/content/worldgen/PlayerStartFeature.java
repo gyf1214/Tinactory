@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import org.shsts.tinactory.content.AllItems;
+import org.shsts.tinactory.AllItems;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

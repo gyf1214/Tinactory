@@ -19,15 +19,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
-import org.shsts.tinactory.content.AllEvents;
+import org.shsts.tinactory.AllEvents;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.content.AllEvents.BLOCK_PLACE;
-import static org.shsts.tinactory.content.AllEvents.BLOCK_USE;
+import static org.shsts.tinactory.AllEvents.BLOCK_PLACE;
+import static org.shsts.tinactory.AllEvents.BLOCK_USE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

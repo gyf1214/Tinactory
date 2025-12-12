@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
@@ -51,8 +51,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.shsts.tinactory.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @JeiPlugin

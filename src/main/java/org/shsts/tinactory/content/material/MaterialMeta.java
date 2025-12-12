@@ -11,15 +11,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.TierSortingRegistry;
-import org.shsts.tinactory.content.AllMaterials;
+import org.shsts.tinactory.AllMaterials;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.material.MaterialSet;
 import org.shsts.tinactory.core.material.OreVariant;
 import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 
-import static org.shsts.tinactory.content.AllRegistries.FLUIDS;
-import static org.shsts.tinactory.content.AllRegistries.ITEMS;
-import static org.shsts.tinactory.content.AllRegistries.SOUND_EVENTS;
+import static org.shsts.tinactory.AllRegistries.FLUIDS;
+import static org.shsts.tinactory.AllRegistries.ITEMS;
+import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

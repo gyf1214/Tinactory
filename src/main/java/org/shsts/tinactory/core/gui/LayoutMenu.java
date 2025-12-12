@@ -9,10 +9,10 @@ import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
 import java.util.Objects;
 
-import static org.shsts.tinactory.content.AllCapabilities.LAYOUT_PROVIDER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;

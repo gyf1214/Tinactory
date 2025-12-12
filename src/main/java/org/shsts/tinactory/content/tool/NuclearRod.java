@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
 
-import static org.shsts.tinactory.content.AllRegistries.ITEMS;
+import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 

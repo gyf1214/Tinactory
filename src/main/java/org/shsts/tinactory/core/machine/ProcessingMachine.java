@@ -40,8 +40,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.AllRecipes.MARKER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

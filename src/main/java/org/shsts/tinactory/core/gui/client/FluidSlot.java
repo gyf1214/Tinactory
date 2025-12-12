@@ -17,7 +17,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

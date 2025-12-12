@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;

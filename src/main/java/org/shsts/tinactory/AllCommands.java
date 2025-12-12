@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -29,8 +29,8 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.Random;
 
+import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.machine
 
 import net.minecraft.world.item.Items
-import org.shsts.tinactory.content.AllItems.STORAGE_CELLS
+import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies

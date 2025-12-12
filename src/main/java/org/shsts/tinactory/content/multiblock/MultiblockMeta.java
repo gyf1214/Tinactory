@@ -10,7 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
-import org.shsts.tinactory.content.AllTags;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
+import static org.shsts.tinactory.AllRecipes.putTypeInfo;
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.content.AllMultiblocks.MULTIBLOCK_SETS;
-import static org.shsts.tinactory.content.AllRecipes.putTypeInfo;
-import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

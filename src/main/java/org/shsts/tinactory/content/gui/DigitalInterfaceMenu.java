@@ -19,7 +19,7 @@ import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 

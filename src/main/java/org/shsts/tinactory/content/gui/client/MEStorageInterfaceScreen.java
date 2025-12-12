@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllMenus.ME_STORAGE_INTERFACE_SLOT;
+import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SLOT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;

@@ -9,18 +9,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.AllMenus;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
-import static org.shsts.tinactory.content.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.content.AllCapabilities.PROCESSOR;
-import static org.shsts.tinactory.content.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 

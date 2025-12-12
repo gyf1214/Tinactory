@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.MESignalControllerMenu.SIGNAL_SYNC;
 import static org.shsts.tinactory.content.logistics.MESignalController.SIGNAL_CONFIG_KEY;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;

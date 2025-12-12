@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.util.ClientUtil;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllMenus.ITEM_SLOT_CLICK;
+import static org.shsts.tinactory.AllMenus.ITEM_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)

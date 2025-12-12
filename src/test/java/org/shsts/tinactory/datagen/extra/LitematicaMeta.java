@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.content.AllData.initDelayed;

@@ -8,8 +8,8 @@ import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 
-import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault

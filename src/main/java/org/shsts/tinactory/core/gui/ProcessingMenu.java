@@ -12,7 +12,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.content.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.util.I18n.tr;
 

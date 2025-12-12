@@ -18,8 +18,8 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.content.AllMenus.RENAME;
-import static org.shsts.tinactory.content.AllMenus.TECH_MENU;
+import static org.shsts.tinactory.AllMenus.RENAME;
+import static org.shsts.tinactory.AllMenus.TECH_MENU;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;

@@ -2,9 +2,9 @@ package org.shsts.tinactory.datagen.content
 
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.RecipeType
-import org.shsts.tinactory.content.AllRecipes.PROCESSING_TYPES
-import org.shsts.tinactory.content.AllRecipes.getTypeInfo
-import org.shsts.tinactory.content.AllTags
+import org.shsts.tinactory.AllRecipes.PROCESSING_TYPES
+import org.shsts.tinactory.AllRecipes.getTypeInfo
+import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc

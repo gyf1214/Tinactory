@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.shsts.tinactory.content.AllRegistries.BLOCKS;
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

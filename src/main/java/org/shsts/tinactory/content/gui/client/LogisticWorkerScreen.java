@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.CONFIG_WIDTH;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;

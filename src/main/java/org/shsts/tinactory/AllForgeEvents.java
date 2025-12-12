@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content;
+package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.tech.TinactorySavedData;
 
 import java.util.Random;
 
-import static org.shsts.tinactory.content.AllWorldGens.PLAYER_START_FEATURE;
+import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

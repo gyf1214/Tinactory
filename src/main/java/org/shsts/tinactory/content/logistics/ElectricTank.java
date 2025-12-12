@@ -24,8 +24,8 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import java.util.Arrays;
 
-import static org.shsts.tinactory.content.AllCapabilities.FLUID_HANDLER;
-import static org.shsts.tinactory.content.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
