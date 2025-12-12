@@ -108,7 +108,7 @@ repositories {
     }
     maven {
         name = 'shsts'
-        url = 'https://www.shsts.org/m2'
+        url = 'https://www.shsts.moe/m2'
     }
 }
 
@@ -202,7 +202,7 @@ publishing {
     repositories {
         maven {
             name = 'shsts'
-            url = 'https://www.shsts.org/m2'
+            url = 'https://www.shsts.moe/m2'
             credentials {
                 username = shstsUser
                 password = shstsPassword
