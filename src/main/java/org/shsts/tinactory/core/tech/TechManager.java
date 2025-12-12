@@ -102,7 +102,7 @@ public class TechManager implements ITechManager {
                     ret.setLoc(loc1);
                     return Optional.of(ret);
                 } catch (IOException | RuntimeException ex) {
-                    LOGGER.warn("Decode resource {} failed: {}", loc, ex);
+                    LOGGER.warn("Decode resource {} failed", loc, ex);
                 }
                 return Optional.empty();
             }

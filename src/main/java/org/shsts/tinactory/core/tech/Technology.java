@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.shsts.tinactory.api.gui.client.IRenderable;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
@@ -81,16 +81,14 @@ public class Technology implements ITechnology {
     }
 
     @Override
-    public DistLazy<IRenderable> getDisplay() {
-        return () -> () -> {
-            if (displayItem != null) {
-                return Renderables.item(displayItem);
-            } else if (displayTexture != null) {
-                return Renderables.texture(displayTexture);
-            } else {
-                return Renderables.VOID;
-            }
-        };
+    public DistLazy<IRectRenderable> getDisplay() {
+        if (displayItem != null) {
+            return () -> () -> Renderables.item(displayItem);
+        } else if (displayTexture != null) {
+            return () -> () -> Renderables.texture(displayTexture);
+        } else {
+            return () -> Renderables::voidRenderable;
+        }
     }
 
     /**

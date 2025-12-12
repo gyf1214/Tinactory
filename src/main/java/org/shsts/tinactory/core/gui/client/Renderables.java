@@ -12,7 +12,11 @@ import org.shsts.tinactory.core.gui.Texture;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Renderables {
-    public static IRectRenderable VOID = (poseStack, rect, z) -> {};
+    private static final IRectRenderable VOID = (poseStack, rect, z) -> {};
+
+    public static IRectRenderable voidRenderable() {
+        return VOID;
+    }
 
     public static IRectRenderable item(ItemStack stack) {
         return (poseStack, rect, z) -> {
