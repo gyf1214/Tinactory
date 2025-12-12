@@ -47,8 +47,15 @@ object Markers {
             oreProcess("macerator", "crushed_centrifuged")
             oreProcess("centrifuge", "raw_fluid")
             oreProcess("centrifuge", "dust_pure")
-            oreProcess("thermal_centrifuge", "crushed")
-            oreProcess("thermal_centrifuge", "crushed_purified")
+            oreProcess("thermal_centrifuge", "crushed") {
+                output(AllTags.material("crushed_centrifuged"), port = 2)
+                output(AllTags.ORE_BASE_DUST, port = 2)
+                output(AllTags.material("dust"), port = 2)
+            }
+            oreProcess("thermal_centrifuge", "crushed_purified") {
+                output(AllTags.material("crushed_centrifuged"), port = 2)
+                output(AllTags.material("dust"), port = 2)
+            }
 
             extrude("stick", "rod")
             extrude("plate")
