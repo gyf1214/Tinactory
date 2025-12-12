@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.recipe;
+package org.shsts.tinactory.core.recipe;
 
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
@@ -23,8 +23,6 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;

@@ -11,10 +11,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
-import org.shsts.tinactory.content.recipe.MarkerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
