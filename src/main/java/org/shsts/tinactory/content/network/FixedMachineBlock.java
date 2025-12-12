@@ -15,6 +15,9 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 
+/**
+ * Entity block that does not have facing or IO facing, only a working state.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FixedMachineBlock extends SmartEntityBlock {

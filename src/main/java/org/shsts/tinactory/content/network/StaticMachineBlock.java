@@ -14,6 +14,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
+/**
+ * Machine block that does not have a working state.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StaticMachineBlock extends MachineBlock {

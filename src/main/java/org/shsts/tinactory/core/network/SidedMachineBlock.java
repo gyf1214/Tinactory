@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.core.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -12,12 +12,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.network.MachineBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
+/**
+ * Machine block that does not have a "front" facing, only IO facing.
+ * <p>
+ * This moves to core because MultiblockInterfaceBlock is inherited from this class.
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SidedMachineBlock extends MachineBlock {

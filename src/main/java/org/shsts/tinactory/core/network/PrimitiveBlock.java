@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 
 /**
- * Entity block that has a face and do not connect to a network.
+ * Entity block that has a facing but do not connect to a network.
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

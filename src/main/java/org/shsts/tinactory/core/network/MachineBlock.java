@@ -37,6 +37,9 @@ import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 
+/**
+ * Most common machine block, have facing, IO facing and working state.
+ */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class MachineBlock extends SmartEntityBlock
