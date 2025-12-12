@@ -18,9 +18,7 @@ import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -223,9 +221,8 @@ public class Multiblock extends MultiblockBase {
         return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
     }
 
-    public IMenuType menu(IMachine machine) {
-        return machine instanceof DigitalInterface ? AllMenus.DIGITAL_INTERFACE :
-            AllMenus.PROCESSING_MACHINE;
+    public IMenuType menu(MultiblockInterface machine) {
+        return machine.isDigital() ? AllMenus.DIGITAL_INTERFACE : AllMenus.PROCESSING_MACHINE;
     }
 
     /**

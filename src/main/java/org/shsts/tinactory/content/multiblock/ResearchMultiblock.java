@@ -4,8 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.AllMenus;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 @ParametersAreNonnullByDefault
@@ -16,8 +16,7 @@ public class ResearchMultiblock extends Multiblock {
     }
 
     @Override
-    public IMenuType menu(IMachine machine) {
-        return machine instanceof DigitalInterface ? AllMenus.RESEARCH_DIGITAL_INTERFACE :
-            AllMenus.RESEARCH_BENCH;
+    public IMenuType menu(MultiblockInterface machine) {
+        return machine.isDigital() ? AllMenus.RESEARCH_DIGITAL_INTERFACE : AllMenus.RESEARCH_BENCH;
     }
 }

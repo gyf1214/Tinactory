@@ -121,6 +121,10 @@ public class MultiblockInterface extends Machine {
         return layout != null;
     }
 
+    public boolean isDigital() {
+        return false;
+    }
+
     public void setMultiblock(Multiblock target) {
         if (multiblock == target) {
             return;

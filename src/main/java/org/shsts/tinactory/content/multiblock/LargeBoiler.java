@@ -144,9 +144,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    public IMenuType menu(IMachine machine) {
-        return machine instanceof DigitalInterface ? AllMenus.BOILER_DIGITAL_INTERFACE :
-            AllMenus.BOILER;
+    public IMenuType menu(MultiblockInterface machine) {
+        return machine.isDigital() ? AllMenus.BOILER_DIGITAL_INTERFACE : AllMenus.BOILER;
     }
 
     private void onConnect(INetwork network) {

@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -54,7 +55,7 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
     }
 
     @Override
-    public IMenuType menu(IMachine machine) {
+    public IMenuType menu(MultiblockInterface machine) {
         return AllMenus.BATTERY_BOX;
     }
 

@@ -18,7 +18,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
@@ -26,6 +25,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -82,7 +82,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     }
 
     @Override
-    public IMenuType menu(IMachine machine) {
+    public IMenuType menu(MultiblockInterface machine) {
         return AllMenus.PRIMITIVE_MACHINE;
     }
 

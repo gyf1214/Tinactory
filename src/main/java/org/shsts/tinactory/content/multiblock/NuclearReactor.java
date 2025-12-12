@@ -17,7 +17,6 @@ import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
@@ -25,6 +24,7 @@ import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.Arrays;
@@ -163,9 +163,9 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
     }
 
     @Override
-    public IMenuType menu(IMachine machine) {
-        return machine instanceof DigitalInterface ?
-            AllMenus.NUCLEAR_REACTOR_DIGITAL_INTERFACE : AllMenus.NUCLEAR_REACTOR;
+    public IMenuType menu(MultiblockInterface machine) {
+        return machine.isDigital() ? AllMenus.NUCLEAR_REACTOR_DIGITAL_INTERFACE :
+            AllMenus.NUCLEAR_REACTOR;
     }
 
     @Override

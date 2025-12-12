@@ -208,6 +208,11 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
+    public boolean isDigital() {
+        return true;
+    }
+
+    @Override
     public Layout getLayout() {
         return layout;
     }
