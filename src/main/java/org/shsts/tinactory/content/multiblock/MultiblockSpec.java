@@ -8,10 +8,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Lazy;
-import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.network.PrimitiveBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -348,13 +348,6 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
 
         public LayerBuilder<P> row(String str) {
             rows.add(str);
-            return this;
-        }
-
-        public LayerBuilder<P> row(char ch, int width, int depth) {
-            for (var i = 0; i < depth; i++) {
-                rows.add(String.valueOf(ch).repeat(width));
-            }
             return this;
         }
 

@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.shsts.tinactory.content.machine.UnsupportedTypeException;
-import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.common.MetaConsumer;
+import org.shsts.tinactory.core.network.PrimitiveBlock;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.slf4j.Logger;
 

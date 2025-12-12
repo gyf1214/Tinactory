@@ -20,9 +20,9 @@ import org.shsts.tinactory.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.AllTags.POWER_BLOCK
 import org.shsts.tinactory.AllTags.machine
 import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
-import org.shsts.tinactory.content.network.PrimitiveBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.network.MachineBlock
+import org.shsts.tinactory.core.network.PrimitiveBlock
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.ic2

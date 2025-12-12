@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Workbench;
-import org.shsts.tinactory.content.network.PrimitiveBlock;
 import org.shsts.tinactory.core.builder.BlockEntityBuilder;
+import org.shsts.tinactory.core.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;

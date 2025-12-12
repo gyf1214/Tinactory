@@ -1,4 +1,4 @@
-package org.shsts.tinactory.content.network;
+package org.shsts.tinactory.core.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
