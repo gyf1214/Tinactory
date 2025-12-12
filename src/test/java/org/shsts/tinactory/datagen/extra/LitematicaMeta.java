@@ -1,4 +1,4 @@
-package org.shsts.tinactory.datagen.content.multiblock;
+package org.shsts.tinactory.datagen.extra;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

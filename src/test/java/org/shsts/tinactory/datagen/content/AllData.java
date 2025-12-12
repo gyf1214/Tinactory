@@ -2,6 +2,7 @@ package org.shsts.tinactory.datagen.content;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.datagen.extra.SourceChecker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,5 +23,7 @@ public final class AllData {
         for (var cb : DELAYED_CALLBACKS) {
             cb.run();
         }
+
+        SourceChecker.check();
     }
 }

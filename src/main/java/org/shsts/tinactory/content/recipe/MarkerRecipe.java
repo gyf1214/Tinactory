@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -71,7 +71,7 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public DistLazy<IRenderable> getDisplay() {
+    public DistLazy<IRectRenderable> getDisplay() {
         if (displayTex != null) {
             return () -> () -> Renderables.texture(displayTex);
         }

@@ -12,9 +12,9 @@ import org.shsts.tinactory.core.gui.Texture;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class Renderables {
-    public static IRenderable VOID = (poseStack, rect, z) -> {};
+    public static IRectRenderable VOID = (poseStack, rect, z) -> {};
 
-    public static IRenderable item(ItemStack stack) {
+    public static IRectRenderable item(ItemStack stack) {
         return (poseStack, rect, z) -> {
             var poseStack1 = RenderUtil.applyToModelViewStack(poseStack);
             RenderUtil.renderItem(stack, rect.x(), rect.y());
@@ -22,11 +22,11 @@ public final class Renderables {
         };
     }
 
-    public static IRenderable fluid(FluidStack stack) {
+    public static IRectRenderable fluid(FluidStack stack) {
         return (poseStack, rect, z) -> RenderUtil.renderFluid(poseStack, stack, rect, z);
     }
 
-    public static IRenderable texture(Texture tex) {
+    public static IRectRenderable texture(Texture tex) {
         return (poseStack, rect, z) -> RenderUtil.blit(poseStack, tex, z, rect);
     }
 }

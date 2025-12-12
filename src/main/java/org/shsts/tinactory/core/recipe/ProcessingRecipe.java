@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -168,7 +168,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    public DistLazy<IRenderable> getDisplay() {
+    public DistLazy<IRectRenderable> getDisplay() {
         return () -> () -> (poseStack, rect, z) -> {
             var object = getDisplayObject();
             var x = rect.x();

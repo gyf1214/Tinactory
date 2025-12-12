@@ -3,7 +3,7 @@ package org.shsts.tinactory.api.tech;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.gui.client.IRenderable;
+import org.shsts.tinactory.api.gui.client.IRenderable;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;

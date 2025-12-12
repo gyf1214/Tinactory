@@ -3,7 +3,7 @@ package org.shsts.tinactory.datagen.content;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.datagen.content.language.LanguageMeta;
-import org.shsts.tinactory.datagen.content.multiblock.LitematicaMeta;
+import org.shsts.tinactory.datagen.extra.LitematicaMeta;
 import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
 import java.util.function.Supplier;

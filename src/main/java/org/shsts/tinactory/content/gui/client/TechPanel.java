@@ -272,8 +272,7 @@ public class TechPanel extends Panel {
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
 
-        var rect1 = new Rect(x, y, 16, 16);
-        technology.getDisplay().getValue().render(poseStack, rect1, z);
+        technology.getDisplay().getValue().render(poseStack, x, y, 16, 16, z);
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,

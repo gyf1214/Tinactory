@@ -15,7 +15,7 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IRecipeBookItem extends ILoc, IRenderable {
+public interface IRecipeBookItem extends ILoc, IRectRenderable {
     boolean isMarker();
 
     void select(Layout layout, GhostRecipe ghostRecipe);
