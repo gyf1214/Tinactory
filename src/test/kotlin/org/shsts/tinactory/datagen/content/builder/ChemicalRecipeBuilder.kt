@@ -52,7 +52,7 @@ class ChemicalRecipeBuilder(builder: ChemicalReactorRecipe.Builder) :
 
     override fun build() {
         if (!requireMultiBlockSet && needMultiblock()) {
-            LOGGER.debug("{} recipe need multiblock", builder.loc)
+            LOGGER.trace("{} recipe need multiblock", builder.loc)
             builder.requireMultiblock(true)
         }
         super.build()

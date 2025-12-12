@@ -913,6 +913,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
+    private fun needProcess(): Boolean {
+        if (!material.hasItem("primary")) {
+            return false
+        }
+        if (!material.hasItem("dust")) {
+            return true
+        }
+        return !material.tag("primary").equals(material.tag("dust"))
+    }
+
     fun build() {
         for (sub in material.itemSubs()) {
             buildItem(sub)
@@ -923,10 +933,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         dustWithTiny()
         toolRecipes()
 
-        if (material.hasItem("primary") && !hasProcess) {
+        if (!hasProcess && needProcess()) {
             LOGGER.warn("{} does not have process", material)
         }
-        if (material.hasBlock("ore") && !hasOreProcess) {
+        if (!hasOreProcess && material.hasItem("raw")) {
             LOGGER.warn("{} does not have ore process", material)
         }
     }
