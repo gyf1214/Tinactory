@@ -118,7 +118,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         var processing = recipeManager.byLoc(recipeType, loc);
         if (processing.isPresent()) {
             var recipe = processing.get();
-            return recipe.canCraft(machine);
+            // skip canCraft check on client side as we can trust server
+            return world.isClientSide || recipe.canCraft(machine);
         }
 
         return false;

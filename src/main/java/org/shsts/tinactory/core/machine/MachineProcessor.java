@@ -67,6 +67,11 @@ public class MachineProcessor extends CapabilityProvider implements
     private final List<IRecipeProcessor<?>> processors;
     private final boolean autoRecipe;
     private boolean stopped = false;
+    /**
+     * We cannot recover recipe on load because team may not be ready at that time.
+     * We need to defer that to connect, but only when the first time of connect.
+     */
+    private boolean firstConnect = false;
 
     /**
      * This is only used during deserializeNBT when world is not available.
@@ -365,24 +370,28 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     private void onServerLoad(Level world) {
-        currentRecipe = null;
-        if (currentRecipeLoc != null) {
-            var processor = processors.get(processorIndex);
-            recoverRecipe(processorIndex, processor, world, currentRecipeLoc);
-            currentRecipeLoc = null;
-        }
-
-        if (currentRecipe != null) {
-            machine().ifPresent(currentRecipe::onWorkContinue);
-            needUpdate = false;
-        }
-
-        updateTargetRecipe();
         TechManager.server().onProgressChange(onTechChange);
     }
 
     private void onConnect(INetwork network) {
         machine().ifPresent(machine -> Machine.registerStopSignal(network, machine, $ -> stopped = $));
+
+        if (!firstConnect) {
+            currentRecipe = null;
+            if (currentRecipeLoc != null) {
+                var processor = processors.get(processorIndex);
+                recoverRecipe(processorIndex, processor, world(), currentRecipeLoc);
+                currentRecipeLoc = null;
+            }
+
+            if (currentRecipe != null) {
+                machine().ifPresent(currentRecipe::onWorkContinue);
+                needUpdate = false;
+            }
+            updateTargetRecipe();
+
+            firstConnect = true;
+        }
     }
 
     private void onRemoved(Level world) {

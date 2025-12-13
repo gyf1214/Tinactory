@@ -29,12 +29,12 @@ public interface IMachine {
     IMachineConfig config();
 
     /**
-     * Called only on server.
+     * Called only on server. Client should only receive config from update.
      */
     void setConfig(ISetMachineConfigPacket packet, boolean invokeUpdate);
 
     /**
-     * Called only on server.
+     * Called only on server. Client should only receive config from update.
      */
     default void setConfig(ISetMachineConfigPacket packet) {
         setConfig(packet, true);
