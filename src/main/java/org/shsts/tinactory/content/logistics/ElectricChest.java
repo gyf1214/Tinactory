@@ -65,12 +65,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            var item = internalItems.getStackInSlot(slot);
-            if (item.isEmpty() || item.getCount() <= item.getMaxStackSize()) {
-                return item;
-            } else {
-                return StackHelper.copyWithCount(item, item.getMaxStackSize());
-            }
+            return internalItems.getStackInSlot(slot);
         }
 
         @Override

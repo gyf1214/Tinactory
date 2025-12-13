@@ -46,7 +46,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
         @Override
         public int getCapacity() {
-            return Integer.MAX_VALUE;
+            return isVoid() ? Integer.MAX_VALUE : super.getCapacity();
         }
 
         @Override
