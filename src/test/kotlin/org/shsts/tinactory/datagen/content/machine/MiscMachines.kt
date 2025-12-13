@@ -303,7 +303,7 @@ object MiscMachines {
                 input("iron", "plate", 2)
                 input("iron", "stick")
             }
-            output(Items.TORCH, 3) {
+            output(Items.TORCH, 6) {
                 input(Items.STICK)
                 input("sulfur", "dust")
                 workTicks(64)

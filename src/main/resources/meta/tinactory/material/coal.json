@@ -5,7 +5,10 @@
     "crushed",
     "crushed_centrifuged",
     "crushed_purified",
-    "dust",
+    {
+      "sub": "dust",
+      "burnTime": 1200
+    },
     "dust_impure",
     "dust_pure",
     "raw"

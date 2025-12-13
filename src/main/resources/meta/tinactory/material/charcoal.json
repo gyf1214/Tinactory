@@ -1,7 +1,10 @@
 {
   "color": "0xFF644646",
   "items": [
-    "dust"
+    {
+      "sub": "dust",
+      "burnTime": 1200
+    }
   ],
   "fluids": {},
   "aliases": {},

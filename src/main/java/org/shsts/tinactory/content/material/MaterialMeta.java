@@ -39,12 +39,13 @@ public class MaterialMeta extends MetaConsumer {
         return parseColor(GsonHelper.getAsString(jo, member));
     }
 
-    private void buildItems(MaterialSet.Builder<?> builder, JsonObject jo, int burnTime) {
-        var items = GsonHelper.getAsJsonArray(jo, "items");
-        for (var item : items) {
-            var sub = GsonHelper.convertToString(item, "items");
-            // TODO: more flexible
-            if (sub.equals("gem") && burnTime > 0) {
+    private void buildItems(MaterialSet.Builder<?> builder, JsonObject jo) {
+        var ja = GsonHelper.getAsJsonArray(jo, "items");
+        for (var je : ja) {
+            if (je.isJsonObject()) {
+                var jo2 = GsonHelper.convertToJsonObject(je, "items");
+                var sub = GsonHelper.getAsString(jo2, "sub");
+                var burnTime = GsonHelper.getAsInt(jo2, "burnTime", -1);
                 builder.item(sub, properties -> new Item(properties) {
                     @Override
                     public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
@@ -52,7 +53,7 @@ public class MaterialMeta extends MetaConsumer {
                     }
                 });
             } else {
-                builder.item(sub);
+                builder.item(GsonHelper.convertToString(je, "items"));
             }
         }
 
@@ -137,9 +138,8 @@ public class MaterialMeta extends MetaConsumer {
 
         var color = parseColor(jo, "color");
         var builder = AllMaterials.newMaterial(loc.getPath()).color(color);
-        var burnTime = jo.has("burnTime") ? GsonHelper.getAsInt(jo, "burnTime") : -1;
 
-        buildItems(builder, jo, burnTime);
+        buildItems(builder, jo);
         buildFluids(builder, jo);
         if (jo.has("ore")) {
             var variant = OreVariant.fromName(GsonHelper.getAsString(jo, "ore"));
