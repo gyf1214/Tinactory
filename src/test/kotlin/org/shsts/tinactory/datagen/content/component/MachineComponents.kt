@@ -1,7 +1,6 @@
 package org.shsts.tinactory.datagen.content.component
 
 import org.shsts.tinactory.AllItems.getComponent
-import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.network.CableBlock
@@ -198,7 +197,7 @@ object MachineComponents {
                 tech(Technologies.BATTERY)
             }
             battery(Voltage.LV, "cadmium")
-            battery(Voltage.MV, "sulfuric_acid", "dilute")
+            battery(Voltage.MV, "sodium_hydroxide")
             battery(Voltage.HV, "lithium")
         }
     }
@@ -207,13 +206,10 @@ object MachineComponents {
         val wires = v.rank - 1
         val plates = wires * wires
         component("battery", voltage = v) {
-            if (v.rank > Voltage.LV.rank) {
-                input(AllTags.battery(Voltage.fromRank(v.rank - 1)), 2)
-                input("soldering_alloy", amount = wires)
-            }
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, sub, plates)
+            input("soldering_alloy", amount = wires)
             voltage(Voltage.fromRank(v.rank - 1))
         }
     }
