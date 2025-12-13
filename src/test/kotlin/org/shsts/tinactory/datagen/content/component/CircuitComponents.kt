@@ -104,7 +104,8 @@ object CircuitComponents {
                     input("red_alloy", "wire", 2)
                 }
                 circuit("good_electronic") {
-                    circuit("electronic", 2)
+                    input(circuitBoard)
+                    circuit("electronic", 3)
                     component("diode", 2)
                     input("copper", "wire", 2)
                 }
@@ -121,7 +122,7 @@ object CircuitComponents {
                     input("tin", "bolt", 2)
                 }
                 circuit("good_integrated") {
-                    circuit("basic_integrated", 2)
+                    circuit("basic_integrated", 1)
                     component("resistor", 2)
                     component("diode", 2)
                     input("gold", "wire_fine", 4)
