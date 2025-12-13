@@ -4,8 +4,10 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -78,5 +80,16 @@ public class BatteryItem extends Item {
         TooltipFlag isAdvanced) {
         addTooltip(tooltip, "battery", NUMBER_FORMAT.format(getPower(stack)),
             NUMBER_FORMAT.format(capacity), voltage.displayName());
+    }
+
+    @Override
+    public void fillItemCategory(CreativeModeTab category, NonNullList<ItemStack> list) {
+        if (!allowdedIn(category)) {
+            return;
+        }
+        list.add(new ItemStack(this));
+        var stack1 = new ItemStack(this);
+        setPowerLevel(stack1, capacity);
+        list.add(stack1);
     }
 }

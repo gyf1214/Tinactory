@@ -11,11 +11,13 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
@@ -24,6 +26,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
+import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
@@ -42,6 +45,7 @@ import org.shsts.tinactory.integration.jei.gui.ResearchHandler;
 import org.shsts.tinactory.integration.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.integration.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.integration.jei.ingredient.IngredientRenderers;
+import org.shsts.tinactory.integration.jei.ingredient.PartialNbtInterpreter;
 import org.shsts.tinactory.integration.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.integration.jei.ingredient.TechIngredient;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
@@ -115,6 +119,15 @@ public class JEI implements IModPlugin {
             TechIngredient.HELPER, IngredientRenderers.empty());
         registration.register(RecipeMarker.TYPE, Collections.emptyList(),
             RecipeMarker.HELPER, IngredientRenderers.empty());
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        for (var item : ForgeRegistries.ITEMS) {
+            if (item instanceof BatteryItem) {
+                registration.registerSubtypeInterpreter(item, PartialNbtInterpreter.INSTANCE);
+            }
+        }
     }
 
     @Override
