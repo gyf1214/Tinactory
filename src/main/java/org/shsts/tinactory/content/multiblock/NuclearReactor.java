@@ -26,6 +26,7 @@ import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
@@ -259,7 +260,12 @@ public class NuclearReactor extends Multiblock implements IBoiler,
 
     @Override
     public long progressTicks() {
-        return reactions > 0 ? 1 : 0;
+        return MathUtil.compare(reactions) > 0 ? 1 : 0;
+    }
+
+    @Override
+    public boolean isWorking(double partial) {
+        return MathUtil.compare(reactions) > 0;
     }
 
     @Override

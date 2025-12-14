@@ -335,10 +335,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var workFactor = network
             .getComponent(ELECTRIC_COMPONENT.get())
             .getWorkFactor();
-        var machineSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
+        var workSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
+        var workSpeed1 = MathUtil.compare(workSpeed) > 0 ? workSpeed : 0d;
         processor().ifPresent(processor -> {
-            processor.onWorkTick(machineSpeed);
-            updateWorkBlock(world, processor.getProgress() > 0d);
+            processor.onWorkTick(workSpeed1);
+            updateWorkBlock(world, processor.isWorking(workSpeed1));
         });
     }
 

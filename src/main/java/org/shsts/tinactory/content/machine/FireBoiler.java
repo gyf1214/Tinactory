@@ -184,6 +184,11 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     }
 
     @Override
+    public boolean isWorking(double partial) {
+        return maxBurn > 0;
+    }
+
+    @Override
     public Optional<IProcessingObject> getInfo(int port, int index) {
         if (index > 0) {
             return Optional.empty();

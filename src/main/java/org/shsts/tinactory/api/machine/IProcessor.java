@@ -17,4 +17,6 @@ public interface IProcessor {
     void onWorkTick(double partial);
 
     double getProgress();
+
+    boolean isWorking(double partial);
 }

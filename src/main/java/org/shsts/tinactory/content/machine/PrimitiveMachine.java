@@ -62,7 +62,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
         var processor = PROCESSOR.get(blockEntity);
         processor.onPreWork();
         processor.onWorkTick(workSpeed);
-        var working = processor.getProgress() > 0d;
+        var working = processor.isWorking(workSpeed);
         var state = blockEntity.getBlockState();
         if (state.getValue(WORKING) != working) {
             // prevent updateShape on neighbor

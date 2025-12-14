@@ -126,14 +126,6 @@ public class MachineProcessor extends CapabilityProvider implements
             return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe)));
         }
 
-        public long progressTicks(long progress) {
-            return processor.workTicksFromProgress(progress);
-        }
-
-        public double workSpeed(double partial) {
-            return processor.workSpeed(partial);
-        }
-
         public ResourceLocation loc() {
             return processor.toLoc(recipe);
         }
@@ -345,7 +337,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
         var progress = currentRecipe.onWorkProcess(partial);
         workProgress += progress;
-        workSpeed = currentRecipe.workSpeed(partial);
+        workSpeed = currentRecipe.processor.workSpeed(partial);
         // We clear currentRecipe and info in the next onPreWork
         if (workProgress >= currentRecipe.maxProgress()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
@@ -371,7 +363,7 @@ public class MachineProcessor extends CapabilityProvider implements
 
     @Override
     public long progressTicks() {
-        return currentRecipe == null ? 0 : currentRecipe.progressTicks(workProgress);
+        return currentRecipe == null ? 0 : currentRecipe.processor().workTicksFromProgress(workProgress);
     }
 
     @Override
@@ -382,6 +374,11 @@ public class MachineProcessor extends CapabilityProvider implements
     @Override
     public double workSpeed() {
         return currentRecipe == null ? -1d : workSpeed;
+    }
+
+    @Override
+    public boolean isWorking(double partial) {
+        return currentRecipe != null && workSpeed > 0;
     }
 
     @Override

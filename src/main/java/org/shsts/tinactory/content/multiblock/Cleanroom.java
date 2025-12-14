@@ -29,6 +29,7 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -130,6 +131,11 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     @Override
     public double getProgress() {
         return cleanness;
+    }
+
+    @Override
+    public boolean isWorking(double partial) {
+        return !stopped && MathUtil.compare(partial) > 0;
     }
 
     private boolean isOpen() {

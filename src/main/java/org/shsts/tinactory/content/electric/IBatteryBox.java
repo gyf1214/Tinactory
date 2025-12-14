@@ -19,4 +19,9 @@ public interface IBatteryBox extends IProcessor {
         }
         return ((double) powerLevel()) / cap;
     }
+
+    @Override
+    default boolean isWorking(double partial) {
+        return powerLevel() > 0;
+    }
 }
