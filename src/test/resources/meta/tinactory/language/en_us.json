@@ -178,6 +178,8 @@
     "tinactory.tooltip.electric.generate": "Power Generation: %s EU/t",
     "tinactory.tooltip.electric.bufferCons": "Buffer Charge: %s EU/t",
     "tinactory.tooltip.electric.bufferGen": "Buffer Discharge: %s EU/t",
+    "tinactory.tooltip.invalidMultiblock": "Invalid Structure",
+    "tinactory.tooltip.multiblock": "Multiblock: %s",
     "tinactory.gui.techMenu.title": "Technologies",
     "tinactory.gui.techMenu.welcome": "New Team Name: ",
     "tinactory.gui.techMenu.welcomeButton": "Create Team",

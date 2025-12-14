@@ -567,6 +567,8 @@
     "tinactory.tooltip.electric.generate": "发电功率: %s EU/t",
     "tinactory.tooltip.electric.bufferCons": "充电功率: %s EU/t",
     "tinactory.tooltip.electric.bufferGen": "放电功率: %s EU/t",
+    "tinactory.tooltip.invalidMultiblock": "结构不完整",
+    "tinactory.tooltip.multiblock": "多方块结构：%s",
     "tinactory.gui.techMenu.title": "科研",
     "tinactory.gui.techMenu.welcome": "新队伍名称：",
     "tinactory.gui.techMenu.welcomeButton": "创建队伍",
