@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
@@ -36,6 +37,7 @@ public final class AllCapabilities {
 
     public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
     public static final ICapability<IMachine> MACHINE;
+    public static final ICapability<IBytesProvider> BYTES_PROVIDER;
     public static final ICapability<IDigitalProvider> DIGITAL_PROVIDER;
     public static final ICapability<ISignalMachine> SIGNAL_MACHINE;
 
@@ -54,6 +56,7 @@ public final class AllCapabilities {
 
         LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
         MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
+        BYTES_PROVIDER = REGISTRATE.capability(IBytesProvider.class, new CapabilityToken<>() {});
         DIGITAL_PROVIDER = REGISTRATE.capability(IDigitalProvider.class, new CapabilityToken<>() {});
         SIGNAL_MACHINE = REGISTRATE.capability(ISignalMachine.class, new CapabilityToken<>() {});
     }

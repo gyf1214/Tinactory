@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
 import org.shsts.tinactory.core.logistics.CombinedItemCollection;
 import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
 import org.shsts.tinactory.core.logistics.DigitalItemStorage;
+import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
@@ -33,13 +34,15 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalInterface extends MultiblockInterface implements ILayoutProvider, IFlexibleContainer {
+public class DigitalInterface extends MultiblockInterface implements ILayoutProvider,
+    IFlexibleContainer, IBytesProvider {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final int maxParallel;
@@ -119,7 +122,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
          * This is not used.
          */
         @Override
-        public int capacity() {
+        public int bytesCapacity() {
             return bytesLimit;
         }
 
@@ -213,6 +216,16 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
+    public int bytesCapacity() {
+        return bytesLimit;
+    }
+
+    @Override
+    public int bytesUsed() {
+        return sharedBytes;
+    }
+
+    @Override
     public Layout getLayout() {
         return layout;
     }
@@ -270,7 +283,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
             return myself();
         }
         return super.getCapability(cap, side);

@@ -5,11 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IDigitalProvider {
-    int capacity();
-
-    int bytesUsed();
-
+public interface IDigitalProvider extends IBytesProvider {
     int consumeLimit(int offset, int bytes);
 
     default int consumeLimit(int bytes) {

@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
 import org.shsts.tinactory.core.logistics.CombinedItemCollection;
+import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.FLUID_COLLECTION;
@@ -55,8 +57,8 @@ import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEDrive extends CapabilityProvider
-    implements IEventSubscriber, ILayoutProvider, INBTSerializable<CompoundTag> {
+public class MEDrive extends CapabilityProvider implements IEventSubscriber,
+    ILayoutProvider, IBytesProvider, INBTSerializable<CompoundTag> {
     public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
     public static final int PRIORITY_DEFAULT = 2;
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
@@ -106,9 +108,9 @@ public class MEDrive extends CapabilityProvider
         return stack.is(AllTags.STORAGE_CELL);
     }
 
-    private int updateSignal() {
-        var totalBytes = 0;
-        var totalCapacity = 0;
+    @Override
+    public int bytesCapacity() {
+        var ret = 0;
         for (var i = 0; i < storages.getSlots(); i++) {
             var storage = storages.getStackInSlot(i);
             if (storage.isEmpty()) {
@@ -117,10 +119,32 @@ public class MEDrive extends CapabilityProvider
             var cap = storage.getCapability(DIGITAL_PROVIDER.get());
             if (cap.isPresent()) {
                 var cap1 = cap.orElseThrow(NoSuchElementException::new);
-                totalBytes += cap1.bytesUsed();
-                totalCapacity += cap1.capacity();
+                ret += cap1.bytesCapacity();
             }
         }
+        return ret;
+    }
+
+    @Override
+    public int bytesUsed() {
+        var ret = 0;
+        for (var i = 0; i < storages.getSlots(); i++) {
+            var storage = storages.getStackInSlot(i);
+            if (storage.isEmpty()) {
+                continue;
+            }
+            var cap = storage.getCapability(DIGITAL_PROVIDER.get());
+            if (cap.isPresent()) {
+                var cap1 = cap.orElseThrow(NoSuchElementException::new);
+                ret += cap1.bytesUsed();
+            }
+        }
+        return ret;
+    }
+
+    private int updateSignal() {
+        var totalBytes = bytesUsed();
+        var totalCapacity = bytesCapacity();
         return totalCapacity == 0 ? 0 : MathUtil.toSignal((double) totalBytes / totalCapacity);
     }
 
@@ -184,7 +208,7 @@ public class MEDrive extends CapabilityProvider
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get()) {
+        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
             return myself();
         } else if (cap == MENU_ITEM_HANDLER.get()) {
             return menuItemHandlerCap.cast();

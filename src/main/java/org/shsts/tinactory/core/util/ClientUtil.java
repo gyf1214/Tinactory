@@ -100,6 +100,10 @@ public final class ClientUtil {
         }
     }
 
+    public static String getBytesString(long count) {
+        return getNumberString(count) + "B";
+    }
+
     public static MutableComponent fluidName(FluidStack stack) {
         return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : (MutableComponent) stack.getDisplayName();
     }

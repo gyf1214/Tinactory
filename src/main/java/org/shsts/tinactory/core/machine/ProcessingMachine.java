@@ -181,6 +181,11 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     private void setInputFilters(ProcessingRecipe recipe, IContainer container) {
+        // if marker does not have inputs, don't set input filter
+        if (recipe instanceof MarkerRecipe && recipe.inputs.isEmpty()) {
+            return;
+        }
+
         var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
         var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
@@ -193,7 +198,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
 
         if (recipe instanceof MarkerRecipe marker) {
-            // if marker does not have markerOutputs, don't set filter at all
+            // if marker does not have markerOutputs, don't set output filter
             if (marker.markerOutputs.isEmpty()) {
                 return;
             }
