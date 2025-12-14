@@ -21,7 +21,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
@@ -144,23 +143,12 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
         var firstValidSlot = -1;
         var lastValidSlot = 0;
-        var packet = SetMachineConfigPacket.builder();
-        var needUpdate = false;
 
         for (var i = 0; i < workerSlots; i++) {
-            var key = PREFIX + i;
-            var entry = getConfig(i).filter(LogisticWorkerConfig::isValid);
-            var valid = false;
-            if (entry.isPresent()) {
-                var entry1 = entry.get();
-                if (!validateConfig(logistic, subnet, entry1)) {
-                    entry1.setValid(false);
-                    packet.set(key, entry1.serializeNBT());
-                    needUpdate = true;
-                } else {
-                    valid = true;
-                }
-            }
+            var valid = getConfig(i)
+                .filter(LogisticWorkerConfig::isValid)
+                .filter(entry -> validateConfig(logistic, subnet, entry))
+                .isPresent();
 
             if (valid) {
                 for (var j = lastValidSlot; j < i; j++) {
@@ -178,11 +166,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
                 nextValidSlot[j] = firstValidSlot;
             }
             noValidSlot = false;
-        }
-
-        if (needUpdate) {
-            // skip event to skip validation
-            machine.setConfig(packet.get(), false);
         }
     }
 
@@ -294,7 +277,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
         var entry1 = entry.get();
 
-        var machine = MACHINE.get(blockEntity);
         var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
         var subnet = network.getSubnet(blockEntity.getBlockPos());
 
@@ -310,12 +292,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             tick = 0;
         } else {
             LOGGER.trace("{}: entry slot {} becomes invalid", blockEntity, currentSlot);
-            entry1.setValid(false);
-            var packet = SetMachineConfigPacket.builder()
-                .set(PREFIX + currentSlot, entry1.serializeNBT())
-                .get();
-            // try revalidate
-            machine.setConfig(packet);
+            needRevalidate = true;
         }
     }
 
