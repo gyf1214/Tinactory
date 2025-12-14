@@ -4,7 +4,7 @@
   "baseHeat": 300,
   "baseDecay": 0.0002,
   "minHeat": 275,
-  "maxHeat": 2000,
+  "maxHeat": 1000,
   "minHeight": 3,
   "rows": [
     2,

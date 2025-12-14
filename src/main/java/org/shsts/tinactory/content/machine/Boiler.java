@@ -10,14 +10,12 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static org.shsts.tinactory.AllRecipes.BOILER;
 import static org.shsts.tinactory.Tinactory.CORE;
@@ -36,7 +34,8 @@ public class Boiler implements INBTSerializable<CompoundTag> {
     // we don't serialize these two, so on reload, hiddenProgress is lost, but it's negligible.
     @Nullable
     protected BoilerRecipe lastRecipe = null;
-    private int lastReaction;
+    private FluidStack lastInput = FluidStack.EMPTY;
+    private FluidStack lastOutput = FluidStack.EMPTY;
     private double hiddenProgress = 0;
 
     public Boiler(double baseHeat, double baseDecay) {
@@ -76,7 +75,6 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         var reaction = recipe.getReaction(heat, parallel) + hiddenProgress;
         var reaction1 = (int) Math.floor(reaction);
         hiddenProgress = reaction - reaction1;
-        lastReaction = reaction1;
         return reaction1 > 0 ? recipe.absorbHeat(input, output, reaction1, heat, callback) : 0;
     }
 
@@ -90,31 +88,27 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         if (recipe.isEmpty()) {
             lastRecipe = null;
             hiddenProgress = 0;
-            lastReaction = 0;
+            lastInput = FluidStack.EMPTY;
+            lastOutput = FluidStack.EMPTY;
         }
-        var absorb = (double) recipe.map($ -> absorbHeat($, parallel, callback)).orElse(0d);
+        var absorb = (double) recipe
+            .map($ -> absorbHeat($, parallel, (input, output) -> {
+                lastInput = input;
+                lastOutput = output;
+                callback.accept(input, output);
+            })).orElse(0d);
 
         heat += heatInput - decay - absorb;
     }
 
-    private Optional<FluidStack> getInfo(Function<BoilerRecipe, FluidStack> mapper) {
-        if (lastRecipe == null) {
-            return Optional.empty();
-        }
-        var stack = mapper.apply(lastRecipe);
-        if (lastReaction > 1) {
-            return Optional.of(StackHelper.copyWithAmount(stack, stack.getAmount() * lastReaction));
-        } else {
-            return Optional.of(stack);
-        }
-    }
-
     public Optional<IProcessingObject> inputInfo() {
-        return getInfo($ -> $.input).map(ProcessingIngredients.FluidIngredient::new);
+        return lastInput.isEmpty() ? Optional.empty() :
+            Optional.of(new ProcessingIngredients.FluidIngredient(lastInput));
     }
 
     public Optional<IProcessingObject> outputInfo() {
-        return getInfo($ -> $.output).map(ProcessingResults.FluidResult::new);
+        return lastOutput.isEmpty() ? Optional.empty() :
+            Optional.of(new ProcessingResults.FluidResult(lastOutput));
     }
 
     public void addAllInfo(Consumer<IProcessingObject> cons) {
