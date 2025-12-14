@@ -167,7 +167,7 @@
     "tinactory.tooltip.fuelRod": "Remaining Reactions: %s",
     "tinactory.tooltip.tag": "Tag: #%s",
     "tinactory.tooltip.progress": "Progress: %s s / %s s",
-    "tinactory.tooltip.heat": "Heat: %s°C",
+    "tinactory.tooltip.heat": "Temperature: %s K",
     "tinactory.tooltip.power": "Power: %s EU / %s EU",
     "tinactory.tooltip.cleanness": "Cleanness: %s",
     "tinactory.tooltip.inputs": "Inputs: ",

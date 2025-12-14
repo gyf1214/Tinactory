@@ -28,6 +28,8 @@ import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TI
 public abstract class FireBoiler extends Boiler implements IBoiler {
     private final double burnSpeed;
     private final double burnHeat;
+    private final double minHeat;
+    private final double maxHeat;
 
     @Nullable
     private IItemCollection fuelPort;
@@ -37,20 +39,25 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     private boolean needUpdate = true;
     private boolean stopped = false;
 
-    public record Properties(double baseHeat, double baseDecay, double burnSpeed, double burnHeat) {
+    public record Properties(double baseHeat, double baseDecay, double minHeat, double maxHeat,
+        double burnSpeed, double burnHeat) {
         public static Properties fromJson(JsonObject jo) {
             return new Properties(
                 GsonHelper.getAsDouble(jo, "baseHeat"),
                 GsonHelper.getAsDouble(jo, "baseDecay"),
+                GsonHelper.getAsDouble(jo, "minHeat"),
+                GsonHelper.getAsDouble(jo, "maxHeat"),
                 GsonHelper.getAsDouble(jo, "burnSpeed"),
                 GsonHelper.getAsDouble(jo, "burnHeat"));
         }
     }
 
     public FireBoiler(Properties properties) {
-        super(properties.baseHeat(), properties.baseDecay());
-        this.burnSpeed = properties.burnSpeed();
-        this.burnHeat = properties.burnHeat();
+        super(properties.baseHeat, properties.baseDecay);
+        this.burnSpeed = properties.burnSpeed;
+        this.burnHeat = properties.burnHeat;
+        this.minHeat = properties.minHeat;
+        this.maxHeat = properties.maxHeat;
     }
 
     public void setContainer(IContainer container) {
@@ -164,8 +171,13 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     }
 
     @Override
+    public double minHeat() {
+        return minHeat;
+    }
+
+    @Override
     public double maxHeat() {
-        return 600d;
+        return maxHeat;
     }
 
     @Override

@@ -24,14 +24,18 @@
   },
   "items": {
     "low": {
-      "baseHeat": 20,
+      "baseHeat": 300,
       "baseDecay": 0.0002,
+      "minHeat": 275,
+      "maxHeat": 1000,
       "burnSpeed": 5,
       "burnHeat": 0.1
     },
     "high": {
-      "baseHeat": 20,
+      "baseHeat": 300,
       "baseDecay": 0.0002,
+      "minHeat": 275,
+      "maxHeat": 1000,
       "burnSpeed": 17,
       "burnHeat": 0.34
     }

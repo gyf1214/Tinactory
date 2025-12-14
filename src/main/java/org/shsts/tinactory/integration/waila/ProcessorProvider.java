@@ -82,9 +82,9 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
     protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
         if (config.get(HEAT) && tag.contains("tinactoryHeat", Tag.TAG_DOUBLE)) {
             var heat = tag.getDouble("tinactoryHeat");
-            var maxHeat = tag.getDouble("tinactoryMaxHeat");
+            var heatProgress = tag.getDouble("tinactoryHeatProgress");
             var text = tr("heat", NUMBER_FORMAT.format(heat));
-            addProgress((float) (heat / maxHeat), text, HEAT_COLOR);
+            addProgress((float) heatProgress, text, HEAT_COLOR);
         }
 
         if (config.get(POWER) && tag.contains("tinactoryPower", Tag.TAG_LONG)) {
@@ -197,7 +197,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
 
             if (processor instanceof IBoiler boiler) {
                 tag.putDouble("tinactoryHeat", boiler.heat());
-                tag.putDouble("tinactoryMaxHeat", boiler.maxHeat());
+                tag.putDouble("tinactoryHeatProgress", boiler.heatProgress());
             }
         }
 

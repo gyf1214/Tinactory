@@ -104,6 +104,7 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     private double reactions;
 
     public record Properties(double baseHeat, double baseDecay,
+        double minHeat, double maxHeat,
         int minHeight, int[] rows, int[] columns,
         double fastDiffusion, double slowDiffusionRate, double maxSlowDiffusion,
         double fastReflection, double slowReflection,
@@ -112,6 +113,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
             return new Properties(
                 GsonHelper.getAsDouble(jo, "baseHeat"),
                 GsonHelper.getAsDouble(jo, "baseDecay"),
+                GsonHelper.getAsDouble(jo, "minHeat"),
+                GsonHelper.getAsDouble(jo, "maxHeat"),
                 GsonHelper.getAsInt(jo, "minHeight"),
                 parseIntArray(GsonHelper.getAsJsonArray(jo, "rows")),
                 parseIntArray(GsonHelper.getAsJsonArray(jo, "columns")),
@@ -254,8 +257,13 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
+    public double minHeat() {
+        return properties.minHeat;
+    }
+
+    @Override
     public double maxHeat() {
-        return 1000d;
+        return properties.maxHeat;
     }
 
     @Override

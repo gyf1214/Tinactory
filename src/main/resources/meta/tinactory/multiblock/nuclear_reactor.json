@@ -1,11 +1,25 @@
 {
   "recipes": {},
   "machine": "nuclear_reactor",
-  "baseHeat": 20,
+  "baseHeat": 300,
   "baseDecay": 0.0002,
+  "minHeat": 275,
+  "maxHeat": 2000,
   "minHeight": 3,
-  "rows": [2, 3, 4, 4, 5],
-  "columns": [2, 3, 4, 5, 5],
+  "rows": [
+    2,
+    3,
+    4,
+    4,
+    5
+  ],
+  "columns": [
+    2,
+    3,
+    4,
+    5,
+    5
+  ],
   "fastDiffusion": 0.8,
   "slowDiffusionRate": 2e-4,
   "maxSlowDiffusion": 0.4,

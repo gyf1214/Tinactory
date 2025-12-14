@@ -12,11 +12,11 @@ object Generators {
     fun init() {
         boiler {
             recipe("water") {
-                heat(100.0, 400.0, 500.0)
+                heat(375.0, 750.0, 1000.0)
                 reaction(0.01, 0.1)
             }
             recipe("coolant") {
-                heat(150.0, 1000.0, 2000.0)
+                heat(400.0, 1000.0, 2000.0)
                 reaction(0.003, 1.0)
             }
         }

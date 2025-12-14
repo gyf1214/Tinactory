@@ -1,8 +1,10 @@
 {
   "recipes": {},
   "machine": "large_boiler",
-  "baseHeat": 20,
+  "baseHeat": 300,
   "baseDecay": 0.0002,
+  "minHeat": 275,
+  "maxHeat": 2000,
   "burnSpeed": 45,
   "burnHeat": 1,
   "baseBoilerParallel": 3,
