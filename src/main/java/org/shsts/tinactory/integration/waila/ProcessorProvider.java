@@ -16,7 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
+import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
@@ -32,7 +34,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
@@ -80,7 +84,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             var heat = tag.getDouble("tinactoryHeat");
             var maxHeat = tag.getDouble("tinactoryMaxHeat");
             var text = tr("heat", NUMBER_FORMAT.format(heat));
-            progress((float) (heat / maxHeat), text, HEAT_COLOR);
+            addProgress((float) (heat / maxHeat), text, HEAT_COLOR);
         }
 
         if (config.get(POWER) && tag.contains("tinactoryPower", Tag.TAG_LONG)) {
@@ -88,13 +92,13 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             var capacity = tag.getLong("tinactoryPowerCapacity");
             var text = tr("power", ClientUtil.getNumberString(power),
                 ClientUtil.getNumberString(capacity));
-            progress((float) power / (float) capacity, text, POWER_COLOR);
+            addProgress((float) power / (float) capacity, text, POWER_COLOR);
         }
 
         if (config.get(CLEANNESS) && tag.contains("tinactoryCleanness", Tag.TAG_DOUBLE)) {
             var cleanness = tag.getDouble("tinactoryCleanness");
             var text = tr("cleanness", PERCENTAGE_FORMAT.format(cleanness));
-            progress((float) cleanness, text, CLEANNESS_COLOR);
+            addProgress((float) cleanness, text, CLEANNESS_COLOR);
         }
 
         if (config.get(PROGRESS) && tag.contains("tinactoryProgress", Tag.TAG_LONG)) {
@@ -102,7 +106,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             var maxProgress = (double) tag.getLong("tinactoryMaxProgress") / 20d;
             var format = maxProgress < 10d ? PROGRESS_FORMAT : NUMBER_FORMAT;
             var text = tr("progress", format.format(progress), format.format(maxProgress));
-            progress((float) (progress / maxProgress), text, PROGRESS_COLOR);
+            addProgress((float) (progress / maxProgress), text, PROGRESS_COLOR);
         }
 
         newSpace();
@@ -150,10 +154,15 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
         }
     }
 
+    private Optional<IProcessor> getProcessor(BlockEntity blockEntity) {
+        return PROCESSOR.tryGet(blockEntity)
+            .or(() -> MACHINE.tryGet(blockEntity).flatMap(IMachine::processor));
+    }
+
     @Override
     public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
         BlockEntity blockEntity, boolean showDetails) {
-        var cap = PROCESSOR.tryGet(blockEntity);
+        var cap = getProcessor(blockEntity);
         if (cap.isEmpty()) {
             return;
         }

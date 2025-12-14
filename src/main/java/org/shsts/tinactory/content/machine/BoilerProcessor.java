@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -23,10 +24,12 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -72,12 +75,17 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
         CONTAINER.tryGet(blockEntity).ifPresent(boiler::setContainer);
     }
 
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> boiler.setStopped(false));
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), network ->
             Machine.registerStopSignal(network, MACHINE.get(blockEntity), boiler::setStopped));
+        eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
         eventManager.subscribe(CONTAINER_CHANGE.get(), boiler::onUpdateContainer);
     }
 

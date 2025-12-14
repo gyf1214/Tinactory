@@ -24,6 +24,7 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -47,12 +48,14 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
@@ -305,7 +308,6 @@ public class MachineProcessor extends CapabilityProvider implements
 
         workProgress = 0;
         if (stopped) {
-            stopped = false;
             return;
         }
 
@@ -447,6 +449,10 @@ public class MachineProcessor extends CapabilityProvider implements
         setUpdateRecipe();
     }
 
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> stopped = false);
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
@@ -454,6 +460,7 @@ public class MachineProcessor extends CapabilityProvider implements
         eventManager.subscribe(REMOVED_IN_WORLD.get(), this::onRemoved);
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::setUpdateRecipe);
         eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 

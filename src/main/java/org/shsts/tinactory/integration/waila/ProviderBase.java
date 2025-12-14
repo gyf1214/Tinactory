@@ -65,7 +65,7 @@ public abstract class ProviderBase implements IComponentProvider {
         return ret;
     }
 
-    protected void progress(float val, Component text, int color) {
+    protected void addProgress(float val, Component text, int color) {
         add(helper.progress(val, text, progressStyle(color), helper.borderStyle()));
     }
 

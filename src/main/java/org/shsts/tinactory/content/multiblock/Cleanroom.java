@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.machine.Machine;
@@ -39,7 +40,9 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CONNECT;
+import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -93,7 +96,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     public ElectricMachineType getMachineType() {
-        return ElectricMachineType.CONSUMER;
+        return stopped ? ElectricMachineType.NONE : ElectricMachineType.CONSUMER;
     }
 
     @Override
@@ -112,7 +115,6 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     @Override
     public void onWorkTick(double partial) {
         if (stopped) {
-            stopped = false;
             return;
         }
         var voltage = getVoltage();
@@ -166,10 +168,15 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
     }
 
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> stopped = false);
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
     }
 
     @Override

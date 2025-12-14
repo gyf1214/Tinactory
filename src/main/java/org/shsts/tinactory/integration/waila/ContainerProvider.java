@@ -102,7 +102,7 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
             var capacity = tag.getLong("tinactoryBytesCapacity");
             var text = tr("bytes", ClientUtil.getBytesString(bytes),
                 ClientUtil.getBytesString(capacity));
-            progress((float) bytes / (float) capacity, text, BYTES_COLOR);
+            addProgress((float) bytes / (float) capacity, text, BYTES_COLOR);
         }
     }
 

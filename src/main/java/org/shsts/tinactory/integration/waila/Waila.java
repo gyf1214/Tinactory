@@ -27,6 +27,7 @@ public class Waila implements IWailaPlugin {
     public static final ResourceLocation PROGRESS = modLoc("progress");
     public static final ResourceLocation RECIPE = modLoc("recipe");
     public static final ResourceLocation WORK_SPEED = modLoc("work_speed");
+    public static final ResourceLocation ELECTRIC = modLoc("electric");
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -39,9 +40,11 @@ public class Waila implements IWailaPlugin {
         registration.addConfig(PROGRESS, true);
         registration.addConfig(RECIPE, true);
         registration.addConfig(WORK_SPEED, true);
+        registration.addConfig(ELECTRIC, true);
 
         registration.registerBlockDataProvider(ContainerProvider.INSTANCE, BlockEntity.class);
         registration.registerBlockDataProvider(ProcessorProvider.INSTANCE, BlockEntity.class);
+        registration.registerBlockDataProvider(ElectricProvider.INSTANCE, BlockEntity.class);
     }
 
     @Override
@@ -49,6 +52,8 @@ public class Waila implements IWailaPlugin {
         registration.registerComponentProvider(ContainerProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
         registration.registerComponentProvider(ProcessorProvider.INSTANCE, TooltipPosition.BODY,
+            SmartEntityBlock.class);
+        registration.registerComponentProvider(ElectricProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
     }
 }

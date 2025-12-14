@@ -112,7 +112,6 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
 
         currentBurn = 0;
         if (stopped) {
-            stopped = false;
             return;
         }
 

@@ -23,6 +23,7 @@ public final class AllNetworks {
     public static final IEntry<IScheduling> POST_WORK_SCHEDULING;
     public static final IEntry<IScheduling> LOGISTICS_SCHEDULING;
     public static final IEntry<IScheduling> ELECTRIC_SCHEDULING;
+    public static final IEntry<IScheduling> PRE_SIGNAL_SCHEDULING;
     public static final IEntry<IScheduling> SIGNAL_READ_SCHEDULING;
     public static final IEntry<IScheduling> SIGNAL_WRITE_SCHEDULING;
 
@@ -39,11 +40,13 @@ public final class AllNetworks {
             .after(PRE_WORK_SCHEDULING)
             .before(WORK_SCHEDULING)
             .register();
+        PRE_SIGNAL_SCHEDULING = scheduling("signal/pre").register();
         SIGNAL_READ_SCHEDULING = scheduling("signal/read")
             .after(POST_WORK_SCHEDULING)
             .register();
         SIGNAL_WRITE_SCHEDULING = scheduling("signal/write")
             .before(LOGISTICS_SCHEDULING)
+            .after(PRE_SIGNAL_SCHEDULING)
             .register();
 
         ELECTRIC_COMPONENT = componentType("electric", ElectricComponent.class, ElectricComponent::new);

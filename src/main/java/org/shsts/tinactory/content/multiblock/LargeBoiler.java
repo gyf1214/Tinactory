@@ -17,6 +17,7 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
@@ -31,8 +32,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
+import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -154,10 +157,15 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
         }
     }
 
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> boiler.setStopped(false));
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(CONNECT.get(), this::onConnect);
+        eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
         eventManager.subscribe(CONTAINER_CHANGE.get(), boiler::onUpdateContainer);
     }
 

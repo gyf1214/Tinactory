@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IItemCollection;
@@ -40,6 +41,7 @@ import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 
@@ -77,6 +79,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
         var voltage = getBlockVoltage(blockEntity);
         var electric = new SimpleElectricConsumer(voltage.value, properties.power) {
+            @Override
+            public ElectricMachineType getMachineType() {
+                return stopped ? ElectricMachineType.NONE : super.getMachineType();
+            }
+
             @Override
             public double getPowerCons() {
                 return stopped ? 0 : super.getPowerCons();
@@ -261,17 +268,14 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private void onConnect(INetwork network) {
         Machine.registerStopSignal(network, MACHINE.get(blockEntity), $ -> stopped = $);
+        needRevalidate = true;
     }
 
     private void onTick(Level world, INetwork network) {
         if (needRevalidate) {
             validateConfigs();
         }
-        if (stopped) {
-            stopped = false;
-            return;
-        }
-        if (noValidSlot) {
+        if (stopped || noValidSlot) {
             return;
         }
         if (tick < workerInterval) {
@@ -315,15 +319,16 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
+    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> stopped = false);
+        builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> needRevalidate = true);
-    }
-
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
-        builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
     }
 
     @Override
