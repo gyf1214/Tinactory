@@ -256,7 +256,6 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                     var edge = x == -w || x == w || z == -d || z == d;
                     var block = ctx.getBlock(center.offset(x, 0, z));
                     if (block.isEmpty()) {
-                        ctx.setFailed();
                         return false;
                     }
                     if (edge) {
@@ -270,6 +269,16 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                     }
                 }
             }
+
+            for (var x = -w; x <= w; x++) {
+                for (var z = -d; z <= d; z++) {
+                    if (x == 0 && z == 0) {
+                        continue;
+                    }
+                    ctx.addBlock(center.offset(x, 0, z));
+                }
+            }
+
             ctx.setProperty("w", w);
             ctx.setProperty("d", d);
             ctx.setProperty("doors", new ArrayList<DoorState>());
