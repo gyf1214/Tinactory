@@ -91,8 +91,16 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         from = new LogisticComponent.PortKey(machineId, portIndex);
     }
 
+    public void resetFrom() {
+        from = null;
+    }
+
     public void setTo(UUID machineId, int portIndex) {
         to = new LogisticComponent.PortKey(machineId, portIndex);
+    }
+
+    public void resetTo() {
+        to = null;
     }
 
     public void setFilter(ItemStack val) {

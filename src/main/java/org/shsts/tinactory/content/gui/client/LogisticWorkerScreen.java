@@ -160,9 +160,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         @Override
         protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {
             if (FROM_RECT.in(mouseX, mouseY) || TO_RECT.in(mouseX, mouseY) ||
-                VALID_RECT.in(mouseX, mouseY)) {
-                return button == 0;
-            } else if (FILTER_RECT.in(mouseX, mouseY)) {
+                VALID_RECT.in(mouseX, mouseY) || FILTER_RECT.in(mouseX, mouseY)) {
                 return button == 0 || button == 1;
             }
             return false;
@@ -171,20 +169,35 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
             var config = getConfig(index);
+            var needUpdate = false;
 
             if (FROM_RECT.in(mouseX, mouseY)) {
-                selectedConfig = index;
-                selectedFrom = true;
-                config.from().ifPresent(p -> machinePanel.select(p.machineId()));
+                if (button == 0) {
+                    selectedConfig = index;
+                    selectedFrom = true;
+                    config.from().ifPresent(p -> machinePanel.select(p.machineId()));
+                } else {
+                    config.resetFrom();
+                    needUpdate = true;
+                }
             } else if (TO_RECT.in(mouseX, mouseY)) {
-                selectedConfig = index;
-                selectedFrom = false;
-                config.to().ifPresent(p -> machinePanel.select(p.machineId()));
+                if (button == 0) {
+                    selectedConfig = index;
+                    selectedFrom = false;
+                    config.to().ifPresent(p -> machinePanel.select(p.machineId()));
+                } else {
+                    config.resetTo();
+                    needUpdate = true;
+                }
             } else if (VALID_RECT.in(mouseX, mouseY)) {
-                config.setValid(!config.isValid());
-                var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + index, config.serializeNBT());
-                menu.triggerEvent(SET_MACHINE_CONFIG, packet);
+                if (button == 0) {
+                    config.setValid(!config.isValid());
+                } else {
+                    config.setValid(false);
+                    config.resetFrom();
+                    config.resetTo();
+                }
+                needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
                 var carried = menu.getCarried();
                 if (carried.isEmpty()) {
@@ -230,6 +243,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 }
 
                 tagFilterItems = null;
+                needUpdate = true;
+            }
+
+            if (needUpdate) {
                 var packet = SetMachineConfigPacket.builder()
                     .set(PREFIX + index, config.serializeNBT());
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
