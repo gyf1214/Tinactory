@@ -724,6 +724,17 @@
     "tinactory.technology.nuclear_physics": "核物理学",
     "tinactory.technology.nuclear_physics.details": "探索原子核之间的相互作用，释放物质核心蕴藏的巨大能量。这些知识将为核能、先进反应堆和毁灭性武器的研发铺平道路。",
     "generator.tinactory.void": "虚空",
-    "key.tinactory.open_tech": "科研面板"
+    "key.tinactory.open_tech": "科研面板",
+    "config.waila.plugin_tinactory.hide_empty_tank": "隐藏空流体槽",
+    "config.waila.plugin_tinactory.enhance_items": "更好的物品信息",
+    "config.waila.plugin_tinactory.bytes": "存储空间",
+    "config.waila.plugin_tinactory.heat": "温度",
+    "config.waila.plugin_tinactory.power": "电量",
+    "config.waila.plugin_tinactory.cleanness": "洁净度",
+    "config.waila.plugin_tinactory.progress": "工作进度",
+    "config.waila.plugin_tinactory.recipe": "工作配方",
+    "config.waila.plugin_tinactory.work_speed": "工作速度",
+    "config.waila.plugin_tinactory.electric": "用电情况",
+    "config.waila.plugin_tinactory.multiblock": "多方块"
   }
 }

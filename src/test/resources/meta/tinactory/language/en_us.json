@@ -287,6 +287,17 @@
     "tinactory.technology.platinum_group_metal.details": "A collection of rare, lustrous elements prized for their exceptional catalytic and conductive properties. They are vital for high-end electronics, advanced catalysts, and cutting-edge energy systems.",
     "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
     "generator.tinactory.void": "Void",
-    "key.tinactory.open_tech": "Technology Screen"
+    "key.tinactory.open_tech": "Technology Screen",
+    "config.waila.plugin_tinactory.hide_empty_tank": "Hide Empty Tank",
+    "config.waila.plugin_tinactory.enhance_items": "Enhance Item Information",
+    "config.waila.plugin_tinactory.bytes": "Bytes",
+    "config.waila.plugin_tinactory.heat": "Heat",
+    "config.waila.plugin_tinactory.power": "Power",
+    "config.waila.plugin_tinactory.cleanness": "Cleanness",
+    "config.waila.plugin_tinactory.progress": "Working Progress",
+    "config.waila.plugin_tinactory.recipe": "Working Recipe",
+    "config.waila.plugin_tinactory.work_speed": "Working Speed",
+    "config.waila.plugin_tinactory.electric": "Electric",
+    "config.waila.plugin_tinactory.multiblock": "Multiblock"
   }
 }

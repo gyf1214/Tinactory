@@ -222,7 +222,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     @Override
     public int bytesUsed() {
-        return sharedBytes;
+        return bytesLimit - sharedBytes;
     }
 
     @Override
