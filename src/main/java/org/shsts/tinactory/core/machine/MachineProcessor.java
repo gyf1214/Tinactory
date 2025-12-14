@@ -53,7 +53,6 @@ import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
@@ -82,6 +81,7 @@ public class MachineProcessor extends CapabilityProvider implements
     private int processorIndex;
     private final List<ProcessingInfo> infoList = new ArrayList<>();
     private final ListMultimap<Integer, IProcessingObject> infoMap = ArrayListMultimap.create();
+    private double workSpeed;
 
     private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
         public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> infoList) {
@@ -115,8 +115,20 @@ public class MachineProcessor extends CapabilityProvider implements
             });
         }
 
-        public long maxProcess() {
-            return processor.getMaxWorkProgress(recipe);
+        public long maxProgress() {
+            return processor.maxWorkProgress(recipe);
+        }
+
+        public long maxProgressTicks() {
+            return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe)));
+        }
+
+        public long progressTicks(long progress) {
+            return processor.workTicksFromProgress(progress);
+        }
+
+        public double workSpeed(double partial) {
+            return processor.workSpeed(partial);
         }
 
         public ResourceLocation loc() {
@@ -277,7 +289,7 @@ public class MachineProcessor extends CapabilityProvider implements
         }
 
         if (currentRecipe != null) {
-            if (workProgress >= currentRecipe.maxProcess()) {
+            if (workProgress >= currentRecipe.maxProgress()) {
                 currentRecipe = null;
                 infoList.clear();
                 infoMap.clear();
@@ -331,13 +343,14 @@ public class MachineProcessor extends CapabilityProvider implements
 
         var progress = currentRecipe.onWorkProcess(partial);
         workProgress += progress;
+        workSpeed = currentRecipe.workSpeed(partial);
         // We clear currentRecipe and info in the next onPreWork
-        if (workProgress >= currentRecipe.maxProcess()) {
+        if (workProgress >= currentRecipe.maxProgress()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
             // onWorkDone may set outputFilters, we clear it now.
             clearFilters(PortDirection.OUTPUT);
             // make sure getProgress never overflows
-            workProgress = currentRecipe.maxProcess();
+            workProgress = currentRecipe.maxProgress();
         }
         blockEntity.setChanged();
     }
@@ -356,12 +369,17 @@ public class MachineProcessor extends CapabilityProvider implements
 
     @Override
     public long progressTicks() {
-        return workProgress / PROGRESS_PER_TICK;
+        return currentRecipe == null ? 0 : currentRecipe.progressTicks(workProgress);
     }
 
     @Override
     public long maxProgressTicks() {
-        return currentRecipe == null ? 0 : currentRecipe.maxProcess() / PROGRESS_PER_TICK;
+        return currentRecipe == null ? 0 : currentRecipe.maxProgressTicks();
+    }
+
+    @Override
+    public double workSpeed() {
+        return currentRecipe == null ? -1d : workSpeed;
     }
 
     @Override

@@ -268,6 +268,11 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
+    public double workSpeed() {
+        return -1d;
+    }
+
+    @Override
     public Optional<IProcessingObject> getInfo(int port, int index) {
         if (index > 0) {
             return Optional.empty();

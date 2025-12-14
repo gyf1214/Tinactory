@@ -18,6 +18,8 @@ public interface IMachineProcessor extends IProcessor {
 
     long maxProgressTicks();
 
+    double workSpeed();
+
     @Override
     default double getProgress() {
         var maxProgress = maxProgressTicks();

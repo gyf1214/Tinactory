@@ -262,8 +262,18 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public long getMaxWorkProgress(SmeltingRecipe recipe) {
+    public long maxWorkProgress(SmeltingRecipe recipe) {
         return recipe.getCookingTime() * PROGRESS_PER_TICK;
+    }
+
+    @Override
+    public long workTicksFromProgress(long progress) {
+        return (long) Math.floor((double) progress / (double) PROGRESS_PER_TICK / workFactor);
+    }
+
+    @Override
+    public double workSpeed(double partial) {
+        return partial;
     }
 
     @Override

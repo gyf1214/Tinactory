@@ -58,7 +58,11 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
      */
     void onWorkDone(T recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback);
 
-    long getMaxWorkProgress(T recipe);
+    long maxWorkProgress(T recipe);
+
+    long workTicksFromProgress(long progress);
+
+    double workSpeed(double partial);
 
     ElectricMachineType electricMachineType(T recipe);
 

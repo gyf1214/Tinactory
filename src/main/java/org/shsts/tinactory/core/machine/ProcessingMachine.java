@@ -342,8 +342,18 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public long getMaxWorkProgress(R recipe) {
+    public long maxWorkProgress(R recipe) {
         return recipe.workTicks * PROGRESS_PER_TICK;
+    }
+
+    @Override
+    public double workSpeed(double partial) {
+        return partial;
+    }
+
+    @Override
+    public long workTicksFromProgress(long progress) {
+        return (long) Math.floor((double) progress / (double) PROGRESS_PER_TICK / workFactor);
     }
 
     @Override

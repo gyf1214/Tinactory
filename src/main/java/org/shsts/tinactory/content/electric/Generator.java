@@ -45,6 +45,16 @@ public class Generator extends ProcessingMachine<ProcessingRecipe> {
     }
 
     @Override
+    public long workTicksFromProgress(long progress) {
+        return progress / PROGRESS_PER_TICK;
+    }
+
+    @Override
+    public double workSpeed(double partial) {
+        return 1d;
+    }
+
+    @Override
     public ElectricMachineType electricMachineType(ProcessingRecipe recipe) {
         return ElectricMachineType.GENERATOR;
     }
