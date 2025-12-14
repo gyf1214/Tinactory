@@ -16,6 +16,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -40,7 +41,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
     private final Voltage subVoltage;
 
     public SubnetBlock(Properties properties, Voltage voltage, Voltage subVoltage) {
-        super(properties.requiresCorrectToolForDrops());
+        super(properties.requiresCorrectToolForDrops().isValidSpawn(AllItems::never));
         this.voltage = voltage;
         this.subVoltage = subVoltage;
 

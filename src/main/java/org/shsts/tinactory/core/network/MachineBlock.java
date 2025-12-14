@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
@@ -53,7 +52,7 @@ public class MachineBlock extends SmartEntityBlock
     public MachineBlock(Properties properties,
         Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu, Voltage voltage) {
-        super(properties.requiresCorrectToolForDrops().isValidSpawn(AllItems::never), entityType, menu);
+        super(properties.requiresCorrectToolForDrops(), entityType, menu);
         this.voltage = voltage;
     }
 

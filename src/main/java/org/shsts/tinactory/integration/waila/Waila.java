@@ -61,4 +61,8 @@ public class Waila implements IWailaPlugin {
         registration.registerComponentProvider(ElectricProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
     }
+
+    static {
+        ToolHandlers.init();
+    }
 }

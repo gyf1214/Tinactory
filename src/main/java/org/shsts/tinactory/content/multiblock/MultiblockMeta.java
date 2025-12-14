@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.machine.FireBoiler;
@@ -306,6 +307,7 @@ public class MultiblockMeta extends MachineMeta {
                 .block()
                 .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
+                .properties(BlockBehaviour.Properties::requiresCorrectToolForDrops)
                 .translucent()
                 .end()
                 .buildObject();

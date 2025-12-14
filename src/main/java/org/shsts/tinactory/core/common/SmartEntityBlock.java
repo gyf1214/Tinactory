@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.AllEvents;
+import org.shsts.tinactory.AllItems;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -43,7 +44,7 @@ public class SmartEntityBlock extends Block implements EntityBlock {
 
     public SmartEntityBlock(Properties properties,
         Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        super(properties);
+        super(properties.isValidSpawn(AllItems::never));
         this.entityType = Lazy.of(entityType);
         this.menu = menu;
         registerDefaultState(createDefaultBlockState());

@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -23,7 +22,7 @@ import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
 public class FixedMachineBlock extends SmartEntityBlock {
     public FixedMachineBlock(Properties properties, Supplier<IBlockEntityType> entityType,
         @Nullable IMenuType menu) {
-        super(properties.requiresCorrectToolForDrops().isValidSpawn(AllItems::never), entityType, menu);
+        super(properties.requiresCorrectToolForDrops(), entityType, menu);
     }
 
     @Override

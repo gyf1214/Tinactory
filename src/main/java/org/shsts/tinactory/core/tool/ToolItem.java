@@ -19,6 +19,8 @@ import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ToolItem extends Item {
+    public static final String HIDE_BAR = "tinactoryHideBar";
+
     protected final int durability;
 
     public ToolItem(Properties properties, int durability) {
@@ -51,7 +53,7 @@ public class ToolItem extends Item {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return true;
+        return stack.getTag() == null || !stack.getTag().getBoolean(HIDE_BAR);
     }
 
     @Override
