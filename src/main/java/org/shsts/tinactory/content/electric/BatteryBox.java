@@ -13,7 +13,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -41,7 +40,7 @@ import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
-    IProcessor, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
+    IBatteryBox, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
     public static final String DISCHARGE_KEY = "discharge";
     public static final boolean DISCHARGE_DEFAULT = false;
     private static final String ID = "battery_box";
@@ -109,18 +108,29 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public double getProgress() {
-        var totalPower = 0L;
-        var totalCapacity = 0L;
+    public long powerLevel() {
+        var ret = 0L;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
             if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
                 continue;
             }
-            totalPower += battery.getPower(stack);
-            totalCapacity += battery.capacity;
+            ret += battery.getPower(stack);
         }
-        return totalCapacity == 0 ? 0 : (double) totalPower / totalCapacity;
+        return ret;
+    }
+
+    @Override
+    public long powerCapacity() {
+        var ret = 0L;
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
+            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+                continue;
+            }
+            ret += battery.capacity;
+        }
+        return ret;
     }
 
     @Override

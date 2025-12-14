@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.multiblock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +16,9 @@ public class LargeTurbine extends Multiblock {
         super(blockEntity, builder);
     }
 
-    private void setBladeBlocks(Level world, Direction dir, boolean working) {
+    private void setBladeBlocks(Level world, BlockState state) {
+        var dir = state.getValue(PrimitiveBlock.FACING);
+        var working = state.getValue(MachineBlock.WORKING);
         var dirW = dir.getCounterClockWise();
         var pos = blockEntity.getBlockPos();
         for (var k = 0; k < TurbineBlock.BLADES; k++) {
@@ -44,15 +45,12 @@ public class LargeTurbine extends Multiblock {
         super.onRegister();
         var world = blockEntity.getLevel();
         assert world != null;
-        var dir = blockEntity.getBlockState().getValue(PrimitiveBlock.FACING);
-        setBladeBlocks(world, dir, false);
+        setBladeBlocks(world, blockEntity.getBlockState());
     }
 
     @Override
     public void setWorkBlock(Level world, BlockState state) {
         super.setWorkBlock(world, state);
-        var dir = state.getValue(PrimitiveBlock.FACING);
-        var working = state.getValue(MachineBlock.WORKING);
-        setBladeBlocks(world, dir, working);
+        setBladeBlocks(world, state);
     }
 }

@@ -17,8 +17,9 @@ import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -27,14 +28,18 @@ import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.core.util.CodecHelper.parseIntArray;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NuclearReactor extends Multiblock implements INBTSerializable<CompoundTag>, IProcessor {
+public class NuclearReactor extends Multiblock implements IBoiler,
+    INBTSerializable<CompoundTag> {
     private static final int[] NEIGHBOR_X = new int[]{-1, 1, 0, 0};
     private static final int[] NEIGHBOR_Y = new int[]{0, 0, -1, 1};
 
@@ -63,7 +68,7 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
 
         @Override
         public double getHeat() {
-            return boiler.getHeat();
+            return boiler.heat();
         }
 
         @Override
@@ -148,10 +153,6 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
         return reactorItems;
     }
 
-    public double getHeat() {
-        return boiler.getHeat();
-    }
-
     @Override
     protected void doCheckMultiblock(CheckContext ctx) {
         super.doCheckMultiblock(ctx);
@@ -210,7 +211,7 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
         }
 
         var slowDiffusion = Math.min(properties.maxSlowDiffusion,
-            properties.slowDiffusionRate * boiler.getHeat());
+            properties.slowDiffusionRate * boiler.heat());
         for (var y = 0; y < rows; y++) {
             for (var x = 0; x < columns; x++) {
                 var i = y * columns + x;
@@ -247,8 +248,42 @@ public class NuclearReactor extends Multiblock implements INBTSerializable<Compo
     }
 
     @Override
-    public double getProgress() {
+    public double heat() {
+        return boiler.heat();
+    }
+
+    @Override
+    public double maxHeat() {
+        return 1000d;
+    }
+
+    @Override
+    public long progressTicks() {
         return reactions > 0 ? 1 : 0;
+    }
+
+    @Override
+    public long maxProgressTicks() {
+        return 0;
+    }
+
+    @Override
+    public Optional<IProcessingObject> getInfo(int port, int index) {
+        if (index > 0) {
+            return Optional.empty();
+        }
+        return switch (port) {
+            case 1 -> boiler.inputInfo();
+            case 2 -> boiler.outputInfo();
+            default -> Optional.empty();
+        };
+    }
+
+    @Override
+    public List<IProcessingObject> getAllInfo() {
+        var ret = new ArrayList<IProcessingObject>();
+        boiler.addAllInfo(ret::add);
+        return ret;
     }
 
     @Override

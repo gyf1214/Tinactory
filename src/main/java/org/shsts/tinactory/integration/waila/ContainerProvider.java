@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import snownee.jade.Jade;
 import snownee.jade.JadeCommonConfig;
@@ -31,11 +32,25 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @MethodsReturnNonnullByDefault
 public class ContainerProvider implements IComponentProvider, IServerDataProvider<BlockEntity> {
     public static final ContainerProvider INSTANCE = new ContainerProvider();
-    public static final ResourceLocation ITEMS = modLoc("items");
+    public static final ResourceLocation TAG = modLoc("items");
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         var tag = accessor.getServerData();
+
+        // remove the fluid tooltip when it is completely empty.
+        // for some reason jade will add an "Empty" tooltip when there is a FluidHandler but no fluid inside.
+        if (tag.contains("jadeTanks", Tag.TAG_LIST)) {
+            var listTag = tag.getList("jadeTanks", Tag.TAG_COMPOUND);
+            if (listTag.size() == 1) {
+                var tag1 = (CompoundTag) listTag.get(0);
+                var fluid = FluidStack.loadFluidStackFromNBT(tag1);
+                if (fluid.isEmpty()) {
+                    tooltip.remove(VanillaPlugin.FORGE_FLUID);
+                }
+            }
+        }
+
         if (tag.contains("tinactoryItems", Tag.TAG_LIST)) {
             // remove Jade tooltip first
             tooltip.remove(VanillaPlugin.INVENTORY);
@@ -59,12 +74,13 @@ public class ContainerProvider implements IComponentProvider, IServerDataProvide
                 if (showName) {
                     var stack1 = stack.copy();
                     stack1.setCount(1);
-                    elements.add(Jade.smallItem(helper, stack1).tag(ITEMS));
+                    elements.add(Jade.smallItem(helper, stack1).tag(TAG));
+                    // jade does not use a TranslatableComponent
                     var text = new TextComponent(NUMBER_FORMAT.format(stack.getCount()))
                         .append("× ").append(stack.getHoverName());
-                    elements.add(helper.text(text).tag(ITEMS).message(null));
+                    elements.add(helper.text(text).tag(TAG).message(null));
                 } else {
-                    elements.add(helper.item(stack).tag(ITEMS));
+                    elements.add(helper.item(stack).tag(TAG));
                 }
 
                 ++drawnCount;

@@ -18,11 +18,14 @@ public class Waila implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(ContainerProvider.INSTANCE, BlockEntity.class);
+        registration.registerBlockDataProvider(ProcessorProvider.INSTANCE, BlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerComponentProvider(ContainerProvider.INSTANCE, TooltipPosition.BODY,
+            SmartEntityBlock.class);
+        registration.registerComponentProvider(ProcessorProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
     }
 }

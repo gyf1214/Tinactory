@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.content.machine.Boiler;
+import org.shsts.tinactory.content.machine.IBoiler;
 
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
 import static org.shsts.tinactory.core.machine.Machine.getProcessor;
@@ -19,17 +19,17 @@ public class BoilerMenu extends MachineMenu {
         addProgressSlots(this);
     }
 
-    private static double getBurn(IProcessor processor) {
+    public static double getBurn(IProcessor processor) {
         var progress = processor.getProgress();
         return progress <= 0 ? 0 : 1 - progress;
     }
 
     public static void addProgressSlots(MachineMenu menu) {
         menu.addSyncSlot(BURN_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
-            .map(org.shsts.tinactory.content.gui.BoilerMenu::getBurn)
+            .map(BoilerMenu::getBurn)
             .orElse(0d)));
         menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
-            .map($ -> ((Boiler) $).getHeat() / 600d)
+            .map($ -> ((IBoiler) $).heatProgress())
             .orElse(0d)));
     }
 }

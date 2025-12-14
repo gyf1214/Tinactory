@@ -90,6 +90,10 @@ public final class ProcessingResults {
             this.stack = stack;
         }
 
+        public ItemResult(ItemStack stack) {
+            this(1d, stack);
+        }
+
         @Override
         protected Optional<IProcessingResult> doInsertPort(IItemCollection port, int parallel,
             Random random, boolean simulate) {
@@ -114,12 +118,16 @@ public final class ProcessingResults {
             this.stack = stack;
         }
 
+        public FluidResult(FluidStack stack) {
+            this(1d, stack);
+        }
+
         @Override
         protected Optional<IProcessingResult> doInsertPort(IFluidCollection port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
             return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount() ?
-                Optional.of(new FluidResult(1d, stack1)) : Optional.empty();
+                Optional.of(new FluidResult(stack1)) : Optional.empty();
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(

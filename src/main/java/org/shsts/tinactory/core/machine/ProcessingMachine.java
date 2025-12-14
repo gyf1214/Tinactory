@@ -277,10 +277,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             var result = output.result();
             if (result instanceof ProcessingResults.ItemResult item) {
                 var stack1 = StackHelper.copyWithCount(item.stack, parallel * item.stack.getCount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(1d, stack1)));
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(stack1)));
             } else if (result instanceof ProcessingResults.FluidResult fluid) {
                 var stack1 = StackHelper.copyWithAmount(fluid.stack, parallel * fluid.stack.getAmount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(1d, stack1)));
+                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(stack1)));
             }
         }
     }

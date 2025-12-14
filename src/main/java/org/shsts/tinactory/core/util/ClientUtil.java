@@ -68,27 +68,35 @@ public final class ClientUtil {
         return List.of(I18n.tr("tinactory.tooltip.tag", tag.location()));
     }
 
-    public static String getItemCountString(int count) {
+    public static String getNumberString(long count) {
         if (count < 1000) {
             return NUMBER_FORMAT.format(count);
+        } else if (count < 10000) {
+            return DOUBLE_FORMAT.format((double) count / 1e3d) + "k";
         } else if (count < 1000000) {
             return NUMBER_FORMAT.format(count / 1000) + "k";
+        } else if (count < 10000000) {
+            return DOUBLE_FORMAT.format((double) count / 1e6d) + "M";
         } else if (count < 1000000000) {
             return NUMBER_FORMAT.format(count / 1000000) + "M";
+        } else if (count < 10000000000L) {
+            return DOUBLE_FORMAT.format((double) count / 1e9d) + "G";
         } else {
             return NUMBER_FORMAT.format(count / 1000000000) + "G";
         }
+    }
+
+    public static String getItemCountString(int count) {
+        return getNumberString(count);
     }
 
     public static String getFluidAmountString(int amount) {
         if (amount < 1000) {
             return NUMBER_FORMAT.format(amount);
         } else if (amount < 1000000) {
-            return NUMBER_FORMAT.format(amount / 1000) + "B";
-        } else if (amount < 1000000000) {
-            return NUMBER_FORMAT.format(amount / 1000000) + "k";
+            return getNumberString(amount / 1000) + "B";
         } else {
-            return NUMBER_FORMAT.format(amount / 1000000000) + "M";
+            return getNumberString(amount / 1000);
         }
     }
 

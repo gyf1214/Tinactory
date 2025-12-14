@@ -55,7 +55,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
 
     @Override
     public boolean matches(Boiler boiler, Level world) {
-        return boiler.getHeat() > minHeat && boiler.getInput()
+        return boiler.heat() > minHeat && boiler.getInput()
             .filter($ -> $.drain(input, true).getAmount() >= input.getAmount())
             .isPresent();
     }

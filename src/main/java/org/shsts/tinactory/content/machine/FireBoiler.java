@@ -12,13 +12,12 @@ import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IItemCollection;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TI
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class FireBoiler extends Boiler implements IMachineProcessor {
+public abstract class FireBoiler extends Boiler implements IBoiler {
     private final double burnSpeed;
     private final double burnHeat;
 
@@ -94,7 +93,20 @@ public abstract class FireBoiler extends Boiler implements IMachineProcessor {
 
     @Override
     public void onPreWork() {
-        if (fuelPort == null || maxBurn > 0 || !needUpdate) {
+        if (fuelPort == null) {
+            return;
+        }
+
+        if (maxBurn > 0) {
+            if (currentBurn >= maxBurn) {
+                maxBurn = 0;
+                needUpdate = true;
+            } else {
+                return;
+            }
+        }
+
+        if (!needUpdate) {
             return;
         }
 
@@ -139,11 +151,7 @@ public abstract class FireBoiler extends Boiler implements IMachineProcessor {
 
         var heatInput = 0d;
         if (maxBurn > 0) {
-            currentBurn += (long) (burnSpeed * (double) PROGRESS_PER_TICK);
-            if (currentBurn >= maxBurn) {
-                maxBurn = 0;
-                needUpdate = true;
-            }
+            currentBurn = Math.min(maxBurn, currentBurn + (long) (burnSpeed * (double) PROGRESS_PER_TICK));
             heatInput = burnHeat * burningItem.getCount();
         }
 
@@ -157,23 +165,39 @@ public abstract class FireBoiler extends Boiler implements IMachineProcessor {
     }
 
     @Override
-    public double getProgress() {
-        if (maxBurn <= 0) {
-            return currentBurn > 0 ? 1 : 0;
-        }
-        return (double) currentBurn / (double) maxBurn;
+    public double maxHeat() {
+        return 600d;
+    }
+
+    @Override
+    public long progressTicks() {
+        return (long) Math.floor((double) currentBurn / PROGRESS_PER_TICK / burnSpeed);
+    }
+
+    @Override
+    public long maxProgressTicks() {
+        return (long) Math.ceil((double) maxBurn / PROGRESS_PER_TICK / burnSpeed);
     }
 
     @Override
     public Optional<IProcessingObject> getInfo(int port, int index) {
+        if (index > 0) {
+            return Optional.empty();
+        }
         return switch (port) {
             case 0 -> Optional.of(new ProcessingIngredients.ItemIngredient(burningItem));
-            case 1 -> lastRecipe == null ? Optional.empty() :
-                Optional.of(new ProcessingIngredients.FluidIngredient(lastRecipe.input));
-            case 2 -> lastRecipe == null ? Optional.empty() :
-                Optional.of(new ProcessingResults.FluidResult(1d, lastRecipe.output));
+            case 1 -> inputInfo();
+            case 2 -> outputInfo();
             default -> Optional.empty();
         };
+    }
+
+    @Override
+    public List<IProcessingObject> getAllInfo() {
+        var ret = new ArrayList<IProcessingObject>();
+        ret.add(new ProcessingIngredients.ItemIngredient(burningItem));
+        addAllInfo(ret::add);
+        return ret;
     }
 
     @Override

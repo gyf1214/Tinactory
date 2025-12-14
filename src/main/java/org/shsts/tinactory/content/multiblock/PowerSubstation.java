@@ -13,7 +13,7 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -27,8 +27,8 @@ import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class PowerSubstation extends Multiblock implements IProcessor, IElectricMachine,
-    INBTSerializable<CompoundTag> {
+public class PowerSubstation extends Multiblock implements IBatteryBox,
+    IElectricMachine, INBTSerializable<CompoundTag> {
     private long output = 0L;
     private long capacity = 0L;
     private long power = 0L;
@@ -48,10 +48,6 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
         } else {
             ctx.setFailed();
         }
-    }
-
-    private long getPower() {
-        return MathUtil.clamp(power, 0, capacity);
     }
 
     @Override
@@ -91,8 +87,13 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
     }
 
     @Override
-    public double getProgress() {
-        return (double) getPower() / (double) capacity;
+    public long powerLevel() {
+        return MathUtil.clamp(power, 0, capacity);
+    }
+
+    @Override
+    public long powerCapacity() {
+        return capacity;
     }
 
     @Override
@@ -107,12 +108,12 @@ public class PowerSubstation extends Multiblock implements IProcessor, IElectric
 
     @Override
     public double getPowerGen() {
-        return Math.min(getPower(), output);
+        return Math.min(powerLevel(), output);
     }
 
     @Override
     public double getPowerCons() {
-        return isDischarge() ? 0 : Math.min(capacity - getPower(), output);
+        return isDischarge() ? 0 : Math.min(capacity - powerLevel(), output);
     }
 
     @Override

@@ -53,6 +53,7 @@ import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
@@ -256,13 +257,6 @@ public class MachineProcessor extends CapabilityProvider implements
         }
     }
 
-    @Override
-    public Optional<IProcessingObject> getInfo(int port, int index) {
-        var list = infoMap.get(port);
-        return index >= 0 && index < list.size() ? Optional.ofNullable(list.get(index)) :
-            Optional.empty();
-    }
-
     private void setUpdateRecipe() {
         if (currentRecipe == null) {
             needUpdate = true;
@@ -277,18 +271,33 @@ public class MachineProcessor extends CapabilityProvider implements
 
     @Override
     public void onPreWork() {
-        if (currentRecipe != null || !needUpdate) {
+        // this is possible in primitive machine
+        if (!firstConnect) {
+            onFirstConnect();
+        }
+
+        if (currentRecipe != null) {
+            if (workProgress >= currentRecipe.maxProcess()) {
+                currentRecipe = null;
+                infoList.clear();
+                infoMap.clear();
+                needUpdate = true;
+            } else {
+                return;
+            }
+        }
+
+        if (!needUpdate) {
             return;
         }
 
+        workProgress = 0;
         if (stopped) {
-            workProgress = 0;
             stopped = false;
             return;
         }
 
         var world = world();
-        assert currentRecipeLoc == null;
         var machine = machine();
         if (machine.isEmpty()) {
             return;
@@ -302,7 +311,6 @@ public class MachineProcessor extends CapabilityProvider implements
             }
         }
 
-        workProgress = 0;
         if (currentRecipe != null) {
             currentRecipe.onWorkBegin(machine.get(), maxParallel(), infoList);
             buildInfoMap();
@@ -323,24 +331,37 @@ public class MachineProcessor extends CapabilityProvider implements
 
         var progress = currentRecipe.onWorkProcess(partial);
         workProgress += progress;
+        // We clear currentRecipe and info in the next onPreWork
         if (workProgress >= currentRecipe.maxProcess()) {
             currentRecipe.onWorkDone(machine.get(), world().random);
             // onWorkDone may set outputFilters, we clear it now.
             clearFilters(PortDirection.OUTPUT);
-            currentRecipe = null;
-            infoList.clear();
-            infoMap.clear();
-            needUpdate = true;
+            // make sure getProgress never overflows
+            workProgress = currentRecipe.maxProcess();
         }
         blockEntity.setChanged();
     }
 
     @Override
-    public double getProgress() {
-        if (currentRecipe == null) {
-            return workProgress > 0 ? 1d : 0d;
-        }
-        return (double) workProgress / (double) currentRecipe.maxProcess();
+    public Optional<IProcessingObject> getInfo(int port, int index) {
+        var list = infoMap.get(port);
+        return index >= 0 && index < list.size() ? Optional.ofNullable(list.get(index)) :
+            Optional.empty();
+    }
+
+    @Override
+    public List<IProcessingObject> getAllInfo() {
+        return infoList.stream().map(ProcessingInfo::object).toList();
+    }
+
+    @Override
+    public long progressTicks() {
+        return workProgress / PROGRESS_PER_TICK;
+    }
+
+    @Override
+    public long maxProgressTicks() {
+        return currentRecipe == null ? 0 : currentRecipe.maxProcess() / PROGRESS_PER_TICK;
     }
 
     @Override
@@ -373,24 +394,27 @@ public class MachineProcessor extends CapabilityProvider implements
         TechManager.server().onProgressChange(onTechChange);
     }
 
+    private void onFirstConnect() {
+        currentRecipe = null;
+        if (currentRecipeLoc != null) {
+            var processor = processors.get(processorIndex);
+            recoverRecipe(processorIndex, processor, world(), currentRecipeLoc);
+            currentRecipeLoc = null;
+        }
+
+        if (currentRecipe != null) {
+            machine().ifPresent(currentRecipe::onWorkContinue);
+            needUpdate = false;
+        }
+        updateTargetRecipe();
+        firstConnect = true;
+    }
+
     private void onConnect(INetwork network) {
         machine().ifPresent(machine -> Machine.registerStopSignal(network, machine, $ -> stopped = $));
 
         if (!firstConnect) {
-            currentRecipe = null;
-            if (currentRecipeLoc != null) {
-                var processor = processors.get(processorIndex);
-                recoverRecipe(processorIndex, processor, world(), currentRecipeLoc);
-                currentRecipeLoc = null;
-            }
-
-            if (currentRecipe != null) {
-                machine().ifPresent(currentRecipe::onWorkContinue);
-                needUpdate = false;
-            }
-            updateTargetRecipe();
-
-            firstConnect = true;
+            onFirstConnect();
         }
     }
 
