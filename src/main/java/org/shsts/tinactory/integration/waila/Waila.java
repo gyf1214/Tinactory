@@ -8,12 +8,13 @@ import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.WailaPlugin;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
-@WailaPlugin
+@WailaPlugin(priority = 20)
 @SuppressWarnings("UnstableApiUsage")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -53,7 +54,7 @@ public class Waila implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerComponentProvider(ContainerProvider.INSTANCE, TooltipPosition.BODY,
-            SmartEntityBlock.class);
+            Block.class);
         registration.registerComponentProvider(MultiblockProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
         registration.registerComponentProvider(ProcessorProvider.INSTANCE, TooltipPosition.BODY,

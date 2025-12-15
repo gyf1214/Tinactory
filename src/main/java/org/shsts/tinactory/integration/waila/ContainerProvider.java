@@ -11,10 +11,12 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
+import org.shsts.tinactory.core.logistics.ItemStackWrapper;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 import snownee.jade.Jade;
@@ -22,6 +24,7 @@ import snownee.jade.JadeCommonConfig;
 import snownee.jade.VanillaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
@@ -61,39 +64,19 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
             // remove Jade tooltip first
             tooltip.remove(VanillaPlugin.INVENTORY);
 
-            // use the same logic as Jade, but with support of 64+ items.
+            // use the same logic as Jade, but with support of 64+ items and force show name.
             var listTag = tag.getList("tinactoryItems", Tag.TAG_COMPOUND);
-            var elements = new ArrayList<IElement>();
-            var showName = listTag.size() < 5;
-            var drawnCount = 0;
-            var first = true;
-
             for (var itemTag : listTag) {
-                if (!first && (showName || drawnCount >= JadeCommonConfig.inventoryShowItemPreLine)) {
-                    add(elements);
-                    elements.clear();
-                    drawnCount = 0;
-                }
+                var line = new ArrayList<IElement>();
 
                 var stack = StackHelper.deserializeItemStack((CompoundTag) itemTag);
-                if (showName) {
-                    var stack1 = stack.copy();
-                    stack1.setCount(1);
-                    elements.add(Jade.smallItem(helper, stack1));
-                    // jade does not use a TranslatableComponent
-                    var text = new TextComponent(NUMBER_FORMAT.format(stack.getCount()))
-                        .append("× ").append(stack.getHoverName());
-                    elements.add(helper.text(text).message(null));
-                } else {
-                    elements.add(helper.item(stack));
-                }
+                line.add(Jade.smallItem(helper, StackHelper.copyWithCount(stack, 1)));
+                // jade does not use a TranslatableComponent
+                var text = new TextComponent(NUMBER_FORMAT.format(stack.getCount()))
+                    .append("× ").append(stack.getHoverName());
+                line.add(helper.text(text).message(null));
 
-                ++drawnCount;
-                first = false;
-            }
-
-            if (!elements.isEmpty()) {
-                add(elements);
+                add(line);
             }
         }
 
@@ -107,21 +90,32 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
     }
 
     private void appendItems(CompoundTag tag, IItemHandler items, boolean showDetails) {
-        var limit = showDetails ? JadeCommonConfig.inventoryDetailedShowAmount :
-            JadeCommonConfig.inventoryNormalShowAmount;
+        // TODO: make is configurable
+        var limit = showDetails ? 9 : 4;
 
-        var listTag = new ListTag();
+        var itemMap = new HashMap<ItemStackWrapper, ItemStack>();
+        var itemList = new ArrayList<ItemStack>();
+
         for (var i = 0; i < items.getSlots(); i++) {
-            if (limit <= 0) {
-                break;
-            }
             var stack = items.getStackInSlot(i);
             if (stack.isEmpty()) {
                 continue;
             }
 
+            var key = new ItemStackWrapper(stack);
+            if (itemMap.containsKey(key)) {
+                var stack1 = itemMap.get(key);
+                stack1.grow(stack.getCount());
+            } else if (itemList.size() < limit) {
+                var stack1 = stack.copy();
+                itemMap.put(key, stack1);
+                itemList.add(stack1);
+            }
+        }
+
+        var listTag = new ListTag();
+        for (var stack : itemList) {
             listTag.add(StackHelper.serializeItemStack(stack));
-            limit--;
         }
 
         if (!listTag.isEmpty()) {
