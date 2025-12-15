@@ -22,19 +22,19 @@ object Crops {
         farm(Items.PUMPKIN, Items.PUMPKIN_SEEDS, false)
         farm(Items.MELON, Items.MELON_SEEDS, false)
         farm(Items.CARROT)
-        farm(Items.POTATO)
         farm(Items.COCOA_BEANS)
-        farm(Items.SUGAR_CANE)
-        farm(Items.SWEET_BERRIES)
         farm(Items.CACTUS)
+        farm(Items.POTATO)
         farm(Items.KELP)
         farm(Items.SEA_PICKLE)
-        farm(Items.NETHER_WART)
-        farm(Items.CRIMSON_FUNGUS)
-        farm(Items.WARPED_FUNGUS)
+        farm(Items.SUGAR_CANE)
+        farm(Items.SWEET_BERRIES)
         farm(Items.GLOW_BERRIES)
         farm(Items.BROWN_MUSHROOM)
         farm(Items.RED_MUSHROOM)
+        farm(Items.NETHER_WART)
+        farm(Items.CRIMSON_FUNGUS)
+        farm(Items.WARPED_FUNGUS)
 
         // cut melon
         cutter {
@@ -48,40 +48,41 @@ object Crops {
         // crop to seed
         toSeed(Items.WHEAT, Items.WHEAT_SEEDS)
         toSeed(Items.BEETROOT, Items.BEETROOT_SEEDS)
-        toSeed(Items.PUMPKIN, Items.PUMPKIN_SEEDS, 4, 256)
+        toSeed(Items.PUMPKIN, Items.PUMPKIN_SEEDS, 4)
         toSeed(Items.MELON_SLICE, Items.MELON_SEEDS)
+        toSeed(Items.MELON, Items.MELON_SEEDS, 9)
 
         // crop to biomass
-        toBiomass(Items.WHEAT, 1, 0.1, 48)
-        toBiomass(Items.BEETROOT, 1, 0.5, 48)
-        toBiomass(Items.CARROT, 2, 0.1, 96)
-        toBiomass(Items.POTATO, 2, 0.15, 64)
-        toBiomass(Items.MELON, 1, 0.6, 240)
-        toBiomass(Items.PUMPKIN, 1, 0.3, 256)
-        toBiomass(Items.COCOA_BEANS, 2, 0.1, 128)
-        toBiomass(Items.SUGAR_CANE, 1, 0.4, 48)
-        toBiomass(Items.SWEET_BERRIES, 1, 0.1, 32)
-        toBiomass(Items.CACTUS, 1, 0.1, 128)
-        toBiomass(Items.KELP, 2, 0.15, 64)
-        toBiomass(Items.SEA_PICKLE, 2, 0.1, 96)
-        toBiomass(Items.NETHER_WART, 4, 0.1, 96)
-        toBiomass(Items.CRIMSON_FUNGUS, 4, 0.1, 128)
-        toBiomass(Items.WARPED_FUNGUS, 4, 0.1, 128)
-        toBiomass(Items.GLOW_BERRIES, 2, 0.15, 64)
-        // seeds to biomass
-        toBiomass(Items.WHEAT_SEEDS, 16, 0.1, 64)
-        toBiomass(Items.BEETROOT_SEEDS, 16, 0.1, 64)
-        toBiomass(Items.MELON_SEEDS, 16, 0.1, 64)
-        toBiomass(Items.PUMPKIN_SEEDS, 16, 0.1, 64)
-
+        biomass(Items.WHEAT, 1, 1.0, 48)
+        biomass(Items.BEETROOT, 1, 1.5, 48)
+        biomass(Items.PUMPKIN, 1, 1.0, 240)
+        biomass(Items.MELON, 1, 2.0, 240)
+        biomass(Items.CARROT, 1, 0.5, 64)
+        biomass(Items.COCOA_BEANS, 1, 0.5, 64)
+        biomass(Items.CACTUS, 1, 0.5, 64)
+        biomass(Items.POTATO, 1, 0.75, 64)
+        biomass(Items.KELP, 1, 0.75, 64)
+        biomass(Items.SEA_PICKLE, 1, 0.75, 64)
+        biomass(Items.SUGAR_CANE, 1, 1.0, 96)
+        biomass(Items.SWEET_BERRIES, 2, 1.5, 64)
+        biomass(Items.GLOW_BERRIES, 2, 1.5, 64)
+        biomass(Items.NETHER_WART, 2, 0.75, 96)
+        biomass(Items.CRIMSON_FUNGUS, 2, 0.75, 96)
+        biomass(Items.WARPED_FUNGUS, 2, 0.75, 96)
         extractor {
-            input(Tags.Items.MUSHROOMS, 6) {
-                output("biomass", amount = 0.1)
+            input(Tags.Items.MUSHROOMS, 2) {
+                output("biomass", amount = 0.75)
                 voltage(Voltage.LV)
                 workTicks(96)
             }
         }
+        // seeds to biomass
+        biomass(Items.WHEAT_SEEDS, 16, 1.6, 64)
+        biomass(Items.BEETROOT_SEEDS, 16, 1.6, 64)
+        biomass(Items.MELON_SEEDS, 16, 1.6, 64)
+        biomass(Items.PUMPKIN_SEEDS, 16, 1.6, 64)
 
+        // misc
         assembler {
             defaults {
                 voltage(Voltage.ULV)
@@ -113,7 +114,7 @@ object Crops {
             input(seed, suffix = "_with_bone_meal") {
                 input("water", amount = 0.5)
                 input(Items.BONE_MEAL, 1, port = 2)
-                workTicks(300)
+                workTicks(320)
             }
         }
         autofarm {
@@ -125,7 +126,7 @@ object Crops {
                     output(seed, 4)
                 }
                 voltage(Voltage.LV)
-                workTicks(300)
+                workTicks(320)
             }
         }
     }
@@ -140,7 +141,7 @@ object Crops {
         }
     }
 
-    private fun toBiomass(crop: Item, amount: Int, outAmount: Double, workTicks: Long) {
+    private fun biomass(crop: Item, amount: Int, outAmount: Double, workTicks: Long) {
         extractor {
             input(crop, amount) {
                 output("biomass", amount = outAmount)

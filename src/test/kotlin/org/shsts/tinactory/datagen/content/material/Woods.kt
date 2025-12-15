@@ -257,14 +257,13 @@ object Woods {
         extractor {
             defaults {
                 voltage(Voltage.LV)
+                workTicks(64)
             }
-            input(ItemTags.LEAVES, 16) {
-                output("biomass", amount = 0.3)
-                workTicks(128)
+            input(ItemTags.LEAVES, 8) {
+                output("biomass", amount = 1.6)
             }
             input(ItemTags.SAPLINGS, 16) {
-                output("biomass", amount = 0.1)
-                workTicks(64)
+                output("biomass", amount = 1.6)
             }
         }
 
