@@ -196,6 +196,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     config.setValid(false);
                     config.resetFrom();
                     config.resetTo();
+                    config.clearFilter();
                 }
                 needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {

@@ -49,6 +49,10 @@ public class MachineSelectPanel extends ButtonPanel {
         return Optional.ofNullable(selected);
     }
 
+    public void clearSelect() {
+        selected = null;
+    }
+
     public void select(UUID machine) {
         selected = machines.contains(machine) ? machine : null;
     }

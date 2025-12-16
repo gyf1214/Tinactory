@@ -146,9 +146,28 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
 
         this.machinePanel = new MachineSelectPanel(this) {
             @Override
+            protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {
+                return button == 0 || button == 1;
+            }
+
+            @Override
             public void select(UUID machine) {
                 super.select(machine);
                 signalPanel.refresh();
+            }
+
+            @Override
+            protected void onSelect(int index, double mouseX, double mouseY, int button) {
+                if (button == 0) {
+                    super.onSelect(index, mouseX, mouseY, button);
+                } else {
+                    clearSelect();
+                    signalPanel.refresh();
+
+                    var packet = SetMachineConfigPacket.builder()
+                        .reset(SIGNAL_CONFIG_KEY);
+                    menu.triggerEvent(SET_MACHINE_CONFIG, packet);
+                }
             }
         };
         this.signalPanel = new SignalSelectPanel();
