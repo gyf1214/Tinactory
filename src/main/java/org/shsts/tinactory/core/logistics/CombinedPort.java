@@ -9,7 +9,7 @@ import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedCollection implements IPortNotifier {
+public class CombinedPort implements IPortNotifier {
     private final Set<Runnable> updateListeners = new HashSet<>();
     protected final Runnable combinedListener = this::invokeUpdate;
 

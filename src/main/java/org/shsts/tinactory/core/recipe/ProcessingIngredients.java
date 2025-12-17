@@ -11,8 +11,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
@@ -42,12 +42,12 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
-            if (!(port instanceof IItemCollection collection)) {
+            if (!(port instanceof IItemPort item)) {
                 return Optional.empty();
             }
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
-            var extracted = collection.extractItem(stack1, simulate);
+            var extracted = item.extractItem(stack1, simulate);
             return extracted.getCount() >= stack1.getCount() ?
                 Optional.of(new ItemIngredient(stack1)) : Optional.empty();
         }
@@ -72,14 +72,14 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
-            if (!(port instanceof IItemCollection item)) {
+            if (!(port instanceof IItemPort item)) {
                 return Optional.empty();
             }
             if (amount <= 0) {
                 return StackHelper.hasItem(item, ingredient)
                     .map($ -> new ItemIngredient(StackHelper.copyWithCount($, 1)));
             } else {
-                return StackHelper.consumeItemCollection(item, ingredient, amount * parallel, simulate)
+                return StackHelper.consumeItemPort(item, ingredient, amount * parallel, simulate)
                     .map(ItemIngredient::new);
             }
         }
@@ -133,12 +133,12 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
-            if (!(port instanceof IFluidCollection collection)) {
+            if (!(port instanceof IFluidPort fluidPort)) {
                 return Optional.empty();
             }
             var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
-            var extracted = collection.drain(fluid1, simulate);
+            var extracted = fluidPort.drain(fluid1, simulate);
             return extracted.getAmount() >= fluid1.getAmount() ?
                 Optional.of(new FluidIngredient(extracted)) : Optional.empty();
         }

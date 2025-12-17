@@ -18,8 +18,8 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.logistics.ContainerPort;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.CombinedFluidCollection;
-import org.shsts.tinactory.core.logistics.CombinedItemCollection;
+import org.shsts.tinactory.core.logistics.CombinedFluidPort;
+import org.shsts.tinactory.core.logistics.CombinedItemPort;
 import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
 import org.shsts.tinactory.core.logistics.DigitalItemStorage;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
@@ -54,24 +54,24 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
         private final DigitalItemStorage internalItem;
-        private final CombinedItemCollection menuItem;
-        private final CombinedItemCollection externalItem;
+        private final CombinedItemPort menuItem;
+        private final CombinedItemPort externalItem;
         private final ContainerPort itemPort;
-        private final CombinedFluidCollection menuFluid;
+        private final CombinedFluidPort menuFluid;
         private final DigitalFluidStorage internalFluid;
-        private final CombinedFluidCollection externalFluid;
+        private final CombinedFluidPort externalFluid;
         private final ContainerPort fluidPort;
         public SlotType type;
         private int bytesUsed;
 
         private Storage() {
             this.internalItem = new DigitalItemStorage(this);
-            this.menuItem = new CombinedItemCollection(internalItem);
-            this.externalItem = new CombinedItemCollection(internalItem);
+            this.menuItem = new CombinedItemPort(internalItem);
+            this.externalItem = new CombinedItemPort(internalItem);
             this.itemPort = new ContainerPort(SlotType.NONE, internalItem, menuItem, externalItem);
             this.internalFluid = new DigitalFluidStorage(this);
-            this.menuFluid = new CombinedFluidCollection(internalFluid);
-            this.externalFluid = new CombinedFluidCollection(internalFluid);
+            this.menuFluid = new CombinedFluidPort(internalFluid);
+            this.externalFluid = new CombinedFluidPort(internalFluid);
             this.fluidPort = new ContainerPort(SlotType.NONE, internalFluid, menuFluid, externalFluid);
             this.type = SlotType.NONE;
             this.bytesUsed = 0;

@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -32,7 +32,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     private final double maxHeat;
 
     @Nullable
-    private IItemCollection fuelPort;
+    private IItemPort fuelPort;
     private long maxBurn = 0L;
     private ItemStack burningItem = ItemStack.EMPTY;
     private long currentBurn = 0L;

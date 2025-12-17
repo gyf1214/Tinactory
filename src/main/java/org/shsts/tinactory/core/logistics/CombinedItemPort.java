@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
@@ -16,20 +16,20 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemCollection extends CombinedCollection implements IItemCollection {
+public class CombinedItemPort extends CombinedPort implements IItemPort {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final List<IItemCollection> composes = new ArrayList<>();
+    private final List<IItemPort> composes = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedItemCollection(IItemCollection... composes) {
+    public CombinedItemPort(IItemPort... composes) {
         addComposes(Arrays.asList(composes));
     }
 
-    public CombinedItemCollection() {}
+    public CombinedItemPort() {}
 
-    private void addComposes(Collection<IItemCollection> val) {
+    private void addComposes(Collection<IItemPort> val) {
         composes.clear();
         composes.addAll(val);
         for (var compose : composes) {
@@ -39,7 +39,7 @@ public class CombinedItemCollection extends CombinedCollection implements IItemC
         }
     }
 
-    public void setComposes(Collection<IItemCollection> val) {
+    public void setComposes(Collection<IItemPort> val) {
         for (var compose : composes) {
             if (compose instanceof IPortNotifier notifier) {
                 notifier.unregisterListener(combinedListener);

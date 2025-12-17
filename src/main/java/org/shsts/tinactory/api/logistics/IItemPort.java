@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IItemCollection extends IPort {
+public interface IItemPort extends IPort {
     @Override
     default PortType type() {
         return PortType.ITEM;

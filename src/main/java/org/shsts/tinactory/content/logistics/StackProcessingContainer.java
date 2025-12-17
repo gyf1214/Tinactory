@@ -22,7 +22,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
+import org.shsts.tinactory.core.logistics.ItemHandlerPort;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -107,9 +107,9 @@ public class StackProcessingContainer extends CapabilityProvider
                     }
                 }
 
-                var internalPort = new ItemHandlerCollection(internalItems, itemIdx, endIdx);
-                var menuPort = new ItemHandlerCollection(menuItems, itemIdx, endIdx);
-                var externalPort = new ItemHandlerCollection(externalItems, itemIdx, endIdx);
+                var internalPort = new ItemHandlerPort(internalItems, itemIdx, endIdx);
+                var menuPort = new ItemHandlerPort(menuItems, itemIdx, endIdx);
+                var externalPort = new ItemHandlerPort(externalItems, itemIdx, endIdx);
                 ports.add(new ContainerPort(type, internalPort, menuPort, externalPort));
 
                 itemIdx = endIdx;

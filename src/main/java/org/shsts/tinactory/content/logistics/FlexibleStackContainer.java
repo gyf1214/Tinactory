@@ -21,7 +21,7 @@ import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.ItemHandlerCollection;
+import org.shsts.tinactory.core.logistics.ItemHandlerPort;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperFluidTank;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
@@ -121,9 +121,9 @@ public class FlexibleStackContainer extends CapabilityProvider
             }
         }
 
-        var internalPort = new ItemHandlerCollection(internalItems, minSlot, maxSlot);
-        var menuPort = new ItemHandlerCollection(menuItems, minSlot, maxSlot);
-        var externalPort = new ItemHandlerCollection(externalItems, minSlot, maxSlot);
+        var internalPort = new ItemHandlerPort(internalItems, minSlot, maxSlot);
+        var menuPort = new ItemHandlerPort(menuItems, minSlot, maxSlot);
+        var externalPort = new ItemHandlerPort(externalItems, minSlot, maxSlot);
         return new ContainerPort(type, internalPort, menuPort, externalPort);
     }
 

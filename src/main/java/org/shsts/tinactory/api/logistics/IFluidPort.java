@@ -8,7 +8,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IFluidCollection extends IPort {
+public interface IFluidPort extends IPort {
     @Override
     default PortType type() {
         return PortType.FLUID;

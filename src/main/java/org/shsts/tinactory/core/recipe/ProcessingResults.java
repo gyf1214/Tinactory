@@ -8,8 +8,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -80,13 +80,13 @@ public final class ProcessingResults {
         }
     }
 
-    public static class ItemResult extends RatedResult<IItemCollection> {
+    public static class ItemResult extends RatedResult<IItemPort> {
         private static final String CODEC_NAME = "item_result";
 
         public final ItemStack stack;
 
         public ItemResult(double rate, ItemStack stack) {
-            super(rate, PortType.ITEM, IItemCollection.class, CODEC_NAME);
+            super(rate, PortType.ITEM, IItemPort.class, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -95,7 +95,7 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected Optional<IProcessingResult> doInsertPort(IItemCollection port, int parallel,
+        protected Optional<IProcessingResult> doInsertPort(IItemPort port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
             return port.insertItem(stack1, simulate).isEmpty() ?
@@ -108,13 +108,13 @@ public final class ProcessingResults {
         ).apply(instance, ItemResult::new));
     }
 
-    public static class FluidResult extends RatedResult<IFluidCollection> {
+    public static class FluidResult extends RatedResult<IFluidPort> {
         private static final String CODEC_NAME = "fluid_result";
 
         public final FluidStack stack;
 
         public FluidResult(double rate, FluidStack stack) {
-            super(rate, PortType.FLUID, IFluidCollection.class, CODEC_NAME);
+            super(rate, PortType.FLUID, IFluidPort.class, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -123,7 +123,7 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected Optional<IProcessingResult> doInsertPort(IFluidCollection port, int parallel,
+        protected Optional<IProcessingResult> doInsertPort(IFluidPort port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
             return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount() ?

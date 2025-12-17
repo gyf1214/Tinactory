@@ -14,8 +14,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
@@ -169,7 +169,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack testTransmitItem(IItemCollection from, IItemCollection to, ItemStack stack) {
+    private ItemStack testTransmitItem(IItemPort from, IItemPort to, ItemStack stack) {
         var stack1 = StackHelper.copyWithCount(stack, workerStack);
         var stack2 = from.extractItem(stack1, true);
         var remaining = to.insertItem(stack2, true);
@@ -182,7 +182,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack selectTransmittedItem(IItemCollection from, IItemCollection to, LogisticWorkerConfig config) {
+    private ItemStack selectTransmittedItem(IItemPort from, IItemPort to, LogisticWorkerConfig config) {
         var filterType = config.filterType();
         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
             return testTransmitItem(from, to, config.itemFilter());
@@ -202,7 +202,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         return ItemStack.EMPTY;
     }
 
-    private void transmitItem(IItemCollection from, IItemCollection to, LogisticWorkerConfig config) {
+    private void transmitItem(IItemPort from, IItemPort to, LogisticWorkerConfig config) {
         var stack = selectTransmittedItem(from, to, config);
         if (stack.isEmpty()) {
             return;
@@ -214,7 +214,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private FluidStack testTransmitFluid(IFluidCollection from, IFluidCollection to, FluidStack stack) {
+    private FluidStack testTransmitFluid(IFluidPort from, IFluidPort to, FluidStack stack) {
         var stack1 = StackHelper.copyWithAmount(stack, workerFluidStack);
         var stack2 = from.drain(stack1, true);
         var limit = to.fill(stack2, true);
@@ -226,7 +226,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private FluidStack selectTransmittedFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
+    private FluidStack selectTransmittedFluid(IFluidPort from, IFluidPort to, FluidStack filter) {
         if (!filter.isEmpty()) {
             return testTransmitFluid(from, to, filter);
         }
@@ -240,7 +240,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         return FluidStack.EMPTY;
     }
 
-    private void transmitFluid(IFluidCollection from, IFluidCollection to, FluidStack filter) {
+    private void transmitFluid(IFluidPort from, IFluidPort to, FluidStack filter) {
         var stack = selectTransmittedFluid(from, to, filter);
         var stack1 = from.drain(stack, false);
         var inserted = to.fill(stack1, false);

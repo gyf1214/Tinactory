@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
@@ -59,11 +59,11 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         this.baseTemperature = baseTemperature;
     }
 
-    private IItemCollection getInputPort(IContainer container) {
+    private IItemPort getInputPort(IContainer container) {
         return container.getPort(inputPort, ContainerAccess.INTERNAL).asItem();
     }
 
-    private IItemCollection getOutputPort(IContainer container) {
+    private IItemPort getOutputPort(IContainer container) {
         return container.getPort(outputPort, ContainerAccess.INTERNAL).asItem();
     }
 
@@ -74,12 +74,12 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return recipe.getResultItem();
     }
 
-    private boolean matchesInput(SmeltingRecipe recipe, IItemCollection port) {
+    private boolean matchesInput(SmeltingRecipe recipe, IItemPort port) {
         var ingredient = recipe.getIngredients().get(0);
-        return StackHelper.consumeItemCollection(port, ingredient, 1, true).isPresent();
+        return StackHelper.consumeItemPort(port, ingredient, 1, true).isPresent();
     }
 
-    private boolean matchesOutput(SmeltingRecipe recipe, IItemCollection port) {
+    private boolean matchesOutput(SmeltingRecipe recipe, IItemPort port) {
         var result = getResult(recipe);
         return port.insertItem(result, true).isEmpty();
     }
@@ -191,12 +191,12 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return CoilMultiblock.getTemperature(machine).orElse(0);
     }
 
-    private int calculateParallel(IItemCollection port, Ingredient ingredient, int maxParallel) {
+    private int calculateParallel(IItemPort port, Ingredient ingredient, int maxParallel) {
         var l = 1;
         var r = maxParallel + 1;
         while (r - l > 1) {
             var m = (l + r) / 2;
-            if (StackHelper.consumeItemCollection(port, ingredient, m, true).isPresent()) {
+            if (StackHelper.consumeItemPort(port, ingredient, m, true).isPresent()) {
                 l = m;
             } else {
                 r = m;
@@ -231,7 +231,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var ingredient = recipe.getIngredients().get(0);
 
         parallel = calculateParallel(port, ingredient, maxParallel);
-        StackHelper.consumeItemCollection(port, ingredient, parallel, false)
+        StackHelper.consumeItemPort(port, ingredient, parallel, false)
             .ifPresent($ -> callback.accept(new ProcessingInfo(inputPort,
                 new ProcessingIngredients.ItemIngredient($))));
 

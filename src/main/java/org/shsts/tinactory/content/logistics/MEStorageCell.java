@@ -13,8 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
-import static org.shsts.tinactory.AllCapabilities.FLUID_COLLECTION;
-import static org.shsts.tinactory.AllCapabilities.ITEM_COLLECTION;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -65,7 +65,7 @@ public class MEStorageCell extends CapabilityItem {
     private static class ItemCapability extends ItemCapabilityProvider {
         private final IDigitalProvider provider;
         private final DigitalItemStorage storage;
-        private final LazyOptional<IItemCollection> itemCap;
+        private final LazyOptional<IItemPort> itemCap;
         private final LazyOptional<IDigitalProvider> providerCap;
 
         public ItemCapability(ItemStack stack, int bytesLimit) {
@@ -90,7 +90,7 @@ public class MEStorageCell extends CapabilityItem {
 
         @Override
         public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == ITEM_COLLECTION.get()) {
+            if (cap == ITEM_PORT.get()) {
                 return itemCap.cast();
             } else if (cap == DIGITAL_PROVIDER.get()) {
                 return providerCap.cast();
@@ -102,7 +102,7 @@ public class MEStorageCell extends CapabilityItem {
     private static class FluidCapability extends ItemCapabilityProvider {
         private final IDigitalProvider provider;
         private final DigitalFluidStorage storage;
-        private final LazyOptional<IFluidCollection> fluidCap;
+        private final LazyOptional<IFluidPort> fluidCap;
         private final LazyOptional<IDigitalProvider> providerCap;
 
         protected FluidCapability(ItemStack stack, int bytesLimit) {
@@ -127,7 +127,7 @@ public class MEStorageCell extends CapabilityItem {
 
         @Override
         public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == FLUID_COLLECTION.get()) {
+            if (cap == FLUID_PORT.get()) {
                 return fluidCap.cast();
             } else if (cap == DIGITAL_PROVIDER.get()) {
                 return providerCap.cast();

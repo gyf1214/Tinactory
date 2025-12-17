@@ -7,8 +7,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
 import org.shsts.tinactory.api.logistics.IFluidFilter;
+import org.shsts.tinactory.api.logistics.IFluidPort;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,7 +22,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalFluidStorage extends PortNotifier implements IFluidCollection,
+public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     IFluidFilter, INBTSerializable<CompoundTag> {
     private final IDigitalProvider provider;
     public int maxAmount = Integer.MAX_VALUE;

@@ -20,7 +20,7 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -151,8 +151,8 @@ public final class StackHelper {
         return ret;
     }
 
-    public static Optional<ItemStack> hasItem(IItemCollection collection, Predicate<ItemStack> ingredient) {
-        for (var stack : collection.getAllItems()) {
+    public static Optional<ItemStack> hasItem(IItemPort port, Predicate<ItemStack> ingredient) {
+        for (var stack : port.getAllItems()) {
             if (ingredient.test(stack)) {
                 return Optional.of(stack);
             }
@@ -163,21 +163,21 @@ public final class StackHelper {
     /**
      * Return the itemStack that is actually consumed.
      */
-    public static Optional<ItemStack> consumeItemCollection(IItemCollection collection,
+    public static Optional<ItemStack> consumeItemPort(IItemPort port,
         Predicate<ItemStack> ingredient, int count, boolean simulate) {
-        for (var stack : collection.getAllItems()) {
+        for (var stack : port.getAllItems()) {
             if (ingredient.test(stack) && stack.getCount() >= count) {
                 var stack1 = copyWithCount(stack, count);
                 // always simulate first, this is because we actually don't know which item to extract
-                var extracted = collection.extractItem(stack1, true);
+                var extracted = port.extractItem(stack1, true);
                 if (extracted.getCount() >= count) {
                     if (simulate) {
                         return Optional.of(extracted);
                     } else {
-                        var extracted1 = collection.extractItem(stack1, false);
+                        var extracted1 = port.extractItem(stack1, false);
                         if (extracted1.getCount() < count) {
-                            LOGGER.warn("consume item failed collection={} content={}/{}",
-                                collection, extracted, stack1);
+                            LOGGER.warn("consume item failed port={} content={}/{}",
+                                port, extracted, stack1);
                         }
                         return Optional.of(extracted1);
                     }

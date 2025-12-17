@@ -7,8 +7,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
-import org.shsts.tinactory.api.logistics.IItemCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
@@ -32,8 +32,8 @@ public final class AllCapabilities {
     public static final ICapability<IElectricMachine> ELECTRIC_MACHINE;
     public static final ICapability<IMenuItemHandler> MENU_ITEM_HANDLER;
     public static final ICapability<IFluidTanksHandler> MENU_FLUID_HANDLER;
-    public static final ICapability<IItemCollection> ITEM_COLLECTION;
-    public static final ICapability<IFluidCollection> FLUID_COLLECTION;
+    public static final ICapability<IItemPort> ITEM_PORT;
+    public static final ICapability<IFluidPort> FLUID_PORT;
 
     public static final ICapability<ILayoutProvider> LAYOUT_PROVIDER;
     public static final ICapability<IMachine> MACHINE;
@@ -51,8 +51,8 @@ public final class AllCapabilities {
         ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
         MENU_ITEM_HANDLER = REGISTRATE.capability(IMenuItemHandler.class, new CapabilityToken<>() {});
         MENU_FLUID_HANDLER = REGISTRATE.capability(IFluidTanksHandler.class, new CapabilityToken<>() {});
-        ITEM_COLLECTION = REGISTRATE.capability(IItemCollection.class, new CapabilityToken<>() {});
-        FLUID_COLLECTION = REGISTRATE.capability(IFluidCollection.class, new CapabilityToken<>() {});
+        ITEM_PORT = REGISTRATE.capability(IItemPort.class, new CapabilityToken<>() {});
+        FLUID_PORT = REGISTRATE.capability(IFluidPort.class, new CapabilityToken<>() {});
 
         LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
         MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});

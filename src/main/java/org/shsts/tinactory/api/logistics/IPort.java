@@ -8,9 +8,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 public interface IPort {
     PortType type();
 
-    default IItemCollection asItem() {
+    default IItemPort asItem() {
         assert type() == PortType.ITEM;
-        return (IItemCollection) this;
+        return (IItemPort) this;
     }
 
     default IItemFilter asItemFilter() {
@@ -18,9 +18,9 @@ public interface IPort {
         return (IItemFilter) this;
     }
 
-    default IFluidCollection asFluid() {
+    default IFluidPort asFluid() {
         assert type() == PortType.FLUID;
-        return (IFluidCollection) this;
+        return (IFluidPort) this;
     }
 
     default IFluidFilter asFluidFilter() {

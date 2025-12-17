@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidCollection;
+import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
@@ -16,20 +16,20 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidCollection extends CombinedCollection implements IFluidCollection {
+public class CombinedFluidPort extends CombinedPort implements IFluidPort {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final List<IFluidCollection> composes = new ArrayList<>();
+    private final List<IFluidPort> composes = new ArrayList<>();
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedFluidCollection(IFluidCollection... composes) {
+    public CombinedFluidPort(IFluidPort... composes) {
         addComposes(Arrays.asList(composes));
     }
 
-    public CombinedFluidCollection() {}
+    public CombinedFluidPort() {}
 
-    private void addComposes(Collection<IFluidCollection> val) {
+    private void addComposes(Collection<IFluidPort> val) {
         composes.clear();
         composes.addAll(val);
         for (var compose : composes) {
@@ -39,7 +39,7 @@ public class CombinedFluidCollection extends CombinedCollection implements IFlui
         }
     }
 
-    public void setComposes(Collection<IFluidCollection> val) {
+    public void setComposes(Collection<IFluidPort> val) {
         for (var compose : composes) {
             if (compose instanceof IPortNotifier notifier) {
                 notifier.unregisterListener(combinedListener);
