@@ -63,10 +63,7 @@ public final class ProcessingResults {
             Random random, boolean simulate) {
             if (portClazz.isInstance(port)) {
                 var port1 = portClazz.cast(port);
-                if (rate < 1d) {
-                    if (simulate) {
-                        return Optional.of(this);
-                    }
+                if (rate < 1d && !simulate) {
                     var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
                     if (parallel1 <= 0) {
                         return Optional.empty();

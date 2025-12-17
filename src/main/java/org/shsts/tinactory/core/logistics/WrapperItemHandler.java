@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import org.shsts.tinactory.api.logistics.IPortNotifier;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -15,7 +14,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class WrapperItemHandler extends PortNotifier implements IItemHandlerModifiable, IPortNotifier {
+public class WrapperItemHandler extends PortNotifier implements IItemHandlerModifiable {
     private final IItemHandlerModifiable compose;
     private final Predicate<ItemStack>[] filters;
     private final boolean[] allowOutputs;

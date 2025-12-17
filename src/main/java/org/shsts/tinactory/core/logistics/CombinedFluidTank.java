@@ -12,6 +12,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.IFluidFilter;
 import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
@@ -24,7 +25,7 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluidFilter,
-    IPortNotifier, INBTSerializable<CompoundTag> {
+    IPortNotifier, ILimitedPort, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final WrapperFluidTank[] tanks;
@@ -210,6 +211,11 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
         for (var tank : tanks) {
             tank.unregisterListener(listener);
         }
+    }
+
+    @Override
+    public int getPortLimit() {
+        return tanks.length;
     }
 
     @Override

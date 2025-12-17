@@ -11,6 +11,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.IItemFilter;
 import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
 
@@ -25,7 +26,7 @@ import java.util.function.Predicate;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier {
+public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier, ILimitedPort {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final IItemHandler itemHandler;
@@ -199,5 +200,10 @@ public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier {
         } else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public int getPortLimit() {
+        return maxSlot - minSlot;
     }
 }

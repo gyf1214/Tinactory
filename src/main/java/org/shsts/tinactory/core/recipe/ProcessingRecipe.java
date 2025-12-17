@@ -14,6 +14,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -32,7 +33,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -85,12 +88,27 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         return insertOutput(container, output, parallel, random, true).isPresent();
     }
 
+    protected boolean canInsertOutput(IContainer container, Output output, int parallel,
+        Random random, Map<Integer, Integer> outputSlots) {
+        var port = container.getPort(output.port, ContainerAccess.INTERNAL);
+        var limit = port instanceof ILimitedPort limitedPort ?
+            limitedPort.getPortLimit() : Integer.MAX_VALUE;
+        if (outputSlots.getOrDefault(output.port, 0) >= limit) {
+            return true;
+        }
+        outputSlots.merge(output.port, 1, Integer::sum);
+
+        return output.result.insertPort(port, parallel, random, true).isPresent();
+    }
+
     protected boolean matchInputs(IContainer container, int parallel) {
         return inputs.stream().allMatch(input -> canConsumeInput(container, input, parallel));
     }
 
     protected boolean matchOutputs(IContainer container, int parallel, Random random) {
-        return outputs.stream().allMatch(output -> canInsertOutput(container, output, parallel, random));
+        var outputSlots = new HashMap<Integer, Integer>();
+        return outputs.stream().allMatch(output ->
+            canInsertOutput(container, output, parallel, random, outputSlots));
     }
 
     protected boolean matchTeam(Optional<ITeamProfile> team) {
