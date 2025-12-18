@@ -36,6 +36,8 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
+import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
 
@@ -79,14 +81,17 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return StackHelper.consumeItemPort(port, ingredient, 1, true).isPresent();
     }
 
-    private boolean matchesOutput(SmeltingRecipe recipe, IItemPort port) {
+    private boolean matchesOutput(SmeltingRecipe recipe, IMachine machine, IItemPort port) {
+        if (machine.config().getBoolean(VOID_KEY, VOID_DEFAULT)) {
+            return true;
+        }
         var result = getResult(recipe);
         return port.insertItem(result, true).isEmpty();
     }
 
-    private boolean matches(SmeltingRecipe recipe, IContainer container) {
+    private boolean matches(SmeltingRecipe recipe, IMachine machine, IContainer container) {
         return matchesInput(recipe, getInputPort(container)) &&
-            matchesOutput(recipe, getOutputPort(container));
+            matchesOutput(recipe, machine, getOutputPort(container));
     }
 
     @Override
@@ -156,7 +161,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine) {
         return machine.container().flatMap(container -> world.getRecipeManager()
             .getAllRecipesFor(RecipeType.SMELTING).stream()
-            .filter($ -> matches($, container))
+            .filter($ -> matches($, machine, container))
             .findFirst());
     }
 
@@ -171,7 +176,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
         var vanilla = recipeManager.byKey(target);
         if (vanilla.isPresent() && vanilla.get() instanceof SmeltingRecipe smelting) {
-            return matches(smelting, container1) ? Optional.of(smelting) : Optional.empty();
+            return matches(smelting, machine, container1) ? Optional.of(smelting) : Optional.empty();
         }
 
         var marker = CORE.recipeManager(world).byLoc(MARKER, target);
@@ -179,7 +184,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             var recipe = marker.get();
             if (recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine)) {
                 return recipeManager.getAllRecipesFor(RecipeType.SMELTING).stream()
-                    .filter($ -> matches($, container1))
+                    .filter($ -> matches($, machine, container1))
                     .findFirst();
             }
         }

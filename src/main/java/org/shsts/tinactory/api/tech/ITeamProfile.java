@@ -43,8 +43,14 @@ public interface ITeamProfile {
         return isTechAvailable(tech) && !isTechFinished(tech);
     }
 
+    boolean canResearch(ResourceLocation tech, long progress);
+
     default boolean canResearch(ITechnology tech) {
         return isTechAvailable(tech) && !isTechFinished(tech);
+    }
+
+    default boolean canResearch(ITechnology tech, long progress) {
+        return isTechAvailable(tech) && getTechProgress(tech) + progress <= tech.getMaxProgress();
     }
 
     Optional<ITechnology> getTargetTech();

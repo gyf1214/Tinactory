@@ -65,6 +65,8 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseList;
 public class MachineProcessor extends CapabilityProvider implements
     IMachineProcessor, IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final String VOID_KEY = "void";
+    public static final boolean VOID_DEFAULT = false;
 
     protected final BlockEntity blockEntity;
     private final List<IRecipeProcessor<?>> processors;

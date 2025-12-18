@@ -8,16 +8,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
+import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.api.tech.ITechManager;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -37,33 +35,19 @@ public class ResearchRecipe extends ProcessingRecipe {
         this.progress = builder.progress;
     }
 
-    private boolean canResearch(ITeamProfile team) {
-        return team.canResearch(target) && team.getTargetTech()
+    @Override
+    protected boolean matchTeam(Optional<ITeamProfile> team) {
+        return team.filter($ -> $.canResearch(target))
+            .flatMap(ITeamProfile::getTargetTech)
             .filter(tech -> tech.getLoc().equals(target))
             .isPresent();
     }
 
     @Override
-    protected boolean matchTeam(Optional<ITeamProfile> team) {
-        return team.filter(this::canResearch).isPresent();
-    }
-
-    private boolean matchOutputs(ITechManager techManager, Optional<ITeamProfile> team, int parallel) {
-        if (parallel <= 1) {
-            return true;
-        }
-        return team.flatMap(team1 -> techManager
-                .techByKey(target)
-                .map(tech -> team1.getTechProgress(tech) + progress * parallel <= tech.getMaxProgress()))
-            .orElse(false);
-    }
-
-    @Override
-    public boolean matches(IMachine machine, Level world, int parallel) {
-        var container = machine.container();
-        var manager = TechManager.get(world);
-        return canCraft(machine) && matchOutputs(manager, machine.owner(), parallel) && container
-            .filter($ -> matchInputs($, parallel))
+    protected boolean matchOutputs(IMachine machine, IContainer container, int parallel, Random random) {
+        var progress1 = parallel <= 1 ? 1 : progress * parallel;
+        return machine.owner()
+            .filter($ -> $.canResearch(target, progress1))
             .isPresent();
     }
 

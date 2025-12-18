@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -15,7 +14,6 @@ import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
-import java.util.Random;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -38,12 +36,6 @@ public class GeneratorRecipe extends DisplayInputRecipe {
             return false;
         }
         return matches(machine, world, (int) (machineVoltage / voltage));
-    }
-
-    @Override
-    protected boolean matchOutputs(IContainer container, int parallel, Random random) {
-        // no check output
-        return true;
     }
 
     @Override

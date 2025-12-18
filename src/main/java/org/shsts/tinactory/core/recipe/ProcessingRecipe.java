@@ -41,6 +41,9 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
+import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRecipe implements IRecipe<IMachine> {
@@ -101,11 +104,12 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         return output.result.insertPort(port, parallel, random, true).isPresent();
     }
 
-    protected boolean matchInputs(IContainer container, int parallel) {
+    protected boolean matchInputs(IMachine machine, IContainer container, int parallel) {
         return inputs.stream().allMatch(input -> canConsumeInput(container, input, parallel));
     }
 
-    protected boolean matchOutputs(IContainer container, int parallel, Random random) {
+    protected boolean matchOutputs(IMachine machine, IContainer container,
+        int parallel, Random random) {
         var outputSlots = new HashMap<Integer, Integer>();
         return outputs.stream().allMatch(output ->
             canInsertOutput(container, output, parallel, random, outputSlots));
@@ -133,8 +137,10 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public boolean matches(IMachine machine, Level world, int parallel) {
         var container = machine.container();
+        var autoVoid = machine.config().getBoolean(VOID_KEY, VOID_DEFAULT);
         return canCraft(machine) && container
-            .filter($ -> matchInputs($, parallel) && matchOutputs($, parallel, world.random))
+            .filter($ -> matchInputs(machine, $, parallel) &&
+                (autoVoid || matchOutputs(machine, $, parallel, world.random)))
             .isPresent();
     }
 

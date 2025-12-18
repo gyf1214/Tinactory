@@ -108,6 +108,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     @Override
+    public boolean canResearch(ResourceLocation tech, long progress) {
+        return techManager.techByKey(tech).map($ -> canResearch($, progress)).orElse(false);
+    }
+
+    @Override
     public Optional<ITechnology> getTargetTech() {
         return Optional.ofNullable(targetTech);
     }

@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.recipe;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -33,18 +32,12 @@ public class DistillationRecipe extends DisplayInputRecipe {
             .orElse(0);
     }
 
-    private boolean matchOutputs(IMachine machine, IContainer container, int parallel, Random random) {
+    @Override
+    protected boolean matchOutputs(IMachine machine, IContainer container,
+        int parallel, Random random) {
         var slots = getSlots(machine);
         return outputs.stream().limit(slots)
             .allMatch(output -> canInsertOutput(container, output, parallel, random));
-    }
-
-    @Override
-    public boolean matches(IMachine machine, Level world, int parallel) {
-        var container = machine.container();
-        return canCraft(machine) && container
-            .filter($ -> matchInputs($, parallel) && matchOutputs(machine, $, parallel, world.random))
-            .isPresent();
     }
 
     @Override

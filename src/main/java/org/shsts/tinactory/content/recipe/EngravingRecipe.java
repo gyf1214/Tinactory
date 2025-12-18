@@ -51,19 +51,12 @@ public class EngravingRecipe extends CleanRecipe {
             .orElse(true);
     }
 
-    private boolean matchInputs(IMachine machine, int parallel, IContainer container) {
+    @Override
+    protected boolean matchInputs(IMachine machine, IContainer container, int parallel) {
         return getLithography(machine)
             .map($ -> inputs.stream().allMatch(input ->
                 input.port() == 1 || canConsumeInput(container, input, parallel)))
-            .orElseGet(() -> matchInputs(container, parallel));
-    }
-
-    @Override
-    public boolean matches(IMachine machine, Level world, int parallel) {
-        var container = machine.container();
-        return canCraft(machine) && container
-            .filter($ -> matchInputs(machine, parallel, $) && matchOutputs($, parallel, world.random))
-            .isPresent();
+            .orElseGet(() -> super.matchInputs(machine, container, parallel));
     }
 
     @Override
