@@ -39,7 +39,7 @@ public class ElectricStorageScreen<M extends ElectricStorageMenu> extends Layout
             LOCK_BUTTON, 18, 0, "chestLock", "chestUnlock"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         addWidget(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
-            VOID_BUTTON, 18, 0, "chestNotVoid", "chestVoid"));
+            VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         addWidget(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
