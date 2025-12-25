@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.chemistry
 
+import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
@@ -43,6 +44,18 @@ object OrganicChemistry {
             output(Items.COARSE_DIRT, 2) {
                 input(Items.DIRT)
                 input(Items.GRAVEL)
+            }
+            output(Items.SOUL_SAND) {
+                input("netherrack")
+                input("biomass")
+            }
+            output(Items.SOUL_SOIL) {
+                input(Items.SOUL_SAND)
+                input("biomass")
+            }
+            output(Items.MOSS_BLOCK) {
+                input(ItemTags.LEAVES)
+                input("biomass")
             }
         }
 

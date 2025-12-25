@@ -28,6 +28,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.pyrolyseOven
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 
@@ -228,6 +229,28 @@ object Woods {
     }
 
     private fun misc() {
+        // azalea
+        farm(Items.AZALEA, Items.OAK_LOG, Items.AZALEA_LEAVES, false)
+        farm(Items.FLOWERING_AZALEA, Items.OAK_LOG, Items.FLOWERING_AZALEA_LEAVES, false)
+
+        sifter {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            input(Items.FLOWERING_AZALEA_LEAVES) {
+                output(Items.OAK_SAPLING, rate = 0.1)
+                output(Items.BIRCH_SAPLING, rate = 0.1)
+                output(RUBBER_SAPLING.get(), rate = 0.1)
+            }
+            input(Items.AZALEA_LEAVES) {
+                output(Items.SPRUCE_SAPLING, rate = 0.1)
+                output(Items.JUNGLE_SAPLING, rate = 0.1)
+                output(Items.ACACIA_SAPLING, rate = 0.1)
+                output(Items.DARK_OAK_SAPLING, rate = 0.1)
+            }
+        }
+
         // stick
         toolCrafting {
             result(Items.STICK, 4) {

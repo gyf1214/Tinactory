@@ -12,6 +12,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autofarm
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object Crops {
@@ -82,6 +83,14 @@ object Crops {
         biomass(Items.MELON_SEEDS, 16, 1.6, 64)
         biomass(Items.PUMPKIN_SEEDS, 16, 1.6, 64)
 
+        // sifting seeds
+        siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT)
+        siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO)
+        siftSeed(Items.PODZOL, Items.COCOA_BEANS, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM)
+        siftSeed(Items.SAND, Items.CACTUS, Items.SUGAR_CANE, Items.KELP, Items.SEA_PICKLE)
+        siftSeed(Items.MOSS_BLOCK, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.AZALEA, Items.FLOWERING_AZALEA)
+        siftSeed(Items.SOUL_SOIL, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
+
         // misc
         assembler {
             defaults {
@@ -147,6 +156,18 @@ object Crops {
                 output("biomass", amount = outAmount)
                 voltage(Voltage.LV)
                 workTicks(workTicks)
+            }
+        }
+    }
+
+    private fun siftSeed(base: Item, vararg items: Item, rate: Double = 0.1) {
+        sifter {
+            input(base) {
+                for (item in items) {
+                    output(item, rate = rate)
+                }
+                voltage(Voltage.LV)
+                workTicks(64)
             }
         }
     }
