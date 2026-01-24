@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record ItemStackWrapper(ItemStack stack) {
+public record ItemStackWrapper(ItemStack stack) implements IIngredientWrapper {
     @Override
     public boolean equals(Object other) {
         return this == other || (other instanceof ItemStackWrapper wrapper &&
