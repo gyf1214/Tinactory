@@ -69,18 +69,18 @@ configurations {
 }
 
 task apiJar(type: Jar) {
-    classifier = 'api'
+    archiveClassifier = 'api'
     include "org/shsts/tinactory/api/**"
     from sourceSets.main.output
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task devJar(type: Jar) {
-    classifier = 'dev'
+    archiveClassifier = 'dev'
     from sourceSets.main.output
 }
 
