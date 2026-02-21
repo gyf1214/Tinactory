@@ -13,214 +13,92 @@ buildscript {
     }
 }
 
-plugins {
-    id 'eclipse'
-    id 'maven-publish'
-    id 'checkstyle'
+subprojects {
+    group = 'org.shsts.tinactory'
+    version = "${minecraft_version}-${mod_version}"
+
+    apply plugin: 'checkstyle'
+    apply plugin: 'eclipse'
+    apply plugin: 'net.minecraftforge.gradle'
+    apply plugin: 'kotlin'
+    apply plugin: 'org.parchmentmc.librarian.forgegradle'
+    apply plugin: 'org.spongepowered.mixin'
+    apply plugin: 'maven-publish'
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+    checkstyle {
+        toolVersion = "10.20.1"
+    }
+
+    minecraft {
+        mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            // location of the maven that hosts JEI files since January 2023
+            name = "Jared's maven"
+            url = "https://maven.blamejared.com/"
+        }
+        maven {
+            url = 'https://cursemaven.com'
+            content {
+                includeGroup "curse.maven"
+            }
+        }
+        maven {
+            name = 'shsts'
+            url = 'https://www.shsts.org/m2'
+        }
+    }
+
+    dependencies {
+        minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    }
+
+    processResources {
+        from(sourceSets.main.resources.srcDirs) {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+            include 'META-INF/mods.toml'
+
+            expand 'mod_version': "${version}"
+        }
+    }
+
+    processTestResources {
+        from(sourceSets.test.resources.srcDirs) {
+            duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+            include 'META-INF/mods.toml'
+
+            expand 'mod_version': "${version}"
+        }
+    }
+
+    jar.finalizedBy('reobfJar')
+
+    publishing {
+        repositories {
+            if (project.findProperty('shstsUser')) {
+                maven {
+                    name = 'shsts'
+                    url = 'https://www.shsts.org/m2'
+                    credentials {
+                        username = project.findProperty('shstsUser')
+                        password = project.findProperty('shstsPassword') ?: ''
+                    }
+                }
+            }
+        }
+    }
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'kotlin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'org.spongepowered.mixin'
-
-group = 'org.shsts.tinactory'
-archivesBaseName = "tinactory"
-version = "${minecraft_version}-${mod_version}"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 println "Minecraft: ${minecraft_version}, Forge: ${forge_version}, ForgeGradle: ${forgegradle_version}"
-minecraft {
-    mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
-
-    runs {
-        client {
-            workingDirectory project.file('run/client')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
-
-            ideaModule project.name + ".main"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run/server')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
-
-            ideaModule project.name + ".main"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
-
-            ideaModule project.name + ".test"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                }
-
-                tinactory_test {
-                    source sourceSets.test
-                }
-            }
-
-            workingDirectory project.file('run/data')
-            args '--mod', 'tinactory_test', '--all', '--output', file('src/generated/resources/')
-            args '--existing', file('src/test/resources/')
-            args '--existing', file('src/main/resources/')
-            args '--existing', file("libs/tinactory_extra_resources_${extra_resources_version}.zip")
-        }
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        url = 'https://cursemaven.com'
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-    maven {
-        name = 'shsts'
-        url = 'https://www.shsts.org/m2'
-    }
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
-
-    // kotlin
-    minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
-        exclude group: "org.jetbrains", module: "annotations"
-    }
-
-    // extra resources
-    compileOnly files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
-
-    // tinycorelib
-    compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
-    runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
-    testCompileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
-    testCompileOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}:api"
-    testRuntimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
-    testRuntimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
-
-    // JEI
-    implementation fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
-
-    // CTM
-    runtimeOnly fg.deobf("curse.maven:ctm-267602:${ctm_id}")
-
-    // waila
-    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
-}
-
-mixin {
-    add sourceSets.main, 'mixins.tinactory.refmap.json'
-    config 'mixins.tinactory.jei.json'
-}
-
-sourceSets.main.resources {
-    srcDir 'src/generated/resources'
-    exclude '.cache/'
-}
-
-checkstyle {
-    toolVersion = "10.20.1"
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-        include 'META-INF/mods.toml'
-
-        expand 'mod_version': "${version}"
-    }
-}
-
-processTestResources {
-    from(sourceSets.test.resources.srcDirs) {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-        include 'META-INF/mods.toml'
-
-        expand 'mod_version': "${version}"
-    }
-}
-
-configurations {
-    api
-}
-
-task apiJar(type: Jar) {
-    classifier = 'api'
-    include "org/shsts/tinactory/api/**"
-    from sourceSets.main.output
-}
-
-jar.finalizedBy('reobfJar')
-
-artifacts {
-    api apiJar
-}
-
-build.dependsOn apiJar
-
-publishing {
-    repositories {
-        if (project.findProperty('shstsUser')) {
-            maven {
-                name = 'shsts'
-                url = 'https://www.shsts.org/m2'
-                credentials {
-                    username = project.findProperty('shstsUser')
-                    password = project.findProperty('shstsPassword') ?: ''
-                }
-            }
-        }
-    }
-    publications {
-        maven(MavenPublication) {
-            artifact jar
-            artifact apiJar
-        }
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}

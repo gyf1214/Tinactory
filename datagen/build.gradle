@@ -1,0 +1,52 @@
+archivesBaseName = "tinactory_datagen"
+
+minecraft {
+    runs {
+        data {
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            ideaModule project.name + ".test"
+
+            mods {
+                tinactory {
+                    source project(':mod').sourceSets.main
+                }
+
+                tinactory_datagen {
+                    source sourceSets.test
+                }
+            }
+
+            workingDirectory rootProject.file('run/data')
+            args '--mod', 'tinactory_test', '--all', '--output', project(':mod').file('src/generated/resources/')
+            args '--existing', project(':mod').file('src/main/resources/')
+            args '--existing', file('src/main/resources/')
+            args '--existing', rootProject.file("libs/tinactory_extra_resources_${extra_resources_version}.zip")
+        }
+    }
+}
+
+dependencies {
+    compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
+    compileOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}:api"
+    runtimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
+
+    compileOnly project(path: ':mod')
+    runtimeOnly project(path: ':mod', configuration: 'dev')
+
+    // kotlin
+    minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
+        exclude group: "org.jetbrains", module: "annotations"
+    }
+
+    // extra resources
+    compileOnly rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}

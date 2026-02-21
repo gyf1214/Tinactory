@@ -1,0 +1,102 @@
+archivesBaseName = "tinactory"
+
+minecraft {
+    runs {
+        client {
+            workingDirectory project.file('run/client')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            ideaModule project.name + ".main"
+
+            mods {
+                tinactory {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run/server')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            ideaModule project.name + ".main"
+
+            mods {
+                tinactory {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    // mixin
+    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+
+    compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
+    runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
+
+    // JEI
+    implementation fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+
+    // CTM
+    runtimeOnly fg.deobf("curse.maven:ctm-267602:${ctm_id}")
+
+    // waila
+    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+}
+
+mixin {
+    add sourceSets.main, 'mixins.tinactory.refmap.json'
+    config 'mixins.tinactory.jei.json'
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude '.cache/'
+}
+
+configurations {
+    api
+    dev
+}
+
+task apiJar(type: Jar) {
+    classifier = 'api'
+    include "org/shsts/tinactory/api/**"
+    from sourceSets.main.output
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task devJar(type: Jar) {
+    classifier = 'dev'
+    from sourceSets.main.output
+}
+
+artifacts {
+    api apiJar
+    dev devJar
+}
+
+build.dependsOn apiJar, sourcesJar
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact jar
+            artifact apiJar
+            artifact sourcesJar
+        }
+    }
+}
