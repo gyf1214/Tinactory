@@ -72,7 +72,9 @@ dependencies {
 
 mixin {
     add sourceSets.main, 'mixins.tinactory.refmap.json'
+    add sourceSets.test, 'mixins.tinactory.test.refmap.json'
     config 'mixins.tinactory.jei.json'
+    config 'mixins.tinactory.test.json'
 }
 
 sourceSets.main.resources {

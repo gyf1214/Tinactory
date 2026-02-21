@@ -1,7 +1,14 @@
 package org.shsts.tinactory.test;
 
+import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraftforge.gametest.GameTestHolder;
 import org.shsts.tinactory.api.TinactoryKeys;
 
 @GameTestHolder(TinactoryKeys.ID)
-public class TinactoryTest {}
+public final class TinactoryTest {
+    @GameTest
+    public static void testSucceed(GameTestHelper helper) {
+        helper.succeed();
+    }
+}
