@@ -22,12 +22,12 @@ eclipse
 run
 
 # generated
-src/generated
+mod/src/generated
 
 # libs
 libs/
 
 # scratch
-.codex
+.codex/
 MEMORY.md
 scratch/

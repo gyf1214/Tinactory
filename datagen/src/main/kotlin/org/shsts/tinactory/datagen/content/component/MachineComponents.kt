@@ -43,7 +43,7 @@ object MachineComponents {
                 }
                 val cable = entry.get() as CableBlock
                 output(cable) {
-                    input(cable.material, "wire", 4)
+                    input(cable.cableMaterial, "wire", 4)
                     if (v.rank >= Voltage.EV.rank) {
                         input("silicone_rubber", "foil", 2)
                     }

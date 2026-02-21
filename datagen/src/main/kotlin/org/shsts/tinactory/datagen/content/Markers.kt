@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content
 
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.RecipeType
 import org.shsts.tinactory.AllRecipes.PROCESSING_TYPES
@@ -12,7 +13,6 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.MarkerBuilder
 import org.shsts.tinactory.datagen.content.builder.MarkerFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.marker
-import org.shsts.tinactory.integration.jei.category.RecipeCategory
 
 object Markers {
     fun init() {
@@ -145,6 +145,10 @@ object Markers {
         }
     }
 
+    private fun jeiCategory(loc: ResourceLocation): String {
+        return "${loc.namespace}.jei.category.${loc.path}"
+    }
+
     private fun trackJEICategory() {
         val allTypes = buildList {
             add(modLoc("tool_crafting"))
@@ -155,7 +159,7 @@ object Markers {
 
         dataGen {
             for (type in allTypes) {
-                trackLang(RecipeCategory.categoryTitleId(type))
+                trackLang(jeiCategory(type))
             }
         }
     }

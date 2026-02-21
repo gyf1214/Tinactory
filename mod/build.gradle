@@ -9,7 +9,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
-            ideaModule project.name + ".main"
+            ideaModule rootProject.name + "." + project.name + ".main"
 
             mods {
                 tinactory {
@@ -25,7 +25,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
 
-            ideaModule project.name + ".main"
+            ideaModule rootProject.name + "." + project.name + ".main"
 
             mods {
                 tinactory {

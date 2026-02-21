@@ -198,8 +198,4 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         var list = recipeManager.getAllRecipesFor(recipeType);
         registration.addRecipes(type, list);
     }
-
-    public static String categoryTitleId(ResourceLocation loc) {
-        return loc.getNamespace() + ".jei.category." + loc.getPath();
-    }
 }

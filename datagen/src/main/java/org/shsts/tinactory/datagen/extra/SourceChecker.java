@@ -18,7 +18,7 @@ import java.util.List;
 public class SourceChecker {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private static final Path SOURCE = Path.of("../../src/main/java");
+    private static final Path SOURCE = Path.of("../../mod/src/main/java");
     private static final String TOP_PACKAGE = "org.shsts.tinactory";
     private static final Path TOP_FOLDER = SOURCE.resolve(TOP_PACKAGE.replace('.', '/'));
 

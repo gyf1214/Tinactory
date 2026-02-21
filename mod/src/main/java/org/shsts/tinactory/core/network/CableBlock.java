@@ -62,7 +62,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     private final int radius;
     public final Voltage voltage;
     private final double resistance;
-    public final MaterialSet material;
+    private final MaterialSet material;
     private final Map<BlockState, VoxelShape> shapes;
 
     public CableBlock(Properties properties, int radius, Voltage voltage, double resistance, MaterialSet mat) {
@@ -95,6 +95,10 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         } else {
             return $ -> $.tint(CableBlock.INSULATION_COLOR, color);
         }
+    }
+
+    public MaterialSet getCableMaterial() {
+        return material;
     }
 
     private Map<BlockState, VoxelShape> makeShapes() {
