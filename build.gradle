@@ -108,7 +108,7 @@ repositories {
     }
     maven {
         name = 'shsts'
-        url = 'https://www.shsts.moe/m2'
+        url = 'https://www.shsts.org/m2'
     }
 }
 
@@ -200,12 +200,14 @@ build.dependsOn apiJar
 
 publishing {
     repositories {
-        maven {
-            name = 'shsts'
-            url = 'https://www.shsts.moe/m2'
-            credentials {
-                username = shstsUser
-                password = shstsPassword
+        if (project.findProperty('shstsUser')) {
+            maven {
+                name = 'shsts'
+                url = 'https://www.shsts.org/m2'
+                credentials {
+                    username = project.findProperty('shstsUser')
+                    password = project.findProperty('shstsPassword') ?: ''
+                }
             }
         }
     }
