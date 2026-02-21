@@ -72,16 +72,6 @@ subprojects {
         }
     }
 
-    processTestResources {
-        from(sourceSets.test.resources.srcDirs) {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-            include 'META-INF/mods.toml'
-
-            expand 'mod_version': "${version}"
-        }
-    }
-
     jar.finalizedBy('reobfJar')
 
     publishing {

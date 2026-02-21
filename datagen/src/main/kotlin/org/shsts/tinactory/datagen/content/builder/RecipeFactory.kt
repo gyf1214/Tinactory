@@ -8,7 +8,7 @@ import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.suffix
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 open class RecipeFactory<B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>>(

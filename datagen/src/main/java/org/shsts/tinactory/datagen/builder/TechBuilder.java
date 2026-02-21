@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.AllItems.getComponent;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
+import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

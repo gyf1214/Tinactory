@@ -4,47 +4,46 @@ license="All rights reserved"
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
 
 [[mods]]
-modId="tinactory_test"
+modId = "tinactory_datagen"
 version = "${mod_version}"
-displayName="Tinactory"
+displayName = "Tinactory Datagen"
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
-#logoFile="tinactory_test.png" #optional
+#logoFile="tinactory_datagen.png" #optional
 #credits="Thanks for this example mod goes to Java" #optional
 authors="Tiny"
 
-[[dependencies.tinactory_test]]
+[[dependencies.tinactory_datagen]]
 modId = "forge"
 mandatory = true
 versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.tinactory_test]]
+[[dependencies.tinactory_datagen]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.18.2,1.19)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.tinactory_test]]
+[[dependencies.tinactory_datagen]]
 modId = "tinycorelib"
 mandatory = true
 versionRange = "[1.18.2-0.0.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.tinactory_test]]
+[[dependencies.tinactory_datagen]]
 modId = "tinydatagen"
 mandatory = true
 versionRange = "[1.18.2-0.0.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.tinactory_test]]
+[[dependencies.tinactory_datagen]]
 modId = "tinactory"
 mandatory = true
 versionRange = "[0,)"
 ordering = "NONE"
 side = "BOTH"
-

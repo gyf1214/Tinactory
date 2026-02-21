@@ -4,7 +4,7 @@ import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.BOILER
 import org.shsts.tinactory.content.recipe.BoilerRecipe
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 
 class BoilerRecipeFactory {
     fun recipe(name: String, block: BoilerRecipe.Builder.() -> Unit) {

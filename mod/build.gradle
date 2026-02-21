@@ -33,6 +33,23 @@ minecraft {
                 }
             }
         }
+
+        gameTestServer {
+            workingDirectory rootProject.file('run/gameTestServer')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-ea'
+
+            ideaModule rootProject.name + "." + project.name + ".test"
+
+            mods {
+                tinactory {
+                    source sourceSets.main
+                    source sourceSets.test
+                }
+            }
+        }
     }
 }
 

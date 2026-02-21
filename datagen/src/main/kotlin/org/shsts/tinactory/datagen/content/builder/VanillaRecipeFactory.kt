@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.has
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 
 class VanillaRecipeFactory(private val replace: Boolean) {
     private fun build(suffix: String = "", block: () -> RecipeBuilder) {

@@ -10,7 +10,7 @@ import org.shsts.tinycorelib.datagen.api.IDataGen;
 
 import java.io.IOException;
 
-import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
+import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

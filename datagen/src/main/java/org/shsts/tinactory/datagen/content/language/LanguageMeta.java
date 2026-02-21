@@ -11,8 +11,8 @@ import org.shsts.tinactory.datagen.provider.LanguageDataProvider;
 
 import java.util.function.BiConsumer;
 
+import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.AllData.initDelayed;
-import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

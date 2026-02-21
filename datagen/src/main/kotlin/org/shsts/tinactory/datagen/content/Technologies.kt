@@ -14,11 +14,11 @@ import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.provider.TechProvider
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 object Technologies {
     val TECHS = DATA_GEN.createHandler(::TechProvider)

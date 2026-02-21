@@ -1,4 +1,4 @@
-package org.shsts.tinactory.test;
+package org.shsts.tinactory.datagen;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,16 +19,16 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-@Mod(TinactoryTest.ID)
-public class TinactoryTest {
-    public static final String ID = "tinactory_test";
+@Mod(TinactoryDatagen.ID)
+public class TinactoryDatagen {
+    public static final String ID = "tinactory_datagen";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static ITinyCoreLib CORE;
     public static ITinyDataGen DATA_CORE;
     public static IDataGen DATA_GEN;
 
-    public TinactoryTest() {
+    public TinactoryDatagen() {
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::onConstruct);
@@ -42,7 +42,7 @@ public class TinactoryTest {
     }
 
     private void init(FMLCommonSetupEvent event) {
-        LOGGER.info("hello TinactoryTest!");
+        LOGGER.info("hello TinactoryDatagen!");
     }
 
     private void onGatherData(GatherDataEvent event) {

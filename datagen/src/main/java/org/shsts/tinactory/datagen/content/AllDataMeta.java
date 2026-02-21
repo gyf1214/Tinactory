@@ -8,7 +8,7 @@ import org.shsts.tinycorelib.api.meta.IMetaConsumer;
 
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.test.TinactoryTest.CORE;
+import static org.shsts.tinactory.datagen.TinactoryDatagen.CORE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

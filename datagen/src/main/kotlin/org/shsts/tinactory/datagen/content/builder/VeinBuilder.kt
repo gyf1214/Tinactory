@@ -6,11 +6,11 @@ import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.material.OreVariant
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE
 import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE
 import org.shsts.tinactory.datagen.content.Technologies.TECHS
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
 
 class VeinBuilder(private val id: String, private val rank: Int, private val rate: Double) {
     var primitive = false

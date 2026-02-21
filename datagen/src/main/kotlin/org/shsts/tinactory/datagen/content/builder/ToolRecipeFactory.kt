@@ -7,7 +7,7 @@ import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.recipe.ToolRecipe
-import org.shsts.tinactory.test.TinactoryTest.DATA_GEN
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 
 class ToolRecipeFactory {
     fun recipe(loc: ResourceLocation, block: ToolRecipe.Builder.() -> Unit) {

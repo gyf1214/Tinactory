@@ -20,7 +20,7 @@ minecraft {
             }
 
             workingDirectory rootProject.file('run/data')
-            args '--mod', 'tinactory_test', '--all', '--output', project(':mod').file('src/generated/resources/')
+            args '--mod', 'tinactory_datagen', '--all', '--output', project(':mod').file('src/generated/resources/')
             args '--existing', project(':mod').file('src/main/resources/')
             args '--existing', file('src/main/resources/')
             args '--existing', rootProject.file("libs/tinactory_extra_resources_${extra_resources_version}.zip")

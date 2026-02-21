@@ -38,9 +38,9 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
+import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.CASING_MODEL;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCasing;
-import static org.shsts.tinactory.test.TinactoryTest.DATA_GEN;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
