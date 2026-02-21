@@ -3,7 +3,7 @@ archivesBaseName = "tinactory"
 minecraft {
     runs {
         client {
-            workingDirectory project.file('run/client')
+            workingDirectory rootProject.file('run/client')
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
@@ -19,7 +19,7 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run/server')
+            workingDirectory rootProject.file('run/server')
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'

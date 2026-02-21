@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.9.21'
+    ext.kotlin_version = '1.9.25'
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://maven.parchmentmc.org' }
@@ -25,7 +25,7 @@ subprojects {
     apply plugin: 'org.spongepowered.mixin'
     apply plugin: 'maven-publish'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
     checkstyle {
         toolVersion = "10.20.1"
