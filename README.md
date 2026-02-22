@@ -4,7 +4,7 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 
 ## Requirements
 
-- JDK 17
+- JDK 21
 - idea IntelliJ is recommended. I have not tested on other IDEs.
 
 ## Setup
@@ -16,15 +16,14 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 - Run gradle task `genIntellijRuns`. This will generate 3 tasks: `runClient`, `runServer`, and `runData`.
 - Run the task `runData` to generate data and asset files.
 - Run the task `runClient` to start the testing client.
-- Copy `libs/tinactory_extra_resources_v0.zip` to `run/client/resourcepacks`.
+- Copy `libs/tinactory_extra_resources_v1.zip` to `run/client/resourcepacks`.
 - Restart the client. Load the resource pack `Tinactory extra texture resources`.
 
 ## Code Structure
 
-- **src/main/java**: java classes of the mod.
-- **src/test/java**: java and kotlin classes for datagen and testing. Those classes will not be packaged into the final
+- **mod**: Main java classes and resources of the mod, including game tests
+- **datagen**: java and kotlin classes fo data generator. Those classes will not be packaged into the final
   mod.
-- **src/generated/resources**: generated resources from datagen.
 
 ### TinyCoreLib
 
