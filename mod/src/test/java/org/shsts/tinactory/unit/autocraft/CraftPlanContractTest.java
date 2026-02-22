@@ -1,6 +1,7 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import org.junit.jupiter.api.Test;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
@@ -25,7 +26,7 @@ class CraftPlanContractTest {
             "tinactory:gear",
             List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement("tinactory:assembler", 1, List.of()));
+            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
         var step = new CraftStep("step-1", pattern, 3);
         var plan = new CraftPlan(List.of(step));
 

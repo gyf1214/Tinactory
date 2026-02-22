@@ -1,6 +1,7 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import org.junit.jupiter.api.Test;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -79,7 +80,8 @@ class GoalReductionPlannerErrorTest {
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
-        return new CraftPattern(id, inputs, outputs, new MachineRequirement("tinactory:machine", 1, List.of()));
+        return new CraftPattern(id, inputs, outputs,
+            new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {

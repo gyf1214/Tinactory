@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,8 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
+import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.slf4j.Logger;
 
@@ -21,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -35,6 +40,8 @@ public class LogisticComponent extends NotifierComponent {
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
     private final Set<PortKey> storagePorts = new HashSet<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
+    @Nullable
+    private AutocraftJobService autocraftJobService;
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -110,6 +117,23 @@ public class LogisticComponent extends NotifierComponent {
         }
     }
 
+    public void setAutocraftJobService(AutocraftJobService service) {
+        autocraftJobService = service;
+    }
+
+    public UUID submitAutocraft(java.util.List<CraftAmount> targets) {
+        if (autocraftJobService == null) {
+            throw new IllegalStateException("Autocraft job service is not initialized");
+        }
+        return autocraftJobService.submit(targets);
+    }
+
+    public void tickAutocraftJobs() {
+        if (autocraftJobService != null) {
+            autocraftJobService.tick();
+        }
+    }
+
     @Override
     public void onDisconnect() {
         super.onDisconnect();
@@ -117,8 +141,11 @@ public class LogisticComponent extends NotifierComponent {
         subnetPorts.clear();
         globalPorts.clear();
         storagePorts.clear();
+        autocraftJobService = null;
     }
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {}
+    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+        builder.add(LOGISTICS_SCHEDULING.get(), (world, network) -> tickAutocraftJobs());
+    }
 }
