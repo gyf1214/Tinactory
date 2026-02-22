@@ -13,7 +13,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class GoalReductionPlanner implements ICraftPlanner {
+public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCraftPlanner {
     private final IPatternRepository patterns;
 
     public GoalReductionPlanner(IPatternRepository patterns) {
@@ -22,19 +22,54 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     @Override
     public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
-        var steps = new ArrayList<CraftStep>();
-        var stepIndex = new StepIndex();
-        var ledger = new PlannerLedger();
-        for (var resource : available) {
-            ledger.add(resource.key(), resource.amount());
-        }
-        for (var target : targets) {
-            var error = reduceTarget(target.key(), target.amount(), ledger, steps, stepIndex, new ArrayList<>(), true);
-            if (error != null) {
-                return PlanResult.failure(error);
+        var session = startSession(targets, available);
+        while (true) {
+            var progress = resume(session, Integer.MAX_VALUE);
+            if (progress.state() != PlannerProgress.State.RUNNING) {
+                return progress.result();
             }
         }
-        return PlanResult.success(new CraftPlan(steps));
+    }
+
+    @Override
+    public PlannerSession startSession(List<CraftAmount> targets, List<CraftAmount> available) {
+        return new PlannerSession(targets, available);
+    }
+
+    @Override
+    public PlannerProgress resume(PlannerSession session, int stepBudget) {
+        if (session.result != null) {
+            return session.result.isSuccess() ? PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+        }
+        if (stepBudget <= 0) {
+            return PlannerProgress.running();
+        }
+
+        var budget = stepBudget;
+        while (budget > 0 && session.nextTargetIndex < session.targets.size()) {
+            var target = session.targets.get(session.nextTargetIndex);
+            var stepIndex = new StepIndex(session.nextStepId);
+            var error = reduceTarget(
+                target.key(),
+                target.amount(),
+                session.ledger,
+                session.steps,
+                stepIndex,
+                new ArrayList<>(),
+                true);
+            session.nextStepId = stepIndex.snapshot();
+            if (error != null) {
+                session.result = PlanResult.failure(error);
+                return PlannerProgress.failed(session.result);
+            }
+            session.nextTargetIndex++;
+            budget--;
+        }
+        if (session.nextTargetIndex >= session.targets.size()) {
+            session.result = PlanResult.success(new CraftPlan(session.steps));
+            return PlannerProgress.done(session.result);
+        }
+        return PlannerProgress.running();
     }
 
     private PlanError reduceTarget(
@@ -119,7 +154,11 @@ public final class GoalReductionPlanner implements ICraftPlanner {
     }
 
     private static final class StepIndex {
-        private long value = 1L;
+        private long value;
+
+        private StepIndex(long value) {
+            this.value = value;
+        }
 
         private long next() {
             return value++;
