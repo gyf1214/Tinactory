@@ -9,7 +9,7 @@
 - `mod`: run `./gradlew runGameTestServer` (server exits after all tests finish).
 - `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
 
-## Format
+## Coding Rules
 Common
 - Use LF (`\n`) line endings.
 - Keep at most 1 blank line in code/declarations.
@@ -23,6 +23,9 @@ Common
 - Import order: non-`java` imports, blank line, `java.*`, blank line, static imports.
 - Keep simple methods, lambdas, and classes on one line when possible.
 - Always use braces for `if`, `for`, `while`, and `do-while`.
+- Interface names must start with `I`.
+- Annotate classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and `@MethodsReturnNonnullByDefault`; use `@Nullable` for nullable fields/overrides.
+- Mark singleton/utility classes `final`.
 
 ### Kotlin
 - Avoid star imports.
