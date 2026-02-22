@@ -41,8 +41,6 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
         return entry.encode(constraint);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     private record CodecEntry<T extends IMachineConstraint>(
         IMachineConstraintType<T> type,
         IMachineConstraintCodec<T> codec) {

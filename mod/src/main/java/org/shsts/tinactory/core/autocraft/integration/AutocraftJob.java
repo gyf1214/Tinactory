@@ -22,8 +22,6 @@ public record AutocraftJob(
         targets = List.copyOf(targets);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     public enum Status {
         QUEUED,
         RUNNING,

@@ -13,8 +13,6 @@ public interface IMachineConstraintRegistry {
 
     SerializedConstraint encode(IMachineConstraint constraint);
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     record SerializedConstraint(String typeId, String payload) {
     }
 }

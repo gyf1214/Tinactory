@@ -28,7 +28,8 @@ Common
 - Keep simple methods, lambdas, and classes on one line when possible.
 - Always use braces for `if`, `for`, `while`, and `do-while`.
 - Interface names must start with `I`.
-- Annotate classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and `@MethodsReturnNonnullByDefault`; use `@Nullable` for nullable fields/overrides.
+- Annotate top-level classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and `@MethodsReturnNonnullByDefault`; no need to annotate inner classes/interfaces/enums/records. Use `@Nullable` for nullable fields/overrides.
+- Test code does not require `@ParametersAreNonnullByDefault` or `@MethodsReturnNonnullByDefault`.
 - Mark singleton/utility classes `final`.
 
 ### Kotlin

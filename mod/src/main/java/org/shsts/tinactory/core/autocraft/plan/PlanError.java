@@ -26,8 +26,6 @@ public record PlanError(Code code, @Nullable CraftKey targetKey, String message,
         return new PlanError(Code.CYCLE_DETECTED, null, "Cycle detected in craft graph", cyclePath);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     public enum Code {
         MISSING_PATTERN,
         UNSATISFIED_BASE_RESOURCE,

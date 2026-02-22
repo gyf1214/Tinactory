@@ -19,8 +19,6 @@ public record PlannerProgress(State state, @Nullable PlanResult result) {
         return new PlannerProgress(State.FAILED, result);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     public enum State {
         RUNNING,
         DONE,

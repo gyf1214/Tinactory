@@ -61,8 +61,6 @@ public final class AutocraftServiceBootstrap {
             inventory::snapshotAvailable);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     private static final class SilentJobEvents implements IJobEvents {
         @Override
         public void onStepStarted(org.shsts.tinactory.core.autocraft.plan.CraftStep step) {}

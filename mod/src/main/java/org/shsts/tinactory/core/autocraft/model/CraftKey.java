@@ -21,8 +21,6 @@ public record CraftKey(Type type, String id, String nbt) {
         return new CraftKey(Type.FLUID, id, nbt);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     public enum Type {
         ITEM,
         FLUID

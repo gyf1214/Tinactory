@@ -35,8 +35,6 @@ public final class PlannerSession {
         this.result = null;
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     static final class SearchFrame {
         final CraftKey key;
         final long demand;
@@ -73,8 +71,6 @@ public final class PlannerSession {
         }
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
     enum Stage {
         START,
         SELECT_PATTERN,
