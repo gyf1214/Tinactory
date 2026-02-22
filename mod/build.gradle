@@ -68,6 +68,10 @@ dependencies {
 
     // waila
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+
+    testImplementation platform('org.junit:junit-bom:5.12.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 mixin {
@@ -109,6 +113,10 @@ artifacts {
 }
 
 build.dependsOn apiJar, sourcesJar
+
+test {
+    useJUnitPlatform()
+}
 
 publishing {
     publications {
