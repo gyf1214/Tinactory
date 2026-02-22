@@ -116,6 +116,10 @@ build.dependsOn apiJar, sourcesJar
 
 test {
     useJUnitPlatform()
+    workingDir rootProject.file('run/unitTest')
+    doFirst {
+        workingDir.mkdirs()
+    }
 }
 
 publishing {

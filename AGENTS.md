@@ -10,7 +10,7 @@
 - `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
 
 ## Validation
-- Before committing any code changes, run `./gradlew check` as the required format validation task.
+- Before committing any code changes, run `./gradlew checkstyleMain checkstyleTest` as the required format validation task.
 
 ## Coding Rules
 Common
