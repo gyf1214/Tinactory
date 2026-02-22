@@ -12,6 +12,7 @@ import java.util.ArrayDeque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -50,6 +51,36 @@ public class AutocraftJobService {
 
     public AutocraftJob job(UUID id) {
         return jobs.get(id);
+    }
+
+    public Optional<AutocraftJob> findJob(UUID id) {
+        return Optional.ofNullable(jobs.get(id));
+    }
+
+    public List<AutocraftJob> listJobs() {
+        return List.copyOf(jobs.values());
+    }
+
+    public boolean cancel(UUID id) {
+        var current = jobs.get(id);
+        if (current == null) {
+            return false;
+        }
+        if (current.status() == AutocraftJob.Status.QUEUED) {
+            queued.remove(id);
+            jobs.put(id, new AutocraftJob(id, current.targets(), AutocraftJob.Status.CANCELLED, current.planError(), null));
+            return true;
+        }
+        if (current.status() == AutocraftJob.Status.RUNNING && id.equals(runningJobId)) {
+            if (runningExecutor != null) {
+                runningExecutor.cancel();
+            }
+            jobs.put(id, new AutocraftJob(id, current.targets(), AutocraftJob.Status.CANCELLED, current.planError(), null));
+            runningJobId = null;
+            runningExecutor = null;
+            return true;
+        }
+        return false;
     }
 
     public void tick() {

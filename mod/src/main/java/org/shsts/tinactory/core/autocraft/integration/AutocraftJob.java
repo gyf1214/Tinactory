@@ -29,6 +29,7 @@ public record AutocraftJob(
         RUNNING,
         BLOCKED,
         FAILED,
+        CANCELLED,
         DONE
     }
 }

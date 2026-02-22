@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.network.ComponentType;
@@ -137,6 +138,18 @@ public class LogisticComponent extends NotifierComponent {
             throw new IllegalStateException("Autocraft job service is not initialized");
         }
         return autocraftJobService.submit(targets);
+    }
+
+    public Optional<AutocraftJob> findAutocraftJob(UUID id) {
+        return autocraftJobService == null ? Optional.empty() : autocraftJobService.findJob(id);
+    }
+
+    public java.util.List<AutocraftJob> listAutocraftJobs() {
+        return autocraftJobService == null ? java.util.List.of() : autocraftJobService.listJobs();
+    }
+
+    public boolean cancelAutocraft(UUID id) {
+        return autocraftJobService != null && autocraftJobService.cancel(id);
     }
 
     public void tickAutocraftJobs() {

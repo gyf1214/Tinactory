@@ -17,8 +17,12 @@ import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftJobServiceTest {
     @Test
@@ -62,6 +66,53 @@ class AutocraftJobServiceTest {
         assertEquals(AutocraftJob.Status.BLOCKED, service.job(id).status());
     }
 
+    @Test
+    void serviceShouldExposeSafeLookupForMissingJob() {
+        var service = new AutocraftJobService(
+            new TestPlanner(PlanResult.success(new CraftPlan(List.of(step())))),
+            () -> new TestExecutor(ExecutionState.COMPLETED),
+            List::of);
+
+        assertTrue(service.findJob(UUID.fromString("99999999-9999-9999-9999-999999999999")).isEmpty());
+    }
+
+    @Test
+    void serviceShouldListJobsInSubmitOrder() {
+        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
+        var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
+
+        var first = service.submit(List.of(new CraftAmount(CraftKey.item("x:y1", ""), 1)));
+        var second = service.submit(List.of(new CraftAmount(CraftKey.item("x:y2", ""), 1)));
+
+        assertEquals(
+            List.of(first, second),
+            service.listJobs().stream().map(AutocraftJob::id).collect(Collectors.toList()));
+    }
+
+    @Test
+    void serviceShouldCancelQueuedJob() {
+        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
+        var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
+        var id = service.submit(List.of(new CraftAmount(CraftKey.item("x:y", ""), 1)));
+
+        assertTrue(service.cancel(id));
+        assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
+    }
+
+    @Test
+    void serviceShouldCancelRunningJob() {
+        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
+        var executor = new TestExecutor(ExecutionState.RUNNING);
+        var service = new AutocraftJobService(planner, () -> executor, List::of);
+        var id = service.submit(List.of(new CraftAmount(CraftKey.item("x:y", ""), 1)));
+        service.tick();
+
+        assertTrue(service.cancel(id));
+        assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
+        assertTrue(executor.cancelled);
+        assertFalse(service.cancel(id));
+    }
+
     private static CraftStep step() {
         return new CraftStep("s1", new CraftPattern(
             "tinactory:test",
@@ -80,6 +131,7 @@ class AutocraftJobServiceTest {
     private static final class TestExecutor implements ICraftExecutor {
         private final List<ExecutionState> states;
         private int index = 0;
+        private boolean cancelled;
 
         private TestExecutor(ExecutionState... states) {
             this.states = List.of(states);
@@ -96,7 +148,9 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public void cancel() {}
+        public void cancel() {
+            cancelled = true;
+        }
 
         @Override
         public ExecutionState state() {
