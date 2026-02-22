@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.autocraft;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
-import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
@@ -31,8 +30,16 @@ class CraftExecutorTest {
         var events = new RecordingEvents();
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, events);
         executor.start(new CraftPlan(List.of(
-            new CraftStep("s1", pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))), 1),
-            new CraftStep("s2", pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))), 1)
+            new CraftStep(
+                "s1",
+                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+                1
+            ),
+            new CraftStep(
+                "s2",
+                pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))),
+                1
+            )
         )));
 
         executor.tick();
@@ -50,7 +57,11 @@ class CraftExecutorTest {
         var inventory = new FakeInventory(Map.of());
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, new RecordingEvents());
         executor.start(new CraftPlan(List.of(
-            new CraftStep("s1", pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))), 1)
+            new CraftStep(
+                "s1",
+                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+                1
+            )
         )));
 
         executor.tick();
@@ -66,7 +77,11 @@ class CraftExecutorTest {
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, new RecordingEvents());
         executor.start(new CraftPlan(List.of(
-            new CraftStep("s1", pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))), 1)
+            new CraftStep(
+                "s1",
+                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+                1
+            )
         )));
 
         executor.cancel();

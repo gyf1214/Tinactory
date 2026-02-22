@@ -14,7 +14,10 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
     private final Map<Class<?>, CodecEntry<?>> byClass = new HashMap<>();
 
     @Override
-    public <T extends IMachineConstraint> void register(IMachineConstraintType<T> type, IMachineConstraintCodec<T> codec) {
+    public <T extends IMachineConstraint> void register(
+        IMachineConstraintType<T> type,
+        IMachineConstraintCodec<T> codec
+    ) {
         var entry = new CodecEntry<>(type, codec);
         byTypeId.put(type.id(), entry);
         byClass.put(type.constraintClass(), entry);
@@ -33,7 +36,9 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
     public SerializedConstraint encode(IMachineConstraint constraint) {
         var entry = byClass.get(constraint.getClass());
         if (entry == null) {
-            throw new IllegalArgumentException("no machine constraint codec for class: " + constraint.getClass().getName());
+            throw new IllegalArgumentException(
+                "no machine constraint codec for class: " + constraint.getClass().getName()
+            );
         }
         return entry.encode(constraint);
     }

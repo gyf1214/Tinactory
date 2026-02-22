@@ -22,8 +22,16 @@ class GoalReductionPlannerTest {
         var plate = CraftKey.item("tinactory:plate", "");
         var gear = CraftKey.item("tinactory:gear", "");
 
-        var platePattern = pattern("tinactory:plate_from_ingot", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1)));
-        var gearPattern = pattern("tinactory:gear_from_plate", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1)));
+        var platePattern = pattern(
+            "tinactory:plate_from_ingot",
+            List.of(new CraftAmount(ingot, 2)),
+            List.of(new CraftAmount(plate, 1))
+        );
+        var gearPattern = pattern(
+            "tinactory:gear_from_plate",
+            List.of(new CraftAmount(plate, 1)),
+            List.of(new CraftAmount(gear, 1))
+        );
         var planner = new GoalReductionPlanner(repo(List.of(platePattern, gearPattern)));
 
         var result = planner.plan(List.of(new CraftAmount(gear, 1)), List.of(new CraftAmount(ingot, 2)));
@@ -41,8 +49,16 @@ class GoalReductionPlannerTest {
         var dust = CraftKey.item("tinactory:dust", "");
         var plate = CraftKey.item("tinactory:plate", "");
 
-        var aPattern = pattern("tinactory:a_ore_to_plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1)));
-        var zPattern = pattern("tinactory:z_dust_to_plate", List.of(new CraftAmount(dust, 1)), List.of(new CraftAmount(plate, 1)));
+        var aPattern = pattern(
+            "tinactory:a_ore_to_plate",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(plate, 1))
+        );
+        var zPattern = pattern(
+            "tinactory:z_dust_to_plate",
+            List.of(new CraftAmount(dust, 1)),
+            List.of(new CraftAmount(plate, 1))
+        );
         var planner = new GoalReductionPlanner(repo(List.of(zPattern, aPattern)));
 
         var result = planner.plan(

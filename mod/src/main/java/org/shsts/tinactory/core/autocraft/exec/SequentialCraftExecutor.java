@@ -45,7 +45,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
         var step = plan.steps().get(nextStep);
         if (!machineAllocator.canRun(step.pattern().machineRequirement())) {
-            error = new ExecutionError(ExecutionError.Code.MACHINE_UNAVAILABLE, step.stepId(), "Machine requirement is unavailable");
+            error = new ExecutionError(
+                ExecutionError.Code.MACHINE_UNAVAILABLE,
+                step.stepId(),
+                "Machine requirement is unavailable"
+            );
             jobEvents.onStepBlocked(step, error.message());
             state = ExecutionState.BLOCKED;
             return;
@@ -53,7 +57,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         for (var input : step.pattern().inputs()) {
             var required = input.amount() * step.runs();
             if (inventory.amountOf(input.key()) < required) {
-                error = new ExecutionError(ExecutionError.Code.INPUT_MISSING, step.stepId(), "Input resources are unavailable");
+                error = new ExecutionError(
+                    ExecutionError.Code.INPUT_MISSING,
+                    step.stepId(),
+                    "Input resources are unavailable"
+                );
                 jobEvents.onStepBlocked(step, error.message());
                 state = ExecutionState.BLOCKED;
                 return;
