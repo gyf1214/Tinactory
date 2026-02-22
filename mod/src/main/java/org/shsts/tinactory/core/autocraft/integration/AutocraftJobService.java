@@ -68,14 +68,24 @@ public class AutocraftJobService {
         }
         if (current.status() == AutocraftJob.Status.QUEUED) {
             queued.remove(id);
-            jobs.put(id, new AutocraftJob(id, current.targets(), AutocraftJob.Status.CANCELLED, current.planError(), null));
+            jobs.put(id, new AutocraftJob(
+                id,
+                current.targets(),
+                AutocraftJob.Status.CANCELLED,
+                current.planError(),
+                null));
             return true;
         }
         if (current.status() == AutocraftJob.Status.RUNNING && id.equals(runningJobId)) {
             if (runningExecutor != null) {
                 runningExecutor.cancel();
             }
-            jobs.put(id, new AutocraftJob(id, current.targets(), AutocraftJob.Status.CANCELLED, current.planError(), null));
+            jobs.put(id, new AutocraftJob(
+                id,
+                current.targets(),
+                AutocraftJob.Status.CANCELLED,
+                current.planError(),
+                null));
             runningJobId = null;
             runningExecutor = null;
             return true;

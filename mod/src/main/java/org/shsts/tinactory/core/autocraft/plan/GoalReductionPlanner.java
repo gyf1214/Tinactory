@@ -39,7 +39,8 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
     @Override
     public PlannerProgress resume(PlannerSession session, int stepBudget) {
         if (session.result != null) {
-            return session.result.isSuccess() ? PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+            return session.result.isSuccess() ?
+                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
         }
         if (stepBudget <= 0) {
             return PlannerProgress.running();
