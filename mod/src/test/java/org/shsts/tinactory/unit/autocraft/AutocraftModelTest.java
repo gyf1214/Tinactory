@@ -46,12 +46,10 @@ class AutocraftModelTest {
             "tinactory:part",
             List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(CraftKey.item("tinactory:part", ""), 1)),
-            requirement
-        );
+            requirement);
 
         assertThrows(UnsupportedOperationException.class, () -> pattern.inputs().add(
-            new CraftAmount(CraftKey.item("tinactory:other", ""), 1)
-        ));
+            new CraftAmount(CraftKey.item("tinactory:other", ""), 1)));
         assertThrows(IllegalArgumentException.class, () -> new CraftAmount(CraftKey.item("tinactory:invalid", ""), 0));
     }
 

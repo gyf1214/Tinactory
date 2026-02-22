@@ -11,8 +11,7 @@ public record CraftPattern(
     String patternId,
     List<CraftAmount> inputs,
     List<CraftAmount> outputs,
-    MachineRequirement machineRequirement
-) {
+    MachineRequirement machineRequirement) {
     public CraftPattern {
         if (patternId.isBlank()) {
             throw new IllegalArgumentException("patternId must not be blank");

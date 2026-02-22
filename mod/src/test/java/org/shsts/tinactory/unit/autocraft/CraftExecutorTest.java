@@ -29,18 +29,15 @@ class CraftExecutorTest {
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var events = new RecordingEvents();
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, events);
-        executor.start(new CraftPlan(List.of(
-            new CraftStep(
-                "s1",
-                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
-                1
-            ),
-            new CraftStep(
-                "s2",
-                pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))),
-                1
-            )
-        )));
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+        var secondStep = new CraftStep(
+            "s2",
+            pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))),
+            1);
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         executor.tick();
         executor.tick();
@@ -56,13 +53,11 @@ class CraftExecutorTest {
         var plate = CraftKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of());
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, new RecordingEvents());
-        executor.start(new CraftPlan(List.of(
-            new CraftStep(
-                "s1",
-                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
-                1
-            )
-        )));
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+        executor.start(new CraftPlan(List.of(step)));
 
         executor.tick();
 
@@ -76,13 +71,11 @@ class CraftExecutorTest {
         var plate = CraftKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var executor = new SequentialCraftExecutor(inventory, requirement -> true, new RecordingEvents());
-        executor.start(new CraftPlan(List.of(
-            new CraftStep(
-                "s1",
-                pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
-                1
-            )
-        )));
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+        executor.start(new CraftPlan(List.of(step)));
 
         executor.cancel();
 

@@ -44,8 +44,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         List<CraftStep> steps,
         StepIndex stepIndex,
         List<CraftKey> path,
-        boolean rootDemand
-    ) {
+        boolean rootDemand) {
         var remaining = amount - ledger.consume(key, amount);
         if (remaining <= 0L) {
             return null;

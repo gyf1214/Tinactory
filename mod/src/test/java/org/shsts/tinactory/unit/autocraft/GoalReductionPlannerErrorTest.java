@@ -68,8 +68,7 @@ class GoalReductionPlannerErrorTest {
         var gearPattern = pattern(
             "tinactory:gear_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
-            List.of(new CraftAmount(gear, 1))
-        );
+            List.of(new CraftAmount(gear, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(gearPattern)));
 
         var result = planner.plan(List.of(new CraftAmount(gear, 1)), List.of());

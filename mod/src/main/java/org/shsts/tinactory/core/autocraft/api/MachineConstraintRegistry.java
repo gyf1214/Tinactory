@@ -16,8 +16,7 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
     @Override
     public <T extends IMachineConstraint> void register(
         IMachineConstraintType<T> type,
-        IMachineConstraintCodec<T> codec
-    ) {
+        IMachineConstraintCodec<T> codec) {
         var entry = new CodecEntry<>(type, codec);
         byTypeId.put(type.id(), entry);
         byClass.put(type.constraintClass(), entry);
@@ -37,8 +36,7 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
         var entry = byClass.get(constraint.getClass());
         if (entry == null) {
             throw new IllegalArgumentException(
-                "no machine constraint codec for class: " + constraint.getClass().getName()
-            );
+                "no machine constraint codec for class: " + constraint.getClass().getName());
         }
         return entry.encode(constraint);
     }
@@ -47,8 +45,7 @@ public final class MachineConstraintRegistry implements IMachineConstraintRegist
     @MethodsReturnNonnullByDefault
     private record CodecEntry<T extends IMachineConstraint>(
         IMachineConstraintType<T> type,
-        IMachineConstraintCodec<T> codec
-    ) {
+        IMachineConstraintCodec<T> codec) {
         private IMachineConstraint decode(String payload) {
             return codec.decode(payload);
         }

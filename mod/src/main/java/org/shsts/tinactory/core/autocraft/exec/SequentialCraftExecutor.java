@@ -48,8 +48,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             error = new ExecutionError(
                 ExecutionError.Code.MACHINE_UNAVAILABLE,
                 step.stepId(),
-                "Machine requirement is unavailable"
-            );
+                "Machine requirement is unavailable");
             jobEvents.onStepBlocked(step, error.message());
             state = ExecutionState.BLOCKED;
             return;
@@ -60,8 +59,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 error = new ExecutionError(
                     ExecutionError.Code.INPUT_MISSING,
                     step.stepId(),
-                    "Input resources are unavailable"
-                );
+                    "Input resources are unavailable");
                 jobEvents.onStepBlocked(step, error.message());
                 state = ExecutionState.BLOCKED;
                 return;
