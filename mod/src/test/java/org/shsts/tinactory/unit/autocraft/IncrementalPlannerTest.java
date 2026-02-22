@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlannerProgress;
+import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,17 +53,17 @@ class IncrementalPlannerTest {
             List.of(new CraftAmount(ingot, 4)));
 
         var first = planner.resume(session, 1);
-        var second = planner.resume(session, 1);
+        var progress = runUntilTerminal(planner, session, 64);
 
         assertEquals(PlannerProgress.State.RUNNING, first.state());
-        assertEquals(PlannerProgress.State.DONE, second.state());
-        assertNotNull(second.result());
-        assertTrue(second.result().isSuccess());
+        assertEquals(PlannerProgress.State.DONE, progress.state());
+        assertNotNull(progress.result());
+        assertTrue(progress.result().isSuccess());
         assertEquals(
             planner.plan(
                 List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)),
                 List.of(new CraftAmount(ingot, 4))).plan(),
-            second.result().plan());
+            progress.result().plan());
     }
 
     @Test
@@ -108,8 +109,46 @@ class IncrementalPlannerTest {
         assertEquals(firstRunB.result(), secondRunB.result());
     }
 
+    @Test
+    void incrementalPlannerBudgetShouldAdvanceWithinSingleRootTargetExpansion() {
+        var ingot = CraftKey.item("tinactory:ingot", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var gear = CraftKey.item("tinactory:gear", "");
+        var platePattern = pattern(
+            "tinactory:plate_from_ingot",
+            List.of(new CraftAmount(ingot, 2)),
+            List.of(new CraftAmount(plate, 1)));
+        var gearPattern = pattern(
+            "tinactory:gear_from_plate",
+            List.of(new CraftAmount(plate, 1)),
+            List.of(new CraftAmount(gear, 1)));
+        var planner = planner(repo(List.of(platePattern, gearPattern)));
+        var session = planner.startSession(List.of(new CraftAmount(gear, 1)), List.of(new CraftAmount(ingot, 2)));
+
+        var first = planner.resume(session, 1);
+        var progress = runUntilTerminal(planner, session, 64);
+
+        assertEquals(PlannerProgress.State.RUNNING, first.state());
+        assertEquals(PlannerProgress.State.DONE, progress.state());
+        assertNotNull(progress.result());
+        assertEquals(
+            planner.plan(List.of(new CraftAmount(gear, 1)), List.of(new CraftAmount(ingot, 2))),
+            progress.result());
+    }
+
     private static GoalReductionPlanner planner(IPatternRepository repo) {
         return new GoalReductionPlanner(repo);
+    }
+
+    private static PlannerProgress runUntilTerminal(
+        GoalReductionPlanner planner,
+        PlannerSession session,
+        int maxSteps) {
+        var progress = PlannerProgress.running();
+        for (var i = 0; i < maxSteps && progress.state() == PlannerProgress.State.RUNNING; i++) {
+            progress = planner.resume(session, 1);
+        }
+        return progress;
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {

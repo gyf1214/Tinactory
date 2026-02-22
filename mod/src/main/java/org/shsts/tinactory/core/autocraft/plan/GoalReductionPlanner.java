@@ -47,92 +47,159 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         }
 
         var budget = stepBudget;
-        while (budget > 0 && session.nextTargetIndex < session.targets.size()) {
-            var target = session.targets.get(session.nextTargetIndex);
-            var stepIndex = new StepIndex(session.nextStepId);
-            var error = reduceTarget(
-                target.key(),
-                target.amount(),
-                session.ledger,
-                session.steps,
-                stepIndex,
-                new ArrayList<>(),
-                true);
-            session.nextStepId = stepIndex.snapshot();
-            if (error != null) {
-                session.result = PlanResult.failure(error);
-                return PlannerProgress.failed(session.result);
+        while (budget > 0 && session.result == null) {
+            if (session.searchStack.isEmpty()) {
+                if (session.nextTargetIndex >= session.targets.size()) {
+                    session.result = PlanResult.success(new CraftPlan(session.steps));
+                    return PlannerProgress.done(session.result);
+                }
+                var target = session.targets.get(session.nextTargetIndex);
+                session.searchStack.add(new PlannerSession.SearchFrame(target.key(), target.amount(), true));
             }
-            session.nextTargetIndex++;
+            processOneSearchStep(session);
             budget--;
         }
-        if (session.nextTargetIndex >= session.targets.size()) {
+        if (session.result != null) {
+            return session.result.isSuccess() ?
+                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+        }
+        if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
             session.result = PlanResult.success(new CraftPlan(session.steps));
             return PlannerProgress.done(session.result);
         }
         return PlannerProgress.running();
     }
 
-    private PlanError reduceTarget(
-        CraftKey key,
-        long amount,
-        PlannerLedger ledger,
-        List<CraftStep> steps,
-        StepIndex stepIndex,
-        List<CraftKey> path,
-        boolean rootDemand) {
-        var remaining = amount - ledger.consume(key, amount);
-        if (remaining <= 0L) {
-            return null;
+    private void processOneSearchStep(PlannerSession session) {
+        var frame = peekFrame(session);
+        switch (frame.stage) {
+            case START:
+                runStartStage(session, frame);
+                break;
+            case SELECT_PATTERN:
+                runSelectPatternStage(session, frame);
+                break;
+            case REDUCE_INPUTS:
+                runReduceInputsStage(session, frame);
+                break;
+            case APPLY_PATTERN:
+                runApplyPatternStage(session, frame);
+                break;
         }
-        var cycleStart = path.indexOf(key);
-        if (cycleStart >= 0) {
-            var cyclePath = new ArrayList<>(path.subList(cycleStart, path.size()));
-            cyclePath.add(key);
-            return PlanError.cycleDetected(cyclePath);
-        }
+    }
 
-        var candidates = choosePatterns(key);
-        if (candidates.isEmpty()) {
-            return rootDemand ? PlanError.missingPattern(key) : PlanError.unsatisfiedBaseResource(key);
+    private void runStartStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        frame.remaining = frame.demand - session.ledger.consume(frame.key, frame.demand);
+        if (frame.remaining <= 0L) {
+            popSuccess(session);
+            return;
         }
-        path.add(key);
-        PlanError firstError = null;
-        try {
-            for (var pattern : candidates) {
-                var ledgerSnapshot = ledger.copy();
-                var stepCount = steps.size();
-                var stepIndexSnapshot = stepIndex.snapshot();
-                var outputPerRun = getProducedAmount(pattern, key);
-                var runs = divideCeil(remaining, outputPerRun);
-                PlanError error = null;
-                for (var input : pattern.inputs()) {
-                    error = reduceTarget(input.key(), input.amount() * runs, ledger, steps, stepIndex, path, false);
-                    if (error != null) {
-                        break;
-                    }
-                }
-                if (error == null) {
-                    for (var output : pattern.outputs()) {
-                        ledger.add(output.key(), output.amount() * runs);
-                    }
-                    steps.add(new CraftStep("step-" + stepIndex.next(), pattern, runs));
-                    ledger.consume(key, remaining);
-                    return null;
-                }
-                if (firstError == null) {
-                    firstError = error;
-                }
-                ledger.reset(ledgerSnapshot);
-                while (steps.size() > stepCount) {
-                    steps.remove(steps.size() - 1);
-                }
-                stepIndex.reset(stepIndexSnapshot);
+        var cycleError = detectCycle(session.searchStack);
+        if (cycleError != null) {
+            popFailure(session, cycleError);
+            return;
+        }
+        frame.candidates = choosePatterns(frame.key);
+        if (frame.candidates.isEmpty()) {
+            var error = frame.rootDemand ?
+                PlanError.missingPattern(frame.key) :
+                PlanError.unsatisfiedBaseResource(frame.key);
+            popFailure(session, error);
+            return;
+        }
+        frame.firstError = null;
+        frame.candidateIndex = 0;
+        frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+    }
+
+    private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        if (frame.candidateIndex >= frame.candidates.size()) {
+            var error = frame.firstError == null ? PlanError.unsatisfiedBaseResource(frame.key) : frame.firstError;
+            popFailure(session, error);
+            return;
+        }
+        var pattern = frame.candidates.get(frame.candidateIndex);
+        frame.ledgerSnapshot = session.ledger.copy();
+        frame.stepCountSnapshot = session.steps.size();
+        frame.stepIdSnapshot = session.nextStepId;
+        frame.runs = divideCeil(frame.remaining, getProducedAmount(pattern, frame.key));
+        frame.inputIndex = 0;
+        frame.childError = null;
+        frame.stage = PlannerSession.Stage.REDUCE_INPUTS;
+    }
+
+    private void runReduceInputsStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        if (frame.childError != null) {
+            if (frame.firstError == null) {
+                frame.firstError = frame.childError;
             }
-        } finally {
-            path.remove(path.size() - 1);
+            rollbackCandidate(session, frame);
+            frame.childError = null;
+            frame.candidateIndex++;
+            frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+            return;
         }
-        return firstError == null ? PlanError.unsatisfiedBaseResource(key) : firstError;
+        var pattern = frame.candidates.get(frame.candidateIndex);
+        if (frame.inputIndex >= pattern.inputs().size()) {
+            frame.stage = PlannerSession.Stage.APPLY_PATTERN;
+            return;
+        }
+        var input = pattern.inputs().get(frame.inputIndex);
+        frame.inputIndex++;
+        session.searchStack.add(new PlannerSession.SearchFrame(input.key(), input.amount() * frame.runs, false));
+    }
+
+    private void runApplyPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        var pattern = frame.candidates.get(frame.candidateIndex);
+        for (var output : pattern.outputs()) {
+            session.ledger.add(output.key(), output.amount() * frame.runs);
+        }
+        session.steps.add(new CraftStep("step-" + session.nextStepId++, pattern, frame.runs));
+        session.ledger.consume(frame.key, frame.remaining);
+        popSuccess(session);
+    }
+
+    private void rollbackCandidate(PlannerSession session, PlannerSession.SearchFrame frame) {
+        session.ledger.reset(frame.ledgerSnapshot);
+        while (session.steps.size() > frame.stepCountSnapshot) {
+            session.steps.remove(session.steps.size() - 1);
+        }
+        session.nextStepId = frame.stepIdSnapshot;
+    }
+
+    private PlannerSession.SearchFrame peekFrame(PlannerSession session) {
+        return session.searchStack.get(session.searchStack.size() - 1);
+    }
+
+    private void popSuccess(PlannerSession session) {
+        session.searchStack.remove(session.searchStack.size() - 1);
+        if (session.searchStack.isEmpty()) {
+            session.nextTargetIndex++;
+        }
+    }
+
+    private void popFailure(PlannerSession session, PlanError error) {
+        session.searchStack.remove(session.searchStack.size() - 1);
+        if (session.searchStack.isEmpty()) {
+            session.result = PlanResult.failure(error);
+            return;
+        }
+        var parent = peekFrame(session);
+        parent.childError = error;
+    }
+
+    private static PlanError detectCycle(List<PlannerSession.SearchFrame> stack) {
+        var current = stack.get(stack.size() - 1);
+        for (var i = 0; i < stack.size() - 1; i++) {
+            if (stack.get(i).key.equals(current.key)) {
+                var cyclePath = new ArrayList<CraftKey>();
+                for (var j = i; j < stack.size(); j++) {
+                    cyclePath.add(stack.get(j).key);
+                }
+                return PlanError.cycleDetected(cyclePath);
+            }
+        }
+        return null;
     }
 
     private List<CraftPattern> choosePatterns(CraftKey key) {
@@ -152,25 +219,5 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
 
     private static long divideCeil(long numerator, long denominator) {
         return (numerator + denominator - 1L) / denominator;
-    }
-
-    private static final class StepIndex {
-        private long value;
-
-        private StepIndex(long value) {
-            this.value = value;
-        }
-
-        private long next() {
-            return value++;
-        }
-
-        private long snapshot() {
-            return value;
-        }
-
-        private void reset(long snapshot) {
-            value = snapshot;
-        }
     }
 }
