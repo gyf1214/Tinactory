@@ -29,7 +29,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
             ledger.add(resource.key(), resource.amount());
         }
         for (var target : targets) {
-            var error = reduceTarget(target.key(), target.amount(), ledger, steps, stepIndex);
+            var error = reduceTarget(target.key(), target.amount(), ledger, steps, stepIndex, new ArrayList<>(), true);
             if (error != null) {
                 return PlanResult.failure(error);
             }
@@ -42,26 +42,39 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         long amount,
         PlannerLedger ledger,
         List<CraftStep> steps,
-        StepIndex stepIndex
+        StepIndex stepIndex,
+        List<CraftKey> path,
+        boolean rootDemand
     ) {
         var remaining = amount - ledger.consume(key, amount);
         if (remaining <= 0L) {
             return null;
         }
+        var cycleStart = path.indexOf(key);
+        if (cycleStart >= 0) {
+            var cyclePath = new ArrayList<>(path.subList(cycleStart, path.size()));
+            cyclePath.add(key);
+            return PlanError.cycleDetected(cyclePath);
+        }
 
         var pattern = choosePattern(key);
         if (pattern == null) {
-            return PlanError.missingPattern(key);
+            return rootDemand ? PlanError.missingPattern(key) : PlanError.unsatisfiedBaseResource(key);
         }
 
         var outputPerRun = getProducedAmount(pattern, key);
         var runs = divideCeil(remaining, outputPerRun);
+        path.add(key);
 
-        for (var input : pattern.inputs()) {
-            var error = reduceTarget(input.key(), input.amount() * runs, ledger, steps, stepIndex);
-            if (error != null) {
-                return error;
+        try {
+            for (var input : pattern.inputs()) {
+                var error = reduceTarget(input.key(), input.amount() * runs, ledger, steps, stepIndex, path, false);
+                if (error != null) {
+                    return error;
+                }
             }
+        } finally {
+            path.remove(path.size() - 1);
         }
 
         for (var output : pattern.outputs()) {
