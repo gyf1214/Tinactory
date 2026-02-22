@@ -67,6 +67,35 @@ class AutocraftLogisticsIntegrationTest {
         assertEquals(List.of(target), submitted);
     }
 
+    @Test
+    void logisticComponentShouldInitializeAutocraftServiceOnlyOnce() {
+        var component = new LogisticComponent(null, new FakeNetwork());
+        var first = new CountingService();
+        var second = new CountingService();
+        component.registerAutocraftBootstrap(() -> first);
+        component.registerAutocraftBootstrap(() -> second);
+
+        component.tickAutocraftJobs();
+        component.tickAutocraftJobs();
+
+        assertEquals(2, first.ticks);
+        assertEquals(0, second.ticks);
+    }
+
+    @Test
+    void logisticComponentShouldAllowExplicitServiceOverride() {
+        var component = new LogisticComponent(null, new FakeNetwork());
+        var bootstrap = new CountingService();
+        var overridden = new CountingService();
+        component.registerAutocraftBootstrap(() -> bootstrap);
+        component.setAutocraftJobService(overridden);
+
+        component.tickAutocraftJobs();
+
+        assertEquals(0, bootstrap.ticks);
+        assertEquals(1, overridden.ticks);
+    }
+
     private static int tickCount = 0;
     private static List<CraftAmount> submitted = List.of();
     private static final UUID jobId = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -95,6 +124,21 @@ class AutocraftLogisticsIntegrationTest {
         @Override
         public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
             return List.of();
+        }
+    }
+
+    private static final class CountingService extends AutocraftJobService {
+        private int ticks;
+
+        private CountingService() {
+            super((targets, available) -> {
+                throw new UnsupportedOperationException();
+            }, () -> null, List::of);
+        }
+
+        @Override
+        public void tick() {
+            ticks++;
         }
     }
 }

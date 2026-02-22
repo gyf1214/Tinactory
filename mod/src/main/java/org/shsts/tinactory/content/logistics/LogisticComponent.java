@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 
@@ -42,6 +43,8 @@ public class LogisticComponent extends NotifierComponent {
     private final Set<PortKey> globalPorts = new HashSet<>();
     @Nullable
     private AutocraftJobService autocraftJobService;
+    @Nullable
+    private Supplier<AutocraftJobService> autocraftBootstrap;
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -119,6 +122,14 @@ public class LogisticComponent extends NotifierComponent {
 
     public void setAutocraftJobService(AutocraftJobService service) {
         autocraftJobService = service;
+        autocraftBootstrap = null;
+    }
+
+    public void registerAutocraftBootstrap(Supplier<AutocraftJobService> bootstrap) {
+        if (autocraftJobService != null || autocraftBootstrap != null) {
+            return;
+        }
+        autocraftBootstrap = bootstrap;
     }
 
     public UUID submitAutocraft(java.util.List<CraftAmount> targets) {
@@ -129,6 +140,10 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     public void tickAutocraftJobs() {
+        if (autocraftJobService == null && autocraftBootstrap != null) {
+            autocraftJobService = autocraftBootstrap.get();
+            autocraftBootstrap = null;
+        }
         if (autocraftJobService != null) {
             autocraftJobService.tick();
         }
@@ -142,6 +157,7 @@ public class LogisticComponent extends NotifierComponent {
         globalPorts.clear();
         storagePorts.clear();
         autocraftJobService = null;
+        autocraftBootstrap = null;
     }
 
     @Override
