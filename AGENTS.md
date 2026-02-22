@@ -9,6 +9,9 @@
 - `mod`: run `./gradlew runGameTestServer` (server exits after all tests finish).
 - `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
 
+## Validation
+- Before committing any code changes, run `./gradlew check` as the required format validation task.
+
 ## Coding Rules
 Common
 - Use LF (`\n`) line endings.
