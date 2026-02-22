@@ -94,6 +94,62 @@ class GoalReductionPlannerTest {
             result.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
     }
 
+    @Test
+    void plannerShouldBacktrackToSecondRootCandidate() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var dust = CraftKey.item("tinactory:dust", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+
+        var first = pattern(
+            "tinactory:a_plate_from_missing_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(plate, 1)));
+        var second = pattern(
+            "tinactory:b_plate_from_dust",
+            List.of(new CraftAmount(dust, 1)),
+            List.of(new CraftAmount(plate, 1)));
+        var planner = new GoalReductionPlanner(repo(List.of(first, second)));
+
+        var result = planner.plan(
+            List.of(new CraftAmount(plate, 1)),
+            List.of(new CraftAmount(dust, 1)));
+
+        assertTrue(result.isSuccess());
+        assertEquals(List.of("tinactory:b_plate_from_dust"),
+            result.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+    }
+
+    @Test
+    void plannerShouldBacktrackNestedCandidate() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var dust = CraftKey.item("tinactory:dust", "");
+        var ingot = CraftKey.item("tinactory:ingot", "");
+        var gear = CraftKey.item("tinactory:gear", "");
+
+        var gearFromIngot = pattern(
+            "tinactory:gear_from_ingot",
+            List.of(new CraftAmount(ingot, 1)),
+            List.of(new CraftAmount(gear, 1)));
+        var ingotFromOre = pattern(
+            "tinactory:a_ingot_from_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(ingot, 1)));
+        var ingotFromDust = pattern(
+            "tinactory:b_ingot_from_dust",
+            List.of(new CraftAmount(dust, 1)),
+            List.of(new CraftAmount(ingot, 1)));
+        var planner = new GoalReductionPlanner(repo(List.of(gearFromIngot, ingotFromOre, ingotFromDust)));
+
+        var result = planner.plan(
+            List.of(new CraftAmount(gear, 1)),
+            List.of(new CraftAmount(dust, 1)));
+
+        assertTrue(result.isSuccess());
+        assertEquals(
+            List.of("tinactory:b_ingot_from_dust", "tinactory:gear_from_ingot"),
+            result.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));

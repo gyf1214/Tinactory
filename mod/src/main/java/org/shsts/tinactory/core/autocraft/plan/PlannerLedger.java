@@ -12,6 +12,17 @@ import java.util.Map;
 public final class PlannerLedger {
     private final Map<CraftKey, Long> stock = new HashMap<>();
 
+    public PlannerLedger copy() {
+        var copy = new PlannerLedger();
+        copy.stock.putAll(stock);
+        return copy;
+    }
+
+    public void reset(PlannerLedger snapshot) {
+        stock.clear();
+        stock.putAll(snapshot.stock);
+    }
+
     public long get(CraftKey key) {
         return stock.getOrDefault(key, 0L);
     }

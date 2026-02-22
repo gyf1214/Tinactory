@@ -56,40 +56,53 @@ public final class GoalReductionPlanner implements ICraftPlanner {
             return PlanError.cycleDetected(cyclePath);
         }
 
-        var pattern = choosePattern(key);
-        if (pattern == null) {
+        var candidates = choosePatterns(key);
+        if (candidates.isEmpty()) {
             return rootDemand ? PlanError.missingPattern(key) : PlanError.unsatisfiedBaseResource(key);
         }
-
-        var outputPerRun = getProducedAmount(pattern, key);
-        var runs = divideCeil(remaining, outputPerRun);
         path.add(key);
-
+        PlanError firstError = null;
         try {
-            for (var input : pattern.inputs()) {
-                var error = reduceTarget(input.key(), input.amount() * runs, ledger, steps, stepIndex, path, false);
-                if (error != null) {
-                    return error;
+            for (var pattern : candidates) {
+                var ledgerSnapshot = ledger.copy();
+                var stepCount = steps.size();
+                var stepIndexSnapshot = stepIndex.snapshot();
+                var outputPerRun = getProducedAmount(pattern, key);
+                var runs = divideCeil(remaining, outputPerRun);
+                PlanError error = null;
+                for (var input : pattern.inputs()) {
+                    error = reduceTarget(input.key(), input.amount() * runs, ledger, steps, stepIndex, path, false);
+                    if (error != null) {
+                        break;
+                    }
                 }
+                if (error == null) {
+                    for (var output : pattern.outputs()) {
+                        ledger.add(output.key(), output.amount() * runs);
+                    }
+                    steps.add(new CraftStep("step-" + stepIndex.next(), pattern, runs));
+                    ledger.consume(key, remaining);
+                    return null;
+                }
+                if (firstError == null) {
+                    firstError = error;
+                }
+                ledger.reset(ledgerSnapshot);
+                while (steps.size() > stepCount) {
+                    steps.remove(steps.size() - 1);
+                }
+                stepIndex.reset(stepIndexSnapshot);
             }
         } finally {
             path.remove(path.size() - 1);
         }
-
-        for (var output : pattern.outputs()) {
-            ledger.add(output.key(), output.amount() * runs);
-        }
-        steps.add(new CraftStep("step-" + stepIndex.next(), pattern, runs));
-
-        ledger.consume(key, remaining);
-        return null;
+        return firstError == null ? PlanError.unsatisfiedBaseResource(key) : firstError;
     }
 
-    private CraftPattern choosePattern(CraftKey key) {
+    private List<CraftPattern> choosePatterns(CraftKey key) {
         return patterns.findPatternsProducing(key).stream()
             .sorted(Comparator.comparing(CraftPattern::patternId))
-            .findFirst()
-            .orElse(null);
+            .toList();
     }
 
     private static long getProducedAmount(CraftPattern pattern, CraftKey key) {
@@ -110,6 +123,14 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
         private long next() {
             return value++;
+        }
+
+        private long snapshot() {
+            return value;
+        }
+
+        private void reset(long snapshot) {
+            value = snapshot;
         }
     }
 }
