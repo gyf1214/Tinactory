@@ -20,6 +20,7 @@ import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
+import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
@@ -97,6 +98,11 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     @Override
     public Class<SmeltingRecipe> baseClass() {
         return SmeltingRecipe.class;
+    }
+
+    @Override
+    public ResourceLocation recipeTypeId() {
+        return SmeltingRecipePatternSource.SMELTING_RECIPE_TYPE_ID;
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.shsts.tinactory.api.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 
 import java.util.List;
@@ -19,6 +20,10 @@ public interface IMachineProcessor extends IProcessor {
     long maxProgressTicks();
 
     double workSpeed();
+
+    default boolean supportsRecipeType(ResourceLocation recipeTypeId) {
+        return false;
+    }
 
     @Override
     default double getProgress() {

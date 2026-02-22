@@ -20,6 +20,8 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
+    ResourceLocation recipeTypeId();
+
     Class<T> baseClass();
 
     Optional<T> byLoc(Level world, ResourceLocation loc);
