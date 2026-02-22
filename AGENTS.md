@@ -1,5 +1,14 @@
 # AGENTS
 
+## Build
+- Use `./gradlew runData` to generate resources for `mod`.
+- Before `runData`, ensure `libs/tinactory_extra_resources_{version}.zip` exists (current: `libs/tinactory_extra_resources_v1.zip`).
+- Run `runData` once before testing/packaging, or whenever `datagen` changes.
+
+## Test
+- `mod`: run `./gradlew runGameTestServer` (server exits after all tests finish).
+- `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
+
 ## Format
 Common
 - Use LF (`\n`) line endings.
