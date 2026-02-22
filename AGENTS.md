@@ -20,6 +20,7 @@ Common
 - Continuation indent: 4 spaces.
 - Avoid multiline alignment.
 - Wrap lists/arguments/annotations/enum constants as needed (do not force one-per-line).
+- In wrapped calls/declarations, keep closing `)` on the same line as the final item (no dangling `)` line).
 
 ### Java
 - Avoid wildcard imports.
