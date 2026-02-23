@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 
 import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -65,7 +64,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     @Override
     public ResourceLocation recipeTypeId() {
-        return modLoc(recipeType.id());
+        return recipeType.loc();
     }
 
     @Override

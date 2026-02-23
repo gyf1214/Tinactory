@@ -15,7 +15,6 @@ import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public final class AutocraftServiceBootstrap {
             var recipeType = (IRecipeType<?>) info.recipeType();
             var recipes = (List<ProcessingRecipe>) (List<?>) recipeManager.getAllRecipesFor((IRecipeType) recipeType);
             patterns.addAll(new ProcessingRecipePatternSource(
-                LocHelper.modLoc(recipeType.id()),
+                recipeType.loc(),
                 recipes).loadPatterns());
         }
         var smelting = level.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
