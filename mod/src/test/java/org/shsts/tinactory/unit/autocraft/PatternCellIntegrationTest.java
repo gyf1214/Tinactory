@@ -1,12 +1,8 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.integration.PatternCellStorage;
-import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.integration.PatternCellPortState;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
@@ -20,29 +16,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PatternCellIntegrationTest {
     @Test
-    void patternCellShouldUseFixedByteAccounting() {
-        var tag = new CompoundTag();
-        var codec = new PatternNbtCodec(new MachineConstraintRegistry());
+    void patternCellCapabilityShouldUseFixedByteAccounting() {
+        var port = new PatternCellPortState(2048);
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
-        assertTrue(PatternCellStorage.insertPattern(tag, 2048, first, codec));
-        assertTrue(PatternCellStorage.insertPattern(tag, 2048, second, codec));
+        assertTrue(port.insert(first));
+        assertTrue(port.insert(second));
 
-        assertEquals(2, PatternCellStorage.listPatterns(tag, codec).size());
-        assertEquals(2 * PatternCellStorage.BYTES_PER_PATTERN, PatternCellStorage.bytesUsed(tag, codec));
+        assertEquals(2048, port.bytesCapacity());
+        assertEquals(2, port.patterns().size());
+        assertEquals(2 * PatternCellPortState.BYTES_PER_PATTERN, port.bytesUsed());
     }
 
     @Test
-    void patternCellShouldSkipInvalidEntries() {
-        var tag = new CompoundTag();
-        var codec = new PatternNbtCodec(new MachineConstraintRegistry());
-        var list = new ListTag();
-        list.add(new CompoundTag());
-        tag.put(PatternCellStorage.PATTERNS_KEY, list);
+    void patternCellCapabilityShouldPersistToItemTag() {
+        var port = new PatternCellPortState(2048);
+        var first = pattern("tinactory:first");
+        var second = pattern("tinactory:second");
 
-        assertEquals(0, PatternCellStorage.listPatterns(tag, codec).size());
-        assertFalse(PatternCellStorage.listPatterns(tag, codec).iterator().hasNext());
+        assertTrue(port.insert(first));
+        assertTrue(port.insert(second));
+        assertTrue(port.remove(first.patternId()));
+
+        var clonedPort = new PatternCellPortState(2048);
+        clonedPort.deserialize(port.serialize());
+
+        assertEquals(List.of(second), clonedPort.patterns());
+        assertFalse(clonedPort.remove(first.patternId()));
     }
 
     private static CraftPattern pattern(String id) {

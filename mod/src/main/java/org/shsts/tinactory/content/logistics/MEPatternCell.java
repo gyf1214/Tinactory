@@ -3,27 +3,38 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.integration.PatternCellStorage;
+import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.integration.PatternCellPortState;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.common.CapabilityItem;
+import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternCell extends CapabilityItem {
-    public static final int BYTES_PER_PATTERN = PatternCellStorage.BYTES_PER_PATTERN;
+    private static final ResourceLocation ID = modLoc("logistics/me_pattern_cell");
+    public static final int BYTES_PER_PATTERN = PatternCellPortState.BYTES_PER_PATTERN;
 
     private final int bytesLimit;
 
@@ -41,22 +52,26 @@ public class MEPatternCell extends CapabilityItem {
     }
 
     public int bytesUsed(ItemStack stack, PatternNbtCodec codec) {
-        return PatternCellStorage.bytesUsed(stack.getOrCreateTag(), codec);
+        return patternPort(stack).bytesUsed();
     }
 
     public int patternCount(ItemStack stack, PatternNbtCodec codec) {
-        return listPatterns(stack, codec).size();
+        return patternPort(stack).patterns().size();
     }
 
     public List<CraftPattern> listPatterns(ItemStack stack, PatternNbtCodec codec) {
-        return PatternCellStorage.listPatterns(stack.getOrCreateTag(), codec);
+        return patternPort(stack).patterns();
     }
 
     public boolean insertPattern(ItemStack stack, CraftPattern pattern, PatternNbtCodec codec) {
         if (!(stack.getItem() instanceof MEPatternCell)) {
             return false;
         }
-        return PatternCellStorage.insertPattern(stack.getOrCreateTag(), bytesLimit, pattern, codec);
+        return patternPort(stack).insert(pattern);
+    }
+
+    public IPatternCellPort patternPort(ItemStack stack) {
+        return stack.getCapability(PATTERN_CELL.get()).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
@@ -65,9 +80,8 @@ public class MEPatternCell extends CapabilityItem {
         @Nullable Level world,
         List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        var count = PatternCellStorage.listPatterns(stack.getOrCreateTag(), new PatternNbtCodec(
-            new MachineConstraintRegistry())).size();
-        var used = count * BYTES_PER_PATTERN;
+        var count = patternCount(stack, new PatternNbtCodec(new MachineConstraintRegistry()));
+        var used = bytesUsed(stack, new PatternNbtCodec(new MachineConstraintRegistry()));
         addTooltip(tooltip, "mePatternCell",
             NUMBER_FORMAT.format(count),
             NUMBER_FORMAT.format(used),
@@ -75,5 +89,69 @@ public class MEPatternCell extends CapabilityItem {
     }
 
     @Override
-    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {}
+    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
+        event.addCapability(ID, new PatternCapability(event.getObject(), bytesLimit));
+    }
+
+    private static final class PatternCapability extends ItemCapabilityProvider implements IPatternCellPort {
+        private final PatternCellPortState state;
+        private final LazyOptional<IPatternCellPort> patternCap;
+
+        private PatternCapability(ItemStack stack, int bytesLimit) {
+            super(stack, ID);
+            this.state = new PatternCellPortState(bytesLimit);
+            this.patternCap = LazyOptional.of(() -> this);
+        }
+
+        @Override
+        public int bytesCapacity() {
+            return state.bytesCapacity();
+        }
+
+        @Override
+        public int bytesUsed() {
+            return state.bytesUsed();
+        }
+
+        @Override
+        public List<CraftPattern> patterns() {
+            return state.patterns();
+        }
+
+        @Override
+        public boolean insert(CraftPattern pattern) {
+            if (!state.insert(pattern)) {
+                return false;
+            }
+            syncTag();
+            return true;
+        }
+
+        @Override
+        public boolean remove(String patternId) {
+            if (!state.remove(patternId)) {
+                return false;
+            }
+            syncTag();
+            return true;
+        }
+
+        @Override
+        protected CompoundTag serializeNBT() {
+            return state.serialize();
+        }
+
+        @Override
+        protected void deserializeNBT(CompoundTag tag) {
+            state.deserialize(tag);
+        }
+
+        @Override
+        public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+            if (cap == PATTERN_CELL.get()) {
+                return patternCap.cast();
+            }
+            return LazyOptional.empty();
+        }
+    }
 }
