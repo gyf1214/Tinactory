@@ -20,9 +20,9 @@ import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -154,17 +153,10 @@ public class LogisticComponent extends NotifierComponent {
             return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_NOT_VISIBLE);
         }
         var service = cpu.service();
-        if (service == null) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.SERVICE_UNAVAILABLE);
-        }
         if (service.isBusy()) {
             return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_BUSY);
         }
-        try {
-            return AutocraftSubmitResult.success(service.submit(targets));
-        } catch (IllegalStateException ignored) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_BUSY);
-        }
+        return AutocraftSubmitResult.success(service.submit(targets));
     }
 
     public Optional<AutocraftJob> findAutocraftJob(UUID id) {

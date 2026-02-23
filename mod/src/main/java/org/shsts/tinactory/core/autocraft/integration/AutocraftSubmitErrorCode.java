@@ -9,6 +9,5 @@ public enum AutocraftSubmitErrorCode {
     CPU_NOT_VISIBLE,
     CPU_OFFLINE,
     CPU_BUSY,
-    SERVICE_UNAVAILABLE,
     INVALID_REQUEST
 }
