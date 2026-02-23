@@ -31,9 +31,12 @@ class PatternNetworkApiTest {
     @Test
     void writeShouldAutoPlaceByPriorityThenMachineThenSlot() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var cellB = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(1, 0, 0), 8, 1, new FakePatternPort(1024));
-        var cellA = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(2, 0, 0), 8, 2, new FakePatternPort(1024));
-        var cellC = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(3, 0, 0), 8, 0, new FakePatternPort(1024));
+        var cellB = new NetworkPatternCell(
+            uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(1, 0, 0), 8, 1, new FakePatternPort(1024));
+        var cellA = new NetworkPatternCell(
+            uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(2, 0, 0), 8, 2, new FakePatternPort(1024));
+        var cellC = new NetworkPatternCell(
+            uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(3, 0, 0), 8, 0, new FakePatternPort(1024));
         component.registerPatternCell(cellB);
         component.registerPatternCell(cellA);
         component.registerPatternCell(cellC);
@@ -49,7 +52,8 @@ class PatternNetworkApiTest {
     @Test
     void writeShouldRejectWhenNoVisibleCapacity() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(0, 0, 0), 1, 0, new FakePatternPort(256));
+        var cell = new NetworkPatternCell(
+            uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(0, 0, 0), 1, 0, new FakePatternPort(256));
         component.registerPatternCell(cell);
         assertTrue(component.writePattern(pattern("tinactory:first")));
 
@@ -59,8 +63,10 @@ class PatternNetworkApiTest {
     @Test
     void readShouldReturnAllNetworkPatterns() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(1, 0, 0), 1, 0, new FakePatternPort(1024));
-        var other = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(9, 0, 0), 1, 0, new FakePatternPort(1024));
+        var cell = new NetworkPatternCell(
+            uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(1, 0, 0), 1, 0, new FakePatternPort(1024));
+        var other = new NetworkPatternCell(
+            uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(9, 0, 0), 1, 0, new FakePatternPort(1024));
         cell.insert(pattern("tinactory:one"));
         other.insert(pattern("tinactory:two"));
         component.registerPatternCell(cell);

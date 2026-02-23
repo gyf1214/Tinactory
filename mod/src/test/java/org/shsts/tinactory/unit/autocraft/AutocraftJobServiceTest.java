@@ -89,7 +89,7 @@ class AutocraftJobServiceTest {
         var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
 
         var first = service.submit(List.of(new CraftAmount(CraftKey.item("x:y1", ""), 1)));
-        assertThrows(IllegalStateException.class, () ->
+        assertThrows(AssertionError.class, () ->
             service.submit(List.of(new CraftAmount(CraftKey.item("x:y2", ""), 1))));
 
         assertEquals(
