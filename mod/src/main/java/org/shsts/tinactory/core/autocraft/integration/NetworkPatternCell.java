@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -17,15 +16,19 @@ public final class NetworkPatternCell {
     private final BlockPos subnet;
     private final int priority;
     private final int slotIndex;
-    private final int bytesCapacity;
-    private final List<CraftPattern> patterns = new ArrayList<>();
+    private final IPatternCellPort patternPort;
 
-    public NetworkPatternCell(UUID machineId, BlockPos subnet, int priority, int slotIndex, int bytesCapacity) {
+    public NetworkPatternCell(
+        UUID machineId,
+        BlockPos subnet,
+        int priority,
+        int slotIndex,
+        IPatternCellPort patternPort) {
         this.machineId = machineId;
         this.subnet = subnet;
         this.priority = priority;
         this.slotIndex = slotIndex;
-        this.bytesCapacity = bytesCapacity;
+        this.patternPort = patternPort;
     }
 
     public UUID machineId() {
@@ -45,24 +48,15 @@ public final class NetworkPatternCell {
     }
 
     public List<CraftPattern> patterns() {
-        return List.copyOf(patterns);
+        return patternPort.patterns();
     }
 
     public boolean insert(CraftPattern pattern) {
-        for (var existing : patterns) {
-            if (existing.patternId().equals(pattern.patternId())) {
-                return true;
-            }
-        }
-        if ((patterns.size() + 1) * PatternCellStorage.BYTES_PER_PATTERN > bytesCapacity) {
-            return false;
-        }
-        patterns.add(pattern);
-        return true;
+        return patternPort.insert(pattern);
     }
 
     public boolean remove(String patternId) {
-        return patterns.removeIf(pattern -> pattern.patternId().equals(patternId));
+        return patternPort.remove(patternId);
     }
 
     public static final Comparator<NetworkPatternCell> ORDER = Comparator

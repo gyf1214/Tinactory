@@ -26,6 +26,7 @@ import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
+import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -46,6 +47,7 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
 import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
@@ -189,6 +191,24 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         }
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);
+        if (machine != null) {
+            machine.network().ifPresent(network -> {
+                var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+                logistics.unregisterPatternCells(machine.uuid());
+                var subnet = network.getSubnet(blockEntity.getBlockPos());
+                var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+                for (var i = 0; i < slots; i++) {
+                    var stack = storages.getStackInSlot(i);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    var slotIndex = i;
+                    stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
+                        logistics.registerPatternCell(new NetworkPatternCell(
+                            machine.uuid(), subnet, priority, slotIndex, port)));
+                }
+            });
+        }
         onContainerChange();
     }
 

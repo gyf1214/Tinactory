@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -31,9 +32,9 @@ class PatternNetworkApiTest {
     void writeShouldAutoPlaceByPriorityThenMachineThenSlot() {
         var component = new LogisticComponent(null, new FakeNetwork());
         var subnet = new BlockPos(0, 0, 0);
-        var cellB = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), subnet, 8, 1, 1024);
-        var cellA = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 2, 1024);
-        var cellC = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 0, 1024);
+        var cellB = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), subnet, 8, 1, new FakePatternPort(1024));
+        var cellA = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 2, new FakePatternPort(1024));
+        var cellC = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 0, new FakePatternPort(1024));
         component.registerPatternCell(cellB);
         component.registerPatternCell(cellA);
         component.registerPatternCell(cellC);
@@ -50,7 +51,7 @@ class PatternNetworkApiTest {
     void writeShouldRejectWhenNoVisibleCapacity() {
         var component = new LogisticComponent(null, new FakeNetwork());
         var subnet = new BlockPos(0, 0, 0);
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, 256);
+        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, new FakePatternPort(256));
         component.registerPatternCell(cell);
         assertTrue(component.writePattern(subnet, pattern("tinactory:first")));
 
@@ -61,7 +62,7 @@ class PatternNetworkApiTest {
     void readShouldReturnVisiblePatterns() {
         var component = new LogisticComponent(null, new FakeNetwork());
         var subnet = new BlockPos(0, 0, 0);
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, 1024);
+        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, new FakePatternPort(1024));
         cell.insert(pattern("tinactory:one"));
         cell.insert(pattern("tinactory:two"));
         component.registerPatternCell(cell);
@@ -81,6 +82,47 @@ class PatternNetworkApiTest {
 
     private static UUID uuid(String value) {
         return UUID.fromString(value);
+    }
+
+    private static final class FakePatternPort implements IPatternCellPort {
+        private final int capacity;
+        private final List<CraftPattern> patterns = new java.util.ArrayList<>();
+
+        private FakePatternPort(int capacity) {
+            this.capacity = capacity;
+        }
+
+        @Override
+        public int bytesCapacity() {
+            return capacity;
+        }
+
+        @Override
+        public int bytesUsed() {
+            return patterns.size() * 256;
+        }
+
+        @Override
+        public List<CraftPattern> patterns() {
+            return List.copyOf(patterns);
+        }
+
+        @Override
+        public boolean insert(CraftPattern pattern) {
+            if (patterns.stream().anyMatch($ -> $.patternId().equals(pattern.patternId()))) {
+                return true;
+            }
+            if ((patterns.size() + 1) * 256 > capacity) {
+                return false;
+            }
+            patterns.add(pattern);
+            return true;
+        }
+
+        @Override
+        public boolean remove(String patternId) {
+            return patterns.removeIf($ -> $.patternId().equals(patternId));
+        }
     }
 
     private static final class FakeNetwork implements INetwork {
