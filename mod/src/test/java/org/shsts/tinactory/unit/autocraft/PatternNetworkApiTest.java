@@ -31,15 +31,14 @@ class PatternNetworkApiTest {
     @Test
     void writeShouldAutoPlaceByPriorityThenMachineThenSlot() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var subnet = new BlockPos(0, 0, 0);
-        var cellB = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), subnet, 8, 1, new FakePatternPort(1024));
-        var cellA = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 2, new FakePatternPort(1024));
-        var cellC = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 8, 0, new FakePatternPort(1024));
+        var cellB = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(1, 0, 0), 8, 1, new FakePatternPort(1024));
+        var cellA = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(2, 0, 0), 8, 2, new FakePatternPort(1024));
+        var cellC = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(3, 0, 0), 8, 0, new FakePatternPort(1024));
         component.registerPatternCell(cellB);
         component.registerPatternCell(cellA);
         component.registerPatternCell(cellC);
 
-        var ok = component.writePattern(subnet, pattern("tinactory:target"));
+        var ok = component.writePattern(pattern("tinactory:target"));
 
         assertTrue(ok);
         assertEquals(1, cellC.patterns().size());
@@ -50,24 +49,24 @@ class PatternNetworkApiTest {
     @Test
     void writeShouldRejectWhenNoVisibleCapacity() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var subnet = new BlockPos(0, 0, 0);
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, new FakePatternPort(256));
+        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(0, 0, 0), 1, 0, new FakePatternPort(256));
         component.registerPatternCell(cell);
-        assertTrue(component.writePattern(subnet, pattern("tinactory:first")));
+        assertTrue(component.writePattern(pattern("tinactory:first")));
 
-        assertFalse(component.writePattern(subnet, pattern("tinactory:second")));
+        assertFalse(component.writePattern(pattern("tinactory:second")));
     }
 
     @Test
-    void readShouldReturnVisiblePatterns() {
+    void readShouldReturnAllNetworkPatterns() {
         var component = new LogisticComponent(null, new FakeNetwork());
-        var subnet = new BlockPos(0, 0, 0);
-        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), subnet, 1, 0, new FakePatternPort(1024));
+        var cell = new NetworkPatternCell(uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), new BlockPos(1, 0, 0), 1, 0, new FakePatternPort(1024));
+        var other = new NetworkPatternCell(uuid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), new BlockPos(9, 0, 0), 1, 0, new FakePatternPort(1024));
         cell.insert(pattern("tinactory:one"));
-        cell.insert(pattern("tinactory:two"));
+        other.insert(pattern("tinactory:two"));
         component.registerPatternCell(cell);
+        component.registerPatternCell(other);
 
-        var ids = component.listVisiblePatterns(subnet).stream().map(CraftPattern::patternId).toList();
+        var ids = component.listVisiblePatterns().stream().map(CraftPattern::patternId).toList();
 
         assertEquals(List.of("tinactory:one", "tinactory:two"), ids);
     }

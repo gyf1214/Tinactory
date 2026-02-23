@@ -200,9 +200,8 @@ public class LogisticComponent extends NotifierComponent {
         patternCells.removeIf(cell -> cell.machineId().equals(machineId));
     }
 
-    public List<CraftPattern> listVisiblePatterns(BlockPos subnet) {
+    public List<CraftPattern> listVisiblePatterns() {
         var ordered = patternCells.stream()
-            .filter(cell -> cell.subnet().equals(subnet))
             .sorted(NetworkPatternCell.ORDER)
             .toList();
 
@@ -220,9 +219,8 @@ public class LogisticComponent extends NotifierComponent {
         return out;
     }
 
-    public boolean writePattern(BlockPos subnet, CraftPattern pattern) {
+    public boolean writePattern(CraftPattern pattern) {
         var ordered = patternCells.stream()
-            .filter(cell -> cell.subnet().equals(subnet))
             .sorted(NetworkPatternCell.ORDER)
             .toList();
         for (var cell : ordered) {
@@ -233,9 +231,8 @@ public class LogisticComponent extends NotifierComponent {
         return false;
     }
 
-    public boolean removePattern(BlockPos subnet, String patternId) {
+    public boolean removePattern(String patternId) {
         var ordered = patternCells.stream()
-            .filter(cell -> cell.subnet().equals(subnet))
             .sorted(NetworkPatternCell.ORDER)
             .toList();
         for (var cell : ordered) {
@@ -246,9 +243,9 @@ public class LogisticComponent extends NotifierComponent {
         return false;
     }
 
-    public boolean updatePattern(BlockPos subnet, CraftPattern pattern) {
-        removePattern(subnet, pattern.patternId());
-        return writePattern(subnet, pattern);
+    public boolean updatePattern(CraftPattern pattern) {
+        removePattern(pattern.patternId());
+        return writePattern(pattern);
     }
 
     @Override
