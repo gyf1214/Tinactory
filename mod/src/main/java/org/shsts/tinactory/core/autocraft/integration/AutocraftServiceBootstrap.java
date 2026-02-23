@@ -10,18 +10,15 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
-import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 
 import java.util.UUID;
-
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AutocraftServiceBootstrap {
     private AutocraftServiceBootstrap() {}
 
-    @SuppressWarnings("unchecked")
     public static AutocraftJobService create(
         BlockEntity blockEntity,
         INetwork network,
@@ -45,14 +42,5 @@ public final class AutocraftServiceBootstrap {
             inventory::snapshotAvailable);
     }
 
-    private static final class SilentJobEvents implements IJobEvents {
-        @Override
-        public void onStepStarted(CraftStep step) {}
-
-        @Override
-        public void onStepCompleted(CraftStep step) {}
-
-        @Override
-        public void onStepBlocked(CraftStep step, String reason) {}
-    }
+    private static final class SilentJobEvents implements IJobEvents {}
 }

@@ -7,12 +7,9 @@ import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IJobEvents {
-    default void onStepStarted(CraftStep step) {
-    }
+    default void onStepStarted(CraftStep step) {}
 
-    default void onStepCompleted(CraftStep step) {
-    }
+    default void onStepCompleted(CraftStep step) {}
 
-    default void onStepBlocked(CraftStep step, String reason) {
-    }
+    default void onStepBlocked(CraftStep step, String reason) {}
 }

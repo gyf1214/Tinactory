@@ -23,7 +23,6 @@ import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternCell extends CapabilityItem {
-    public static final String PATTERNS_KEY = PatternCellStorage.PATTERNS_KEY;
     public static final int BYTES_PER_PATTERN = PatternCellStorage.BYTES_PER_PATTERN;
 
     private final int bytesLimit;

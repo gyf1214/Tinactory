@@ -22,8 +22,8 @@ import java.util.Objects;
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -54,14 +54,12 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         service = AutocraftServiceBootstrap.create(
             blockEntity, network, logistics, combinedItem, combinedFluid, machine.uuid());
-        if (pendingSnapshot != null && service != null) {
+        if (pendingSnapshot != null) {
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;
         }
-        if (service != null) {
-            logistics.registerAutocraftCpu(machine, network.getSubnet(blockEntity.getBlockPos()), service);
-            lastSnapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(null);
-        }
+        logistics.registerAutocraftCpu(machine, network.getSubnet(blockEntity.getBlockPos()), service);
+        lastSnapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(null);
         blockEntity.setChanged();
     }
 

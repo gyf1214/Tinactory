@@ -112,14 +112,5 @@ class AutocraftCpuPersistenceTest {
         }
     }
 
-    private static final class NoOpEvents implements IJobEvents {
-        @Override
-        public void onStepStarted(CraftStep step) {}
-
-        @Override
-        public void onStepCompleted(CraftStep step) {}
-
-        @Override
-        public void onStepBlocked(CraftStep step, String reason) {}
-    }
+    private static final class NoOpEvents implements IJobEvents {}
 }
