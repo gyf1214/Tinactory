@@ -5,6 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
@@ -66,7 +68,7 @@ public final class ProcessingRecipePatternSource {
     }
 
     @Nullable
-    private static CraftAmount convertIngredient(org.shsts.tinactory.api.recipe.IProcessingIngredient ingredient) {
+    private static CraftAmount convertIngredient(IProcessingIngredient ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             return new CraftAmount(LogisticsInventoryView.fromItemStack(item.stack()), item.stack().getCount());
         }
@@ -93,7 +95,7 @@ public final class ProcessingRecipePatternSource {
     }
 
     @Nullable
-    private static CraftAmount convertResult(org.shsts.tinactory.api.recipe.IProcessingResult result) {
+    private static CraftAmount convertResult(IProcessingResult result) {
         if (result instanceof ProcessingResults.ItemResult item) {
             if (item.rate < 1d) {
                 return null;

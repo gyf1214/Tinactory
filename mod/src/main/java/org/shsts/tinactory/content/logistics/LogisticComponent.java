@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -133,7 +134,7 @@ public class LogisticComponent extends NotifierComponent {
         autocraftBootstrap = bootstrap;
     }
 
-    public UUID submitAutocraft(java.util.List<CraftAmount> targets) {
+    public UUID submitAutocraft(List<CraftAmount> targets) {
         if (autocraftJobService == null) {
             throw new IllegalStateException("Autocraft job service is not initialized");
         }
@@ -144,8 +145,8 @@ public class LogisticComponent extends NotifierComponent {
         return autocraftJobService == null ? Optional.empty() : autocraftJobService.findJob(id);
     }
 
-    public java.util.List<AutocraftJob> listAutocraftJobs() {
-        return autocraftJobService == null ? java.util.List.of() : autocraftJobService.listJobs();
+    public List<AutocraftJob> listAutocraftJobs() {
+        return autocraftJobService == null ? List.of() : autocraftJobService.listJobs();
     }
 
     public boolean cancelAutocraft(UUID id) {

@@ -24,6 +24,8 @@ Common
 
 ### Java
 - Avoid wildcard imports.
+- Do not use fully qualified class names in code; always import types.
+- Avoid duplicate type names in the same file/import set.
 - Import order: non-`java` imports, blank line, `java.*`, blank line, static imports.
 - Keep simple methods, lambdas, and classes on one line when possible.
 - Always use braces for `if`, `for`, `while`, and `do-while`.

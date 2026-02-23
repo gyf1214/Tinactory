@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.autocraft.integration;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
@@ -27,7 +28,7 @@ public final class SmeltingRecipePatternSource {
     public List<CraftPattern> loadPatterns() {
         var patterns = new ArrayList<CraftPattern>();
         for (var recipe : recipes) {
-            var choices = recipe.getIngredients().isEmpty() ? List.<net.minecraft.world.item.ItemStack>of() :
+            var choices = recipe.getIngredients().isEmpty() ? List.<ItemStack>of() :
                 List.of(recipe.getIngredients().get(0).getItems());
             if (choices.isEmpty()) {
                 continue;

@@ -8,13 +8,15 @@ import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 
+import java.util.List;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class SequentialCraftExecutor implements ICraftExecutor {
     private final IInventoryView inventory;
     private final IMachineAllocator machineAllocator;
     private final IJobEvents jobEvents;
-    private CraftPlan plan = new CraftPlan(java.util.List.of());
+    private CraftPlan plan = new CraftPlan(List.of());
     private int nextStep = 0;
     private ExecutionState state = ExecutionState.IDLE;
     @Nullable

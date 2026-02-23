@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
@@ -63,12 +64,12 @@ public final class AutocraftServiceBootstrap {
 
     private static final class SilentJobEvents implements IJobEvents {
         @Override
-        public void onStepStarted(org.shsts.tinactory.core.autocraft.plan.CraftStep step) {}
+        public void onStepStarted(CraftStep step) {}
 
         @Override
-        public void onStepCompleted(org.shsts.tinactory.core.autocraft.plan.CraftStep step) {}
+        public void onStepCompleted(CraftStep step) {}
 
         @Override
-        public void onStepBlocked(org.shsts.tinactory.core.autocraft.plan.CraftStep step, String reason) {}
+        public void onStepBlocked(CraftStep step, String reason) {}
     }
 }

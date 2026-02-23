@@ -13,6 +13,7 @@ import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.autocraft.plan.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 
@@ -121,7 +122,7 @@ class AutocraftJobServiceTest {
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
     }
 
-    private record TestPlanner(PlanResult result) implements org.shsts.tinactory.core.autocraft.plan.ICraftPlanner {
+    private record TestPlanner(PlanResult result) implements ICraftPlanner {
         @Override
         public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
             return result;

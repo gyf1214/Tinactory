@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.network.MachineBlock;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.function.BiPredicate;
@@ -19,11 +20,11 @@ import java.util.function.ToIntFunction;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsMachineAllocator implements IMachineAllocator {
-    private final Supplier<java.util.Collection<LogisticComponent.PortInfo>> visiblePorts;
+    private final Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts;
     private final ToIntFunction<IMachine> voltageRankResolver;
     private final BiPredicate<IMachine, ResourceLocation> recipeSupport;
 
-    public LogisticsMachineAllocator(Supplier<java.util.Collection<LogisticComponent.PortInfo>> visiblePorts) {
+    public LogisticsMachineAllocator(Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts) {
         this(
             visiblePorts,
             machine -> MachineBlock.getBlockVoltage(machine.blockEntity()).rank,
@@ -35,7 +36,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     public LogisticsMachineAllocator(
-        Supplier<java.util.Collection<LogisticComponent.PortInfo>> visiblePorts,
+        Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts,
         ToIntFunction<IMachine> voltageRankResolver,
         BiPredicate<IMachine, ResourceLocation> recipeSupport) {
 
