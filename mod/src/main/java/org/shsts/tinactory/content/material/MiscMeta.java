@@ -19,7 +19,10 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
+import org.shsts.tinactory.content.autocraft.AutocraftCpu;
 import org.shsts.tinactory.content.logistics.MEDrive;
+import org.shsts.tinactory.content.logistics.MEPatternCellSet;
+import org.shsts.tinactory.content.logistics.MEPatternCell;
 import org.shsts.tinactory.content.logistics.MESignalController;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
@@ -48,6 +51,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllItems.PATTERN_CELLS;
 import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
@@ -221,6 +225,31 @@ public class MiscMeta extends MetaConsumer {
         STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid));
     }
 
+    private void mePatternCell(String name, String id, JsonObject jo) {
+        var parent = LocHelper.name(id, -2);
+        var prefix = id.substring(0, id.length() - parent.length() - name.length() - 1);
+        var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
+        var bytes = GsonHelper.getAsInt(jo, "bytes");
+
+        var component = REGISTRATE.item(componentPrefix + "/" + name).register();
+        var pattern = REGISTRATE.item(prefix + parent + "/" + name, MEPatternCell.patternCell(bytes)).register();
+        PATTERN_CELLS.add(new MEPatternCellSet(component, pattern));
+    }
+
+    private void autocraftCpu(String id, JsonObject jo) {
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id,
+                MachineBlocks.simple(tooltip -> {
+                    addTooltip(tooltip, "autocraftCpu");
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                }))
+            .transform(MachineSet::baseMachine)
+            .blockEntity()
+            .transform(AutocraftCpu.factory(power))
+            .end()
+            .build();
+    }
+
     private void boiler(String id, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
@@ -273,8 +302,10 @@ public class MiscMeta extends MetaConsumer {
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);
+            case "me_pattern_cell" -> mePatternCell(name, id, jo);
             case "me_signal_controller" -> meSignalController(id, jo);
             case "me_storage_detector" -> meStorageDetector(id, jo);
+            case "autocraft_cpu" -> autocraftCpu(id, jo);
             case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }

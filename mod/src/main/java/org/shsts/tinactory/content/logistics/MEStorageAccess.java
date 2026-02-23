@@ -13,7 +13,6 @@ import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftServiceBootstrap;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.CombinedFluidPort;
 import org.shsts.tinactory.core.logistics.CombinedItemPort;
@@ -68,8 +67,6 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     protected void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.onUpdate(() -> onUpdateLogistics(logistics));
-        logistics.registerAutocraftBootstrap(
-            () -> AutocraftServiceBootstrap.create(blockEntity, network, logistics, combinedItem, combinedFluid));
     }
 
     public void onUpdate(Runnable listener) {

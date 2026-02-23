@@ -49,6 +49,7 @@ public final class AllTags {
     public static final TagKey<Item> STORAGE_CELL = modItem("storage_cell");
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
+    public static final TagKey<Item> PATTERN_STORAGE_CELL = extend(STORAGE_CELL, "pattern");
     public static final TagKey<Item> NUCLEAR_ITEM = modItem("nuclear");
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {

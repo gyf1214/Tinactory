@@ -5,6 +5,7 @@ import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ITEM_STORAGE_CELL
+import org.shsts.tinactory.AllTags.PATTERN_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ORE_BASE_DUST
 import org.shsts.tinactory.AllTags.STORAGE_CELL
 import org.shsts.tinactory.AllTags.TOOL
@@ -288,6 +289,7 @@ object MiscMaterials {
 
             tag(ITEM_STORAGE_CELL, STORAGE_CELL)
             tag(FLUID_STORAGE_CELL, STORAGE_CELL)
+            tag(PATTERN_STORAGE_CELL, STORAGE_CELL)
         }
     }
 }

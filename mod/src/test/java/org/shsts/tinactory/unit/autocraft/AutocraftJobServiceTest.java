@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftJobServiceTest {
@@ -83,10 +84,11 @@ class AutocraftJobServiceTest {
         var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
 
         var first = service.submit(List.of(new CraftAmount(CraftKey.item("x:y1", ""), 1)));
-        var second = service.submit(List.of(new CraftAmount(CraftKey.item("x:y2", ""), 1)));
+        assertThrows(IllegalStateException.class, () ->
+            service.submit(List.of(new CraftAmount(CraftKey.item("x:y2", ""), 1))));
 
         assertEquals(
-            List.of(first, second),
+            List.of(first),
             service.listJobs().stream().map(AutocraftJob::id).collect(Collectors.toList()));
     }
 

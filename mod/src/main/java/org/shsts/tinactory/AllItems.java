@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.electric.Circuits;
+import org.shsts.tinactory.content.logistics.MEPatternCellSet;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
 import org.shsts.tinactory.content.material.RubberTreeGrower;
@@ -32,6 +33,7 @@ public final class AllItems {
     public static final Map<String, Map<Voltage, ? extends Supplier<? extends ItemLike>>> COMPONENTS;
 
     public static final List<MEStorageCellSet> STORAGE_CELLS;
+    public static final List<MEPatternCellSet> PATTERN_CELLS;
 
     public static final IEntry<RubberLogBlock> RUBBER_LOG;
     public static final IEntry<LeavesBlock> RUBBER_LEAVES;
@@ -40,6 +42,7 @@ public final class AllItems {
     static {
         COMPONENTS = new HashMap<>();
         STORAGE_CELLS = new ArrayList<>();
+        PATTERN_CELLS = new ArrayList<>();
 
         Circuits.buildBoards();
 

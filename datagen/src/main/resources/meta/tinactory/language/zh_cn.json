@@ -408,6 +408,7 @@
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",
     "item[.]tinactory[.]component[.]storage_component[.](.*)": "$1 ME存储组件",
+    "item[.]tinactory[.]component[.]pattern_storage_component[.](.*)": "$1 ME图样存储组件",
     "item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)": "$2$1",
     "item[.]tinactory[.]component[.](.*)[.](.*)": "$1$2",
     "item[.]tinactory[.]component[.](.*)": "$1",
@@ -434,6 +435,7 @@
     "item[.]tinactory[.]wafer[.](.*)": "$1晶圆",
     "item[.]tinactory[.]chip[.](.*)": "$1芯片",
     "item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)": "$2 ME$1",
+    "item[.]tinactory[.]logistics[.](.*_pattern_cell)[.](.*)": "$2 ME$1",
     "block[.]tinactory[.]material[.]ore[.](.*)": "$1矿石",
     "block[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",
     "block[.]tinactory[.]machine[.](.*)[.](.*)": "$1$2",

@@ -30,10 +30,17 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
     @Override
     public void start(CraftPlan plan) {
+        start(plan, 0);
+    }
+
+    public void start(CraftPlan plan, int nextStepIndex) {
         this.plan = plan;
-        nextStep = 0;
+        nextStep = nextStepIndex;
         error = null;
         state = plan.steps().isEmpty() ? ExecutionState.COMPLETED : ExecutionState.RUNNING;
+        if (nextStep >= plan.steps().size()) {
+            state = ExecutionState.COMPLETED;
+        }
     }
 
     @Override
@@ -97,6 +104,14 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     @Override
     public @Nullable ExecutionError error() {
         return error;
+    }
+
+    public CraftPlan currentPlan() {
+        return plan;
+    }
+
+    public int nextStepIndex() {
+        return nextStep;
     }
 
     private String nextStepId() {
