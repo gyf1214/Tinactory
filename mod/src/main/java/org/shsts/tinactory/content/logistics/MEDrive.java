@@ -20,13 +20,14 @@ import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.CombinedFluidPort;
 import org.shsts.tinactory.core.logistics.CombinedItemPort;
-import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
+import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -37,7 +38,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
@@ -64,6 +64,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
     public static final int PRIORITY_DEFAULT = 2;
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
+
+    public record ByteStats(int bytesUsed, int bytesCapacity) {}
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "logistics/me_drive";
@@ -112,36 +114,42 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public int bytesCapacity() {
-        var ret = 0;
-        for (var i = 0; i < storages.getSlots(); i++) {
-            var storage = storages.getStackInSlot(i);
-            if (storage.isEmpty()) {
-                continue;
-            }
-            var cap = storage.getCapability(DIGITAL_PROVIDER.get());
-            if (cap.isPresent()) {
-                var cap1 = cap.orElseThrow(NoSuchElementException::new);
-                ret += cap1.bytesCapacity();
-            }
-        }
-        return ret;
+        return collectByteStats().bytesCapacity();
     }
 
     @Override
     public int bytesUsed() {
-        var ret = 0;
+        return collectByteStats().bytesUsed();
+    }
+
+    private ByteStats collectByteStats() {
+        var digital = new ArrayList<IBytesProvider>();
+        var patterns = new ArrayList<IPatternCellPort>();
         for (var i = 0; i < storages.getSlots(); i++) {
             var storage = storages.getStackInSlot(i);
             if (storage.isEmpty()) {
                 continue;
             }
-            var cap = storage.getCapability(DIGITAL_PROVIDER.get());
-            if (cap.isPresent()) {
-                var cap1 = cap.orElseThrow(NoSuchElementException::new);
-                ret += cap1.bytesUsed();
-            }
+            storage.getCapability(DIGITAL_PROVIDER.get()).ifPresent(digital::add);
+            storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
         }
-        return ret;
+        return aggregateByteStats(digital, patterns);
+    }
+
+    public static ByteStats aggregateByteStats(
+        Iterable<? extends IBytesProvider> digitalProviders,
+        Iterable<? extends IPatternCellPort> patternPorts) {
+        var bytesUsed = 0;
+        var bytesCapacity = 0;
+        for (var provider : digitalProviders) {
+            bytesUsed += provider.bytesUsed();
+            bytesCapacity += provider.bytesCapacity();
+        }
+        for (var patternPort : patternPorts) {
+            bytesUsed += patternPort.bytesUsed();
+            bytesCapacity += patternPort.bytesCapacity();
+        }
+        return new ByteStats(bytesUsed, bytesCapacity);
     }
 
     private int updateSignal() {

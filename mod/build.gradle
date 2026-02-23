@@ -71,6 +71,7 @@ dependencies {
 
     testImplementation platform('org.junit:junit-bom:5.12.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testCompileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
