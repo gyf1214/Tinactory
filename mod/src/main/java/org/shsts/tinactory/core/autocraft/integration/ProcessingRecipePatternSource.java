@@ -22,49 +22,47 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public final class ProcessingRecipePatternSource {
     private final ResourceLocation recipeTypeId;
-    private final List<? extends ProcessingRecipe> recipes;
 
-    public ProcessingRecipePatternSource(ResourceLocation recipeTypeId, List<? extends ProcessingRecipe> recipes) {
+    public ProcessingRecipePatternSource(ResourceLocation recipeTypeId) {
         this.recipeTypeId = recipeTypeId;
-        this.recipes = recipes;
     }
 
-    public List<CraftPattern> loadPatterns() {
-        var patterns = new ArrayList<CraftPattern>();
-        for (var recipe : recipes) {
-            var inputs = new ArrayList<CraftAmount>();
-            var outputs = new ArrayList<CraftAmount>();
-            var ok = true;
-            for (var input : recipe.inputs) {
-                var converted = convertIngredient(input.ingredient());
-                if (converted == null) {
-                    ok = false;
-                    break;
-                }
-                inputs.add(converted);
+    @Nullable
+    public CraftPattern convertRecipe(ProcessingRecipe recipe) {
+        var inputs = recipe.inputs.stream().map(ProcessingRecipe.Input::ingredient).toList();
+        var outputs = recipe.outputs.stream().map(ProcessingRecipe.Output::result).toList();
+        return convertRecipe(recipe.loc().toString(), inputs, outputs);
+    }
+
+    @Nullable
+    public CraftPattern convertRecipe(
+        String patternId,
+        List<? extends IProcessingIngredient> inputObjects,
+        List<? extends IProcessingResult> outputObjects) {
+        var inputs = new ArrayList<CraftAmount>();
+        var outputs = new ArrayList<CraftAmount>();
+        for (var input : inputObjects) {
+            var converted = convertIngredient(input);
+            if (converted == null) {
+                return null;
             }
-            if (!ok) {
-                continue;
-            }
-            for (var output : recipe.outputs) {
-                var converted = convertResult(output.result());
-                if (converted == null) {
-                    ok = false;
-                    break;
-                }
-                outputs.add(converted);
-            }
-            if (!ok || outputs.isEmpty()) {
-                continue;
-            }
-            patterns.add(new CraftPattern(
-                recipe.loc().toString(),
-                inputs,
-                outputs,
-                new MachineRequirement(recipeTypeId, 0, List.of())));
+            inputs.add(converted);
         }
-        patterns.sort(Comparator.comparing(CraftPattern::patternId));
-        return patterns;
+        for (var output : outputObjects) {
+            var converted = convertResult(output);
+            if (converted == null) {
+                return null;
+            }
+            outputs.add(converted);
+        }
+        if (outputs.isEmpty()) {
+            return null;
+        }
+        return new CraftPattern(
+            patternId,
+            inputs,
+            outputs,
+            new MachineRequirement(recipeTypeId, 0, List.of()));
     }
 
     @Nullable
