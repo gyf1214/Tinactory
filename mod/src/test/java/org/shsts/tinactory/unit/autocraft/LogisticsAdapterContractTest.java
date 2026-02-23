@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -25,10 +26,12 @@ import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,15 +52,22 @@ class LogisticsAdapterContractTest {
     }
 
     @Test
-    void allocatorShouldUseRecipeTypeCapabilityProbe() {
+    void allocatorShouldAllocateLeaseWithRecipeTypeCapabilityProbe() {
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "smelting"), 0, List.of());
         var machine = new FakeMachine();
         var allocator = new LogisticsMachineAllocator(
-            () -> List.of(new PortInfo(machine, 0, IPort.EMPTY, BlockPos.ZERO, 0)),
+            () -> List.of(new PortInfo(machine, 0, new FakeItemPort(), BlockPos.ZERO, 0)),
             $ -> 0,
             ($, recipeTypeId) -> recipeTypeId.equals(requirement.recipeTypeId()));
 
-        assertTrue(allocator.canRun(requirement));
+        var lease = allocator.allocate(new CraftStep("s1", new CraftPattern(
+            "tinactory:test",
+            List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(CraftKey.item("minecraft:stone", ""), 1)),
+            requirement), 1));
+
+        assertTrue(lease.isPresent());
+        assertEquals(machine.uuid(), lease.orElseThrow().machineId());
     }
 
     @Test
@@ -69,7 +79,23 @@ class LogisticsAdapterContractTest {
             $ -> 0,
             ($, recipeTypeId) -> false);
 
-        assertFalse(allocator.canRun(requirement));
+        var lease = allocator.allocate(new CraftStep("s1", new CraftPattern(
+            "tinactory:test",
+            List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(CraftKey.item("minecraft:stone", ""), 1)),
+            requirement), 1));
+
+        assertTrue(lease.isEmpty());
+    }
+
+    @Test
+    void leaseReleaseShouldBeIdempotent() {
+        var lease = new TestLease();
+
+        lease.release();
+        lease.release();
+
+        assertFalse(lease.isValid());
     }
 
     private static CraftPattern pattern(String id, CraftKey key) {
@@ -78,6 +104,72 @@ class LogisticsAdapterContractTest {
             List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(key, 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+    }
+
+    private static final class TestLease implements org.shsts.tinactory.core.autocraft.api.IMachineLease {
+        private boolean released;
+
+        @Override
+        public UUID machineId() {
+            return UUID.randomUUID();
+        }
+
+        @Override
+        public List<org.shsts.tinactory.core.autocraft.api.IMachineInputRoute> inputRoutes() {
+            return List.of();
+        }
+
+        @Override
+        public List<org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute> outputRoutes() {
+            return List.of();
+        }
+
+        @Override
+        public boolean isValid() {
+            return !released;
+        }
+
+        @Override
+        public void release() {
+            released = true;
+        }
+    }
+
+    private static final class FakeItemPort implements IItemPort {
+        @Override
+        public boolean acceptInput(ItemStack stack) {
+            return true;
+        }
+
+        @Override
+        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack extractItem(ItemStack item, boolean simulate) {
+            return item.copy();
+        }
+
+        @Override
+        public ItemStack extractItem(int limit, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getItemCount(ItemStack item) {
+            return 64;
+        }
+
+        @Override
+        public Collection<ItemStack> getAllItems() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return true;
+        }
     }
 
     private static final class FakeMachine implements IMachine {

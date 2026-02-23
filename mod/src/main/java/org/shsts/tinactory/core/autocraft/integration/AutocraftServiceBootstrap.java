@@ -25,7 +25,10 @@ public final class AutocraftServiceBootstrap {
         LogisticComponent logistics,
         IItemPort itemPort,
         IFluidPort fluidPort,
-        UUID cpuId) {
+        UUID cpuId,
+        long bufferLimit,
+        long transmissionBandwidth,
+        int executionIntervalTicks) {
 
         var level = blockEntity.getLevel();
         if (level == null || level.isClientSide) {
@@ -38,9 +41,12 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftJobService(
             cpuId,
             planner,
-            () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
-            inventory::snapshotAvailable);
+            () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents(), bufferLimit),
+            inventory::snapshotAvailable,
+            transmissionBandwidth,
+            executionIntervalTicks);
     }
 
-    private static final class SilentJobEvents implements IJobEvents {}
+    private static final class SilentJobEvents implements IJobEvents {
+    }
 }

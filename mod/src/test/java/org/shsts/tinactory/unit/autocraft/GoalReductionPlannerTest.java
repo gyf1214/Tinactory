@@ -92,6 +92,8 @@ class GoalReductionPlannerTest {
         assertEquals(
             List.of("tinactory:refine_oil", "tinactory:residue_to_carbon"),
             result.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
+        assertEquals(List.of(new CraftAmount(plastic, 1)), result.plan().steps().get(0).requiredOutputs());
+        assertEquals(List.of(new CraftAmount(carbon, 1)), result.plan().steps().get(1).requiredOutputs());
     }
 
     @Test

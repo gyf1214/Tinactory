@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
+import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
+import org.shsts.tinactory.core.autocraft.api.IMachineLease;
+import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
@@ -20,6 +23,7 @@ import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,12 +41,15 @@ class AutocraftCpuPersistenceTest {
         var jobId = first.submit(List.of(target));
         first.tick();
         first.tick();
+        first.tick();
         var snapshot = first.snapshotRunning().orElseThrow();
 
         var restored = new AutocraftJobService(cpuId, planner, AutocraftCpuPersistenceTest::executor, List::of);
         restored.restoreRunning(snapshot);
         assertEquals(AutocraftJob.Status.RUNNING, restored.job(jobId).status());
 
+        restored.tick();
+        restored.tick();
         restored.tick();
         assertEquals(AutocraftJob.Status.DONE, restored.job(jobId).status());
     }
@@ -59,7 +66,7 @@ class AutocraftCpuPersistenceTest {
         var snapshot = service.snapshotRunning().orElseThrow();
 
         assertEquals(cpuId, snapshot.cpuId());
-        assertTrue(snapshot.nextStepIndex() >= 0);
+        assertTrue(snapshot.runtimeSnapshot().nextStepIndex() >= 0);
     }
 
     private static CraftStep step(String id) {
@@ -90,27 +97,78 @@ class AutocraftCpuPersistenceTest {
         }
 
         @Override
-        public boolean consume(CraftKey key, long amount) {
+        public long extract(CraftKey key, long amount, boolean simulate) {
             var current = amountOf(key);
-            if (current < amount) {
-                return false;
+            var moved = Math.min(current, amount);
+            if (!simulate) {
+                amounts.put(key, current - moved);
             }
-            amounts.put(key, current - amount);
-            return true;
+            return moved;
         }
 
         @Override
-        public void produce(CraftKey key, long amount) {
-            amounts.put(key, amountOf(key) + amount);
+        public long insert(CraftKey key, long amount, boolean simulate) {
+            var moved = Math.max(0L, amount);
+            if (!simulate) {
+                amounts.put(key, amountOf(key) + moved);
+            }
+            return moved;
         }
     }
 
     private static final class AlwaysMachineAllocator implements IMachineAllocator {
         @Override
-        public boolean canRun(MachineRequirement requirement) {
-            return true;
+        public Optional<IMachineLease> allocate(CraftStep step) {
+            return Optional.of(new IMachineLease() {
+                @Override
+                public UUID machineId() {
+                    return UUID.fromString("11111111-1111-1111-1111-111111111111");
+                }
+
+                @Override
+                public List<IMachineInputRoute> inputRoutes() {
+                    return step.pattern().inputs().stream().map(input -> (IMachineInputRoute) new IMachineInputRoute() {
+                        @Override
+                        public CraftKey key() {
+                            return input.key();
+                        }
+
+                        @Override
+                        public long push(long amount, boolean simulate) {
+                            return amount;
+                        }
+                    }).toList();
+                }
+
+                @Override
+                public List<IMachineOutputRoute> outputRoutes() {
+                    return step.pattern().outputs().stream()
+                        .map(output -> (IMachineOutputRoute) new IMachineOutputRoute() {
+                            @Override
+                            public CraftKey key() {
+                                return output.key();
+                            }
+
+                            @Override
+                            public long pull(long amount, boolean simulate) {
+                                return amount;
+                            }
+                        })
+                        .toList();
+                }
+
+                @Override
+                public boolean isValid() {
+                    return true;
+                }
+
+                @Override
+                public void release() {
+                }
+            });
         }
     }
 
-    private static final class NoOpEvents implements IJobEvents {}
+    private static final class NoOpEvents implements IJobEvents {
+    }
 }

@@ -6,9 +6,15 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
+import org.shsts.tinactory.core.autocraft.api.IMachineLease;
+import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
+import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -16,84 +22,139 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private final IInventoryView inventory;
     private final IMachineAllocator machineAllocator;
     private final IJobEvents jobEvents;
+    private final long bufferLimit;
+
     private CraftPlan plan = new CraftPlan(List.of());
     private int nextStep = 0;
     private ExecutionState state = ExecutionState.IDLE;
+    private ExecutionDetails.Phase phase = ExecutionDetails.Phase.TERMINAL;
+    @Nullable
+    private ExecutionState pendingTerminalState;
     @Nullable
     private ExecutionError error;
+    @Nullable
+    private ExecutionError.Code blockedReason;
+    @Nullable
+    private IMachineLease lease;
+    @Nullable
+    private UUID leasedMachineId;
+
+    private final Map<CraftKey, Long> stepBuffer = new HashMap<>();
+    private final Map<CraftKey, Long> stepRequiredOutputs = new HashMap<>();
+    private final Map<CraftKey, Long> stepRequiredInputs = new HashMap<>();
+    private final Map<CraftKey, Long> transmittedInputs = new HashMap<>();
+    private final Map<CraftKey, Long> transmittedRequiredOutputs = new HashMap<>();
 
     public SequentialCraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
+        this(inventory, machineAllocator, jobEvents, Long.MAX_VALUE);
+    }
+
+    public SequentialCraftExecutor(
+        IInventoryView inventory,
+        IMachineAllocator machineAllocator,
+        IJobEvents jobEvents,
+        long bufferLimit) {
+
         this.inventory = inventory;
         this.machineAllocator = machineAllocator;
         this.jobEvents = jobEvents;
+        this.bufferLimit = bufferLimit;
     }
 
     @Override
     public void start(CraftPlan plan) {
-        start(plan, 0);
+        start(plan, 0, null);
     }
 
-    public void start(CraftPlan plan, int nextStepIndex) {
+    public void start(CraftPlan plan, int nextStepIndex, @Nullable ExecutorRuntimeSnapshot snapshot) {
         this.plan = plan;
         nextStep = nextStepIndex;
-        error = null;
-        state = plan.steps().isEmpty() ? ExecutionState.COMPLETED : ExecutionState.RUNNING;
-        if (nextStep >= plan.steps().size()) {
+        if (plan.steps().isEmpty() || nextStep >= plan.steps().size()) {
             state = ExecutionState.COMPLETED;
+        } else {
+            state = ExecutionState.RUNNING;
+        }
+        phase = state == ExecutionState.RUNNING ? ExecutionDetails.Phase.RUN_STEP : ExecutionDetails.Phase.TERMINAL;
+        error = null;
+        blockedReason = null;
+        pendingTerminalState = null;
+        releaseLease();
+        clearStepState();
+
+        if (snapshot != null) {
+            restoreSnapshot(snapshot);
         }
     }
 
     @Override
-    public void tick() {
-        if (state != ExecutionState.RUNNING) {
+    public void runCycle(long transmissionBandwidth) {
+        if (phase == ExecutionDetails.Phase.TERMINAL ||
+            state == ExecutionState.COMPLETED ||
+            state == ExecutionState.CANCELLED ||
+            state == ExecutionState.FAILED) {
+            return;
+        }
+        if (phase == ExecutionDetails.Phase.FLUSHING) {
+            flushStepBuffer(transmissionBandwidth);
             return;
         }
         if (nextStep >= plan.steps().size()) {
-            state = ExecutionState.COMPLETED;
+            beginFlushing(ExecutionState.COMPLETED, null, null);
+            flushStepBuffer(transmissionBandwidth);
             return;
         }
+
         var step = plan.steps().get(nextStep);
-        if (!machineAllocator.canRun(step.pattern().machineRequirement())) {
-            error = new ExecutionError(
-                ExecutionError.Code.MACHINE_UNAVAILABLE,
-                step.stepId(),
-                "Machine requirement is unavailable");
-            jobEvents.onStepBlocked(step, error.message());
-            state = ExecutionState.BLOCKED;
+        if (!ensureStepReady()) {
+            jobEvents.onStepBlocked(step, error == null ? "step blocked" : error.message());
             return;
         }
-        for (var input : step.pattern().inputs()) {
-            var required = input.amount() * step.runs();
-            if (inventory.amountOf(input.key()) < required) {
-                error = new ExecutionError(
-                    ExecutionError.Code.INPUT_MISSING,
-                    step.stepId(),
-                    "Input resources are unavailable");
-                jobEvents.onStepBlocked(step, error.message());
-                state = ExecutionState.BLOCKED;
-                return;
+        if (!ensureLease(step)) {
+            jobEvents.onStepBlocked(step, error == null ? "machine unavailable" : error.message());
+            return;
+        }
+
+        if (transmissionBandwidth > 0L) {
+            var remaining = pullOutputs(transmissionBandwidth);
+            if (remaining > 0L) {
+                pushInputs(remaining);
             }
         }
-        jobEvents.onStepStarted(step);
-        for (var input : step.pattern().inputs()) {
-            inventory.consume(input.key(), input.amount() * step.runs());
-        }
-        for (var output : step.pattern().outputs()) {
-            inventory.produce(output.key(), output.amount() * step.runs());
-        }
-        jobEvents.onStepCompleted(step);
-        nextStep++;
-        if (nextStep >= plan.steps().size()) {
-            state = ExecutionState.COMPLETED;
+
+        if (stepCompleted()) {
+            releaseLease();
+            if (!flushStepBufferNow()) {
+                phase = ExecutionDetails.Phase.FLUSHING;
+                pendingTerminalState = ExecutionState.RUNNING;
+                state = ExecutionState.BLOCKED;
+                blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
+                error = new ExecutionError(
+                    ExecutionError.Code.FLUSH_BACKPRESSURE,
+                    step.stepId(),
+                    "Flush blocked by storage backpressure");
+                return;
+            }
+            clearStepState();
+            jobEvents.onStepCompleted(step);
+            nextStep++;
+            blockedReason = null;
+            error = null;
+            state = ExecutionState.RUNNING;
+            if (nextStep >= plan.steps().size()) {
+                beginFlushing(ExecutionState.COMPLETED, null, null);
+            }
         }
     }
 
     @Override
     public void cancel() {
-        if (state == ExecutionState.RUNNING || state == ExecutionState.BLOCKED) {
-            error = new ExecutionError(ExecutionError.Code.CANCELLED, nextStepId(), "Execution cancelled");
-            state = ExecutionState.CANCELLED;
+        if (phase == ExecutionDetails.Phase.TERMINAL) {
+            return;
         }
+        beginFlushing(
+            ExecutionState.CANCELLED,
+            new ExecutionError(ExecutionError.Code.CANCELLED, nextStepId(), "Execution cancelled"),
+            null);
     }
 
     @Override
@@ -106,6 +167,19 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return error;
     }
 
+    @Override
+    public ExecutionDetails details() {
+        return new ExecutionDetails(
+            phase,
+            blockedReason,
+            pendingTerminalState,
+            nextStep,
+            stepBuffer,
+            transmittedInputs,
+            transmittedRequiredOutputs,
+            leasedMachineId);
+    }
+
     public CraftPlan currentPlan() {
         return plan;
     }
@@ -114,10 +188,319 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return nextStep;
     }
 
+    public ExecutorRuntimeSnapshot snapshot() {
+        return new ExecutorRuntimeSnapshot(
+            state,
+            phase,
+            error,
+            blockedReason,
+            pendingTerminalState,
+            nextStep,
+            stepBuffer,
+            stepRequiredOutputs,
+            stepRequiredInputs,
+            transmittedInputs,
+            transmittedRequiredOutputs,
+            leasedMachineId);
+    }
+
+    private void restoreSnapshot(ExecutorRuntimeSnapshot snapshot) {
+        state = snapshot.state();
+        phase = snapshot.phase();
+        error = snapshot.error();
+        blockedReason = snapshot.blockedReason();
+        pendingTerminalState = snapshot.pendingTerminalState();
+        nextStep = snapshot.nextStepIndex();
+        stepBuffer.putAll(snapshot.stepBuffer());
+        stepRequiredOutputs.putAll(snapshot.stepRequiredOutputs());
+        stepRequiredInputs.putAll(snapshot.stepRequiredInputs());
+        transmittedInputs.putAll(snapshot.transmittedInputs());
+        transmittedRequiredOutputs.putAll(snapshot.transmittedRequiredOutputs());
+        leasedMachineId = snapshot.leasedMachineId();
+    }
+
+    private boolean ensureStepReady() {
+        if (!stepRequiredInputs.isEmpty()) {
+            return true;
+        }
+        var step = plan.steps().get(nextStep);
+        for (var output : step.requiredOutputs()) {
+            stepRequiredOutputs.merge(output.key(), output.amount(), Long::sum);
+        }
+        for (var input : step.pattern().inputs()) {
+            var amount = input.amount() * step.runs();
+            stepRequiredInputs.merge(input.key(), amount, Long::sum);
+        }
+        long reservedTotal = 0L;
+        for (var amount : stepRequiredInputs.values()) {
+            reservedTotal += amount;
+        }
+        if (reservedTotal > bufferLimit) {
+            blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Step reservation exceeds buffer limit");
+            return false;
+        }
+
+        var reservations = new HashMap<CraftKey, Long>();
+        for (var required : stepRequiredInputs.entrySet()) {
+            var simulated = inventory.extract(required.getKey(), required.getValue(), true);
+            if (simulated < required.getValue()) {
+                rollbackReservations(reservations);
+                blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
+                return false;
+            }
+            var extracted = inventory.extract(required.getKey(), required.getValue(), false);
+            if (extracted < required.getValue()) {
+                reservations.put(required.getKey(), extracted);
+                rollbackReservations(reservations);
+                blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
+                return false;
+            }
+            reservations.put(required.getKey(), extracted);
+            stepBuffer.merge(required.getKey(), extracted, Long::sum);
+        }
+        jobEvents.onStepStarted(step);
+        blockedReason = null;
+        error = null;
+        state = ExecutionState.RUNNING;
+        return true;
+    }
+
+    private boolean ensureLease(CraftStep step) {
+        if (lease != null) {
+            if (lease.isValid()) {
+                return true;
+            }
+            if (!canReassignAfterMachineLoss()) {
+                blockStep(
+                    ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED,
+                    "Machine reassignment blocked by in-flight transfer");
+                return false;
+            }
+            releaseLease();
+        }
+
+        var allocated = machineAllocator.allocate(step);
+        if (allocated.isEmpty()) {
+            blockStep(ExecutionError.Code.MACHINE_UNAVAILABLE, "Machine requirement is unavailable");
+            return false;
+        }
+        lease = allocated.get();
+        leasedMachineId = lease.machineId();
+        blockedReason = null;
+        error = null;
+        state = ExecutionState.RUNNING;
+        return true;
+    }
+
+    private long pullOutputs(long bandwidth) {
+        if (lease == null) {
+            return bandwidth;
+        }
+        var remaining = bandwidth;
+        for (var route : lease.outputRoutes()) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var key = route.key();
+            var needed = stepRequiredOutputs.getOrDefault(key, 0L) - transmittedRequiredOutputs.getOrDefault(key, 0L);
+            if (needed <= 0L) {
+                continue;
+            }
+            var moved = route.pull(Math.min(remaining, needed), false);
+            if (moved <= 0L) {
+                continue;
+            }
+            stepBuffer.merge(key, moved, Long::sum);
+            transmittedRequiredOutputs.merge(key, moved, Long::sum);
+            remaining -= moved;
+        }
+        return remaining;
+    }
+
+    private void pushInputs(long bandwidth) {
+        if (lease == null) {
+            return;
+        }
+        var remaining = bandwidth;
+        for (var route : lease.inputRoutes()) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var key = route.key();
+            var buffered = stepBuffer.getOrDefault(key, 0L);
+            if (buffered <= 0L) {
+                continue;
+            }
+            var moved = route.push(Math.min(remaining, buffered), false);
+            if (moved <= 0L) {
+                continue;
+            }
+            stepBuffer.put(key, buffered - moved);
+            if (stepBuffer.get(key) == 0L) {
+                stepBuffer.remove(key);
+            }
+            transmittedInputs.merge(key, moved, Long::sum);
+            remaining -= moved;
+        }
+    }
+
+    private boolean stepCompleted() {
+        for (var required : stepRequiredOutputs.entrySet()) {
+            if (transmittedRequiredOutputs.getOrDefault(required.getKey(), 0L) < required.getValue()) {
+                return false;
+            }
+        }
+        return !stepRequiredOutputs.isEmpty();
+    }
+
+    private boolean canReassignAfterMachineLoss() {
+        long scheduledRuns = 0L;
+        for (var input : stepRequiredInputs.entrySet()) {
+            var requiredPerStep = input.getValue();
+            if (requiredPerStep <= 0L) {
+                continue;
+            }
+            var transmitted = transmittedInputs.getOrDefault(input.getKey(), 0L);
+            var runs = divideCeil(transmitted, requiredPerStep);
+            if (runs > scheduledRuns) {
+                scheduledRuns = runs;
+            }
+        }
+
+        long recoveredRuns = Long.MAX_VALUE;
+        if (stepRequiredOutputs.isEmpty()) {
+            recoveredRuns = 0L;
+        }
+        for (var output : stepRequiredOutputs.entrySet()) {
+            var requiredPerStep = output.getValue();
+            if (requiredPerStep <= 0L) {
+                continue;
+            }
+            var transmitted = transmittedRequiredOutputs.getOrDefault(output.getKey(), 0L);
+            var runs = transmitted / requiredPerStep;
+            if (runs < recoveredRuns) {
+                recoveredRuns = runs;
+            }
+        }
+        return scheduledRuns <= recoveredRuns;
+    }
+
+    private void beginFlushing(
+        ExecutionState terminalState,
+        @Nullable ExecutionError terminalError,
+        @Nullable ExecutionError.Code flushBlockedReason) {
+        releaseLease();
+        pendingTerminalState = terminalState;
+        phase = ExecutionDetails.Phase.FLUSHING;
+        error = terminalError;
+        blockedReason = flushBlockedReason;
+        state = flushBlockedReason == null ? ExecutionState.RUNNING : ExecutionState.BLOCKED;
+    }
+
+    private void flushStepBuffer(long bandwidth) {
+        if (phase != ExecutionDetails.Phase.FLUSHING) {
+            return;
+        }
+        var remaining = bandwidth;
+        var anyBlocked = false;
+
+        for (var entry : List.copyOf(stepBuffer.entrySet())) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var target = Math.min(remaining, entry.getValue());
+            var inserted = inventory.insert(entry.getKey(), target, false);
+            if (inserted <= 0L) {
+                anyBlocked = true;
+                continue;
+            }
+            var left = entry.getValue() - inserted;
+            if (left <= 0L) {
+                stepBuffer.remove(entry.getKey());
+            } else {
+                stepBuffer.put(entry.getKey(), left);
+            }
+            remaining -= inserted;
+        }
+
+        if (stepBuffer.isEmpty()) {
+            phase = ExecutionDetails.Phase.TERMINAL;
+            state = pendingTerminalState == null ? ExecutionState.COMPLETED : pendingTerminalState;
+            blockedReason = null;
+            pendingTerminalState = null;
+            clearStepState();
+            return;
+        }
+        if (anyBlocked) {
+            blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
+            error = new ExecutionError(
+                ExecutionError.Code.FLUSH_BACKPRESSURE,
+                nextStepId(),
+                "Flush blocked by storage backpressure");
+            state = ExecutionState.BLOCKED;
+        } else {
+            blockedReason = null;
+            if (error != null && error.code() == ExecutionError.Code.FLUSH_BACKPRESSURE) {
+                error = null;
+            }
+            state = ExecutionState.RUNNING;
+        }
+    }
+
+    private boolean flushStepBufferNow() {
+        for (var entry : List.copyOf(stepBuffer.entrySet())) {
+            var inserted = inventory.insert(entry.getKey(), entry.getValue(), false);
+            if (inserted < entry.getValue()) {
+                stepBuffer.put(entry.getKey(), entry.getValue() - inserted);
+                return false;
+            }
+            stepBuffer.remove(entry.getKey());
+        }
+        return true;
+    }
+
+    private void clearStepState() {
+        stepBuffer.clear();
+        stepRequiredOutputs.clear();
+        stepRequiredInputs.clear();
+        transmittedInputs.clear();
+        transmittedRequiredOutputs.clear();
+        leasedMachineId = null;
+    }
+
+    private void rollbackReservations(Map<CraftKey, Long> reservations) {
+        for (var reserved : reservations.entrySet()) {
+            if (reserved.getValue() > 0L) {
+                inventory.insert(reserved.getKey(), reserved.getValue(), false);
+            }
+        }
+    }
+
+    private void blockStep(ExecutionError.Code code, String message) {
+        error = new ExecutionError(code, nextStepId(), message);
+        blockedReason = code;
+        state = ExecutionState.BLOCKED;
+    }
+
     private String nextStepId() {
         if (nextStep >= plan.steps().size()) {
             return "complete";
         }
         return plan.steps().get(nextStep).stepId();
+    }
+
+    private void releaseLease() {
+        if (lease != null) {
+            lease.release();
+            lease = null;
+        }
+        leasedMachineId = null;
+    }
+
+    private static long divideCeil(long numerator, long denominator) {
+        if (denominator <= 0L || numerator <= 0L) {
+            return 0L;
+        }
+        return (numerator + denominator - 1L) / denominator;
     }
 }

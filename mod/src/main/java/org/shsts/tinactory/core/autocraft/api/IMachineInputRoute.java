@@ -6,10 +6,8 @@ import org.shsts.tinactory.core.autocraft.model.CraftKey;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IInventoryView {
-    long amountOf(CraftKey key);
+public interface IMachineInputRoute {
+    CraftKey key();
 
-    long extract(CraftKey key, long amount, boolean simulate);
-
-    long insert(CraftKey key, long amount, boolean simulate);
+    long push(long amount, boolean simulate);
 }

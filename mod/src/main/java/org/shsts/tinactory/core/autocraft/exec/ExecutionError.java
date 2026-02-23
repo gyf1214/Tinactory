@@ -7,8 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public record ExecutionError(Code code, String stepId, String message) {
     public enum Code {
-        INPUT_MISSING,
+        INPUT_UNAVAILABLE,
         MACHINE_UNAVAILABLE,
+        MACHINE_REASSIGNMENT_BLOCKED,
+        FLUSH_BACKPRESSURE,
         CANCELLED
     }
 }

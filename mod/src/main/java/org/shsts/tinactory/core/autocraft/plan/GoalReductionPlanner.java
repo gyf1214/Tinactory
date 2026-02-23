@@ -154,7 +154,11 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         for (var output : pattern.outputs()) {
             session.ledger.add(output.key(), output.amount() * frame.runs);
         }
-        session.steps.add(new CraftStep("step-" + session.nextStepId++, pattern, frame.runs));
+        session.steps.add(new CraftStep(
+            "step-" + session.nextStepId++,
+            pattern,
+            frame.runs,
+            List.of(new CraftAmount(frame.key, frame.remaining))));
         session.ledger.consume(frame.key, frame.remaining);
         popSuccess(session);
     }

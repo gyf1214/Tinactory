@@ -30,6 +30,9 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
     private static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
+    private static final long BUFFER_LIMIT = 4096L;
+    private static final long TRANSMISSION_BANDWIDTH = 64L;
+    private static final int EXECUTION_INTERVAL_TICKS = 1;
 
     private final PatternNbtCodec snapshotCodec = new PatternNbtCodec(new MachineConstraintRegistry());
     @Nullable
@@ -53,7 +56,15 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         service = AutocraftServiceBootstrap.create(
-            blockEntity, network, logistics, combinedItem, combinedFluid, machine.uuid());
+            blockEntity,
+            network,
+            logistics,
+            combinedItem,
+            combinedFluid,
+            machine.uuid(),
+            BUFFER_LIMIT,
+            TRANSMISSION_BANDWIDTH,
+            EXECUTION_INTERVAL_TICKS);
         if (pendingSnapshot != null) {
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;

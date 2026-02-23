@@ -38,61 +38,62 @@ public final class LogisticsInventoryView implements IInventoryView {
     }
 
     @Override
-    public boolean consume(CraftKey key, long amount) {
+    public long extract(CraftKey key, long amount, boolean simulate) {
         if (amount <= 0L) {
-            return true;
-        }
-        if (amountOf(key) < amount) {
-            return false;
+            return 0L;
         }
         var left = amount;
+        long extractedTotal = 0L;
         while (left > 0L) {
             var chunk = (int) Math.min(left, Integer.MAX_VALUE);
             switch (key.type()) {
                 case ITEM -> {
                     var expected = toItemStack(key, chunk);
-                    var extracted = itemPort.extractItem(expected, false);
-                    if (extracted.getCount() < chunk) {
-                        return false;
-                    }
+                    var extracted = itemPort.extractItem(expected, simulate);
+                    extractedTotal += extracted.getCount();
+                    left -= extracted.getCount();
                 }
                 case FLUID -> {
                     var expected = toFluidStack(key, chunk);
-                    var extracted = fluidPort.drain(expected, false);
-                    if (extracted.getAmount() < chunk) {
-                        return false;
-                    }
+                    var extracted = fluidPort.drain(expected, simulate);
+                    extractedTotal += extracted.getAmount();
+                    left -= extracted.getAmount();
                 }
             }
-            left -= chunk;
+            if (left > 0L && extractedTotal < amount) {
+                break;
+            }
         }
-        return true;
+        return extractedTotal;
     }
 
     @Override
-    public void produce(CraftKey key, long amount) {
+    public long insert(CraftKey key, long amount, boolean simulate) {
         if (amount <= 0L) {
-            return;
+            return 0L;
         }
         var left = amount;
+        long insertedTotal = 0L;
         while (left > 0L) {
             var chunk = (int) Math.min(left, Integer.MAX_VALUE);
             switch (key.type()) {
                 case ITEM -> {
-                    var remaining = itemPort.insertItem(toItemStack(key, chunk), false);
-                    if (!remaining.isEmpty()) {
-                        throw new IllegalStateException("cannot insert item output: " + key);
-                    }
+                    var remaining = itemPort.insertItem(toItemStack(key, chunk), simulate);
+                    var inserted = chunk - remaining.getCount();
+                    insertedTotal += inserted;
+                    left -= inserted;
                 }
                 case FLUID -> {
-                    var inserted = fluidPort.fill(toFluidStack(key, chunk), false);
-                    if (inserted < chunk) {
-                        throw new IllegalStateException("cannot insert fluid output: " + key);
-                    }
+                    var inserted = fluidPort.fill(toFluidStack(key, chunk), simulate);
+                    insertedTotal += inserted;
+                    left -= inserted;
                 }
             }
-            left -= chunk;
+            if (left > 0L && insertedTotal < amount) {
+                break;
+            }
         }
+        return insertedTotal;
     }
 
     public List<CraftAmount> snapshotAvailable() {
@@ -128,7 +129,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return CraftKey.fluid(fluidId.toString(), nbt);
     }
 
-    private static ItemStack toItemStack(CraftKey key, int amount) {
+    static ItemStack toItemStack(CraftKey key, int amount) {
         var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(key.id()));
         if (item == null) {
             throw new IllegalArgumentException("unknown item id: " + key.id());
@@ -141,7 +142,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return stack;
     }
 
-    private static FluidStack toFluidStack(CraftKey key, int amount) {
+    static FluidStack toFluidStack(CraftKey key, int amount) {
         var fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(key.id()));
         if (fluid == null) {
             throw new IllegalArgumentException("unknown fluid id: " + key.id());

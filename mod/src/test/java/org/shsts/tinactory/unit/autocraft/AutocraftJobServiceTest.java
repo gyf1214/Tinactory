@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.ICraftExecutor;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,16 +58,19 @@ class AutocraftJobServiceTest {
     }
 
     @Test
-    void serviceShouldTransitionToBlockedOnExecutorBlocked() {
+    void serviceShouldRemainRunningWhenExecutorBlockedRetriably() {
         var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
-        var executor = new TestExecutor(ExecutionState.BLOCKED);
+        var executor = new TestExecutor(ExecutionState.BLOCKED, ExecutionState.BLOCKED, ExecutionState.COMPLETED);
+        executor.blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
         var service = new AutocraftJobService(planner, () -> executor, List::of);
 
         var id = service.submit(List.of(new CraftAmount(CraftKey.item("x:y", ""), 1)));
         service.tick();
         service.tick();
-
         assertEquals(AutocraftJob.Status.BLOCKED, service.job(id).status());
+        service.tick();
+        service.tick();
+        assertEquals(AutocraftJob.Status.DONE, service.job(id).status());
     }
 
     @Test
@@ -105,12 +110,13 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldCancelRunningJob() {
         var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
-        var executor = new TestExecutor(ExecutionState.RUNNING);
+        var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.CANCELLED);
         var service = new AutocraftJobService(planner, () -> executor, List::of);
         var id = service.submit(List.of(new CraftAmount(CraftKey.item("x:y", ""), 1)));
         service.tick();
 
         assertTrue(service.cancel(id));
+        service.tick();
         assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
         assertTrue(executor.cancelled);
         assertFalse(service.cancel(id));
@@ -133,8 +139,9 @@ class AutocraftJobServiceTest {
 
     private static final class TestExecutor implements ICraftExecutor {
         private final List<ExecutionState> states;
-        private int index = 0;
+        private int index;
         private boolean cancelled;
+        private ExecutionError.Code blockedReason;
 
         private TestExecutor(ExecutionState... states) {
             this.states = List.of(states);
@@ -144,7 +151,7 @@ class AutocraftJobServiceTest {
         public void start(CraftPlan plan) {}
 
         @Override
-        public void tick() {
+        public void runCycle(long transmissionBandwidth) {
             if (index + 1 < states.size()) {
                 index++;
             }
@@ -162,8 +169,24 @@ class AutocraftJobServiceTest {
 
         @Override
         public ExecutionError error() {
-            return state() == ExecutionState.BLOCKED ?
-                new ExecutionError(ExecutionError.Code.MACHINE_UNAVAILABLE, "s1", "blocked") : null;
+            if (state() != ExecutionState.BLOCKED && state() != ExecutionState.CANCELLED) {
+                return null;
+            }
+            var code = state() == ExecutionState.CANCELLED ? ExecutionError.Code.CANCELLED : blockedReason;
+            return new ExecutionError(code == null ? ExecutionError.Code.MACHINE_UNAVAILABLE : code, "s1", "blocked");
+        }
+
+        @Override
+        public ExecutionDetails details() {
+            return new ExecutionDetails(
+                state() == ExecutionState.CANCELLED ? ExecutionDetails.Phase.TERMINAL : ExecutionDetails.Phase.RUN_STEP,
+                state() == ExecutionState.BLOCKED ? blockedReason : null,
+                state() == ExecutionState.CANCELLED ? ExecutionState.CANCELLED : null,
+                0,
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                null);
         }
     }
 }

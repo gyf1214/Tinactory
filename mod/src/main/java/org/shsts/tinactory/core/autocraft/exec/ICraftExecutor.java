@@ -10,7 +10,7 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 public interface ICraftExecutor {
     void start(CraftPlan plan);
 
-    void tick();
+    void runCycle(long transmissionBandwidth);
 
     void cancel();
 
@@ -18,4 +18,6 @@ public interface ICraftExecutor {
 
     @Nullable
     ExecutionError error();
+
+    ExecutionDetails details();
 }
