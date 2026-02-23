@@ -10,7 +10,6 @@ public record CraftKey(Type type, String id, String nbt) {
         if (id.isBlank()) {
             throw new IllegalArgumentException("id must not be blank");
         }
-        nbt = nbt == null ? "" : nbt;
     }
 
     public static CraftKey item(String id, String nbt) {

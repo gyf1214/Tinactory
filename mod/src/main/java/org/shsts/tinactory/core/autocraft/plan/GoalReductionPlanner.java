@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.plan;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
@@ -192,6 +193,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         parent.childError = error;
     }
 
+    @Nullable
     private static PlanError detectCycle(List<PlannerSession.SearchFrame> stack) {
         var current = stack.get(stack.size() - 1);
         for (var i = 0; i < stack.size() - 1; i++) {

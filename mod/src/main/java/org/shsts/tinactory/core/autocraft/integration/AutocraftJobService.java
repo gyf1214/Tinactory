@@ -202,7 +202,7 @@ public class AutocraftJobService {
             startNextJob();
             return;
         }
-        if (runningJobId == null || runningExecutor == null) {
+        if (runningExecutor == null) {
             return;
         }
 
