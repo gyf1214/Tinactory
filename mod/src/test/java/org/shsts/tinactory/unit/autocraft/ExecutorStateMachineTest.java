@@ -210,6 +210,56 @@ class ExecutorStateMachineTest {
         assertEquals(ExecutionState.COMPLETED, executor.state());
     }
 
+    @Test
+    void stepBoundaryShouldKeepIntermediateOutputsBufferedForDownstreamStep() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var gear = CraftKey.item("tinactory:gear", "");
+        var firstStep = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:part",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(part, 1))),
+            1,
+            List.of(new CraftAmount(part, 1)),
+            List.of());
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:gear",
+                List.of(new CraftAmount(part, 1)),
+                List.of(new CraftAmount(gear, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(gear, 1)));
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 1L), true);
+        var allocator = new IMachineAllocator() {
+            private int call;
+
+            @Override
+            public Optional<IMachineLease> allocate(CraftStep step) {
+                call++;
+                if (call == 1) {
+                    return Optional.of(firstLease);
+                }
+                return Optional.empty();
+            }
+        };
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+        executor.runCycle(64);
+        executor.runCycle(64);
+        executor.runCycle(64);
+        executor.runCycle(64);
+
+        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertEquals(ExecutionError.Code.MACHINE_UNAVAILABLE, executor.error().code());
+        assertEquals(0L, inventory.amountOf(part));
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));

@@ -95,6 +95,45 @@ class CraftExecutorTest {
         assertEquals(0L, inventory.amountOf(plate));
     }
 
+    @Test
+    void executorShouldRetainIntermediateOutputsAndFlushFinalSurplus() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var waste = CraftKey.item("tinactory:waste", "");
+        var gear = CraftKey.item("tinactory:gear", "");
+        var inventory = new FakeInventory(Map.of(ore, 1L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var firstStep = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:part",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(part, 2), new CraftAmount(waste, 1))),
+            1,
+            List.of(new CraftAmount(part, 1)),
+            List.of(new CraftAmount(part, 1)));
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:gear",
+                List.of(new CraftAmount(part, 1)),
+                List.of(new CraftAmount(gear, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(gear, 1)));
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+
+        for (var i = 0; i < 16; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(1L, inventory.amountOf(gear));
+        assertEquals(1L, inventory.amountOf(part));
+        assertEquals(1L, inventory.amountOf(waste));
+        assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
@@ -102,6 +141,7 @@ class CraftExecutorTest {
 
     private static final class FakeInventory implements IInventoryView {
         private final Map<CraftKey, Long> stock = new HashMap<>();
+        private final Map<CraftKey, Integer> extractCallsByKey = new HashMap<>();
         private int insertCalls;
 
         private FakeInventory(Map<CraftKey, Long> initial) {
@@ -119,6 +159,7 @@ class CraftExecutorTest {
             var moved = Math.min(available, amount);
             if (!simulate && moved > 0L) {
                 stock.put(key, available - moved);
+                extractCallsByKey.merge(key, 1, Integer::sum);
             }
             return moved;
         }

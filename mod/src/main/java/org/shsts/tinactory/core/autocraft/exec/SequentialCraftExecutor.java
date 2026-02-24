@@ -43,6 +43,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private final Map<CraftKey, Long> stepRequiredInputs = new HashMap<>();
     private final Map<CraftKey, Long> transmittedInputs = new HashMap<>();
     private final Map<CraftKey, Long> transmittedRequiredOutputs = new HashMap<>();
+    private final Map<CraftKey, Long> pendingFlush = new HashMap<>();
+    private boolean flushStepBufferInPhase;
 
     public SequentialCraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
         this.inventory = inventory;
@@ -69,6 +71,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         pendingTerminalState = null;
         releaseLease();
         clearStepState();
+        flushStepBufferInPhase = false;
 
         if (snapshot != null) {
             restoreSnapshot(snapshot);
@@ -88,7 +91,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         if (nextStep >= plan.steps().size()) {
-            beginFlushing(ExecutionState.COMPLETED, null, null);
+            beginFlushing(ExecutionState.COMPLETED, null, null, true);
             flushStepBuffer(transmissionBandwidth);
             return;
         }
@@ -112,25 +115,30 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         if (stepCompleted()) {
             releaseLease();
-            if (!flushStepBufferNow()) {
+            var completedStep = step;
+            var flushCandidates = extractFlushCandidates(nextStep + 1);
+            clearStepProgressState();
+            jobEvents.onStepCompleted(completedStep);
+            nextStep++;
+            blockedReason = null;
+            error = null;
+            state = ExecutionState.RUNNING;
+
+            if (!flushStepBufferNow(flushCandidates)) {
+                pendingFlush.putAll(flushCandidates);
                 phase = ExecutionDetails.Phase.FLUSHING;
                 pendingTerminalState = ExecutionState.RUNNING;
                 state = ExecutionState.BLOCKED;
                 blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
                 error = new ExecutionError(
                     ExecutionError.Code.FLUSH_BACKPRESSURE,
-                    step.stepId(),
+                    completedStep.stepId(),
                     "Flush blocked by storage backpressure");
+                flushStepBufferInPhase = false;
                 return;
             }
-            clearStepState();
-            jobEvents.onStepCompleted(step);
-            nextStep++;
-            blockedReason = null;
-            error = null;
-            state = ExecutionState.RUNNING;
             if (nextStep >= plan.steps().size()) {
-                beginFlushing(ExecutionState.COMPLETED, null, null);
+                beginFlushing(ExecutionState.COMPLETED, null, null, true);
             }
         }
     }
@@ -143,7 +151,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         beginFlushing(
             ExecutionState.CANCELLED,
             new ExecutionError(ExecutionError.Code.CANCELLED, nextStepId(), "Execution cancelled"),
-            null);
+            null,
+            true);
     }
 
     @Override
@@ -306,6 +315,20 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             transmittedRequiredOutputs.merge(key, moved, Long::sum);
             remaining -= moved;
         }
+        if (remaining <= 0L) {
+            return 0L;
+        }
+        for (var route : lease.outputRoutes()) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var moved = route.pull(remaining, false);
+            if (moved <= 0L) {
+                continue;
+            }
+            stepBuffer.merge(route.key(), moved, Long::sum);
+            remaining -= moved;
+        }
         return remaining;
     }
 
@@ -380,12 +403,14 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private void beginFlushing(
         ExecutionState terminalState,
         @Nullable ExecutionError terminalError,
-        @Nullable ExecutionError.Code flushBlockedReason) {
+        @Nullable ExecutionError.Code flushBlockedReason,
+        boolean includeStepBuffer) {
         releaseLease();
         pendingTerminalState = terminalState;
         phase = ExecutionDetails.Phase.FLUSHING;
         error = terminalError;
         blockedReason = flushBlockedReason;
+        flushStepBufferInPhase = includeStepBuffer;
         state = flushBlockedReason == null ? ExecutionState.RUNNING : ExecutionState.BLOCKED;
     }
 
@@ -394,36 +419,30 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         var remaining = bandwidth;
-        var anyBlocked = false;
-
-        for (var entry : List.copyOf(stepBuffer.entrySet())) {
-            if (remaining <= 0L) {
-                break;
-            }
-            var target = Math.min(remaining, entry.getValue());
-            var inserted = inventory.insert(entry.getKey(), target, false);
-            if (inserted <= 0L) {
-                anyBlocked = true;
-                continue;
-            }
-            var left = entry.getValue() - inserted;
-            if (left <= 0L) {
-                stepBuffer.remove(entry.getKey());
-            } else {
-                stepBuffer.put(entry.getKey(), left);
-            }
-            remaining -= inserted;
+        remaining = flushAmounts(pendingFlush, remaining);
+        if (flushStepBufferInPhase && remaining > 0L) {
+            remaining = flushAmounts(stepBuffer, remaining);
         }
 
-        if (stepBuffer.isEmpty()) {
-            phase = ExecutionDetails.Phase.TERMINAL;
-            state = pendingTerminalState == null ? ExecutionState.COMPLETED : pendingTerminalState;
+        var done = pendingFlush.isEmpty() && (!flushStepBufferInPhase || stepBuffer.isEmpty());
+        if (done) {
+            var terminalState = pendingTerminalState == null ? ExecutionState.COMPLETED : pendingTerminalState;
+            state = terminalState;
             blockedReason = null;
             pendingTerminalState = null;
-            clearStepState();
+            if (terminalState == ExecutionState.RUNNING) {
+                phase = ExecutionDetails.Phase.RUN_STEP;
+                if (error != null && error.code() == ExecutionError.Code.FLUSH_BACKPRESSURE) {
+                    error = null;
+                }
+            } else {
+                phase = ExecutionDetails.Phase.TERMINAL;
+                clearStepState();
+            }
+            flushStepBufferInPhase = false;
             return;
         }
-        if (anyBlocked) {
+        if (remaining > 0L) {
             blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
             error = new ExecutionError(
                 ExecutionError.Code.FLUSH_BACKPRESSURE,
@@ -439,20 +458,48 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private boolean flushStepBufferNow() {
-        for (var entry : List.copyOf(stepBuffer.entrySet())) {
+    private long flushAmounts(Map<CraftKey, Long> amounts, long bandwidth) {
+        var remaining = bandwidth;
+        for (var entry : List.copyOf(amounts.entrySet())) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var target = Math.min(remaining, entry.getValue());
+            var inserted = inventory.insert(entry.getKey(), target, false);
+            if (inserted <= 0L) {
+                continue;
+            }
+            var left = entry.getValue() - inserted;
+            if (left <= 0L) {
+                amounts.remove(entry.getKey());
+            } else {
+                amounts.put(entry.getKey(), left);
+            }
+            remaining -= inserted;
+        }
+        return remaining;
+    }
+
+    private boolean flushStepBufferNow(Map<CraftKey, Long> amounts) {
+        for (var entry : List.copyOf(amounts.entrySet())) {
             var inserted = inventory.insert(entry.getKey(), entry.getValue(), false);
             if (inserted < entry.getValue()) {
-                stepBuffer.put(entry.getKey(), entry.getValue() - inserted);
+                amounts.put(entry.getKey(), entry.getValue() - inserted);
                 return false;
             }
-            stepBuffer.remove(entry.getKey());
+            amounts.remove(entry.getKey());
         }
         return true;
     }
 
     private void clearStepState() {
         stepBuffer.clear();
+        clearStepProgressState();
+        pendingFlush.clear();
+        flushStepBufferInPhase = false;
+    }
+
+    private void clearStepProgressState() {
         stepRequiredOutputs.clear();
         stepRequiredInputs.clear();
         transmittedInputs.clear();
@@ -499,6 +546,35 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             lease = null;
         }
         leasedMachineId = null;
+    }
+
+    private Map<CraftKey, Long> extractFlushCandidates(int fromStepIndex) {
+        var remainingIntermediateDemand = remainingIntermediateDemand(fromStepIndex);
+        var flushCandidates = new HashMap<CraftKey, Long>();
+        for (var entry : List.copyOf(stepBuffer.entrySet())) {
+            var keep = Math.min(entry.getValue(), remainingIntermediateDemand.getOrDefault(entry.getKey(), 0L));
+            var flush = entry.getValue() - keep;
+            if (keep > 0L) {
+                stepBuffer.put(entry.getKey(), keep);
+            } else {
+                stepBuffer.remove(entry.getKey());
+            }
+            if (flush > 0L) {
+                flushCandidates.put(entry.getKey(), flush);
+            }
+        }
+        return flushCandidates;
+    }
+
+    private Map<CraftKey, Long> remainingIntermediateDemand(int fromStepIndex) {
+        var demand = new HashMap<CraftKey, Long>();
+        for (var i = fromStepIndex; i < plan.steps().size(); i++) {
+            var step = plan.steps().get(i);
+            for (var input : step.pattern().inputs()) {
+                demand.merge(input.key(), input.amount() * step.runs(), Long::sum);
+            }
+        }
+        return demand;
     }
 
     private static long divideCeil(long numerator, long denominator) {
