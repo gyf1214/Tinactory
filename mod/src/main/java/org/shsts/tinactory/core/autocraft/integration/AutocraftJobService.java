@@ -383,18 +383,12 @@ public class AutocraftJobService {
         var out = new ArrayList<CraftStep>(steps.size());
         for (var i = 0; i < steps.size(); i++) {
             var stepTag = steps.getCompound(i);
-            var requiredIntermediateOutputs = stepTag.contains("requiredIntermediateOutputs") ?
-                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND)) :
-                List.<CraftAmount>of();
-            var requiredFinalOutputs = stepTag.contains("requiredFinalOutputs") ?
-                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND)) :
-                deserializeAmounts(stepTag.getList("requiredOutputs", TAG_COMPOUND));
             out.add(new CraftStep(
                 stepTag.getString("stepId"),
                 codec.decodePattern(stepTag.getCompound("pattern")),
                 stepTag.getLong("runs"),
-                requiredIntermediateOutputs,
-                requiredFinalOutputs));
+                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND)),
+                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND))));
         }
         return new CraftPlan(out);
     }
