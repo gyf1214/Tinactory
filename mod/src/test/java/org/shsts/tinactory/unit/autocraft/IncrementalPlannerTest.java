@@ -59,6 +59,20 @@ class IncrementalPlannerTest {
         assertEquals(PlannerProgress.State.DONE, progress.state());
         assertNotNull(progress.result());
         assertTrue(progress.result().isSuccess());
+        var plannedPlateIntermediate = progress.result().plan().steps().stream()
+            .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
+            .flatMap(step -> step.requiredIntermediateOutputs().stream())
+            .filter(amount -> amount.key().equals(plate))
+            .mapToLong(CraftAmount::amount)
+            .sum();
+        var plannedPlateFinal = progress.result().plan().steps().stream()
+            .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
+            .flatMap(step -> step.requiredFinalOutputs().stream())
+            .filter(amount -> amount.key().equals(plate))
+            .mapToLong(CraftAmount::amount)
+            .sum();
+        assertEquals(1L, plannedPlateIntermediate);
+        assertEquals(1L, plannedPlateFinal);
         assertEquals(
             planner.plan(
                 List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)),

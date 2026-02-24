@@ -10,7 +10,9 @@ import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -51,7 +53,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlanResult.success(new CraftPlan(session.steps));
+                    session.result = PlanResult.success(buildPlan(session));
                     return PlannerProgress.done(session.result);
                 }
                 var target = session.targets.get(session.nextTargetIndex);
@@ -65,7 +67,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
                 PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlanResult.success(new CraftPlan(session.steps));
+            session.result = PlanResult.success(buildPlan(session));
             return PlannerProgress.done(session.result);
         }
         return PlannerProgress.running();
@@ -225,5 +227,76 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
 
     private static long divideCeil(long numerator, long denominator) {
         return (numerator + denominator - 1L) / denominator;
+    }
+
+    private static CraftPlan buildPlan(PlannerSession session) {
+        return new CraftPlan(classifyStepOutputRoles(session.steps, session.targets));
+    }
+
+    private static List<CraftStep> classifyStepOutputRoles(List<CraftStep> steps, List<CraftAmount> targets) {
+        var remainingIntermediateDemand = new LinkedHashMap<CraftKey, Long>();
+        var remainingFinalDemand = new LinkedHashMap<CraftKey, Long>();
+        for (var target : targets) {
+            addDemand(remainingFinalDemand, target.key(), target.amount());
+        }
+        var out = new ArrayList<CraftStep>(steps.size());
+        for (var i = steps.size() - 1; i >= 0; i--) {
+            var step = steps.get(i);
+            var stepOutputs = aggregateOutputs(step.pattern().outputs(), step.runs());
+            var requiredIntermediateOutputs = new ArrayList<CraftAmount>();
+            var requiredFinalOutputs = new ArrayList<CraftAmount>();
+            for (var output : stepOutputs.entrySet()) {
+                var intermediateRequired = consumeDemand(remainingIntermediateDemand, output.getKey(), output.getValue());
+                var finalRequired = consumeDemand(remainingFinalDemand, output.getKey(), output.getValue() - intermediateRequired);
+                if (intermediateRequired > 0L) {
+                    requiredIntermediateOutputs.add(new CraftAmount(output.getKey(), intermediateRequired));
+                }
+                if (finalRequired > 0L) {
+                    requiredFinalOutputs.add(new CraftAmount(output.getKey(), finalRequired));
+                }
+            }
+            out.add(0, new CraftStep(
+                step.stepId(),
+                step.pattern(),
+                step.runs(),
+                requiredIntermediateOutputs,
+                requiredFinalOutputs));
+            for (var input : step.pattern().inputs()) {
+                addDemand(remainingIntermediateDemand, input.key(), input.amount() * step.runs());
+            }
+        }
+        return out;
+    }
+
+    private static Map<CraftKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
+        var aggregated = new LinkedHashMap<CraftKey, Long>();
+        for (var output : outputs) {
+            addDemand(aggregated, output.key(), output.amount() * runs);
+        }
+        return aggregated;
+    }
+
+    private static void addDemand(Map<CraftKey, Long> demandMap, CraftKey key, long amount) {
+        if (amount <= 0L) {
+            return;
+        }
+        demandMap.put(key, demandMap.getOrDefault(key, 0L) + amount);
+    }
+
+    private static long consumeDemand(Map<CraftKey, Long> demandMap, CraftKey key, long availableAmount) {
+        if (availableAmount <= 0L) {
+            return 0L;
+        }
+        var demand = demandMap.getOrDefault(key, 0L);
+        var consumed = Math.min(demand, availableAmount);
+        if (consumed <= 0L) {
+            return 0L;
+        }
+        if (consumed == demand) {
+            demandMap.remove(key);
+        } else {
+            demandMap.put(key, demand - consumed);
+        }
+        return consumed;
     }
 }

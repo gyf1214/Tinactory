@@ -92,8 +92,38 @@ class GoalReductionPlannerTest {
         assertEquals(
             List.of("tinactory:refine_oil", "tinactory:residue_to_carbon"),
             result.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
-        assertEquals(List.of(new CraftAmount(plastic, 1)), result.plan().steps().get(0).requiredOutputs());
-        assertEquals(List.of(new CraftAmount(carbon, 1)), result.plan().steps().get(1).requiredOutputs());
+        assertEquals(List.of(new CraftAmount(residue, 1)),
+            result.plan().steps().get(0).requiredIntermediateOutputs());
+        assertEquals(List.of(new CraftAmount(plastic, 1)),
+            result.plan().steps().get(0).requiredFinalOutputs());
+        assertEquals(List.of(), result.plan().steps().get(1).requiredIntermediateOutputs());
+        assertEquals(List.of(new CraftAmount(carbon, 1)),
+            result.plan().steps().get(1).requiredFinalOutputs());
+    }
+
+    @Test
+    void plannerShouldAggregateDuplicateOutputsByRole() {
+        var base = CraftKey.item("tinactory:base", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var finalKey = CraftKey.item("tinactory:final", "");
+        var makePart = pattern(
+            "tinactory:make_part",
+            List.of(new CraftAmount(base, 2)),
+            List.of(new CraftAmount(part, 1), new CraftAmount(part, 1)));
+        var makeFinal = pattern(
+            "tinactory:make_final",
+            List.of(new CraftAmount(part, 1)),
+            List.of(new CraftAmount(finalKey, 1)));
+        var planner = new GoalReductionPlanner(repo(List.of(makePart, makeFinal)));
+
+        var result = planner.plan(
+            List.of(new CraftAmount(finalKey, 1), new CraftAmount(part, 1)),
+            List.of(new CraftAmount(base, 2)));
+
+        assertTrue(result.isSuccess());
+        var partStep = result.plan().steps().get(0);
+        assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredIntermediateOutputs());
+        assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredFinalOutputs());
     }
 
     @Test
