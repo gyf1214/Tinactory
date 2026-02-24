@@ -5,11 +5,18 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record CraftStep(String stepId, CraftPattern pattern, long runs, List<CraftAmount> requiredOutputs) {
+public record CraftStep(
+    String stepId,
+    CraftPattern pattern,
+    long runs,
+    List<CraftAmount> requiredIntermediateOutputs,
+    List<CraftAmount> requiredFinalOutputs
+) {
     public CraftStep {
         if (stepId.isBlank()) {
             throw new IllegalArgumentException("stepId must not be blank");
@@ -17,10 +24,22 @@ public record CraftStep(String stepId, CraftPattern pattern, long runs, List<Cra
         if (runs <= 0L) {
             throw new IllegalArgumentException("runs must be positive");
         }
-        requiredOutputs = List.copyOf(requiredOutputs);
+        requiredIntermediateOutputs = List.copyOf(requiredIntermediateOutputs);
+        requiredFinalOutputs = List.copyOf(requiredFinalOutputs);
+    }
+
+    public CraftStep(String stepId, CraftPattern pattern, long runs, List<CraftAmount> requiredOutputs) {
+        this(stepId, pattern, runs, List.of(), requiredOutputs);
     }
 
     public CraftStep(String stepId, CraftPattern pattern, long runs) {
-        this(stepId, pattern, runs, pattern.outputs());
+        this(stepId, pattern, runs, List.of(), pattern.outputs());
+    }
+
+    public List<CraftAmount> requiredOutputs() {
+        var outputs = new ArrayList<CraftAmount>(requiredIntermediateOutputs.size() + requiredFinalOutputs.size());
+        outputs.addAll(requiredIntermediateOutputs);
+        outputs.addAll(requiredFinalOutputs);
+        return List.copyOf(outputs);
     }
 }

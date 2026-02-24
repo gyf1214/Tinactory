@@ -16,6 +16,7 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,44 @@ class CraftPlanContractTest {
 
         assertEquals("step-1", plan.steps().get(0).stepId());
         assertThrows(UnsupportedOperationException.class, () -> plan.steps().add(step));
+    }
+
+    @Test
+    void craftStepShouldSplitRequiredOutputsByRole() {
+        var pattern = new CraftPattern(
+            "tinactory:gear",
+            List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
+            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+        var intermediate = List.of(new CraftAmount(CraftKey.item("tinactory:half", ""), 2));
+        var finals = List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1));
+
+        var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
+
+        assertEquals(intermediate, step.requiredIntermediateOutputs());
+        assertEquals(finals, step.requiredFinalOutputs());
+    }
+
+    @Test
+    void craftStepShouldDefensivelyCopyRoleOutputs() {
+        var pattern = new CraftPattern(
+            "tinactory:gear",
+            List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
+            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+        var intermediate = new ArrayList<>(List.of(new CraftAmount(CraftKey.item("tinactory:half", ""), 2)));
+        var finals = new ArrayList<>(List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)));
+        var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
+
+        intermediate.clear();
+        finals.clear();
+
+        assertEquals(1, step.requiredIntermediateOutputs().size());
+        assertEquals(1, step.requiredFinalOutputs().size());
+        assertThrows(UnsupportedOperationException.class, () -> step.requiredIntermediateOutputs().add(new CraftAmount(
+            CraftKey.item("tinactory:x", ""), 1)));
+        assertThrows(UnsupportedOperationException.class, () -> step.requiredFinalOutputs().add(new CraftAmount(
+            CraftKey.item("tinactory:y", ""), 1)));
     }
 
     @Test
