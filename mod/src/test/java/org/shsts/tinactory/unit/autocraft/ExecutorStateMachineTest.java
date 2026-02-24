@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
+import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -28,6 +29,78 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ExecutorStateMachineTest {
+    @Test
+    void reservationShouldConsumeBufferedInputsBeforeNetworkExtraction() {
+        var ingot = CraftKey.item("tinactory:ingot", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:press", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+        var inventory = new MutableInventory(Map.of(ingot, 1L));
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            new NoOpEvents());
+        var snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.RUNNING,
+            ExecutionDetails.Phase.RUN_STEP,
+            null,
+            null,
+            null,
+            0,
+            Map.of(ingot, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.runCycle(0);
+
+        assertEquals(ExecutionState.RUNNING, executor.state());
+        assertEquals(0L, inventory.amountOf(ingot));
+        assertEquals(2L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+    }
+
+    @Test
+    void reservationShouldRollbackWhenBufferedFirstNetworkExtractionIsPartial() {
+        var ingot = CraftKey.item("tinactory:ingot", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:press", List.of(new CraftAmount(ingot, 3)), List.of(new CraftAmount(plate, 1))),
+            1);
+        var inventory = new MutableInventory(Map.of(ingot, 2L));
+        inventory.forcedActualExtract.put(ingot, 1L);
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            new NoOpEvents());
+        var snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.RUNNING,
+            ExecutionDetails.Phase.RUN_STEP,
+            null,
+            null,
+            null,
+            0,
+            Map.of(ingot, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.runCycle(0);
+
+        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.error().code());
+        assertEquals(2L, inventory.amountOf(ingot));
+        assertEquals(1L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+    }
+
     @Test
     void stepCompletionShouldUseRequiredOutputsOnly() {
         var ore = CraftKey.item("tinactory:ore", "");
@@ -144,6 +217,7 @@ class ExecutorStateMachineTest {
 
     private static final class MutableInventory implements IInventoryView {
         private final Map<CraftKey, Long> amounts = new HashMap<>();
+        private final Map<CraftKey, Long> forcedActualExtract = new HashMap<>();
         private int extractCount;
         private boolean failSecondExtract;
 
@@ -165,6 +239,7 @@ class ExecutorStateMachineTest {
                 if (failSecondExtract && extractCount == 2) {
                     return 0L;
                 }
+                moved = Math.min(moved, forcedActualExtract.getOrDefault(key, moved));
                 amounts.put(key, available - moved);
             }
             return moved;

@@ -221,22 +221,33 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             stepRequiredInputs.merge(input.key(), amount, Long::sum);
         }
 
-        var reservations = new HashMap<CraftKey, Long>();
+        var inventoryReservations = new HashMap<CraftKey, Long>();
+        var bufferedReservations = new HashMap<CraftKey, Long>();
         for (var required : stepRequiredInputs.entrySet()) {
-            var simulated = inventory.extract(required.getKey(), required.getValue(), true);
-            if (simulated < required.getValue()) {
-                rollbackReservations(reservations);
+            var buffered = stepBuffer.getOrDefault(required.getKey(), 0L);
+            var missing = required.getValue() - Math.min(required.getValue(), buffered);
+            if (missing <= 0L) {
+                continue;
+            }
+            var simulated = inventory.extract(required.getKey(), missing, true);
+            if (simulated < missing) {
+                rollbackReservations(inventoryReservations);
+                rollbackBufferedReservations(bufferedReservations);
                 blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
                 return false;
             }
-            var extracted = inventory.extract(required.getKey(), required.getValue(), false);
-            if (extracted < required.getValue()) {
-                reservations.put(required.getKey(), extracted);
-                rollbackReservations(reservations);
+            var extracted = inventory.extract(required.getKey(), missing, false);
+            if (extracted < missing) {
+                if (extracted > 0L) {
+                    inventory.insert(required.getKey(), extracted, false);
+                }
+                rollbackReservations(inventoryReservations);
+                rollbackBufferedReservations(bufferedReservations);
                 blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
                 return false;
             }
-            reservations.put(required.getKey(), extracted);
+            inventoryReservations.put(required.getKey(), extracted);
+            bufferedReservations.put(required.getKey(), extracted);
             stepBuffer.merge(required.getKey(), extracted, Long::sum);
         }
         jobEvents.onStepStarted(step);
@@ -453,6 +464,18 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         for (var reserved : reservations.entrySet()) {
             if (reserved.getValue() > 0L) {
                 inventory.insert(reserved.getKey(), reserved.getValue(), false);
+            }
+        }
+    }
+
+    private void rollbackBufferedReservations(Map<CraftKey, Long> reservations) {
+        for (var reserved : reservations.entrySet()) {
+            var buffered = stepBuffer.getOrDefault(reserved.getKey(), 0L);
+            var retained = buffered - reserved.getValue();
+            if (retained > 0L) {
+                stepBuffer.put(reserved.getKey(), retained);
+            } else {
+                stepBuffer.remove(reserved.getKey());
             }
         }
     }
