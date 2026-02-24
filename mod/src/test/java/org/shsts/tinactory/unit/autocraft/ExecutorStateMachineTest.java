@@ -261,6 +261,101 @@ class ExecutorStateMachineTest {
     }
 
     @Test
+    void branchingDownstreamStepsShouldConsumeAllBufferedIntermediates() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var machineA = CraftKey.item("tinactory:machine_a", "");
+        var machineB = CraftKey.item("tinactory:machine_b", "");
+
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:part", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 2))),
+            1,
+            List.of(new CraftAmount(part, 2)),
+            List.of());
+        var secondStep = new CraftStep(
+            "s2",
+            pattern("tinactory:machine_a", List.of(new CraftAmount(part, 1)), List.of(new CraftAmount(machineA, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(machineA, 1)));
+        var thirdStep = new CraftStep(
+            "s3",
+            pattern("tinactory:machine_b", List.of(new CraftAmount(part, 1)), List.of(new CraftAmount(machineB, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(machineB, 1)));
+
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 2L), true);
+        var secondLease = new RouteLease(Map.of(part, 1L), Map.of(machineA, 1L), true);
+        var thirdLease = new RouteLease(Map.of(part, 1L), Map.of(machineB, 1L), true);
+        var allocator = new SequenceAllocator(List.of(firstLease, secondLease, thirdLease));
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep, thirdStep)));
+        for (int i = 0; i < 12; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(1L, inventory.amountOf(machineA));
+        assertEquals(1L, inventory.amountOf(machineB));
+        assertEquals(0L, inventory.amountOf(part));
+    }
+
+    @Test
+    void fanInStepsShouldAccumulateBufferedIntermediatesForSingleConsumerStep() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var machine = CraftKey.item("tinactory:machine", "");
+
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:part_from_ore", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 1))),
+            1,
+            List.of(new CraftAmount(part, 1)),
+            List.of());
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:part_from_plate",
+                List.of(new CraftAmount(plate, 1)),
+                List.of(new CraftAmount(part, 1))),
+            1,
+            List.of(new CraftAmount(part, 1)),
+            List.of());
+        var thirdStep = new CraftStep(
+            "s3",
+            pattern(
+                "tinactory:machine_from_part",
+                List.of(new CraftAmount(part, 2)),
+                List.of(new CraftAmount(machine, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(machine, 1)));
+
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 1L), true);
+        var secondLease = new RouteLease(Map.of(plate, 1L), Map.of(part, 1L), true);
+        var thirdLease = new RouteLease(Map.of(part, 2L), Map.of(machine, 1L), true);
+        var allocator = new SequenceAllocator(List.of(firstLease, secondLease, thirdLease));
+        var inventory = new MutableInventory(Map.of(ore, 1L, plate, 1L));
+        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep, thirdStep)));
+        for (int i = 0; i < 12; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(1L, inventory.amountOf(machine));
+        assertEquals(0L, inventory.amountOf(part));
+        assertEquals(1L, inventory.actualInserted(part));
+        assertEquals(1L, inventory.actualExtracted(part));
+    }
+
+    @Test
     void stepBoundaryFlushShouldIgnoreUnrelatedBufferedKeys() {
         var ore = CraftKey.item("tinactory:ore", "");
         var plate = CraftKey.item("tinactory:plate", "");
@@ -317,6 +412,8 @@ class ExecutorStateMachineTest {
         private final Map<CraftKey, Long> amounts = new HashMap<>();
         private final java.util.Set<CraftKey> rejectInsertKeys = new java.util.HashSet<>();
         private final Map<CraftKey, Long> forcedActualExtract = new HashMap<>();
+        private final Map<CraftKey, Long> actualExtracted = new HashMap<>();
+        private final Map<CraftKey, Long> actualInserted = new HashMap<>();
         private int extractCount;
         private boolean failSecondExtract;
 
@@ -340,6 +437,9 @@ class ExecutorStateMachineTest {
                 }
                 moved = Math.min(moved, forcedActualExtract.getOrDefault(key, moved));
                 amounts.put(key, available - moved);
+                if (moved > 0L) {
+                    actualExtracted.merge(key, moved, Long::sum);
+                }
             }
             return moved;
         }
@@ -352,8 +452,17 @@ class ExecutorStateMachineTest {
             }
             if (!simulate && moved > 0L) {
                 amounts.merge(key, moved, Long::sum);
+                actualInserted.merge(key, moved, Long::sum);
             }
             return moved;
+        }
+
+        private long actualExtracted(CraftKey key) {
+            return actualExtracted.getOrDefault(key, 0L);
+        }
+
+        private long actualInserted(CraftKey key) {
+            return actualInserted.getOrDefault(key, 0L);
         }
     }
 
