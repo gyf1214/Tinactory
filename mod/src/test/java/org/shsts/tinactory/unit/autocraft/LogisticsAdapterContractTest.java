@@ -7,9 +7,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fluids.FluidStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -25,13 +27,14 @@ import org.shsts.tinactory.core.autocraft.integration.LogisticsPatternRepository
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -96,6 +99,121 @@ class LogisticsAdapterContractTest {
         lease.release();
 
         assertFalse(lease.isValid());
+    }
+
+    @Test
+    void allocatorShouldMapDuplicateInputSlotsToDistinctConstrainedPorts() {
+        var ore = CraftKey.item("minecraft:iron_ore", "");
+        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
+        var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
+        var allocator = new LogisticsMachineAllocator(
+            () -> List.of(
+                new PortInfo(firstMachine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0),
+                new PortInfo(firstMachine, 1, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0),
+                new PortInfo(secondMachine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0),
+                new PortInfo(secondMachine, 2, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0)),
+            $ -> 0,
+            ($, recipeTypeId) -> true);
+        var step = new CraftStep(
+            "s1",
+            new CraftPattern(
+                "tinactory:double_ore",
+                List.of(new CraftAmount(ore, 1), new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(ingot, 1)),
+                new MachineRequirement(
+                    new ResourceLocation("tinactory", "smelting"),
+                    0,
+                    List.of(new InputPortConstraint(0, 0, null), new InputPortConstraint(1, 2, null)))),
+            1);
+
+        var lease = allocator.allocate(step).orElseThrow();
+
+        assertEquals(secondMachine.uuid(), lease.machineId());
+    }
+
+    @Test
+    void allocatorShouldHonorDirectionConstraintForInputRoutes() {
+        var ore = CraftKey.item("minecraft:iron_ore", "");
+        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
+        var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
+        var allocator = new LogisticsMachineAllocator(
+            () -> List.of(
+                new PortInfo(firstMachine, 0, new TrackingItemPort(true, false, 32), BlockPos.ZERO, 0),
+                new PortInfo(firstMachine, 1, new TrackingFluidPort(true, 1000), BlockPos.ZERO, 0),
+                new PortInfo(secondMachine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0)),
+            $ -> 0,
+            ($, recipeTypeId) -> true);
+        var step = new CraftStep(
+            "s1",
+            new CraftPattern(
+                "tinactory:directed",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(ingot, 1)),
+                new MachineRequirement(
+                    new ResourceLocation("tinactory", "smelting"),
+                    0,
+                    List.of(new InputPortConstraint(0, null, InputPortConstraint.Direction.OUTPUT)))),
+            1);
+
+        var lease = allocator.allocate(step).orElseThrow();
+
+        assertEquals(secondMachine.uuid(), lease.machineId());
+    }
+
+    @Test
+    void allocatorShouldSkipMachineWhenAnyConstrainedSlotCannotRouteAndFallbackToNext() {
+        var ore = CraftKey.item("minecraft:iron_ore", "");
+        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
+        var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
+        var allocator = new LogisticsMachineAllocator(
+            () -> List.of(
+                new PortInfo(firstMachine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0),
+                new PortInfo(secondMachine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0),
+                new PortInfo(secondMachine, 1, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0)),
+            $ -> 0,
+            ($, recipeTypeId) -> true);
+        var step = new CraftStep(
+            "s1",
+            new CraftPattern(
+                "tinactory:double_ore",
+                List.of(new CraftAmount(ore, 1), new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(ingot, 1)),
+                new MachineRequirement(
+                    new ResourceLocation("tinactory", "smelting"),
+                    0,
+                    List.of(new InputPortConstraint(0, 0, null), new InputPortConstraint(1, 1, null)))),
+            1);
+
+        var lease = allocator.allocate(step).orElseThrow();
+
+        assertEquals(secondMachine.uuid(), lease.machineId());
+    }
+
+    @Test
+    void allocatorShouldReturnEmptyWhenNoMachineMatchesSlotConstraints() {
+        var ore = CraftKey.item("minecraft:iron_ore", "");
+        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var machine = new FakeMachine("11111111-1111-1111-1111-111111111111");
+        var allocator = new LogisticsMachineAllocator(
+            () -> List.of(new PortInfo(machine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0)),
+            $ -> 0,
+            ($, recipeTypeId) -> true);
+        var step = new CraftStep(
+            "s1",
+            new CraftPattern(
+                "tinactory:double_ore",
+                List.of(new CraftAmount(ore, 1), new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(ingot, 1)),
+                new MachineRequirement(
+                    new ResourceLocation("tinactory", "smelting"),
+                    0,
+                    List.of(new InputPortConstraint(0, 0, null), new InputPortConstraint(1, 1, null)))),
+            1);
+
+        assertTrue(allocator.allocate(step).isEmpty());
     }
 
     private static CraftPattern pattern(String id, CraftKey key) {
@@ -172,10 +290,139 @@ class LogisticsAdapterContractTest {
         }
     }
 
+    private static final class TrackingItemPort implements IItemPort {
+        private final boolean allowInput;
+        private final boolean allowOutput;
+        private int available;
+
+        private TrackingItemPort(boolean allowInput, boolean allowOutput, int available) {
+            this.allowInput = allowInput;
+            this.allowOutput = allowOutput;
+            this.available = available;
+        }
+
+        @Override
+        public boolean acceptInput(ItemStack stack) {
+            return allowInput;
+        }
+
+        @Override
+        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+            if (!allowInput || stack.isEmpty()) {
+                return stack.copy();
+            }
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack extractItem(ItemStack item, boolean simulate) {
+            if (!allowOutput || item.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            var moved = Math.min(item.getCount(), available);
+            if (moved <= 0) {
+                return ItemStack.EMPTY;
+            }
+            if (!simulate) {
+                available -= moved;
+            }
+            var ret = item.copy();
+            ret.setCount(moved);
+            return ret;
+        }
+
+        @Override
+        public ItemStack extractItem(int limit, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getItemCount(ItemStack item) {
+            return allowOutput ? available : 0;
+        }
+
+        @Override
+        public Collection<ItemStack> getAllItems() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return allowOutput;
+        }
+    }
+
+    private static final class TrackingFluidPort implements IFluidPort {
+        private final boolean allowOutput;
+        private int available;
+
+        private TrackingFluidPort(boolean allowOutput, int available) {
+            this.allowOutput = allowOutput;
+            this.available = available;
+        }
+
+        @Override
+        public boolean acceptInput(FluidStack stack) {
+            return false;
+        }
+
+        @Override
+        public int fill(FluidStack fluid, boolean simulate) {
+            return 0;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack fluid, boolean simulate) {
+            if (!allowOutput || fluid.isEmpty()) {
+                return FluidStack.EMPTY;
+            }
+            var moved = Math.min(fluid.getAmount(), available);
+            if (moved <= 0) {
+                return FluidStack.EMPTY;
+            }
+            if (!simulate) {
+                available -= moved;
+            }
+            var ret = fluid.copy();
+            ret.setAmount(moved);
+            return ret;
+        }
+
+        @Override
+        public FluidStack drain(int limit, boolean simulate) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public int getFluidAmount(FluidStack fluid) {
+            return allowOutput ? available : 0;
+        }
+
+        @Override
+        public Collection<FluidStack> getAllFluids() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return allowOutput;
+        }
+    }
+
     private static final class FakeMachine implements IMachine {
+        private final UUID id;
+
+        private FakeMachine(String id) {
+            this.id = UUID.fromString(id);
+        }
+
+        private FakeMachine() {
+            this("11111111-1111-1111-1111-111111111111");
+        }
+
         @Override
         public UUID uuid() {
-            return UUID.fromString("11111111-1111-1111-1111-111111111111");
+            return id;
         }
 
         @Override

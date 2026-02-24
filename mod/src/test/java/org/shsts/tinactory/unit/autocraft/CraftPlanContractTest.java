@@ -9,7 +9,9 @@ import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.IMachineConstraint;
+import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -57,6 +59,23 @@ class CraftPlanContractTest {
         assertEquals("abc", encoded.payload());
         assertEquals("test:constraint", encoded.typeId());
         assertThrows(IllegalArgumentException.class, () -> registry.decode("test:unknown", "x"));
+    }
+
+    @Test
+    void machineConstraintRegistryShouldPreserveSlotScopedPortConstraints() {
+        var registry = new MachineConstraintRegistry();
+        registry.register(new InputPortConstraint.Type(), new InputPortConstraint.Codec());
+        registry.register(new OutputPortConstraint.Type(), new OutputPortConstraint.Codec());
+
+        var inputConstraint = new InputPortConstraint(1, 4, InputPortConstraint.Direction.INPUT);
+        var inputEncoded = registry.encode(inputConstraint);
+        var inputDecoded = registry.decode(inputEncoded.typeId(), inputEncoded.payload());
+        assertEquals(inputConstraint, inputDecoded);
+
+        var outputConstraint = new OutputPortConstraint(2, 6, OutputPortConstraint.Direction.OUTPUT);
+        var outputEncoded = registry.encode(outputConstraint);
+        var outputDecoded = registry.decode(outputEncoded.typeId(), outputEncoded.payload());
+        assertEquals(outputConstraint, outputDecoded);
     }
 
     private record TestConstraint(String value) implements IMachineConstraint {

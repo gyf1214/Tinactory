@@ -13,6 +13,8 @@ import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftServiceBootstrap;
 import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
+import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -30,11 +32,10 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
     private static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
-    private static final long BUFFER_LIMIT = 4096L;
-    private static final long TRANSMISSION_BANDWIDTH = 64L;
-    private static final int EXECUTION_INTERVAL_TICKS = 1;
 
-    private final PatternNbtCodec snapshotCodec = new PatternNbtCodec(new MachineConstraintRegistry());
+    private final PatternNbtCodec snapshotCodec = new PatternNbtCodec(createConstraintRegistry());
+    private final long transmissionBandwidth;
+    private final int executionIntervalTicks;
     @Nullable
     private AutocraftJobService service;
     @Nullable
@@ -42,12 +43,28 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     @Nullable
     private CompoundTag lastSnapshot;
 
-    public AutocraftCpu(BlockEntity blockEntity, double power) {
+    public AutocraftCpu(
+        BlockEntity blockEntity,
+        double power,
+        long transmissionBandwidth,
+        int executionIntervalTicks) {
         super(blockEntity, power);
+        this.transmissionBandwidth = transmissionBandwidth;
+        this.executionIntervalTicks = executionIntervalTicks;
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new AutocraftCpu(be, power));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
+        double power,
+        long transmissionBandwidth,
+        int executionIntervalTicks) {
+        return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
+    }
+
+    public static MachineConstraintRegistry createConstraintRegistry() {
+        var registry = new MachineConstraintRegistry();
+        registry.register(new InputPortConstraint.Type(), new InputPortConstraint.Codec());
+        registry.register(new OutputPortConstraint.Type(), new OutputPortConstraint.Codec());
+        return registry;
     }
 
     @Override
@@ -62,9 +79,8 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
             combinedItem,
             combinedFluid,
             machine.uuid(),
-            BUFFER_LIMIT,
-            TRANSMISSION_BANDWIDTH,
-            EXECUTION_INTERVAL_TICKS);
+            transmissionBandwidth,
+            executionIntervalTicks);
         if (pendingSnapshot != null) {
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;

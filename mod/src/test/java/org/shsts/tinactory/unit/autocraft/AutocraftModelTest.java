@@ -6,7 +6,9 @@ import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.IMachineConstraint;
+import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 
 import java.util.List;
 
@@ -54,6 +56,41 @@ class AutocraftModelTest {
         assertThrows(UnsupportedOperationException.class, () -> pattern.inputs().add(
             new CraftAmount(CraftKey.item("tinactory:other", ""), 1)));
         assertThrows(IllegalArgumentException.class, () -> new CraftAmount(CraftKey.item("tinactory:invalid", ""), 0));
+    }
+
+    @Test
+    void inputPortConstraintShouldValidateSelectorsAndIndices() {
+        var constraint = new InputPortConstraint(0, 2, null);
+        assertEquals(0, constraint.inputSlotIndex());
+        assertEquals(2, constraint.portIndex());
+        assertEquals("tinactory:input_port", constraint.typeId());
+
+        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(-1, 0, null));
+        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(0, -1, null));
+        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(0, null, null));
+    }
+
+    @Test
+    void outputPortConstraintShouldValidateSelectorsAndIndices() {
+        var constraint = new OutputPortConstraint(1, null, OutputPortConstraint.Direction.OUTPUT);
+        assertEquals(1, constraint.outputSlotIndex());
+        assertEquals(OutputPortConstraint.Direction.OUTPUT, constraint.direction());
+        assertEquals("tinactory:output_port", constraint.typeId());
+
+        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(-1, 0, null));
+        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(0, -1, null));
+        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(0, null, null));
+    }
+
+    @Test
+    void slotScopedConstraintsShouldDisambiguateDuplicateCraftKeysByIndex() {
+        var input0 = new InputPortConstraint(0, 1, null);
+        var input1 = new InputPortConstraint(1, 1, null);
+        var output0 = new OutputPortConstraint(0, 3, null);
+        var output1 = new OutputPortConstraint(1, 3, null);
+
+        assertThrows(AssertionError.class, () -> assertEquals(input0, input1));
+        assertThrows(AssertionError.class, () -> assertEquals(output0, output1));
     }
 
     private record TestConstraint(String typeId) implements IMachineConstraint {

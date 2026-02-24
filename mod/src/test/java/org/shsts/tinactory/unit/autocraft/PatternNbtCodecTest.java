@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.content.autocraft.AutocraftCpu;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
@@ -12,7 +13,9 @@ import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.IMachineConstraint;
+import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 
 import java.util.List;
 
@@ -65,6 +68,31 @@ class PatternNbtCodecTest {
         tag.put("machineRequirement", machine);
 
         assertThrows(IllegalArgumentException.class, () -> codec.decodePattern(tag));
+    }
+
+    @Test
+    void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
+        var codec = new PatternNbtCodec(AutocraftCpu.createConstraintRegistry());
+        var pattern = new CraftPattern(
+            "tinactory:slot_constraints",
+            List.of(
+                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(
+                new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1),
+                new CraftAmount(CraftKey.item("minecraft:slag", ""), 1)),
+            new MachineRequirement(
+                new ResourceLocation("tinactory", "press"),
+                1,
+                List.of(
+                    new InputPortConstraint(0, 2, null),
+                    new InputPortConstraint(1, null, InputPortConstraint.Direction.INPUT),
+                    new OutputPortConstraint(0, 5, null),
+                    new OutputPortConstraint(1, null, OutputPortConstraint.Direction.OUTPUT))));
+
+        var decoded = codec.decodePattern(codec.encodePattern(pattern));
+
+        assertEquals(pattern, decoded);
     }
 
     private record TestConstraint(String value) implements IMachineConstraint {

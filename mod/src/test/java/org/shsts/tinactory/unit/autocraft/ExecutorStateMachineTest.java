@@ -114,6 +114,29 @@ class ExecutorStateMachineTest {
         assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
     }
 
+    @Test
+    void reservationShouldNotBlockWhenOnlyBufferLimitWouldOverflow() {
+        var ingot = CraftKey.item("tinactory:ingot", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:press", List.of(new CraftAmount(ingot, 3)), List.of(new CraftAmount(plate, 1))),
+            1);
+        var lease = new RouteLease(Map.of(ingot, 3L), Map.of(plate, 1L), true);
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ingot, 3L)),
+            $ -> Optional.of(lease),
+            new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(step)));
+        executor.runCycle(4);
+        executor.runCycle(4);
+        executor.runCycle(4);
+        executor.runCycle(4);
+
+        assertEquals(ExecutionState.COMPLETED, executor.state());
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));

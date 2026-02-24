@@ -22,7 +22,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private final IInventoryView inventory;
     private final IMachineAllocator machineAllocator;
     private final IJobEvents jobEvents;
-    private final long bufferLimit;
 
     private CraftPlan plan = new CraftPlan(List.of());
     private int nextStep = 0;
@@ -46,19 +45,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private final Map<CraftKey, Long> transmittedRequiredOutputs = new HashMap<>();
 
     public SequentialCraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
-        this(inventory, machineAllocator, jobEvents, Long.MAX_VALUE);
-    }
-
-    public SequentialCraftExecutor(
-        IInventoryView inventory,
-        IMachineAllocator machineAllocator,
-        IJobEvents jobEvents,
-        long bufferLimit) {
-
         this.inventory = inventory;
         this.machineAllocator = machineAllocator;
         this.jobEvents = jobEvents;
-        this.bufferLimit = bufferLimit;
     }
 
     @Override
@@ -230,14 +219,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         for (var input : step.pattern().inputs()) {
             var amount = input.amount() * step.runs();
             stepRequiredInputs.merge(input.key(), amount, Long::sum);
-        }
-        long reservedTotal = 0L;
-        for (var amount : stepRequiredInputs.values()) {
-            reservedTotal += amount;
-        }
-        if (reservedTotal > bufferLimit) {
-            blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Step reservation exceeds buffer limit");
-            return false;
         }
 
         var reservations = new HashMap<CraftKey, Long>();

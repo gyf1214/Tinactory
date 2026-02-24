@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -15,6 +16,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.content.material.MiscMeta;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitErrorCode;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
@@ -34,6 +36,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftCpuLifecycleTest {
@@ -97,6 +100,28 @@ class AutocraftCpuLifecycleTest {
         assertTrue(result.isSuccess());
         assertNotNull(result.optionalJobId().orElse(null));
         assertEquals(cpu.uuid(), service.cpuId());
+    }
+
+    @Test
+    void miscMetaShouldRequireCpuRuntimeFields() {
+        var jo = new JsonObject();
+        jo.addProperty("power", 32d);
+
+        assertThrows(IllegalArgumentException.class, () -> MiscMeta.parseAutocraftCpuConfig(jo));
+    }
+
+    @Test
+    void miscMetaShouldParseCpuRuntimeFields() {
+        var jo = new JsonObject();
+        jo.addProperty("power", 32d);
+        jo.addProperty("transmissionBandwidth", 128L);
+        jo.addProperty("executionIntervalTicks", 2);
+
+        var config = MiscMeta.parseAutocraftCpuConfig(jo);
+
+        assertEquals(32d, config.power());
+        assertEquals(128L, config.transmissionBandwidth());
+        assertEquals(2, config.executionIntervalTicks());
     }
 
     private static final class TestService extends AutocraftJobService {

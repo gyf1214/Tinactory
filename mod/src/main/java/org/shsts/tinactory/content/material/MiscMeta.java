@@ -74,6 +74,38 @@ public class MiscMeta extends MetaConsumer {
         super("Misc");
     }
 
+    public record AutocraftCpuConfig(double power, long transmissionBandwidth, int executionIntervalTicks) {
+    }
+
+    public static AutocraftCpuConfig parseAutocraftCpuConfig(JsonObject jo) {
+        var power = GsonHelper.getAsDouble(jo, "power");
+        var transmissionBandwidth = requiredPositiveLong(jo, "transmissionBandwidth");
+        var executionIntervalTicks = requiredPositiveInt(jo, "executionIntervalTicks");
+        return new AutocraftCpuConfig(power, transmissionBandwidth, executionIntervalTicks);
+    }
+
+    private static long requiredPositiveLong(JsonObject jo, String field) {
+        if (!jo.has(field)) {
+            throw new IllegalArgumentException("missing required field: " + field);
+        }
+        var value = GsonHelper.getAsLong(jo, field);
+        if (value <= 0L) {
+            throw new IllegalArgumentException(field + " must be positive");
+        }
+        return value;
+    }
+
+    private static int requiredPositiveInt(JsonObject jo, String field) {
+        if (!jo.has(field)) {
+            throw new IllegalArgumentException("missing required field: " + field);
+        }
+        var value = GsonHelper.getAsInt(jo, field);
+        if (value <= 0) {
+            throw new IllegalArgumentException(field + " must be positive");
+        }
+        return value;
+    }
+
     private static MaterialColor parseMaterialColor(JsonObject jo, String field) {
         // TODO: use string instead of integer
         return MaterialColor.byId(GsonHelper.getAsInt(jo, field));
@@ -237,15 +269,18 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void autocraftCpu(String id, JsonObject jo) {
-        var power = GsonHelper.getAsDouble(jo, "power");
+        var config = parseAutocraftCpuConfig(jo);
         BlockEntityBuilder.builder(id,
                 MachineBlocks.simple(tooltip -> {
                     addTooltip(tooltip, "autocraftCpu");
-                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(config.power()));
                 }))
             .transform(MachineSet::baseMachine)
             .blockEntity()
-            .transform(AutocraftCpu.factory(power))
+            .transform(AutocraftCpu.factory(
+                config.power(),
+                config.transmissionBandwidth(),
+                config.executionIntervalTicks()))
             .end()
             .build();
     }

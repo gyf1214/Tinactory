@@ -26,7 +26,6 @@ public final class AutocraftServiceBootstrap {
         IItemPort itemPort,
         IFluidPort fluidPort,
         UUID cpuId,
-        long bufferLimit,
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
@@ -41,7 +40,7 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftJobService(
             cpuId,
             planner,
-            () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents(), bufferLimit),
+            () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
             inventory::snapshotAvailable,
             transmissionBandwidth,
             executionIntervalTicks);
