@@ -116,7 +116,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         if (stepCompleted()) {
             releaseLease();
             var completedStep = step;
-            var flushCandidates = extractFlushCandidates(nextStep + 1);
+            var flushCandidates = extractFlushCandidates(completedStep);
             clearStepProgressState();
             jobEvents.onStepCompleted(completedStep);
             nextStep++;
@@ -548,33 +548,29 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         leasedMachineId = null;
     }
 
-    private Map<CraftKey, Long> extractFlushCandidates(int fromStepIndex) {
-        var remainingIntermediateDemand = remainingIntermediateDemand(fromStepIndex);
+    private Map<CraftKey, Long> extractFlushCandidates(CraftStep step) {
+        var requiredIntermediateByKey = new HashMap<CraftKey, Long>();
+        for (var amount : step.requiredIntermediateOutputs()) {
+            requiredIntermediateByKey.merge(amount.key(), amount.amount(), Long::sum);
+        }
         var flushCandidates = new HashMap<CraftKey, Long>();
-        for (var entry : List.copyOf(stepBuffer.entrySet())) {
-            var keep = Math.min(entry.getValue(), remainingIntermediateDemand.getOrDefault(entry.getKey(), 0L));
-            var flush = entry.getValue() - keep;
+        for (var output : step.pattern().outputs()) {
+            var buffered = stepBuffer.getOrDefault(output.key(), 0L);
+            if (buffered <= 0L) {
+                continue;
+            }
+            var keep = Math.min(buffered, requiredIntermediateByKey.getOrDefault(output.key(), 0L));
+            var flush = buffered - keep;
             if (keep > 0L) {
-                stepBuffer.put(entry.getKey(), keep);
+                stepBuffer.put(output.key(), keep);
             } else {
-                stepBuffer.remove(entry.getKey());
+                stepBuffer.remove(output.key());
             }
             if (flush > 0L) {
-                flushCandidates.put(entry.getKey(), flush);
+                flushCandidates.merge(output.key(), flush, Long::sum);
             }
         }
         return flushCandidates;
-    }
-
-    private Map<CraftKey, Long> remainingIntermediateDemand(int fromStepIndex) {
-        var demand = new HashMap<CraftKey, Long>();
-        for (var i = fromStepIndex; i < plan.steps().size(); i++) {
-            var step = plan.steps().get(i);
-            for (var input : step.pattern().inputs()) {
-                demand.merge(input.key(), input.amount() * step.runs(), Long::sum);
-            }
-        }
-        return demand;
     }
 
     private static long divideCeil(long numerator, long denominator) {

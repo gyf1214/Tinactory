@@ -260,6 +260,54 @@ class ExecutorStateMachineTest {
         assertEquals(0L, inventory.amountOf(part));
     }
 
+    @Test
+    void stepBoundaryFlushShouldIgnoreUnrelatedBufferedKeys() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var gear = CraftKey.item("tinactory:gear", "");
+        var carry = CraftKey.item("tinactory:carry", "");
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        var secondStep = new CraftStep(
+            "s2",
+            pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(gear, 1)));
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true);
+        var secondLease = new RouteLease(Map.of(plate, 1L), Map.of(), true);
+        var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        inventory.rejectInsertKeys.add(carry);
+        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.RUNNING,
+            ExecutionDetails.Phase.RUN_STEP,
+            null,
+            null,
+            null,
+            0,
+            Map.of(carry, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.runCycle(64);
+        executor.runCycle(64);
+        executor.runCycle(64);
+
+        assertEquals(ExecutionState.RUNNING, executor.state());
+        assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
+        assertEquals(1, executor.details().nextStepIndex());
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
@@ -267,6 +315,7 @@ class ExecutorStateMachineTest {
 
     private static final class MutableInventory implements IInventoryView {
         private final Map<CraftKey, Long> amounts = new HashMap<>();
+        private final java.util.Set<CraftKey> rejectInsertKeys = new java.util.HashSet<>();
         private final Map<CraftKey, Long> forcedActualExtract = new HashMap<>();
         private int extractCount;
         private boolean failSecondExtract;
@@ -298,6 +347,9 @@ class ExecutorStateMachineTest {
         @Override
         public long insert(CraftKey key, long amount, boolean simulate) {
             var moved = Math.max(0L, amount);
+            if (rejectInsertKeys.contains(key)) {
+                return 0L;
+            }
             if (!simulate && moved > 0L) {
                 amounts.merge(key, moved, Long::sum);
             }
