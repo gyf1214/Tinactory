@@ -246,8 +246,14 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             var requiredIntermediateOutputs = new ArrayList<CraftAmount>();
             var requiredFinalOutputs = new ArrayList<CraftAmount>();
             for (var output : stepOutputs.entrySet()) {
-                var intermediateRequired = consumeDemand(remainingIntermediateDemand, output.getKey(), output.getValue());
-                var finalRequired = consumeDemand(remainingFinalDemand, output.getKey(), output.getValue() - intermediateRequired);
+                var intermediateRequired = consumeDemand(
+                    remainingIntermediateDemand,
+                    output.getKey(),
+                    output.getValue());
+                var finalRequired = consumeDemand(
+                    remainingFinalDemand,
+                    output.getKey(),
+                    output.getValue() - intermediateRequired);
                 if (intermediateRequired > 0L) {
                     requiredIntermediateOutputs.add(new CraftAmount(output.getKey(), intermediateRequired));
                 }
