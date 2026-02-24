@@ -141,7 +141,9 @@ public class AutocraftJobService {
     }
 
     public UUID submit(List<CraftAmount> targets) {
-        assert !isBusy();
+        if (isBusy()) {
+            throw new IllegalStateException("autocraft CPU is busy");
+        }
         var id = UUID.randomUUID();
         jobs.put(id, new AutocraftJob(id, targets, AutocraftJob.Status.QUEUED, null, null, null));
         queued.add(id);
