@@ -370,7 +370,8 @@ public class AutocraftJobService {
             stepTag.putString("stepId", step.stepId());
             stepTag.putLong("runs", step.runs());
             stepTag.put("pattern", codec.encodePattern(step.pattern()));
-            stepTag.put("requiredOutputs", serializeAmounts(step.requiredOutputs()));
+            stepTag.put("requiredIntermediateOutputs", serializeAmounts(step.requiredIntermediateOutputs()));
+            stepTag.put("requiredFinalOutputs", serializeAmounts(step.requiredFinalOutputs()));
             steps.add(stepTag);
         }
         tag.put("steps", steps);
@@ -382,11 +383,18 @@ public class AutocraftJobService {
         var out = new ArrayList<CraftStep>(steps.size());
         for (var i = 0; i < steps.size(); i++) {
             var stepTag = steps.getCompound(i);
+            var requiredIntermediateOutputs = stepTag.contains("requiredIntermediateOutputs") ?
+                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND)) :
+                List.<CraftAmount>of();
+            var requiredFinalOutputs = stepTag.contains("requiredFinalOutputs") ?
+                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND)) :
+                deserializeAmounts(stepTag.getList("requiredOutputs", TAG_COMPOUND));
             out.add(new CraftStep(
                 stepTag.getString("stepId"),
                 codec.decodePattern(stepTag.getCompound("pattern")),
                 stepTag.getLong("runs"),
-                deserializeAmounts(stepTag.getList("requiredOutputs", TAG_COMPOUND))));
+                requiredIntermediateOutputs,
+                requiredFinalOutputs));
         }
         return new CraftPlan(out);
     }

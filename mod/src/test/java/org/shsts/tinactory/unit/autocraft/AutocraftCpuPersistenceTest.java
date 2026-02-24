@@ -11,6 +11,8 @@ import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
+import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
@@ -67,6 +69,37 @@ class AutocraftCpuPersistenceTest {
 
         assertEquals(cpuId, snapshot.cpuId());
         assertTrue(snapshot.runtimeSnapshot().nextStepIndex() >= 0);
+    }
+
+    @Test
+    void serviceShouldPersistStepOutputRolesInSnapshot() {
+        var cpuId = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
+        var step = new CraftStep(
+            "s1",
+            new CraftPattern(
+                "tinactory:s1",
+                List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 2)),
+                List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 2)),
+                new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())),
+            1,
+            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)));
+        var plan = new CraftPlan(List.of(step));
+        var planner = new FixedPlanner(PlanResult.success(plan));
+        var service = new AutocraftJobService(cpuId, planner, AutocraftCpuPersistenceTest::executor, List::of);
+        var codec = new PatternNbtCodec(new MachineConstraintRegistry());
+
+        service.submit(List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)));
+        service.tick();
+        var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
+        var restored = new AutocraftJobService(cpuId, planner, AutocraftCpuPersistenceTest::executor, List::of);
+        restored.restoreRunningSnapshot(serialized, codec);
+
+        var restoredStep = restored.snapshotRunning().orElseThrow().plan().steps().get(0);
+        assertEquals(List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
+            restoredStep.requiredIntermediateOutputs());
+        assertEquals(List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
+            restoredStep.requiredFinalOutputs());
     }
 
     private static CraftStep step(String id) {
