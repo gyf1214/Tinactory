@@ -41,6 +41,7 @@ public final class PlannerSession {
         final boolean rootDemand;
         long remaining;
         List<CraftPattern> candidates;
+        int candidateStartIndex;
         int candidateIndex;
         int inputIndex;
         long runs;
@@ -59,6 +60,7 @@ public final class PlannerSession {
             this.rootDemand = rootDemand;
             this.remaining = 0L;
             this.candidates = List.of();
+            this.candidateStartIndex = 0;
             this.candidateIndex = 0;
             this.inputIndex = 0;
             this.runs = 0L;

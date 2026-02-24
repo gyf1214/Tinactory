@@ -111,6 +111,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             return;
         }
         frame.firstError = null;
+        frame.candidateStartIndex = 0;
         frame.candidateIndex = 0;
         frame.stage = PlannerSession.Stage.SELECT_PATTERN;
     }
@@ -122,10 +123,11 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             return;
         }
         var pattern = frame.candidates.get(frame.candidateIndex);
+        frame.candidateStartIndex = frame.candidateIndex;
         frame.ledgerSnapshot = session.ledger.copy();
         frame.stepCountSnapshot = session.steps.size();
         frame.stepIdSnapshot = session.nextStepId;
-        frame.runs = divideCeil(frame.remaining, getProducedAmount(pattern, frame.key));
+        frame.runs = 1L;
         frame.inputIndex = 0;
         frame.childError = null;
         frame.stage = PlannerSession.Stage.REDUCE_INPUTS;
@@ -157,13 +159,18 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         for (var output : pattern.outputs()) {
             session.ledger.add(output.key(), output.amount() * frame.runs);
         }
+        var fulfilled = session.ledger.consume(frame.key, frame.remaining);
         session.steps.add(new CraftStep(
             "step-" + session.nextStepId++,
             pattern,
             frame.runs,
-            List.of(new CraftAmount(frame.key, frame.remaining))));
-        session.ledger.consume(frame.key, frame.remaining);
-        popSuccess(session);
+            List.of(new CraftAmount(frame.key, fulfilled))));
+        frame.remaining -= fulfilled;
+        if (frame.remaining <= 0L) {
+            popSuccess(session);
+            return;
+        }
+        frame.stage = PlannerSession.Stage.SELECT_PATTERN;
     }
 
     private void rollbackCandidate(PlannerSession session, PlannerSession.SearchFrame frame) {
@@ -223,10 +230,6 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             }
         }
         throw new IllegalArgumentException("pattern does not produce target key: " + pattern.patternId());
-    }
-
-    private static long divideCeil(long numerator, long denominator) {
-        return (numerator + denominator - 1L) / denominator;
     }
 
     private static CraftPlan buildPlan(PlannerSession session) {

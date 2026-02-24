@@ -8,14 +8,12 @@ import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
-import org.shsts.tinactory.core.autocraft.plan.PlanError;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GoalReductionPlannerTest {
@@ -189,9 +187,50 @@ class GoalReductionPlannerTest {
             List.of(new CraftAmount(machine, 1)),
             List.of(new CraftAmount(ore, 1), new CraftAmount(plate, 1)));
 
-        assertFalse(result.isSuccess());
-        assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, result.error().code());
-        assertEquals(ore, result.error().targetKey());
+        assertTrue(result.isSuccess());
+        var steps = result.plan().steps();
+        assertEquals(3, steps.size());
+        assertEquals("tinactory:part_from_ore", steps.get(0).pattern().patternId());
+        assertEquals("tinactory:part_from_plate", steps.get(1).pattern().patternId());
+        assertEquals("tinactory:machine_from_part", steps.get(2).pattern().patternId());
+        assertEquals(List.of(new CraftAmount(part, 1)), steps.get(0).requiredIntermediateOutputs());
+        assertEquals(List.of(), steps.get(0).requiredFinalOutputs());
+        assertEquals(List.of(new CraftAmount(part, 1)), steps.get(1).requiredIntermediateOutputs());
+        assertEquals(List.of(), steps.get(1).requiredFinalOutputs());
+    }
+
+    @Test
+    void plannerShouldMixSecondProducerWhenFirstHasInsufficientInput() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var plate = CraftKey.item("tinactory:plate", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var machine = CraftKey.item("tinactory:machine", "");
+
+        var partFromOre = pattern(
+            "tinactory:a_part_from_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(part, 1)));
+        var partFromPlate = pattern(
+            "tinactory:b_part_from_plate",
+            List.of(new CraftAmount(plate, 1)),
+            List.of(new CraftAmount(part, 1)));
+        var machineFromPart = pattern(
+            "tinactory:machine_from_part",
+            List.of(new CraftAmount(part, 3)),
+            List.of(new CraftAmount(machine, 1)));
+        var planner = new GoalReductionPlanner(repo(List.of(partFromOre, partFromPlate, machineFromPart)));
+
+        var result = planner.plan(
+            List.of(new CraftAmount(machine, 1)),
+            List.of(new CraftAmount(ore, 2), new CraftAmount(plate, 1)));
+
+        assertTrue(result.isSuccess());
+        var steps = result.plan().steps();
+        assertEquals(4, steps.size());
+        assertEquals("tinactory:a_part_from_ore", steps.get(0).pattern().patternId());
+        assertEquals("tinactory:a_part_from_ore", steps.get(1).pattern().patternId());
+        assertEquals("tinactory:b_part_from_plate", steps.get(2).pattern().patternId());
+        assertEquals("tinactory:machine_from_part", steps.get(3).pattern().patternId());
     }
 
     @Test
