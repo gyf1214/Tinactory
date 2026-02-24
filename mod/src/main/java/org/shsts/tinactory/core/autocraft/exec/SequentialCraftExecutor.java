@@ -39,6 +39,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private UUID leasedMachineId;
 
     private final Map<CraftKey, Long> stepBuffer = new HashMap<>();
+    private final Map<CraftKey, Long> stepProducedOutputs = new HashMap<>();
     private final Map<CraftKey, Long> stepRequiredOutputs = new HashMap<>();
     private final Map<CraftKey, Long> stepRequiredInputs = new HashMap<>();
     private final Map<CraftKey, Long> transmittedInputs = new HashMap<>();
@@ -195,6 +196,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             pendingTerminalState,
             nextStep,
             stepBuffer,
+            stepProducedOutputs,
             stepRequiredOutputs,
             stepRequiredInputs,
             transmittedInputs,
@@ -210,6 +212,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         pendingTerminalState = snapshot.pendingTerminalState();
         nextStep = snapshot.nextStepIndex();
         stepBuffer.putAll(snapshot.stepBuffer());
+        stepProducedOutputs.putAll(snapshot.stepProducedOutputs());
         stepRequiredOutputs.putAll(snapshot.stepRequiredOutputs());
         stepRequiredInputs.putAll(snapshot.stepRequiredInputs());
         transmittedInputs.putAll(snapshot.transmittedInputs());
@@ -312,6 +315,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 continue;
             }
             stepBuffer.merge(key, moved, Long::sum);
+            stepProducedOutputs.merge(key, moved, Long::sum);
             transmittedRequiredOutputs.merge(key, moved, Long::sum);
             remaining -= moved;
         }
@@ -327,6 +331,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 continue;
             }
             stepBuffer.merge(route.key(), moved, Long::sum);
+            stepProducedOutputs.merge(route.key(), moved, Long::sum);
             remaining -= moved;
         }
         return remaining;
@@ -500,6 +505,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     }
 
     private void clearStepProgressState() {
+        stepProducedOutputs.clear();
         stepRequiredOutputs.clear();
         stepRequiredInputs.clear();
         transmittedInputs.clear();
@@ -554,20 +560,25 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             requiredIntermediateByKey.merge(amount.key(), amount.amount(), Long::sum);
         }
         var flushCandidates = new HashMap<CraftKey, Long>();
-        for (var output : step.pattern().outputs()) {
-            var buffered = stepBuffer.getOrDefault(output.key(), 0L);
+        for (var produced : stepProducedOutputs.entrySet()) {
+            var key = produced.getKey();
+            var buffered = stepBuffer.getOrDefault(key, 0L);
             if (buffered <= 0L) {
                 continue;
             }
-            var keep = Math.min(buffered, requiredIntermediateByKey.getOrDefault(output.key(), 0L));
-            var flush = buffered - keep;
-            if (keep > 0L) {
-                stepBuffer.put(output.key(), keep);
+            var flush = produced.getValue() - requiredIntermediateByKey.getOrDefault(key, 0L);
+            if (flush <= 0L) {
+                continue;
+            }
+            flush = Math.min(flush, buffered);
+            var retained = buffered - flush;
+            if (retained > 0L) {
+                stepBuffer.put(key, retained);
             } else {
-                stepBuffer.remove(output.key());
+                stepBuffer.remove(key);
             }
             if (flush > 0L) {
-                flushCandidates.merge(output.key(), flush, Long::sum);
+                flushCandidates.put(key, flush);
             }
         }
         return flushCandidates;

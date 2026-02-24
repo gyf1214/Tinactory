@@ -408,6 +408,7 @@ public class AutocraftJobService {
         }
         tag.putInt("nextStepIndex", snapshot.nextStepIndex());
         tag.put("stepBuffer", serializeKeyedAmounts(snapshot.stepBuffer()));
+        tag.put("stepProducedOutputs", serializeKeyedAmounts(snapshot.stepProducedOutputs()));
         tag.put("stepRequiredOutputs", serializeKeyedAmounts(snapshot.stepRequiredOutputs()));
         tag.put("stepRequiredInputs", serializeKeyedAmounts(snapshot.stepRequiredInputs()));
         tag.put("transmittedInputs", serializeKeyedAmounts(snapshot.transmittedInputs()));
@@ -427,6 +428,7 @@ public class AutocraftJobService {
             tag.contains("pendingTerminalState") ? ExecutionState.valueOf(tag.getString("pendingTerminalState")) : null,
             tag.getInt("nextStepIndex"),
             deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND)),
+            deserializeKeyedAmounts(tag.getList("stepProducedOutputs", TAG_COMPOUND)),
             deserializeKeyedAmounts(tag.getList("stepRequiredOutputs", TAG_COMPOUND)),
             deserializeKeyedAmounts(tag.getList("stepRequiredInputs", TAG_COMPOUND)),
             deserializeKeyedAmounts(tag.getList("transmittedInputs", TAG_COMPOUND)),

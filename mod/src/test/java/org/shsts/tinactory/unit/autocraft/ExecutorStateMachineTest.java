@@ -54,6 +54,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             Map.of(),
             Map.of(),
+            Map.of(),
             null);
 
         executor.start(new CraftPlan(List.of(step)), 0, snapshot);
@@ -86,6 +87,7 @@ class ExecutorStateMachineTest {
             null,
             0,
             Map.of(ingot, 1L),
+            Map.of(),
             Map.of(),
             Map.of(),
             Map.of(),
@@ -351,8 +353,65 @@ class ExecutorStateMachineTest {
         assertEquals(ExecutionState.COMPLETED, executor.state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
-        assertEquals(1L, inventory.actualInserted(part));
-        assertEquals(1L, inventory.actualExtracted(part));
+        assertEquals(0L, inventory.actualInserted(part));
+        assertEquals(0L, inventory.actualExtracted(part));
+    }
+
+    @Test
+    void stepBoundaryFlushShouldKeepCarriedBufferForSameKeyOutput() {
+        var ore = CraftKey.item("tinactory:ore", "");
+        var part = CraftKey.item("tinactory:part", "");
+        var machine = CraftKey.item("tinactory:machine", "");
+
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:part_from_ore", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 2))),
+            1,
+            List.of(new CraftAmount(part, 1)),
+            List.of());
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:machine_from_part",
+                List.of(new CraftAmount(part, 2)),
+                List.of(new CraftAmount(machine, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(machine, 1)));
+
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 2L), true);
+        var secondLease = new RouteLease(Map.of(part, 2L), Map.of(machine, 1L), true);
+        var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.RUNNING,
+            ExecutionDetails.Phase.RUN_STEP,
+            null,
+            null,
+            null,
+            0,
+            Map.of(part, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.runCycle(64);
+        executor.runCycle(64);
+        executor.runCycle(64);
+
+        for (int i = 0; i < 6; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(1L, inventory.amountOf(machine));
+        assertEquals(1L, inventory.amountOf(part));
+        assertEquals(0L, inventory.actualExtracted(part));
     }
 
     @Test
@@ -387,6 +446,7 @@ class ExecutorStateMachineTest {
             null,
             0,
             Map.of(carry, 1L),
+            Map.of(),
             Map.of(),
             Map.of(),
             Map.of(),

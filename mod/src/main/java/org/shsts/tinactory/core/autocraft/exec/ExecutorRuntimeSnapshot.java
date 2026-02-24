@@ -18,6 +18,7 @@ public record ExecutorRuntimeSnapshot(
     @Nullable ExecutionState pendingTerminalState,
     int nextStepIndex,
     Map<CraftKey, Long> stepBuffer,
+    Map<CraftKey, Long> stepProducedOutputs,
     Map<CraftKey, Long> stepRequiredOutputs,
     Map<CraftKey, Long> stepRequiredInputs,
     Map<CraftKey, Long> transmittedInputs,
@@ -26,6 +27,7 @@ public record ExecutorRuntimeSnapshot(
 
     public ExecutorRuntimeSnapshot {
         stepBuffer = Map.copyOf(stepBuffer);
+        stepProducedOutputs = Map.copyOf(stepProducedOutputs);
         stepRequiredOutputs = Map.copyOf(stepRequiredOutputs);
         stepRequiredInputs = Map.copyOf(stepRequiredInputs);
         transmittedInputs = Map.copyOf(transmittedInputs);
