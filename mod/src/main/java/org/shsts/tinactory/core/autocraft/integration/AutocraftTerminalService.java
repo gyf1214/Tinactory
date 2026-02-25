@@ -116,9 +116,6 @@ public class AutocraftTerminalService {
     }
 
     public AutocraftExecuteResult execute(AutocraftExecuteRequest request) {
-        if (request.planId() == null || request.cpuId() == null) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.INVALID_REQUEST);
-        }
         var snapshot = previewStore.find(request.planId());
         if (snapshot.isEmpty()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.PLAN_NOT_FOUND);

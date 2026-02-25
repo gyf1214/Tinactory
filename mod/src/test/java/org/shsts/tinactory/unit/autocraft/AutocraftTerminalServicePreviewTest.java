@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalServicePreviewTest {
@@ -52,7 +53,7 @@ class AutocraftTerminalServicePreviewTest {
             new StaticPlanner(),
             List::of,
             List::of,
-            () -> List.of(),
+            List::of,
             List::of,
             new AutocraftPreviewSessionStore());
 
@@ -61,7 +62,7 @@ class AutocraftTerminalServicePreviewTest {
             1,
             cpu));
 
-        assertTrue(!result.isSuccess());
+        assertFalse(result.isSuccess());
         assertEquals(AutocraftPreviewErrorCode.CPU_BUSY, result.errorCode());
     }
 
