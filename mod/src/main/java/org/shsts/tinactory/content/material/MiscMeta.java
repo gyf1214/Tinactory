@@ -20,6 +20,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.content.autocraft.AutocraftCpu;
+import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
 import org.shsts.tinactory.content.logistics.MEDrive;
 import org.shsts.tinactory.content.logistics.MEPatternCellSet;
 import org.shsts.tinactory.content.logistics.MEPatternCell;
@@ -285,6 +286,21 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
+    private void autocraftTerminal(String id, JsonObject jo) {
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id,
+                MachineBlocks.simple(tooltip -> {
+                    addTooltip(tooltip, "autocraftTerminal");
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                }))
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.AUTOCRAFT_TERMINAL)
+            .blockEntity()
+            .transform(AutocraftTerminal.factory(power))
+            .end()
+            .build();
+    }
+
     private void boiler(String id, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
@@ -341,6 +357,7 @@ public class MiscMeta extends MetaConsumer {
             case "me_signal_controller" -> meSignalController(id, jo);
             case "me_storage_detector" -> meStorageDetector(id, jo);
             case "autocraft_cpu" -> autocraftCpu(id, jo);
+            case "autocraft_terminal" -> autocraftTerminal(id, jo);
             case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }
