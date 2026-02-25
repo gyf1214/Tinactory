@@ -54,7 +54,7 @@ public class AutocraftCpuStatusPanel extends Panel {
         }
         var row = rows.get(index.getAsInt());
         var blocked = row.blockedReason().isEmpty() ? "-" : row.blockedReason();
-        summary.setLine(0, new TextComponent("[" + index.getAsInt() + "] "
-            + row.cpuId() + " | " + row.targetSummary() + " | step " + row.currentStep() + " | blocked " + blocked));
+        summary.setLine(0, new TextComponent("[" + index.getAsInt() + "] " +
+            row.cpuId() + " | " + row.targetSummary() + " | step " + row.currentStep() + " | blocked " + blocked));
     }
 }
