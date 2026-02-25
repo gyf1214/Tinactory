@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalContractTest {
@@ -48,7 +49,7 @@ class AutocraftTerminalContractTest {
             AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS,
             Map.of(CraftKey.item("minecraft:iron_ingot", ""), 4L));
 
-        assertTrue(!result.isSuccess());
+        assertFalse(result.isSuccess());
         assertEquals(AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS, result.errorCode());
         assertEquals(4L, result.missingInputs().get(CraftKey.item("minecraft:iron_ingot", "")));
     }
