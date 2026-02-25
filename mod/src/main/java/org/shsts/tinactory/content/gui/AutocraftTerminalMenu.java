@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
@@ -20,9 +22,10 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
+import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -30,8 +33,6 @@ public class AutocraftTerminalMenu extends MenuBase {
     public static final String REQUESTABLES_SYNC = "autocraftTerminalRequestables";
     public static final String CPU_SYNC = "autocraftTerminalCpus";
     public static final String PREVIEW_SYNC = "autocraftTerminalPreview";
-
-    private static Supplier<AutocraftTerminalService> serviceSupplier = () -> null;
 
     private List<AutocraftRequestableEntry> requestables = List.of();
     private List<UUID> availableCpus = List.of();
@@ -42,17 +43,19 @@ public class AutocraftTerminalMenu extends MenuBase {
     private AutocraftPreviewErrorCode previewError;
     @Nullable
     private AutocraftExecuteErrorCode executeError;
+    private final IMachine machine;
+    @Nullable
+    private final AutocraftTerminalService service;
 
     private final ActiveScheduler<AutocraftTerminalRequestablesSyncSlot> requestablesScheduler;
     private final ActiveScheduler<AutocraftTerminalCpuSyncSlot> cpuScheduler;
     private final ActiveScheduler<AutocraftTerminalPreviewSyncSlot> previewScheduler;
 
-    public static void setServiceSupplier(Supplier<AutocraftTerminalService> supplier) {
-        serviceSupplier = supplier;
-    }
-
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
+        this.machine = MACHINE.get(blockEntity());
+        var terminal = getProvider(blockEntity(), AutocraftTerminal.ID, AutocraftTerminal.class);
+        this.service = world.isClientSide ? null : terminal.service();
 
         this.requestablesScheduler = new ActiveScheduler<>(
             () -> new AutocraftTerminalRequestablesSyncSlot(requestables));
@@ -69,11 +72,10 @@ public class AutocraftTerminalMenu extends MenuBase {
 
     @Override
     public boolean stillValid(Player player) {
-        return super.stillValid(player);
+        return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
     private void refreshCatalog() {
-        var service = serviceSupplier.get();
         if (service == null) {
             requestables = List.of();
             availableCpus = List.of();
@@ -99,7 +101,6 @@ public class AutocraftTerminalMenu extends MenuBase {
     }
 
     private void onAction(AutocraftTerminalActionPacket packet) {
-        var service = serviceSupplier.get();
         if (service == null) {
             return;
         }
