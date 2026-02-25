@@ -10,10 +10,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.AutocraftTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncSlot;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncSlot;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncSlot;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
-import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_STATUS_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.PREVIEW_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.REQUESTABLES_SYNC;
@@ -40,7 +38,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     private List<AutocraftRequestableEntry> requestables = List.of();
     private List<UUID> availableCpus = List.of();
-    private List<AutocraftTerminalCpuStatusSyncSlot.Row> cpuStatuses = List.of();
+    private List<AutocraftTerminalCpuStatusSyncPacket.Row> cpuStatuses = List.of();
     @Nullable
     private UUID previewPlanId;
 
@@ -58,7 +56,6 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         this.contentHeight = 180;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, this::onRequestablesSync);
-        menu.onSyncPacket(CPU_SYNC, this::onCpuSync);
         menu.onSyncPacket(CPU_STATUS_SYNC, this::onCpuStatusSync);
         menu.onSyncPacket(PREVIEW_SYNC, this::onPreviewSync);
         tabs.select(0);
@@ -106,22 +103,22 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftTerminalActionPacket.cancelCpu(row.cpuId()));
     }
 
-    private void onRequestablesSync(AutocraftTerminalRequestablesSyncSlot packet) {
+    private void onRequestablesSync(AutocraftTerminalRequestablesSyncPacket packet) {
         requestables = packet.requestables();
         refreshRequestTitle();
     }
 
-    private void onCpuSync(AutocraftTerminalCpuSyncSlot packet) {
-        availableCpus = packet.availableCpus();
-        refreshRequestTitle();
-    }
-
-    private void onCpuStatusSync(AutocraftTerminalCpuStatusSyncSlot packet) {
+    private void onCpuStatusSync(AutocraftTerminalCpuStatusSyncPacket packet) {
         cpuStatuses = packet.rows();
+        availableCpus = cpuStatuses.stream()
+            .filter(AutocraftTerminalCpuStatusSyncPacket.Row::available)
+            .map(AutocraftTerminalCpuStatusSyncPacket.Row::cpuId)
+            .toList();
+        refreshRequestTitle();
         cpuStatusPanel.refreshSummary(cpuStatuses);
     }
 
-    private void onPreviewSync(AutocraftTerminalPreviewSyncSlot packet) {
+    private void onPreviewSync(AutocraftTerminalPreviewSyncPacket packet) {
         previewPlanId = packet.planId();
         if (packet.previewError() != null) {
             previewPanel.setSummary(new TextComponent("Preview error: " + packet.previewError().name()));

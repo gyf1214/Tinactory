@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalPreviewSyncSlot implements IPacket {
+public class AutocraftTerminalPreviewSyncPacket implements IPacket {
     @Nullable
     private UUID planId;
     private final List<CraftAmount> summaryOutputs = new ArrayList<>();
@@ -25,9 +25,9 @@ public class AutocraftTerminalPreviewSyncSlot implements IPacket {
     @Nullable
     private AutocraftExecuteErrorCode executeError;
 
-    public AutocraftTerminalPreviewSyncSlot() {}
+    public AutocraftTerminalPreviewSyncPacket() {}
 
-    public AutocraftTerminalPreviewSyncSlot(
+    public AutocraftTerminalPreviewSyncPacket(
         @Nullable UUID planId,
         List<CraftAmount> summaryOutputs,
         @Nullable AutocraftPreviewErrorCode previewError,

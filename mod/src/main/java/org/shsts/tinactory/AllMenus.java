@@ -33,9 +33,9 @@ import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncSlot;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncSlot;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
@@ -97,12 +97,12 @@ public final class AllMenus {
                 MEStorageInterfaceSyncPacket::new)
             .registerMenuSyncPacket(MESignalControllerSyncPacket.class,
                 MESignalControllerSyncPacket::new)
-            .registerMenuSyncPacket(AutocraftTerminalRequestablesSyncSlot.class,
-                AutocraftTerminalRequestablesSyncSlot::new)
-            .registerMenuSyncPacket(AutocraftTerminalCpuSyncSlot.class,
-                AutocraftTerminalCpuSyncSlot::new)
-            .registerMenuSyncPacket(AutocraftTerminalPreviewSyncSlot.class,
-                AutocraftTerminalPreviewSyncSlot::new);
+            .registerMenuSyncPacket(AutocraftTerminalRequestablesSyncPacket.class,
+                AutocraftTerminalRequestablesSyncPacket::new)
+            .registerMenuSyncPacket(AutocraftTerminalCpuStatusSyncPacket.class,
+                AutocraftTerminalCpuStatusSyncPacket::new)
+            .registerMenuSyncPacket(AutocraftTerminalPreviewSyncPacket.class,
+                AutocraftTerminalPreviewSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);

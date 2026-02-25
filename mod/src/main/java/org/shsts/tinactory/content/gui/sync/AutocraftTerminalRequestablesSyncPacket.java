@@ -10,15 +10,16 @@ import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalRequestablesSyncSlot implements IPacket {
+public class AutocraftTerminalRequestablesSyncPacket implements IPacket {
     private final List<AutocraftRequestableEntry> requestables = new ArrayList<>();
 
-    public AutocraftTerminalRequestablesSyncSlot() {}
+    public AutocraftTerminalRequestablesSyncPacket() {}
 
-    public AutocraftTerminalRequestablesSyncSlot(List<AutocraftRequestableEntry> requestables) {
+    public AutocraftTerminalRequestablesSyncPacket(List<AutocraftRequestableEntry> requestables) {
         this.requestables.addAll(requestables);
     }
 
@@ -42,5 +43,21 @@ public class AutocraftTerminalRequestablesSyncSlot implements IPacket {
         requestables.addAll(buf.readList(buf1 -> new AutocraftRequestableEntry(
             new AutocraftRequestableKey(buf1.readEnum(CraftKey.Type.class), buf1.readUtf(), buf1.readUtf()),
             buf1.readLong())));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof AutocraftTerminalRequestablesSyncPacket other)) {
+            return false;
+        }
+        return requestables.equals(other.requestables);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(requestables);
     }
 }
