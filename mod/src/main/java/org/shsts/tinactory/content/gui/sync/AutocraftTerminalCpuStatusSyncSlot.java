@@ -7,6 +7,7 @@ import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -54,5 +55,21 @@ public class AutocraftTerminalCpuStatusSyncSlot implements IPacket {
             buf1.readUtf(),
             buf1.readUtf(),
             buf1.readBoolean())));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof AutocraftTerminalCpuStatusSyncSlot other)) {
+            return false;
+        }
+        return rows.equals(other.rows);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rows);
     }
 }

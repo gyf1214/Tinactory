@@ -52,9 +52,7 @@ public class AutocraftTerminalMenu extends MenuBase {
 
     private final ActiveScheduler<AutocraftTerminalRequestablesSyncSlot> requestablesScheduler;
     private final ActiveScheduler<AutocraftTerminalCpuSyncSlot> cpuScheduler;
-    private final ActiveScheduler<AutocraftTerminalCpuStatusSyncSlot> cpuStatusScheduler;
     private final ActiveScheduler<AutocraftTerminalPreviewSyncSlot> previewScheduler;
-    private int updateTicker;
 
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
@@ -65,13 +63,21 @@ public class AutocraftTerminalMenu extends MenuBase {
         this.requestablesScheduler = new ActiveScheduler<>(
             () -> new AutocraftTerminalRequestablesSyncSlot(requestables));
         this.cpuScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalCpuSyncSlot(availableCpus));
-        this.cpuStatusScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalCpuStatusSyncSlot(cpuStatuses));
         this.previewScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalPreviewSyncSlot(
             previewPlanId, previewOutputs, previewError, executeError));
 
         addSyncSlot(REQUESTABLES_SYNC, requestablesScheduler);
         addSyncSlot(CPU_SYNC, cpuScheduler);
-        addSyncSlot(CPU_STATUS_SYNC, cpuStatusScheduler);
+        addSyncSlot(CPU_STATUS_SYNC, () -> new AutocraftTerminalCpuStatusSyncSlot(service == null ? List.of() :
+            service.listCpuStatuses().stream()
+                .map(status -> new AutocraftTerminalCpuStatusSyncSlot.Row(
+                    status.cpuId(),
+                    status.available(),
+                    status.targetSummary(),
+                    status.currentStep(),
+                    status.blockedReason(),
+                    status.cancellable()))
+                .toList()));
         addSyncSlot(PREVIEW_SYNC, previewScheduler);
         onEventPacket(AUTOCRAFT_TERMINAL_ACTION, this::onAction);
         refreshCatalog();
@@ -80,19 +86,6 @@ public class AutocraftTerminalMenu extends MenuBase {
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player) && machine.canPlayerInteract(player);
-    }
-
-    @Override
-    public void broadcastChanges() {
-        super.broadcastChanges();
-        if (world.isClientSide || service == null) {
-            return;
-        }
-        updateTicker++;
-        if (updateTicker >= 10) {
-            updateTicker = 0;
-            refreshCatalog();
-        }
     }
 
     private void refreshCatalog() {
@@ -115,7 +108,6 @@ public class AutocraftTerminalMenu extends MenuBase {
         }
         requestablesScheduler.invokeUpdate();
         cpuScheduler.invokeUpdate();
-        cpuStatusScheduler.invokeUpdate();
     }
 
     private void setPreviewState(
