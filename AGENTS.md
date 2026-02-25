@@ -24,6 +24,7 @@ Common
 
 ### Java
 - Avoid wildcard imports.
+- Use `var` whenever the inferred type is clear.
 - Do not use fully qualified class names in code; always import types.
 - Avoid duplicate type names in the same file/import set.
 - Import order: non-`java` imports, blank line, `java.*`, blank line, static imports.
