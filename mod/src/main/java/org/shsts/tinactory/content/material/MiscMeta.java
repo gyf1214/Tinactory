@@ -22,8 +22,8 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.content.autocraft.AutocraftCpu;
 import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
 import org.shsts.tinactory.content.logistics.MEDrive;
-import org.shsts.tinactory.content.logistics.MEPatternCellSet;
 import org.shsts.tinactory.content.logistics.MEPatternCell;
+import org.shsts.tinactory.content.logistics.MEPatternCellSet;
 import org.shsts.tinactory.content.logistics.MESignalController;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
@@ -265,7 +265,7 @@ public class MiscMeta extends MetaConsumer {
         var bytes = GsonHelper.getAsInt(jo, "bytes");
 
         var component = REGISTRATE.item(componentPrefix + "/" + name).register();
-        var pattern = REGISTRATE.item(prefix + parent + "/" + name, MEPatternCell.patternCell(bytes)).register();
+        var pattern = REGISTRATE.item(prefix + parent + "/" + name, MEPatternCell.factory(bytes)).register();
         PATTERN_CELLS.add(new MEPatternCellSet(component, pattern));
     }
 

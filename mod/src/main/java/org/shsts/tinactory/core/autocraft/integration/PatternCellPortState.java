@@ -3,19 +3,24 @@ package org.shsts.tinactory.core.autocraft.integration;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PatternCellPortState implements IPatternCellPort {
-    public static final int BYTES_PER_PATTERN = PatternCellStorage.BYTES_PER_PATTERN;
+    public static final String PATTERNS_KEY = "patterns";
+    public static final int BYTES_PER_PATTERN = 256;
 
     private final int bytesLimit;
     private final PatternNbtCodec codec = new PatternNbtCodec(new MachineConstraintRegistry());
-    private CompoundTag tag = new CompoundTag();
+    private final Map<String, CraftPattern> patterns = new HashMap<>();
 
     public PatternCellPortState(int bytesLimit) {
         this.bytesLimit = bytesLimit;
@@ -28,39 +33,47 @@ public final class PatternCellPortState implements IPatternCellPort {
 
     @Override
     public int bytesUsed() {
-        return PatternCellStorage.bytesUsed(tag, codec);
+        return patterns.size() * BYTES_PER_PATTERN;
     }
 
     @Override
     public List<CraftPattern> patterns() {
-        return PatternCellStorage.listPatterns(tag, codec);
+        return patterns.values().stream().toList();
     }
 
     @Override
     public boolean insert(CraftPattern pattern) {
-        return PatternCellStorage.insertPattern(tag, bytesLimit, pattern, codec);
+        if (patterns.containsKey(pattern.patternId())) {
+            return true;
+        }
+        if ((patterns.size() + 1) * BYTES_PER_PATTERN > bytesLimit) {
+            return false;
+        }
+        patterns.put(pattern.patternId(), pattern);
+        return true;
     }
 
     @Override
     public boolean remove(String patternId) {
-        var old = PatternCellStorage.listPatterns(tag, codec);
-        if (old.stream().noneMatch($ -> $.patternId().equals(patternId))) {
-            return false;
-        }
-        PatternCellStorage.clear(tag);
-        for (var pattern : old) {
-            if (!pattern.patternId().equals(patternId)) {
-                PatternCellStorage.insertPattern(tag, bytesLimit, pattern, codec);
-            }
-        }
-        return true;
+        return patterns.remove(patternId) != null;
     }
 
     public CompoundTag serialize() {
-        return tag.copy();
+        var tag = new CompoundTag();
+        var list = new ListTag();
+        for (var pattern : patterns.values()) {
+            list.add(codec.encodePattern(pattern));
+        }
+        tag.put(PATTERNS_KEY, list);
+        return tag;
     }
 
     public void deserialize(CompoundTag tag) {
-        this.tag = tag.copy();
+        patterns.clear();
+        var list = tag.getList(PATTERNS_KEY, Tag.TAG_COMPOUND);
+        for (var tag1 : list) {
+            var pattern = codec.decodePattern((CompoundTag) tag1);
+            patterns.put(pattern.patternId(), pattern);
+        }
     }
 }
