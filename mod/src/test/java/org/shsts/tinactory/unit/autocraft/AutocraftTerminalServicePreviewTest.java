@@ -34,6 +34,7 @@ class AutocraftTerminalServicePreviewTest {
                     new CraftAmount(CraftKey.fluid("minecraft:water", ""), 1000)))),
             List::of,
             List::of,
+            List::of,
             new AutocraftPreviewSessionStore());
 
         var requestables = service.listRequestables();
@@ -49,6 +50,7 @@ class AutocraftTerminalServicePreviewTest {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
+            List::of,
             List::of,
             () -> List.of(),
             List::of,
@@ -71,6 +73,7 @@ class AutocraftTerminalServicePreviewTest {
         var service = new AutocraftTerminalService(
             planner,
             List::of,
+            () -> List.of(cpu),
             () -> List.of(cpu),
             List::of,
             store);

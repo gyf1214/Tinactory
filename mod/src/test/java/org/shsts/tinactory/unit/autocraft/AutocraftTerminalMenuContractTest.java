@@ -4,6 +4,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncSlot;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalMenuContractTest {
     @Test
@@ -63,6 +65,22 @@ class AutocraftTerminalMenuContractTest {
         assertEquals(0, decoded.summaryOutputs().size());
         assertNull(decoded.previewError());
         assertNull(decoded.executeError());
+    }
+
+    @Test
+    void cpuStatusSyncShouldRoundTripCpuRows() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var src = new AutocraftTerminalCpuStatusSyncSlot(List.of(
+            new AutocraftTerminalCpuStatusSyncSlot.Row(cpu, false,
+                "4x minecraft:iron_ingot", "2/3", "MISSING_INPUT_BUFFER", true)));
+
+        var decoded = roundTrip(src, new AutocraftTerminalCpuStatusSyncSlot());
+
+        assertEquals(1, decoded.rows().size());
+        assertEquals(cpu, decoded.rows().get(0).cpuId());
+        assertEquals("2/3", decoded.rows().get(0).currentStep());
+        assertEquals("MISSING_INPUT_BUFFER", decoded.rows().get(0).blockedReason());
+        assertTrue(decoded.rows().get(0).cancellable());
     }
 
     private static <T extends org.shsts.tinycorelib.api.network.IPacket> T roundTrip(T src, T dst) {

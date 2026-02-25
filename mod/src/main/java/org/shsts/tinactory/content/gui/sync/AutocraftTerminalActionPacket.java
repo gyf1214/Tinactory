@@ -16,7 +16,8 @@ public class AutocraftTerminalActionPacket implements IPacket {
     public enum Action {
         PREVIEW,
         EXECUTE,
-        CANCEL
+        CANCEL,
+        CANCEL_CPU
     }
 
     private Action action;
@@ -54,6 +55,10 @@ public class AutocraftTerminalActionPacket implements IPacket {
 
     public static AutocraftTerminalActionPacket cancel(UUID planId) {
         return new AutocraftTerminalActionPacket(Action.CANCEL, null, 0L, null, planId);
+    }
+
+    public static AutocraftTerminalActionPacket cancelCpu(UUID cpuId) {
+        return new AutocraftTerminalActionPacket(Action.CANCEL_CPU, null, 0L, cpuId, null);
     }
 
     public Action action() {

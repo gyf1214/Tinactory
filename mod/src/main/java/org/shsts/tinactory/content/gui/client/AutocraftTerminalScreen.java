@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.Items;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,18 +11,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.AutocraftTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncSlot;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.core.gui.client.Tab;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_SYNC;
+import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_STATUS_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.PREVIEW_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.REQUESTABLES_SYNC;
 
@@ -30,25 +34,34 @@ import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.REQUESTABLES
 @MethodsReturnNonnullByDefault
 public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private final AutocraftRequestPanel requestPanel;
+    private final AutocraftCpuStatusPanel cpuStatusPanel;
     private final AutocraftPreviewPanel previewPanel;
+    private final Tab tabs;
 
     private List<AutocraftRequestableEntry> requestables = List.of();
     private List<UUID> availableCpus = List.of();
+    private List<AutocraftTerminalCpuStatusSyncSlot.Row> cpuStatuses = List.of();
     @Nullable
     private UUID previewPlanId;
 
     public AutocraftTerminalScreen(AutocraftTerminalMenu menu, Component title) {
         super(menu, title);
         this.requestPanel = new AutocraftRequestPanel(this);
+        this.cpuStatusPanel = new AutocraftCpuStatusPanel(this);
         this.previewPanel = new AutocraftPreviewPanel(this);
+        this.tabs = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 52), requestPanel);
+        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
+        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
+        addPanel(new Rect(0, 0, 0, 0), tabs);
         addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(0, 56, 0, -88), previewPanel);
         this.contentHeight = 180;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, this::onRequestablesSync);
         menu.onSyncPacket(CPU_SYNC, this::onCpuSync);
+        menu.onSyncPacket(CPU_STATUS_SYNC, this::onCpuStatusSync);
         menu.onSyncPacket(PREVIEW_SYNC, this::onPreviewSync);
+        tabs.select(0);
         refreshRequestTitle();
     }
 
@@ -81,6 +94,18 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftTerminalActionPacket.cancel(previewPlanId));
     }
 
+    public void cancelCpuJob() {
+        var index = cpuStatusPanel.selectedIndex(cpuStatuses.size());
+        if (index.isEmpty()) {
+            return;
+        }
+        var row = cpuStatuses.get(index.getAsInt());
+        if (!row.cancellable()) {
+            return;
+        }
+        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftTerminalActionPacket.cancelCpu(row.cpuId()));
+    }
+
     private void onRequestablesSync(AutocraftTerminalRequestablesSyncSlot packet) {
         requestables = packet.requestables();
         refreshRequestTitle();
@@ -89,6 +114,11 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private void onCpuSync(AutocraftTerminalCpuSyncSlot packet) {
         availableCpus = packet.availableCpus();
         refreshRequestTitle();
+    }
+
+    private void onCpuStatusSync(AutocraftTerminalCpuStatusSyncSlot packet) {
+        cpuStatuses = packet.rows();
+        cpuStatusPanel.refreshSummary(cpuStatuses);
     }
 
     private void onPreviewSync(AutocraftTerminalPreviewSyncSlot packet) {

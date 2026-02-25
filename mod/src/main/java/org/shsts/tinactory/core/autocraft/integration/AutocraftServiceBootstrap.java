@@ -63,6 +63,7 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftTerminalService(
             planner,
             logistics::listVisiblePatterns,
+            () -> logistics.listVisibleAutocraftCpus(subnet),
             () -> logistics.listAvailableAutocraftCpus(subnet),
             inventory::snapshotAvailable,
             new AutocraftPreviewSessionStore(),

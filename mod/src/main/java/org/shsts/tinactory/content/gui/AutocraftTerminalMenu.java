@@ -9,6 +9,7 @@ import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuSyncSlot;
+import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncSlot;
 import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncSlot;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteRequest;
@@ -32,10 +33,12 @@ import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 public class AutocraftTerminalMenu extends MenuBase {
     public static final String REQUESTABLES_SYNC = "autocraftTerminalRequestables";
     public static final String CPU_SYNC = "autocraftTerminalCpus";
+    public static final String CPU_STATUS_SYNC = "autocraftTerminalCpuStatuses";
     public static final String PREVIEW_SYNC = "autocraftTerminalPreview";
 
     private List<AutocraftRequestableEntry> requestables = List.of();
     private List<UUID> availableCpus = List.of();
+    private List<AutocraftTerminalCpuStatusSyncSlot.Row> cpuStatuses = List.of();
     @Nullable
     private UUID previewPlanId;
     private List<CraftAmount> previewOutputs = List.of();
@@ -49,7 +52,9 @@ public class AutocraftTerminalMenu extends MenuBase {
 
     private final ActiveScheduler<AutocraftTerminalRequestablesSyncSlot> requestablesScheduler;
     private final ActiveScheduler<AutocraftTerminalCpuSyncSlot> cpuScheduler;
+    private final ActiveScheduler<AutocraftTerminalCpuStatusSyncSlot> cpuStatusScheduler;
     private final ActiveScheduler<AutocraftTerminalPreviewSyncSlot> previewScheduler;
+    private int updateTicker;
 
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
@@ -60,11 +65,13 @@ public class AutocraftTerminalMenu extends MenuBase {
         this.requestablesScheduler = new ActiveScheduler<>(
             () -> new AutocraftTerminalRequestablesSyncSlot(requestables));
         this.cpuScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalCpuSyncSlot(availableCpus));
+        this.cpuStatusScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalCpuStatusSyncSlot(cpuStatuses));
         this.previewScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalPreviewSyncSlot(
             previewPlanId, previewOutputs, previewError, executeError));
 
         addSyncSlot(REQUESTABLES_SYNC, requestablesScheduler);
         addSyncSlot(CPU_SYNC, cpuScheduler);
+        addSyncSlot(CPU_STATUS_SYNC, cpuStatusScheduler);
         addSyncSlot(PREVIEW_SYNC, previewScheduler);
         onEventPacket(AUTOCRAFT_TERMINAL_ACTION, this::onAction);
         refreshCatalog();
@@ -75,16 +82,40 @@ public class AutocraftTerminalMenu extends MenuBase {
         return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        if (world.isClientSide || service == null) {
+            return;
+        }
+        updateTicker++;
+        if (updateTicker >= 10) {
+            updateTicker = 0;
+            refreshCatalog();
+        }
+    }
+
     private void refreshCatalog() {
         if (service == null) {
             requestables = List.of();
             availableCpus = List.of();
+            cpuStatuses = List.of();
         } else {
             requestables = service.listRequestables();
             availableCpus = service.listAvailableCpus();
+            cpuStatuses = service.listCpuStatuses().stream()
+                .map(status -> new AutocraftTerminalCpuStatusSyncSlot.Row(
+                    status.cpuId(),
+                    status.available(),
+                    status.targetSummary(),
+                    status.currentStep(),
+                    status.blockedReason(),
+                    status.cancellable()))
+                .toList();
         }
         requestablesScheduler.invokeUpdate();
         cpuScheduler.invokeUpdate();
+        cpuStatusScheduler.invokeUpdate();
     }
 
     private void setPreviewState(
@@ -120,6 +151,11 @@ public class AutocraftTerminalMenu extends MenuBase {
         if (packet.action() == AutocraftTerminalActionPacket.Action.CANCEL && packet.planId() != null) {
             service.cancelPreview(packet.planId());
             setPreviewState(null, List.of(), null, null);
+            return;
+        }
+        if (packet.action() == AutocraftTerminalActionPacket.Action.CANCEL_CPU && packet.cpuId() != null) {
+            service.cancelCpu(packet.cpuId());
+            refreshCatalog();
         }
     }
 }
