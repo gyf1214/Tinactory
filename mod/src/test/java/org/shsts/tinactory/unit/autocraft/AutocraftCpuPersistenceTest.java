@@ -102,6 +102,20 @@ class AutocraftCpuPersistenceTest {
             restoredStep.requiredFinalOutputs());
     }
 
+    @Test
+    void tickShouldReportDirtyStateChangesOnlyWhenJobStateChanges() {
+        var cpuId = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
+        var plan = new CraftPlan(List.of(step("s1")));
+        var service = new AutocraftJobService(cpuId, new FixedPlanner(PlanResult.success(plan)),
+            AutocraftCpuPersistenceTest::executor, List::of);
+        service.submit(List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)));
+
+        assertTrue(service.tick());
+        assertTrue(service.tick());
+        assertTrue(service.tick());
+        assertTrue(!service.tick());
+    }
+
     private static CraftStep step(String id) {
         return new CraftStep(id, new CraftPattern(
             "tinactory:" + id,

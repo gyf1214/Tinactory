@@ -210,27 +210,27 @@ public class AutocraftJobService {
         return false;
     }
 
-    public void tick() {
+    public boolean tick() {
         if (runningJobId == null) {
-            startNextJob();
-            return;
+            return startNextJob();
         }
         if (runningExecutor == null) {
-            return;
+            return false;
         }
 
         pendingTicks++;
         if (pendingTicks < executionIntervalTicks) {
-            return;
+            return false;
         }
         pendingTicks = 0;
 
+        var changed = false;
         runningExecutor.runCycle(transmissionBandwidth);
         var current = jobs.get(runningJobId);
         if (current == null) {
             runningJobId = null;
             runningExecutor = null;
-            return;
+            return true;
         }
 
         var details = runningExecutor.details();
@@ -244,7 +244,7 @@ public class AutocraftJobService {
                 current.planError(),
                 runningExecutor.error(),
                 details));
-            return;
+            return true;
         }
 
         if (state == ExecutionState.COMPLETED) {
@@ -274,16 +274,18 @@ public class AutocraftJobService {
         }
         runningJobId = null;
         runningExecutor = null;
+        changed = true;
+        return changed;
     }
 
-    private void startNextJob() {
+    private boolean startNextJob() {
         var id = queued.poll();
         if (id == null) {
-            return;
+            return false;
         }
         var current = jobs.get(id);
         if (current == null) {
-            return;
+            return false;
         }
 
         var prepared = preparedPlans.remove(id);
@@ -298,7 +300,7 @@ public class AutocraftJobService {
                     result.error(),
                     null,
                     null));
-                return;
+                return true;
             }
             plan = result.plan();
         }
@@ -316,6 +318,7 @@ public class AutocraftJobService {
         runningJobId = id;
         runningExecutor = executor;
         pendingTicks = 0;
+        return true;
     }
 
     public record RunningSnapshot(

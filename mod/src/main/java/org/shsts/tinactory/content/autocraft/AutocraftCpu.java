@@ -19,8 +19,6 @@ import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
-import java.util.Objects;
-
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
@@ -40,8 +38,6 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private AutocraftJobService service;
     @Nullable
     private CompoundTag pendingSnapshot;
-    @Nullable
-    private CompoundTag lastSnapshot;
 
     public AutocraftCpu(
         BlockEntity blockEntity,
@@ -86,7 +82,6 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
             pendingSnapshot = null;
         }
         logistics.registerAutocraftCpu(machine, network.getSubnet(blockEntity.getBlockPos()), service);
-        lastSnapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(null);
         blockEntity.setChanged();
     }
 
@@ -94,10 +89,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         if (service == null) {
             return;
         }
-        service.tick();
-        var currentSnapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(null);
-        if (!Objects.equals(lastSnapshot, currentSnapshot)) {
-            lastSnapshot = currentSnapshot;
+        if (service.tick()) {
             blockEntity.setChanged();
         }
     }
@@ -119,7 +111,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var snapshot = service == null ? lastSnapshot : service.serializeRunningSnapshot(snapshotCodec).orElse(null);
+        var snapshot = service == null ? pendingSnapshot : service.serializeRunningSnapshot(snapshotCodec).orElse(null);
         if (snapshot != null) {
             tag.put(SNAPSHOT_KEY, snapshot.copy());
         }
@@ -130,10 +122,8 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     public void deserializeNBT(CompoundTag tag) {
         if (tag.contains(SNAPSHOT_KEY, Tag.TAG_COMPOUND)) {
             pendingSnapshot = tag.getCompound(SNAPSHOT_KEY).copy();
-            lastSnapshot = pendingSnapshot.copy();
         } else {
             pendingSnapshot = null;
-            lastSnapshot = null;
         }
     }
 }
