@@ -40,6 +40,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             jvmArgs '-ea'
+            args '--mixin.config', 'mixins.tinactory.test.json'
 
             ideaModule rootProject.name + "." + project.name + ".test"
 
@@ -79,7 +80,6 @@ mixin {
     add sourceSets.main, 'mixins.tinactory.refmap.json'
     add sourceSets.test, 'mixins.tinactory.test.refmap.json'
     config 'mixins.tinactory.jei.json'
-    config 'mixins.tinactory.test.json'
 }
 
 sourceSets.main.resources {
