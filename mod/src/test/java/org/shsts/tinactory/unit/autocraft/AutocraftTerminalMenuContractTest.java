@@ -3,9 +3,9 @@ package org.shsts.tinactory.unit.autocraft;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewErrorCode;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftTerminalMenuContractTest {
     @Test
     void menuShouldExposeRequestablesAndAvailableCpuSlots() {
-        var requestables = new AutocraftTerminalRequestablesSyncPacket(List.of(
+        var requestables = new AutocraftRequestablesSyncPacket(List.of(
             new AutocraftRequestableEntry(
                 new AutocraftRequestableKey(CraftKey.Type.ITEM, "minecraft:iron_ingot", ""), 2L)));
-        var cpus = new AutocraftTerminalCpuStatusSyncPacket(List.of(
-            new AutocraftTerminalCpuStatusSyncPacket.Row(
+        var cpus = new AutocraftCpuSyncPacket(List.of(
+            new AutocraftCpuSyncPacket.Row(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 true,
                 "Idle",
@@ -35,26 +35,26 @@ class AutocraftTerminalMenuContractTest {
                 "",
                 false)));
 
-        var requestablesDecoded = roundTrip(requestables, new AutocraftTerminalRequestablesSyncPacket());
-        var cpusDecoded = roundTrip(cpus, new AutocraftTerminalCpuStatusSyncPacket());
+        var requestablesDecoded = roundTrip(requestables, new AutocraftRequestablesSyncPacket());
+        var cpusDecoded = roundTrip(cpus, new AutocraftCpuSyncPacket());
 
         assertEquals(1, requestablesDecoded.requestables().size());
         assertEquals("minecraft:iron_ingot", requestablesDecoded.requestables().get(0).key().id());
         assertEquals(1, cpusDecoded.rows().stream()
-            .filter(AutocraftTerminalCpuStatusSyncPacket.Row::available)
+            .filter(AutocraftCpuSyncPacket.Row::available)
             .count());
     }
 
     @Test
     void previewActionShouldPublishPreviewStateToSyncSlot() {
         var planId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var preview = new AutocraftTerminalPreviewSyncPacket(
+        var preview = new AutocraftPreviewSyncPacket(
             planId,
             List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 4)),
             AutocraftPreviewErrorCode.PREVIEW_FAILED,
             AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS);
 
-        var decoded = roundTrip(preview, new AutocraftTerminalPreviewSyncPacket());
+        var decoded = roundTrip(preview, new AutocraftPreviewSyncPacket());
 
         assertEquals(planId, decoded.planId());
         assertEquals(1, decoded.summaryOutputs().size());
@@ -64,9 +64,9 @@ class AutocraftTerminalMenuContractTest {
 
     @Test
     void cancelActionShouldClearPreviewState() {
-        var cleared = new AutocraftTerminalPreviewSyncPacket(null, List.of(), null, null);
+        var cleared = new AutocraftPreviewSyncPacket(null, List.of(), null, null);
 
-        var decoded = roundTrip(cleared, new AutocraftTerminalPreviewSyncPacket());
+        var decoded = roundTrip(cleared, new AutocraftPreviewSyncPacket());
 
         assertNull(decoded.planId());
         assertEquals(0, decoded.summaryOutputs().size());
@@ -77,11 +77,11 @@ class AutocraftTerminalMenuContractTest {
     @Test
     void cpuStatusSyncShouldRoundTripCpuRows() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var src = new AutocraftTerminalCpuStatusSyncPacket(List.of(
-            new AutocraftTerminalCpuStatusSyncPacket.Row(cpu, false,
+        var src = new AutocraftCpuSyncPacket(List.of(
+            new AutocraftCpuSyncPacket.Row(cpu, false,
                 "4x minecraft:iron_ingot", "2/3", "MISSING_INPUT_BUFFER", true)));
 
-        var decoded = roundTrip(src, new AutocraftTerminalCpuStatusSyncPacket());
+        var decoded = roundTrip(src, new AutocraftCpuSyncPacket());
 
         assertEquals(1, decoded.rows().size());
         assertEquals(cpu, decoded.rows().get(0).cpuId());

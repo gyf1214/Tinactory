@@ -7,14 +7,14 @@ import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalActionPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalPreviewSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteRequest;
+import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewRequest;
+import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteRequest;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewErrorCode;
+import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewRequest;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftTerminalService;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -44,14 +44,14 @@ public class AutocraftTerminalMenu extends MenuBase {
     @Nullable
     private final AutocraftTerminalService service;
 
-    private final ActiveScheduler<AutocraftTerminalPreviewSyncPacket> previewScheduler;
+    private final ActiveScheduler<AutocraftPreviewSyncPacket> previewScheduler;
 
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
         this.machine = MACHINE.get(blockEntity());
         var terminal = getProvider(blockEntity(), AutocraftTerminal.ID, AutocraftTerminal.class);
         this.service = world.isClientSide ? null : terminal.service();
-        this.previewScheduler = new ActiveScheduler<>(() -> new AutocraftTerminalPreviewSyncPacket(
+        this.previewScheduler = new ActiveScheduler<>(() -> new AutocraftPreviewSyncPacket(
             previewPlanId, previewOutputs, previewError, executeError));
 
         addSyncSlot(REQUESTABLES_SYNC, this::requestablesPacket);
@@ -65,16 +65,16 @@ public class AutocraftTerminalMenu extends MenuBase {
         return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
-    private AutocraftTerminalRequestablesSyncPacket requestablesPacket() {
-        return new AutocraftTerminalRequestablesSyncPacket(service == null ? List.of() : service.listRequestables());
+    private AutocraftRequestablesSyncPacket requestablesPacket() {
+        return new AutocraftRequestablesSyncPacket(service == null ? List.of() : service.listRequestables());
     }
 
-    private AutocraftTerminalCpuStatusSyncPacket cpuStatusPacket() {
+    private AutocraftCpuSyncPacket cpuStatusPacket() {
         if (service == null) {
-            return new AutocraftTerminalCpuStatusSyncPacket(List.of());
+            return new AutocraftCpuSyncPacket(List.of());
         }
-        return new AutocraftTerminalCpuStatusSyncPacket(service.listCpuStatuses().stream().map(
-            status -> new AutocraftTerminalCpuStatusSyncPacket.Row(
+        return new AutocraftCpuSyncPacket(service.listCpuStatuses().stream().map(
+            status -> new AutocraftCpuSyncPacket.Row(
                 status.cpuId(),
                 status.available(),
                 status.targetSummary(),
@@ -96,29 +96,29 @@ public class AutocraftTerminalMenu extends MenuBase {
         previewScheduler.invokeUpdate();
     }
 
-    private void onAction(AutocraftTerminalActionPacket packet) {
+    private void onAction(AutocraftEventPacket packet) {
         if (service == null) {
             return;
         }
-        if (packet.action() == AutocraftTerminalActionPacket.Action.PREVIEW &&
+        if (packet.action() == AutocraftEventPacket.Action.PREVIEW &&
             packet.target() != null && packet.cpuId() != null) {
             var result = service.preview(new AutocraftPreviewRequest(
                 packet.target(), packet.quantity(), packet.cpuId()));
             setPreviewState(result.planId(), result.summaryOutputs(), result.errorCode(), null);
             return;
         }
-        if (packet.action() == AutocraftTerminalActionPacket.Action.EXECUTE &&
+        if (packet.action() == AutocraftEventPacket.Action.EXECUTE &&
             packet.planId() != null && packet.cpuId() != null) {
             var result = service.execute(new AutocraftExecuteRequest(packet.planId(), packet.cpuId()));
             setPreviewState(null, List.of(), null, result.errorCode());
             return;
         }
-        if (packet.action() == AutocraftTerminalActionPacket.Action.CANCEL && packet.planId() != null) {
+        if (packet.action() == AutocraftEventPacket.Action.CANCEL && packet.planId() != null) {
             service.cancelPreview(packet.planId());
             setPreviewState(null, List.of(), null, null);
             return;
         }
-        if (packet.action() == AutocraftTerminalActionPacket.Action.CANCEL_CPU && packet.cpuId() != null) {
+        if (packet.action() == AutocraftEventPacket.Action.CANCEL_CPU && packet.cpuId() != null) {
             service.cancelCpu(packet.cpuId());
         }
     }

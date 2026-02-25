@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalActionPacket implements IPacket {
+public class AutocraftEventPacket implements IPacket {
     public enum Action {
         PREVIEW,
         EXECUTE,
@@ -29,9 +29,9 @@ public class AutocraftTerminalActionPacket implements IPacket {
     @Nullable
     private UUID planId;
 
-    public AutocraftTerminalActionPacket() {}
+    public AutocraftEventPacket() {}
 
-    private AutocraftTerminalActionPacket(
+    private AutocraftEventPacket(
         Action action,
         @Nullable AutocraftRequestableKey target,
         long quantity,
@@ -45,20 +45,20 @@ public class AutocraftTerminalActionPacket implements IPacket {
         this.planId = planId;
     }
 
-    public static AutocraftTerminalActionPacket preview(AutocraftRequestableKey target, long quantity, UUID cpuId) {
-        return new AutocraftTerminalActionPacket(Action.PREVIEW, target, quantity, cpuId, null);
+    public static AutocraftEventPacket preview(AutocraftRequestableKey target, long quantity, UUID cpuId) {
+        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, cpuId, null);
     }
 
-    public static AutocraftTerminalActionPacket execute(UUID planId, UUID cpuId) {
-        return new AutocraftTerminalActionPacket(Action.EXECUTE, null, 0L, cpuId, planId);
+    public static AutocraftEventPacket execute(UUID planId, UUID cpuId) {
+        return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId, planId);
     }
 
-    public static AutocraftTerminalActionPacket cancel(UUID planId) {
-        return new AutocraftTerminalActionPacket(Action.CANCEL, null, 0L, null, planId);
+    public static AutocraftEventPacket cancel(UUID planId) {
+        return new AutocraftEventPacket(Action.CANCEL, null, 0L, null, planId);
     }
 
-    public static AutocraftTerminalActionPacket cancelCpu(UUID cpuId) {
-        return new AutocraftTerminalActionPacket(Action.CANCEL_CPU, null, 0L, cpuId, null);
+    public static AutocraftEventPacket cancelCpu(UUID cpuId) {
+        return new AutocraftEventPacket(Action.CANCEL_CPU, null, 0L, cpuId, null);
     }
 
     public Action action() {

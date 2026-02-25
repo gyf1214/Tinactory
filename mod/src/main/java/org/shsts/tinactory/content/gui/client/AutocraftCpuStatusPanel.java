@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.TextComponent;
-import org.shsts.tinactory.content.gui.sync.AutocraftTerminalCpuStatusSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
@@ -46,7 +46,7 @@ public class AutocraftCpuStatusPanel extends Panel {
         }
     }
 
-    public void refreshSummary(List<AutocraftTerminalCpuStatusSyncPacket.Row> rows) {
+    public void refreshSummary(List<AutocraftCpuSyncPacket.Row> rows) {
         var index = selectedIndex(rows.size());
         if (index.isEmpty()) {
             summary.setLine(0, new TextComponent("CPU index: select 0.." + Math.max(0, rows.size() - 1)));

@@ -14,12 +14,12 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalRequestablesSyncPacket implements IPacket {
+public class AutocraftRequestablesSyncPacket implements IPacket {
     private final List<AutocraftRequestableEntry> requestables = new ArrayList<>();
 
-    public AutocraftTerminalRequestablesSyncPacket() {}
+    public AutocraftRequestablesSyncPacket() {}
 
-    public AutocraftTerminalRequestablesSyncPacket(List<AutocraftRequestableEntry> requestables) {
+    public AutocraftRequestablesSyncPacket(List<AutocraftRequestableEntry> requestables) {
         this.requestables.addAll(requestables);
     }
 
@@ -50,7 +50,7 @@ public class AutocraftTerminalRequestablesSyncPacket implements IPacket {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AutocraftTerminalRequestablesSyncPacket other)) {
+        if (!(obj instanceof AutocraftRequestablesSyncPacket other)) {
             return false;
         }
         return requestables.equals(other.requestables);

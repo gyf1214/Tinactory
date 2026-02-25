@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalCpuStatusSyncPacket implements IPacket {
+public class AutocraftCpuSyncPacket implements IPacket {
     private final List<Row> rows = new ArrayList<>();
 
     public record Row(
@@ -23,9 +23,9 @@ public class AutocraftTerminalCpuStatusSyncPacket implements IPacket {
         String blockedReason,
         boolean cancellable) {}
 
-    public AutocraftTerminalCpuStatusSyncPacket() {}
+    public AutocraftCpuSyncPacket() {}
 
-    public AutocraftTerminalCpuStatusSyncPacket(List<Row> rows) {
+    public AutocraftCpuSyncPacket(List<Row> rows) {
         this.rows.addAll(rows);
     }
 
@@ -62,7 +62,7 @@ public class AutocraftTerminalCpuStatusSyncPacket implements IPacket {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AutocraftTerminalCpuStatusSyncPacket other)) {
+        if (!(obj instanceof AutocraftCpuSyncPacket other)) {
             return false;
         }
         return rows.equals(other.rows);
