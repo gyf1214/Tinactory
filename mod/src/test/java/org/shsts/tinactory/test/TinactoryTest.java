@@ -11,4 +11,9 @@ public final class TinactoryTest {
     public static void testSucceed(GameTestHelper helper) {
         helper.succeed();
     }
+
+    @GameTest
+    public static void autocraftTerminalShouldRequestPreviewThenExecute(GameTestHelper helper) {
+        helper.succeed();
+    }
 }

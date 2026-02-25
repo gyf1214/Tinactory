@@ -141,6 +141,22 @@ public class LogisticComponent extends NotifierComponent {
             .toList();
     }
 
+    public List<UUID> listAvailableAutocraftCpus(BlockPos subnet) {
+        return autocraftCpus.values().stream()
+            .filter(cpu -> cpu.subnet().equals(subnet) && !cpu.service().isBusy())
+            .map(AutocraftCpuState::cpuId)
+            .sorted()
+            .toList();
+    }
+
+    public Optional<AutocraftJobService> findVisibleAutocraftService(BlockPos subnet, UUID cpuId) {
+        var cpu = autocraftCpus.get(cpuId);
+        if (cpu == null || !cpu.subnet().equals(subnet)) {
+            return Optional.empty();
+        }
+        return Optional.of(cpu.service());
+    }
+
     public AutocraftSubmitResult submitAutocraft(BlockPos subnet, UUID cpuId, List<CraftAmount> targets) {
         if (targets.isEmpty()) {
             return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.INVALID_REQUEST);

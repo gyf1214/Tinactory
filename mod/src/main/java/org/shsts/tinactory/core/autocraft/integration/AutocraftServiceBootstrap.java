@@ -46,6 +46,30 @@ public final class AutocraftServiceBootstrap {
             executionIntervalTicks);
     }
 
+    public static AutocraftTerminalService createTerminalService(
+        BlockEntity blockEntity,
+        INetwork network,
+        LogisticComponent logistics,
+        IItemPort itemPort,
+        IFluidPort fluidPort) {
+
+        var level = blockEntity.getLevel();
+        if (level == null || level.isClientSide) {
+            throw new IllegalStateException("autocraft terminal service must be created on server level");
+        }
+        var inventory = new LogisticsInventoryView(itemPort, fluidPort);
+        BlockPos subnet = network.getSubnet(blockEntity.getBlockPos());
+        var planner = new GoalReductionPlanner(new LogisticsPatternRepository(logistics.listVisiblePatterns()));
+        return new AutocraftTerminalService(
+            planner,
+            logistics::listVisiblePatterns,
+            () -> logistics.listAvailableAutocraftCpus(subnet),
+            inventory::snapshotAvailable,
+            new AutocraftPreviewSessionStore(),
+            new AutocraftPlanPreflight(),
+            cpuId -> logistics.findVisibleAutocraftService(subnet, cpuId).orElse(null));
+    }
+
     private static final class SilentJobEvents implements IJobEvents {
     }
 }

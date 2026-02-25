@@ -43,6 +43,7 @@ public class AutocraftJobService {
     private final int executionIntervalTicks;
 
     private final Map<UUID, AutocraftJob> jobs = new LinkedHashMap<>();
+    private final Map<UUID, CraftPlan> preparedPlans = new LinkedHashMap<>();
     private final Queue<UUID> queued = new ArrayDeque<>();
 
     @Nullable
@@ -150,6 +151,17 @@ public class AutocraftJobService {
         return id;
     }
 
+    public UUID submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+        if (isBusy()) {
+            throw new IllegalStateException("autocraft CPU is busy");
+        }
+        var id = UUID.randomUUID();
+        jobs.put(id, new AutocraftJob(id, targets, AutocraftJob.Status.QUEUED, null, null, null));
+        preparedPlans.put(id, plan);
+        queued.add(id);
+        return id;
+    }
+
     public AutocraftJob job(UUID id) {
         return jobs.get(id);
     }
@@ -169,6 +181,7 @@ public class AutocraftJobService {
         }
         if (current.status() == AutocraftJob.Status.QUEUED) {
             queued.remove(id);
+            preparedPlans.remove(id);
             jobs.put(id, new AutocraftJob(
                 id,
                 current.targets(),
@@ -273,20 +286,25 @@ public class AutocraftJobService {
             return;
         }
 
-        var result = planner.plan(current.targets(), availableSupplier.get());
-        if (!result.isSuccess()) {
-            jobs.put(id, new AutocraftJob(
-                id,
-                current.targets(),
-                AutocraftJob.Status.FAILED,
-                result.error(),
-                null,
-                null));
-            return;
+        var prepared = preparedPlans.remove(id);
+        var plan = prepared;
+        if (plan == null) {
+            var result = planner.plan(current.targets(), availableSupplier.get());
+            if (!result.isSuccess()) {
+                jobs.put(id, new AutocraftJob(
+                    id,
+                    current.targets(),
+                    AutocraftJob.Status.FAILED,
+                    result.error(),
+                    null,
+                    null));
+                return;
+            }
+            plan = result.plan();
         }
 
         var executor = executorFactory.get();
-        executor.start(result.plan());
+        executor.start(plan);
         jobs.put(id, new AutocraftJob(
             id,
             current.targets(),

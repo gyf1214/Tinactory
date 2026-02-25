@@ -288,6 +288,7 @@
     "tinactory.technology.ender_chemistry.details": "Harnesses the mysterious energies of the Ender dimension to manipulate matter in impossible ways. Its unstable reactions defy conventional science, unlocking materials and phenomena beyond the known universe.",
     "tinactory.technology.platinum_group_metal.details": "A collection of rare, lustrous elements prized for their exceptional catalytic and conductive properties. They are vital for high-end electronics, advanced catalysts, and cutting-edge energy systems.",
     "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
+    "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",
     "generator.tinactory.void": "Void",
     "key.tinactory.open_tech": "Technology Screen",
     "config.waila.plugin_tinactory.hide_empty_tank": "Hide Empty Tank",
