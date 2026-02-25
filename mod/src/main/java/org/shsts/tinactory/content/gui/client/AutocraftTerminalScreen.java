@@ -53,22 +53,25 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     public void requestPreview() {
-        if (requestables.isEmpty() || availableCpus.isEmpty()) {
+        var targetIndex = requestPanel.targetIndex(requestables.size());
+        var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
+        var quantity = requestPanel.quantity();
+        if (targetIndex.isEmpty() || cpuIndex.isEmpty() || quantity.isEmpty()) {
             return;
         }
-        var quantity = requestPanel.quantity().orElse(1L);
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftTerminalActionPacket.preview(
-            requestables.get(0).key(),
-            Math.max(1L, quantity),
-            availableCpus.get(0)));
+            requestables.get(targetIndex.getAsInt()).key(),
+            quantity.getAsLong(),
+            availableCpus.get(cpuIndex.getAsInt())));
     }
 
     public void executePreview() {
-        if (previewPlanId == null || availableCpus.isEmpty()) {
+        var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
+        if (previewPlanId == null || cpuIndex.isEmpty()) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION,
-            () -> AutocraftTerminalActionPacket.execute(previewPlanId, availableCpus.get(0)));
+            () -> AutocraftTerminalActionPacket.execute(previewPlanId, availableCpus.get(cpuIndex.getAsInt())));
     }
 
     public void cancelPreview() {
@@ -109,5 +112,6 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private void refreshRequestTitle() {
         requestPanel.setTitle(new TextComponent(
             "Requestables: " + requestables.size() + ", CPUs: " + availableCpus.size()));
+        requestPanel.updateSelectionSummary(requestables, availableCpus);
     }
 }
