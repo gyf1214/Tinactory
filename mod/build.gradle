@@ -1,4 +1,5 @@
 archivesBaseName = "tinactory"
+apply plugin: 'jacoco'
 
 minecraft {
     runs {
@@ -121,6 +122,19 @@ test {
     doFirst {
         workingDir.mkdirs()
     }
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+    classDirectories.setFrom(files(
+        fileTree(dir: "$buildDir/classes/java/main", include: ['org/shsts/tinactory/core/**']),
+        fileTree(dir: "$buildDir/classes/kotlin/main", include: ['org/shsts/tinactory/core/**'])
+    ))
 }
 
 publishing {
