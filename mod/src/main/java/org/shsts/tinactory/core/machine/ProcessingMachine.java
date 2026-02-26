@@ -63,6 +63,11 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
+    public ResourceLocation recipeTypeId() {
+        return recipeType.loc();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Class<R> baseClass() {
         return (Class<R>) recipeType.recipeClass();

@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.content.component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
+import org.shsts.tinactory.AllItems.PATTERN_CELLS
 import org.shsts.tinactory.AllItems.componentEntry
 import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.MINEABLE_WITH_WIRE_CUTTER
@@ -139,6 +140,16 @@ object Components {
                 item(entry.fluid) {
                     model(basicItem(ae2("items/fluid_storage_cell_${k}")))
                     tag(AllTags.FLUID_STORAGE_CELL)
+                }
+            }
+            for (entry in PATTERN_CELLS) {
+                val k = name(entry.component.id(), -1).replace('m', 'k')
+                item(entry.component) {
+                    model(basicItem(ae2("items/material_cell${k}_part")))
+                }
+                item(entry.pattern) {
+                    model(basicItem(ae2("items/storage_cell_${k}")))
+                    tag(AllTags.PATTERN_STORAGE_CELL)
                 }
             }
 

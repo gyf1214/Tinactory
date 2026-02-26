@@ -1,0 +1,6 @@
+{
+  "type": "autocraft_cpu",
+  "power": 32,
+  "transmissionBandwidth": 64,
+  "executionIntervalTicks": 1
+}

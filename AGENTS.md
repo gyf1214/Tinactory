@@ -10,7 +10,7 @@
 - `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
 
 ## Validation
-- Before committing any code changes, run `./gradlew check` as the required format validation task.
+- Before committing any code changes, run `./gradlew checkstyleMain checkstyleTest` as the required format validation task.
 
 ## Coding Rules
 Common
@@ -20,14 +20,19 @@ Common
 - Continuation indent: 4 spaces.
 - Avoid multiline alignment.
 - Wrap lists/arguments/annotations/enum constants as needed (do not force one-per-line).
+- When a call or declaration spans multiple lines, put the closing `)` on the last item line, not on its own line.
 
 ### Java
 - Avoid wildcard imports.
+- Use `var` whenever the inferred type is clear.
+- Do not use fully qualified class names in code; always import types.
+- Avoid duplicate type names in the same file/import set.
 - Import order: non-`java` imports, blank line, `java.*`, blank line, static imports.
 - Keep simple methods, lambdas, and classes on one line when possible.
 - Always use braces for `if`, `for`, `while`, and `do-while`.
 - Interface names must start with `I`.
-- Annotate classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and `@MethodsReturnNonnullByDefault`; use `@Nullable` for nullable fields/overrides.
+- Annotate top-level classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and `@MethodsReturnNonnullByDefault`; no need to annotate inner classes/interfaces/enums/records. Use `@Nullable` for nullable fields/overrides.
+- Test code does not require `@ParametersAreNonnullByDefault` or `@MethodsReturnNonnullByDefault`.
 - Mark singleton/utility classes `final`.
 
 ### Kotlin

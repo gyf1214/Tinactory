@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
@@ -39,6 +40,7 @@ public final class AllCapabilities {
     public static final ICapability<IMachine> MACHINE;
     public static final ICapability<IBytesProvider> BYTES_PROVIDER;
     public static final ICapability<IDigitalProvider> DIGITAL_PROVIDER;
+    public static final ICapability<IPatternCellPort> PATTERN_CELL;
     public static final ICapability<ISignalMachine> SIGNAL_MACHINE;
 
     static {
@@ -58,6 +60,7 @@ public final class AllCapabilities {
         MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
         BYTES_PROVIDER = REGISTRATE.capability(IBytesProvider.class, new CapabilityToken<>() {});
         DIGITAL_PROVIDER = REGISTRATE.capability(IDigitalProvider.class, new CapabilityToken<>() {});
+        PATTERN_CELL = REGISTRATE.capability(IPatternCellPort.class, new CapabilityToken<>() {});
         SIGNAL_MACHINE = REGISTRATE.capability(ISignalMachine.class, new CapabilityToken<>() {});
     }
 

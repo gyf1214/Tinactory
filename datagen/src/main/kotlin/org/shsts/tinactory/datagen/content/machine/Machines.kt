@@ -126,6 +126,20 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
+            block("logistics/autocraft_cpu") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("overlay/machine/overlay_screen")
+                    ioTex(ME_BUS)
+                }
+            }
+            block("logistics/autocraft_terminal") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("cover/overlay_controller")
+                    ioTex(ME_BUS)
+                }
+            }
         }
     }
 

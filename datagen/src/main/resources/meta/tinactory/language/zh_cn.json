@@ -408,6 +408,7 @@
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",
     "item[.]tinactory[.]component[.]storage_component[.](.*)": "$1 ME存储组件",
+    "item[.]tinactory[.]component[.]pattern_storage_component[.](.*)": "$1 ME图样存储组件",
     "item[.]tinactory[.]component[.](.*)[.](basic|good|advanced)": "$2$1",
     "item[.]tinactory[.]component[.](.*)[.](.*)": "$1$2",
     "item[.]tinactory[.]component[.](.*)": "$1",
@@ -434,6 +435,7 @@
     "item[.]tinactory[.]wafer[.](.*)": "$1晶圆",
     "item[.]tinactory[.]chip[.](.*)": "$1芯片",
     "item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)": "$2 ME$1",
+    "item[.]tinactory[.]logistics[.](.*_pattern_cell)[.](.*)": "$2 ME$1",
     "block[.]tinactory[.]material[.]ore[.](.*)": "$1矿石",
     "block[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",
     "block[.]tinactory[.]machine[.](.*)[.](.*)": "$1$2",
@@ -723,6 +725,7 @@
     "tinactory.technology.platinum_group_metal.details": "一组稀有的、有光泽的元素，因其卓越的催化和导电性能而备受推崇。它们对于高端电子产品、先进催化剂和尖端能源系统至关重要。",
     "tinactory.technology.nuclear_physics": "核物理学",
     "tinactory.technology.nuclear_physics.details": "探索原子核之间的相互作用，释放物质核心蕴藏的巨大能量。这些知识将为核能、先进反应堆和毁灭性武器的研发铺平道路。",
+    "tinactory.gui.autocraftTerminal.title": "自动合成终端",
     "generator.tinactory.void": "虚空",
     "key.tinactory.open_tech": "科研面板",
     "config.waila.plugin_tinactory.hide_empty_tank": "隐藏空流体槽",

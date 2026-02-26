@@ -379,6 +379,16 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     @Override
+    public boolean supportsRecipeType(ResourceLocation recipeTypeId) {
+        for (var processor : processors) {
+            if (processor.recipeTypeId().equals(recipeTypeId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean isWorking(double partial) {
         return currentRecipe != null && workSpeed > 0;
     }
