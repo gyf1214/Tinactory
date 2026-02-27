@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -23,51 +21,36 @@ public class NetworkGraphEngine<TNodeData> {
         INVALIDATING
     }
 
-    @FunctionalInterface
-    public interface NodeConnected<TNodeData> {
+    public interface INetworkGraphAdapter<TNodeData> {
+        boolean isNodeLoaded(BlockPos pos);
+
+        TNodeData getNodeData(BlockPos pos);
+
         boolean isConnected(BlockPos pos, TNodeData data, Direction dir);
-    }
 
-    @FunctionalInterface
-    public interface IsSubnet<TNodeData> {
         boolean isSubnet(BlockPos pos, TNodeData data);
-    }
 
-    @FunctionalInterface
-    public interface OnDiscover<TNodeData> {
         void onDiscover(BlockPos pos, TNodeData data, BlockPos subnet);
+
+        void onConnectFinished();
+
+        void onDisconnect(boolean connected);
     }
 
     public record BlockInfo<TNodeData>(TNodeData data, BlockPos parent, BlockPos subnet) {}
 
     private final BlockPos center;
-    private final Predicate<BlockPos> isNodeLoaded;
-    private final Function<BlockPos, TNodeData> getNodeData;
-    private final NodeConnected<TNodeData> isConnected;
-    private final IsSubnet<TNodeData> isSubnet;
+    private final INetworkGraphAdapter<TNodeData> adapter;
     private final UUID priority;
-    private final OnDiscover<TNodeData> onDiscover;
-    private final Runnable onConnectFinished;
-    private final java.util.function.Consumer<Boolean> onDisconnect;
 
     private final Queue<BlockPos> queue = new ArrayDeque<>();
     private final Map<BlockPos, BlockInfo<TNodeData>> visited = new HashMap<>();
     private State state;
 
-    public NetworkGraphEngine(UUID priority, BlockPos center, Predicate<BlockPos> isNodeLoaded,
-        Function<BlockPos, TNodeData> getNodeData, NodeConnected<TNodeData> isConnected,
-        IsSubnet<TNodeData> isSubnet,
-        OnDiscover<TNodeData> onDiscover, Runnable onConnectFinished,
-        java.util.function.Consumer<Boolean> onDisconnect) {
+    public NetworkGraphEngine(UUID priority, BlockPos center, INetworkGraphAdapter<TNodeData> adapter) {
         this.priority = priority;
         this.center = center;
-        this.isNodeLoaded = isNodeLoaded;
-        this.getNodeData = getNodeData;
-        this.isConnected = isConnected;
-        this.isSubnet = isSubnet;
-        this.onDiscover = onDiscover;
-        this.onConnectFinished = onConnectFinished;
-        this.onDisconnect = onDisconnect;
+        this.adapter = adapter;
         reset();
     }
 
@@ -87,8 +70,8 @@ public class NetworkGraphEngine<TNodeData> {
         state = State.CONNECTING;
         queue.clear();
         visited.clear();
-        if (isNodeLoaded.test(center)) {
-            var data = getNodeData.apply(center);
+        if (adapter.isNodeLoaded(center)) {
+            var data = adapter.getNodeData(center);
             queue.add(center);
             visited.put(center, new BlockInfo<>(data, center, center));
         }
@@ -100,7 +83,7 @@ public class NetworkGraphEngine<TNodeData> {
         }
         var wasConnected = state == State.CONNECTED;
         state = State.INVALIDATING;
-        onDisconnect.accept(wasConnected);
+        adapter.onDisconnect(wasConnected);
         reset();
     }
 
@@ -110,31 +93,31 @@ public class NetworkGraphEngine<TNodeData> {
         }
         if (queue.isEmpty()) {
             state = State.CONNECTED;
-            onConnectFinished.run();
+            adapter.onConnectFinished();
             return false;
         }
         var pos = queue.remove();
         var info = visited.get(pos);
         assert info != null;
-        var subnet = isSubnet.isSubnet(pos, info.data()) ? pos : info.subnet();
+        var subnet = adapter.isSubnet(pos, info.data()) ? pos : info.subnet();
         for (var dir : Direction.values()) {
             var pos1 = pos.relative(dir);
-            if (!isConnected.isConnected(pos, info.data(), dir)) {
+            if (!adapter.isConnected(pos, info.data(), dir)) {
                 continue;
             }
             if (info.parent().equals(pos1)) {
                 continue;
             }
-            if (visited.containsKey(pos1) || !isNodeLoaded.test(pos1)) {
+            if (visited.containsKey(pos1) || !adapter.isNodeLoaded(pos1)) {
                 continue;
             }
-            var data1 = getNodeData.apply(pos1);
-            if (isConnected.isConnected(pos1, data1, dir.getOpposite())) {
+            var data1 = adapter.getNodeData(pos1);
+            if (adapter.isConnected(pos1, data1, dir.getOpposite())) {
                 queue.add(pos1);
                 visited.put(pos1, new BlockInfo<>(data1, pos, subnet));
             }
         }
-        onDiscover.onDiscover(pos, info.data(), subnet);
+        adapter.onDiscover(pos, info.data(), subnet);
         return true;
     }
 }

@@ -30,19 +30,7 @@ class NetworkGraphEngineTest {
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
-            graph::isLoaded,
-            graph::node,
-            (pos, node, dir) -> graph.connected(pos, dir),
-            (pos, node) -> node.isSubnet(),
-            (pos, node, subnet) -> {
-                events.discovered.add(pos);
-                events.subnets.put(pos, subnet);
-            },
-            () -> events.connectFinishedCalls++,
-            connected -> {
-                events.disconnectCalls++;
-                events.lastDisconnectWasConnected = connected;
-            }
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
         while (engine.connectNext()) {
@@ -70,16 +58,7 @@ class NetworkGraphEngineTest {
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
-            graph::isLoaded,
-            graph::node,
-            (pos, node, dir) -> graph.connected(pos, dir),
-            (pos, node) -> node.isSubnet(),
-            (pos, node, subnet) -> events.subnets.put(pos, subnet),
-            () -> events.connectFinishedCalls++,
-            connected -> {
-                events.disconnectCalls++;
-                events.lastDisconnectWasConnected = connected;
-            }
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
         while (engine.connectNext()) {
@@ -104,16 +83,7 @@ class NetworkGraphEngineTest {
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
-            graph::isLoaded,
-            graph::node,
-            (pos, node, dir) -> graph.connected(pos, dir),
-            (pos, node) -> node.isSubnet(),
-            (pos, node, subnet) -> events.discovered.add(pos),
-            () -> events.connectFinishedCalls++,
-            connected -> {
-                events.disconnectCalls++;
-                events.lastDisconnectWasConnected = connected;
-            }
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
         assertTrue(engine.connectNext());
@@ -133,33 +103,17 @@ class NetworkGraphEngineTest {
     @Test
     void shouldComparePriorityByUuidDeterministically() {
         var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var graph = new NetworkGraphEngineFixtures.Graph();
+        var events = new NetworkGraphEngineFixtures.Events();
         var higher = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000020"),
             center,
-            $ -> false,
-            $ -> false,
-            ($1, $2, $3) -> false,
-            ($1, $2) -> false,
-            ($1, $2, $3) -> {
-            },
-            () -> {
-            },
-            $ -> {
-            }
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
         var lower = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
-            $ -> false,
-            $ -> false,
-            ($1, $2, $3) -> false,
-            ($1, $2) -> false,
-            ($1, $2, $3) -> {
-            },
-            () -> {
-            },
-            $ -> {
-            }
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
         assertTrue(lower.comparePriority(higher));

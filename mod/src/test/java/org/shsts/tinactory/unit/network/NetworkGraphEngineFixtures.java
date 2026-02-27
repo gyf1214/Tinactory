@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.shsts.tinactory.core.network.NetworkGraphEngine;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -64,5 +65,52 @@ final class NetworkGraphEngineFixtures {
         int connectFinishedCalls;
         int disconnectCalls;
         boolean lastDisconnectWasConnected;
+    }
+
+    static final class RecordingAdapter implements NetworkGraphEngine.INetworkGraphAdapter<Node> {
+        private final Graph graph;
+        private final Events events;
+
+        RecordingAdapter(Graph graph, Events events) {
+            this.graph = graph;
+            this.events = events;
+        }
+
+        @Override
+        public boolean isNodeLoaded(BlockPos pos) {
+            return graph.isLoaded(pos);
+        }
+
+        @Override
+        public Node getNodeData(BlockPos pos) {
+            return graph.node(pos);
+        }
+
+        @Override
+        public boolean isConnected(BlockPos pos, Node data, Direction dir) {
+            return graph.connected(pos, dir);
+        }
+
+        @Override
+        public boolean isSubnet(BlockPos pos, Node data) {
+            return data.isSubnet();
+        }
+
+        @Override
+        public void onDiscover(BlockPos pos, Node data, BlockPos subnet) {
+            events.discovered.add(pos);
+            events.subnets.put(pos, subnet);
+        }
+
+        @Override
+        public void onConnectFinished() {
+            events.connectFinishedCalls++;
+        }
+
+        @Override
+        public void onDisconnect(boolean connected) {
+            events.disconnectCalls++;
+            events.lastDisconnectWasConnected = connected;
+        }
     }
 }

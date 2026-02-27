@@ -84,19 +84,43 @@ class NetworkManagerTest {
     }
 
     private static NetworkGraphEngine<Boolean> createEngine(BlockPos center) {
+        var adapter = new NetworkGraphEngine.INetworkGraphAdapter<Boolean>() {
+            @Override
+            public boolean isNodeLoaded(BlockPos pos) {
+                return true;
+            }
+
+            @Override
+            public Boolean getNodeData(BlockPos pos) {
+                return false;
+            }
+
+            @Override
+            public boolean isConnected(BlockPos pos, Boolean data, Direction dir) {
+                return false;
+            }
+
+            @Override
+            public boolean isSubnet(BlockPos pos, Boolean data) {
+                return false;
+            }
+
+            @Override
+            public void onDiscover(BlockPos pos, Boolean data, BlockPos subnet) {
+            }
+
+            @Override
+            public void onConnectFinished() {
+            }
+
+            @Override
+            public void onDisconnect(boolean connected) {
+            }
+        };
         return new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
-            $ -> true,
-            $ -> false,
-            ($1, $2, $3) -> false,
-            ($1, $2) -> false,
-            ($1, $2, $3) -> {
-            },
-            () -> {
-            },
-            $ -> {
-            }
+            adapter
         );
     }
 }

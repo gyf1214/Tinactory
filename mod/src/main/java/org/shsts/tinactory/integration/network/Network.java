@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -62,16 +63,47 @@ public class Network implements INetwork {
         this.graphEngine = new NetworkGraphEngine<>(
             uuid,
             center,
-            world::isLoaded,
-            world::getBlockState,
-            (pos, state, dir) -> IConnector.isConnectedInWorld(world, pos, state, dir),
-            (pos, state) -> IConnector.isSubnetInWorld(world, pos, state),
-            this::onDiscover,
-            this::onConnectFinished,
-            this::onDisconnect
+            new GraphAdapter()
         );
         this.delayTicks = 0;
         attachComponents();
+    }
+
+    private final class GraphAdapter implements NetworkGraphEngine.INetworkGraphAdapter<BlockState> {
+        @Override
+        public boolean isNodeLoaded(BlockPos pos) {
+            return world.isLoaded(pos);
+        }
+
+        @Override
+        public BlockState getNodeData(BlockPos pos) {
+            return world.getBlockState(pos);
+        }
+
+        @Override
+        public boolean isConnected(BlockPos pos, BlockState data, Direction dir) {
+            return IConnector.isConnectedInWorld(world, pos, data, dir);
+        }
+
+        @Override
+        public boolean isSubnet(BlockPos pos, BlockState data) {
+            return IConnector.isSubnetInWorld(world, pos, data);
+        }
+
+        @Override
+        public void onDiscover(BlockPos pos, BlockState data, BlockPos subnet) {
+            Network.this.onDiscover(pos, data, subnet);
+        }
+
+        @Override
+        public void onConnectFinished() {
+            Network.this.onConnectFinished();
+        }
+
+        @Override
+        public void onDisconnect(boolean connected) {
+            Network.this.onDisconnect(connected);
+        }
     }
 
     @Override
