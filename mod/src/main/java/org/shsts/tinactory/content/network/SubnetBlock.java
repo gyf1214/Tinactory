@@ -22,8 +22,8 @@ import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.network.CableBlock;
 import org.shsts.tinactory.core.network.IConnector;
-import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 
 import java.util.List;
 import java.util.function.Function;
@@ -67,7 +67,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
         var oldDir = state.getValue(IO_FACING);
         world.setBlockAndUpdate(pos, state.setValue(IO_FACING, dir));
 
-        NetworkManager.tryGet(world).ifPresent(manager -> {
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> {
             manager.invalidatePosDir(pos, dir);
             manager.invalidatePosDir(pos, dir.getOpposite());
             manager.invalidatePosDir(pos, oldDir);
@@ -136,7 +136,7 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
     }
 
     private void onDestroy(Level world, BlockPos pos, BlockState state) {
-        NetworkManager.tryGet(world).ifPresent(manager -> {
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> {
             var myDir = state.getValue(IO_FACING);
             manager.invalidatePosDir(pos, myDir);
             manager.invalidatePosDir(pos, myDir.getOpposite());

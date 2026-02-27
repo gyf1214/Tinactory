@@ -31,6 +31,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.material.MaterialSet;
 import org.shsts.tinactory.core.tool.IWrenchable;
 import org.shsts.tinactory.core.tool.UsableToolItem;
+import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 
@@ -187,7 +188,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
             return state;
         }
         var newState = state.setValue(property, connected);
-        NetworkManager.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
         return newState;
     }
 
@@ -200,7 +201,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         var newState = state.setValue(property, connected);
         world.setBlockAndUpdate(pos, newState);
 
-        NetworkManager.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> manager.invalidatePosDir(pos, dir));
     }
 
     @Override
@@ -256,7 +257,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state,
         @Nullable LivingEntity placer, ItemStack stack) {
-        NetworkManager.tryGet(world).ifPresent(manager -> {
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var dir : Direction.values()) {
                 if (isConnected(world, pos, state, dir)) {
@@ -285,7 +286,7 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
     }
 
     private void onDestroy(Level world, BlockPos pos, BlockState state) {
-        NetworkManager.tryGet(world).ifPresent(manager -> {
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> {
             manager.invalidatePos(pos);
             for (var entry : PROPERTY_BY_DIRECTION.entrySet()) {
                 if (state.getValue(entry.getValue())) {

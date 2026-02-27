@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.network;
+package org.shsts.tinactory.integration.network;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -15,21 +15,32 @@ import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.core.network.IConnector;
+import org.shsts.tinactory.core.network.NetworkGraphEngine;
+import org.shsts.tinactory.core.network.NetworkManager;
+import org.shsts.tinactory.core.network.SchedulingManager;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Network extends NetworkBase implements INetwork {
+public class Network implements INetwork {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Map<NetworkGraphEngine<?>, UUID> NETWORK_PRIORITIES =
+        new IdentityHashMap<>();
 
+    private final Level world;
+    private final NetworkManager manager;
     private final UUID uuid;
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
@@ -38,16 +49,38 @@ public class Network extends NetworkBase implements INetwork {
         ArrayListMultimap.create();
     private final Multimap<IScheduling, INetworkComponent.Ticker> machineSchedulings =
         ArrayListMultimap.create();
+    private final NetworkGraphEngine<BlockState> graphEngine;
+
+    public final BlockPos center;
+    public final TeamProfile team;
+
+    private int delayTicks;
 
     public Network(Level world, UUID uuid, BlockPos center, TeamProfile team) {
-        super(world, center, team);
+        this.world = world;
+        this.manager = WorldNetworkManagers.get(world);
         this.uuid = uuid;
+        this.center = center;
+        this.team = team;
+        this.graphEngine = new NetworkGraphEngine<>(
+            center,
+            world::isLoaded,
+            world::getBlockState,
+            (pos, state, dir) -> IConnector.isConnectedInWorld(world, pos, state, dir),
+            (pos, state) -> IConnector.isSubnetInWorld(world, pos, state),
+            this::comparePriority,
+            this::onDiscover,
+            this::onConnectFinished,
+            this::onDisconnect
+        );
+        NETWORK_PRIORITIES.put(graphEngine, uuid);
+        this.delayTicks = 0;
         attachComponents();
     }
 
-    @Override
-    protected boolean comparePriority(NetworkBase another) {
-        return uuid.compareTo(((Network) another).uuid) < 0;
+    private boolean comparePriority(NetworkGraphEngine<BlockState> another) {
+        var anotherUuid = NETWORK_PRIORITIES.get(another);
+        return anotherUuid == null || uuid.compareTo(anotherUuid) < 0;
     }
 
     @Override
@@ -92,9 +125,30 @@ public class Network extends NetworkBase implements INetwork {
         subnetMachines.put(subnet, machine);
     }
 
-    @Override
+    private void onDiscover(BlockPos pos, BlockState state, BlockPos subnet) {
+        if (manager.hasNetworkAtPos(pos)) {
+            var network1 = manager.getNetworkAtPos(pos).orElseThrow();
+            if (comparePriorityAgainst(network1)) {
+                LOGGER.debug("{}: invalidate conflict network at {}", this, pos);
+                network1.invalidate();
+            } else {
+                LOGGER.debug("{}: invalidate myself because of conflict at {}", this, pos);
+                invalidate();
+                return;
+            }
+        }
+        manager.putNetworkAtPos(pos, graphEngine);
+        putBlock(pos, state, subnet);
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean comparePriorityAgainst(NetworkGraphEngine<?> another) {
+        return graphEngine.comparePriority((NetworkGraphEngine<BlockState>) another);
+    }
+
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
-        super.putBlock(pos, state, subnet);
+        LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
+            world.dimension(), pos, subnet);
         blockSubnets.put(pos, subnet);
         for (var component : components.values()) {
             component.putBlock(pos, state, subnet);
@@ -106,9 +160,9 @@ public class Network extends NetworkBase implements INetwork {
         }
     }
 
-    @Override
-    protected void connectFinish() {
-        super.connectFinish();
+    private void onConnectFinished() {
+        LOGGER.debug("{}: connect finished", this);
+        delayTicks = 0;
         LOGGER.debug("{}: {} machines connected", this, subnetMachines.values().size());
         for (var component : components.values()) {
             component.onConnect();
@@ -124,9 +178,7 @@ public class Network extends NetworkBase implements INetwork {
         }
     }
 
-    @Override
-    protected void onDisconnect(boolean connected) {
-        // if the network is not ever connected, skip callbacks of the machines and components.
+    private void onDisconnect(boolean connected) {
         if (connected) {
             for (var machine : subnetMachines.values()) {
                 machine.onDisconnectFromNetwork();
@@ -138,12 +190,16 @@ public class Network extends NetworkBase implements INetwork {
         subnetMachines.clear();
         blockSubnets.clear();
         machineSchedulings.clear();
-        super.onDisconnect(connected);
+        LOGGER.debug("{}: disconnect", this);
     }
 
-    @Override
+    public void invalidate() {
+        graphEngine.invalidate();
+        delayTicks = 0;
+        LOGGER.debug("{}: invalidated", this);
+    }
+
     protected void doTick() {
-        super.doTick();
         for (var scheduling : SchedulingManager.getSortedSchedulings()) {
             for (var entry : componentSchedulings.get(scheduling)) {
                 entry.tick(world, this);
@@ -151,6 +207,27 @@ public class Network extends NetworkBase implements INetwork {
             for (var ticker : machineSchedulings.get(scheduling)) {
                 ticker.tick(world, this);
             }
+        }
+    }
+
+    private void doConnect() {
+        var connectDelay = CONFIG.networkConnectDelay.get();
+        var maxConnects = CONFIG.networkMaxConnectsPerTick.get();
+        if (delayTicks < connectDelay) {
+            delayTicks++;
+            return;
+        }
+        for (var i = 0; i < maxConnects; i++) {
+            if (!graphEngine.connectNext()) {
+                return;
+            }
+        }
+    }
+
+    public void tick() {
+        switch (graphEngine.state()) {
+            case CONNECTING -> doConnect();
+            case CONNECTED -> doTick();
         }
     }
 

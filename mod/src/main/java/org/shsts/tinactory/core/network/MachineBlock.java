@@ -25,6 +25,7 @@ import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -98,7 +99,7 @@ public class MachineBlock extends SmartEntityBlock
         var oldDir = state.getValue(IO_FACING);
         world.setBlockAndUpdate(pos, state.setValue(IO_FACING, dir));
 
-        NetworkManager.tryGet(world).ifPresent(manager -> {
+        WorldNetworkManagers.tryGet(world).ifPresent(manager -> {
             manager.invalidatePosDir(pos, dir);
             manager.invalidatePosDir(pos, oldDir);
         });
@@ -137,7 +138,7 @@ public class MachineBlock extends SmartEntityBlock
     }
 
     protected void onDestroy(Level world, BlockPos pos, BlockState state) {
-        NetworkManager.tryGet(world).ifPresent(manager ->
+        WorldNetworkManagers.tryGet(world).ifPresent(manager ->
             manager.invalidatePosDir(pos, state.getValue(IO_FACING)));
     }
 
