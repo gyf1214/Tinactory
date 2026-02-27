@@ -11,8 +11,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 
 import java.util.ArrayList;
 import java.util.List;

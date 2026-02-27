@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;

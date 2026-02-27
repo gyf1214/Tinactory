@@ -1,10 +1,9 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 
 import java.util.Comparator;
 import java.util.List;

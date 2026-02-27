@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.service;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -7,8 +7,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.PatternNbtCodec;
 
 import java.util.HashMap;
 import java.util.List;

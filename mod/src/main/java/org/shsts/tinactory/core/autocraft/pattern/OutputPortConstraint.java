@@ -1,8 +1,9 @@
-package org.shsts.tinactory.core.autocraft.model;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 

@@ -1,8 +1,9 @@
-package org.shsts.tinactory.core.autocraft.model;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 
 import java.util.List;
 

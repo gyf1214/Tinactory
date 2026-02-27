@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
 
 import java.util.List;

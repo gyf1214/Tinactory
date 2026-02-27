@@ -1,16 +1,17 @@
-package org.shsts.tinactory.core.autocraft.model;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintRegistry;
 
 import java.util.ArrayList;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
-import static org.shsts.tinactory.core.autocraft.model.CraftKey.Type.FLUID;
+import static org.shsts.tinactory.core.autocraft.pattern.CraftKey.Type.FLUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -41,10 +41,12 @@ import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
 import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private static final ResourceLocation RECIPE_TYPE_LOC = mcLoc("smelting");
     private static final Voltage BASE_VOLTAGE = Voltage.ULV;
 
     private final int inputPort;
@@ -102,7 +104,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public ResourceLocation recipeTypeId() {
-        return SmeltingRecipePatternSource.SMELTING_RECIPE_TYPE_ID;
+        return RECIPE_TYPE_LOC;
     }
 
     @Override

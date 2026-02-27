@@ -14,9 +14,9 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
-import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.integration.network.MachineBlock;
 

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.model;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

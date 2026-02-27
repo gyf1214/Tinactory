@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.autocraft.service;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 
 import java.util.List;
