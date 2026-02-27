@@ -2,7 +2,7 @@ package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import org.shsts.tinactory.core.network.NetworkGraphEngine;
+import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -67,7 +67,7 @@ final class NetworkGraphEngineFixtures {
         boolean lastDisconnectWasConnected;
     }
 
-    static final class RecordingAdapter implements NetworkGraphEngine.INetworkGraphAdapter<Node> {
+    static final class RecordingAdapter implements INetworkGraphAdapter<Node> {
         private final Graph graph;
         private final Events events;
 

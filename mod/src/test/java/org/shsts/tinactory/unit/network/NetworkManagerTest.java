@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.network;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 
@@ -84,7 +85,7 @@ class NetworkManagerTest {
     }
 
     private static NetworkGraphEngine<Boolean> createEngine(BlockPos center) {
-        var adapter = new NetworkGraphEngine.INetworkGraphAdapter<Boolean>() {
+        var adapter = new INetworkGraphAdapter<Boolean>() {
             @Override
             public boolean isNodeLoaded(BlockPos pos) {
                 return true;

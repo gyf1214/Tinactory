@@ -8,7 +8,6 @@ import net.minecraft.core.Direction;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -21,23 +20,7 @@ public class NetworkGraphEngine<TNodeData> {
         INVALIDATING
     }
 
-    public interface INetworkGraphAdapter<TNodeData> {
-        boolean isNodeLoaded(BlockPos pos);
-
-        TNodeData getNodeData(BlockPos pos);
-
-        boolean isConnected(BlockPos pos, TNodeData data, Direction dir);
-
-        boolean isSubnet(BlockPos pos, TNodeData data);
-
-        void onDiscover(BlockPos pos, TNodeData data, BlockPos subnet);
-
-        void onConnectFinished();
-
-        void onDisconnect(boolean connected);
-    }
-
-    public record BlockInfo<TNodeData>(TNodeData data, BlockPos parent, BlockPos subnet) {}
+    private record BlockInfo<TNodeData>(TNodeData data, BlockPos parent, BlockPos subnet) {}
 
     private final BlockPos center;
     private final INetworkGraphAdapter<TNodeData> adapter;
@@ -60,10 +43,6 @@ public class NetworkGraphEngine<TNodeData> {
 
     public boolean comparePriority(NetworkGraphEngine<TNodeData> another) {
         return priority.compareTo(another.priority) < 0;
-    }
-
-    public Optional<BlockInfo<TNodeData>> infoAt(BlockPos pos) {
-        return Optional.ofNullable(visited.get(pos));
     }
 
     public void reset() {

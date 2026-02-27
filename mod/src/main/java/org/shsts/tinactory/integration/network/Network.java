@@ -18,6 +18,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.IConnector;
+import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.network.SchedulingManager;
@@ -60,16 +61,12 @@ public class Network implements INetwork {
         this.uuid = uuid;
         this.center = center;
         this.team = team;
-        this.graphEngine = new NetworkGraphEngine<>(
-            uuid,
-            center,
-            new GraphAdapter()
-        );
+        this.graphEngine = new NetworkGraphEngine<>(uuid, center, new GraphAdapter());
         this.delayTicks = 0;
         attachComponents();
     }
 
-    private final class GraphAdapter implements NetworkGraphEngine.INetworkGraphAdapter<BlockState> {
+    private final class GraphAdapter implements INetworkGraphAdapter<BlockState> {
         @Override
         public boolean isNodeLoaded(BlockPos pos) {
             return world.isLoaded(pos);
