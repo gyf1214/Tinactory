@@ -85,6 +85,7 @@ class NetworkManagerTest {
     }
 
     private static NetworkGraphEngine<Boolean> createEngine(BlockPos center) {
+        var graphManager = new NetworkManager();
         var adapter = new INetworkGraphAdapter<Boolean>() {
             @Override
             public boolean isNodeLoaded(BlockPos pos) {
@@ -121,6 +122,7 @@ class NetworkManagerTest {
         return new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
+            graphManager,
             adapter
         );
     }

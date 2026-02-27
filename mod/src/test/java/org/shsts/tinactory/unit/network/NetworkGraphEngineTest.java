@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.network;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
+import org.shsts.tinactory.core.network.NetworkManager;
 
 import java.util.Set;
 import java.util.UUID;
@@ -26,10 +27,12 @@ class NetworkGraphEngineTest {
             .addEdge(center, net.minecraft.core.Direction.WEST)
             .addEdge(center, net.minecraft.core.Direction.SOUTH);
         var events = new NetworkGraphEngineFixtures.Events();
+        var manager = new NetworkManager();
 
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
+            manager,
             new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
@@ -54,10 +57,12 @@ class NetworkGraphEngineTest {
             .addEdge(center, net.minecraft.core.Direction.EAST)
             .addEdge(east, net.minecraft.core.Direction.EAST);
         var events = new NetworkGraphEngineFixtures.Events();
+        var manager = new NetworkManager();
 
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
+            manager,
             new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
@@ -79,10 +84,12 @@ class NetworkGraphEngineTest {
             .addNode(east, false)
             .addEdge(center, net.minecraft.core.Direction.EAST);
         var events = new NetworkGraphEngineFixtures.Events();
+        var manager = new NetworkManager();
 
         var engine = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
+            manager,
             new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
@@ -105,18 +112,50 @@ class NetworkGraphEngineTest {
         var center = new net.minecraft.core.BlockPos(0, 0, 0);
         var graph = new NetworkGraphEngineFixtures.Graph();
         var events = new NetworkGraphEngineFixtures.Events();
+        var manager = new NetworkManager();
         var higher = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000020"),
             center,
+            manager,
             new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
         var lower = new NetworkGraphEngine<>(
             UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
+            manager,
             new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
         );
 
         assertTrue(lower.comparePriority(higher));
         assertFalse(higher.comparePriority(lower));
+    }
+
+    @Test
+    void shouldResolveConflictsInEngineAndSkipDiscoverWhenLosingPriority() {
+        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var graph = new NetworkGraphEngineFixtures.Graph().addNode(center, false);
+        var manager = new NetworkManager();
+        var winnerEvents = new NetworkGraphEngineFixtures.Events();
+        var loserEvents = new NetworkGraphEngineFixtures.Events();
+        var winner = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000010"),
+            center,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, winnerEvents)
+        );
+        var loser = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000020"),
+            center,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, loserEvents)
+        );
+
+        assertTrue(winner.connectNext());
+        assertFalse(loser.connectNext());
+        assertEquals(winner, manager.getNetworkAtPos(center).orElseThrow());
+        assertEquals(1, winnerEvents.discovered.size());
+        assertTrue(loserEvents.discovered.isEmpty());
+        assertEquals(1, loserEvents.disconnectCalls);
+        assertEquals(NetworkGraphEngine.State.CONNECTING, loser.state());
     }
 }

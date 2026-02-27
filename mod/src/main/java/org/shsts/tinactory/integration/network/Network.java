@@ -20,7 +20,6 @@ import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
-import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.core.network.SchedulingManager;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
@@ -39,7 +38,6 @@ public class Network implements INetwork {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final Level world;
-    private final NetworkManager manager;
     private final UUID uuid;
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
@@ -57,11 +55,11 @@ public class Network implements INetwork {
 
     public Network(Level world, UUID uuid, BlockPos center, TeamProfile team) {
         this.world = world;
-        this.manager = WorldNetworkManagers.get(world);
         this.uuid = uuid;
         this.center = center;
         this.team = team;
-        this.graphEngine = new NetworkGraphEngine<>(uuid, center, new GraphAdapter());
+        this.graphEngine = new NetworkGraphEngine<>(uuid, center, WorldNetworkManagers.get(world),
+            new GraphAdapter());
         this.delayTicks = 0;
         attachComponents();
     }
@@ -146,24 +144,7 @@ public class Network implements INetwork {
     }
 
     private void onDiscover(BlockPos pos, BlockState state, BlockPos subnet) {
-        if (manager.hasNetworkAtPos(pos)) {
-            var network1 = manager.getNetworkAtPos(pos).orElseThrow();
-            if (comparePriorityAgainst(network1)) {
-                LOGGER.debug("{}: invalidate conflict network at {}", this, pos);
-                network1.invalidate();
-            } else {
-                LOGGER.debug("{}: invalidate myself because of conflict at {}", this, pos);
-                invalidate();
-                return;
-            }
-        }
-        manager.putNetworkAtPos(pos, graphEngine);
         putBlock(pos, state, subnet);
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean comparePriorityAgainst(NetworkGraphEngine<?> another) {
-        return graphEngine.comparePriority((NetworkGraphEngine<BlockState>) another);
     }
 
     protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {

@@ -23,6 +23,7 @@ public class NetworkGraphEngine<TNodeData> {
     private record BlockInfo<TNodeData>(TNodeData data, BlockPos parent, BlockPos subnet) {}
 
     private final BlockPos center;
+    private final NetworkManager manager;
     private final INetworkGraphAdapter<TNodeData> adapter;
     private final UUID priority;
 
@@ -30,9 +31,11 @@ public class NetworkGraphEngine<TNodeData> {
     private final Map<BlockPos, BlockInfo<TNodeData>> visited = new HashMap<>();
     private State state;
 
-    public NetworkGraphEngine(UUID priority, BlockPos center, INetworkGraphAdapter<TNodeData> adapter) {
+    public NetworkGraphEngine(UUID priority, BlockPos center, NetworkManager manager,
+        INetworkGraphAdapter<TNodeData> adapter) {
         this.priority = priority;
         this.center = center;
+        this.manager = manager;
         this.adapter = adapter;
         reset();
     }
@@ -41,7 +44,7 @@ public class NetworkGraphEngine<TNodeData> {
         return state;
     }
 
-    public boolean comparePriority(NetworkGraphEngine<TNodeData> another) {
+    public boolean comparePriority(NetworkGraphEngine<?> another) {
         return priority.compareTo(another.priority) < 0;
     }
 
@@ -95,6 +98,20 @@ public class NetworkGraphEngine<TNodeData> {
                 queue.add(pos1);
                 visited.put(pos1, new BlockInfo<>(data1, pos, subnet));
             }
+        }
+        if (manager.hasNetworkAtPos(pos)) {
+            var network1 = manager.getNetworkAtPos(pos).orElseThrow();
+            if (network1 != this) {
+                if (comparePriority(network1)) {
+                    network1.invalidate();
+                } else {
+                    invalidate();
+                    return false;
+                }
+            }
+        }
+        if (!manager.hasNetworkAtPos(pos)) {
+            manager.putNetworkAtPos(pos, this);
         }
         adapter.onDiscover(pos, info.data(), subnet);
         return true;
