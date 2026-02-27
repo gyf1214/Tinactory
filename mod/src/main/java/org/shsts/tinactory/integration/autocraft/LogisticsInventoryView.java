@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.integration.autocraft;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import javax.annotation.ParametersAreNonnullByDefault;

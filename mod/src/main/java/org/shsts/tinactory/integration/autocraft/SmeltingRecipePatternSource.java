@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.integration.autocraft;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

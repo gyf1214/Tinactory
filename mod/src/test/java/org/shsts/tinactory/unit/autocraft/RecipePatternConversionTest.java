@@ -6,7 +6,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.autocraft.integration.ProcessingRecipePatternSource;
+import org.shsts.tinactory.integration.autocraft.ProcessingRecipePatternSource;
 
 import java.util.List;
 import java.util.Optional;

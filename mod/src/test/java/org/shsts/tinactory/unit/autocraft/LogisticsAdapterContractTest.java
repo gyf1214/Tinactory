@@ -21,14 +21,14 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent.PortInfo;
-import org.shsts.tinactory.core.autocraft.integration.LogisticsMachineAllocator;
-import org.shsts.tinactory.core.autocraft.integration.LogisticsPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.integration.autocraft.LogisticsMachineAllocator;
+import org.shsts.tinactory.integration.autocraft.LogisticsPatternRepository;
 
 import java.util.Collection;
 import java.util.List;
