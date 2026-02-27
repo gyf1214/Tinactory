@@ -1,19 +1,20 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.core.autocraft.service;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.plan.ICraftPlanner;
 
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -23,8 +24,8 @@ public class AutocraftTerminalService {
     private final Supplier<List<UUID>> visibleCpuSupplier;
     private final Supplier<List<UUID>> availableCpuSupplier;
     private final Supplier<List<CraftAmount>> availableSupplier;
-    private final AutocraftPreviewSessionStore previewStore;
-    private final AutocraftPlanPreflight preflight;
+    @Nullable
+    private AutocraftPreview preview;
     private final Function<UUID, AutocraftJobService> jobServiceResolver;
 
     public AutocraftTerminalService(
@@ -32,11 +33,10 @@ public class AutocraftTerminalService {
         Supplier<List<CraftPattern>> patternSupplier,
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
-        Supplier<List<CraftAmount>> availableSupplier,
-        AutocraftPreviewSessionStore previewStore) {
+        Supplier<List<CraftAmount>> availableSupplier) {
 
-        this(planner, patternSupplier, visibleCpuSupplier, availableCpuSupplier, availableSupplier, previewStore,
-            new AutocraftPlanPreflight(), $ -> null);
+        this(planner, patternSupplier, visibleCpuSupplier, availableCpuSupplier, availableSupplier,
+            $ -> null);
     }
 
     public AutocraftTerminalService(
@@ -45,8 +45,6 @@ public class AutocraftTerminalService {
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
         Supplier<List<CraftAmount>> availableSupplier,
-        AutocraftPreviewSessionStore previewStore,
-        AutocraftPlanPreflight preflight,
         Function<UUID, AutocraftJobService> jobServiceResolver) {
 
         this.planner = planner;
@@ -54,24 +52,18 @@ public class AutocraftTerminalService {
         this.visibleCpuSupplier = visibleCpuSupplier;
         this.availableCpuSupplier = availableCpuSupplier;
         this.availableSupplier = availableSupplier;
-        this.previewStore = previewStore;
-        this.preflight = preflight;
         this.jobServiceResolver = jobServiceResolver;
     }
 
-    public List<AutocraftRequestableEntry> listRequestables() {
-        var dedup = new LinkedHashMap<AutocraftRequestableKey, Long>();
-        for (var pattern : patternSupplier.get()) {
-            for (var output : pattern.outputs()) {
-                var key = AutocraftRequestableKey.fromCraftKey(output.key());
-                dedup.put(key, dedup.getOrDefault(key, 0L) + 1L);
-            }
-        }
-        return dedup.entrySet().stream()
-            .map(entry -> new AutocraftRequestableEntry(entry.getKey(), entry.getValue()))
-            .sorted(Comparator.comparing((AutocraftRequestableEntry entry) -> entry.key().type().name())
-                .thenComparing(entry -> entry.key().id())
-                .thenComparing(entry -> entry.key().nbt()))
+    public List<CraftKey> listRequestables() {
+        var dedup = patternSupplier.get().stream()
+            .flatMap(pattern -> pattern.outputs().stream())
+            .map(CraftAmount::key)
+            .collect(Collectors.toSet());
+        return dedup.stream()
+            .sorted(Comparator.comparing(CraftKey::type)
+                .thenComparing(CraftKey::id)
+                .thenComparing(CraftKey::nbt))
             .toList();
     }
 
@@ -97,54 +89,42 @@ public class AutocraftTerminalService {
         return running.isPresent() && service.cancel(running.get().id());
     }
 
-    public AutocraftPreviewResult preview(AutocraftPreviewRequest request) {
-        if (request.quantity() <= 0L) {
-            return AutocraftPreviewResult.failure(AutocraftPreviewErrorCode.INVALID_REQUEST);
+    public AutocraftPreviewResult preview(CraftKey target, long quantity) {
+        if (quantity <= 0L) {
+            return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.INVALID_REQUEST);
         }
-        if (!availableCpuSupplier.get().contains(request.cpuId())) {
-            return AutocraftPreviewResult.failure(AutocraftPreviewErrorCode.CPU_BUSY);
-        }
-        var targets = List.of(new CraftAmount(request.target().toCraftKey(), request.quantity()));
+        var targets = List.of(new CraftAmount(target, quantity));
         var result = planner.plan(targets, availableSupplier.get());
         if (!result.isSuccess() || result.plan() == null) {
-            return AutocraftPreviewResult.failure(AutocraftPreviewErrorCode.PREVIEW_FAILED);
+            return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.PLAN_FAILED);
         }
-        var planId = UUID.randomUUID();
-        var summary = summarizeTargets(targets);
-        previewStore.put(planId, request.cpuId(), targets, result.plan(), summary);
-        return AutocraftPreviewResult.success(planId, result.plan(), summary);
+        preview = new AutocraftPreview(targets, result.plan());
+        return AutocraftPreviewResult.success(preview);
     }
 
-    public AutocraftExecuteResult execute(AutocraftExecuteRequest request) {
-        var snapshot = previewStore.find(request.planId());
-        if (snapshot.isEmpty()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.PLAN_NOT_FOUND);
+    public AutocraftExecuteResult execute(UUID cpuId) {
+        if (preview == null) {
+            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
         }
-        if (!snapshot.get().cpuId().equals(request.cpuId()) || !availableCpuSupplier.get().contains(request.cpuId())) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.CPU_BUSY);
+        var service = jobServiceResolver.apply(cpuId);
+        if (service == null) {
+            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_OFFLINE);
         }
-        var service = jobServiceResolver.apply(request.cpuId());
-        if (service == null || service.isBusy()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.CPU_BUSY);
+        if (service.isBusy()) {
+            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
         }
-        var missingInputs = preflight.findMissingInputs(snapshot.get().planSnapshot(), availableSupplier.get());
-        if (!missingInputs.isEmpty()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS, missingInputs);
-        }
-        var removed = previewStore.remove(request.planId());
-        if (removed.isEmpty()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteErrorCode.PLAN_NOT_FOUND);
-        }
+        var preview1 = preview;
+        preview = null;
         return AutocraftExecuteResult.success(
-            service.submitPrepared(removed.get().targets(), removed.get().planSnapshot()));
+            service.submitPrepared(preview1.targets(), preview1.planSnapshot()));
     }
 
-    public void cancelPreview(UUID planId) {
-        previewStore.remove(planId);
+    public void cancelPreview() {
+        preview = null;
     }
 
-    public AutocraftPreviewSessionStore previewStore() {
-        return previewStore;
+    public Optional<AutocraftPreview> preview() {
+        return Optional.ofNullable(preview);
     }
 
     private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {
@@ -205,12 +185,4 @@ public class AutocraftTerminalService {
         String currentStep,
         String blockedReason,
         boolean cancellable) {}
-
-    private static List<CraftAmount> summarizeTargets(List<CraftAmount> targets) {
-        var merged = new LinkedHashMap<CraftKey, Long>();
-        for (var target : targets) {
-            merged.put(target.key(), merged.getOrDefault(target.key(), 0L) + target.amount());
-        }
-        return merged.entrySet().stream().map(entry -> new CraftAmount(entry.getKey(), entry.getValue())).toList();
-    }
 }

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.core.autocraft.service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -11,6 +11,9 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
+import org.shsts.tinactory.core.autocraft.integration.LogisticsInventoryView;
+import org.shsts.tinactory.core.autocraft.integration.LogisticsMachineAllocator;
+import org.shsts.tinactory.core.autocraft.integration.LogisticsPatternRepository;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 
 import java.util.UUID;
@@ -30,8 +33,8 @@ public final class AutocraftServiceBootstrap {
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
-        var level = blockEntity.getLevel();
-        if (level == null || level.isClientSide) {
+        var world = blockEntity.getLevel();
+        if (world == null || world.isClientSide) {
             throw new IllegalStateException("autocraft service must be created on server level");
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
@@ -54,8 +57,8 @@ public final class AutocraftServiceBootstrap {
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort) {
 
-        var level = blockEntity.getLevel();
-        if (level == null || level.isClientSide) {
+        var world = blockEntity.getLevel();
+        if (world == null || world.isClientSide) {
             throw new IllegalStateException("autocraft terminal service must be created on server level");
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
@@ -67,8 +70,6 @@ public final class AutocraftServiceBootstrap {
             () -> logistics.listVisibleAutocraftCpus(subnet),
             () -> logistics.listAvailableAutocraftCpus(subnet),
             inventory::snapshotAvailable,
-            new AutocraftPreviewSessionStore(),
-            new AutocraftPlanPreflight(),
             cpuId -> logistics.findVisibleAutocraftService(subnet, cpuId).orElse(null));
     }
 

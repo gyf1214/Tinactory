@@ -1,21 +1,22 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.core.autocraft.service;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
-import org.shsts.tinactory.core.autocraft.exec.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.model.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.ICraftPlanner;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

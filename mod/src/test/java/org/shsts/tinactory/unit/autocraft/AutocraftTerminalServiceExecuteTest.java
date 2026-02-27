@@ -2,26 +2,21 @@ package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
-import org.shsts.tinactory.core.autocraft.exec.ICraftExecutor;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteRequest;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPlanPreflight;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewRequest;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewSessionStore;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableKey;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftTerminalService;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
+import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +25,31 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalServiceExecuteTest {
+    @Test
+    void listRequestablesShouldReturnDedupedOutputsFromStoredPatterns() {
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(),
+            () -> List.of(
+                pattern("tinactory:p1", List.of(
+                    new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1))),
+                pattern("tinactory:p2", List.of(
+                    new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 2),
+                    new CraftAmount(CraftKey.fluid("minecraft:water", ""), 1000)))),
+            List::of,
+            List::of,
+            List::of);
+
+        var requestables = service.listRequestables();
+
+        assertEquals(2, requestables.size());
+        assertEquals(CraftKey.Type.ITEM, requestables.get(0).type());
+        assertEquals(CraftKey.Type.FLUID, requestables.get(1).type());
+    }
+
     @Test
     void executeShouldUseStoredSnapshotAndNotInvokePlannerAgain() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -52,15 +69,10 @@ class AutocraftTerminalServiceExecuteTest {
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 64)),
-            new AutocraftPreviewSessionStore(),
-            new AutocraftPlanPreflight(),
             id -> id.equals(cpu) ? jobService : null);
-        var preview = service.preview(new AutocraftPreviewRequest(
-            AutocraftRequestableKey.fromCraftKey(CraftKey.item("minecraft:iron_plate", "")),
-            1,
-            cpu));
 
-        var execute = service.execute(new AutocraftExecuteRequest(preview.planId(), cpu));
+        service.preview(CraftKey.item("minecraft:iron_plate", ""), 1);
+        var execute = service.execute(cpu);
 
         assertTrue(execute.isSuccess());
         assertEquals(1, previewPlanner.calls);
@@ -68,37 +80,18 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     @Test
-    void executeShouldFailWhenPreflightDetectsMissingInputs() {
+    void executeShouldFailWhenCpuUnavailable() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
-        var service = new AutocraftTerminalService(
-            new StaticPlanner(planRequiring(
-                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1))),
-            List::of,
-            () -> List.copyOf(availableCpus),
-            () -> List.copyOf(availableCpus),
-            List::of,
-            new AutocraftPreviewSessionStore(),
-            new AutocraftPlanPreflight(),
-            id -> new AutocraftJobService(id, (targets, available) -> PlanResult.success(new CraftPlan(List.of())),
-                TestExecutor::new, List::of));
-        var preview = service.preview(new AutocraftPreviewRequest(
-            AutocraftRequestableKey.fromCraftKey(CraftKey.item("minecraft:iron_plate", "")),
-            1,
-            cpu));
-
-        var execute = service.execute(new AutocraftExecuteRequest(preview.planId(), cpu));
-
-        assertTrue(!execute.isSuccess());
-        assertEquals(AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS, execute.errorCode());
-        assertEquals(1L, execute.missingInputs().get(CraftKey.item("minecraft:iron_ingot", "")));
-    }
-
-    @Test
-    void executeShouldFailWhenCpuBecameUnavailableAfterPreview() {
-        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var availableCpus = new ArrayList<>(List.of(cpu));
+        // TODO
+        var jobService = new AutocraftJobService(cpu,
+            (targets, available) -> PlanResult.success(new CraftPlan(List.of())),
+            TestExecutor::new, List::of) {
+            @Override
+            public boolean isBusy() {
+                return true;
+            }
+        };
         var service = new AutocraftTerminalService(
             new StaticPlanner(planRequiring(
                 new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
@@ -107,20 +100,20 @@ class AutocraftTerminalServiceExecuteTest {
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 64)),
-            new AutocraftPreviewSessionStore(),
-            new AutocraftPlanPreflight(),
-            id -> new AutocraftJobService(id, (targets, available) -> PlanResult.success(new CraftPlan(List.of())),
-                TestExecutor::new, List::of));
-        var preview = service.preview(new AutocraftPreviewRequest(
-            AutocraftRequestableKey.fromCraftKey(CraftKey.item("minecraft:iron_plate", "")),
-            1,
-            cpu));
+            id -> id.equals(cpu) ? jobService : null);
+        service.preview(CraftKey.item("minecraft:iron_plate", ""), 1);
         availableCpus.clear();
 
-        var execute = service.execute(new AutocraftExecuteRequest(preview.planId(), cpu));
+        var execute = service.execute(cpu);
 
-        assertTrue(!execute.isSuccess());
-        assertEquals(AutocraftExecuteErrorCode.CPU_BUSY, execute.errorCode());
+        assertFalse(execute.isSuccess());
+        assertEquals(AutocraftExecuteResult.Code.CPU_BUSY, execute.errorCode());
+    }
+
+    private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
+        return new CraftPattern(id, List.of(
+            new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
+            outputs, new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 
     private static CraftPlan planRequiring(CraftAmount input, CraftAmount output) {
@@ -134,6 +127,10 @@ class AutocraftTerminalServiceExecuteTest {
     private static final class StaticPlanner implements ICraftPlanner {
         private final CraftPlan plan;
         private int calls;
+
+        private StaticPlanner() {
+            this(new CraftPlan(List.of()));
+        }
 
         private StaticPlanner(CraftPlan plan) {
             this.plan = plan;

@@ -6,12 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableKey;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,8 +20,7 @@ class AutocraftTerminalMenuContractTest {
     @Test
     void menuShouldExposeRequestablesAndAvailableCpuSlots() {
         var requestables = new AutocraftRequestablesSyncPacket(List.of(
-            new AutocraftRequestableEntry(
-                new AutocraftRequestableKey(CraftKey.Type.ITEM, "minecraft:iron_ingot", ""), 2L)));
+            new CraftKey(CraftKey.Type.ITEM, "minecraft:iron_ingot", "")));
         var cpus = new AutocraftCpuSyncPacket(List.of(
             new AutocraftCpuSyncPacket.Row(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
@@ -39,37 +34,32 @@ class AutocraftTerminalMenuContractTest {
         var cpusDecoded = roundTrip(cpus, new AutocraftCpuSyncPacket());
 
         assertEquals(1, requestablesDecoded.requestables().size());
-        assertEquals("minecraft:iron_ingot", requestablesDecoded.requestables().get(0).key().id());
+        assertEquals("minecraft:iron_ingot", requestablesDecoded.requestables().get(0).id());
         assertEquals(1, cpusDecoded.rows().stream()
             .filter(AutocraftCpuSyncPacket.Row::available)
             .count());
     }
 
     @Test
-    void previewActionShouldPublishPreviewStateToSyncSlot() {
-        var planId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var preview = new AutocraftPreviewSyncPacket(
-            planId,
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 4)),
-            AutocraftPreviewErrorCode.PREVIEW_FAILED,
-            AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS);
+    void previewActionShouldPublishFailedPreviewToSyncPacket() {
+        var preview = AutocraftPreviewSyncPacket.preview(new AutocraftPreviewResult(
+            null,
+            AutocraftPreviewResult.Code.PLAN_FAILED));
 
         var decoded = roundTrip(preview, new AutocraftPreviewSyncPacket());
 
-        assertEquals(planId, decoded.planId());
-        assertEquals(1, decoded.summaryOutputs().size());
-        assertEquals(AutocraftPreviewErrorCode.PREVIEW_FAILED, decoded.previewError());
-        assertEquals(AutocraftExecuteErrorCode.PREFLIGHT_MISSING_INPUTS, decoded.executeError());
+        assertNull(decoded.targets());
+        assertEquals(AutocraftPreviewResult.Code.PLAN_FAILED, decoded.previewError());
+        assertNull(decoded.executeError());
     }
 
     @Test
     void cancelActionShouldClearPreviewState() {
-        var cleared = new AutocraftPreviewSyncPacket(null, List.of(), null, null);
+        var cleared = AutocraftPreviewSyncPacket.cancel();
 
         var decoded = roundTrip(cleared, new AutocraftPreviewSyncPacket());
 
-        assertNull(decoded.planId());
-        assertEquals(0, decoded.summaryOutputs().size());
+        assertNull(decoded.targets());
         assertNull(decoded.previewError());
         assertNull(decoded.executeError());
     }

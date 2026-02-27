@@ -11,7 +11,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;

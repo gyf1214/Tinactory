@@ -10,13 +10,9 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitResult;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
@@ -155,55 +151,6 @@ public class LogisticComponent extends NotifierComponent {
             return Optional.empty();
         }
         return Optional.of(cpu.service());
-    }
-
-    public AutocraftSubmitResult submitAutocraft(BlockPos subnet, UUID cpuId, List<CraftAmount> targets) {
-        if (targets.isEmpty()) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.INVALID_REQUEST);
-        }
-        var cpu = autocraftCpus.get(cpuId);
-        if (cpu == null) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_OFFLINE);
-        }
-        if (!cpu.subnet().equals(subnet)) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_NOT_VISIBLE);
-        }
-        var service = cpu.service();
-        if (service.isBusy()) {
-            return AutocraftSubmitResult.failure(AutocraftSubmitErrorCode.CPU_BUSY);
-        }
-        return AutocraftSubmitResult.success(service.submit(targets));
-    }
-
-    public Optional<AutocraftJob> findAutocraftJob(UUID id) {
-        for (var cpu : autocraftCpus.values()) {
-            var ret = cpu.service().findJob(id);
-            if (ret.isPresent()) {
-                return ret;
-            }
-        }
-        return Optional.empty();
-    }
-
-    public List<AutocraftJob> listAutocraftJobs() {
-        return autocraftCpus.values().stream()
-            .flatMap(cpu -> cpu.service().listJobs().stream())
-            .toList();
-    }
-
-    public boolean cancelAutocraft(UUID id) {
-        for (var cpu : autocraftCpus.values()) {
-            if (cpu.service().cancel(id)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void tickAutocraftJobs() {
-        for (var cpu : autocraftCpus.values()) {
-            cpu.service().tick();
-        }
     }
 
     public void registerPatternCell(NetworkPatternCell cell) {

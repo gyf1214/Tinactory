@@ -8,7 +8,6 @@ import org.shsts.tinactory.content.autocraft.AutocraftCpu;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
@@ -16,6 +15,7 @@ import org.shsts.tinactory.core.autocraft.model.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.model.PatternNbtCodec;
 
 import java.util.List;
 

@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.autocraft.plan;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCraftPlanner {
+public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private final IPatternRepository patterns;
 
     public GoalReductionPlanner(IPatternRepository patterns) {

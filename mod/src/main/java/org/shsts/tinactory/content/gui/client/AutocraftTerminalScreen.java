@@ -13,7 +13,7 @@ import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
+import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -36,7 +36,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private final AutocraftPreviewPanel previewPanel;
     private final Tab tabs;
 
-    private List<AutocraftRequestableEntry> requestables = List.of();
+    private List<CraftKey> requestables = List.of();
     private List<UUID> availableCpus = List.of();
     private List<AutocraftCpuSyncPacket.Row> cpuStatuses = List.of();
     @Nullable
@@ -70,7 +70,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftEventPacket.preview(
-            requestables.get(targetIndex.getAsInt()).key(),
+            requestables.get(targetIndex.getAsInt()),
             quantity.getAsLong(),
             availableCpus.get(cpuIndex.getAsInt())));
     }
@@ -81,14 +81,14 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION,
-            () -> AutocraftEventPacket.execute(previewPlanId, availableCpus.get(cpuIndex.getAsInt())));
+            () -> AutocraftEventPacket.execute(availableCpus.get(cpuIndex.getAsInt())));
     }
 
     public void cancelPreview() {
         if (previewPlanId == null) {
             return;
         }
-        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftEventPacket.cancel(previewPlanId));
+        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, AutocraftEventPacket::cancel);
     }
 
     public void cancelCpuJob() {
@@ -119,7 +119,6 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     private void onPreviewSync(AutocraftPreviewSyncPacket packet) {
-        previewPlanId = packet.planId();
         if (packet.previewError() != null) {
             previewPanel.setSummary(new TextComponent("Preview error: " + packet.previewError().name()));
             return;
@@ -128,11 +127,8 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
             previewPanel.setSummary(new TextComponent("Execute error: " + packet.executeError().name()));
             return;
         }
-        if (previewPlanId != null) {
-            previewPanel.setSummary(new TextComponent(
-                "Plan " + previewPlanId + " outputs: " + packet.summaryOutputs().size()));
-        } else {
-            previewPanel.setSummary(new TextComponent("No Preview"));
+        if (packet.targets() != null) {
+            previewPanel.setSummary(new TextComponent("Plan outputs: " + packet.targets().size()));
         }
     }
 

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.autocraft.integration;
+package org.shsts.tinactory.core.autocraft.model;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -6,11 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
 
 import java.util.ArrayList;
 

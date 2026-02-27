@@ -23,10 +23,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.material.MiscMeta;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitErrorCode;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,7 +33,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -69,38 +65,6 @@ class AutocraftCpuLifecycleTest {
         component.registerAutocraftCpu(cpuB, subnet, new TestService(cpuB.uuid()));
 
         assertEquals(List.of(cpuA.uuid(), cpuB.uuid()), component.listVisibleAutocraftCpus(subnet));
-    }
-
-    @Test
-    void submitShouldRejectBusyCpu() {
-        var component = new LogisticComponent(null, new FakeNetwork());
-        var subnet = new BlockPos(0, 0, 0);
-        var cpu = new FakeMachine("11111111-1111-1111-1111-111111111111");
-        var service = new TestService(cpu.uuid());
-        component.registerAutocraftCpu(cpu, subnet, service);
-        service.busy = true;
-
-        var result = component.submitAutocraft(subnet, cpu.uuid(),
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)));
-
-        assertEquals(AutocraftSubmitErrorCode.CPU_BUSY, result.errorCode());
-        assertFalse(result.optionalJobId().isPresent());
-    }
-
-    @Test
-    void submitShouldUseCpuMachineId() {
-        var component = new LogisticComponent(null, new FakeNetwork());
-        var subnet = new BlockPos(0, 0, 0);
-        var cpu = new FakeMachine("11111111-1111-1111-1111-111111111111");
-        var service = new TestService(cpu.uuid());
-        component.registerAutocraftCpu(cpu, subnet, service);
-
-        var result = component.submitAutocraft(subnet, cpu.uuid(),
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)));
-
-        assertTrue(result.isSuccess());
-        assertNotNull(result.optionalJobId().orElse(null));
-        assertEquals(cpu.uuid(), service.cpuId());
     }
 
     @Test

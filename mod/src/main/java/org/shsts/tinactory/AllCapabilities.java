@@ -11,7 +11,7 @@ import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.IMenuItemHandler;

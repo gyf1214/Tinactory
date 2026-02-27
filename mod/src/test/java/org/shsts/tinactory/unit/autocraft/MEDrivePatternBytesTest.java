@@ -2,7 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.logistics.MEDrive;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 
