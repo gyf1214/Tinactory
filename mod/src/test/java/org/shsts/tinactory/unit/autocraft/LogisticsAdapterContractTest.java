@@ -19,7 +19,7 @@ import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent.SchedulingBuilder;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent.PortInfo;
 import org.shsts.tinactory.core.autocraft.integration.LogisticsMachineAllocator;
@@ -495,6 +495,6 @@ class LogisticsAdapterContractTest {
         public void onDisconnectFromNetwork() {}
 
         @Override
-        public void buildSchedulings(SchedulingBuilder builder) {}
+        public void buildSchedulings(ISchedulingRegister builder) {}
     }
 }

@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -75,7 +75,7 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
         CONTAINER.tryGet(blockEntity).ifPresent(boiler::setContainer);
     }
 
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+    private void buildScheduling(ISchedulingRegister builder) {
         builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> boiler.setStopped(false));
     }
 

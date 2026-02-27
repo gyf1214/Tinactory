@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitErrorCode;
@@ -276,7 +276,7 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+    public void buildSchedulings(ISchedulingRegister builder) {
         // Autocraft CPUs own runtime ticking via machine lifecycle scheduling.
     }
 

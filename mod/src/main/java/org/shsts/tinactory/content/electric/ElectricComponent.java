@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.NetworkComponent;
@@ -219,7 +219,7 @@ public class ElectricComponent extends NetworkComponent {
     }
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+    public void buildSchedulings(ISchedulingRegister builder) {
         builder.add(ELECTRIC_SCHEDULING.get(), ($1, $2) -> solveNetwork());
     }
 }

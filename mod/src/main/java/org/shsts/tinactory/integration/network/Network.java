@@ -13,6 +13,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.INetworkTicker;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
@@ -42,9 +43,9 @@ public class Network implements INetwork {
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
     private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
     private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
-    private final Multimap<IScheduling, INetworkComponent.Ticker> componentSchedulings =
+    private final Multimap<IScheduling, INetworkTicker> componentSchedulings =
         ArrayListMultimap.create();
-    private final Multimap<IScheduling, INetworkComponent.Ticker> machineSchedulings =
+    private final Multimap<IScheduling, INetworkTicker> machineSchedulings =
         ArrayListMultimap.create();
     private final NetworkGraphEngine<BlockState> graphEngine;
 
@@ -87,7 +88,7 @@ public class Network implements INetwork {
 
         @Override
         public void onDiscover(BlockPos pos, BlockState data, BlockPos subnet) {
-            Network.this.onDiscover(pos, data, subnet);
+            Network.this.putBlock(pos, data, subnet);
         }
 
         @Override
@@ -111,14 +112,14 @@ public class Network implements INetwork {
         return type.clazz().cast(components.get(type));
     }
 
-    protected void attachComponent(IComponentType<?> type) {
+    private void attachComponent(IComponentType<?> type) {
         assert !components.containsKey(type);
         var component = type.create(this);
         components.put(type, component);
         component.buildSchedulings(componentSchedulings::put);
     }
 
-    protected void attachComponents() {
+    private void attachComponents() {
         ComponentType.getComponentTypes().forEach(this::attachComponent);
     }
 
@@ -137,17 +138,13 @@ public class Network implements INetwork {
         return blockSubnets.entrySet();
     }
 
-    protected void putMachine(BlockPos subnet, IMachine machine) {
+    private void putMachine(BlockPos subnet, IMachine machine) {
         LOGGER.trace("{}: put machine {}", this, machine);
         machine.assignNetwork(this);
         subnetMachines.put(subnet, machine);
     }
 
-    private void onDiscover(BlockPos pos, BlockState state, BlockPos subnet) {
-        putBlock(pos, state, subnet);
-    }
-
-    protected void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
+    private void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
             world.dimension(), pos, subnet);
         blockSubnets.put(pos, subnet);
@@ -200,7 +197,7 @@ public class Network implements INetwork {
         LOGGER.debug("{}: invalidated", this);
     }
 
-    protected void doTick() {
+    private void doTick() {
         for (var scheduling : SchedulingManager.getSortedSchedulings()) {
             for (var entry : componentSchedulings.get(scheduling)) {
                 entry.tick(world, this);

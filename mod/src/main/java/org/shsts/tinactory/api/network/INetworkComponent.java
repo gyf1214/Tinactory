@@ -3,7 +3,6 @@ package org.shsts.tinactory.api.network;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 @ParametersAreNonnullByDefault
@@ -26,15 +25,5 @@ public interface INetworkComponent {
      */
     void onDisconnect();
 
-    void buildSchedulings(SchedulingBuilder builder);
-
-    @FunctionalInterface
-    interface Ticker {
-        void tick(Level world, INetwork network);
-    }
-
-    @FunctionalInterface
-    interface SchedulingBuilder {
-        void add(IScheduling scheduling, Ticker ticker);
-    }
+    void buildSchedulings(ISchedulingRegister builder);
 }

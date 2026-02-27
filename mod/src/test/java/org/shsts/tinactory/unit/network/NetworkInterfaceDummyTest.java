@@ -21,6 +21,7 @@ import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ class NetworkInterfaceDummyTest {
         var machine = new DummyMachine();
 
         var builtSchedulings = new ArrayList<IScheduling>();
-        var tickerCalls = new int[] {0};
+        var tickerCalls = new int[]{0};
         component.buildSchedulings((addedScheduling, ticker) -> {
             builtSchedulings.add(addedScheduling);
             ticker.tick(null, network);
@@ -152,7 +153,7 @@ class NetworkInterfaceDummyTest {
         public void onDisconnectFromNetwork() {}
 
         @Override
-        public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+        public void buildSchedulings(ISchedulingRegister builder) {
             builder.add(new DummyScheduling(), (world, network) -> {
             });
         }
@@ -207,7 +208,7 @@ class NetworkInterfaceDummyTest {
         public void onDisconnect() {}
 
         @Override
-        public void buildSchedulings(SchedulingBuilder builder) {
+        public void buildSchedulings(ISchedulingRegister builder) {
             builder.add(new DummyScheduling(), (world, network) -> {
             });
         }

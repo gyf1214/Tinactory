@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -40,7 +40,7 @@ public final class AllEvents {
     public static final IEntry<IEvent<OnPlaceArg>> BLOCK_PLACE;
     public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
     public static final IEntry<IEvent<INetwork>> CONNECT;
-    public static final IEntry<IEvent<INetworkComponent.SchedulingBuilder>> BUILD_SCHEDULING;
+    public static final IEntry<IEvent<ISchedulingRegister>> BUILD_SCHEDULING;
     public static final IEntry<IEvent<Unit>> SET_MACHINE_CONFIG;
 
     private AllEvents() {}

@@ -17,7 +17,7 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
@@ -157,7 +157,7 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
         }
     }
 
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+    private void buildScheduling(ISchedulingRegister builder) {
         builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> boiler.setStopped(false));
     }
 
