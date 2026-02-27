@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -83,12 +85,12 @@ class NetworkManagerTest {
 
     private static NetworkGraphEngine<Boolean> createEngine(BlockPos center) {
         return new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000010"),
             center,
             $ -> true,
             $ -> false,
             ($1, $2, $3) -> false,
             ($1, $2) -> false,
-            $ -> true,
             ($1, $2, $3) -> {
             },
             () -> {

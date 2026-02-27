@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -33,11 +34,6 @@ public class NetworkGraphEngine<TNodeData> {
     }
 
     @FunctionalInterface
-    public interface ComparePriority<TNodeData> {
-        boolean comparePriority(NetworkGraphEngine<TNodeData> another);
-    }
-
-    @FunctionalInterface
     public interface OnDiscover<TNodeData> {
         void onDiscover(BlockPos pos, TNodeData data, BlockPos subnet);
     }
@@ -49,7 +45,7 @@ public class NetworkGraphEngine<TNodeData> {
     private final Function<BlockPos, TNodeData> getNodeData;
     private final NodeConnected<TNodeData> isConnected;
     private final IsSubnet<TNodeData> isSubnet;
-    private final ComparePriority<TNodeData> comparePriority;
+    private final UUID priority;
     private final OnDiscover<TNodeData> onDiscover;
     private final Runnable onConnectFinished;
     private final java.util.function.Consumer<Boolean> onDisconnect;
@@ -58,17 +54,17 @@ public class NetworkGraphEngine<TNodeData> {
     private final Map<BlockPos, BlockInfo<TNodeData>> visited = new HashMap<>();
     private State state;
 
-    public NetworkGraphEngine(BlockPos center, Predicate<BlockPos> isNodeLoaded,
+    public NetworkGraphEngine(UUID priority, BlockPos center, Predicate<BlockPos> isNodeLoaded,
         Function<BlockPos, TNodeData> getNodeData, NodeConnected<TNodeData> isConnected,
-        IsSubnet<TNodeData> isSubnet, ComparePriority<TNodeData> comparePriority,
+        IsSubnet<TNodeData> isSubnet,
         OnDiscover<TNodeData> onDiscover, Runnable onConnectFinished,
         java.util.function.Consumer<Boolean> onDisconnect) {
+        this.priority = priority;
         this.center = center;
         this.isNodeLoaded = isNodeLoaded;
         this.getNodeData = getNodeData;
         this.isConnected = isConnected;
         this.isSubnet = isSubnet;
-        this.comparePriority = comparePriority;
         this.onDiscover = onDiscover;
         this.onConnectFinished = onConnectFinished;
         this.onDisconnect = onDisconnect;
@@ -80,7 +76,7 @@ public class NetworkGraphEngine<TNodeData> {
     }
 
     public boolean comparePriority(NetworkGraphEngine<TNodeData> another) {
-        return comparePriority.comparePriority(another);
+        return priority.compareTo(another.priority) < 0;
     }
 
     public Optional<BlockInfo<TNodeData>> infoAt(BlockPos pos) {

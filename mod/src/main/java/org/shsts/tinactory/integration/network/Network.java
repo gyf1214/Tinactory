@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,8 +35,6 @@ import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 @MethodsReturnNonnullByDefault
 public class Network implements INetwork {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Map<NetworkGraphEngine<?>, UUID> NETWORK_PRIORITIES =
-        new IdentityHashMap<>();
 
     private final Level world;
     private final NetworkManager manager;
@@ -63,24 +60,18 @@ public class Network implements INetwork {
         this.center = center;
         this.team = team;
         this.graphEngine = new NetworkGraphEngine<>(
+            uuid,
             center,
             world::isLoaded,
             world::getBlockState,
             (pos, state, dir) -> IConnector.isConnectedInWorld(world, pos, state, dir),
             (pos, state) -> IConnector.isSubnetInWorld(world, pos, state),
-            this::comparePriority,
             this::onDiscover,
             this::onConnectFinished,
             this::onDisconnect
         );
-        NETWORK_PRIORITIES.put(graphEngine, uuid);
         this.delayTicks = 0;
         attachComponents();
-    }
-
-    private boolean comparePriority(NetworkGraphEngine<BlockState> another) {
-        var anotherUuid = NETWORK_PRIORITIES.get(another);
-        return anotherUuid == null || uuid.compareTo(anotherUuid) < 0;
     }
 
     @Override
