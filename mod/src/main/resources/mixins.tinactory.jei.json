@@ -1,6 +1,6 @@
 {
   "required": false,
-  "package": "org.shsts.tinactory.integration.jei.mixin",
+  "package": "org.shsts.tinactory.compat.jei.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "mixins": [
