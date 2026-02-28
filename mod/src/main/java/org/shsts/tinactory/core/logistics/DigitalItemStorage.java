@@ -55,7 +55,7 @@ public class DigitalItemStorage extends PortNotifier implements IItemPort,
     }
 
     @Override
-    public ItemStack insertItem(ItemStack stack, boolean simulate) {
+    public ItemStack insert(ItemStack stack, boolean simulate) {
         if (stack.isEmpty() || !acceptInput(stack)) {
             return stack;
         }
@@ -90,7 +90,7 @@ public class DigitalItemStorage extends PortNotifier implements IItemPort,
     }
 
     @Override
-    public ItemStack extractItem(ItemStack item, boolean simulate) {
+    public ItemStack extract(ItemStack item, boolean simulate) {
         if (item.isEmpty() || !acceptOutput()) {
             return ItemStack.EMPTY;
         }
@@ -118,7 +118,7 @@ public class DigitalItemStorage extends PortNotifier implements IItemPort,
     }
 
     @Override
-    public ItemStack extractItem(int limit, boolean simulate) {
+    public ItemStack extract(int limit, boolean simulate) {
         if (limit <= 0 || !acceptOutput() || items.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -142,7 +142,7 @@ public class DigitalItemStorage extends PortNotifier implements IItemPort,
     }
 
     @Override
-    public int getItemCount(ItemStack item) {
+    public int getStorageAmount(ItemStack item) {
         if (!acceptOutput()) {
             return 0;
         }
@@ -151,7 +151,7 @@ public class DigitalItemStorage extends PortNotifier implements IItemPort,
     }
 
     @Override
-    public Collection<ItemStack> getAllItems() {
+    public Collection<ItemStack> getAllStorages() {
         return acceptOutput() ? items.values() : Collections.emptyList();
     }
 

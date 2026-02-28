@@ -60,7 +60,7 @@ public class CombinedItemPort extends CombinedPort implements IItemPort {
     }
 
     @Override
-    public ItemStack insertItem(ItemStack stack, boolean simulate) {
+    public ItemStack insert(ItemStack stack, boolean simulate) {
         if (!allowInput) {
             return stack;
         }
@@ -69,13 +69,13 @@ public class CombinedItemPort extends CombinedPort implements IItemPort {
             if (stack1.isEmpty()) {
                 break;
             }
-            stack1 = compose.insertItem(stack1, simulate);
+            stack1 = compose.insert(stack1, simulate);
         }
         return stack1;
     }
 
     @Override
-    public ItemStack extractItem(ItemStack item, boolean simulate) {
+    public ItemStack extract(ItemStack item, boolean simulate) {
         if (!allowOutput) {
             return ItemStack.EMPTY;
         }
@@ -85,7 +85,7 @@ public class CombinedItemPort extends CombinedPort implements IItemPort {
             if (item1.isEmpty()) {
                 break;
             }
-            var stack = compose.extractItem(item1, simulate);
+            var stack = compose.extract(item1, simulate);
             if (!stack.isEmpty()) {
                 if (ret.isEmpty()) {
                     ret = stack;
@@ -104,21 +104,21 @@ public class CombinedItemPort extends CombinedPort implements IItemPort {
     }
 
     @Override
-    public ItemStack extractItem(int limit, boolean simulate) {
+    public ItemStack extract(int limit, boolean simulate) {
         if (!allowOutput) {
             return ItemStack.EMPTY;
         }
         return composes.isEmpty() ? ItemStack.EMPTY :
-            composes.get(0).extractItem(limit, simulate);
+            composes.get(0).extract(limit, simulate);
     }
 
     @Override
-    public int getItemCount(ItemStack item) {
-        return composes.stream().mapToInt($ -> $.getItemCount(item)).sum();
+    public int getStorageAmount(ItemStack item) {
+        return composes.stream().mapToInt($ -> $.getStorageAmount(item)).sum();
     }
 
     @Override
-    public Collection<ItemStack> getAllItems() {
-        return composes.stream().flatMap($ -> $.getAllItems().stream()).toList();
+    public Collection<ItemStack> getAllStorages() {
+        return composes.stream().flatMap($ -> $.getAllStorages().stream()).toList();
     }
 }

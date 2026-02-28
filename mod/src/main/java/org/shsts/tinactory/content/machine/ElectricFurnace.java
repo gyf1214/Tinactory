@@ -17,10 +17,10 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
+import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
-import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
@@ -87,7 +87,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             return true;
         }
         var result = getResult(recipe);
-        return port.insertItem(result, true).isEmpty();
+        return port.insert(result, true).isEmpty();
     }
 
     private boolean matches(SmeltingRecipe recipe, IMachine machine, IContainer container) {
@@ -269,7 +269,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
         callback.accept(new ProcessingResults.ItemResult(1d, result1));
-        port.insertItem(result1, false);
+        port.insert(result1, false);
     }
 
     @Override

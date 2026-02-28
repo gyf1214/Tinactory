@@ -49,34 +49,34 @@ public class MachineMenu extends ProcessingMenu {
 
     private ItemStack clickItemPort(ItemStack carried, IItemPort port, int button) {
         if (carried.isEmpty()) {
-            var extracted = port.extractItem(64, true);
+            var extracted = port.extract(64, true);
             // need to make sure the extracted does not exceed stack size.
             var limit = Math.min(extracted.getCount(), extracted.getMaxStackSize());
             var limit1 = button == 1 ? limit / 2 : limit;
             var extracted1 = extracted.getCount() > limit1 ?
                 StackHelper.copyWithCount(extracted, limit1) : extracted;
-            return port.extractItem(extracted1, false);
+            return port.extract(extracted1, false);
         } else {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
-                var remaining = port.insertItem(carried1, false);
+                var remaining = port.insert(carried1, false);
                 if (remaining.isEmpty()) {
                     carried.shrink(1);
                 }
                 return carried;
             } else {
-                return port.insertItem(carried, false);
+                return port.insert(carried, false);
             }
         }
     }
 
     private boolean tryDrain(IFluidHandlerItem handler, IFluidPort port, FluidStack fluid) {
-        var fluid1 = fluid.isEmpty() ? port.drain(Integer.MAX_VALUE, true) :
-            port.drain(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
+        var fluid1 = fluid.isEmpty() ? port.extract(Integer.MAX_VALUE, true) :
+            port.extract(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
         int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
         if (amount > 0) {
             var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-            var fluid3 = port.drain(fluid2, false);
+            var fluid3 = port.extract(fluid2, false);
             var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
             if (amount1 != amount) {
                 LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);

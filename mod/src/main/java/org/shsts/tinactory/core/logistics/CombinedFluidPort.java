@@ -61,7 +61,7 @@ public class CombinedFluidPort extends CombinedPort implements IFluidPort {
     }
 
     @Override
-    public FluidStack fill(FluidStack fluid, boolean simulate) {
+    public FluidStack insert(FluidStack fluid, boolean simulate) {
         if (!allowInput) {
             return fluid;
         }
@@ -70,13 +70,13 @@ public class CombinedFluidPort extends CombinedPort implements IFluidPort {
             if (stack.isEmpty()) {
                 break;
             }
-            stack = compose.fill(stack, simulate);
+            stack = compose.insert(stack, simulate);
         }
         return stack;
     }
 
     @Override
-    public FluidStack drain(FluidStack fluid, boolean simulate) {
+    public FluidStack extract(FluidStack fluid, boolean simulate) {
         if (!allowOutput) {
             return FluidStack.EMPTY;
         }
@@ -86,7 +86,7 @@ public class CombinedFluidPort extends CombinedPort implements IFluidPort {
             if (stack.isEmpty()) {
                 break;
             }
-            var stack1 = compose.drain(stack, simulate);
+            var stack1 = compose.extract(stack, simulate);
             if (!stack1.isEmpty()) {
                 if (ret.isEmpty()) {
                     ret = stack1;
@@ -105,21 +105,21 @@ public class CombinedFluidPort extends CombinedPort implements IFluidPort {
     }
 
     @Override
-    public FluidStack drain(int limit, boolean simulate) {
+    public FluidStack extract(int limit, boolean simulate) {
         if (!allowOutput) {
             return FluidStack.EMPTY;
         }
         return composes.isEmpty() ? FluidStack.EMPTY :
-            composes.get(0).drain(limit, simulate);
+            composes.get(0).extract(limit, simulate);
     }
 
     @Override
-    public int getFluidAmount(FluidStack fluid) {
-        return composes.stream().mapToInt($ -> $.getFluidAmount(fluid)).sum();
+    public int getStorageAmount(FluidStack fluid) {
+        return composes.stream().mapToInt($ -> $.getStorageAmount(fluid)).sum();
     }
 
     @Override
-    public Collection<FluidStack> getAllFluids() {
-        return composes.stream().flatMap($ -> $.getAllFluids().stream()).toList();
+    public Collection<FluidStack> getAllStorages() {
+        return composes.stream().flatMap($ -> $.getAllStorages().stream()).toList();
     }
 }

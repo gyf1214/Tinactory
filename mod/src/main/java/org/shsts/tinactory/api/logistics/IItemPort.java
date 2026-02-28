@@ -26,22 +26,22 @@ public interface IItemPort extends IPort {
     /**
      * Returns the remaining items not inserted. The passed and returned ItemStack should be safely modified.
      */
-    ItemStack insertItem(ItemStack stack, boolean simulate);
+    ItemStack insert(ItemStack stack, boolean simulate);
 
     /**
      * Returns the items taken. The passed and returned ItemStack should be safely modified.
      */
-    ItemStack extractItem(ItemStack item, boolean simulate);
+    ItemStack extract(ItemStack item, boolean simulate);
 
     /**
      * Extract any item and returns the items taken. The returned ItemStack should be safely modified.
      */
-    ItemStack extractItem(int limit, boolean simulate);
+    ItemStack extract(int limit, boolean simulate);
 
-    int getItemCount(ItemStack item);
+    int getStorageAmount(ItemStack item);
 
     /**
      * DO NOT change the returned ItemStack.
      */
-    Collection<ItemStack> getAllItems();
+    Collection<ItemStack> getAllStorages();
 }

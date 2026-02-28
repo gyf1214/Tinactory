@@ -94,11 +94,11 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             }
         }
         if (mayDrain) {
-            var fluid1 = port.drain(fluid, true);
+            var fluid1 = port.extract(fluid, true);
             int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
             if (amount > 0) {
                 var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                var fluid3 = port.drain(fluid2, false);
+                var fluid3 = port.extract(fluid2, false);
                 var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
                 if (amount1 != amount) {
                     LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
@@ -131,7 +131,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
                 carried.shrink(1);
-                var remaining = port.insertItem(carried1, false);
+                var remaining = port.insert(carried1, false);
                 var combined = StackHelper.combineStack(carried, remaining);
                 if (combined.isEmpty()) {
                     ItemHandlerHelper.giveItemToPlayer(player, remaining);
@@ -139,13 +139,13 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
                     setCarried(combined.get());
                 }
             } else {
-                setCarried(port.insertItem(carried, false));
+                setCarried(port.insert(carried, false));
             }
         } else {
             var count = Math.min(item.getCount(), item.getMaxStackSize());
             var count1 = button == 1 ? (count + 1) / 2 : count;
             var item1 = StackHelper.copyWithCount(item, count1);
-            var extracted = port.extractItem(item1, false);
+            var extracted = port.extract(item1, false);
             setCarried(extracted);
         }
     }
@@ -180,14 +180,14 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private void quickMoveStack(ItemStack stack) {
         var inv = new PlayerMainInvWrapper(inventory);
         var target = storageInterface.itemPort();
-        var extracted = target.extractItem(stack, true);
+        var extracted = target.extract(stack, true);
         var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
         var inserted = extracted.getCount() - remaining.getCount();
         if (inserted <= 0) {
             return;
         }
         var extracted1 = StackHelper.copyWithCount(extracted, inserted);
-        var extracted2 = target.extractItem(extracted1, false);
+        var extracted2 = target.extract(extracted1, false);
         var remaining1 = ItemHandlerHelper.insertItemStacked(inv, extracted2, false);
         if (!remaining1.isEmpty()) {
             LOGGER.warn("{}: Failed to quick move inventory, extracted {}/{}", blockEntity,
@@ -217,13 +217,13 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         if (!target.acceptInput(stack)) {
             return false;
         }
-        var remaining = target.insertItem(stack, true);
+        var remaining = target.insert(stack, true);
         var inserted = stack.getCount() - remaining.getCount();
         if (inserted <= 0) {
             return false;
         }
         var stack1 = inv.extractItem(index, inserted, false);
-        var remaining1 = target.insertItem(stack1, false);
+        var remaining1 = target.insert(stack1, false);
         if (!remaining1.isEmpty()) {
             LOGGER.warn("{}: Failed to quick move inventory, inserted {}/{}", blockEntity,
                 stack1.getCount() - remaining1.getCount(), stack1.getCount());

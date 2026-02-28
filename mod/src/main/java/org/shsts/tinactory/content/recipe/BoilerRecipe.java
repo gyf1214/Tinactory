@@ -56,7 +56,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     @Override
     public boolean matches(Boiler boiler, Level world) {
         return boiler.heat() > minHeat && boiler.getInput()
-            .filter($ -> $.drain(input, true).getAmount() >= input.getAmount())
+            .filter($ -> $.extract(input, true).getAmount() >= input.getAmount())
             .isPresent();
     }
 
@@ -67,7 +67,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     public double absorbHeat(IFluidPort inputPort, IFluidPort outputPort,
         int reaction, double heat, BiConsumer<FluidStack, FluidStack> callback) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
-        var drained = inputPort.drain(inputStack, true);
+        var drained = inputPort.extract(inputStack, true);
         var reaction1 = drained.getAmount() / input.getAmount();
         if (reaction1 <= 0) {
             return 0;
@@ -77,8 +77,8 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         var decay = MathUtil.clamp(1 - (heat - optimalHeat) / (maxHeat - optimalHeat), 0, 1);
         var outputAmount = (int) Math.floor(output.getAmount() * reaction1 * decay);
         var outputStack = StackHelper.copyWithAmount(output, outputAmount);
-        inputPort.drain(inputStack1, false);
-        outputPort.fill(outputStack, false);
+        inputPort.extract(inputStack1, false);
+        outputPort.insert(outputStack, false);
         callback.accept(inputStack1, outputStack);
 
         return absorbRate * reaction1;

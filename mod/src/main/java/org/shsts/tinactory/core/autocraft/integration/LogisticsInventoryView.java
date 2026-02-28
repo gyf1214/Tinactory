@@ -32,8 +32,8 @@ public final class LogisticsInventoryView implements IInventoryView {
     @Override
     public long amountOf(CraftKey key) {
         return switch (key.type()) {
-            case ITEM -> itemPort.getItemCount(toItemStack(key, 1));
-            case FLUID -> fluidPort.getFluidAmount(toFluidStack(key, 1));
+            case ITEM -> itemPort.getStorageAmount(toItemStack(key, 1));
+            case FLUID -> fluidPort.getStorageAmount(toFluidStack(key, 1));
         };
     }
 
@@ -49,13 +49,13 @@ public final class LogisticsInventoryView implements IInventoryView {
             switch (key.type()) {
                 case ITEM -> {
                     var expected = toItemStack(key, chunk);
-                    var extracted = itemPort.extractItem(expected, simulate);
+                    var extracted = itemPort.extract(expected, simulate);
                     extractedTotal += extracted.getCount();
                     left -= extracted.getCount();
                 }
                 case FLUID -> {
                     var expected = toFluidStack(key, chunk);
-                    var extracted = fluidPort.drain(expected, simulate);
+                    var extracted = fluidPort.extract(expected, simulate);
                     extractedTotal += extracted.getAmount();
                     left -= extracted.getAmount();
                 }
@@ -78,13 +78,13 @@ public final class LogisticsInventoryView implements IInventoryView {
             var chunk = (int) Math.min(left, Integer.MAX_VALUE);
             switch (key.type()) {
                 case ITEM -> {
-                    var remaining = itemPort.insertItem(toItemStack(key, chunk), simulate);
+                    var remaining = itemPort.insert(toItemStack(key, chunk), simulate);
                     var inserted = chunk - remaining.getCount();
                     insertedTotal += inserted;
                     left -= inserted;
                 }
                 case FLUID -> {
-                    var remaining = fluidPort.fill(toFluidStack(key, chunk), simulate);
+                    var remaining = fluidPort.insert(toFluidStack(key, chunk), simulate);
                     var inserted = chunk - remaining.getAmount();
                     insertedTotal += inserted;
                     left -= inserted;
@@ -99,12 +99,12 @@ public final class LogisticsInventoryView implements IInventoryView {
 
     public List<CraftAmount> snapshotAvailable() {
         var ret = new ArrayList<CraftAmount>();
-        for (var stack : itemPort.getAllItems()) {
+        for (var stack : itemPort.getAllStorages()) {
             if (!stack.isEmpty()) {
                 ret.add(new CraftAmount(fromItemStack(stack), stack.getCount()));
             }
         }
-        for (var stack : fluidPort.getAllFluids()) {
+        for (var stack : fluidPort.getAllStorages()) {
             if (!stack.isEmpty()) {
                 ret.add(new CraftAmount(fromFluidStack(stack), stack.getAmount()));
             }

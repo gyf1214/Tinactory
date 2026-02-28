@@ -50,7 +50,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
     }
 
     @Override
-    public FluidStack fill(FluidStack fluid, boolean simulate) {
+    public FluidStack insert(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty()) {
             return fluid;
         }
@@ -76,7 +76,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
     }
 
     @Override
-    public FluidStack drain(FluidStack fluid, boolean simulate) {
+    public FluidStack extract(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return FluidStack.EMPTY;
         }
@@ -106,7 +106,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
     }
 
     @Override
-    public FluidStack drain(int limit, boolean simulate) {
+    public FluidStack extract(int limit, boolean simulate) {
         if (limit <= 0 || !acceptOutput()) {
             return FluidStack.EMPTY;
         }
@@ -114,7 +114,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
             var tankFluid = tank.getFluid();
             if (!tankFluid.isEmpty()) {
                 var fluid = StackHelper.copyWithAmount(tankFluid, limit);
-                return drain(fluid, simulate);
+                return extract(fluid, simulate);
             }
         }
         return FluidStack.EMPTY;
@@ -122,22 +122,22 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
 
     @Override
     public int fill(FluidStack fluid, FluidAction action) {
-        var remaining = fill(fluid, action.simulate());
+        var remaining = insert(fluid, action.simulate());
         return fluid.getAmount() - remaining.getAmount();
     }
 
     @Override
     public FluidStack drain(FluidStack fluid, FluidAction action) {
-        return drain(fluid, action.simulate());
+        return extract(fluid, action.simulate());
     }
 
     @Override
     public FluidStack drain(int limit, FluidAction action) {
-        return drain(limit, action.simulate());
+        return extract(limit, action.simulate());
     }
 
     @Override
-    public int getFluidAmount(FluidStack fluid) {
+    public int getStorageAmount(FluidStack fluid) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return 0;
         }
@@ -152,7 +152,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
     }
 
     @Override
-    public Collection<FluidStack> getAllFluids() {
+    public Collection<FluidStack> getAllStorages() {
         if (!acceptOutput()) {
             return Collections.emptyList();
         }

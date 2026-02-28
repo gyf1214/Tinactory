@@ -55,7 +55,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public FluidStack fill(FluidStack fluid, boolean simulate) {
+    public FluidStack insert(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty() || !acceptInput(fluid)) {
             return fluid;
         }
@@ -90,7 +90,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public FluidStack drain(FluidStack fluid, boolean simulate) {
+    public FluidStack extract(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return FluidStack.EMPTY;
         }
@@ -118,7 +118,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public FluidStack drain(int limit, boolean simulate) {
+    public FluidStack extract(int limit, boolean simulate) {
         if (limit <= 0 || !acceptOutput() || fluids.isEmpty()) {
             return FluidStack.EMPTY;
         }
@@ -142,7 +142,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public int getFluidAmount(FluidStack fluid) {
+    public int getStorageAmount(FluidStack fluid) {
         if (!acceptOutput()) {
             return 0;
         }
@@ -151,7 +151,7 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public Collection<FluidStack> getAllFluids() {
+    public Collection<FluidStack> getAllStorages() {
         return acceptOutput() ? fluids.values() : Collections.emptyList();
     }
 

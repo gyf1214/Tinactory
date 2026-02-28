@@ -77,9 +77,9 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
 
     private int recalculateSignal() {
         if (!targetItem.isEmpty()) {
-            return toSignal(combinedItem.getItemCount(targetItem));
+            return toSignal(combinedItem.getStorageAmount(targetItem));
         } else if (!targetFluid.isEmpty()) {
-            return toSignal(combinedFluid.getFluidAmount(targetFluid));
+            return toSignal(combinedFluid.getStorageAmount(targetFluid));
         } else {
             return 0;
         }

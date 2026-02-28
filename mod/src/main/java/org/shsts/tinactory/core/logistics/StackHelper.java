@@ -154,7 +154,7 @@ public final class StackHelper {
     }
 
     public static Optional<ItemStack> hasItem(IItemPort port, Predicate<ItemStack> ingredient) {
-        for (var stack : port.getAllItems()) {
+        for (var stack : port.getAllStorages()) {
             if (ingredient.test(stack)) {
                 return Optional.of(stack);
             }
@@ -167,16 +167,16 @@ public final class StackHelper {
      */
     public static Optional<ItemStack> consumeItemPort(IItemPort port,
         Predicate<ItemStack> ingredient, int count, boolean simulate) {
-        for (var stack : port.getAllItems()) {
+        for (var stack : port.getAllStorages()) {
             if (ingredient.test(stack) && stack.getCount() >= count) {
                 var stack1 = copyWithCount(stack, count);
                 // always simulate first, this is because we actually don't know which item to extract
-                var extracted = port.extractItem(stack1, true);
+                var extracted = port.extract(stack1, true);
                 if (extracted.getCount() >= count) {
                     if (simulate) {
                         return Optional.of(extracted);
                     } else {
-                        var extracted1 = port.extractItem(stack1, false);
+                        var extracted1 = port.extract(stack1, false);
                         if (extracted1.getCount() < count) {
                             LOGGER.warn("consume item failed port={} content={}/{}",
                                 port, extracted, stack1);
@@ -222,12 +222,12 @@ public final class StackHelper {
         if (fluid.isEmpty()) {
             return false;
         }
-        var remaining = port.fill(fluid, true);
+        var remaining = port.insert(fluid, true);
         var amount = fluid.getAmount() - remaining.getAmount();
         if (amount > 0) {
             var fluid1 = StackHelper.copyWithAmount(fluid, amount);
             var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.EXECUTE);
-            var remaining1 = port.fill(fluid2, false);
+            var remaining1 = port.insert(fluid2, false);
             if (!remaining1.isEmpty()) {
                 LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount - remaining1.getAmount(), amount);
             }

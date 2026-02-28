@@ -130,10 +130,10 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
 
         var maxParallel = burnParallel();
         burningItem = ItemStack.EMPTY;
-        for (var stack : fuelPort.getAllItems()) {
+        for (var stack : fuelPort.getAllStorages()) {
             if (ForgeHooks.getBurnTime(stack, null) > 0) {
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
-                var extracted = fuelPort.extractItem(stack1, false);
+                var extracted = fuelPort.extract(stack1, false);
                 if (!extracted.isEmpty()) {
                     MetricsManager.reportItem("item_consumed", machine1, extracted);
                     maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;

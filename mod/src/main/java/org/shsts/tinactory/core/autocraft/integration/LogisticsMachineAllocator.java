@@ -238,7 +238,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                     if (!itemPort.acceptInput(stack)) {
                         break;
                     }
-                    var remaining = itemPort.insertItem(stack, simulate);
+                    var remaining = itemPort.insert(stack, simulate);
                     var moved = chunk - remaining.getCount();
                     total += moved;
                     left -= moved;
@@ -271,7 +271,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                 var left = amount;
                 while (left > 0L) {
                     var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = itemPort.extractItem(LogisticsInventoryView.toItemStack(key, chunk), simulate);
+                    var extracted = itemPort.extract(LogisticsInventoryView.toItemStack(key, chunk), simulate);
                     total += extracted.getCount();
                     left -= extracted.getCount();
                     if (extracted.isEmpty()) {
@@ -307,7 +307,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                     if (!fluidPort.acceptInput(fluid)) {
                         break;
                     }
-                    var remaining = fluidPort.fill(fluid, simulate);
+                    var remaining = fluidPort.insert(fluid, simulate);
                     var moved = chunk - remaining.getAmount();
                     total += moved;
                     left -= moved;
@@ -340,7 +340,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                 var left = amount;
                 while (left > 0L) {
                     var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = fluidPort.drain(LogisticsInventoryView.toFluidStack(key, chunk), simulate);
+                    var extracted = fluidPort.extract(LogisticsInventoryView.toFluidStack(key, chunk), simulate);
                     total += extracted.getAmount();
                     left -= extracted.getAmount();
                     if (extracted.isEmpty()) {

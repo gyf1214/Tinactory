@@ -260,27 +260,27 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        public ItemStack insert(ItemStack stack, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public ItemStack extractItem(ItemStack item, boolean simulate) {
+        public ItemStack extract(ItemStack item, boolean simulate) {
             return item.copy();
         }
 
         @Override
-        public ItemStack extractItem(int limit, boolean simulate) {
+        public ItemStack extract(int limit, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public int getItemCount(ItemStack item) {
+        public int getStorageAmount(ItemStack item) {
             return 64;
         }
 
         @Override
-        public Collection<ItemStack> getAllItems() {
+        public Collection<ItemStack> getAllStorages() {
             return List.of();
         }
 
@@ -307,7 +307,7 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        public ItemStack insert(ItemStack stack, boolean simulate) {
             if (!allowInput || stack.isEmpty()) {
                 return stack.copy();
             }
@@ -315,7 +315,7 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack extractItem(ItemStack item, boolean simulate) {
+        public ItemStack extract(ItemStack item, boolean simulate) {
             if (!allowOutput || item.isEmpty()) {
                 return ItemStack.EMPTY;
             }
@@ -332,17 +332,17 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack extractItem(int limit, boolean simulate) {
+        public ItemStack extract(int limit, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public int getItemCount(ItemStack item) {
+        public int getStorageAmount(ItemStack item) {
             return allowOutput ? available : 0;
         }
 
         @Override
-        public Collection<ItemStack> getAllItems() {
+        public Collection<ItemStack> getAllStorages() {
             return List.of();
         }
 
@@ -367,12 +367,12 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public FluidStack fill(FluidStack fluid, boolean simulate) {
+        public FluidStack insert(FluidStack fluid, boolean simulate) {
             return fluid;
         }
 
         @Override
-        public FluidStack drain(FluidStack fluid, boolean simulate) {
+        public FluidStack extract(FluidStack fluid, boolean simulate) {
             if (!allowOutput || fluid.isEmpty()) {
                 return FluidStack.EMPTY;
             }
@@ -389,17 +389,17 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public FluidStack drain(int limit, boolean simulate) {
+        public FluidStack extract(int limit, boolean simulate) {
             return FluidStack.EMPTY;
         }
 
         @Override
-        public int getFluidAmount(FluidStack fluid) {
+        public int getStorageAmount(FluidStack fluid) {
             return allowOutput ? available : 0;
         }
 
         @Override
-        public Collection<FluidStack> getAllFluids() {
+        public Collection<FluidStack> getAllStorages() {
             return List.of();
         }
 

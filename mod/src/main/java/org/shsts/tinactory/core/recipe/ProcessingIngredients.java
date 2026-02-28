@@ -47,7 +47,7 @@ public final class ProcessingIngredients {
             }
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
-            var extracted = item.extractItem(stack1, simulate);
+            var extracted = item.extract(stack1, simulate);
             return extracted.getCount() >= stack1.getCount() ?
                 Optional.of(new ItemIngredient(stack1)) : Optional.empty();
         }
@@ -138,7 +138,7 @@ public final class ProcessingIngredients {
             }
             var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
-            var extracted = fluidPort.drain(fluid1, simulate);
+            var extracted = fluidPort.extract(fluid1, simulate);
             return extracted.getAmount() >= fluid1.getAmount() ?
                 Optional.of(new FluidIngredient(extracted)) : Optional.empty();
         }

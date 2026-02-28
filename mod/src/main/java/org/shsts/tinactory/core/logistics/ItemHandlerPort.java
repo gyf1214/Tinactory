@@ -78,13 +78,13 @@ public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier, I
     }
 
     @Override
-    public ItemStack insertItem(ItemStack stack, boolean simulate) {
+    public ItemStack insert(ItemStack stack, boolean simulate) {
         // need to make sure stack is not set to some itemHandler
         return ItemHandlerHelper.insertItemStacked(rangedWrapper, stack.copy(), simulate);
     }
 
     @Override
-    public ItemStack extractItem(ItemStack item, boolean simulate) {
+    public ItemStack extract(ItemStack item, boolean simulate) {
         if (item.isEmpty() || !acceptOutput()) {
             return ItemStack.EMPTY;
         }
@@ -117,21 +117,21 @@ public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier, I
     }
 
     @Override
-    public ItemStack extractItem(int limit, boolean simulate) {
+    public ItemStack extract(int limit, boolean simulate) {
         if (limit <= 0 || !acceptOutput()) {
             return ItemStack.EMPTY;
         }
         for (var i = minSlot; i < maxSlot; i++) {
             var slotItem = itemHandler.getStackInSlot(i);
             if (!slotItem.isEmpty()) {
-                return extractItem(StackHelper.copyWithCount(slotItem, limit), simulate);
+                return extract(StackHelper.copyWithCount(slotItem, limit), simulate);
             }
         }
         return ItemStack.EMPTY;
     }
 
     @Override
-    public int getItemCount(ItemStack item) {
+    public int getStorageAmount(ItemStack item) {
         if (item.isEmpty() || !acceptOutput()) {
             return 0;
         }
@@ -146,7 +146,7 @@ public class ItemHandlerPort implements IItemPort, IItemFilter, IPortNotifier, I
     }
 
     @Override
-    public Collection<ItemStack> getAllItems() {
+    public Collection<ItemStack> getAllStorages() {
         if (!acceptOutput()) {
             return Collections.emptyList();
         }

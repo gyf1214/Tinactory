@@ -19,22 +19,22 @@ public interface IFluidPort extends IPort {
     /**
      * Returns the amount of fluid not inserted. The passed and returned FluidStack should be safely modified.
      */
-    FluidStack fill(FluidStack fluid, boolean simulate);
+    FluidStack insert(FluidStack fluid, boolean simulate);
 
     /**
      * Returns the fluid taken. The passed and returned FluidStack can be safely modified.
      */
-    FluidStack drain(FluidStack fluid, boolean simulate);
+    FluidStack extract(FluidStack fluid, boolean simulate);
 
     /**
      * Returns the fluid taken. The returned FluidStack can be safely modified.
      */
-    FluidStack drain(int limit, boolean simulate);
+    FluidStack extract(int limit, boolean simulate);
 
-    int getFluidAmount(FluidStack fluid);
+    int getStorageAmount(FluidStack fluid);
 
     /**
      * DO NOT change the returned FluidStack.
      */
-    Collection<FluidStack> getAllFluids();
+    Collection<FluidStack> getAllStorages();
 }
