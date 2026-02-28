@@ -12,17 +12,17 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IPort<T> extends IPortFilter<T> {
+    @SuppressWarnings("unchecked")
+    static <T> IPort<T> empty() {
+        return (IPort<T>) EMPTY;
+    }
+
     PortType type();
 
     @SuppressWarnings("unchecked")
     default IPort<ItemStack> asItem() {
         assert type() == PortType.ITEM;
         return (IPort<ItemStack>) this;
-    }
-
-    default IItemPort asItemPort() {
-        assert type() == PortType.ITEM;
-        return (IItemPort) this;
     }
 
     @SuppressWarnings("unchecked")
@@ -35,11 +35,6 @@ public interface IPort<T> extends IPortFilter<T> {
     default IPort<FluidStack> asFluid() {
         assert type() == PortType.FLUID;
         return (IPort<FluidStack>) this;
-    }
-
-    default IFluidPort asFluidPort() {
-        assert type() == PortType.FLUID;
-        return (IFluidPort) this;
     }
 
     boolean acceptInput(T stack);

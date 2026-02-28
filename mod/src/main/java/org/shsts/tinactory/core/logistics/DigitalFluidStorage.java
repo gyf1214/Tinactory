@@ -7,7 +7,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +22,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalFluidStorage extends PortNotifier implements IFluidPort, INBTSerializable<CompoundTag> {
+public class DigitalFluidStorage extends PortNotifier implements IPort<FluidStack>, INBTSerializable<CompoundTag> {
     private final IDigitalProvider provider;
     public int maxAmount = Integer.MAX_VALUE;
     private final Map<FluidStackWrapper, FluidStack> fluids = new HashMap<>();
@@ -29,6 +30,11 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort, INB
 
     public DigitalFluidStorage(IDigitalProvider provider) {
         this.provider = provider;
+    }
+
+    @Override
+    public PortType type() {
+        return PortType.FLUID;
     }
 
     @Override

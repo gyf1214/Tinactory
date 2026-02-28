@@ -9,9 +9,10 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.function.Predicate;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemHandlerPort implements IItemPort, IPortNotifier, ILimitedPort {
+public class ItemHandlerPort implements IPort<ItemStack>, IPortNotifier, ILimitedPort {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final IItemHandler itemHandler;
@@ -50,6 +51,11 @@ public class ItemHandlerPort implements IItemPort, IPortNotifier, ILimitedPort {
 
     public ItemHandlerPort(IItemHandlerModifiable itemHandler) {
         this(itemHandler, 0, itemHandler.getSlots());
+    }
+
+    @Override
+    public PortType type() {
+        return PortType.ITEM;
     }
 
     @Override

@@ -109,7 +109,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             return switch (type.portType) {
                 case ITEM -> itemPort.get(access);
                 case FLUID -> fluidPort.get(access);
-                case NONE -> IPort.EMPTY;
+                case NONE -> IPort.empty();
             };
         }
 

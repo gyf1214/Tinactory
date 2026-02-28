@@ -11,9 +11,8 @@ import net.minecraftforge.fluids.FluidStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -78,7 +77,7 @@ class LogisticsAdapterContractTest {
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "smelting"), 0, List.of());
         var machine = new FakeMachine();
         var allocator = new LogisticsMachineAllocator(
-            () -> List.of(new PortInfo(machine, 0, IPort.EMPTY, BlockPos.ZERO, 0)),
+            () -> List.of(new PortInfo(machine, 0, IPort.empty(), BlockPos.ZERO, 0)),
             $ -> 0,
             ($, recipeTypeId) -> false);
 
@@ -253,7 +252,12 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class FakeItemPort implements IItemPort {
+    private static final class FakeItemPort implements IPort<ItemStack> {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
         @Override
         public boolean acceptInput(ItemStack stack) {
             return true;
@@ -290,7 +294,7 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class TrackingItemPort implements IItemPort {
+    private static final class TrackingItemPort implements IPort<ItemStack> {
         private final boolean allowInput;
         private final boolean allowOutput;
         private int available;
@@ -299,6 +303,11 @@ class LogisticsAdapterContractTest {
             this.allowInput = allowInput;
             this.allowOutput = allowOutput;
             this.available = available;
+        }
+
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
         }
 
         @Override
@@ -352,13 +361,18 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class TrackingFluidPort implements IFluidPort {
+    private static final class TrackingFluidPort implements IPort<FluidStack> {
         private final boolean allowOutput;
         private int available;
 
         private TrackingFluidPort(boolean allowOutput, int available) {
             this.allowOutput = allowOutput;
             this.available = available;
+        }
+
+        @Override
+        public PortType type() {
+            return PortType.FLUID;
         }
 
         @Override

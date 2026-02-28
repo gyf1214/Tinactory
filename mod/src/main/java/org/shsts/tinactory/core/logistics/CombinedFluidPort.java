@@ -3,15 +3,15 @@ package org.shsts.tinactory.core.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack>> implements IFluidPort {
+public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack>> implements IPort<FluidStack> {
     private static final IPortAccess<FluidStack, IPort<FluidStack>> PORT_ACCESS = new IPortAccess<>() {
         @Override
         public boolean acceptInput(IPort<FluidStack> port, FluidStack stack) {
@@ -92,6 +92,11 @@ public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack
 
     public CombinedFluidPort() {
         super(PORT_ACCESS, STACK_ADAPTER);
+    }
+
+    @Override
+    public PortType type() {
+        return PortType.FLUID;
     }
 
     @Override

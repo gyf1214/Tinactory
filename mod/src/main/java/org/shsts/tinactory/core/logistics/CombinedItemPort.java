@@ -3,15 +3,15 @@ package org.shsts.tinactory.core.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> implements IItemPort {
+public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> implements IPort<ItemStack> {
     private static final IPortAccess<ItemStack, IPort<ItemStack>> PORT_ACCESS = new IPortAccess<>() {
         @Override
         public boolean acceptInput(IPort<ItemStack> port, ItemStack stack) {
@@ -92,6 +92,11 @@ public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> 
 
     public CombinedItemPort() {
         super(PORT_ACCESS, STACK_ADAPTER);
+    }
+
+    @Override
+    public PortType type() {
+        return PortType.ITEM;
     }
 
     @Override

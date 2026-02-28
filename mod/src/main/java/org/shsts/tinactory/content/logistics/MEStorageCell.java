@@ -12,9 +12,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
@@ -72,7 +74,7 @@ public class MEStorageCell extends CapabilityItem {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
             this.storage = new DigitalItemStorage(provider);
-            this.itemCap = LazyOptional.of(() -> storage);
+            this.itemCap = LazyOptional.of(() -> capabilityItemPort(storage));
             this.providerCap = LazyOptional.of(() -> provider);
 
             storage.onUpdate(this::syncTag);
@@ -109,7 +111,7 @@ public class MEStorageCell extends CapabilityItem {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
             this.storage = new DigitalFluidStorage(provider);
-            this.fluidCap = LazyOptional.of(() -> storage);
+            this.fluidCap = LazyOptional.of(() -> capabilityFluidPort(storage));
             this.providerCap = LazyOptional.of(() -> provider);
 
             storage.onUpdate(this::syncTag);
@@ -144,5 +146,83 @@ public class MEStorageCell extends CapabilityItem {
         } else {
             event.addCapability(ID, new ItemCapability(stack, bytesLimit));
         }
+    }
+
+    private static IItemPort capabilityItemPort(IPort<ItemStack> port) {
+        return new IItemPort() {
+            @Override
+            public boolean acceptInput(ItemStack stack) {
+                return port.acceptInput(stack);
+            }
+
+            @Override
+            public ItemStack insert(ItemStack stack, boolean simulate) {
+                return port.insert(stack, simulate);
+            }
+
+            @Override
+            public ItemStack extract(ItemStack stack, boolean simulate) {
+                return port.extract(stack, simulate);
+            }
+
+            @Override
+            public ItemStack extract(int limit, boolean simulate) {
+                return port.extract(limit, simulate);
+            }
+
+            @Override
+            public int getStorageAmount(ItemStack stack) {
+                return port.getStorageAmount(stack);
+            }
+
+            @Override
+            public List<ItemStack> getAllStorages() {
+                return List.copyOf(port.getAllStorages());
+            }
+
+            @Override
+            public boolean acceptOutput() {
+                return port.acceptOutput();
+            }
+        };
+    }
+
+    private static IFluidPort capabilityFluidPort(IPort<FluidStack> port) {
+        return new IFluidPort() {
+            @Override
+            public boolean acceptInput(FluidStack stack) {
+                return port.acceptInput(stack);
+            }
+
+            @Override
+            public FluidStack insert(FluidStack stack, boolean simulate) {
+                return port.insert(stack, simulate);
+            }
+
+            @Override
+            public FluidStack extract(FluidStack stack, boolean simulate) {
+                return port.extract(stack, simulate);
+            }
+
+            @Override
+            public FluidStack extract(int limit, boolean simulate) {
+                return port.extract(limit, simulate);
+            }
+
+            @Override
+            public int getStorageAmount(FluidStack stack) {
+                return port.getStorageAmount(stack);
+            }
+
+            @Override
+            public List<FluidStack> getAllStorages() {
+                return List.copyOf(port.getAllStorages());
+            }
+
+            @Override
+            public boolean acceptOutput() {
+                return port.acceptOutput();
+            }
+        };
     }
 }

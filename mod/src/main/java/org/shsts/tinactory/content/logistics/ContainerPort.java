@@ -10,7 +10,7 @@ import org.shsts.tinactory.api.logistics.SlotType;
 @MethodsReturnNonnullByDefault
 public record ContainerPort(SlotType type, IPort<?> internal, IPort<?> menu, IPort<?> external) {
     public static final ContainerPort EMPTY = new ContainerPort(
-        SlotType.NONE, IPort.EMPTY, IPort.EMPTY, IPort.EMPTY);
+        SlotType.NONE, IPort.empty(), IPort.empty(), IPort.empty());
 
     public IPort<?> get(ContainerAccess access) {
         return switch (access) {

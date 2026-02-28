@@ -3,10 +3,9 @@ package org.shsts.tinactory.unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
+import org.shsts.tinactory.api.logistics.PortType;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,9 +42,14 @@ class PortFilterApiTest {
         assertSame(port, port.asFluid());
     }
 
-    private static final class TestItemPort implements IItemPort {
+    private static final class TestItemPort implements IPort<ItemStack> {
         private boolean setInvoked;
         private boolean resetInvoked;
+
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
 
         @Override
         public boolean acceptInput(ItemStack stack) {
@@ -93,9 +97,14 @@ class PortFilterApiTest {
         }
     }
 
-    private static final class TestFluidPort implements IFluidPort {
+    private static final class TestFluidPort implements IPort<FluidStack> {
         private boolean setInvoked;
         private boolean resetInvoked;
+
+        @Override
+        public PortType type() {
+            return PortType.FLUID;
+        }
 
         @Override
         public boolean acceptInput(FluidStack stack) {
