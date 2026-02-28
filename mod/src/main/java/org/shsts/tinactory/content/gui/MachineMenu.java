@@ -94,18 +94,9 @@ public class MachineMenu extends ProcessingMenu {
         }
         var handler = cap.get();
         if (mayFill) {
-            var fluid1 = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-            if (!fluid1.isEmpty()) {
-                int amount = port.fill(fluid1, true);
-                if (amount > 0) {
-                    var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                    var fluid3 = handler.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
-                    var amount1 = port.fill(fluid3, false);
-                    if (amount1 != amount) {
-                        LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                    }
-                    return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
-                }
+            var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+            if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
             }
         }
         if (mayDrain) {

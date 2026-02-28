@@ -84,7 +84,8 @@ public final class LogisticsInventoryView implements IInventoryView {
                     left -= inserted;
                 }
                 case FLUID -> {
-                    var inserted = fluidPort.fill(toFluidStack(key, chunk), simulate);
+                    var remaining = fluidPort.fill(toFluidStack(key, chunk), simulate);
+                    var inserted = chunk - remaining.getAmount();
                     insertedTotal += inserted;
                     left -= inserted;
                 }

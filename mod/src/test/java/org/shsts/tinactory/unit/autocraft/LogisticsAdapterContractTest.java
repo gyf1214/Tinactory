@@ -367,8 +367,8 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public int fill(FluidStack fluid, boolean simulate) {
-            return 0;
+        public FluidStack fill(FluidStack fluid, boolean simulate) {
+            return fluid;
         }
 
         @Override

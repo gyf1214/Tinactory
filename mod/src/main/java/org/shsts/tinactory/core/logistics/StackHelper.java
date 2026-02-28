@@ -16,10 +16,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.slf4j.Logger;
 
@@ -214,6 +216,24 @@ public final class StackHelper {
             return Optional.empty();
         }
         return FluidUtil.getFluidHandler(stack).resolve();
+    }
+
+    public static boolean transmitFluidFromHandler(IFluidHandler handler, IFluidPort port, FluidStack fluid) {
+        if (fluid.isEmpty()) {
+            return false;
+        }
+        var remaining = port.fill(fluid, true);
+        var amount = fluid.getAmount() - remaining.getAmount();
+        if (amount > 0) {
+            var fluid1 = StackHelper.copyWithAmount(fluid, amount);
+            var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.EXECUTE);
+            var remaining1 = port.fill(fluid2, false);
+            if (!remaining1.isEmpty()) {
+                LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount - remaining1.getAmount(), amount);
+            }
+            return true;
+        }
+        return false;
     }
 
     public static void returnItemHandlerToPlayer(Player player, IItemHandlerModifiable itemHandler) {

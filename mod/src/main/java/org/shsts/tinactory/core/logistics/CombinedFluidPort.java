@@ -61,19 +61,18 @@ public class CombinedFluidPort extends CombinedPort implements IFluidPort {
     }
 
     @Override
-    public int fill(FluidStack fluid, boolean simulate) {
+    public FluidStack fill(FluidStack fluid, boolean simulate) {
         if (!allowInput) {
-            return 0;
+            return fluid;
         }
         var stack = fluid.copy();
         for (var compose : composes) {
             if (stack.isEmpty()) {
                 break;
             }
-            var filled = compose.fill(stack, simulate);
-            stack.shrink(filled);
+            stack = compose.fill(stack, simulate);
         }
-        return fluid.getAmount() - stack.getAmount();
+        return stack;
     }
 
     @Override

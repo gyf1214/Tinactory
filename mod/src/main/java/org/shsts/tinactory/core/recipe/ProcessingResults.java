@@ -95,8 +95,8 @@ public final class ProcessingResults {
         protected Optional<IProcessingResult> doInsertPort(IItemPort port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
-            return port.insertItem(stack1, simulate).isEmpty() ?
-                Optional.of(new ItemResult(1d, stack1)) : Optional.empty();
+            return port.acceptInput(stack1) && port.insertItem(stack1, simulate).isEmpty() ?
+                Optional.of(new ItemResult(stack1)) : Optional.empty();
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -123,7 +123,7 @@ public final class ProcessingResults {
         protected Optional<IProcessingResult> doInsertPort(IFluidPort port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
-            return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount() ?
+            return port.acceptInput(stack1) && port.fill(stack1, simulate).isEmpty() ?
                 Optional.of(new FluidResult(stack1)) : Optional.empty();
         }
 

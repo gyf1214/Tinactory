@@ -307,7 +307,8 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                     if (!fluidPort.acceptInput(fluid)) {
                         break;
                     }
-                    var moved = fluidPort.fill(fluid, simulate);
+                    var remaining = fluidPort.fill(fluid, simulate);
+                    var moved = chunk - remaining.getAmount();
                     total += moved;
                     left -= moved;
                     if (moved <= 0L) {

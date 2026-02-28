@@ -217,7 +217,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private FluidStack testTransmitFluid(IFluidPort from, IFluidPort to, FluidStack stack) {
         var stack1 = StackHelper.copyWithAmount(stack, workerFluidStack);
         var stack2 = from.drain(stack1, true);
-        var limit = to.fill(stack2, true);
+        var remaining = to.fill(stack2, true);
+        var limit = stack2.getAmount() - remaining.getAmount();
         if (limit > 0) {
             stack2.setAmount(limit);
             return stack2;
@@ -243,8 +244,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private void transmitFluid(IFluidPort from, IFluidPort to, FluidStack filter) {
         var stack = selectTransmittedFluid(from, to, filter);
         var stack1 = from.drain(stack, false);
-        var inserted = to.fill(stack1, false);
-        if (inserted != stack1.getAmount()) {
+        var remaining = to.fill(stack1, false);
+        if (!remaining.isEmpty()) {
             LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
         }
     }

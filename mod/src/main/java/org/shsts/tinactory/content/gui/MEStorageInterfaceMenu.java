@@ -89,18 +89,8 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         if (mayFill) {
             var fluid1 = StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE);
             var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.SIMULATE);
-            if (!fluid2.isEmpty()) {
-                int amount = port.fill(fluid2, true);
-                if (amount > 0) {
-                    var fluid3 = StackHelper.copyWithAmount(fluid2, amount);
-                    var fluid4 = handler.drain(fluid3, IFluidHandler.FluidAction.EXECUTE);
-                    var amount1 = port.fill(fluid4, false);
-                    if (amount1 != amount) {
-                        LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                    }
-                    return new FluidClickResult(FluidClickAction.FILL,
-                        handler.getContainer());
-                }
+            if (StackHelper.transmitFluidFromHandler(handler, port, fluid2)) {
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
             }
         }
         if (mayDrain) {
@@ -130,18 +120,8 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         }
         var handler = cap.get();
         var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-        if (!fluid.isEmpty()) {
-            int amount = port.fill(fluid, true);
-            if (amount > 0) {
-                var fluid1 = StackHelper.copyWithAmount(fluid, amount);
-                var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.EXECUTE);
-                var amount1 = port.fill(fluid2, false);
-                if (amount1 != amount) {
-                    LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                }
-                return new FluidClickResult(FluidClickAction.FILL,
-                    handler.getContainer());
-            }
+        if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
+            return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
         }
         return new FluidClickResult();
     }

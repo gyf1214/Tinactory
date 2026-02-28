@@ -55,9 +55,9 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
     }
 
     @Override
-    public int fill(FluidStack fluid, boolean simulate) {
+    public FluidStack fill(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty() || !acceptInput(fluid)) {
-            return 0;
+            return fluid;
         }
         var key = new FluidStackWrapper(fluid);
         var bytesPerFluid = CONFIG.bytesPerFluid.get();
@@ -66,24 +66,26 @@ public class DigitalFluidStorage extends PortNotifier implements IFluidPort,
             var limit = Math.min(provider.consumeLimit(bytesPerType, bytesPerFluid), maxAmount);
             var inserted = Math.min(fluid.getAmount(), limit);
             assert inserted > 0 && inserted <= fluid.getAmount();
+            var remaining = StackHelper.copyWithAmount(fluid, fluid.getAmount() - inserted);
             if (!simulate) {
                 var insertedStack = StackHelper.copyWithAmount(fluid, inserted);
                 fluids.put(new FluidStackWrapper(insertedStack), insertedStack);
                 provider.consume(bytesPerType + inserted * bytesPerFluid);
                 invokeUpdate();
             }
-            return inserted;
+            return remaining;
         } else {
             var existing = fluids.get(key);
             var limit = Math.min(provider.consumeLimit(bytesPerFluid), maxAmount - existing.getAmount());
             var inserted = Math.min(fluid.getAmount(), limit);
             assert inserted > 0 && inserted <= fluid.getAmount();
+            var remaining = StackHelper.copyWithAmount(fluid, fluid.getAmount() - inserted);
             if (!simulate) {
                 existing.grow(inserted);
                 provider.consume(inserted * bytesPerFluid);
                 invokeUpdate();
             }
-            return inserted;
+            return remaining;
         }
     }
 

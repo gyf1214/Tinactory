@@ -50,29 +50,29 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
     }
 
     @Override
-    public int fill(FluidStack fluid, boolean simulate) {
+    public FluidStack fill(FluidStack fluid, boolean simulate) {
         if (fluid.isEmpty()) {
-            return 0;
+            return fluid;
         }
         var action = simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE;
         var stack = fluid.copy();
         for (var tank : tanks) {
+            if (stack.isEmpty()) {
+                return stack;
+            }
             if (!tank.getFluid().isEmpty() && tank.getFluid().isFluidEqual(stack)) {
                 stack.shrink(tank.fill(stack, action));
-                if (stack.isEmpty()) {
-                    return fluid.getAmount();
-                }
             }
         }
         for (var tank : tanks) {
+            if (stack.isEmpty()) {
+                return stack;
+            }
             if (tank.getFluid().isEmpty()) {
                 stack.shrink(tank.fill(stack, action));
-                if (stack.isEmpty()) {
-                    return fluid.getAmount();
-                }
             }
         }
-        return fluid.getAmount() - stack.getAmount();
+        return stack;
     }
 
     @Override
@@ -122,7 +122,8 @@ public class CombinedFluidTank implements IFluidTanksHandler, IFluidPort, IFluid
 
     @Override
     public int fill(FluidStack fluid, FluidAction action) {
-        return fill(fluid, action.simulate());
+        var remaining = fill(fluid, action.simulate());
+        return fluid.getAmount() - remaining.getAmount();
     }
 
     @Override
