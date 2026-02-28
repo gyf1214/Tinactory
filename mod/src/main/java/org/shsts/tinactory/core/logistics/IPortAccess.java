@@ -2,13 +2,12 @@ package org.shsts.tinactory.core.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.api.logistics.IPortFilter;
 
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IPortAccess<T, P extends IPortFilter<T>> {
+public interface IPortAccess<T, P> {
     boolean acceptInput(P port, T stack);
 
     boolean acceptOutput(P port);

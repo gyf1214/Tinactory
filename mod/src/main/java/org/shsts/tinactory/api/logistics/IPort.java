@@ -7,11 +7,10 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IPort<T> extends IPortFilter<T> {
+public interface IPort<T> {
     @SuppressWarnings("unchecked")
     static <T> IPort<T> empty() {
         return (IPort<T>) EMPTY;
@@ -26,9 +25,12 @@ public interface IPort<T> extends IPortFilter<T> {
     }
 
     @SuppressWarnings("unchecked")
-    default <TFilter> IPortFilter<TFilter> asFilter() {
+    default IPortFilter<T> asFilter() {
         assert type() != PortType.NONE;
-        return (IPortFilter<TFilter>) this;
+        if (this instanceof IPortFilter<?> filter) {
+            return (IPortFilter<T>) filter;
+        }
+        throw new UnsupportedOperationException("Port does not support filters");
     }
 
     @SuppressWarnings("unchecked")
@@ -53,12 +55,6 @@ public interface IPort<T> extends IPortFilter<T> {
      * If this returns false, extract and getItem should return empty.
      */
     boolean acceptOutput();
-
-    @Override
-    default void setFilters(List<? extends Predicate<T>> filters) {}
-
-    @Override
-    default void resetFilters() {}
 
     IPort<?> EMPTY = new IPort<>() {
         @Override

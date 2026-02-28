@@ -157,7 +157,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             return;
         }
         machine.container().ifPresent(container -> getInputPort(container)
-            .setFilters(smeltingRecipe.getIngredients()));
+            .asFilter().setFilters(smeltingRecipe.getIngredients()));
     }
 
     /**

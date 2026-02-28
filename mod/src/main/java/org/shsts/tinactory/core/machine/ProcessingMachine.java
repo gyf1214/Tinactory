@@ -143,8 +143,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             }
             var port = container.getPort(i, ContainerAccess.INTERNAL);
             switch (port.type()) {
-                case ITEM -> port.asItem().setFilters(itemFilters.get(i));
-                case FLUID -> port.asFluid().setFilters(fluidFilters.get(i));
+                case ITEM -> port.asItem().asFilter().setFilters(itemFilters.get(i));
+                case FLUID -> port.asFluid().asFilter().setFilters(fluidFilters.get(i));
             }
         }
     }

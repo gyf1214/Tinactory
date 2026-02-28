@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedPort<T, P extends IPortFilter<T>> implements IPortFilter<T>, IPortNotifier {
+public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final IPortAccess<T, P> portAccess;
@@ -124,16 +124,22 @@ public class CombinedPort<T, P extends IPortFilter<T>> implements IPortFilter<T>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setFilters(List<? extends Predicate<T>> filters) {
         for (var compose : composes) {
-            compose.setFilters(filters);
+            if (compose instanceof IPortFilter<?> filter) {
+                ((IPortFilter<T>) filter).setFilters(filters);
+            }
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void resetFilters() {
         for (var compose : composes) {
-            compose.resetFilters();
+            if (compose instanceof IPortFilter<?> filter) {
+                ((IPortFilter<T>) filter).resetFilters();
+            }
         }
     }
 

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,7 +20,7 @@ class PortFilterApiTest {
     void itemPortShouldSupportTypedFilterAccessFromPort() {
         var port = new TestItemPort();
         IPort<?> base = port;
-        IPortFilter<ItemStack> filter = base.asFilter();
+        IPortFilter<ItemStack> filter = base.asItem().asFilter();
 
         filter.setFilters(List.<Predicate<ItemStack>>of($ -> true));
         filter.resetFilters();
@@ -42,7 +43,12 @@ class PortFilterApiTest {
         assertSame(port, port.asFluid());
     }
 
-    private static final class TestItemPort implements IPort<ItemStack> {
+    @Test
+    void portWithoutFilterShouldThrowOnAsFilter() {
+        assertThrows(UnsupportedOperationException.class, () -> new NonFilterItemPort().asFilter());
+    }
+
+    private static final class TestItemPort implements IPort<ItemStack>, IPortFilter<ItemStack> {
         private boolean setInvoked;
         private boolean resetInvoked;
 
@@ -97,7 +103,7 @@ class PortFilterApiTest {
         }
     }
 
-    private static final class TestFluidPort implements IPort<FluidStack> {
+    private static final class TestFluidPort implements IPort<FluidStack>, IPortFilter<FluidStack> {
         private boolean setInvoked;
         private boolean resetInvoked;
 
@@ -149,6 +155,48 @@ class PortFilterApiTest {
         @Override
         public void resetFilters() {
             resetInvoked = true;
+        }
+    }
+
+    private static final class NonFilterItemPort implements IPort<ItemStack> {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
+        @Override
+        public boolean acceptInput(ItemStack stack) {
+            return true;
+        }
+
+        @Override
+        public ItemStack insert(ItemStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Override
+        public ItemStack extract(ItemStack stack, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public ItemStack extract(int limit, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getStorageAmount(ItemStack stack) {
+            return 0;
+        }
+
+        @Override
+        public Collection<ItemStack> getAllStorages() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return true;
         }
     }
 }

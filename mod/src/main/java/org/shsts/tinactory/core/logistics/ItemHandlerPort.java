@@ -11,6 +11,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import java.util.function.Predicate;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemHandlerPort implements IPort<ItemStack>, IPortNotifier, ILimitedPort {
+public class ItemHandlerPort implements IPort<ItemStack>, IPortFilter<ItemStack>, IPortNotifier, ILimitedPort {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public final IItemHandler itemHandler;

@@ -12,6 +12,7 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
+public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>, IPortFilter<FluidStack>,
     IPortNotifier, ILimitedPort, INBTSerializable<CompoundTag> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
