@@ -121,11 +121,11 @@ public class MachineMenu extends ProcessingMenu {
     private void onPortClick(int port, int button) {
         getPort(port).ifPresent(port1 -> {
             if (port1.type() == PortType.ITEM) {
-                var carried1 = clickItemPort(getCarried(), port1.asItem(), button);
+                var carried1 = clickItemPort(getCarried(), port1.asItemPort(), button);
                 setCarried(carried1);
             } else if (port1.type() == PortType.FLUID) {
                 clickFluidSlot((carried, mayDrain, mayFill) ->
-                    doClickFluidPort(carried, port1.asFluid(), mayDrain, mayFill), button);
+                    doClickFluidPort(carried, port1.asFluidPort(), mayDrain, mayFill), button);
             }
         });
     }

@@ -55,9 +55,9 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         var ports = logistics.getStoragePorts();
         for (var port : ports) {
             if (port.type() == PortType.ITEM) {
-                items.add(port.asItem());
+                items.add(port.asItemPort());
             } else if (port.type() == PortType.FLUID) {
-                fluids.add(port.asFluid());
+                fluids.add(port.asFluidPort());
             }
         }
         combinedItem.setComposes(items);

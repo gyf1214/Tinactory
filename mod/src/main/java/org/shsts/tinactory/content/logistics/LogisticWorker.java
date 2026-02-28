@@ -286,9 +286,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
-                transmitItem(from.asItem(), to.asItem(), entry1);
+                transmitItem(from.asItemPort(), to.asItemPort(), entry1);
             } else {
-                transmitFluid(from.asFluid(), to.asFluid(), entry1.fluidFilter());
+                transmitFluid(from.asFluidPort(), to.asFluidPort(), entry1.fluidFilter());
             }
             tick = 0;
         } else {

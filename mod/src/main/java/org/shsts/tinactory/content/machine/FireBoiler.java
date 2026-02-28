@@ -61,12 +61,12 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     }
 
     public void setContainer(IContainer container) {
-        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
+        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItemPort();
         fuelPort.setFilters(List.of(item ->
             ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
 
-        var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
-        var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
+        var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluidPort();
+        var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluidPort();
         setContainer(inputPort, outputPort);
     }
 

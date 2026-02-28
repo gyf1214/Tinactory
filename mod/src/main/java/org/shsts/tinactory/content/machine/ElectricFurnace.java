@@ -63,11 +63,11 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     private IItemPort getInputPort(IContainer container) {
-        return container.getPort(inputPort, ContainerAccess.INTERNAL).asItem();
+        return container.getPort(inputPort, ContainerAccess.INTERNAL).asItemPort();
     }
 
     private IItemPort getOutputPort(IContainer container) {
-        return container.getPort(outputPort, ContainerAccess.INTERNAL).asItem();
+        return container.getPort(outputPort, ContainerAccess.INTERNAL).asItemPort();
     }
 
     /**

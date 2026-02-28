@@ -218,7 +218,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.ITEM) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItem();
+        IItemPort itemPort = port.asItemPort();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -255,7 +255,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.ITEM || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItem();
+        IItemPort itemPort = port.asItemPort();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
@@ -287,7 +287,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.FLUID) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluid();
+        IFluidPort fluidPort = port.asFluidPort();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -324,7 +324,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.FLUID || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluid();
+        IFluidPort fluidPort = port.asFluidPort();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
