@@ -17,7 +17,7 @@ public interface IFluidPort extends IPort {
     boolean acceptInput(FluidStack stack);
 
     /**
-     * Returns the amount of fluid not inserted. The passed and returned ItemStack should be safely modified.
+     * Returns the amount of fluid not inserted. The passed and returned FluidStack should be safely modified.
      */
     FluidStack fill(FluidStack fluid, boolean simulate);
 
@@ -34,7 +34,7 @@ public interface IFluidPort extends IPort {
     int getFluidAmount(FluidStack fluid);
 
     /**
-     * DO NOT change the returned ItemStack.
+     * DO NOT change the returned FluidStack.
      */
     Collection<FluidStack> getAllFluids();
 }
