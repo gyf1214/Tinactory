@@ -7,7 +7,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
-import org.shsts.tinactory.api.logistics.IItemFilter;
 import org.shsts.tinactory.api.logistics.IItemPort;
 
 import java.util.Collection;
@@ -22,8 +21,7 @@ import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalItemStorage extends PortNotifier implements IItemPort,
-    IItemFilter, INBTSerializable<CompoundTag> {
+public class DigitalItemStorage extends PortNotifier implements IItemPort, INBTSerializable<CompoundTag> {
     private final IDigitalProvider provider;
     public int maxCount = Integer.MAX_VALUE;
     private final Map<ItemStackWrapper, ItemStack> items = new HashMap<>();

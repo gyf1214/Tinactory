@@ -5,4 +5,4 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IIngredientWrapper {}
+public interface IIngredientKey {}

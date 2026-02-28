@@ -13,19 +13,15 @@ public interface IPort {
         return (IItemPort) this;
     }
 
-    default IItemFilter asItemFilter() {
-        assert type() == PortType.ITEM;
-        return (IItemFilter) this;
+    @SuppressWarnings("unchecked")
+    default <T> IPortFilter<T> asFilter() {
+        assert type() != PortType.NONE;
+        return (IPortFilter<T>) this;
     }
 
     default IFluidPort asFluid() {
         assert type() == PortType.FLUID;
         return (IFluidPort) this;
-    }
-
-    default IFluidFilter asFluidFilter() {
-        assert type() == PortType.FLUID;
-        return (IFluidFilter) this;
     }
 
     /**

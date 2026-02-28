@@ -1,125 +1,130 @@
 package org.shsts.tinactory.core.logistics;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.IPortNotifier;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidPort extends CombinedPort implements IFluidPort {
-    private static final Logger LOGGER = LogUtils.getLogger();
+public class CombinedFluidPort extends CombinedPort<FluidStack, IFluidPort> implements IFluidPort {
+    private static final IPortAccess<FluidStack, IFluidPort> PORT_ACCESS = new IPortAccess<>() {
+        @Override
+        public boolean acceptInput(IFluidPort port, FluidStack stack) {
+            return port.acceptInput(stack);
+        }
 
-    private final List<IFluidPort> composes = new ArrayList<>();
-    public boolean allowInput = true;
-    public boolean allowOutput = true;
+        @Override
+        public boolean acceptOutput(IFluidPort port) {
+            return port.acceptOutput();
+        }
+
+        @Override
+        public FluidStack insert(IFluidPort port, FluidStack stack, boolean simulate) {
+            return port.insert(stack, simulate);
+        }
+
+        @Override
+        public FluidStack extract(IFluidPort port, FluidStack stack, boolean simulate) {
+            return port.extract(stack, simulate);
+        }
+
+        @Override
+        public FluidStack extract(IFluidPort port, int limit, boolean simulate) {
+            return port.extract(limit, simulate);
+        }
+
+        @Override
+        public int getStorageAmount(IFluidPort port, FluidStack stack) {
+            return port.getStorageAmount(stack);
+        }
+
+        @Override
+        public Collection<FluidStack> getAllStorages(IFluidPort port) {
+            return port.getAllStorages();
+        }
+    };
+
+    private static final IStackAdapter<FluidStack> STACK_ADAPTER = new IStackAdapter<>() {
+        @Override
+        public FluidStack empty() {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public boolean isEmpty(FluidStack stack) {
+            return stack.isEmpty();
+        }
+
+        @Override
+        public FluidStack copy(FluidStack stack) {
+            return stack.copy();
+        }
+
+        @Override
+        public int amount(FluidStack stack) {
+            return stack.getAmount();
+        }
+
+        @Override
+        public FluidStack withAmount(FluidStack stack, int amount) {
+            return StackHelper.copyWithAmount(stack, amount);
+        }
+
+        @Override
+        public boolean canStack(FluidStack left, FluidStack right) {
+            return left.isFluidEqual(right);
+        }
+
+        @Override
+        public IIngredientKey keyOf(FluidStack stack) {
+            return new FluidStackWrapper(stack);
+        }
+    };
 
     public CombinedFluidPort(IFluidPort... composes) {
-        addComposes(Arrays.asList(composes));
+        super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
     }
 
-    public CombinedFluidPort() {}
-
-    private void addComposes(Collection<IFluidPort> val) {
-        composes.clear();
-        composes.addAll(val);
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.onUpdate(combinedListener);
-            }
-        }
-    }
-
-    public void setComposes(Collection<IFluidPort> val) {
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.unregisterListener(combinedListener);
-            }
-        }
-        composes.clear();
-        addComposes(val);
-        invokeUpdate();
+    public CombinedFluidPort() {
+        super(PORT_ACCESS, STACK_ADAPTER);
     }
 
     @Override
     public boolean acceptInput(FluidStack stack) {
-        return allowInput && composes.stream().anyMatch($ -> $.acceptInput(stack));
+        return super.acceptInput(stack);
     }
 
     @Override
     public boolean acceptOutput() {
-        return allowOutput && composes.stream().anyMatch(IPort::acceptOutput);
+        return super.acceptOutput();
     }
 
     @Override
-    public FluidStack insert(FluidStack fluid, boolean simulate) {
-        if (!allowInput) {
-            return fluid;
-        }
-        var stack = fluid.copy();
-        for (var compose : composes) {
-            if (stack.isEmpty()) {
-                break;
-            }
-            stack = compose.insert(stack, simulate);
-        }
-        return stack;
+    public FluidStack insert(FluidStack stack, boolean simulate) {
+        return super.insert(stack, simulate);
     }
 
     @Override
     public FluidStack extract(FluidStack fluid, boolean simulate) {
-        if (!allowOutput) {
-            return FluidStack.EMPTY;
-        }
-        var stack = fluid.copy();
-        var ret = FluidStack.EMPTY;
-        for (var compose : composes) {
-            if (stack.isEmpty()) {
-                break;
-            }
-            var stack1 = compose.extract(stack, simulate);
-            if (!stack1.isEmpty()) {
-                if (ret.isEmpty()) {
-                    ret = stack1;
-                } else if (ret.isFluidEqual(stack1)) {
-                    ret.grow(stack1.getAmount());
-                } else {
-                    // don't know what to do actually, can only destroy the extracted fluid
-                    LOGGER.warn("{}: Extracted fluid {} cannot stack with required fluid {}",
-                        this, stack1, ret);
-                    continue;
-                }
-                stack.shrink(stack1.getAmount());
-            }
-        }
-        return ret;
+        return super.extract(fluid, simulate);
     }
 
     @Override
     public FluidStack extract(int limit, boolean simulate) {
-        if (!allowOutput) {
-            return FluidStack.EMPTY;
-        }
-        return composes.isEmpty() ? FluidStack.EMPTY :
-            composes.get(0).extract(limit, simulate);
+        return super.extract(limit, simulate);
     }
 
     @Override
     public int getStorageAmount(FluidStack fluid) {
-        return composes.stream().mapToInt($ -> $.getStorageAmount(fluid)).sum();
+        return super.getStorageAmount(fluid);
     }
 
     @Override
     public Collection<FluidStack> getAllStorages() {
-        return composes.stream().flatMap($ -> $.getAllStorages().stream()).toList();
+        return super.getAllStorages();
     }
 }

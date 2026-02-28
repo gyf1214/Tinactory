@@ -5,10 +5,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IFluidPort extends IPort {
+public interface IFluidPort extends IPort, IPortFilter<FluidStack> {
     @Override
     default PortType type() {
         return PortType.FLUID;
@@ -37,4 +39,10 @@ public interface IFluidPort extends IPort {
      * DO NOT change the returned FluidStack.
      */
     Collection<FluidStack> getAllStorages();
+
+    @Override
+    default void setFilters(List<? extends Predicate<FluidStack>> filters) {}
+
+    @Override
+    default void resetFilters() {}
 }

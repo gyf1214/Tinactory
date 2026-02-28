@@ -212,8 +212,8 @@ public class MachineProcessor extends CapabilityProvider implements
                 }
                 var port = container.getPort(i, ContainerAccess.INTERNAL);
                 switch (port.type()) {
-                    case ITEM -> port.asItemFilter().resetFilters();
-                    case FLUID -> port.asFluidFilter().resetFilters();
+                    case ITEM -> port.asItem().resetFilters();
+                    case FLUID -> port.asFluid().resetFilters();
                 }
             }
         });

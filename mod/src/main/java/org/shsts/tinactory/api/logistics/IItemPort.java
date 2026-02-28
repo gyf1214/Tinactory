@@ -5,6 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Represent a collection of items without specific slots.
@@ -12,7 +14,7 @@ import java.util.Collection;
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IItemPort extends IPort {
+public interface IItemPort extends IPort, IPortFilter<ItemStack> {
     @Override
     default PortType type() {
         return PortType.ITEM;
@@ -44,4 +46,10 @@ public interface IItemPort extends IPort {
      * DO NOT change the returned ItemStack.
      */
     Collection<ItemStack> getAllStorages();
+
+    @Override
+    default void setFilters(List<? extends Predicate<ItemStack>> filters) {}
+
+    @Override
+    default void resetFilters() {}
 }

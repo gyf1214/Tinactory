@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record FluidStackWrapper(FluidStack stack) implements IIngredientWrapper {
+public record FluidStackWrapper(FluidStack stack) implements IIngredientKey {
     @Override
     public boolean equals(Object other) {
         return this == other || (other instanceof FluidStackWrapper wrapper &&

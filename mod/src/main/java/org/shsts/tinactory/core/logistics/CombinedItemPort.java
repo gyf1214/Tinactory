@@ -1,124 +1,130 @@
 package org.shsts.tinactory.core.logistics;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IItemPort;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.IPortNotifier;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemPort extends CombinedPort implements IItemPort {
-    private static final Logger LOGGER = LogUtils.getLogger();
+public class CombinedItemPort extends CombinedPort<ItemStack, IItemPort> implements IItemPort {
+    private static final IPortAccess<ItemStack, IItemPort> PORT_ACCESS = new IPortAccess<>() {
+        @Override
+        public boolean acceptInput(IItemPort port, ItemStack stack) {
+            return port.acceptInput(stack);
+        }
 
-    private final List<IItemPort> composes = new ArrayList<>();
-    public boolean allowInput = true;
-    public boolean allowOutput = true;
+        @Override
+        public boolean acceptOutput(IItemPort port) {
+            return port.acceptOutput();
+        }
+
+        @Override
+        public ItemStack insert(IItemPort port, ItemStack stack, boolean simulate) {
+            return port.insert(stack, simulate);
+        }
+
+        @Override
+        public ItemStack extract(IItemPort port, ItemStack stack, boolean simulate) {
+            return port.extract(stack, simulate);
+        }
+
+        @Override
+        public ItemStack extract(IItemPort port, int limit, boolean simulate) {
+            return port.extract(limit, simulate);
+        }
+
+        @Override
+        public int getStorageAmount(IItemPort port, ItemStack stack) {
+            return port.getStorageAmount(stack);
+        }
+
+        @Override
+        public Collection<ItemStack> getAllStorages(IItemPort port) {
+            return port.getAllStorages();
+        }
+    };
+
+    private static final IStackAdapter<ItemStack> STACK_ADAPTER = new IStackAdapter<>() {
+        @Override
+        public ItemStack empty() {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public boolean isEmpty(ItemStack stack) {
+            return stack.isEmpty();
+        }
+
+        @Override
+        public ItemStack copy(ItemStack stack) {
+            return stack.copy();
+        }
+
+        @Override
+        public int amount(ItemStack stack) {
+            return stack.getCount();
+        }
+
+        @Override
+        public ItemStack withAmount(ItemStack stack, int amount) {
+            return StackHelper.copyWithCount(stack, amount);
+        }
+
+        @Override
+        public boolean canStack(ItemStack left, ItemStack right) {
+            return StackHelper.canItemsStack(left, right);
+        }
+
+        @Override
+        public IIngredientKey keyOf(ItemStack stack) {
+            return new ItemStackWrapper(stack);
+        }
+    };
 
     public CombinedItemPort(IItemPort... composes) {
-        addComposes(Arrays.asList(composes));
+        super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
     }
 
-    public CombinedItemPort() {}
-
-    private void addComposes(Collection<IItemPort> val) {
-        composes.clear();
-        composes.addAll(val);
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.onUpdate(combinedListener);
-            }
-        }
-    }
-
-    public void setComposes(Collection<IItemPort> val) {
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.unregisterListener(combinedListener);
-            }
-        }
-        addComposes(val);
-        invokeUpdate();
+    public CombinedItemPort() {
+        super(PORT_ACCESS, STACK_ADAPTER);
     }
 
     @Override
     public boolean acceptInput(ItemStack stack) {
-        return allowInput && composes.stream().anyMatch($ -> $.acceptInput(stack));
+        return super.acceptInput(stack);
     }
 
     @Override
     public boolean acceptOutput() {
-        return allowOutput && composes.stream().anyMatch(IPort::acceptOutput);
+        return super.acceptOutput();
     }
 
     @Override
     public ItemStack insert(ItemStack stack, boolean simulate) {
-        if (!allowInput) {
-            return stack;
-        }
-        var stack1 = stack.copy();
-        for (var compose : composes) {
-            if (stack1.isEmpty()) {
-                break;
-            }
-            stack1 = compose.insert(stack1, simulate);
-        }
-        return stack1;
+        return super.insert(stack, simulate);
     }
 
     @Override
     public ItemStack extract(ItemStack item, boolean simulate) {
-        if (!allowOutput) {
-            return ItemStack.EMPTY;
-        }
-        var item1 = item.copy();
-        var ret = ItemStack.EMPTY;
-        for (var compose : composes) {
-            if (item1.isEmpty()) {
-                break;
-            }
-            var stack = compose.extract(item1, simulate);
-            if (!stack.isEmpty()) {
-                if (ret.isEmpty()) {
-                    ret = stack;
-                } else if (StackHelper.canItemsStack(ret, stack)) {
-                    ret.grow(stack.getCount());
-                } else {
-                    // don't know what to do actually, can only destroy the extracted item
-                    LOGGER.warn("{}: Extracted item {} cannot stack with required item {}",
-                        this, stack, ret);
-                    continue;
-                }
-                item1.shrink(stack.getCount());
-            }
-        }
-        return ret;
+        return super.extract(item, simulate);
     }
 
     @Override
     public ItemStack extract(int limit, boolean simulate) {
-        if (!allowOutput) {
-            return ItemStack.EMPTY;
-        }
-        return composes.isEmpty() ? ItemStack.EMPTY :
-            composes.get(0).extract(limit, simulate);
+        return super.extract(limit, simulate);
     }
 
     @Override
     public int getStorageAmount(ItemStack item) {
-        return composes.stream().mapToInt($ -> $.getStorageAmount(item)).sum();
+        return super.getStorageAmount(item);
     }
 
     @Override
     public Collection<ItemStack> getAllStorages() {
-        return composes.stream().flatMap($ -> $.getAllStorages().stream()).toList();
+        return super.getAllStorages();
     }
 }
