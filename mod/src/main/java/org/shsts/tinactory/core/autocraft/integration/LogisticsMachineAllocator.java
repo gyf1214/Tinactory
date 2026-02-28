@@ -3,8 +3,8 @@ package org.shsts.tinactory.core.autocraft.integration;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -218,7 +218,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.ITEM) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItemPort();
+        IPort<ItemStack> itemPort = port.asItem();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -255,7 +255,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.ITEM || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItemPort();
+        IPort<ItemStack> itemPort = port.asItem();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
@@ -287,7 +287,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.FLUID) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluidPort();
+        IPort<FluidStack> fluidPort = port.asFluid();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -324,7 +324,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         if (port.type() != PortType.FLUID || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluidPort();
+        IPort<FluidStack> fluidPort = port.asFluid();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {

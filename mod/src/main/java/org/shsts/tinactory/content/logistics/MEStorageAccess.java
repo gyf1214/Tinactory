@@ -8,8 +8,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
@@ -50,14 +51,14 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     }
 
     private void onUpdateLogistics(LogisticComponent logistics) {
-        var items = new ArrayList<IItemPort>();
-        var fluids = new ArrayList<IFluidPort>();
+        var items = new ArrayList<IPort<ItemStack>>();
+        var fluids = new ArrayList<IPort<FluidStack>>();
         var ports = logistics.getStoragePorts();
         for (var port : ports) {
             if (port.type() == PortType.ITEM) {
-                items.add(port.asItemPort());
+                items.add(port.asItem());
             } else if (port.type() == PortType.FLUID) {
-                fluids.add(port.asFluidPort());
+                fluids.add(port.asFluid());
             }
         }
         combinedItem.setComposes(items);
@@ -79,11 +80,11 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         combinedFluid.unregisterListener(listener);
     }
 
-    public IItemPort itemPort() {
+    public IPort<ItemStack> itemPort() {
         return combinedItem;
     }
 
-    public IFluidPort fluidPort() {
+    public IPort<FluidStack> fluidPort() {
         return combinedFluid;
     }
 

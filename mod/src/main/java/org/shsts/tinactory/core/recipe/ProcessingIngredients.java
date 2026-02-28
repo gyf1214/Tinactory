@@ -11,8 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
@@ -42,9 +40,10 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            if (!(port instanceof IItemPort item)) {
+            if (port.type() != PortType.ITEM) {
                 return Optional.empty();
             }
+            var item = port.asItem();
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
             var extracted = item.extract(stack1, simulate);
@@ -72,9 +71,10 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            if (!(port instanceof IItemPort item)) {
+            if (port.type() != PortType.ITEM) {
                 return Optional.empty();
             }
+            var item = port.asItem();
             if (amount <= 0) {
                 return StackHelper.hasItem(item, ingredient)
                     .map($ -> new ItemIngredient(StackHelper.copyWithCount($, 1)));
@@ -133,9 +133,10 @@ public final class ProcessingIngredients {
 
         @Override
         public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            if (!(port instanceof IFluidPort fluidPort)) {
+            if (port.type() != PortType.FLUID) {
                 return Optional.empty();
             }
+            var fluidPort = port.asFluid();
             var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
             var extracted = fluidPort.extract(fluid1, simulate);

@@ -178,8 +178,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
         if (multiblockInterface != null) {
             var container = multiblockInterface.container().orElseThrow();
             boiler.setContainer(
-                container.getPort(1, ContainerAccess.INTERNAL).asFluidPort(),
-                container.getPort(2, ContainerAccess.INTERNAL).asFluidPort());
+                container.getPort(1, ContainerAccess.INTERNAL).asFluid(),
+                container.getPort(2, ContainerAccess.INTERNAL).asFluid());
         }
     }
 

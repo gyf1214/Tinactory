@@ -4,46 +4,47 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemPort extends CombinedPort<ItemStack, IItemPort> implements IItemPort {
-    private static final IPortAccess<ItemStack, IItemPort> PORT_ACCESS = new IPortAccess<>() {
+public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> implements IItemPort {
+    private static final IPortAccess<ItemStack, IPort<ItemStack>> PORT_ACCESS = new IPortAccess<>() {
         @Override
-        public boolean acceptInput(IItemPort port, ItemStack stack) {
+        public boolean acceptInput(IPort<ItemStack> port, ItemStack stack) {
             return port.acceptInput(stack);
         }
 
         @Override
-        public boolean acceptOutput(IItemPort port) {
+        public boolean acceptOutput(IPort<ItemStack> port) {
             return port.acceptOutput();
         }
 
         @Override
-        public ItemStack insert(IItemPort port, ItemStack stack, boolean simulate) {
+        public ItemStack insert(IPort<ItemStack> port, ItemStack stack, boolean simulate) {
             return port.insert(stack, simulate);
         }
 
         @Override
-        public ItemStack extract(IItemPort port, ItemStack stack, boolean simulate) {
+        public ItemStack extract(IPort<ItemStack> port, ItemStack stack, boolean simulate) {
             return port.extract(stack, simulate);
         }
 
         @Override
-        public ItemStack extract(IItemPort port, int limit, boolean simulate) {
+        public ItemStack extract(IPort<ItemStack> port, int limit, boolean simulate) {
             return port.extract(limit, simulate);
         }
 
         @Override
-        public int getStorageAmount(IItemPort port, ItemStack stack) {
+        public int getStorageAmount(IPort<ItemStack> port, ItemStack stack) {
             return port.getStorageAmount(stack);
         }
 
         @Override
-        public Collection<ItemStack> getAllStorages(IItemPort port) {
+        public Collection<ItemStack> getAllStorages(IPort<ItemStack> port) {
             return port.getAllStorages();
         }
     };
@@ -85,7 +86,7 @@ public class CombinedItemPort extends CombinedPort<ItemStack, IItemPort> impleme
         }
     };
 
-    public CombinedItemPort(IItemPort... composes) {
+    public CombinedItemPort(IPort<ItemStack>... composes) {
         super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
     }
 

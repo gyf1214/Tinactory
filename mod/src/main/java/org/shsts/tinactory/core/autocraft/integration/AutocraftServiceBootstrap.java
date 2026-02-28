@@ -4,8 +4,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -23,8 +24,8 @@ public final class AutocraftServiceBootstrap {
         BlockEntity blockEntity,
         INetwork network,
         LogisticComponent logistics,
-        IItemPort itemPort,
-        IFluidPort fluidPort,
+        IPort<ItemStack> itemPort,
+        IPort<FluidStack> fluidPort,
         UUID cpuId,
         long transmissionBandwidth,
         int executionIntervalTicks) {
@@ -50,8 +51,8 @@ public final class AutocraftServiceBootstrap {
         BlockEntity blockEntity,
         INetwork network,
         LogisticComponent logistics,
-        IItemPort itemPort,
-        IFluidPort fluidPort) {
+        IPort<ItemStack> itemPort,
+        IPort<FluidStack> fluidPort) {
 
         var level = blockEntity.getLevel();
         if (level == null || level.isClientSide) {

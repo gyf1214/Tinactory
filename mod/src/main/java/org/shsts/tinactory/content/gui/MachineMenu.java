@@ -9,8 +9,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -47,7 +45,7 @@ public class MachineMenu extends ProcessingMenu {
         return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
-    private ItemStack clickItemPort(ItemStack carried, IItemPort port, int button) {
+    private ItemStack clickItemPort(ItemStack carried, IPort<ItemStack> port, int button) {
         if (carried.isEmpty()) {
             var extracted = port.extract(64, true);
             // need to make sure the extracted does not exceed stack size.
@@ -70,7 +68,7 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    private boolean tryDrain(IFluidHandlerItem handler, IFluidPort port, FluidStack fluid) {
+    private boolean tryDrain(IFluidHandlerItem handler, IPort<FluidStack> port, FluidStack fluid) {
         var fluid1 = fluid.isEmpty() ? port.extract(Integer.MAX_VALUE, true) :
             port.extract(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
         int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
@@ -86,7 +84,7 @@ public class MachineMenu extends ProcessingMenu {
         return false;
     }
 
-    private FluidClickResult doClickFluidPort(ItemStack carried, IFluidPort port,
+    private FluidClickResult doClickFluidPort(ItemStack carried, IPort<FluidStack> port,
         boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
@@ -121,11 +119,11 @@ public class MachineMenu extends ProcessingMenu {
     private void onPortClick(int port, int button) {
         getPort(port).ifPresent(port1 -> {
             if (port1.type() == PortType.ITEM) {
-                var carried1 = clickItemPort(getCarried(), port1.asItemPort(), button);
+                var carried1 = clickItemPort(getCarried(), port1.asItem(), button);
                 setCarried(carried1);
             } else if (port1.type() == PortType.FLUID) {
                 clickFluidSlot((carried, mayDrain, mayFill) ->
-                    doClickFluidPort(carried, port1.asFluidPort(), mayDrain, mayFill), button);
+                    doClickFluidPort(carried, port1.asFluid(), mayDrain, mayFill), button);
             }
         });
     }

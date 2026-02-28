@@ -9,8 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -21,10 +20,10 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsInventoryView implements IInventoryView {
-    private final IItemPort itemPort;
-    private final IFluidPort fluidPort;
+    private final IPort<ItemStack> itemPort;
+    private final IPort<FluidStack> fluidPort;
 
-    public LogisticsInventoryView(IItemPort itemPort, IFluidPort fluidPort) {
+    public LogisticsInventoryView(IPort<ItemStack> itemPort, IPort<FluidStack> fluidPort) {
         this.itemPort = itemPort;
         this.fluidPort = fluidPort;
     }

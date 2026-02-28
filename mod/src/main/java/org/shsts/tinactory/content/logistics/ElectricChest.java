@@ -14,7 +14,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.ItemHandlerPort;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -38,7 +38,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     public final int capacity;
     private final int size;
     private final WrapperItemHandler internalItems;
-    private final IItemPort externalPort;
+    private final IPort<ItemStack> externalPort;
     private final ItemStack[] filters;
     private final LazyOptional<IItemHandler> itemHandlerCap;
 

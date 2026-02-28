@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -32,7 +32,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     private final double maxHeat;
 
     @Nullable
-    private IItemPort fuelPort;
+    private IPort<ItemStack> fuelPort;
     private long maxBurn = 0L;
     private ItemStack burningItem = ItemStack.EMPTY;
     private long currentBurn = 0L;
@@ -61,12 +61,12 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     }
 
     public void setContainer(IContainer container) {
-        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItemPort();
+        fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
         fuelPort.setFilters(List.of(item ->
             ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
 
-        var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluidPort();
-        var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluidPort();
+        var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
+        var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
         setContainer(inputPort, outputPort);
     }
 

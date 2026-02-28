@@ -9,7 +9,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -64,7 +64,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         return (heat - minHeat) * reactionRate * parallel;
     }
 
-    public double absorbHeat(IFluidPort inputPort, IFluidPort outputPort,
+    public double absorbHeat(IPort<FluidStack> inputPort, IPort<FluidStack> outputPort,
         int reaction, double heat, BiConsumer<FluidStack, FluidStack> callback) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
         var drained = inputPort.extract(inputStack, true);

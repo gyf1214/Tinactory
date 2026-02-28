@@ -10,8 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
@@ -79,7 +78,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return machineConfig;
     }
 
-    private FluidClickResult doClickFluidSlot(ItemStack carried, IFluidPort port,
+    private FluidClickResult doClickFluidSlot(ItemStack carried, IPort<FluidStack> port,
         FluidStack fluid, boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
@@ -110,7 +109,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private FluidClickResult doClickEmptyFluidSlot(ItemStack carried, IFluidPort port, boolean mayFill) {
+    private FluidClickResult doClickEmptyFluidSlot(ItemStack carried, IPort<FluidStack> port, boolean mayFill) {
         if (!mayFill) {
             return new FluidClickResult();
         }
@@ -126,7 +125,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private void clickItemSlot(ItemStack carried, ItemStack item, IItemPort port, int button) {
+    private void clickItemSlot(ItemStack carried, ItemStack item, IPort<ItemStack> port, int button) {
         if (!carried.isEmpty()) {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);

@@ -14,8 +14,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
@@ -169,7 +167,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack testTransmitItem(IItemPort from, IItemPort to, ItemStack stack) {
+    private ItemStack testTransmitItem(IPort<ItemStack> from, IPort<ItemStack> to, ItemStack stack) {
         var stack1 = StackHelper.copyWithCount(stack, workerStack);
         var stack2 = from.extract(stack1, true);
         var remaining = to.insert(stack2, true);
@@ -182,7 +180,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack selectTransmittedItem(IItemPort from, IItemPort to, LogisticWorkerConfig config) {
+    private ItemStack selectTransmittedItem(IPort<ItemStack> from, IPort<ItemStack> to,
+        LogisticWorkerConfig config) {
         var filterType = config.filterType();
         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
             return testTransmitItem(from, to, config.itemFilter());
@@ -202,7 +201,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         return ItemStack.EMPTY;
     }
 
-    private void transmitItem(IItemPort from, IItemPort to, LogisticWorkerConfig config) {
+    private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
         var stack = selectTransmittedItem(from, to, config);
         if (stack.isEmpty()) {
             return;
@@ -214,7 +213,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private FluidStack testTransmitFluid(IFluidPort from, IFluidPort to, FluidStack stack) {
+    private FluidStack testTransmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack stack) {
         var stack1 = StackHelper.copyWithAmount(stack, workerFluidStack);
         var stack2 = from.extract(stack1, true);
         var remaining = to.insert(stack2, true);
@@ -227,7 +226,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private FluidStack selectTransmittedFluid(IFluidPort from, IFluidPort to, FluidStack filter) {
+    private FluidStack selectTransmittedFluid(IPort<FluidStack> from, IPort<FluidStack> to,
+        FluidStack filter) {
         if (!filter.isEmpty()) {
             return testTransmitFluid(from, to, filter);
         }
@@ -241,7 +241,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         return FluidStack.EMPTY;
     }
 
-    private void transmitFluid(IFluidPort from, IFluidPort to, FluidStack filter) {
+    private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
         var stack = selectTransmittedFluid(from, to, filter);
         var stack1 = from.extract(stack, false);
         var remaining = to.insert(stack1, false);
@@ -286,9 +286,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
-                transmitItem(from.asItemPort(), to.asItemPort(), entry1);
+                transmitItem(from.asItem(), to.asItem(), entry1);
             } else {
-                transmitFluid(from.asFluidPort(), to.asFluidPort(), entry1.fluidFilter());
+                transmitFluid(from.asFluid(), to.asFluid(), entry1.fluidFilter());
             }
             tick = 0;
         } else {

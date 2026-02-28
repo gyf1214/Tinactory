@@ -4,46 +4,47 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IPort;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidPort extends CombinedPort<FluidStack, IFluidPort> implements IFluidPort {
-    private static final IPortAccess<FluidStack, IFluidPort> PORT_ACCESS = new IPortAccess<>() {
+public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack>> implements IFluidPort {
+    private static final IPortAccess<FluidStack, IPort<FluidStack>> PORT_ACCESS = new IPortAccess<>() {
         @Override
-        public boolean acceptInput(IFluidPort port, FluidStack stack) {
+        public boolean acceptInput(IPort<FluidStack> port, FluidStack stack) {
             return port.acceptInput(stack);
         }
 
         @Override
-        public boolean acceptOutput(IFluidPort port) {
+        public boolean acceptOutput(IPort<FluidStack> port) {
             return port.acceptOutput();
         }
 
         @Override
-        public FluidStack insert(IFluidPort port, FluidStack stack, boolean simulate) {
+        public FluidStack insert(IPort<FluidStack> port, FluidStack stack, boolean simulate) {
             return port.insert(stack, simulate);
         }
 
         @Override
-        public FluidStack extract(IFluidPort port, FluidStack stack, boolean simulate) {
+        public FluidStack extract(IPort<FluidStack> port, FluidStack stack, boolean simulate) {
             return port.extract(stack, simulate);
         }
 
         @Override
-        public FluidStack extract(IFluidPort port, int limit, boolean simulate) {
+        public FluidStack extract(IPort<FluidStack> port, int limit, boolean simulate) {
             return port.extract(limit, simulate);
         }
 
         @Override
-        public int getStorageAmount(IFluidPort port, FluidStack stack) {
+        public int getStorageAmount(IPort<FluidStack> port, FluidStack stack) {
             return port.getStorageAmount(stack);
         }
 
         @Override
-        public Collection<FluidStack> getAllStorages(IFluidPort port) {
+        public Collection<FluidStack> getAllStorages(IPort<FluidStack> port) {
             return port.getAllStorages();
         }
     };
@@ -85,7 +86,7 @@ public class CombinedFluidPort extends CombinedPort<FluidStack, IFluidPort> impl
         }
     };
 
-    public CombinedFluidPort(IFluidPort... composes) {
+    public CombinedFluidPort(IPort<FluidStack>... composes) {
         super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
     }
 

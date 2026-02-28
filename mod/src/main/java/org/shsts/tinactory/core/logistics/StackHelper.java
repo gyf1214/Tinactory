@@ -21,8 +21,7 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -153,7 +152,7 @@ public final class StackHelper {
         return ret;
     }
 
-    public static Optional<ItemStack> hasItem(IItemPort port, Predicate<ItemStack> ingredient) {
+    public static Optional<ItemStack> hasItem(IPort<ItemStack> port, Predicate<ItemStack> ingredient) {
         for (var stack : port.getAllStorages()) {
             if (ingredient.test(stack)) {
                 return Optional.of(stack);
@@ -165,7 +164,7 @@ public final class StackHelper {
     /**
      * Return the itemStack that is actually consumed.
      */
-    public static Optional<ItemStack> consumeItemPort(IItemPort port,
+    public static Optional<ItemStack> consumeItemPort(IPort<ItemStack> port,
         Predicate<ItemStack> ingredient, int count, boolean simulate) {
         for (var stack : port.getAllStorages()) {
             if (ingredient.test(stack) && stack.getCount() >= count) {
@@ -218,7 +217,8 @@ public final class StackHelper {
         return FluidUtil.getFluidHandler(stack).resolve();
     }
 
-    public static boolean transmitFluidFromHandler(IFluidHandler handler, IFluidPort port, FluidStack fluid) {
+    public static boolean transmitFluidFromHandler(IFluidHandler handler, IPort<FluidStack> port,
+        FluidStack fluid) {
         if (fluid.isEmpty()) {
             return false;
         }

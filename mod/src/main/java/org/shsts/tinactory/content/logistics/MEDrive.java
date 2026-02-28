@@ -13,8 +13,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
@@ -187,8 +187,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         }
         LOGGER.debug("{} on update storage", blockEntity);
         var slots = storages.getSlots();
-        var items = new ArrayList<IItemPort>();
-        var fluids = new ArrayList<IFluidPort>();
+        var items = new ArrayList<IPort<ItemStack>>();
+        var fluids = new ArrayList<IPort<FluidStack>>();
         for (var i = 0; i < slots; i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {
