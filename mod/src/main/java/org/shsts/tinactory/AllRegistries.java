@@ -18,7 +18,8 @@ import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.common.SimpleFluid;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.SchedulingManager;
+import org.shsts.tinactory.core.network.SchedulingSorter;
+import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRegistry;
@@ -44,7 +45,10 @@ public final class AllRegistries {
 
     static {
         SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
-            .onBake((registry, stage) -> SchedulingManager.onBake(registry))
+            .onBake((registry, stage) -> {
+                var sorted = SchedulingSorter.sort(registry);
+                WorldNetworkManagers.setSortedSchedulings(sorted);
+            })
             .register();
         COMPONENT_TYPES = REGISTRATE.<IComponentType<?>>genericRegistry("component_type", IComponentType.class)
             .onBake((registry, stage) -> ComponentType.onBake(registry))

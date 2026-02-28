@@ -1,6 +1,5 @@
 package org.shsts.tinactory.integration.network;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -13,20 +12,17 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
-import org.shsts.tinactory.api.network.INetworkTicker;
-import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.ComponentType;
 import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
-import org.shsts.tinactory.core.network.SchedulingManager;
+import org.shsts.tinactory.core.network.NetworkRuntime;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,13 +36,7 @@ public class Network implements INetwork {
 
     private final Level world;
     private final UUID uuid;
-    private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
-    private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
-    private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
-    private final Multimap<IScheduling, INetworkTicker> componentSchedulings =
-        ArrayListMultimap.create();
-    private final Multimap<IScheduling, INetworkTicker> machineSchedulings =
-        ArrayListMultimap.create();
+    private final NetworkRuntime runtime;
     private final NetworkGraphEngine<BlockState> graphEngine;
 
     public final BlockPos center;
@@ -59,6 +49,7 @@ public class Network implements INetwork {
         this.uuid = uuid;
         this.center = center;
         this.team = team;
+        this.runtime = new NetworkRuntime(this, WorldNetworkManagers.getSortedSchedulings());
         this.graphEngine = new NetworkGraphEngine<>(uuid, center, WorldNetworkManagers.get(world),
             new GraphAdapter());
         this.delayTicks = 0;
@@ -109,14 +100,11 @@ public class Network implements INetwork {
 
     @Override
     public <T extends INetworkComponent> T getComponent(IComponentType<T> type) {
-        return type.clazz().cast(components.get(type));
+        return runtime.getComponent(type);
     }
 
     private void attachComponent(IComponentType<?> type) {
-        assert !components.containsKey(type);
-        var component = type.create(this);
-        components.put(type, component);
-        component.buildSchedulings(componentSchedulings::put);
+        runtime.attachComponent(type, ticker -> () -> ticker.tick(world, this));
     }
 
     private void attachComponents() {
@@ -125,32 +113,28 @@ public class Network implements INetwork {
 
     @Override
     public Multimap<BlockPos, IMachine> allMachines() {
-        return subnetMachines;
+        return runtime.allMachines();
     }
 
     @Override
     public BlockPos getSubnet(BlockPos pos) {
-        return blockSubnets.get(pos);
+        return runtime.getSubnet(pos);
     }
 
     @Override
     public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
-        return blockSubnets.entrySet();
+        return runtime.allBlocks();
     }
 
     private void putMachine(BlockPos subnet, IMachine machine) {
         LOGGER.trace("{}: put machine {}", this, machine);
-        machine.assignNetwork(this);
-        subnetMachines.put(subnet, machine);
+        runtime.putMachine(subnet, machine);
     }
 
     private void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
             world.dimension(), pos, subnet);
-        blockSubnets.put(pos, subnet);
-        for (var component : components.values()) {
-            component.putBlock(pos, state, subnet);
-        }
+        runtime.putBlock(pos, state, subnet);
         if (state.getBlock() instanceof SmartEntityBlock entityBlock) {
             entityBlock.getBlockEntity(world, pos)
                 .flatMap(MACHINE::tryGet)
@@ -161,33 +145,12 @@ public class Network implements INetwork {
     private void onConnectFinished() {
         LOGGER.debug("{}: connect finished", this);
         delayTicks = 0;
-        LOGGER.debug("{}: {} machines connected", this, subnetMachines.values().size());
-        for (var component : components.values()) {
-            component.onConnect();
-        }
-        for (var machine : subnetMachines.values()) {
-            machine.onConnectToNetwork(this);
-        }
-        for (var component : components.values()) {
-            component.onPostConnect();
-        }
-        for (var machine : subnetMachines.values()) {
-            machine.buildSchedulings(machineSchedulings::put);
-        }
+        LOGGER.debug("{}: {} machines connected", this, runtime.allMachines().values().size());
+        runtime.onConnectFinished(ticker -> () -> ticker.tick(world, this));
     }
 
     private void onDisconnect(boolean connected) {
-        if (connected) {
-            for (var machine : subnetMachines.values()) {
-                machine.onDisconnectFromNetwork();
-            }
-            for (var component : components.values()) {
-                component.onDisconnect();
-            }
-        }
-        subnetMachines.clear();
-        blockSubnets.clear();
-        machineSchedulings.clear();
+        runtime.onDisconnect(connected);
         LOGGER.debug("{}: disconnect", this);
     }
 
@@ -198,14 +161,7 @@ public class Network implements INetwork {
     }
 
     private void doTick() {
-        for (var scheduling : SchedulingManager.getSortedSchedulings()) {
-            for (var entry : componentSchedulings.get(scheduling)) {
-                entry.tick(world, this);
-            }
-            for (var ticker : machineSchedulings.get(scheduling)) {
-                ticker.tick(world, this);
-            }
-        }
+        runtime.tick();
     }
 
     private void doConnect() {
