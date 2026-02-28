@@ -17,10 +17,9 @@ import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
-import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
-import org.shsts.tinactory.core.logistics.DigitalItemStorage;
 import org.shsts.tinactory.core.logistics.DigitalProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 
 import java.util.List;
 import java.util.function.Function;
@@ -62,28 +61,16 @@ public class MEStorageCell extends CapabilityItem {
                 NUMBER_FORMAT.format(provider.bytesUsed()), NUMBER_FORMAT.format(bytesLimit)));
     }
 
-    private static final class ItemPortCapabilityStorage extends DigitalItemStorage implements IItemPort {
-        private ItemPortCapabilityStorage(IDigitalProvider provider) {
-            super(provider);
-        }
-    }
-
-    private static final class FluidPortCapabilityStorage extends DigitalFluidStorage implements IFluidPort {
-        private FluidPortCapabilityStorage(IDigitalProvider provider) {
-            super(provider);
-        }
-    }
-
     private static class ItemCapability extends ItemCapabilityProvider {
         private final IDigitalProvider provider;
-        private final ItemPortCapabilityStorage storage;
+        private final StoragePorts.ItemStorage storage;
         private final LazyOptional<IItemPort> itemCap;
         private final LazyOptional<IDigitalProvider> providerCap;
 
         public ItemCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
-            this.storage = new ItemPortCapabilityStorage(provider);
+            this.storage = StoragePorts.itemStorage(provider);
             this.itemCap = LazyOptional.of(() -> storage);
             this.providerCap = LazyOptional.of(() -> provider);
 
@@ -113,14 +100,14 @@ public class MEStorageCell extends CapabilityItem {
 
     private static class FluidCapability extends ItemCapabilityProvider {
         private final IDigitalProvider provider;
-        private final FluidPortCapabilityStorage storage;
+        private final StoragePorts.FluidStorage storage;
         private final LazyOptional<IFluidPort> fluidCap;
         private final LazyOptional<IDigitalProvider> providerCap;
 
         protected FluidCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
-            this.storage = new FluidPortCapabilityStorage(provider);
+            this.storage = StoragePorts.fluidStorage(provider);
             this.fluidCap = LazyOptional.of(() -> storage);
             this.providerCap = LazyOptional.of(() -> provider);
 

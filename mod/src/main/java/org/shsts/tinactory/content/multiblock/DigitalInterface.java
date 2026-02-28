@@ -18,15 +18,12 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.logistics.ContainerPort;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
-import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
-import org.shsts.tinactory.core.logistics.DigitalItemStorage;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
@@ -53,25 +50,25 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private int sharedBytes;
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
-        private final DigitalItemStorage internalItem;
-        private final CombinedItemPort menuItem;
-        private final CombinedItemPort externalItem;
+        private final StoragePorts.ItemStorage internalItem;
+        private final StoragePorts.ItemCombinedPort menuItem;
+        private final StoragePorts.ItemCombinedPort externalItem;
         private final ContainerPort itemPort;
-        private final CombinedFluidPort menuFluid;
-        private final DigitalFluidStorage internalFluid;
-        private final CombinedFluidPort externalFluid;
+        private final StoragePorts.FluidCombinedPort menuFluid;
+        private final StoragePorts.FluidStorage internalFluid;
+        private final StoragePorts.FluidCombinedPort externalFluid;
         private final ContainerPort fluidPort;
         public SlotType type;
         private int bytesUsed;
 
         private Storage() {
-            this.internalItem = new DigitalItemStorage(this);
-            this.menuItem = new CombinedItemPort(internalItem);
-            this.externalItem = new CombinedItemPort(internalItem);
+            this.internalItem = StoragePorts.itemStorage(this);
+            this.menuItem = StoragePorts.combinedItem(internalItem);
+            this.externalItem = StoragePorts.combinedItem(internalItem);
             this.itemPort = new ContainerPort(SlotType.NONE, internalItem, menuItem, externalItem);
-            this.internalFluid = new DigitalFluidStorage(this);
-            this.menuFluid = new CombinedFluidPort(internalFluid);
-            this.externalFluid = new CombinedFluidPort(internalFluid);
+            this.internalFluid = StoragePorts.fluidStorage(this);
+            this.menuFluid = StoragePorts.combinedFluid(internalFluid);
+            this.externalFluid = StoragePorts.combinedFluid(internalFluid);
             this.fluidPort = new ContainerPort(SlotType.NONE, internalFluid, menuFluid, externalFluid);
             this.type = SlotType.NONE;
             this.bytesUsed = 0;
@@ -85,7 +82,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             internalItem.resetFilters();
             internalFluid.resetFilters();
             if (type.direction == PortDirection.INPUT) {
-                internalItem.maxCount = amountByteLimit / CONFIG.bytesPerItem.get();
+                internalItem.maxAmount = amountByteLimit / CONFIG.bytesPerItem.get();
                 menuItem.allowInput = true;
                 externalItem.allowInput = true;
                 externalItem.allowOutput = false;
@@ -94,7 +91,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
                 externalFluid.allowInput = true;
                 externalFluid.allowOutput = false;
             } else {
-                internalItem.maxCount = Integer.MAX_VALUE;
+                internalItem.maxAmount = Integer.MAX_VALUE;
                 menuItem.allowInput = false;
                 externalItem.allowInput = false;
                 externalItem.allowOutput = true;

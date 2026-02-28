@@ -15,9 +15,8 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -34,16 +33,16 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @MethodsReturnNonnullByDefault
 public abstract class MEStorageAccess extends CapabilityProvider implements IEventSubscriber {
     protected final BlockEntity blockEntity;
-    protected final CombinedItemPort combinedItem;
-    protected final CombinedFluidPort combinedFluid;
+    protected final StoragePorts.ItemCombinedPort combinedItem;
+    protected final StoragePorts.FluidCombinedPort combinedFluid;
     private final LazyOptional<IElectricMachine> electricCap;
 
     protected IMachine machine;
 
     public MEStorageAccess(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
-        this.combinedItem = new CombinedItemPort();
-        this.combinedFluid = new CombinedFluidPort();
+        this.combinedItem = StoragePorts.combinedItem();
+        this.combinedFluid = StoragePorts.combinedFluid();
 
         var voltage = getBlockVoltage(blockEntity);
         var electric = new SimpleElectricConsumer(voltage.value, power);

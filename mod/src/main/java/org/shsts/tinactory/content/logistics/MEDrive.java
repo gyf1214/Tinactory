@@ -22,8 +22,6 @@ import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IMenuItemHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
@@ -31,6 +29,7 @@ import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -73,8 +72,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private final BlockEntity blockEntity;
     private final Layout layout;
     private final WrapperItemHandler storages;
-    private final CombinedItemPort combinedItems;
-    private final CombinedFluidPort combinedFluids;
+    private final StoragePorts.ItemCombinedPort combinedItems;
+    private final StoragePorts.FluidCombinedPort combinedFluids;
     private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
     private final LazyOptional<IElectricMachine> electricCap;
 
@@ -93,10 +92,10 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         this.menuItemHandlerCap = IMenuItemHandler.cap(storages);
         storages.onUpdate(this::onStorageChange);
 
-        this.combinedItems = new CombinedItemPort();
+        this.combinedItems = StoragePorts.combinedItem();
         combinedItems.onUpdate(this::onContainerChange);
 
-        this.combinedFluids = new CombinedFluidPort();
+        this.combinedFluids = StoragePorts.combinedFluid();
         combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);
