@@ -183,16 +183,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
         Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
             stack -> stack.is(config.tagFilter()) : StackHelper.TRUE_FILTER;
-        for (var stack : from.getAllStorages()) {
-            if (!filter.test(stack)) {
-                continue;
-            }
-            var stack1 = ITEM_TRANSMITTER.probe(from, to, stack, workerStack);
-            if (!stack1.isEmpty()) {
-                return stack1;
-            }
-        }
-        return ItemStack.EMPTY;
+        return ITEM_TRANSMITTER.select(from, to,
+            from.getAllStorages().stream().filter(filter).toList(), workerStack);
     }
 
     private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
@@ -211,14 +203,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (!filter.isEmpty()) {
             return FLUID_TRANSMITTER.probe(from, to, filter, workerFluidStack);
         }
-
-        for (var stack : from.getAllStorages()) {
-            var stack1 = FLUID_TRANSMITTER.probe(from, to, stack, workerFluidStack);
-            if (!stack1.isEmpty()) {
-                return stack1;
-            }
-        }
-        return FluidStack.EMPTY;
+        return FLUID_TRANSMITTER.select(from, to, from.getAllStorages(), workerFluidStack);
     }
 
     private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
