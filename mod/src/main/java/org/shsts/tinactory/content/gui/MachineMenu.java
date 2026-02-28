@@ -113,7 +113,7 @@ public class MachineMenu extends ProcessingMenu {
         return new FluidClickResult();
     }
 
-    private Optional<IPort> getPort(int port) {
+    private Optional<IPort<?>> getPort(int port) {
         return machine.container().flatMap($ -> $.hasPort(port) ?
             Optional.of($.getPort(port, ContainerAccess.MENU)) : Optional.empty());
     }

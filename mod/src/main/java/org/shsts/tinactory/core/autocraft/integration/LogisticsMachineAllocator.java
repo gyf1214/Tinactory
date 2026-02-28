@@ -207,14 +207,14 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return true;
     }
 
-    private static boolean matchesDirection(CraftKey key, IPort port, boolean inputDirection) {
+    private static boolean matchesDirection(CraftKey key, IPort<?> port, boolean inputDirection) {
         if (!inputDirection) {
             return port.acceptOutput();
         }
         return true;
     }
 
-    private static Optional<IMachineInputRoute> buildItemInputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineInputRoute> buildItemInputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.ITEM) {
             return Optional.empty();
         }
@@ -251,7 +251,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.ITEM || !port.acceptOutput()) {
             return Optional.empty();
         }
@@ -283,7 +283,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.FLUID) {
             return Optional.empty();
         }
@@ -320,7 +320,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.FLUID || !port.acceptOutput()) {
             return Optional.empty();
         }

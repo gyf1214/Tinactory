@@ -183,7 +183,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     @Override
-    public IPort getPort(int port, ContainerAccess access) {
+    public IPort<?> getPort(int port, ContainerAccess access) {
         if (!hasPort(port)) {
             return IPort.EMPTY;
         }

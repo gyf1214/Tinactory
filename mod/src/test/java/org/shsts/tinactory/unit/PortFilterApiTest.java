@@ -19,7 +19,7 @@ class PortFilterApiTest {
     @Test
     void itemPortShouldSupportTypedFilterAccessFromPort() {
         var port = new TestItemPort();
-        IPort base = port;
+        IPort<?> base = port;
         IPortFilter<ItemStack> filter = base.asFilter();
 
         filter.setFilters(List.<Predicate<ItemStack>>of($ -> true));

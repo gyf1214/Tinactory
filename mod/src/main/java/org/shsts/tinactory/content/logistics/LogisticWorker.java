@@ -101,7 +101,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             .map(LogisticWorkerConfig::fromTag);
     }
 
-    private static Optional<IPort> getPort(LogisticComponent logistic, BlockPos subnet,
+    private static Optional<IPort<?>> getPort(LogisticComponent logistic, BlockPos subnet,
         LogisticComponent.PortKey key) {
         return logistic.getPort(key, subnet)
             .map(LogisticComponent.PortInfo::port);

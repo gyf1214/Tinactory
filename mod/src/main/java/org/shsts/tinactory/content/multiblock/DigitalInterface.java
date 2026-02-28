@@ -105,7 +105,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
         }
 
-        public IPort port(ContainerAccess access) {
+        public IPort<?> port(ContainerAccess access) {
             return switch (type.portType) {
                 case ITEM -> itemPort.get(access);
                 case FLUID -> fluidPort.get(access);
@@ -251,7 +251,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public IPort getPort(int port, ContainerAccess access) {
+    public IPort<?> getPort(int port, ContainerAccess access) {
         return storages.get(port).port(access);
     }
 

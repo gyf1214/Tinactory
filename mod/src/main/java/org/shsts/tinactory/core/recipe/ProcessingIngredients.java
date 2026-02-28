@@ -41,7 +41,7 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
             if (!(port instanceof IItemPort item)) {
                 return Optional.empty();
             }
@@ -71,7 +71,7 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
             if (!(port instanceof IItemPort item)) {
                 return Optional.empty();
             }
@@ -132,7 +132,7 @@ public final class ProcessingIngredients {
         }
 
         @Override
-        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
             if (!(port instanceof IFluidPort fluidPort)) {
                 return Optional.empty();
             }

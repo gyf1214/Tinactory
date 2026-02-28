@@ -70,7 +70,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         return machineConfig.getBoolean(VOID_KEY, VOID_DEFAULT);
     }
 
-    protected void registerPort(INetwork network, IPort port) {
+    protected void registerPort(INetwork network, IPort<?> port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine, 0);
         logistics.registerStoragePort(machine, 0, port,

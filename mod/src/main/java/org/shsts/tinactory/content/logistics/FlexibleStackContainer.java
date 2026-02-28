@@ -218,7 +218,7 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     @Override
-    public IPort getPort(int port, ContainerAccess access) {
+    public IPort<?> getPort(int port, ContainerAccess access) {
         return ports.get(port).get(access);
     }
 

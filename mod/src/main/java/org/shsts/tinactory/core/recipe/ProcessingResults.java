@@ -32,7 +32,7 @@ import java.util.function.Function;
 public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
 
-    public abstract static class RatedResult<T extends IPort> implements IProcessingResult {
+    public abstract static class RatedResult<T extends IPort<?>> implements IProcessingResult {
         public final double rate;
         private final PortType portType;
         private final Class<T> portClazz;
@@ -59,7 +59,7 @@ public final class ProcessingResults {
             Random random, boolean simulate);
 
         @Override
-        public Optional<IProcessingResult> insertPort(IPort port, int parallel,
+        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel,
             Random random, boolean simulate) {
             if (portClazz.isInstance(port)) {
                 var port1 = portClazz.cast(port);
