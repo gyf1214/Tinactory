@@ -129,11 +129,10 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
-        csv.required = false
+        csv.required = true
     }
     classDirectories.setFrom(files(
-        fileTree(dir: "$buildDir/classes/java/main", include: ['org/shsts/tinactory/core/**']),
-        fileTree(dir: "$buildDir/classes/kotlin/main", include: ['org/shsts/tinactory/core/**'])
+            fileTree(dir: "$buildDir/classes/java/main", include: ['org/shsts/tinactory/core/**'])
     ))
 }
 
