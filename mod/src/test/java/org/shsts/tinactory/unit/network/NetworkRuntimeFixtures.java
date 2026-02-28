@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.network;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -117,7 +118,7 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
+        public void putBlock(BlockPos pos, @Nullable BlockState state, BlockPos subnet) {
             events.add("component.putBlock:" + pos + "->" + subnet);
         }
 
@@ -247,16 +248,6 @@ final class NetworkRuntimeFixtures {
 
         @Override
         public Component title() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public ItemStack icon() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public BlockEntity blockEntity() {
             throw new UnsupportedOperationException();
         }
 

@@ -132,7 +132,7 @@ public class Network implements INetwork {
     private void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
             world.dimension(), pos, subnet);
-        runtime.putBlock(pos, state, subnet);
+        runtime.putBlock(pos, subnet, component -> component.putBlock(pos, state, subnet));
         if (state.getBlock() instanceof SmartEntityBlock entityBlock) {
             entityBlock.getBlockEntity(world, pos)
                 .flatMap(MACHINE::tryGet)

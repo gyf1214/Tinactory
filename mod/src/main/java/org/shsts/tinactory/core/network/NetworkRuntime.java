@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
@@ -17,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
@@ -66,10 +66,10 @@ public final class NetworkRuntime {
         subnetMachines.put(subnet, machine);
     }
 
-    public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
+    public void putBlock(BlockPos pos, BlockPos subnet, Consumer<INetworkComponent> componentCallback) {
         blockSubnets.put(pos, subnet);
         for (var component : components.values()) {
-            component.putBlock(pos, state, subnet);
+            componentCallback.accept(component);
         }
     }
 

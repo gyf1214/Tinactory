@@ -1,7 +1,6 @@
 package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.network.NetworkRuntime;
 
@@ -24,7 +23,7 @@ class NetworkRuntimeTest {
         var subnet = new BlockPos(7, 8, 9);
 
         runtime.attachComponent(type, ticker -> () -> ticker.tick(null, null));
-        runtime.putBlock(block, (BlockState) null, subnet);
+        runtime.putBlock(block, subnet, component1 -> component1.putBlock(block, null, subnet));
 
         assertSame(component, runtime.getComponent(type));
         assertSame(subnet, runtime.getSubnet(block));
@@ -75,7 +74,7 @@ class NetworkRuntimeTest {
         var block = new BlockPos(0, 0, 2);
 
         runtime.putMachine(subnet, machine);
-        runtime.putBlock(block, (BlockState) null, subnet);
+        runtime.putBlock(block, subnet, component -> component.putBlock(block, null, subnet));
         runtime.onDisconnect(true);
 
         assertTrue(runtime.allMachines().isEmpty());
