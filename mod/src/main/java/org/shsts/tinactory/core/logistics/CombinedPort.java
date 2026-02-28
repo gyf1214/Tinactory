@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.logistics;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.slf4j.Logger;
@@ -16,28 +17,26 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
+public class CombinedPort<T> implements IPortFilter<T>, IPortNotifier {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final IPortAccess<T, P> portAccess;
     private final IStackAdapter<T> stackAdapter;
     private final Set<Runnable> updateListeners = new HashSet<>();
-    protected final List<P> composes = new ArrayList<>();
+    protected final List<IPort<T>> composes = new ArrayList<>();
     protected final Runnable combinedListener = this::invokeUpdate;
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedPort(IPortAccess<T, P> portAccess, IStackAdapter<T> stackAdapter, Collection<P> composes) {
-        this.portAccess = portAccess;
+    public CombinedPort(IStackAdapter<T> stackAdapter, Collection<IPort<T>> composes) {
         this.stackAdapter = stackAdapter;
         addComposes(composes);
     }
 
-    public CombinedPort(IPortAccess<T, P> portAccess, IStackAdapter<T> stackAdapter) {
-        this(portAccess, stackAdapter, List.of());
+    public CombinedPort(IStackAdapter<T> stackAdapter) {
+        this(stackAdapter, List.of());
     }
 
-    private void addComposes(Collection<P> values) {
+    private void addComposes(Collection<IPort<T>> values) {
         composes.clear();
         composes.addAll(values);
         for (var compose : composes) {
@@ -47,7 +46,7 @@ public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
         }
     }
 
-    public void setComposes(Collection<P> values) {
+    public void setComposes(Collection<IPort<T>> values) {
         for (var compose : composes) {
             if (compose instanceof IPortNotifier notifier) {
                 notifier.unregisterListener(combinedListener);
@@ -58,11 +57,11 @@ public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
     }
 
     public boolean acceptInput(T stack) {
-        return allowInput && composes.stream().anyMatch($ -> portAccess.acceptInput($, stack));
+        return allowInput && composes.stream().anyMatch($ -> $.acceptInput(stack));
     }
 
     public boolean acceptOutput() {
-        return allowOutput && composes.stream().anyMatch(portAccess::acceptOutput);
+        return allowOutput && composes.stream().anyMatch(IPort::acceptOutput);
     }
 
     public T insert(T stack, boolean simulate) {
@@ -74,7 +73,7 @@ public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
             if (stackAdapter.isEmpty(stack1)) {
                 break;
             }
-            stack1 = portAccess.insert(compose, stack1, simulate);
+            stack1 = compose.insert(stack1, simulate);
         }
         return stack1;
     }
@@ -89,7 +88,7 @@ public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
             if (stackAdapter.isEmpty(stack1)) {
                 break;
             }
-            var extracted = portAccess.extract(compose, stack1, simulate);
+            var extracted = compose.extract(stack1, simulate);
             if (!stackAdapter.isEmpty(extracted)) {
                 if (stackAdapter.isEmpty(ret)) {
                     ret = extracted;
@@ -112,15 +111,15 @@ public class CombinedPort<T, P> implements IPortFilter<T>, IPortNotifier {
         if (!allowOutput || limit <= 0 || composes.isEmpty()) {
             return stackAdapter.empty();
         }
-        return portAccess.extract(composes.get(0), limit, simulate);
+        return composes.get(0).extract(limit, simulate);
     }
 
     public int getStorageAmount(T stack) {
-        return composes.stream().mapToInt($ -> portAccess.getStorageAmount($, stack)).sum();
+        return composes.stream().mapToInt($ -> $.getStorageAmount(stack)).sum();
     }
 
     public Collection<T> getAllStorages() {
-        return composes.stream().flatMap($ -> portAccess.getAllStorages($).stream()).toList();
+        return composes.stream().flatMap($ -> $.getAllStorages().stream()).toList();
     }
 
     @Override

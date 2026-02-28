@@ -11,44 +11,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> implements IPort<ItemStack> {
-    private static final IPortAccess<ItemStack, IPort<ItemStack>> PORT_ACCESS = new IPortAccess<>() {
-        @Override
-        public boolean acceptInput(IPort<ItemStack> port, ItemStack stack) {
-            return port.acceptInput(stack);
-        }
-
-        @Override
-        public boolean acceptOutput(IPort<ItemStack> port) {
-            return port.acceptOutput();
-        }
-
-        @Override
-        public ItemStack insert(IPort<ItemStack> port, ItemStack stack, boolean simulate) {
-            return port.insert(stack, simulate);
-        }
-
-        @Override
-        public ItemStack extract(IPort<ItemStack> port, ItemStack stack, boolean simulate) {
-            return port.extract(stack, simulate);
-        }
-
-        @Override
-        public ItemStack extract(IPort<ItemStack> port, int limit, boolean simulate) {
-            return port.extract(limit, simulate);
-        }
-
-        @Override
-        public int getStorageAmount(IPort<ItemStack> port, ItemStack stack) {
-            return port.getStorageAmount(stack);
-        }
-
-        @Override
-        public Collection<ItemStack> getAllStorages(IPort<ItemStack> port) {
-            return port.getAllStorages();
-        }
-    };
-
+public class CombinedItemPort extends CombinedPort<ItemStack> implements IPort<ItemStack> {
     private static final IStackAdapter<ItemStack> STACK_ADAPTER = new IStackAdapter<>() {
         @Override
         public ItemStack empty() {
@@ -87,11 +50,11 @@ public class CombinedItemPort extends CombinedPort<ItemStack, IPort<ItemStack>> 
     };
 
     public CombinedItemPort(IPort<ItemStack>... composes) {
-        super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
+        super(STACK_ADAPTER, Arrays.asList(composes));
     }
 
     public CombinedItemPort() {
-        super(PORT_ACCESS, STACK_ADAPTER);
+        super(STACK_ADAPTER);
     }
 
     @Override

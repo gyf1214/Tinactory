@@ -11,44 +11,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack>> implements IPort<FluidStack> {
-    private static final IPortAccess<FluidStack, IPort<FluidStack>> PORT_ACCESS = new IPortAccess<>() {
-        @Override
-        public boolean acceptInput(IPort<FluidStack> port, FluidStack stack) {
-            return port.acceptInput(stack);
-        }
-
-        @Override
-        public boolean acceptOutput(IPort<FluidStack> port) {
-            return port.acceptOutput();
-        }
-
-        @Override
-        public FluidStack insert(IPort<FluidStack> port, FluidStack stack, boolean simulate) {
-            return port.insert(stack, simulate);
-        }
-
-        @Override
-        public FluidStack extract(IPort<FluidStack> port, FluidStack stack, boolean simulate) {
-            return port.extract(stack, simulate);
-        }
-
-        @Override
-        public FluidStack extract(IPort<FluidStack> port, int limit, boolean simulate) {
-            return port.extract(limit, simulate);
-        }
-
-        @Override
-        public int getStorageAmount(IPort<FluidStack> port, FluidStack stack) {
-            return port.getStorageAmount(stack);
-        }
-
-        @Override
-        public Collection<FluidStack> getAllStorages(IPort<FluidStack> port) {
-            return port.getAllStorages();
-        }
-    };
-
+public class CombinedFluidPort extends CombinedPort<FluidStack> implements IPort<FluidStack> {
     private static final IStackAdapter<FluidStack> STACK_ADAPTER = new IStackAdapter<>() {
         @Override
         public FluidStack empty() {
@@ -87,11 +50,11 @@ public class CombinedFluidPort extends CombinedPort<FluidStack, IPort<FluidStack
     };
 
     public CombinedFluidPort(IPort<FluidStack>... composes) {
-        super(PORT_ACCESS, STACK_ADAPTER, Arrays.asList(composes));
+        super(STACK_ADAPTER, Arrays.asList(composes));
     }
 
     public CombinedFluidPort() {
-        super(PORT_ACCESS, STACK_ADAPTER);
+        super(STACK_ADAPTER);
     }
 
     @Override
