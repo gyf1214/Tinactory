@@ -19,9 +19,12 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.PortTransmitter;
 import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -47,6 +50,10 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 public class LogisticWorker extends CapabilityProvider implements IEventSubscriber {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "logistics/logistic_worker";
+    private static final PortTransmitter<ItemStack> ITEM_TRANSMITTER =
+        new PortTransmitter<>(ItemPortAdapter.INSTANCE);
+    private static final PortTransmitter<FluidStack> FLUID_TRANSMITTER =
+        new PortTransmitter<>(FluidPortAdapter.INSTANCE);
 
     private final BlockEntity blockEntity;
     public final int workerSlots;
@@ -167,24 +174,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack testTransmitItem(IPort<ItemStack> from, IPort<ItemStack> to, ItemStack stack) {
-        var stack1 = StackHelper.copyWithCount(stack, workerStack);
-        var stack2 = from.extract(stack1, true);
-        var remaining = to.insert(stack2, true);
-        var limit = stack2.getCount() - remaining.getCount();
-        if (limit > 0) {
-            stack2.setCount(limit);
-            return stack2;
-        } else {
-            return ItemStack.EMPTY;
-        }
-    }
-
     private ItemStack selectTransmittedItem(IPort<ItemStack> from, IPort<ItemStack> to,
         LogisticWorkerConfig config) {
         var filterType = config.filterType();
         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-            return testTransmitItem(from, to, config.itemFilter());
+            return ITEM_TRANSMITTER.probe(from, to, config.itemFilter(), workerStack);
         }
 
         Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
@@ -193,7 +187,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             if (!filter.test(stack)) {
                 continue;
             }
-            var stack1 = testTransmitItem(from, to, stack);
+            var stack1 = ITEM_TRANSMITTER.probe(from, to, stack, workerStack);
             if (!stack1.isEmpty()) {
                 return stack1;
             }
@@ -206,34 +200,20 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (stack.isEmpty()) {
             return;
         }
-        var stack1 = from.extract(stack, false);
-        var remaining = to.insert(stack1, false);
+        var remaining = ITEM_TRANSMITTER.transmit(from, to, stack);
         if (!remaining.isEmpty()) {
             LOGGER.warn("transmit item failed from={} to={} content={}", from, to, stack);
-        }
-    }
-
-    private FluidStack testTransmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack stack) {
-        var stack1 = StackHelper.copyWithAmount(stack, workerFluidStack);
-        var stack2 = from.extract(stack1, true);
-        var remaining = to.insert(stack2, true);
-        var limit = stack2.getAmount() - remaining.getAmount();
-        if (limit > 0) {
-            stack2.setAmount(limit);
-            return stack2;
-        } else {
-            return FluidStack.EMPTY;
         }
     }
 
     private FluidStack selectTransmittedFluid(IPort<FluidStack> from, IPort<FluidStack> to,
         FluidStack filter) {
         if (!filter.isEmpty()) {
-            return testTransmitFluid(from, to, filter);
+            return FLUID_TRANSMITTER.probe(from, to, filter, workerFluidStack);
         }
 
         for (var stack : from.getAllStorages()) {
-            var stack1 = testTransmitFluid(from, to, stack);
+            var stack1 = FLUID_TRANSMITTER.probe(from, to, stack, workerFluidStack);
             if (!stack1.isEmpty()) {
                 return stack1;
             }
@@ -243,8 +223,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
         var stack = selectTransmittedFluid(from, to, filter);
-        var stack1 = from.extract(stack, false);
-        var remaining = to.insert(stack1, false);
+        var remaining = FLUID_TRANSMITTER.transmit(from, to, stack);
         if (!remaining.isEmpty()) {
             LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
         }
