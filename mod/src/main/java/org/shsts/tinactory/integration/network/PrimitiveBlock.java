@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.network;
+package org.shsts.tinactory.integration.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -16,7 +16,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 /**
  * Entity block that has a facing but do not connect to a network.

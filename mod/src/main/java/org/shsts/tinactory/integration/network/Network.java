@@ -14,8 +14,6 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
-import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkRuntime;

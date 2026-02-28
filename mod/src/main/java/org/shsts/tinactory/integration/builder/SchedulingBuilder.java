@@ -1,9 +1,10 @@
-package org.shsts.tinactory.core.builder;
+package org.shsts.tinactory.integration.builder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
-import org.shsts.tinactory.core.network.Scheduling;
+import org.shsts.tinactory.core.builder.Builder;
+import org.shsts.tinactory.integration.network.Scheduling;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 

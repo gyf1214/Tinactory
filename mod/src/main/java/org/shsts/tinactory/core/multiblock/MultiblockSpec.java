@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.network.PrimitiveBlock;
+import org.shsts.tinactory.integration.network.PrimitiveBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;

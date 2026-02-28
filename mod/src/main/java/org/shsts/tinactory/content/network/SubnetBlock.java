@@ -20,9 +20,9 @@ import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.network.CableBlock;
-import org.shsts.tinactory.core.network.IConnector;
 import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.integration.network.CableBlock;
+import org.shsts.tinactory.integration.network.IConnector;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 
 import java.util.List;
@@ -30,9 +30,9 @@ import java.util.function.Function;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.TinactoryConfig.listConfig;
-import static org.shsts.tinactory.core.network.MachineBlock.IO_FACING;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.network.MachineBlock.IO_FACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

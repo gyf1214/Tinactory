@@ -36,7 +36,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 /**
  * Machine that can run without a network.

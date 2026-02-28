@@ -42,7 +42,7 @@ import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

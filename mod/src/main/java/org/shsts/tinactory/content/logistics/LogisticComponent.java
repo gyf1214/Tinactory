@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitResult;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

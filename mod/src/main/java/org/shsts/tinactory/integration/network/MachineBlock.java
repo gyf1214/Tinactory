@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.network;
+package org.shsts.tinactory.integration.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -25,7 +25,6 @@ import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.tool.IWrenchable;
-import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 

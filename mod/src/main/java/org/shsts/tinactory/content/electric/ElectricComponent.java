@@ -9,9 +9,9 @@ import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.metrics.MetricsManager;
-import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.NetworkComponent;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.network.ComponentType;
+import org.shsts.tinactory.integration.network.NetworkComponent;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

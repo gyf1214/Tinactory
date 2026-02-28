@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.network.MachineBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;

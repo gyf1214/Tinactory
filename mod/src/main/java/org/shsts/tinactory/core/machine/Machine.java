@@ -65,7 +65,7 @@ import static org.shsts.tinactory.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.WORK_SCHEDULING;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

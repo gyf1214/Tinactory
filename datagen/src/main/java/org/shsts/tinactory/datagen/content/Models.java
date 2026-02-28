@@ -21,11 +21,11 @@ import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.material.OreVariant;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
-import org.shsts.tinactory.core.network.CableBlock;
-import org.shsts.tinactory.core.network.MachineBlock;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
 import org.shsts.tinactory.datagen.content.model.MachineModel;
+import org.shsts.tinactory.integration.network.CableBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Map;

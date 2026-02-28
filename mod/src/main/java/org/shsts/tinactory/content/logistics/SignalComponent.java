@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
