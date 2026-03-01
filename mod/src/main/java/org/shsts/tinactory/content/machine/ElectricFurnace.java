@@ -17,7 +17,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
-import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
