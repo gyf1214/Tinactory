@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
+import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.core.logistics.StackHelper;
 
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;

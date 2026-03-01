@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.logistics;
+package org.shsts.tinactory.integration.logistics;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;

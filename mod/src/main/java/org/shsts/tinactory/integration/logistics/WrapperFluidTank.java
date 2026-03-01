@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.logistics;
+package org.shsts.tinactory.integration.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -9,6 +9,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import org.shsts.tinactory.core.logistics.PortNotifier;
 
 import java.util.function.Predicate;
 
