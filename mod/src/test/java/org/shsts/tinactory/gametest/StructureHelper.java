@@ -1,4 +1,4 @@
-package org.shsts.tinactory.test;
+package org.shsts.tinactory.gametest;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

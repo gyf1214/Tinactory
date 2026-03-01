@@ -1,4 +1,4 @@
-package org.shsts.tinactory.test;
+package org.shsts.tinactory.gametest;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -9,11 +9,6 @@ import org.shsts.tinactory.api.TinactoryKeys;
 public final class TinactoryTest {
     @GameTest
     public static void testSucceed(GameTestHelper helper) {
-        helper.succeed();
-    }
-
-    @GameTest
-    public static void autocraftTerminalShouldRequestPreviewThenExecute(GameTestHelper helper) {
         helper.succeed();
     }
 }

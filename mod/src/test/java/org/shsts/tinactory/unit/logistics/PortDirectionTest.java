@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit;
+package org.shsts.tinactory.unit.logistics;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
