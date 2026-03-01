@@ -34,29 +34,29 @@ public final class StoragePorts {
         return new FluidStorage(provider);
     }
 
-    public static ItemCombinedPort combinedItem() {
+    public static CombinedPort<ItemStack> combinedItem() {
         return new ItemCombinedPort();
     }
 
     @SafeVarargs
-    public static ItemCombinedPort combinedItem(IPort<ItemStack>... composes) {
+    public static CombinedPort<ItemStack> combinedItem(IPort<ItemStack>... composes) {
         return combinedItem(Arrays.asList(composes));
     }
 
-    public static ItemCombinedPort combinedItem(Collection<IPort<ItemStack>> composes) {
+    public static CombinedPort<ItemStack> combinedItem(Collection<IPort<ItemStack>> composes) {
         return new ItemCombinedPort(composes);
     }
 
-    public static FluidCombinedPort combinedFluid() {
+    public static CombinedPort<FluidStack> combinedFluid() {
         return new FluidCombinedPort();
     }
 
     @SafeVarargs
-    public static FluidCombinedPort combinedFluid(IPort<FluidStack>... composes) {
+    public static CombinedPort<FluidStack> combinedFluid(IPort<FluidStack>... composes) {
         return combinedFluid(Arrays.asList(composes));
     }
 
-    public static FluidCombinedPort combinedFluid(Collection<IPort<FluidStack>> composes) {
+    public static CombinedPort<FluidStack> combinedFluid(Collection<IPort<FluidStack>> composes) {
         return new FluidCombinedPort(composes);
     }
 
@@ -116,7 +116,7 @@ public final class StoragePorts {
         }
     }
 
-    public static class ItemCombinedPort extends CombinedPort<ItemStack> implements IItemPort {
+    private static class ItemCombinedPort extends CombinedPort<ItemStack> implements IItemPort {
         private ItemCombinedPort() {
             super(ItemPortAdapter.INSTANCE);
         }
@@ -126,7 +126,7 @@ public final class StoragePorts {
         }
     }
 
-    public static class FluidCombinedPort extends CombinedPort<FluidStack> implements IFluidPort {
+    private static class FluidCombinedPort extends CombinedPort<FluidStack> implements IFluidPort {
         private FluidCombinedPort() {
             super(FluidPortAdapter.INSTANCE);
         }

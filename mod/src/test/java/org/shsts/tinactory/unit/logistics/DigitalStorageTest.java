@@ -1,60 +1,32 @@
 package org.shsts.tinactory.unit.logistics;
 
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.DigitalStorage;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
-import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DigitalStorageTest {
-    private static final IStackAdapter<TestStack> STACK_ADAPTER = new IStackAdapter<>() {
-        @Override
-        public TestStack empty() {
-            return new TestStack("", 0);
+    private static class TestStorage extends DigitalStorage<TestStack> {
+        public TestStorage(IDigitalProvider provider, int bytesPerType, int bytesPerUnit) {
+            super(provider, TestStack.ADAPTER, bytesPerType, bytesPerUnit);
         }
 
         @Override
-        public boolean isEmpty(TestStack stack) {
-            return stack.amount() <= 0;
+        public PortType type() {
+            return PortType.ITEM;
         }
-
-        @Override
-        public TestStack copy(TestStack stack) {
-            return stack.copy();
-        }
-
-        @Override
-        public int amount(TestStack stack) {
-            return stack.amount();
-        }
-
-        @Override
-        public TestStack withAmount(TestStack stack, int amount) {
-            return new TestStack(stack.id(), amount);
-        }
-
-        @Override
-        public boolean canStack(TestStack left, TestStack right) {
-            return Objects.equals(left.id(), right.id());
-        }
-
-        @Override
-        public IIngredientKey keyOf(TestStack stack) {
-            return new TestKey(stack.id());
-        }
-    };
+    }
 
     @Test
     void shouldTrackBytesAndRemainderForInsertAndExtract() {
         var provider = new FakeDigitalProvider(20);
-        var storage = new DigitalStorage<>(provider, STACK_ADAPTER, 4, 2);
+        var storage = new TestStorage(provider, 4, 2);
 
         var firstRemainder = storage.insert(new TestStack("iron", 5), false);
         var secondRemainder = storage.insert(new TestStack("iron", 5), false);
@@ -74,7 +46,7 @@ class DigitalStorageTest {
     @Test
     void shouldHonorFilters() {
         var provider = new FakeDigitalProvider(20);
-        var storage = new DigitalStorage<>(provider, STACK_ADAPTER, 2, 1);
+        var storage = new TestStorage(provider, 2, 1);
         storage.setFilters(List.of(stack -> stack.id().equals("gold")));
 
         var blocked = storage.insert(new TestStack("iron", 1), false);
@@ -89,7 +61,7 @@ class DigitalStorageTest {
     @Test
     void shouldNotMutateStateWhenSimulating() {
         var provider = new FakeDigitalProvider(20);
-        var storage = new DigitalStorage<>(provider, STACK_ADAPTER, 2, 1);
+        var storage = new TestStorage(provider, 2, 1);
         storage.insert(new TestStack("iron", 3), false);
 
         var insertRemainder = storage.insert(new TestStack("iron", 10), true);
@@ -104,7 +76,7 @@ class DigitalStorageTest {
     @Test
     void extractAnyShouldDrainFirstEntryWithinLimit() {
         var provider = new FakeDigitalProvider(100);
-        var storage = new DigitalStorage<>(provider, STACK_ADAPTER, 3, 1);
+        var storage = new TestStorage(provider, 3, 1);
         storage.insert(new TestStack("iron", 4), false);
 
         var extracted = storage.extract(2, false);
@@ -113,14 +85,6 @@ class DigitalStorageTest {
         assertEquals(2, extracted.amount());
         assertEquals(2, storage.getStorageAmount(new TestStack("iron", 1)));
     }
-
-    private record TestStack(String id, int amount) {
-        private TestStack copy() {
-            return new TestStack(id, amount);
-        }
-    }
-
-    private record TestKey(String id) implements IIngredientKey {}
 
     private static final class FakeDigitalProvider implements IDigitalProvider {
         private final int capacity;

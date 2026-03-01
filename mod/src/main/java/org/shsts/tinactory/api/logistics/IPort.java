@@ -25,18 +25,18 @@ public interface IPort<T> {
     }
 
     @SuppressWarnings("unchecked")
+    default IPort<FluidStack> asFluid() {
+        assert type() == PortType.FLUID;
+        return (IPort<FluidStack>) this;
+    }
+
+    @SuppressWarnings("unchecked")
     default IPortFilter<T> asFilter() {
         assert type() != PortType.NONE;
         if (this instanceof IPortFilter<?> filter) {
             return (IPortFilter<T>) filter;
         }
         throw new UnsupportedOperationException("Port does not support filters");
-    }
-
-    @SuppressWarnings("unchecked")
-    default IPort<FluidStack> asFluid() {
-        assert type() == PortType.FLUID;
-        return (IPort<FluidStack>) this;
     }
 
     boolean acceptInput(T stack);

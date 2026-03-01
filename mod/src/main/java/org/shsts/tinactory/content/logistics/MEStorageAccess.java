@@ -4,17 +4,18 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.api.electric.IElectricMachine;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -33,8 +34,8 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @MethodsReturnNonnullByDefault
 public abstract class MEStorageAccess extends CapabilityProvider implements IEventSubscriber {
     protected final BlockEntity blockEntity;
-    protected final StoragePorts.ItemCombinedPort combinedItem;
-    protected final StoragePorts.FluidCombinedPort combinedFluid;
+    protected final CombinedPort<ItemStack> combinedItem;
+    protected final CombinedPort<FluidStack> combinedFluid;
     private final LazyOptional<IElectricMachine> electricCap;
 
     protected IMachine machine;

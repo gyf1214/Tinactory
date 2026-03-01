@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 
 import java.util.Collection;
@@ -13,7 +14,7 @@ import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class DigitalStorage<T> extends PortNotifier implements IPortFilter<T> {
+public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>, IPortFilter<T> {
     private final IDigitalProvider provider;
     private final IStackAdapter<T> stackAdapter;
     private final int bytesPerType;

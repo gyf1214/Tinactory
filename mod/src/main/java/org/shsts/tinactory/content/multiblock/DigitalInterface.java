@@ -8,16 +8,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.logistics.ContainerPort;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
@@ -51,12 +54,12 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
         private final StoragePorts.ItemStorage internalItem;
-        private final StoragePorts.ItemCombinedPort menuItem;
-        private final StoragePorts.ItemCombinedPort externalItem;
+        private final CombinedPort<ItemStack> menuItem;
+        private final CombinedPort<ItemStack> externalItem;
         private final ContainerPort itemPort;
-        private final StoragePorts.FluidCombinedPort menuFluid;
         private final StoragePorts.FluidStorage internalFluid;
-        private final StoragePorts.FluidCombinedPort externalFluid;
+        private final CombinedPort<FluidStack> menuFluid;
+        private final CombinedPort<FluidStack> externalFluid;
         private final ContainerPort fluidPort;
         public SlotType type;
         private int bytesUsed;
