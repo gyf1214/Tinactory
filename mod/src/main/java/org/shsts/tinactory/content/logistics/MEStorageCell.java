@@ -18,13 +18,14 @@ import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.logistics.DigitalProvider;
+import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
 import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
@@ -56,7 +57,7 @@ public class MEStorageCell extends CapabilityItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world,
         List<Component> tooltip, TooltipFlag isAdvanced) {
-        stack.getCapability(DIGITAL_PROVIDER.get())
+        stack.getCapability(BYTES_PROVIDER.get())
             .ifPresent(provider -> addTooltip(tooltip, "meStorageCell",
                 NUMBER_FORMAT.format(provider.bytesUsed()), NUMBER_FORMAT.format(bytesLimit)));
     }
@@ -65,7 +66,7 @@ public class MEStorageCell extends CapabilityItem {
         private final IDigitalProvider provider;
         private final StoragePorts.ItemStorage storage;
         private final LazyOptional<IItemPort> itemCap;
-        private final LazyOptional<IDigitalProvider> providerCap;
+        private final LazyOptional<IBytesProvider> providerCap;
 
         public ItemCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
@@ -91,7 +92,7 @@ public class MEStorageCell extends CapabilityItem {
         public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
             if (cap == ITEM_PORT.get()) {
                 return itemCap.cast();
-            } else if (cap == DIGITAL_PROVIDER.get()) {
+            } else if (cap == BYTES_PROVIDER.get()) {
                 return providerCap.cast();
             }
             return LazyOptional.empty();
@@ -102,7 +103,7 @@ public class MEStorageCell extends CapabilityItem {
         private final IDigitalProvider provider;
         private final StoragePorts.FluidStorage storage;
         private final LazyOptional<IFluidPort> fluidCap;
-        private final LazyOptional<IDigitalProvider> providerCap;
+        private final LazyOptional<IBytesProvider> providerCap;
 
         protected FluidCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
@@ -128,7 +129,7 @@ public class MEStorageCell extends CapabilityItem {
         public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
             if (cap == FLUID_PORT.get()) {
                 return fluidCap.cast();
-            } else if (cap == DIGITAL_PROVIDER.get()) {
+            } else if (cap == BYTES_PROVIDER.get()) {
                 return providerCap.cast();
             }
             return LazyOptional.empty();

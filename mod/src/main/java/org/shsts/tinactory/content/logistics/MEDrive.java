@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
-import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
 import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
@@ -130,7 +129,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (storage.isEmpty()) {
                 continue;
             }
-            storage.getCapability(DIGITAL_PROVIDER.get()).ifPresent(digital::add);
+            storage.getCapability(BYTES_PROVIDER.get()).ifPresent(digital::add);
             storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
         }
         return aggregateByteStats(digital, patterns);
