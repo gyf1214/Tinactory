@@ -14,7 +14,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

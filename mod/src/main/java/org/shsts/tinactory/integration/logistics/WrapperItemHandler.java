@@ -10,8 +10,8 @@ import org.shsts.tinactory.core.logistics.PortNotifier;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FILTER;
-import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FILTER;
+import static org.shsts.tinactory.integration.logistics.StackHelper.FALSE_FILTER;
+import static org.shsts.tinactory.integration.logistics.StackHelper.TRUE_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

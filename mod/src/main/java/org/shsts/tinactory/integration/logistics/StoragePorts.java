@@ -14,7 +14,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.logistics.DigitalStorage;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
-import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Arrays;
 import java.util.Collection;

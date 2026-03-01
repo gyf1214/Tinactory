@@ -15,7 +15,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import java.util.Optional;

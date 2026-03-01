@@ -11,7 +11,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;

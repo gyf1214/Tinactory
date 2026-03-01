@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.logistics;
+package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;

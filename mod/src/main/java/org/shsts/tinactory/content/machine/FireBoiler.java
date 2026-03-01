@@ -13,9 +13,9 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.List;

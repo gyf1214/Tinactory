@@ -12,7 +12,7 @@ import net.minecraftforge.network.NetworkEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 

@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.logistics.StackHelper;
 
 import java.util.Objects;
 

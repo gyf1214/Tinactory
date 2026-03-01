@@ -18,7 +18,7 @@ import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.core.gui.InventoryMenu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;

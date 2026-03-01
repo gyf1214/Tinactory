@@ -13,8 +13,8 @@ import org.shsts.tinactory.core.logistics.PortNotifier;
 
 import java.util.function.Predicate;
 
-import static org.shsts.tinactory.core.logistics.StackHelper.FALSE_FLUID_FILTER;
-import static org.shsts.tinactory.core.logistics.StackHelper.TRUE_FLUID_FILTER;
+import static org.shsts.tinactory.integration.logistics.StackHelper.FALSE_FLUID_FILTER;
+import static org.shsts.tinactory.integration.logistics.StackHelper.TRUE_FLUID_FILTER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

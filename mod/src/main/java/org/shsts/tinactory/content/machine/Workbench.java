@@ -23,7 +23,7 @@ import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
