@@ -19,8 +19,8 @@ import org.shsts.tinactory.core.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Optional;
 

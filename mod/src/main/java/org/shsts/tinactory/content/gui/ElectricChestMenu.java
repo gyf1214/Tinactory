@@ -9,7 +9,7 @@ import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

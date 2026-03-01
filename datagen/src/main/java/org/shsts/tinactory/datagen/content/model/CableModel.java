@@ -11,7 +11,7 @@ import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
-import org.shsts.tinactory.core.network.CableBlock;
+import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.datagen.api.context.IDataContext;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
@@ -19,16 +19,16 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.shsts.tinactory.core.network.CableBlock.PIPE_RADIUS;
-import static org.shsts.tinactory.core.network.CableBlock.RADIUS;
-import static org.shsts.tinactory.core.network.CableBlock.SMALL_WIRE_RADIUS;
-import static org.shsts.tinactory.core.network.CableBlock.WIRE_RADIUS;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.WHITE_TEX;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
+import static org.shsts.tinactory.integration.network.CableBlock.PIPE_RADIUS;
+import static org.shsts.tinactory.integration.network.CableBlock.RADIUS;
+import static org.shsts.tinactory.integration.network.CableBlock.SMALL_WIRE_RADIUS;
+import static org.shsts.tinactory.integration.network.CableBlock.WIRE_RADIUS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

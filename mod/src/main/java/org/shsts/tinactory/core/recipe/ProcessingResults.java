@@ -8,15 +8,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,16 +30,14 @@ import java.util.function.Function;
 public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
 
-    public abstract static class RatedResult<T extends IPort> implements IProcessingResult {
+    public abstract static class RatedResult<T> implements IProcessingResult {
         public final double rate;
         private final PortType portType;
-        private final Class<T> portClazz;
         private final String codecName;
 
-        public RatedResult(double rate, PortType portType, Class<T> portClazz, String codecName) {
+        public RatedResult(double rate, PortType portType, String codecName) {
             this.rate = rate;
             this.portType = portType;
-            this.portClazz = portClazz;
             this.codecName = codecName;
         }
 
@@ -55,35 +51,36 @@ public final class ProcessingResults {
             return portType;
         }
 
-        protected abstract Optional<IProcessingResult> doInsertPort(T port, int parallel,
+        protected abstract Optional<IProcessingResult> doInsertPort(IPort<T> port, int parallel,
             Random random, boolean simulate);
 
         @Override
-        public Optional<IProcessingResult> insertPort(IPort port, int parallel,
+        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel,
             Random random, boolean simulate) {
-            if (portClazz.isInstance(port)) {
-                var port1 = portClazz.cast(port);
-                if (rate < 1d && !simulate) {
-                    var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
-                    if (parallel1 <= 0) {
-                        return Optional.empty();
-                    }
-                    return doInsertPort(port1, parallel1, random, false);
-                } else {
-                    return doInsertPort(port1, parallel, random, simulate);
-                }
+            if (port.type() != portType) {
+                return Optional.empty();
             }
-            return Optional.empty();
+            @SuppressWarnings("unchecked")
+            var port1 = (IPort<T>) port;
+            if (rate < 1d && !simulate) {
+                var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
+                if (parallel1 <= 0) {
+                    return Optional.empty();
+                }
+                return doInsertPort(port1, parallel1, random, false);
+            } else {
+                return doInsertPort(port1, parallel, random, simulate);
+            }
         }
     }
 
-    public static class ItemResult extends RatedResult<IItemPort> {
+    public static class ItemResult extends RatedResult<ItemStack> {
         private static final String CODEC_NAME = "item_result";
 
         public final ItemStack stack;
 
         public ItemResult(double rate, ItemStack stack) {
-            super(rate, PortType.ITEM, IItemPort.class, CODEC_NAME);
+            super(rate, PortType.ITEM, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -92,11 +89,11 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected Optional<IProcessingResult> doInsertPort(IItemPort port, int parallel,
+        protected Optional<IProcessingResult> doInsertPort(IPort<ItemStack> port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
-            return port.insertItem(stack1, simulate).isEmpty() ?
-                Optional.of(new ItemResult(1d, stack1)) : Optional.empty();
+            return port.acceptInput(stack1) && port.insert(stack1, simulate).isEmpty() ?
+                Optional.of(new ItemResult(stack1)) : Optional.empty();
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -105,13 +102,13 @@ public final class ProcessingResults {
         ).apply(instance, ItemResult::new));
     }
 
-    public static class FluidResult extends RatedResult<IFluidPort> {
+    public static class FluidResult extends RatedResult<FluidStack> {
         private static final String CODEC_NAME = "fluid_result";
 
         public final FluidStack stack;
 
         public FluidResult(double rate, FluidStack stack) {
-            super(rate, PortType.FLUID, IFluidPort.class, CODEC_NAME);
+            super(rate, PortType.FLUID, CODEC_NAME);
             this.stack = stack;
         }
 
@@ -120,10 +117,10 @@ public final class ProcessingResults {
         }
 
         @Override
-        protected Optional<IProcessingResult> doInsertPort(IFluidPort port, int parallel,
+        protected Optional<IProcessingResult> doInsertPort(IPort<FluidStack> port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
-            return port.acceptInput(stack1) && port.fill(stack1, simulate) == stack1.getAmount() ?
+            return port.acceptInput(stack1) && port.insert(stack1, simulate).isEmpty() ?
                 Optional.of(new FluidResult(stack1)) : Optional.empty();
         }
 

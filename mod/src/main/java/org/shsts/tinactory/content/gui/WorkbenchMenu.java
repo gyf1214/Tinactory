@@ -9,7 +9,7 @@ import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.core.gui.LayoutMenu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import static org.shsts.tinactory.core.gui.Menu.EMPTY_CONTAINER;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;

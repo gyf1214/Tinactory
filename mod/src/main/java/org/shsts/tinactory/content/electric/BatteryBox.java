@@ -17,11 +17,11 @@ import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -35,7 +35,7 @@ import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

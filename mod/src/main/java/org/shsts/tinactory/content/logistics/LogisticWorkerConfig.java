@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Optional;
 import java.util.UUID;

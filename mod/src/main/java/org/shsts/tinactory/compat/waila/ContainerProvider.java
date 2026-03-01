@@ -1,0 +1,141 @@
+package org.shsts.tinactory.compat.waila;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import mcp.mobius.waila.api.BlockAccessor;
+import mcp.mobius.waila.api.IServerDataProvider;
+import mcp.mobius.waila.api.config.IPluginConfig;
+import mcp.mobius.waila.api.ui.IElement;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.items.IItemHandler;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import snownee.jade.Jade;
+import snownee.jade.JadeCommonConfig;
+import snownee.jade.VanillaPlugin;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.compat.waila.Waila.BYTES;
+import static org.shsts.tinactory.compat.waila.Waila.ENHANCE_ITEMS;
+import static org.shsts.tinactory.compat.waila.Waila.HIDE_EMPTY_TANK;
+import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class ContainerProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+    public static final ContainerProvider INSTANCE = new ContainerProvider();
+
+    private static final int BYTES_COLOR = 0xFFD400CD;
+
+    public ContainerProvider() {
+        super(modLoc("items"));
+    }
+
+    @Override
+    protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
+        // remove the fluid tooltip when it is completely empty.
+        // for some reason jade will add an "Empty" tooltip when there is a FluidHandler but no fluid inside.
+        if (config.get(HIDE_EMPTY_TANK) && tag.contains("jadeTanks", Tag.TAG_LIST)) {
+            var listTag = tag.getList("jadeTanks", Tag.TAG_COMPOUND);
+            if (listTag.size() == 1) {
+                var tag1 = (CompoundTag) listTag.get(0);
+                var fluid = FluidStack.loadFluidStackFromNBT(tag1);
+                if (fluid.isEmpty()) {
+                    tooltip.remove(VanillaPlugin.FORGE_FLUID);
+                }
+            }
+        }
+
+        if (config.get(ENHANCE_ITEMS) && tag.contains("tinactoryItems", Tag.TAG_LIST)) {
+            // remove Jade tooltip first
+            tooltip.remove(VanillaPlugin.INVENTORY);
+
+            // use the same logic as Jade, but with support of 64+ items and force show name.
+            var listTag = tag.getList("tinactoryItems", Tag.TAG_COMPOUND);
+            for (var itemTag : listTag) {
+                var line = new ArrayList<IElement>();
+
+                var stack = StackHelper.deserializeItemStack((CompoundTag) itemTag);
+                line.add(Jade.smallItem(helper, StackHelper.copyWithCount(stack, 1)));
+                // jade does not use a TranslatableComponent
+                var text = new TextComponent(NUMBER_FORMAT.format(stack.getCount()))
+                    .append("× ").append(stack.getHoverName());
+                line.add(helper.text(text).message(null));
+
+                add(line);
+            }
+        }
+
+        if (config.get(BYTES) && tag.contains("tinactoryBytesUsed")) {
+            var bytes = tag.getLong("tinactoryBytesUsed");
+            var capacity = tag.getLong("tinactoryBytesCapacity");
+            var text = tr("bytes", ClientUtil.getBytesString(bytes),
+                ClientUtil.getBytesString(capacity));
+            addProgress((float) bytes / (float) capacity, text, BYTES_COLOR);
+        }
+    }
+
+    private void appendItems(CompoundTag tag, IItemHandler items, boolean showDetails) {
+        // TODO: make is configurable
+        var limit = showDetails ? 9 : 4;
+
+        var itemMap = new HashMap<IIngredientKey, ItemStack>();
+        var itemList = new ArrayList<ItemStack>();
+
+        for (var i = 0; i < items.getSlots(); i++) {
+            var stack = items.getStackInSlot(i);
+            if (stack.isEmpty()) {
+                continue;
+            }
+
+            var key = ItemPortAdapter.INSTANCE.keyOf(stack);
+            if (itemMap.containsKey(key)) {
+                var stack1 = itemMap.get(key);
+                stack1.grow(stack.getCount());
+            } else if (itemList.size() < limit) {
+                var stack1 = stack.copy();
+                itemMap.put(key, stack1);
+                itemList.add(stack1);
+            }
+        }
+
+        var listTag = new ListTag();
+        for (var stack : itemList) {
+            listTag.add(StackHelper.serializeItemStack(stack));
+        }
+
+        if (!listTag.isEmpty()) {
+            tag.put("tinactoryItems", listTag);
+        }
+    }
+
+    @Override
+    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
+        BlockEntity blockEntity, boolean showDetails) {
+        if (JadeCommonConfig.shouldIgnoreTE(blockEntity.getType())) {
+            return;
+        }
+
+        ITEM_HANDLER.tryGet(blockEntity).ifPresent(items -> appendItems(tag, items, showDetails));
+
+        BYTES_PROVIDER.tryGet(blockEntity).ifPresent(bytes -> {
+            tag.putLong("tinactoryBytesUsed", bytes.bytesUsed());
+            tag.putLong("tinactoryBytesCapacity", bytes.bytesCapacity());
+        });
+    }
+}

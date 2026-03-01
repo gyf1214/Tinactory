@@ -21,8 +21,6 @@ import org.shsts.tinactory.AllTags.POWER_BLOCK
 import org.shsts.tinactory.AllTags.machine
 import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.network.MachineBlock
-import org.shsts.tinactory.core.network.PrimitiveBlock
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.ic2
@@ -54,6 +52,8 @@ import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
 import org.shsts.tinactory.datagen.content.model.MachineModel.ME_BUS
+import org.shsts.tinactory.integration.network.MachineBlock
+import org.shsts.tinactory.integration.network.PrimitiveBlock
 import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Multiblocks {

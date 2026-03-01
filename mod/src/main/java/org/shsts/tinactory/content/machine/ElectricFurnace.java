@@ -12,20 +12,20 @@ import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
+import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
-import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
@@ -62,11 +62,11 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         this.baseTemperature = baseTemperature;
     }
 
-    private IItemPort getInputPort(IContainer container) {
+    private IPort<ItemStack> getInputPort(IContainer container) {
         return container.getPort(inputPort, ContainerAccess.INTERNAL).asItem();
     }
 
-    private IItemPort getOutputPort(IContainer container) {
+    private IPort<ItemStack> getOutputPort(IContainer container) {
         return container.getPort(outputPort, ContainerAccess.INTERNAL).asItem();
     }
 
@@ -77,17 +77,17 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return recipe.getResultItem();
     }
 
-    private boolean matchesInput(SmeltingRecipe recipe, IItemPort port) {
+    private boolean matchesInput(SmeltingRecipe recipe, IPort<ItemStack> port) {
         var ingredient = recipe.getIngredients().get(0);
         return StackHelper.consumeItemPort(port, ingredient, 1, true).isPresent();
     }
 
-    private boolean matchesOutput(SmeltingRecipe recipe, IMachine machine, IItemPort port) {
+    private boolean matchesOutput(SmeltingRecipe recipe, IMachine machine, IPort<ItemStack> port) {
         if (machine.config().getBoolean(VOID_KEY, VOID_DEFAULT)) {
             return true;
         }
         var result = getResult(recipe);
-        return port.insertItem(result, true).isEmpty();
+        return port.insert(result, true).isEmpty();
     }
 
     private boolean matches(SmeltingRecipe recipe, IMachine machine, IContainer container) {
@@ -157,7 +157,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
             return;
         }
         machine.container().ifPresent(container -> getInputPort(container)
-            .asItemFilter().setFilters(smeltingRecipe.getIngredients()));
+            .asFilter().setFilters(smeltingRecipe.getIngredients()));
     }
 
     /**
@@ -202,7 +202,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         return CoilMultiblock.getTemperature(machine).orElse(0);
     }
 
-    private int calculateParallel(IItemPort port, Ingredient ingredient, int maxParallel) {
+    private int calculateParallel(IPort<ItemStack> port, Ingredient ingredient, int maxParallel) {
         var l = 1;
         var r = maxParallel + 1;
         while (r - l > 1) {
@@ -269,7 +269,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
         callback.accept(new ProcessingResults.ItemResult(1d, result1));
-        port.insertItem(result1, false);
+        port.insert(result1, false);
     }
 
     @Override

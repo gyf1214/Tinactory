@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.util.I18n;
@@ -36,7 +36,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 /**
  * Machine that can run without a network.
@@ -183,7 +183,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     public void onDisconnectFromNetwork() {}
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {}
+    public void buildSchedulings(ISchedulingRegister builder) {}
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {

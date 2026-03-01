@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.CellItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.network.CableBlock;
+import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.slf4j.Logger;
 

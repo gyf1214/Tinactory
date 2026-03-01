@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitErrorCode;
@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.autocraft.integration.AutocraftSubmitResult;
 import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.network.ComponentType;
+import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class LogisticComponent extends NotifierComponent {
 
     public record PortKey(UUID machineId, int portIndex) {}
 
-    public record PortInfo(IMachine machine, int portIndex, IPort port, BlockPos subnet, int priority) {}
+    public record PortInfo(IMachine machine, int portIndex, IPort<?> port, BlockPos subnet, int priority) {}
 
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
@@ -51,7 +51,7 @@ public class LogisticComponent extends NotifierComponent {
         super(type, network);
     }
 
-    private PortKey createPort(IMachine machine, int index, IPort port, BlockPos subnet, int priority) {
+    private PortKey createPort(IMachine machine, int index, IPort<?> port, BlockPos subnet, int priority) {
         var key = new PortKey(machine.uuid(), index);
         if (ports.containsKey(key)) {
             LOGGER.warn("duplicate port key {}", key);
@@ -60,7 +60,7 @@ public class LogisticComponent extends NotifierComponent {
         return key;
     }
 
-    private void registerPortInSubnet(IMachine machine, int index, IPort port,
+    private void registerPortInSubnet(IMachine machine, int index, IPort<?> port,
         BlockPos subnet, boolean isGlobal, int priority) {
         var key = createPort(machine, index, port, subnet, priority);
         if (isGlobal) {
@@ -73,13 +73,13 @@ public class LogisticComponent extends NotifierComponent {
         invokeUpdate();
     }
 
-    public void registerPort(IMachine machine, int index, IPort port,
+    public void registerPort(IMachine machine, int index, IPort<?> port,
         boolean isGlobal) {
         registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
             isGlobal, -1);
     }
 
-    public void registerStoragePort(IMachine machine, int index, IPort port,
+    public void registerStoragePort(IMachine machine, int index, IPort<?> port,
         boolean isGlobal, int priority) {
         registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
             isGlobal, priority);
@@ -104,7 +104,7 @@ public class LogisticComponent extends NotifierComponent {
         return keys.stream().map(ports::get).toList();
     }
 
-    public Collection<IPort> getStoragePorts() {
+    public Collection<IPort<?>> getStoragePorts() {
         return storagePorts.stream()
             .map(ports::get)
             .sorted(Comparator.comparing(PortInfo::priority).reversed())
@@ -276,7 +276,7 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+    public void buildSchedulings(ISchedulingRegister builder) {
         // Autocraft CPUs own runtime ticking via machine lifecycle scheduling.
     }
 

@@ -9,8 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.model.CraftAmount;
 import org.shsts.tinactory.core.autocraft.model.CraftKey;
@@ -21,10 +20,10 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsInventoryView implements IInventoryView {
-    private final IItemPort itemPort;
-    private final IFluidPort fluidPort;
+    private final IPort<ItemStack> itemPort;
+    private final IPort<FluidStack> fluidPort;
 
-    public LogisticsInventoryView(IItemPort itemPort, IFluidPort fluidPort) {
+    public LogisticsInventoryView(IPort<ItemStack> itemPort, IPort<FluidStack> fluidPort) {
         this.itemPort = itemPort;
         this.fluidPort = fluidPort;
     }
@@ -32,8 +31,8 @@ public final class LogisticsInventoryView implements IInventoryView {
     @Override
     public long amountOf(CraftKey key) {
         return switch (key.type()) {
-            case ITEM -> itemPort.getItemCount(toItemStack(key, 1));
-            case FLUID -> fluidPort.getFluidAmount(toFluidStack(key, 1));
+            case ITEM -> itemPort.getStorageAmount(toItemStack(key, 1));
+            case FLUID -> fluidPort.getStorageAmount(toFluidStack(key, 1));
         };
     }
 
@@ -49,13 +48,13 @@ public final class LogisticsInventoryView implements IInventoryView {
             switch (key.type()) {
                 case ITEM -> {
                     var expected = toItemStack(key, chunk);
-                    var extracted = itemPort.extractItem(expected, simulate);
+                    var extracted = itemPort.extract(expected, simulate);
                     extractedTotal += extracted.getCount();
                     left -= extracted.getCount();
                 }
                 case FLUID -> {
                     var expected = toFluidStack(key, chunk);
-                    var extracted = fluidPort.drain(expected, simulate);
+                    var extracted = fluidPort.extract(expected, simulate);
                     extractedTotal += extracted.getAmount();
                     left -= extracted.getAmount();
                 }
@@ -78,13 +77,14 @@ public final class LogisticsInventoryView implements IInventoryView {
             var chunk = (int) Math.min(left, Integer.MAX_VALUE);
             switch (key.type()) {
                 case ITEM -> {
-                    var remaining = itemPort.insertItem(toItemStack(key, chunk), simulate);
+                    var remaining = itemPort.insert(toItemStack(key, chunk), simulate);
                     var inserted = chunk - remaining.getCount();
                     insertedTotal += inserted;
                     left -= inserted;
                 }
                 case FLUID -> {
-                    var inserted = fluidPort.fill(toFluidStack(key, chunk), simulate);
+                    var remaining = fluidPort.insert(toFluidStack(key, chunk), simulate);
+                    var inserted = chunk - remaining.getAmount();
                     insertedTotal += inserted;
                     left -= inserted;
                 }
@@ -98,12 +98,12 @@ public final class LogisticsInventoryView implements IInventoryView {
 
     public List<CraftAmount> snapshotAvailable() {
         var ret = new ArrayList<CraftAmount>();
-        for (var stack : itemPort.getAllItems()) {
+        for (var stack : itemPort.getAllStorages()) {
             if (!stack.isEmpty()) {
                 ret.add(new CraftAmount(fromItemStack(stack), stack.getCount()));
             }
         }
-        for (var stack : fluidPort.getAllFluids()) {
+        for (var stack : fluidPort.getAllStorages()) {
             if (!stack.isEmpty()) {
                 ret.add(new CraftAmount(fromFluidStack(stack), stack.getAmount()));
             }

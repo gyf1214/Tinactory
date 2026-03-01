@@ -1,4 +1,5 @@
 archivesBaseName = "tinactory_datagen"
+apply plugin: 'kotlin'
 
 minecraft {
     runs {

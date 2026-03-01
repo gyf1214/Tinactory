@@ -36,10 +36,10 @@ public class MEStorageInterface extends MEStorageAccess {
     }
 
     public Collection<ItemStack> getAllItems() {
-        return combinedItem.getAllItems();
+        return combinedItem.getAllStorages();
     }
 
     public Collection<FluidStack> getAllFluids() {
-        return combinedFluid.getAllFluids();
+        return combinedFluid.getAllStorages();
     }
 }

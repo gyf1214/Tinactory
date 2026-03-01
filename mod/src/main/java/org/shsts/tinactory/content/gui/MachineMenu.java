@@ -9,15 +9,13 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -47,36 +45,36 @@ public class MachineMenu extends ProcessingMenu {
         return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
-    private ItemStack clickItemPort(ItemStack carried, IItemPort port, int button) {
+    private ItemStack clickItemPort(ItemStack carried, IPort<ItemStack> port, int button) {
         if (carried.isEmpty()) {
-            var extracted = port.extractItem(64, true);
+            var extracted = port.extract(64, true);
             // need to make sure the extracted does not exceed stack size.
             var limit = Math.min(extracted.getCount(), extracted.getMaxStackSize());
             var limit1 = button == 1 ? limit / 2 : limit;
             var extracted1 = extracted.getCount() > limit1 ?
                 StackHelper.copyWithCount(extracted, limit1) : extracted;
-            return port.extractItem(extracted1, false);
+            return port.extract(extracted1, false);
         } else {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
-                var remaining = port.insertItem(carried1, false);
+                var remaining = port.insert(carried1, false);
                 if (remaining.isEmpty()) {
                     carried.shrink(1);
                 }
                 return carried;
             } else {
-                return port.insertItem(carried, false);
+                return port.insert(carried, false);
             }
         }
     }
 
-    private boolean tryDrain(IFluidHandlerItem handler, IFluidPort port, FluidStack fluid) {
-        var fluid1 = fluid.isEmpty() ? port.drain(Integer.MAX_VALUE, true) :
-            port.drain(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
+    private boolean tryDrain(IFluidHandlerItem handler, IPort<FluidStack> port, FluidStack fluid) {
+        var fluid1 = fluid.isEmpty() ? port.extract(Integer.MAX_VALUE, true) :
+            port.extract(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
         int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
         if (amount > 0) {
             var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-            var fluid3 = port.drain(fluid2, false);
+            var fluid3 = port.extract(fluid2, false);
             var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
             if (amount1 != amount) {
                 LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
@@ -86,7 +84,7 @@ public class MachineMenu extends ProcessingMenu {
         return false;
     }
 
-    private FluidClickResult doClickFluidPort(ItemStack carried, IFluidPort port,
+    private FluidClickResult doClickFluidPort(ItemStack carried, IPort<FluidStack> port,
         boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
@@ -94,18 +92,9 @@ public class MachineMenu extends ProcessingMenu {
         }
         var handler = cap.get();
         if (mayFill) {
-            var fluid1 = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-            if (!fluid1.isEmpty()) {
-                int amount = port.fill(fluid1, true);
-                if (amount > 0) {
-                    var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                    var fluid3 = handler.drain(fluid2, IFluidHandler.FluidAction.EXECUTE);
-                    var amount1 = port.fill(fluid3, false);
-                    if (amount1 != amount) {
-                        LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                    }
-                    return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
-                }
+            var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+            if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
             }
         }
         if (mayDrain) {
@@ -122,7 +111,7 @@ public class MachineMenu extends ProcessingMenu {
         return new FluidClickResult();
     }
 
-    private Optional<IPort> getPort(int port) {
+    private Optional<IPort<?>> getPort(int port) {
         return machine.container().flatMap($ -> $.hasPort(port) ?
             Optional.of($.getPort(port, ContainerAccess.MENU)) : Optional.empty());
     }

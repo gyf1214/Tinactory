@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.network.MachineBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 

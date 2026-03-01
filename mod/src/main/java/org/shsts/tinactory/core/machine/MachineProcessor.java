@@ -24,7 +24,7 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
@@ -56,9 +56,9 @@ import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -212,8 +212,8 @@ public class MachineProcessor extends CapabilityProvider implements
                 }
                 var port = container.getPort(i, ContainerAccess.INTERNAL);
                 switch (port.type()) {
-                    case ITEM -> port.asItemFilter().resetFilters();
-                    case FLUID -> port.asFluidFilter().resetFilters();
+                    case ITEM -> port.asItem().asFilter().resetFilters();
+                    case FLUID -> port.asFluid().asFilter().resetFilters();
                 }
             }
         });
@@ -458,7 +458,7 @@ public class MachineProcessor extends CapabilityProvider implements
         setUpdateRecipe();
     }
 
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+    private void buildScheduling(ISchedulingRegister builder) {
         builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> stopped = false);
     }
 

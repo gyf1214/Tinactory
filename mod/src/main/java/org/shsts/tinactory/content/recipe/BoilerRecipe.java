@@ -9,12 +9,12 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -56,7 +56,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     @Override
     public boolean matches(Boiler boiler, Level world) {
         return boiler.heat() > minHeat && boiler.getInput()
-            .filter($ -> $.drain(input, true).getAmount() >= input.getAmount())
+            .filter($ -> $.extract(input, true).getAmount() >= input.getAmount())
             .isPresent();
     }
 
@@ -64,10 +64,10 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         return (heat - minHeat) * reactionRate * parallel;
     }
 
-    public double absorbHeat(IFluidPort inputPort, IFluidPort outputPort,
+    public double absorbHeat(IPort<FluidStack> inputPort, IPort<FluidStack> outputPort,
         int reaction, double heat, BiConsumer<FluidStack, FluidStack> callback) {
         var inputStack = StackHelper.copyWithAmount(input, input.getAmount() * reaction);
-        var drained = inputPort.drain(inputStack, true);
+        var drained = inputPort.extract(inputStack, true);
         var reaction1 = drained.getAmount() / input.getAmount();
         if (reaction1 <= 0) {
             return 0;
@@ -77,8 +77,8 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         var decay = MathUtil.clamp(1 - (heat - optimalHeat) / (maxHeat - optimalHeat), 0, 1);
         var outputAmount = (int) Math.floor(output.getAmount() * reaction1 * decay);
         var outputStack = StackHelper.copyWithAmount(output, outputAmount);
-        inputPort.drain(inputStack1, false);
-        outputPort.fill(outputStack, false);
+        inputPort.extract(inputStack1, false);
+        outputPort.insert(outputStack, false);
         callback.accept(inputStack1, outputStack);
 
         return absorbRate * reaction1;

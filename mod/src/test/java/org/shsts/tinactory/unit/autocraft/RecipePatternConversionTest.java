@@ -38,7 +38,7 @@ class RecipePatternConversionTest {
 
     private static final class UnsupportedIngredient implements IProcessingIngredient {
         @Override
-        public Optional<IProcessingIngredient> consumePort(IPort port, int parallel, boolean simulate) {
+        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
             return Optional.empty();
         }
 
@@ -55,7 +55,7 @@ class RecipePatternConversionTest {
 
     private static final class UnsupportedResult implements IProcessingResult {
         @Override
-        public Optional<IProcessingResult> insertPort(IPort port, int parallel, Random random, boolean simulate) {
+        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
             return Optional.empty();
         }
 

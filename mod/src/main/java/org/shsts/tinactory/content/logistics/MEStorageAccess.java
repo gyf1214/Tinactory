@@ -4,19 +4,20 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.CapabilityProvider;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
+import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -27,22 +28,22 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MEStorageAccess extends CapabilityProvider implements IEventSubscriber {
     protected final BlockEntity blockEntity;
-    protected final CombinedItemPort combinedItem;
-    protected final CombinedFluidPort combinedFluid;
+    protected final CombinedPort<ItemStack> combinedItem;
+    protected final CombinedPort<FluidStack> combinedFluid;
     private final LazyOptional<IElectricMachine> electricCap;
 
     protected IMachine machine;
 
     public MEStorageAccess(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
-        this.combinedItem = new CombinedItemPort();
-        this.combinedFluid = new CombinedFluidPort();
+        this.combinedItem = StoragePorts.combinedItem();
+        this.combinedFluid = StoragePorts.combinedFluid();
 
         var voltage = getBlockVoltage(blockEntity);
         var electric = new SimpleElectricConsumer(voltage.value, power);
@@ -50,8 +51,8 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     }
 
     private void onUpdateLogistics(LogisticComponent logistics) {
-        var items = new ArrayList<IItemPort>();
-        var fluids = new ArrayList<IFluidPort>();
+        var items = new ArrayList<IPort<ItemStack>>();
+        var fluids = new ArrayList<IPort<FluidStack>>();
         var ports = logistics.getStoragePorts();
         for (var port : ports) {
             if (port.type() == PortType.ITEM) {
@@ -79,11 +80,11 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         combinedFluid.unregisterListener(listener);
     }
 
-    public IItemPort itemPort() {
+    public IPort<ItemStack> itemPort() {
         return combinedItem;
     }
 
-    public IFluidPort fluidPort() {
+    public IPort<FluidStack> fluidPort() {
         return combinedFluid;
     }
 

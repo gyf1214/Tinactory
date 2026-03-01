@@ -11,26 +11,26 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
-import org.shsts.tinactory.core.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.logistics.WrapperItemHandler;
-import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
-import static org.shsts.tinactory.AllCapabilities.DIGITAL_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
 import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
@@ -55,7 +54,7 @@ import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -73,8 +72,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private final BlockEntity blockEntity;
     private final Layout layout;
     private final WrapperItemHandler storages;
-    private final CombinedItemPort combinedItems;
-    private final CombinedFluidPort combinedFluids;
+    private final CombinedPort<ItemStack> combinedItems;
+    private final CombinedPort<FluidStack> combinedFluids;
     private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
     private final LazyOptional<IElectricMachine> electricCap;
 
@@ -93,10 +92,10 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         this.menuItemHandlerCap = IMenuItemHandler.cap(storages);
         storages.onUpdate(this::onStorageChange);
 
-        this.combinedItems = new CombinedItemPort();
+        this.combinedItems = StoragePorts.combinedItem();
         combinedItems.onUpdate(this::onContainerChange);
 
-        this.combinedFluids = new CombinedFluidPort();
+        this.combinedFluids = StoragePorts.combinedFluid();
         combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);
@@ -130,7 +129,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (storage.isEmpty()) {
                 continue;
             }
-            storage.getCapability(DIGITAL_PROVIDER.get()).ifPresent(digital::add);
+            storage.getCapability(BYTES_PROVIDER.get()).ifPresent(digital::add);
             storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
         }
         return aggregateByteStats(digital, patterns);
@@ -187,8 +186,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         }
         LOGGER.debug("{} on update storage", blockEntity);
         var slots = storages.getSlots();
-        var items = new ArrayList<IItemPort>();
-        var fluids = new ArrayList<IFluidPort>();
+        var items = new ArrayList<IPort<ItemStack>>();
+        var fluids = new ArrayList<IPort<FluidStack>>();
         for (var i = 0; i < slots; i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {

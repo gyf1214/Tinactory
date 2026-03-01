@@ -2,8 +2,8 @@ package org.shsts.tinactory.datagen.content.component
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
-import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.PATTERN_CELLS
+import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.componentEntry
 import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.MINEABLE_WITH_WIRE_CUTTER
@@ -22,7 +22,6 @@ import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.tool.BatteryItem
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.network.CableBlock
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.ic2
 import org.shsts.tinactory.core.util.LocHelper.name
@@ -33,6 +32,7 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.ItemDataFactory
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
+import org.shsts.tinactory.integration.network.CableBlock
 import org.shsts.tinycorelib.datagen.api.builder.IItemDataBuilder
 
 object Components {

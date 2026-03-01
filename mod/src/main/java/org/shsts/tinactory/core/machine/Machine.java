@@ -27,15 +27,15 @@ import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.network.Network;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.network.Network;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
@@ -65,7 +65,7 @@ import static org.shsts.tinactory.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.WORK_SCHEDULING;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -344,7 +344,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public void buildSchedulings(INetworkComponent.SchedulingBuilder builder) {
+    public void buildSchedulings(ISchedulingRegister builder) {
         builder.add(PRE_WORK_SCHEDULING.get(), this::onPreWork);
         builder.add(WORK_SCHEDULING.get(), this::onWork);
         invoke(blockEntity, BUILD_SCHEDULING, builder);

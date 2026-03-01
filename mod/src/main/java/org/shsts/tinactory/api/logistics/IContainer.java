@@ -7,5 +7,5 @@ public interface IContainer {
 
     PortDirection portDirection(int port);
 
-    IPort getPort(int port, ContainerAccess access);
+    IPort<?> getPort(int port, ContainerAccess access);
 }

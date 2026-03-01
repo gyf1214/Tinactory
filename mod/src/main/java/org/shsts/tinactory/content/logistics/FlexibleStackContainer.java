@@ -17,15 +17,15 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.CombinedFluidTank;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
-import org.shsts.tinactory.core.logistics.IFluidTanksHandler;
-import org.shsts.tinactory.core.logistics.IMenuItemHandler;
-import org.shsts.tinactory.core.logistics.ItemHandlerPort;
-import org.shsts.tinactory.core.logistics.StackHelper;
-import org.shsts.tinactory.core.logistics.WrapperFluidTank;
-import org.shsts.tinactory.core.logistics.WrapperItemHandler;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
+import org.shsts.tinactory.integration.logistics.CombinedFluidTank;
+import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
+import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
+import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.WrapperFluidTank;
+import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -218,7 +218,7 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     @Override
-    public IPort getPort(int port, ContainerAccess access) {
+    public IPort<?> getPort(int port, ContainerAccess access) {
         return ports.get(port).get(access);
     }
 

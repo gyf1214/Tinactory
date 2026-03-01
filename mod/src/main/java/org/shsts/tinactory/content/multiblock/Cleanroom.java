@@ -20,7 +20,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.machine.Machine;
@@ -174,7 +174,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
         }
     }
 
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+    private void buildScheduling(ISchedulingRegister builder) {
         builder.add(PRE_SIGNAL_SCHEDULING.get(), (world, network) -> stopped = false);
     }
 

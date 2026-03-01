@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IFluidPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
@@ -27,9 +27,9 @@ public class Boiler implements INBTSerializable<CompoundTag> {
     private final double baseDecay;
 
     @Nullable
-    private IFluidPort input;
+    private IPort<FluidStack> input;
     @Nullable
-    private IFluidPort output;
+    private IPort<FluidStack> output;
     private double heat;
     // we don't serialize these two, so on reload, hiddenProgress is lost, but it's negligible.
     @Nullable
@@ -44,7 +44,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         this.heat = baseHeat;
     }
 
-    public void setContainer(IFluidPort input, IFluidPort output) {
+    public void setContainer(IPort<FluidStack> input, IPort<FluidStack> output) {
         this.input = input;
         this.output = output;
     }
@@ -58,7 +58,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         return heat;
     }
 
-    public Optional<IFluidPort> getInput() {
+    public Optional<IPort<FluidStack>> getInput() {
         return Optional.ofNullable(input);
     }
 

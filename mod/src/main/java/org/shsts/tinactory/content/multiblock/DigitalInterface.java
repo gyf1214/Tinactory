@@ -8,25 +8,25 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.logistics.ContainerPort;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.logistics.CombinedFluidPort;
-import org.shsts.tinactory.core.logistics.CombinedItemPort;
-import org.shsts.tinactory.core.logistics.DigitalFluidStorage;
-import org.shsts.tinactory.core.logistics.DigitalItemStorage;
+import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.machine.ILayoutProvider;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
@@ -53,25 +53,25 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private int sharedBytes;
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
-        private final DigitalItemStorage internalItem;
-        private final CombinedItemPort menuItem;
-        private final CombinedItemPort externalItem;
+        private final StoragePorts.ItemStorage internalItem;
+        private final CombinedPort<ItemStack> menuItem;
+        private final CombinedPort<ItemStack> externalItem;
         private final ContainerPort itemPort;
-        private final CombinedFluidPort menuFluid;
-        private final DigitalFluidStorage internalFluid;
-        private final CombinedFluidPort externalFluid;
+        private final StoragePorts.FluidStorage internalFluid;
+        private final CombinedPort<FluidStack> menuFluid;
+        private final CombinedPort<FluidStack> externalFluid;
         private final ContainerPort fluidPort;
         public SlotType type;
         private int bytesUsed;
 
         private Storage() {
-            this.internalItem = new DigitalItemStorage(this);
-            this.menuItem = new CombinedItemPort(internalItem);
-            this.externalItem = new CombinedItemPort(internalItem);
+            this.internalItem = StoragePorts.itemStorage(this);
+            this.menuItem = StoragePorts.combinedItem(internalItem);
+            this.externalItem = StoragePorts.combinedItem(internalItem);
             this.itemPort = new ContainerPort(SlotType.NONE, internalItem, menuItem, externalItem);
-            this.internalFluid = new DigitalFluidStorage(this);
-            this.menuFluid = new CombinedFluidPort(internalFluid);
-            this.externalFluid = new CombinedFluidPort(internalFluid);
+            this.internalFluid = StoragePorts.fluidStorage(this);
+            this.menuFluid = StoragePorts.combinedFluid(internalFluid);
+            this.externalFluid = StoragePorts.combinedFluid(internalFluid);
             this.fluidPort = new ContainerPort(SlotType.NONE, internalFluid, menuFluid, externalFluid);
             this.type = SlotType.NONE;
             this.bytesUsed = 0;
@@ -85,7 +85,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             internalItem.resetFilters();
             internalFluid.resetFilters();
             if (type.direction == PortDirection.INPUT) {
-                internalItem.maxCount = amountByteLimit / CONFIG.bytesPerItem.get();
+                internalItem.maxAmount = amountByteLimit / CONFIG.bytesPerItem.get();
                 menuItem.allowInput = true;
                 externalItem.allowInput = true;
                 externalItem.allowOutput = false;
@@ -94,7 +94,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
                 externalFluid.allowInput = true;
                 externalFluid.allowOutput = false;
             } else {
-                internalItem.maxCount = Integer.MAX_VALUE;
+                internalItem.maxAmount = Integer.MAX_VALUE;
                 menuItem.allowInput = false;
                 externalItem.allowInput = false;
                 externalItem.allowOutput = true;
@@ -105,11 +105,11 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             }
         }
 
-        public IPort port(ContainerAccess access) {
+        public IPort<?> port(ContainerAccess access) {
             return switch (type.portType) {
                 case ITEM -> itemPort.get(access);
                 case FLUID -> fluidPort.get(access);
-                case NONE -> IPort.EMPTY;
+                case NONE -> IPort.empty();
             };
         }
 
@@ -251,7 +251,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public IPort getPort(int port, ContainerAccess access) {
+    public IPort<?> getPort(int port, ContainerAccess access) {
         return storages.get(port).port(access);
     }
 

@@ -10,8 +10,8 @@ import net.minecraft.world.level.BlockGetter;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
-import org.shsts.tinactory.core.network.MachineBlock;
-import org.shsts.tinactory.core.network.SidedMachineBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
+import org.shsts.tinactory.integration.network.SidedMachineBlock;
 
 import java.util.List;
 import java.util.function.Consumer;

@@ -10,7 +10,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.network.SignalMachineBlock;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.ISignalMachine;
@@ -29,8 +29,8 @@ import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_READ_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_WRITE_SCHEDULING;
-import static org.shsts.tinactory.core.network.MachineBlock.FACING;
-import static org.shsts.tinactory.core.network.MachineBlock.getBlockVoltage;
+import static org.shsts.tinactory.integration.network.MachineBlock.FACING;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -120,7 +120,7 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
         component.write(config.machine(), config.key(), signal);
     }
 
-    private void buildScheduling(INetworkComponent.SchedulingBuilder builder) {
+    private void buildScheduling(ISchedulingRegister builder) {
         builder.add(SIGNAL_READ_SCHEDULING.get(), this::readSignal);
         builder.add(SIGNAL_WRITE_SCHEDULING.get(), this::writeSignal);
     }

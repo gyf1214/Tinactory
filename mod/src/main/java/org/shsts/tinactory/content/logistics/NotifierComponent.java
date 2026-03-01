@@ -3,8 +3,8 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.core.network.ComponentType;
-import org.shsts.tinactory.core.network.NetworkComponent;
+import org.shsts.tinactory.integration.network.ComponentType;
+import org.shsts.tinactory.integration.network.NetworkComponent;
 
 import java.util.HashSet;
 import java.util.Set;

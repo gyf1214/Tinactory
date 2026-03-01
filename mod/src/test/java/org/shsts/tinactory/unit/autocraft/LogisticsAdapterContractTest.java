@@ -11,15 +11,14 @@ import net.minecraftforge.fluids.FluidStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent.SchedulingBuilder;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent.PortInfo;
 import org.shsts.tinactory.core.autocraft.integration.LogisticsMachineAllocator;
@@ -78,7 +77,7 @@ class LogisticsAdapterContractTest {
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "smelting"), 0, List.of());
         var machine = new FakeMachine();
         var allocator = new LogisticsMachineAllocator(
-            () -> List.of(new PortInfo(machine, 0, IPort.EMPTY, BlockPos.ZERO, 0)),
+            () -> List.of(new PortInfo(machine, 0, IPort.empty(), BlockPos.ZERO, 0)),
             $ -> 0,
             ($, recipeTypeId) -> false);
 
@@ -253,34 +252,39 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class FakeItemPort implements IItemPort {
+    private static final class FakeItemPort implements IPort<ItemStack> {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
         @Override
         public boolean acceptInput(ItemStack stack) {
             return true;
         }
 
         @Override
-        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        public ItemStack insert(ItemStack stack, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public ItemStack extractItem(ItemStack item, boolean simulate) {
+        public ItemStack extract(ItemStack item, boolean simulate) {
             return item.copy();
         }
 
         @Override
-        public ItemStack extractItem(int limit, boolean simulate) {
+        public ItemStack extract(int limit, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public int getItemCount(ItemStack item) {
+        public int getStorageAmount(ItemStack item) {
             return 64;
         }
 
         @Override
-        public Collection<ItemStack> getAllItems() {
+        public Collection<ItemStack> getAllStorages() {
             return List.of();
         }
 
@@ -290,7 +294,7 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class TrackingItemPort implements IItemPort {
+    private static final class TrackingItemPort implements IPort<ItemStack> {
         private final boolean allowInput;
         private final boolean allowOutput;
         private int available;
@@ -302,12 +306,17 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
+        @Override
         public boolean acceptInput(ItemStack stack) {
             return allowInput;
         }
 
         @Override
-        public ItemStack insertItem(ItemStack stack, boolean simulate) {
+        public ItemStack insert(ItemStack stack, boolean simulate) {
             if (!allowInput || stack.isEmpty()) {
                 return stack.copy();
             }
@@ -315,7 +324,7 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack extractItem(ItemStack item, boolean simulate) {
+        public ItemStack extract(ItemStack item, boolean simulate) {
             if (!allowOutput || item.isEmpty()) {
                 return ItemStack.EMPTY;
             }
@@ -332,17 +341,17 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public ItemStack extractItem(int limit, boolean simulate) {
+        public ItemStack extract(int limit, boolean simulate) {
             return ItemStack.EMPTY;
         }
 
         @Override
-        public int getItemCount(ItemStack item) {
+        public int getStorageAmount(ItemStack item) {
             return allowOutput ? available : 0;
         }
 
         @Override
-        public Collection<ItemStack> getAllItems() {
+        public Collection<ItemStack> getAllStorages() {
             return List.of();
         }
 
@@ -352,7 +361,7 @@ class LogisticsAdapterContractTest {
         }
     }
 
-    private static final class TrackingFluidPort implements IFluidPort {
+    private static final class TrackingFluidPort implements IPort<FluidStack> {
         private final boolean allowOutput;
         private int available;
 
@@ -362,17 +371,22 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
+        public PortType type() {
+            return PortType.FLUID;
+        }
+
+        @Override
         public boolean acceptInput(FluidStack stack) {
             return false;
         }
 
         @Override
-        public int fill(FluidStack fluid, boolean simulate) {
-            return 0;
+        public FluidStack insert(FluidStack fluid, boolean simulate) {
+            return fluid;
         }
 
         @Override
-        public FluidStack drain(FluidStack fluid, boolean simulate) {
+        public FluidStack extract(FluidStack fluid, boolean simulate) {
             if (!allowOutput || fluid.isEmpty()) {
                 return FluidStack.EMPTY;
             }
@@ -389,17 +403,17 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public FluidStack drain(int limit, boolean simulate) {
+        public FluidStack extract(int limit, boolean simulate) {
             return FluidStack.EMPTY;
         }
 
         @Override
-        public int getFluidAmount(FluidStack fluid) {
+        public int getStorageAmount(FluidStack fluid) {
             return allowOutput ? available : 0;
         }
 
         @Override
-        public Collection<FluidStack> getAllFluids() {
+        public Collection<FluidStack> getAllStorages() {
             return List.of();
         }
 
@@ -495,6 +509,6 @@ class LogisticsAdapterContractTest {
         public void onDisconnectFromNetwork() {}
 
         @Override
-        public void buildSchedulings(SchedulingBuilder builder) {}
+        public void buildSchedulings(ISchedulingRegister builder) {}
     }
 }

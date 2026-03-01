@@ -10,8 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
@@ -19,7 +18,7 @@ import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.core.gui.InventoryMenu;
-import org.shsts.tinactory.core.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -79,7 +78,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return machineConfig;
     }
 
-    private FluidClickResult doClickFluidSlot(ItemStack carried, IFluidPort port,
+    private FluidClickResult doClickFluidSlot(ItemStack carried, IPort<FluidStack> port,
         FluidStack fluid, boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
@@ -89,26 +88,16 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         if (mayFill) {
             var fluid1 = StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE);
             var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.SIMULATE);
-            if (!fluid2.isEmpty()) {
-                int amount = port.fill(fluid2, true);
-                if (amount > 0) {
-                    var fluid3 = StackHelper.copyWithAmount(fluid2, amount);
-                    var fluid4 = handler.drain(fluid3, IFluidHandler.FluidAction.EXECUTE);
-                    var amount1 = port.fill(fluid4, false);
-                    if (amount1 != amount) {
-                        LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                    }
-                    return new FluidClickResult(FluidClickAction.FILL,
-                        handler.getContainer());
-                }
+            if (StackHelper.transmitFluidFromHandler(handler, port, fluid2)) {
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
             }
         }
         if (mayDrain) {
-            var fluid1 = port.drain(fluid, true);
+            var fluid1 = port.extract(fluid, true);
             int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
             if (amount > 0) {
                 var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                var fluid3 = port.drain(fluid2, false);
+                var fluid3 = port.extract(fluid2, false);
                 var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
                 if (amount1 != amount) {
                     LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
@@ -120,7 +109,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private FluidClickResult doClickEmptyFluidSlot(ItemStack carried, IFluidPort port, boolean mayFill) {
+    private FluidClickResult doClickEmptyFluidSlot(ItemStack carried, IPort<FluidStack> port, boolean mayFill) {
         if (!mayFill) {
             return new FluidClickResult();
         }
@@ -130,28 +119,18 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         }
         var handler = cap.get();
         var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-        if (!fluid.isEmpty()) {
-            int amount = port.fill(fluid, true);
-            if (amount > 0) {
-                var fluid1 = StackHelper.copyWithAmount(fluid, amount);
-                var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.EXECUTE);
-                var amount1 = port.fill(fluid2, false);
-                if (amount1 != amount) {
-                    LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
-                }
-                return new FluidClickResult(FluidClickAction.FILL,
-                    handler.getContainer());
-            }
+        if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
+            return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
         }
         return new FluidClickResult();
     }
 
-    private void clickItemSlot(ItemStack carried, ItemStack item, IItemPort port, int button) {
+    private void clickItemSlot(ItemStack carried, ItemStack item, IPort<ItemStack> port, int button) {
         if (!carried.isEmpty()) {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
                 carried.shrink(1);
-                var remaining = port.insertItem(carried1, false);
+                var remaining = port.insert(carried1, false);
                 var combined = StackHelper.combineStack(carried, remaining);
                 if (combined.isEmpty()) {
                     ItemHandlerHelper.giveItemToPlayer(player, remaining);
@@ -159,13 +138,13 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
                     setCarried(combined.get());
                 }
             } else {
-                setCarried(port.insertItem(carried, false));
+                setCarried(port.insert(carried, false));
             }
         } else {
             var count = Math.min(item.getCount(), item.getMaxStackSize());
             var count1 = button == 1 ? (count + 1) / 2 : count;
             var item1 = StackHelper.copyWithCount(item, count1);
-            var extracted = port.extractItem(item1, false);
+            var extracted = port.extract(item1, false);
             setCarried(extracted);
         }
     }
@@ -200,14 +179,14 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private void quickMoveStack(ItemStack stack) {
         var inv = new PlayerMainInvWrapper(inventory);
         var target = storageInterface.itemPort();
-        var extracted = target.extractItem(stack, true);
+        var extracted = target.extract(stack, true);
         var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
         var inserted = extracted.getCount() - remaining.getCount();
         if (inserted <= 0) {
             return;
         }
         var extracted1 = StackHelper.copyWithCount(extracted, inserted);
-        var extracted2 = target.extractItem(extracted1, false);
+        var extracted2 = target.extract(extracted1, false);
         var remaining1 = ItemHandlerHelper.insertItemStacked(inv, extracted2, false);
         if (!remaining1.isEmpty()) {
             LOGGER.warn("{}: Failed to quick move inventory, extracted {}/{}", blockEntity,
@@ -237,13 +216,13 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         if (!target.acceptInput(stack)) {
             return false;
         }
-        var remaining = target.insertItem(stack, true);
+        var remaining = target.insert(stack, true);
         var inserted = stack.getCount() - remaining.getCount();
         if (inserted <= 0) {
             return false;
         }
         var stack1 = inv.extractItem(index, inserted, false);
-        var remaining1 = target.insertItem(stack1, false);
+        var remaining1 = target.insert(stack1, false);
         if (!remaining1.isEmpty()) {
             LOGGER.warn("{}: Failed to quick move inventory, inserted {}/{}", blockEntity,
                 stack1.getCount() - remaining1.getCount(), stack1.getCount());

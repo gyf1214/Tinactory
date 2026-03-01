@@ -3,12 +3,12 @@ package org.shsts.tinactory.datagen.content.component
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.network.CableBlock
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
+import org.shsts.tinactory.integration.network.CableBlock
 
 object MachineComponents {
     fun init() {

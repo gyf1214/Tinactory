@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.Optional;
@@ -77,5 +77,5 @@ public interface IMachine {
      */
     void onDisconnectFromNetwork();
 
-    void buildSchedulings(INetworkComponent.SchedulingBuilder builder);
+    void buildSchedulings(ISchedulingRegister builder);
 }

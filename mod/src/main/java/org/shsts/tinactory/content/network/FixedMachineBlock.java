@@ -12,7 +12,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.core.network.MachineBlock.WORKING;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 /**
  * Entity block that does not have facing or IO facing, only a working state.

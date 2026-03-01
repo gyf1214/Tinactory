@@ -1,48 +1,49 @@
 package org.shsts.tinactory.core.network;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.core.common.WeakMap;
-import org.slf4j.Logger;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class NetworkManager {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    private final Level world;
-    private final WeakMap<BlockPos, NetworkBase> networkPosMap = new WeakMap<>();
-
-    public NetworkManager(Level world) {
-        LOGGER.debug("create network manager for {}", world.dimension().location());
-        this.world = world;
-    }
+    private final WeakMap<BlockPos, NetworkGraphEngine<?>> networkPosMap = new WeakMap<>();
+    private final Map<NetworkGraphEngine<?>, WeakMap.Ref<NetworkGraphEngine<?>>> networkRefs =
+        new IdentityHashMap<>();
 
     public boolean hasNetworkAtPos(BlockPos pos) {
         return getNetworkAtPos(pos).isPresent();
     }
 
-    public Optional<NetworkBase> getNetworkAtPos(BlockPos pos) {
+    public Optional<NetworkGraphEngine<?>> getNetworkAtPos(BlockPos pos) {
         return networkPosMap.get(pos);
     }
 
-    public void putNetworkAtPos(BlockPos pos, NetworkBase network) {
+    public void putNetworkAtPos(BlockPos pos, NetworkGraphEngine<?> network) {
         assert !hasNetworkAtPos(pos);
-        LOGGER.trace("track block at {}:{} to network {}", world.dimension().location(), pos, network);
-        network.addToMap(networkPosMap, pos);
+        var ref = networkRefs.get(network);
+        if (ref == null || ref.get().isEmpty()) {
+            ref = networkPosMap.put(pos, network);
+            networkRefs.put(network, ref);
+            return;
+        }
+        networkPosMap.put(pos, ref);
     }
 
     public void invalidatePos(BlockPos pos) {
-        getNetworkAtPos(pos).ifPresent(NetworkBase::invalidate);
+        getNetworkAtPos(pos).ifPresent(network -> {
+            network.invalidate();
+            var ref = networkRefs.remove(network);
+            if (ref != null) {
+                ref.invalidate();
+            }
+        });
     }
 
     public void invalidatePosDir(BlockPos pos, Direction dir) {
@@ -53,26 +54,6 @@ public final class NetworkManager {
 
     public void destroy() {
         networkPosMap.clear();
-    }
-
-    private static final Map<ResourceKey<Level>, NetworkManager> INSTANCES = new HashMap<>();
-
-    public static NetworkManager get(Level world) {
-        assert !world.isClientSide;
-        var dimension = world.dimension();
-        return INSTANCES.computeIfAbsent(dimension, $ -> new NetworkManager(world));
-    }
-
-    public static Optional<NetworkManager> tryGet(Level world) {
-        return world.isClientSide ? Optional.empty() : Optional.of(get(world));
-    }
-
-    public static void onUnload(Level world) {
-        LOGGER.debug("remove network manager for {}", world.dimension().location());
-        var manager = INSTANCES.get(world.dimension());
-        if (manager != null) {
-            manager.destroy();
-            INSTANCES.remove(world.dimension());
-        }
+        networkRefs.clear();
     }
 }

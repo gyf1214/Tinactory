@@ -10,12 +10,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.ForgeHooks;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.core.logistics.StackHelper;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     private final double maxHeat;
 
     @Nullable
-    private IItemPort fuelPort;
+    private IPort<ItemStack> fuelPort;
     private long maxBurn = 0L;
     private ItemStack burningItem = ItemStack.EMPTY;
     private long currentBurn = 0L;
@@ -62,7 +62,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
 
     public void setContainer(IContainer container) {
         fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
-        fuelPort.asItemFilter().setFilters(List.of(item ->
+        fuelPort.asFilter().setFilters(List.of(item ->
             ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
 
         var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
@@ -130,10 +130,10 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
 
         var maxParallel = burnParallel();
         burningItem = ItemStack.EMPTY;
-        for (var stack : fuelPort.getAllItems()) {
+        for (var stack : fuelPort.getAllStorages()) {
             if (ForgeHooks.getBurnTime(stack, null) > 0) {
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
-                var extracted = fuelPort.extractItem(stack1, false);
+                var extracted = fuelPort.extract(stack1, false);
                 if (!extracted.isEmpty()) {
                     MetricsManager.reportItem("item_consumed", machine1, extracted);
                     maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;

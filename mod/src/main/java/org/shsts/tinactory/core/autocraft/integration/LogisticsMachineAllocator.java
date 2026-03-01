@@ -3,8 +3,8 @@ package org.shsts.tinactory.core.autocraft.integration;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.autocraft.model.CraftKey;
 import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.network.MachineBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -207,18 +207,18 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return true;
     }
 
-    private static boolean matchesDirection(CraftKey key, IPort port, boolean inputDirection) {
+    private static boolean matchesDirection(CraftKey key, IPort<?> port, boolean inputDirection) {
         if (!inputDirection) {
             return port.acceptOutput();
         }
         return true;
     }
 
-    private static Optional<IMachineInputRoute> buildItemInputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineInputRoute> buildItemInputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.ITEM) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItem();
+        IPort<ItemStack> itemPort = port.asItem();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -238,7 +238,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                     if (!itemPort.acceptInput(stack)) {
                         break;
                     }
-                    var remaining = itemPort.insertItem(stack, simulate);
+                    var remaining = itemPort.insert(stack, simulate);
                     var moved = chunk - remaining.getCount();
                     total += moved;
                     left -= moved;
@@ -251,11 +251,11 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.ITEM || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IItemPort itemPort = port.asItem();
+        IPort<ItemStack> itemPort = port.asItem();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
@@ -271,7 +271,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                 var left = amount;
                 while (left > 0L) {
                     var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = itemPort.extractItem(LogisticsInventoryView.toItemStack(key, chunk), simulate);
+                    var extracted = itemPort.extract(LogisticsInventoryView.toItemStack(key, chunk), simulate);
                     total += extracted.getCount();
                     left -= extracted.getCount();
                     if (extracted.isEmpty()) {
@@ -283,11 +283,11 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.FLUID) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluid();
+        IPort<FluidStack> fluidPort = port.asFluid();
         return Optional.of(new IMachineInputRoute() {
             @Override
             public CraftKey key() {
@@ -307,7 +307,8 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                     if (!fluidPort.acceptInput(fluid)) {
                         break;
                     }
-                    var moved = fluidPort.fill(fluid, simulate);
+                    var remaining = fluidPort.insert(fluid, simulate);
+                    var moved = chunk - remaining.getAmount();
                     total += moved;
                     left -= moved;
                     if (moved <= 0L) {
@@ -319,11 +320,11 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         });
     }
 
-    private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort port, CraftKey key) {
+    private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort<?> port, CraftKey key) {
         if (port.type() != PortType.FLUID || !port.acceptOutput()) {
             return Optional.empty();
         }
-        IFluidPort fluidPort = port.asFluid();
+        IPort<FluidStack> fluidPort = port.asFluid();
         return Optional.of(new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
@@ -339,7 +340,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                 var left = amount;
                 while (left > 0L) {
                     var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = fluidPort.drain(LogisticsInventoryView.toFluidStack(key, chunk), simulate);
+                    var extracted = fluidPort.extract(LogisticsInventoryView.toFluidStack(key, chunk), simulate);
                     total += extracted.getAmount();
                     left -= extracted.getAmount();
                     if (extracted.isEmpty()) {
