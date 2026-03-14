@@ -13,7 +13,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
-import org.shsts.tinactory.core.logistics.IStackAdapter;
+import org.shsts.tinactory.core.logistics.CraftPortChannel;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
@@ -22,22 +22,20 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsInventoryView implements IInventoryView {
-    private final Map<CraftKey.Type, Channel<?>> channels;
+    private final Map<CraftKey.Type, CraftPortChannel<?>> channels;
 
     public LogisticsInventoryView(IPort<ItemStack> itemPort, IPort<FluidStack> fluidPort) {
         channels = new EnumMap<>(CraftKey.Type.class);
-        channels.put(CraftKey.Type.ITEM, new Channel<>(
+        channels.put(CraftKey.Type.ITEM, new CraftPortChannel<>(
             ItemPortAdapter.INSTANCE,
             itemPort,
             LogisticsInventoryView::toItemStack,
             LogisticsInventoryView::fromItemStack));
-        channels.put(CraftKey.Type.FLUID, new Channel<>(
+        channels.put(CraftKey.Type.FLUID, new CraftPortChannel<>(
             FluidPortAdapter.INSTANCE,
             fluidPort,
             LogisticsInventoryView::toFluidStack,
@@ -62,12 +60,12 @@ public final class LogisticsInventoryView implements IInventoryView {
     public List<CraftAmount> snapshotAvailable() {
         var ret = new ArrayList<CraftAmount>();
         for (var channel : channels.values()) {
-            channel.snapshotTo(ret);
+            ret.addAll(channel.snapshot());
         }
         return ret;
     }
 
-    private Channel<?> channel(CraftKey.Type type) {
+    private CraftPortChannel<?> channel(CraftKey.Type type) {
         return Objects.requireNonNull(channels.get(type), "missing channel for craft key type " + type);
     }
 
@@ -123,72 +121,6 @@ public final class LogisticsInventoryView implements IInventoryView {
             return TagParser.parseTag(nbt);
         } catch (CommandSyntaxException ex) {
             throw new IllegalArgumentException("invalid nbt: " + nbt, ex);
-        }
-    }
-
-    private record Channel<T>(
-        IStackAdapter<T> stackAdapter,
-        IPort<T> port,
-        BiFunction<CraftKey, Integer, T> stackOf,
-        Function<T, CraftKey> keyOf
-    ) {
-        private long amountOf(CraftKey key) {
-            return port.getStorageAmount(stackOf.apply(key, 1));
-        }
-
-        private long extract(CraftKey key, long amount, boolean simulate) {
-            if (amount <= 0L) {
-                return 0L;
-            }
-            var left = amount;
-            long extractedTotal = 0L;
-            while (left > 0L) {
-                var chunk = (int) Math.min(left, Integer.MAX_VALUE);
-                var expected = stackOf.apply(key, chunk);
-                var moved = movedByExtract(expected, simulate);
-                if (moved <= 0L) {
-                    break;
-                }
-                extractedTotal += moved;
-                left -= moved;
-            }
-            return extractedTotal;
-        }
-
-        private long insert(CraftKey key, long amount, boolean simulate) {
-            if (amount <= 0L) {
-                return 0L;
-            }
-            var left = amount;
-            long insertedTotal = 0L;
-            while (left > 0L) {
-                var chunk = (int) Math.min(left, Integer.MAX_VALUE);
-                var expected = stackOf.apply(key, chunk);
-                var moved = movedByInsert(expected, chunk, simulate);
-                if (moved <= 0L) {
-                    break;
-                }
-                insertedTotal += moved;
-                left -= moved;
-            }
-            return insertedTotal;
-        }
-
-        private void snapshotTo(List<CraftAmount> out) {
-            for (var stack : port.getAllStorages()) {
-                if (!stackAdapter.isEmpty(stack)) {
-                    out.add(new CraftAmount(keyOf.apply(stack), stackAdapter.amount(stack)));
-                }
-            }
-        }
-
-        private int movedByExtract(T expected, boolean simulate) {
-            return stackAdapter.amount(port.extract(expected, simulate));
-        }
-
-        private int movedByInsert(T expected, int expectedAmount, boolean simulate) {
-            var remaining = port.insert(expected, simulate);
-            return expectedAmount - stackAdapter.amount(remaining);
         }
     }
 }
