@@ -18,6 +18,9 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.logistics.CraftPortChannel;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.ArrayList;
@@ -215,11 +218,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     private static Optional<IMachineInputRoute> buildItemInputRoute(IPort<?> port, CraftKey key) {
-        if (port.type() != PortType.ITEM) {
-            return Optional.empty();
-        }
-        IPort<ItemStack> itemPort = port.asItem();
-        return Optional.of(new IMachineInputRoute() {
+        return itemChannel(port).map(channel -> new IMachineInputRoute() {
             @Override
             public CraftKey key() {
                 return key;
@@ -227,36 +226,16 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
             @Override
             public long push(long amount, boolean simulate) {
-                if (amount <= 0L) {
-                    return 0L;
-                }
-                var total = 0L;
-                var left = amount;
-                while (left > 0L) {
-                    var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var stack = LogisticsInventoryView.toItemStack(key, chunk);
-                    if (!itemPort.acceptInput(stack)) {
-                        break;
-                    }
-                    var remaining = itemPort.insert(stack, simulate);
-                    var moved = chunk - remaining.getCount();
-                    total += moved;
-                    left -= moved;
-                    if (moved <= 0L) {
-                        break;
-                    }
-                }
-                return total;
+                return channel.insert(key, amount, simulate);
             }
         });
     }
 
     private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort<?> port, CraftKey key) {
-        if (port.type() != PortType.ITEM || !port.acceptOutput()) {
+        if (!port.acceptOutput()) {
             return Optional.empty();
         }
-        IPort<ItemStack> itemPort = port.asItem();
-        return Optional.of(new IMachineOutputRoute() {
+        return itemChannel(port).map(channel -> new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
                 return key;
@@ -264,31 +243,13 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
             @Override
             public long pull(long amount, boolean simulate) {
-                if (amount <= 0L) {
-                    return 0L;
-                }
-                var total = 0L;
-                var left = amount;
-                while (left > 0L) {
-                    var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = itemPort.extract(LogisticsInventoryView.toItemStack(key, chunk), simulate);
-                    total += extracted.getCount();
-                    left -= extracted.getCount();
-                    if (extracted.isEmpty()) {
-                        break;
-                    }
-                }
-                return total;
+                return channel.extract(key, amount, simulate);
             }
         });
     }
 
     private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort<?> port, CraftKey key) {
-        if (port.type() != PortType.FLUID) {
-            return Optional.empty();
-        }
-        IPort<FluidStack> fluidPort = port.asFluid();
-        return Optional.of(new IMachineInputRoute() {
+        return fluidChannel(port).map(channel -> new IMachineInputRoute() {
             @Override
             public CraftKey key() {
                 return key;
@@ -296,36 +257,16 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
             @Override
             public long push(long amount, boolean simulate) {
-                if (amount <= 0L) {
-                    return 0L;
-                }
-                var total = 0L;
-                var left = amount;
-                while (left > 0L) {
-                    var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var fluid = LogisticsInventoryView.toFluidStack(key, chunk);
-                    if (!fluidPort.acceptInput(fluid)) {
-                        break;
-                    }
-                    var remaining = fluidPort.insert(fluid, simulate);
-                    var moved = chunk - remaining.getAmount();
-                    total += moved;
-                    left -= moved;
-                    if (moved <= 0L) {
-                        break;
-                    }
-                }
-                return total;
+                return channel.insert(key, amount, simulate);
             }
         });
     }
 
     private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort<?> port, CraftKey key) {
-        if (port.type() != PortType.FLUID || !port.acceptOutput()) {
+        if (!port.acceptOutput()) {
             return Optional.empty();
         }
-        IPort<FluidStack> fluidPort = port.asFluid();
-        return Optional.of(new IMachineOutputRoute() {
+        return fluidChannel(port).map(channel -> new IMachineOutputRoute() {
             @Override
             public CraftKey key() {
                 return key;
@@ -333,23 +274,31 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
             @Override
             public long pull(long amount, boolean simulate) {
-                if (amount <= 0L) {
-                    return 0L;
-                }
-                var total = 0L;
-                var left = amount;
-                while (left > 0L) {
-                    var chunk = (int) Math.min(Integer.MAX_VALUE, left);
-                    var extracted = fluidPort.extract(LogisticsInventoryView.toFluidStack(key, chunk), simulate);
-                    total += extracted.getAmount();
-                    left -= extracted.getAmount();
-                    if (extracted.isEmpty()) {
-                        break;
-                    }
-                }
-                return total;
+                return channel.extract(key, amount, simulate);
             }
         });
+    }
+
+    private static Optional<CraftPortChannel<ItemStack>> itemChannel(IPort<?> port) {
+        if (port.type() != PortType.ITEM) {
+            return Optional.empty();
+        }
+        return Optional.of(new CraftPortChannel<>(
+            ItemPortAdapter.INSTANCE,
+            port.asItem(),
+            LogisticsInventoryView::toItemStack,
+            LogisticsInventoryView::fromItemStack));
+    }
+
+    private static Optional<CraftPortChannel<FluidStack>> fluidChannel(IPort<?> port) {
+        if (port.type() != PortType.FLUID) {
+            return Optional.empty();
+        }
+        return Optional.of(new CraftPortChannel<>(
+            FluidPortAdapter.INSTANCE,
+            port.asFluid(),
+            LogisticsInventoryView::toFluidStack,
+            LogisticsInventoryView::fromFluidStack));
     }
 
     private static final class Lease implements IMachineLease {
