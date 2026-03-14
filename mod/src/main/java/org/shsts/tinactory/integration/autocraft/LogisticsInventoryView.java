@@ -10,17 +10,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.logistics.PortTransmitter;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +34,11 @@ public final class LogisticsInventoryView implements IInventoryView {
         channels = new EnumMap<>(CraftKey.Type.class);
         channels.put(CraftKey.Type.ITEM, new Channel<>(
             ItemPortAdapter.INSTANCE,
-            new PortTransmitter<>(ItemPortAdapter.INSTANCE),
             itemPort,
             LogisticsInventoryView::toItemStack,
             LogisticsInventoryView::fromItemStack));
         channels.put(CraftKey.Type.FLUID, new Channel<>(
             FluidPortAdapter.INSTANCE,
-            new PortTransmitter<>(FluidPortAdapter.INSTANCE),
             fluidPort,
             LogisticsInventoryView::toFluidStack,
             LogisticsInventoryView::fromFluidStack));
@@ -133,7 +128,6 @@ public final class LogisticsInventoryView implements IInventoryView {
 
     private record Channel<T>(
         IStackAdapter<T> stackAdapter,
-        PortTransmitter<T> transmitter,
         IPort<T> port,
         BiFunction<CraftKey, Integer, T> stackOf,
         Function<T, CraftKey> keyOf
@@ -189,127 +183,12 @@ public final class LogisticsInventoryView implements IInventoryView {
         }
 
         private int movedByExtract(T expected, boolean simulate) {
-            if (simulate) {
-                var moved = transmitter.probe(
-                    port,
-                    new SinkPort<>(stackAdapter),
-                    expected,
-                    stackAdapter.amount(expected));
-                return stackAdapter.amount(moved);
-            }
-            return stackAdapter.amount(port.extract(expected, false));
+            return stackAdapter.amount(port.extract(expected, simulate));
         }
 
         private int movedByInsert(T expected, int expectedAmount, boolean simulate) {
-            if (simulate) {
-                var moved = transmitter.probe(
-                    new SourcePort<>(stackAdapter, expected),
-                    port,
-                    expected,
-                    expectedAmount);
-                return stackAdapter.amount(moved);
-            }
-            var remaining = port.insert(expected, false);
+            var remaining = port.insert(expected, simulate);
             return expectedAmount - stackAdapter.amount(remaining);
-        }
-    }
-
-    private record SinkPort<T>(IStackAdapter<T> stackAdapter) implements IPort<T> {
-        @Override
-        public PortType type() {
-            return PortType.NONE;
-        }
-
-        @Override
-        public boolean acceptInput(T stack) {
-            return true;
-        }
-
-        @Override
-        public T insert(T stack, boolean simulate) {
-            return stackAdapter.empty();
-        }
-
-        @Override
-        public T extract(T stack, boolean simulate) {
-            return stackAdapter.empty();
-        }
-
-        @Override
-        public T extract(int limit, boolean simulate) {
-            return stackAdapter.empty();
-        }
-
-        @Override
-        public int getStorageAmount(T stack) {
-            return 0;
-        }
-
-        @Override
-        public Collection<T> getAllStorages() {
-            return List.of();
-        }
-
-        @Override
-        public boolean acceptOutput() {
-            return false;
-        }
-    }
-
-    private record SourcePort<T>(IStackAdapter<T> stackAdapter, T stack) implements IPort<T> {
-        @Override
-        public PortType type() {
-            return PortType.NONE;
-        }
-
-        @Override
-        public boolean acceptInput(T input) {
-            return false;
-        }
-
-        @Override
-        public T insert(T input, boolean simulate) {
-            return input;
-        }
-
-        @Override
-        public T extract(T requested, boolean simulate) {
-            if (stackAdapter.isEmpty(stack) ||
-                stackAdapter.isEmpty(requested) ||
-                !stackAdapter.canStack(stack, requested)) {
-                return stackAdapter.empty();
-            }
-            var moved = Math.min(stackAdapter.amount(stack), stackAdapter.amount(requested));
-            return stackAdapter.withAmount(stack, moved);
-        }
-
-        @Override
-        public T extract(int limit, boolean simulate) {
-            if (stackAdapter.isEmpty(stack) || limit <= 0) {
-                return stackAdapter.empty();
-            }
-            var moved = Math.min(stackAdapter.amount(stack), limit);
-            return stackAdapter.withAmount(stack, moved);
-        }
-
-        @Override
-        public int getStorageAmount(T requested) {
-            if (stackAdapter.isEmpty(stack) ||
-                stackAdapter.isEmpty(requested) ||
-                !stackAdapter.canStack(stack, requested)) {
-                return 0;
-            }
-            return stackAdapter.amount(stack);
-        }
-
-        @Override
-        public Collection<T> getAllStorages() {
-            return stackAdapter.isEmpty(stack) ? List.of() : List.of(stackAdapter.copy(stack));
-        }
-
-        @Override
-        public boolean acceptOutput() {
-            return !stackAdapter.isEmpty(stack);
         }
     }
 }
