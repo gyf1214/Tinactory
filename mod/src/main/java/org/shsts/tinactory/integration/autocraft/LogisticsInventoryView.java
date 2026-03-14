@@ -69,7 +69,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return Objects.requireNonNull(channels.get(type), "missing channel for craft key type " + type);
     }
 
-    static CraftKey fromItemStack(ItemStack stack) {
+    public static CraftKey fromItemStack(ItemStack stack) {
         var itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
         if (itemId == null) {
             throw new IllegalArgumentException("unknown item stack: " + stack);
@@ -78,7 +78,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return CraftKey.item(itemId.toString(), nbt);
     }
 
-    static CraftKey fromFluidStack(FluidStack stack) {
+    public static CraftKey fromFluidStack(FluidStack stack) {
         var fluidId = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
         if (fluidId == null) {
             throw new IllegalArgumentException("unknown fluid stack: " + stack);
@@ -87,7 +87,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return CraftKey.fluid(fluidId.toString(), nbt);
     }
 
-    static ItemStack toItemStack(CraftKey key, int amount) {
+    public static ItemStack toItemStack(CraftKey key, int amount) {
         var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(key.id()));
         if (item == null) {
             throw new IllegalArgumentException("unknown item id: " + key.id());
@@ -100,7 +100,7 @@ public final class LogisticsInventoryView implements IInventoryView {
         return stack;
     }
 
-    static FluidStack toFluidStack(CraftKey key, int amount) {
+    public static FluidStack toFluidStack(CraftKey key, int amount) {
         var fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(key.id()));
         if (fluid == null) {
             throw new IllegalArgumentException("unknown fluid id: " + key.id());
