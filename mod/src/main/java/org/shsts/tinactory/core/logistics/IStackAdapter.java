@@ -19,4 +19,8 @@ public interface IStackAdapter<T> {
     boolean canStack(T left, T right);
 
     IIngredientKey keyOf(T stack);
+
+    default T stackOf(IIngredientKey key, long amount) {
+        throw new UnsupportedOperationException("stackOf is not implemented");
+    }
 }
