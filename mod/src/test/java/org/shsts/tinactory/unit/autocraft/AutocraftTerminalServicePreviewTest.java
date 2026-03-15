@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;

@@ -1,11 +1,11 @@
-package org.shsts.tinactory.unit.autocraft;
+package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
-record TestIngredientKey(PortType type, String id, String nbt) implements IIngredientKey {
+public record TestIngredientKey(PortType type, String id, String nbt) implements IIngredientKey {
     private static final Codec<TestIngredientKey> RAW_CODEC = Codec.STRING.comapFlatMap(
         TestIngredientKey::decode,
         TestIngredientKey::encode
@@ -16,11 +16,11 @@ record TestIngredientKey(PortType type, String id, String nbt) implements IIngre
         key -> (TestIngredientKey) key
     );
 
-    static IIngredientKey item(String id, String nbt) {
+    public static TestIngredientKey item(String id, String nbt) {
         return new TestIngredientKey(PortType.ITEM, id, nbt);
     }
 
-    static IIngredientKey fluid(String id, String nbt) {
+    public static TestIngredientKey fluid(String id, String nbt) {
         return new TestIngredientKey(PortType.FLUID, id, nbt);
     }
 

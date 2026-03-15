@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.logistics;
 
+import org.shsts.tinactory.unit.fixture.TestStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.PortType;
