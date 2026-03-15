@@ -13,6 +13,8 @@ import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -68,7 +70,7 @@ public final class ProcessingRecipePatternSource {
     @Nullable
     private static CraftAmount convertIngredient(IProcessingIngredient ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-            return new CraftAmount(LogisticsInventoryView.fromItemStack(item.stack()), item.stack().getCount());
+            return new CraftAmount(ItemPortAdapter.INSTANCE.keyOf(item.stack()), item.stack().getCount());
         }
         if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase items) {
             var choices = items.ingredient.getItems();
@@ -84,10 +86,10 @@ public final class ProcessingRecipePatternSource {
                 return null;
             }
             var size = Math.max(1, items.amount);
-            return new CraftAmount(LogisticsInventoryView.fromItemStack(selected.get()), size);
+            return new CraftAmount(ItemPortAdapter.INSTANCE.keyOf(selected.get()), size);
         }
         if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return new CraftAmount(LogisticsInventoryView.fromFluidStack(fluid.fluid()), fluid.fluid().getAmount());
+            return new CraftAmount(FluidPortAdapter.INSTANCE.keyOf(fluid.fluid()), fluid.fluid().getAmount());
         }
         return null;
     }
@@ -98,13 +100,13 @@ public final class ProcessingRecipePatternSource {
             if (item.rate < 1d) {
                 return null;
             }
-            return new CraftAmount(LogisticsInventoryView.fromItemStack(item.stack), item.stack.getCount());
+            return new CraftAmount(ItemPortAdapter.INSTANCE.keyOf(item.stack), item.stack.getCount());
         }
         if (result instanceof ProcessingResults.FluidResult fluid) {
             if (fluid.rate < 1d) {
                 return null;
             }
-            return new CraftAmount(LogisticsInventoryView.fromFluidStack(fluid.stack), fluid.stack.getAmount());
+            return new CraftAmount(FluidPortAdapter.INSTANCE.keyOf(fluid.stack), fluid.stack.getAmount());
         }
         return null;
     }

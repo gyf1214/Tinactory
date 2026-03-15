@@ -10,6 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.Comparator;
 import java.util.List;
@@ -40,8 +41,8 @@ public final class SmeltingRecipePatternSource {
         }
         return new CraftPattern(
             recipe.getId().toString(),
-            List.of(new CraftAmount(LogisticsInventoryView.fromItemStack(input), input.getCount())),
-            List.of(new CraftAmount(LogisticsInventoryView.fromItemStack(output), output.getCount())),
+            List.of(new CraftAmount(ItemPortAdapter.INSTANCE.keyOf(input), input.getCount())),
+            List.of(new CraftAmount(ItemPortAdapter.INSTANCE.keyOf(output), output.getCount())),
             new MachineRequirement(SMELTING_RECIPE_TYPE_ID, 0, List.of()));
     }
 }

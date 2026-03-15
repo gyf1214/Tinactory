@@ -56,12 +56,4 @@ public final class LogisticsInventoryView implements IInventoryView {
     private CraftPortChannel<?> channel(PortType type) {
         return Objects.requireNonNull(channels.get(type), "missing channel for ingredient key type " + type);
     }
-
-    public static IIngredientKey fromItemStack(ItemStack stack) {
-        return ItemPortAdapter.INSTANCE.keyOf(stack);
-    }
-
-    public static IIngredientKey fromFluidStack(FluidStack stack) {
-        return FluidPortAdapter.INSTANCE.keyOf(stack);
-    }
 }
