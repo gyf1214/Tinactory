@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.autocraft;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsPatternRepository implements IPatternRepository {
-    private final Map<CraftKey, List<CraftPattern>> byOutput = new HashMap<>();
+    private final Map<IIngredientKey, List<CraftPattern>> byOutput = new HashMap<>();
 
     public LogisticsPatternRepository(List<CraftPattern> patterns) {
         for (var pattern : patterns) {
@@ -29,7 +29,7 @@ public final class LogisticsPatternRepository implements IPatternRepository {
     }
 
     @Override
-    public List<CraftPattern> findPatternsProducing(CraftKey key) {
+    public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
         return byOutput.getOrDefault(key, List.of());
     }
 }

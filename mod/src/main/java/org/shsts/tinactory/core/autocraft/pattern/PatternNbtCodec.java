@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -7,19 +8,26 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintRegistry;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayList;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
-import static org.shsts.tinactory.core.autocraft.pattern.CraftKey.Type.FLUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PatternNbtCodec {
     private final IMachineConstraintRegistry constraints;
+    private final Codec<IIngredientKey> keyCodec;
 
-    public PatternNbtCodec(IMachineConstraintRegistry constraints) {
+    public PatternNbtCodec(IMachineConstraintRegistry constraints, Codec<IIngredientKey> keyCodec) {
         this.constraints = constraints;
+        this.keyCodec = keyCodec;
+    }
+
+    public Codec<IIngredientKey> keyCodec() {
+        return keyCodec;
     }
 
     public CompoundTag encodePattern(CraftPattern pattern) {
@@ -48,18 +56,13 @@ public final class PatternNbtCodec {
     }
 
     private CraftAmount decodeAmount(CompoundTag tag) {
-        var type = CraftKey.Type.valueOf(tag.getString("type"));
-        var key = type == FLUID ?
-            CraftKey.fluid(tag.getString("id"), tag.getString("nbt")) :
-            CraftKey.item(tag.getString("id"), tag.getString("nbt"));
+        var key = CodecHelper.parseTag(keyCodec, tag.get("key"));
         return new CraftAmount(key, tag.getLong("amount"));
     }
 
     private CompoundTag encodeAmount(CraftAmount amount) {
         var tag = new CompoundTag();
-        tag.putString("type", amount.key().type().name());
-        tag.putString("id", amount.key().id());
-        tag.putString("nbt", amount.key().nbt());
+        tag.put("key", CodecHelper.encodeTag(keyCodec, amount.key()));
         tag.putLong("amount", amount.amount());
         return tag;
     }

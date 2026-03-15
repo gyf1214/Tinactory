@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -31,7 +32,8 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
-    private final PatternNbtCodec snapshotCodec = new PatternNbtCodec(createConstraintRegistry());
+    private final PatternNbtCodec snapshotCodec =
+        new PatternNbtCodec(createConstraintRegistry(), IngredientKeyCodecHelper.CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable

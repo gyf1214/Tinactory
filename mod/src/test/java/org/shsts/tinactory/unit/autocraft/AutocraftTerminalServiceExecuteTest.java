@@ -2,13 +2,13 @@ package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
@@ -35,10 +35,10 @@ class AutocraftTerminalServiceExecuteTest {
             new StaticPlanner(),
             () -> List.of(
                 pattern("tinactory:p1", List.of(
-                    new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1))),
+                    new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1))),
                 pattern("tinactory:p2", List.of(
-                    new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 2),
-                    new CraftAmount(CraftKey.fluid("minecraft:water", ""), 1000)))),
+                    new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 2),
+                    new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 1000)))),
             List::of,
             List::of,
             List::of);
@@ -46,8 +46,8 @@ class AutocraftTerminalServiceExecuteTest {
         var requestables = service.listRequestables();
 
         assertEquals(2, requestables.size());
-        assertEquals(CraftKey.Type.ITEM, requestables.get(0).type());
-        assertEquals(CraftKey.Type.FLUID, requestables.get(1).type());
+        assertEquals(PortType.ITEM, requestables.get(0).type());
+        assertEquals(PortType.FLUID, requestables.get(1).type());
     }
 
     @Test
@@ -55,8 +55,8 @@ class AutocraftTerminalServiceExecuteTest {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
         var previewPlanner = new StaticPlanner(planRequiring(
-            new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
-            new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1)));
+            new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
+            new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)));
         var jobService = new AutocraftJobService(cpu,
             (targets, available) -> {
                 throw new IllegalStateException("planner should not be called during execute tick");
@@ -68,10 +68,10 @@ class AutocraftTerminalServiceExecuteTest {
             List::of,
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
-            () -> List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 64)),
+            () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
             id -> id.equals(cpu) ? jobService : null);
 
-        service.preview(CraftKey.item("minecraft:iron_plate", ""), 1);
+        service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         var execute = service.execute(cpu);
 
         assertTrue(execute.isSuccess());
@@ -94,14 +94,14 @@ class AutocraftTerminalServiceExecuteTest {
         };
         var service = new AutocraftTerminalService(
             new StaticPlanner(planRequiring(
-                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1))),
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1))),
             List::of,
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
-            () -> List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 64)),
+            () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
             id -> id.equals(cpu) ? jobService : null);
-        service.preview(CraftKey.item("minecraft:iron_plate", ""), 1);
+        service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         availableCpus.clear();
 
         var execute = service.execute(cpu);
@@ -112,7 +112,7 @@ class AutocraftTerminalServiceExecuteTest {
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
         return new CraftPattern(id, List.of(
-            new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
+            new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
             outputs, new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 

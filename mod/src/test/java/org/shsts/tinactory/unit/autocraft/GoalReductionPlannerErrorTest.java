@@ -4,7 +4,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class GoalReductionPlannerErrorTest {
     @Test
     void plannerShouldDetectDirectCycle() {
-        var a = CraftKey.item("tinactory:a", "");
+        var a = TestIngredientKey.item("tinactory:a", "");
         var loop = pattern("tinactory:a_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(a, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(loop)));
 
@@ -34,9 +33,9 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldDetectIndirectCycleWithPath() {
-        var a = CraftKey.item("tinactory:a", "");
-        var b = CraftKey.item("tinactory:b", "");
-        var c = CraftKey.item("tinactory:c", "");
+        var a = TestIngredientKey.item("tinactory:a", "");
+        var b = TestIngredientKey.item("tinactory:b", "");
+        var c = TestIngredientKey.item("tinactory:c", "");
 
         var aFromB = pattern("tinactory:a_from_b", List.of(new CraftAmount(b, 1)), List.of(new CraftAmount(a, 1)));
         var bFromC = pattern("tinactory:b_from_c", List.of(new CraftAmount(c, 1)), List.of(new CraftAmount(b, 1)));
@@ -52,7 +51,7 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldReportMissingPatternForTarget() {
-        var missing = CraftKey.item("tinactory:unknown", "");
+        var missing = TestIngredientKey.item("tinactory:unknown", "");
         var planner = new GoalReductionPlanner(repo(List.of()));
 
         var result = planner.plan(List.of(new CraftAmount(missing, 1)), List.of());
@@ -64,8 +63,8 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldReportUnsatisfiedBaseResource() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var gearPattern = pattern(
             "tinactory:gear_from_ingot",
             List.of(new CraftAmount(ingot, 2)),

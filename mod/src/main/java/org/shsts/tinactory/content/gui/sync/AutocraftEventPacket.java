@@ -3,8 +3,11 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.UUID;
@@ -21,7 +24,7 @@ public class AutocraftEventPacket implements IPacket {
 
     private Action action;
     @Nullable
-    private CraftKey target;
+    private IIngredientKey target;
     private long quantity;
     @Nullable
     private UUID cpuId;
@@ -30,7 +33,7 @@ public class AutocraftEventPacket implements IPacket {
 
     private AutocraftEventPacket(
         Action action,
-        @Nullable CraftKey target,
+        @Nullable IIngredientKey target,
         long quantity,
         @Nullable UUID cpuId) {
 
@@ -40,7 +43,7 @@ public class AutocraftEventPacket implements IPacket {
         this.cpuId = cpuId;
     }
 
-    public static AutocraftEventPacket preview(CraftKey target, long quantity, UUID cpuId) {
+    public static AutocraftEventPacket preview(IIngredientKey target, long quantity, UUID cpuId) {
         return new AutocraftEventPacket(Action.PREVIEW, target, quantity, cpuId);
     }
 
@@ -61,7 +64,7 @@ public class AutocraftEventPacket implements IPacket {
     }
 
     @Nullable
-    public CraftKey target() {
+    public IIngredientKey target() {
         return target;
     }
 
@@ -79,9 +82,7 @@ public class AutocraftEventPacket implements IPacket {
         buf.writeEnum(action);
         buf.writeBoolean(target != null);
         if (target != null) {
-            buf.writeEnum(target.type());
-            buf.writeUtf(target.id());
-            buf.writeUtf(target.nbt());
+            buf.writeNbt((CompoundTag) CodecHelper.encodeTag(IngredientKeyCodecHelper.CODEC, target));
         }
         buf.writeLong(quantity);
         buf.writeBoolean(cpuId != null);
@@ -93,10 +94,9 @@ public class AutocraftEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        target = buf.readBoolean() ? new CraftKey(
-            buf.readEnum(CraftKey.Type.class),
-            buf.readUtf(),
-            buf.readUtf()) : null;
+        target = buf.readBoolean() ?
+            CodecHelper.parseTag(IngredientKeyCodecHelper.CODEC, buf.readNbt()) :
+            null;
         quantity = buf.readLong();
         cpuId = buf.readBoolean() ? buf.readUUID() : null;
     }

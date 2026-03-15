@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
@@ -208,7 +208,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         var current = stack.get(stack.size() - 1);
         for (var i = 0; i < stack.size() - 1; i++) {
             if (stack.get(i).key.equals(current.key)) {
-                var cyclePath = new ArrayList<CraftKey>();
+                var cyclePath = new ArrayList<IIngredientKey>();
                 for (var j = i; j < stack.size(); j++) {
                     cyclePath.add(stack.get(j).key);
                 }
@@ -218,13 +218,13 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         return null;
     }
 
-    private List<CraftPattern> choosePatterns(CraftKey key) {
+    private List<CraftPattern> choosePatterns(IIngredientKey key) {
         return patterns.findPatternsProducing(key).stream()
             .sorted(Comparator.comparing(CraftPattern::patternId))
             .toList();
     }
 
-    private static long getProducedAmount(CraftPattern pattern, CraftKey key) {
+    private static long getProducedAmount(CraftPattern pattern, IIngredientKey key) {
         for (var output : pattern.outputs()) {
             if (output.key().equals(key)) {
                 return output.amount();
@@ -238,8 +238,8 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     private static List<CraftStep> classifyStepOutputRoles(List<CraftStep> steps, List<CraftAmount> targets) {
-        var remainingIntermediateDemand = new LinkedHashMap<CraftKey, Long>();
-        var remainingFinalDemand = new LinkedHashMap<CraftKey, Long>();
+        var remainingIntermediateDemand = new LinkedHashMap<IIngredientKey, Long>();
+        var remainingFinalDemand = new LinkedHashMap<IIngredientKey, Long>();
         for (var target : targets) {
             addDemand(remainingFinalDemand, target.key(), target.amount());
         }
@@ -278,22 +278,22 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         return out;
     }
 
-    private static Map<CraftKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
-        var aggregated = new LinkedHashMap<CraftKey, Long>();
+    private static Map<IIngredientKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
+        var aggregated = new LinkedHashMap<IIngredientKey, Long>();
         for (var output : outputs) {
             addDemand(aggregated, output.key(), output.amount() * runs);
         }
         return aggregated;
     }
 
-    private static void addDemand(Map<CraftKey, Long> demandMap, CraftKey key, long amount) {
+    private static void addDemand(Map<IIngredientKey, Long> demandMap, IIngredientKey key, long amount) {
         if (amount <= 0L) {
             return;
         }
         demandMap.put(key, demandMap.getOrDefault(key, 0L) + amount);
     }
 
-    private static long consumeDemand(Map<CraftKey, Long> demandMap, CraftKey key, long availableAmount) {
+    private static long consumeDemand(Map<IIngredientKey, Long> demandMap, IIngredientKey key, long availableAmount) {
         if (availableAmount <= 0L) {
             return 0L;
         }

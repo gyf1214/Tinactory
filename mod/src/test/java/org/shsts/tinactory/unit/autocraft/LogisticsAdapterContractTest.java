@@ -22,7 +22,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent.PortInfo;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LogisticsAdapterContractTest {
     @Test
     void repositoryShouldReturnPatternsSortedByPatternId() {
-        var key = CraftKey.item("minecraft:iron_ingot", "");
+        var key = TestIngredientKey.item("minecraft:iron_ingot", "");
         var second = pattern("tinactory:z_second", key);
         var first = pattern("tinactory:a_first", key);
         var repo = new LogisticsPatternRepository(List.of(second, first));
@@ -64,8 +64,8 @@ class LogisticsAdapterContractTest {
 
         var lease = allocator.allocate(new CraftStep("s1", new CraftPattern(
             "tinactory:test",
-            List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
-            List.of(new CraftAmount(CraftKey.item("minecraft:stone", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:stone", ""), 1)),
             requirement), 1));
 
         assertTrue(lease.isPresent());
@@ -83,8 +83,8 @@ class LogisticsAdapterContractTest {
 
         var lease = allocator.allocate(new CraftStep("s1", new CraftPattern(
             "tinactory:test",
-            List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
-            List.of(new CraftAmount(CraftKey.item("minecraft:stone", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:stone", ""), 1)),
             requirement), 1));
 
         assertTrue(lease.isEmpty());
@@ -102,8 +102,8 @@ class LogisticsAdapterContractTest {
 
     @Test
     void allocatorShouldMapDuplicateInputSlotsToDistinctConstrainedPorts() {
-        var ore = CraftKey.item("minecraft:iron_ore", "");
-        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var ore = TestIngredientKey.item("minecraft:iron_ore", "");
+        var ingot = TestIngredientKey.item("minecraft:iron_ingot", "");
         var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
         var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
         var allocator = new LogisticsMachineAllocator(
@@ -133,8 +133,8 @@ class LogisticsAdapterContractTest {
 
     @Test
     void allocatorShouldHonorDirectionConstraintForInputRoutes() {
-        var ore = CraftKey.item("minecraft:iron_ore", "");
-        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var ore = TestIngredientKey.item("minecraft:iron_ore", "");
+        var ingot = TestIngredientKey.item("minecraft:iron_ingot", "");
         var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
         var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
         var allocator = new LogisticsMachineAllocator(
@@ -163,8 +163,8 @@ class LogisticsAdapterContractTest {
 
     @Test
     void allocatorShouldSkipMachineWhenAnyConstrainedSlotCannotRouteAndFallbackToNext() {
-        var ore = CraftKey.item("minecraft:iron_ore", "");
-        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var ore = TestIngredientKey.item("minecraft:iron_ore", "");
+        var ingot = TestIngredientKey.item("minecraft:iron_ingot", "");
         var firstMachine = new FakeMachine("11111111-1111-1111-1111-111111111111");
         var secondMachine = new FakeMachine("22222222-2222-2222-2222-222222222222");
         var allocator = new LogisticsMachineAllocator(
@@ -193,8 +193,8 @@ class LogisticsAdapterContractTest {
 
     @Test
     void allocatorShouldReturnEmptyWhenNoMachineMatchesSlotConstraints() {
-        var ore = CraftKey.item("minecraft:iron_ore", "");
-        var ingot = CraftKey.item("minecraft:iron_ingot", "");
+        var ore = TestIngredientKey.item("minecraft:iron_ore", "");
+        var ingot = TestIngredientKey.item("minecraft:iron_ingot", "");
         var machine = new FakeMachine("11111111-1111-1111-1111-111111111111");
         var allocator = new LogisticsMachineAllocator(
             () -> List.of(new PortInfo(machine, 0, new TrackingItemPort(true, true, 32), BlockPos.ZERO, 0)),
@@ -215,10 +215,10 @@ class LogisticsAdapterContractTest {
         assertTrue(allocator.allocate(step).isEmpty());
     }
 
-    private static CraftPattern pattern(String id, CraftKey key) {
+    private static CraftPattern pattern(String id, IIngredientKey key) {
         return new CraftPattern(
             id,
-            List.of(new CraftAmount(CraftKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(key, 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }

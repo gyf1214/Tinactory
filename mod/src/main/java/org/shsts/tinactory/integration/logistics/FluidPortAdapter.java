@@ -154,6 +154,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         public int hashCode() {
             return Objects.hash(id, nbt);
         }
+
+        @Override
+        public String toString() {
+            return nbt.isEmpty() ? id : id + nbt;
+        }
     }
 
     private record FluidKeyData(String id, String nbt) {}

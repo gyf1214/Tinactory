@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.autocraft;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PatternCellIntegrationTest {
     @Test
     void patternCellCapabilityShouldUseFixedByteAccounting() {
-        var port = new PatternCellPortState(2048);
+        var port = new PatternCellPortState(2048, TestIngredientKey.CODEC);
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -31,7 +30,7 @@ class PatternCellIntegrationTest {
 
     @Test
     void patternCellCapabilityShouldPersistToItemTag() {
-        var port = new PatternCellPortState(2048);
+        var port = new PatternCellPortState(2048, TestIngredientKey.CODEC);
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -39,7 +38,7 @@ class PatternCellIntegrationTest {
         assertTrue(port.insert(second));
         assertTrue(port.remove(first.patternId()));
 
-        var clonedPort = new PatternCellPortState(2048);
+        var clonedPort = new PatternCellPortState(2048, TestIngredientKey.CODEC);
         clonedPort.deserialize(port.serialize());
 
         assertEquals(List.of(second), clonedPort.patterns());
@@ -49,8 +48,8 @@ class PatternCellIntegrationTest {
     private static CraftPattern pattern(String id) {
         return new CraftPattern(
             id,
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 }

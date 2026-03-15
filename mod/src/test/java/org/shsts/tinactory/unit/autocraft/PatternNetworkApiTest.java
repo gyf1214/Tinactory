@@ -13,7 +13,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.NetworkPatternCell;
@@ -80,8 +79,8 @@ class PatternNetworkApiTest {
     private static CraftPattern pattern(String id) {
         return new CraftPattern(
             id,
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 

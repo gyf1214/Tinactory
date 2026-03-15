@@ -10,12 +10,12 @@ import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 
@@ -27,11 +27,11 @@ class PatternNbtCodecTest {
     void codecShouldRoundTripPattern() {
         var registry = new MachineConstraintRegistry();
         registry.register(new TestConstraintType(), new TestConstraintCodec());
-        var codec = new PatternNbtCodec(registry);
+        var codec = new PatternNbtCodec(registry, TestIngredientKey.CODEC);
         var pattern = new CraftPattern(
             "tinactory:test",
-            List.of(new CraftAmount(CraftKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
-            List.of(new CraftAmount(CraftKey.fluid("minecraft:water", ""), 250)),
+            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
+            List.of(new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 250)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 2,
                 List.of(new TestConstraint("v1"))));
 
@@ -44,15 +44,15 @@ class PatternNbtCodecTest {
     @Test
     void codecShouldRejectUnknownConstraintType() {
         var registry = new MachineConstraintRegistry();
-        var codec = new PatternNbtCodec(registry);
+        var codec = new PatternNbtCodec(registry, TestIngredientKey.CODEC);
         var tag = new CompoundTag();
         tag.putString("patternId", "tinactory:bad");
         tag.put("inputs", new ListTag());
         var outputs = new ListTag();
         var out = new CompoundTag();
-        out.putString("type", "ITEM");
-        out.putString("id", "minecraft:iron_ingot");
-        out.putString("nbt", "");
+        out.put("key", CodecHelper.encodeTag(
+            TestIngredientKey.CODEC,
+            TestIngredientKey.item("minecraft:iron_ingot", "")));
         out.putLong("amount", 1);
         outputs.add(out);
         tag.put("outputs", outputs);
@@ -72,15 +72,15 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
-        var codec = new PatternNbtCodec(AutocraftCpu.createConstraintRegistry());
+        var codec = new PatternNbtCodec(AutocraftCpu.createConstraintRegistry(), TestIngredientKey.CODEC);
         var pattern = new CraftPattern(
             "tinactory:slot_constraints",
             List.of(
-                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(CraftKey.item("minecraft:iron_ingot", ""), 1)),
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(
-                new CraftAmount(CraftKey.item("minecraft:iron_plate", ""), 1),
-                new CraftAmount(CraftKey.item("minecraft:slag", ""), 1)),
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1),
+                new CraftAmount(TestIngredientKey.item("minecraft:slag", ""), 1)),
             new MachineRequirement(
                 new ResourceLocation("tinactory", "press"),
                 1,

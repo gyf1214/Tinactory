@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.autocraft;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
@@ -24,7 +23,7 @@ class AutocraftTerminalServicePreviewTest {
             List::of,
             List::of);
 
-        var result = service.preview(CraftKey.item("minecraft:iron_ingot", ""), 3);
+        var result = service.preview(TestIngredientKey.item("minecraft:iron_ingot", ""), 3);
 
         assertTrue(result.isSuccess());
         assertEquals(0, result.planSnapshot().steps().size());

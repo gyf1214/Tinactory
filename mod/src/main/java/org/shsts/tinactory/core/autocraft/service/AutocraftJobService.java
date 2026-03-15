@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.service;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -13,10 +14,11 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -135,11 +137,11 @@ public class AutocraftJobService {
     }
 
     public Optional<CompoundTag> serializeRunningSnapshot(PatternNbtCodec codec) {
-        return snapshotRunning().map(snapshot -> serializeSnapshot(snapshot, codec));
+        return snapshotRunning().map(snapshot -> serializeSnapshot(snapshot, codec, codec.keyCodec()));
     }
 
     public void restoreRunningSnapshot(CompoundTag tag, PatternNbtCodec codec) {
-        restoreRunning(deserializeSnapshot(tag, codec));
+        restoreRunning(deserializeSnapshot(tag, codec, codec.keyCodec()));
     }
 
     public UUID submit(List<CraftAmount> targets) {
@@ -329,62 +331,60 @@ public class AutocraftJobService {
         CraftPlan plan,
         ExecutorRuntimeSnapshot runtimeSnapshot) {}
 
-    private static CompoundTag serializeSnapshot(RunningSnapshot snapshot, PatternNbtCodec codec) {
+    private static CompoundTag serializeSnapshot(
+        RunningSnapshot snapshot,
+        PatternNbtCodec codec,
+        Codec<IIngredientKey> keyCodec) {
         var tag = new CompoundTag();
         tag.putUUID("cpuId", snapshot.cpuId());
         tag.putUUID("jobId", snapshot.jobId());
-        tag.put("targets", serializeAmounts(snapshot.targets()));
-        tag.put("plan", serializePlan(snapshot.plan(), codec));
-        tag.put("runtime", serializeRuntime(snapshot.runtimeSnapshot()));
+        tag.put("targets", serializeAmounts(snapshot.targets(), keyCodec));
+        tag.put("plan", serializePlan(snapshot.plan(), codec, keyCodec));
+        tag.put("runtime", serializeRuntime(snapshot.runtimeSnapshot(), keyCodec));
         return tag;
     }
 
-    private static RunningSnapshot deserializeSnapshot(CompoundTag tag, PatternNbtCodec codec) {
+    private static RunningSnapshot deserializeSnapshot(
+        CompoundTag tag,
+        PatternNbtCodec codec,
+        Codec<IIngredientKey> keyCodec) {
         return new RunningSnapshot(
             tag.getUUID("cpuId"),
             tag.getUUID("jobId"),
-            deserializeAmounts(tag.getList("targets", TAG_COMPOUND)),
-            deserializePlan(tag.getCompound("plan"), codec),
-            deserializeRuntime(tag.getCompound("runtime")));
+            deserializeAmounts(tag.getList("targets", TAG_COMPOUND), keyCodec),
+            deserializePlan(tag.getCompound("plan"), codec, keyCodec),
+            deserializeRuntime(tag.getCompound("runtime"), keyCodec));
     }
 
-    private static ListTag serializeAmounts(List<CraftAmount> amounts) {
+    private static ListTag serializeAmounts(List<CraftAmount> amounts, Codec<IIngredientKey> keyCodec) {
         var out = new ListTag();
         for (var amount : amounts) {
-            out.add(serializeAmount(amount));
+            out.add(serializeAmount(amount, keyCodec));
         }
         return out;
     }
 
-    private static List<CraftAmount> deserializeAmounts(ListTag amounts) {
+    private static List<CraftAmount> deserializeAmounts(ListTag amounts, Codec<IIngredientKey> keyCodec) {
         var out = new ArrayList<CraftAmount>(amounts.size());
         for (var i = 0; i < amounts.size(); i++) {
-            out.add(deserializeAmount(amounts.getCompound(i)));
+            out.add(deserializeAmount(amounts.getCompound(i), keyCodec));
         }
         return out;
     }
 
-    private static CompoundTag serializeAmount(CraftAmount amount) {
+    private static CompoundTag serializeAmount(CraftAmount amount, Codec<IIngredientKey> keyCodec) {
         var tag = new CompoundTag();
-        tag.putString("type", amount.key().type().name());
-        tag.putString("id", amount.key().id());
-        tag.putString("nbt", amount.key().nbt());
+        tag.put("key", CodecHelper.encodeTag(keyCodec, amount.key()));
         tag.putLong("amount", amount.amount());
         return tag;
     }
 
-    private static CraftAmount deserializeAmount(CompoundTag tag) {
-        var type = CraftKey.Type.valueOf(tag.getString("type"));
-        CraftKey key;
-        if (type == CraftKey.Type.FLUID) {
-            key = CraftKey.fluid(tag.getString("id"), tag.getString("nbt"));
-        } else {
-            key = CraftKey.item(tag.getString("id"), tag.getString("nbt"));
-        }
+    private static CraftAmount deserializeAmount(CompoundTag tag, Codec<IIngredientKey> keyCodec) {
+        var key = CodecHelper.parseTag(keyCodec, tag.get("key"));
         return new CraftAmount(key, tag.getLong("amount"));
     }
 
-    private static CompoundTag serializePlan(CraftPlan plan, PatternNbtCodec codec) {
+    private static CompoundTag serializePlan(CraftPlan plan, PatternNbtCodec codec, Codec<IIngredientKey> keyCodec) {
         var tag = new CompoundTag();
         var steps = new ListTag();
         for (var step : plan.steps()) {
@@ -392,15 +392,18 @@ public class AutocraftJobService {
             stepTag.putString("stepId", step.stepId());
             stepTag.putLong("runs", step.runs());
             stepTag.put("pattern", codec.encodePattern(step.pattern()));
-            stepTag.put("requiredIntermediateOutputs", serializeAmounts(step.requiredIntermediateOutputs()));
-            stepTag.put("requiredFinalOutputs", serializeAmounts(step.requiredFinalOutputs()));
+            stepTag.put("requiredIntermediateOutputs", serializeAmounts(step.requiredIntermediateOutputs(), keyCodec));
+            stepTag.put("requiredFinalOutputs", serializeAmounts(step.requiredFinalOutputs(), keyCodec));
             steps.add(stepTag);
         }
         tag.put("steps", steps);
         return tag;
     }
 
-    private static CraftPlan deserializePlan(CompoundTag tag, PatternNbtCodec codec) {
+    private static CraftPlan deserializePlan(
+        CompoundTag tag,
+        PatternNbtCodec codec,
+        Codec<IIngredientKey> keyCodec) {
         var steps = tag.getList("steps", TAG_COMPOUND);
         var out = new ArrayList<CraftStep>(steps.size());
         for (var i = 0; i < steps.size(); i++) {
@@ -409,13 +412,13 @@ public class AutocraftJobService {
                 stepTag.getString("stepId"),
                 codec.decodePattern(stepTag.getCompound("pattern")),
                 stepTag.getLong("runs"),
-                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND)),
-                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND))));
+                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND), keyCodec),
+                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND), keyCodec)));
         }
         return new CraftPlan(out);
     }
 
-    private static CompoundTag serializeRuntime(ExecutorRuntimeSnapshot snapshot) {
+    private static CompoundTag serializeRuntime(ExecutorRuntimeSnapshot snapshot, Codec<IIngredientKey> keyCodec) {
         var tag = new CompoundTag();
         tag.putString("state", snapshot.state().name());
         tag.putString("phase", snapshot.phase().name());
@@ -429,19 +432,19 @@ public class AutocraftJobService {
             tag.putString("pendingTerminalState", snapshot.pendingTerminalState().name());
         }
         tag.putInt("nextStepIndex", snapshot.nextStepIndex());
-        tag.put("stepBuffer", serializeKeyedAmounts(snapshot.stepBuffer()));
-        tag.put("stepProducedOutputs", serializeKeyedAmounts(snapshot.stepProducedOutputs()));
-        tag.put("stepRequiredOutputs", serializeKeyedAmounts(snapshot.stepRequiredOutputs()));
-        tag.put("stepRequiredInputs", serializeKeyedAmounts(snapshot.stepRequiredInputs()));
-        tag.put("transmittedInputs", serializeKeyedAmounts(snapshot.transmittedInputs()));
-        tag.put("transmittedRequiredOutputs", serializeKeyedAmounts(snapshot.transmittedRequiredOutputs()));
+        tag.put("stepBuffer", serializeKeyedAmounts(snapshot.stepBuffer(), keyCodec));
+        tag.put("stepProducedOutputs", serializeKeyedAmounts(snapshot.stepProducedOutputs(), keyCodec));
+        tag.put("stepRequiredOutputs", serializeKeyedAmounts(snapshot.stepRequiredOutputs(), keyCodec));
+        tag.put("stepRequiredInputs", serializeKeyedAmounts(snapshot.stepRequiredInputs(), keyCodec));
+        tag.put("transmittedInputs", serializeKeyedAmounts(snapshot.transmittedInputs(), keyCodec));
+        tag.put("transmittedRequiredOutputs", serializeKeyedAmounts(snapshot.transmittedRequiredOutputs(), keyCodec));
         if (snapshot.leasedMachineId() != null) {
             tag.putUUID("leasedMachineId", snapshot.leasedMachineId());
         }
         return tag;
     }
 
-    private static ExecutorRuntimeSnapshot deserializeRuntime(CompoundTag tag) {
+    private static ExecutorRuntimeSnapshot deserializeRuntime(CompoundTag tag, Codec<IIngredientKey> keyCodec) {
         return new ExecutorRuntimeSnapshot(
             ExecutionState.valueOf(tag.getString("state")),
             ExecutionDetails.Phase.valueOf(tag.getString("phase")),
@@ -449,12 +452,12 @@ public class AutocraftJobService {
             tag.contains("blockedReason") ? ExecutionError.Code.valueOf(tag.getString("blockedReason")) : null,
             tag.contains("pendingTerminalState") ? ExecutionState.valueOf(tag.getString("pendingTerminalState")) : null,
             tag.getInt("nextStepIndex"),
-            deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND)),
-            deserializeKeyedAmounts(tag.getList("stepProducedOutputs", TAG_COMPOUND)),
-            deserializeKeyedAmounts(tag.getList("stepRequiredOutputs", TAG_COMPOUND)),
-            deserializeKeyedAmounts(tag.getList("stepRequiredInputs", TAG_COMPOUND)),
-            deserializeKeyedAmounts(tag.getList("transmittedInputs", TAG_COMPOUND)),
-            deserializeKeyedAmounts(tag.getList("transmittedRequiredOutputs", TAG_COMPOUND)),
+            deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND), keyCodec),
+            deserializeKeyedAmounts(tag.getList("stepProducedOutputs", TAG_COMPOUND), keyCodec),
+            deserializeKeyedAmounts(tag.getList("stepRequiredOutputs", TAG_COMPOUND), keyCodec),
+            deserializeKeyedAmounts(tag.getList("stepRequiredInputs", TAG_COMPOUND), keyCodec),
+            deserializeKeyedAmounts(tag.getList("transmittedInputs", TAG_COMPOUND), keyCodec),
+            deserializeKeyedAmounts(tag.getList("transmittedRequiredOutputs", TAG_COMPOUND), keyCodec),
             tag.hasUUID("leasedMachineId") ? tag.getUUID("leasedMachineId") : null);
     }
 
@@ -473,30 +476,22 @@ public class AutocraftJobService {
             tag.getString("message"));
     }
 
-    private static ListTag serializeKeyedAmounts(Map<CraftKey, Long> amounts) {
+    private static ListTag serializeKeyedAmounts(Map<IIngredientKey, Long> amounts, Codec<IIngredientKey> keyCodec) {
         var out = new ListTag();
         for (var entry : amounts.entrySet()) {
             var tag = new CompoundTag();
-            tag.putString("type", entry.getKey().type().name());
-            tag.putString("id", entry.getKey().id());
-            tag.putString("nbt", entry.getKey().nbt());
+            tag.put("key", CodecHelper.encodeTag(keyCodec, entry.getKey()));
             tag.putLong("amount", entry.getValue());
             out.add(tag);
         }
         return out;
     }
 
-    private static Map<CraftKey, Long> deserializeKeyedAmounts(ListTag tags) {
-        var out = new LinkedHashMap<CraftKey, Long>();
+    private static Map<IIngredientKey, Long> deserializeKeyedAmounts(ListTag tags, Codec<IIngredientKey> keyCodec) {
+        var out = new LinkedHashMap<IIngredientKey, Long>();
         for (var i = 0; i < tags.size(); i++) {
             var tag = tags.getCompound(i);
-            var type = CraftKey.Type.valueOf(tag.getString("type"));
-            CraftKey key;
-            if (type == CraftKey.Type.FLUID) {
-                key = CraftKey.fluid(tag.getString("id"), tag.getString("nbt"));
-            } else {
-                key = CraftKey.item(tag.getString("id"), tag.getString("nbt"));
-            }
+            var key = CodecHelper.parseTag(keyCodec, tag.get("key"));
             out.put(key, tag.getLong("amount"));
         }
         return out;

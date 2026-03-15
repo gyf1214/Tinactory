@@ -154,6 +154,11 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         public int hashCode() {
             return Objects.hash(id, nbt);
         }
+
+        @Override
+        public String toString() {
+            return nbt.isEmpty() ? id : id + nbt;
+        }
     }
 
     private record ItemKeyData(String id, String nbt) {}

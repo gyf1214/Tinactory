@@ -5,7 +5,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
@@ -18,15 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ChannelMachineRouteTest {
     @Test
     void inputRouteShouldTransferViaInsert() {
-        var key = CraftKey.item("tinactory:iron", "");
+        var key = Stack.ADAPTER.keyOf(new Stack("tinactory:iron", 1));
         var port = new RecordingPort();
         var route = new ChannelMachineRoute<>(
             key,
             IMachineRoute.Direction.INPUT,
             Stack.ADAPTER,
-            port,
-            (routeKey, amount) -> new Stack(routeKey.id(), amount),
-            stack -> CraftKey.item(stack.id(), ""));
+            port);
 
         var moved = route.transfer(17, false);
 
@@ -37,15 +34,13 @@ class ChannelMachineRouteTest {
 
     @Test
     void outputRouteShouldTransferViaExtract() {
-        var key = CraftKey.item("tinactory:iron", "");
+        var key = Stack.ADAPTER.keyOf(new Stack("tinactory:iron", 1));
         var port = new RecordingPort();
         var route = new ChannelMachineRoute<>(
             key,
             IMachineRoute.Direction.OUTPUT,
             Stack.ADAPTER,
-            port,
-            (routeKey, amount) -> new Stack(routeKey.id(), amount),
-            stack -> CraftKey.item(stack.id(), ""));
+            port);
 
         var moved = route.transfer(17, false);
 
@@ -90,10 +85,27 @@ class ChannelMachineRouteTest {
             public IIngredientKey keyOf(Stack stack) {
                 return new Key(stack.id());
             }
+
+            @Override
+            public Stack stackOf(IIngredientKey key, long amount) {
+                var typed = (Key) key;
+                return new Stack(typed.id(), (int) amount);
+            }
         };
     }
 
-    private record Key(String id) implements IIngredientKey {}
+    private record Key(String id) implements IIngredientKey {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
+        @Override
+        public int compareTo(IIngredientKey other) {
+            var typed = (Key) other;
+            return id.compareTo(typed.id());
+        }
+    }
 
     private static final class RecordingPort implements IPort<Stack> {
         private int insertCalls;

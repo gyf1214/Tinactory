@@ -5,10 +5,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,15 +54,13 @@ public class AutocraftTerminalService {
         this.jobServiceResolver = jobServiceResolver;
     }
 
-    public List<CraftKey> listRequestables() {
+    public List<IIngredientKey> listRequestables() {
         var dedup = patternSupplier.get().stream()
             .flatMap(pattern -> pattern.outputs().stream())
             .map(CraftAmount::key)
             .collect(Collectors.toSet());
         return dedup.stream()
-            .sorted(Comparator.comparing(CraftKey::type)
-                .thenComparing(CraftKey::id)
-                .thenComparing(CraftKey::nbt))
+            .sorted()
             .toList();
     }
 
@@ -89,7 +86,7 @@ public class AutocraftTerminalService {
         return running.isPresent() && service.cancel(running.get().id());
     }
 
-    public AutocraftPreviewResult preview(CraftKey target, long quantity) {
+    public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
         if (quantity <= 0L) {
             return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.INVALID_REQUEST);
         }
@@ -157,7 +154,7 @@ public class AutocraftTerminalService {
             return job.status().name();
         }
         var first = job.targets().get(0);
-        return first.amount() + "x " + first.key().id();
+        return first.amount() + "x " + first.key();
     }
 
     private static String formatCurrentStep(AutocraftJobService service, AutocraftJob job) {

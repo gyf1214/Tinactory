@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -7,6 +8,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +21,16 @@ public final class PatternCellPortState implements IPatternCellPort {
     public static final int BYTES_PER_PATTERN = 256;
 
     private final int bytesLimit;
-    private final PatternNbtCodec codec = new PatternNbtCodec(new MachineConstraintRegistry());
+    private final PatternNbtCodec codec;
     private final Map<String, CraftPattern> patterns = new HashMap<>();
 
-    public PatternCellPortState(int bytesLimit) {
+    public PatternCellPortState(int bytesLimit, Codec<IIngredientKey> keyCodec) {
+        this(bytesLimit, new PatternNbtCodec(new MachineConstraintRegistry(), keyCodec));
+    }
+
+    public PatternCellPortState(int bytesLimit, PatternNbtCodec codec) {
         this.bytesLimit = bytesLimit;
+        this.codec = codec;
     }
 
     @Override

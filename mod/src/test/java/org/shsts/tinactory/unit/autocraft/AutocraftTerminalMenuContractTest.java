@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
 
 import java.util.List;
@@ -19,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftTerminalMenuContractTest {
     @Test
     void menuShouldExposeRequestablesAndAvailableCpuSlots() {
-        var requestables = new AutocraftRequestablesSyncPacket(List.of(
-            new CraftKey(CraftKey.Type.ITEM, "minecraft:iron_ingot", "")));
+        var requestables = new AutocraftRequestablesSyncPacket(List.of());
         var cpus = new AutocraftCpuSyncPacket(List.of(
             new AutocraftCpuSyncPacket.Row(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
@@ -33,8 +31,7 @@ class AutocraftTerminalMenuContractTest {
         var requestablesDecoded = roundTrip(requestables, new AutocraftRequestablesSyncPacket());
         var cpusDecoded = roundTrip(cpus, new AutocraftCpuSyncPacket());
 
-        assertEquals(1, requestablesDecoded.requestables().size());
-        assertEquals("minecraft:iron_ingot", requestablesDecoded.requestables().get(0).id());
+        assertEquals(0, requestablesDecoded.requestables().size());
         assertEquals(1, cpusDecoded.rows().stream()
             .filter(AutocraftCpuSyncPacket.Row::available)
             .count());

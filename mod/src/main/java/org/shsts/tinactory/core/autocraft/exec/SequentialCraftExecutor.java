@@ -8,7 +8,7 @@ import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
@@ -39,13 +39,13 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     @Nullable
     private UUID leasedMachineId;
 
-    private final Map<CraftKey, Long> stepBuffer = new HashMap<>();
-    private final Map<CraftKey, Long> stepProducedOutputs = new HashMap<>();
-    private final Map<CraftKey, Long> stepRequiredOutputs = new HashMap<>();
-    private final Map<CraftKey, Long> stepRequiredInputs = new HashMap<>();
-    private final Map<CraftKey, Long> transmittedInputs = new HashMap<>();
-    private final Map<CraftKey, Long> transmittedRequiredOutputs = new HashMap<>();
-    private final Map<CraftKey, Long> pendingFlush = new HashMap<>();
+    private final Map<IIngredientKey, Long> stepBuffer = new HashMap<>();
+    private final Map<IIngredientKey, Long> stepProducedOutputs = new HashMap<>();
+    private final Map<IIngredientKey, Long> stepRequiredOutputs = new HashMap<>();
+    private final Map<IIngredientKey, Long> stepRequiredInputs = new HashMap<>();
+    private final Map<IIngredientKey, Long> transmittedInputs = new HashMap<>();
+    private final Map<IIngredientKey, Long> transmittedRequiredOutputs = new HashMap<>();
+    private final Map<IIngredientKey, Long> pendingFlush = new HashMap<>();
     private boolean flushStepBufferInPhase;
 
     public SequentialCraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
@@ -234,8 +234,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             stepRequiredInputs.merge(input.key(), amount, Long::sum);
         }
 
-        var inventoryReservations = new HashMap<CraftKey, Long>();
-        var bufferedReservations = new HashMap<CraftKey, Long>();
+        var inventoryReservations = new HashMap<IIngredientKey, Long>();
+        var bufferedReservations = new HashMap<IIngredientKey, Long>();
         for (var required : stepRequiredInputs.entrySet()) {
             var buffered = stepBuffer.getOrDefault(required.getKey(), 0L);
             var missing = required.getValue() - Math.min(required.getValue(), buffered);
@@ -464,7 +464,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private long flushAmounts(Map<CraftKey, Long> amounts, long bandwidth) {
+    private long flushAmounts(Map<IIngredientKey, Long> amounts, long bandwidth) {
         var remaining = bandwidth;
         for (var entry : List.copyOf(amounts.entrySet())) {
             if (remaining <= 0L) {
@@ -486,7 +486,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return remaining;
     }
 
-    private boolean flushStepBufferNow(Map<CraftKey, Long> amounts) {
+    private boolean flushStepBufferNow(Map<IIngredientKey, Long> amounts) {
         for (var entry : List.copyOf(amounts.entrySet())) {
             var inserted = inventory.insert(entry.getKey(), entry.getValue(), false);
             if (inserted < entry.getValue()) {
@@ -514,7 +514,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         leasedMachineId = null;
     }
 
-    private void rollbackReservations(Map<CraftKey, Long> reservations) {
+    private void rollbackReservations(Map<IIngredientKey, Long> reservations) {
         for (var reserved : reservations.entrySet()) {
             if (reserved.getValue() > 0L) {
                 inventory.insert(reserved.getKey(), reserved.getValue(), false);
@@ -522,7 +522,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private void rollbackBufferedReservations(Map<CraftKey, Long> reservations) {
+    private void rollbackBufferedReservations(Map<IIngredientKey, Long> reservations) {
         for (var reserved : reservations.entrySet()) {
             var buffered = stepBuffer.getOrDefault(reserved.getKey(), 0L);
             var retained = buffered - reserved.getValue();
@@ -555,12 +555,12 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         leasedMachineId = null;
     }
 
-    private Map<CraftKey, Long> extractFlushCandidates(CraftStep step) {
-        var requiredIntermediateByKey = new HashMap<CraftKey, Long>();
+    private Map<IIngredientKey, Long> extractFlushCandidates(CraftStep step) {
+        var requiredIntermediateByKey = new HashMap<IIngredientKey, Long>();
         for (var amount : step.requiredIntermediateOutputs()) {
             requiredIntermediateByKey.merge(amount.key(), amount.amount(), Long::sum);
         }
-        var flushCandidates = new HashMap<CraftKey, Long>();
+        var flushCandidates = new HashMap<IIngredientKey, Long>();
         for (var produced : stepProducedOutputs.entrySet()) {
             var key = produced.getKey();
             var buffered = stepBuffer.getOrDefault(key, 0L);

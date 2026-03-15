@@ -2,8 +2,11 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
@@ -13,32 +16,30 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftRequestablesSyncPacket implements IPacket {
-    private final List<CraftKey> requestables = new ArrayList<>();
+    private final List<IIngredientKey> requestables = new ArrayList<>();
 
     public AutocraftRequestablesSyncPacket() {}
 
-    public AutocraftRequestablesSyncPacket(List<CraftKey> requestables) {
+    public AutocraftRequestablesSyncPacket(List<IIngredientKey> requestables) {
         this.requestables.addAll(requestables);
     }
 
-    public List<CraftKey> requestables() {
+    public List<IIngredientKey> requestables() {
         return requestables;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(requestables, (buf1, entry) -> {
-            buf1.writeEnum(entry.type());
-            buf1.writeUtf(entry.id());
-            buf1.writeUtf(entry.nbt());
-        });
+        buf.writeCollection(requestables,
+            (buf1, entry) ->
+                buf1.writeNbt((CompoundTag) CodecHelper.encodeTag(IngredientKeyCodecHelper.CODEC, entry)));
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         requestables.clear();
         requestables.addAll(
-            buf.readList(buf1 -> new CraftKey(buf1.readEnum(CraftKey.Type.class), buf1.readUtf(), buf1.readUtf())));
+            buf.readList(buf1 -> CodecHelper.parseTag(IngredientKeyCodecHelper.CODEC, buf1.readNbt())));
     }
 
     @Override

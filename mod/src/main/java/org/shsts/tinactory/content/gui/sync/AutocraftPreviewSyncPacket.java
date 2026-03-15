@@ -3,11 +3,13 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.List;
@@ -66,9 +68,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         buf.writeBoolean(targets != null);
         if (targets != null) {
             buf.writeCollection(targets, (buf1, amount) -> {
-                buf1.writeEnum(amount.key().type());
-                buf1.writeUtf(amount.key().id());
-                buf1.writeUtf(amount.key().nbt());
+                buf1.writeNbt((CompoundTag) CodecHelper.encodeTag(IngredientKeyCodecHelper.CODEC, amount.key()));
                 buf1.writeLong(amount.amount());
             });
         }
@@ -85,11 +85,8 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         targets = buf.readBoolean() ? buf.readList(buf1 -> {
-            var type = buf1.readEnum(CraftKey.Type.class);
-            var id = buf1.readUtf();
-            var nbt = buf1.readUtf();
+            var key = CodecHelper.parseTag(IngredientKeyCodecHelper.CODEC, buf1.readNbt());
             var amount = buf1.readLong();
-            var key = type == CraftKey.Type.FLUID ? CraftKey.fluid(id, nbt) : CraftKey.item(id, nbt);
             return new CraftAmount(key, amount);
         }) : null;
         previewError = buf.readBoolean() ? buf.readEnum(AutocraftPreviewResult.Code.class) : null;

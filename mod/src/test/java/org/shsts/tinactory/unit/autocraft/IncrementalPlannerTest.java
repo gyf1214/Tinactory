@@ -4,7 +4,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
@@ -25,7 +24,7 @@ class IncrementalPlannerTest {
     @Test
     void incrementalPlannerShouldReturnRunningWhenBudgetIsZero() {
         var planner = planner(repo(List.of()));
-        var key = CraftKey.item("tinactory:gear", "");
+        var key = TestIngredientKey.item("tinactory:gear", "");
         var session = planner.startSession(List.of(new CraftAmount(key, 1)), List.of());
 
         var progress = planner.resume(session, 0);
@@ -36,9 +35,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldMakePartialProgressAndThenFinish() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -82,7 +81,7 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldMatchSynchronousFailure() {
-        var gear = CraftKey.item("tinactory:gear", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var planner = planner(repo(List.of()));
         var session = planner.startSession(List.of(new CraftAmount(gear, 1)), List.of());
 
@@ -96,9 +95,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldBeDeterministicAcrossReplays() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -125,9 +124,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerBudgetShouldAdvanceWithinSingleRootTargetExpansion() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),

@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public final class PlannerSession {
     }
 
     static final class SearchFrame {
-        final CraftKey key;
+        final IIngredientKey key;
         final long demand;
         final boolean rootDemand;
         long remaining;
@@ -54,7 +54,7 @@ public final class PlannerSession {
         PlanError childError;
         Stage stage;
 
-        SearchFrame(CraftKey key, long demand, boolean rootDemand) {
+        SearchFrame(IIngredientKey key, long demand, boolean rootDemand) {
             this.key = key;
             this.demand = demand;
             this.rootDemand = rootDemand;

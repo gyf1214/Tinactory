@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.autocraft.exec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,12 +17,12 @@ public record ExecutorRuntimeSnapshot(
     @Nullable ExecutionError.Code blockedReason,
     @Nullable ExecutionState pendingTerminalState,
     int nextStepIndex,
-    Map<CraftKey, Long> stepBuffer,
-    Map<CraftKey, Long> stepProducedOutputs,
-    Map<CraftKey, Long> stepRequiredOutputs,
-    Map<CraftKey, Long> stepRequiredInputs,
-    Map<CraftKey, Long> transmittedInputs,
-    Map<CraftKey, Long> transmittedRequiredOutputs,
+    Map<IIngredientKey, Long> stepBuffer,
+    Map<IIngredientKey, Long> stepProducedOutputs,
+    Map<IIngredientKey, Long> stepRequiredOutputs,
+    Map<IIngredientKey, Long> stepRequiredInputs,
+    Map<IIngredientKey, Long> transmittedInputs,
+    Map<IIngredientKey, Long> transmittedRequiredOutputs,
     @Nullable UUID leasedMachineId) {
 
     public ExecutorRuntimeSnapshot {

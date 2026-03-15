@@ -7,7 +7,6 @@ import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
@@ -27,8 +26,8 @@ class CraftPlanContractTest {
     void craftPlanShouldBeImmutableStepList() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
         var step = new CraftStep("step-1", pattern, 3);
         var plan = new CraftPlan(List.of(step));
@@ -41,11 +40,11 @@ class CraftPlanContractTest {
     void craftStepShouldSplitRequiredOutputsByRole() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
-        var intermediate = List.of(new CraftAmount(CraftKey.item("tinactory:half", ""), 2));
-        var finals = List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1));
+        var intermediate = List.of(new CraftAmount(TestIngredientKey.item("tinactory:half", ""), 2));
+        var finals = List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1));
 
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
 
@@ -57,11 +56,11 @@ class CraftPlanContractTest {
     void craftStepShouldDefensivelyCopyRoleOutputs() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(CraftKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
-        var intermediate = new ArrayList<>(List.of(new CraftAmount(CraftKey.item("tinactory:half", ""), 2)));
-        var finals = new ArrayList<>(List.of(new CraftAmount(CraftKey.item("tinactory:gear", ""), 1)));
+        var intermediate = new ArrayList<>(List.of(new CraftAmount(TestIngredientKey.item("tinactory:half", ""), 2)));
+        var finals = new ArrayList<>(List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)));
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
 
         intermediate.clear();
@@ -70,14 +69,14 @@ class CraftPlanContractTest {
         assertEquals(1, step.requiredIntermediateOutputs().size());
         assertEquals(1, step.requiredFinalOutputs().size());
         assertThrows(UnsupportedOperationException.class, () -> step.requiredIntermediateOutputs().add(new CraftAmount(
-            CraftKey.item("tinactory:x", ""), 1)));
+            TestIngredientKey.item("tinactory:x", ""), 1)));
         assertThrows(UnsupportedOperationException.class, () -> step.requiredFinalOutputs().add(new CraftAmount(
-            CraftKey.item("tinactory:y", ""), 1)));
+            TestIngredientKey.item("tinactory:y", ""), 1)));
     }
 
     @Test
     void planErrorShouldExposeTypedPayload() {
-        var key = CraftKey.item("tinactory:missing", "");
+        var key = TestIngredientKey.item("tinactory:missing", "");
         var error = PlanError.missingPattern(key);
 
         assertEquals(PlanError.Code.MISSING_PATTERN, error.code());
