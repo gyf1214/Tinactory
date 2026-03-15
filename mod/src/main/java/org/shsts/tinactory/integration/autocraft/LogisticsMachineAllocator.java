@@ -11,9 +11,9 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
+import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
 import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
@@ -101,7 +101,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         IMachine machine,
         List<LogisticComponent.PortInfo> ports,
         CraftStep step) {
-        var inputRoutes = new ArrayList<IMachineInputRoute>();
+        var inputRoutes = new ArrayList<IMachineRoute>();
         for (var i = 0; i < step.pattern().inputs().size(); i++) {
             var input = step.pattern().inputs().get(i);
             var route = buildInputRoute(input.key(), ports, inputConstraints(step, i));
@@ -111,7 +111,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             inputRoutes.add(route.get());
         }
 
-        var outputRoutes = new ArrayList<IMachineOutputRoute>();
+        var outputRoutes = new ArrayList<IMachineRoute>();
         for (var i = 0; i < step.pattern().outputs().size(); i++) {
             var output = step.pattern().outputs().get(i);
             var route = buildOutputRoute(output.key(), ports, outputConstraints(step, i));
@@ -124,7 +124,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return Optional.of(new Lease(machine.uuid(), inputRoutes, outputRoutes));
     }
 
-    private Optional<IMachineInputRoute> buildInputRoute(
+    private Optional<IMachineRoute> buildInputRoute(
         CraftKey key,
         List<LogisticComponent.PortInfo> ports,
         List<InputPortConstraint> constraints) {
@@ -143,7 +143,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return Optional.empty();
     }
 
-    private Optional<IMachineOutputRoute> buildOutputRoute(
+    private Optional<IMachineRoute> buildOutputRoute(
         CraftKey key,
         List<LogisticComponent.PortInfo> ports,
         List<OutputPortConstraint> constraints) {
@@ -217,66 +217,30 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return true;
     }
 
-    private static Optional<IMachineInputRoute> buildItemInputRoute(IPort<?> port, CraftKey key) {
-        return itemChannel(port).map(channel -> new IMachineInputRoute() {
-            @Override
-            public CraftKey key() {
-                return key;
-            }
-
-            @Override
-            public long push(long amount, boolean simulate) {
-                return channel.insert(key, amount, simulate);
-            }
-        });
+    private static Optional<IMachineRoute> buildItemInputRoute(IPort<?> port, CraftKey key) {
+        return itemChannel(port)
+            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.INPUT, channel));
     }
 
-    private static Optional<IMachineOutputRoute> buildItemOutputRoute(IPort<?> port, CraftKey key) {
+    private static Optional<IMachineRoute> buildItemOutputRoute(IPort<?> port, CraftKey key) {
         if (!port.acceptOutput()) {
             return Optional.empty();
         }
-        return itemChannel(port).map(channel -> new IMachineOutputRoute() {
-            @Override
-            public CraftKey key() {
-                return key;
-            }
-
-            @Override
-            public long pull(long amount, boolean simulate) {
-                return channel.extract(key, amount, simulate);
-            }
-        });
+        return itemChannel(port)
+            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.OUTPUT, channel));
     }
 
-    private static Optional<IMachineInputRoute> buildFluidInputRoute(IPort<?> port, CraftKey key) {
-        return fluidChannel(port).map(channel -> new IMachineInputRoute() {
-            @Override
-            public CraftKey key() {
-                return key;
-            }
-
-            @Override
-            public long push(long amount, boolean simulate) {
-                return channel.insert(key, amount, simulate);
-            }
-        });
+    private static Optional<IMachineRoute> buildFluidInputRoute(IPort<?> port, CraftKey key) {
+        return fluidChannel(port)
+            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.INPUT, channel));
     }
 
-    private static Optional<IMachineOutputRoute> buildFluidOutputRoute(IPort<?> port, CraftKey key) {
+    private static Optional<IMachineRoute> buildFluidOutputRoute(IPort<?> port, CraftKey key) {
         if (!port.acceptOutput()) {
             return Optional.empty();
         }
-        return fluidChannel(port).map(channel -> new IMachineOutputRoute() {
-            @Override
-            public CraftKey key() {
-                return key;
-            }
-
-            @Override
-            public long pull(long amount, boolean simulate) {
-                return channel.extract(key, amount, simulate);
-            }
-        });
+        return fluidChannel(port)
+            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.OUTPUT, channel));
     }
 
     private static Optional<CraftPortChannel<ItemStack>> itemChannel(IPort<?> port) {
@@ -303,11 +267,11 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
     private static final class Lease implements IMachineLease {
         private final UUID machineId;
-        private final List<IMachineInputRoute> inputRoutes;
-        private final List<IMachineOutputRoute> outputRoutes;
+        private final List<IMachineRoute> inputRoutes;
+        private final List<IMachineRoute> outputRoutes;
         private boolean released;
 
-        private Lease(UUID machineId, List<IMachineInputRoute> inputRoutes, List<IMachineOutputRoute> outputRoutes) {
+        private Lease(UUID machineId, List<IMachineRoute> inputRoutes, List<IMachineRoute> outputRoutes) {
             this.machineId = machineId;
             this.inputRoutes = List.copyOf(inputRoutes);
             this.outputRoutes = List.copyOf(outputRoutes);
@@ -319,12 +283,12 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         }
 
         @Override
-        public List<IMachineInputRoute> inputRoutes() {
+        public List<IMachineRoute> inputRoutes() {
             return inputRoutes;
         }
 
         @Override
-        public List<IMachineOutputRoute> outputRoutes() {
+        public List<IMachineRoute> outputRoutes() {
             return outputRoutes;
         }
 

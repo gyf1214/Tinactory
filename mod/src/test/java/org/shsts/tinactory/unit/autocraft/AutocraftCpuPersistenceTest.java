@@ -6,9 +6,8 @@ import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -173,31 +172,41 @@ class AutocraftCpuPersistenceTest {
                 }
 
                 @Override
-                public List<IMachineInputRoute> inputRoutes() {
-                    return step.pattern().inputs().stream().map(input -> (IMachineInputRoute) new IMachineInputRoute() {
+                public List<IMachineRoute> inputRoutes() {
+                    return step.pattern().inputs().stream().map(input -> (IMachineRoute) new IMachineRoute() {
                         @Override
                         public CraftKey key() {
                             return input.key();
                         }
 
                         @Override
-                        public long push(long amount, boolean simulate) {
+                        public Direction direction() {
+                            return Direction.INPUT;
+                        }
+
+                        @Override
+                        public long transfer(long amount, boolean simulate) {
                             return amount;
                         }
                     }).toList();
                 }
 
                 @Override
-                public List<IMachineOutputRoute> outputRoutes() {
+                public List<IMachineRoute> outputRoutes() {
                     return step.pattern().outputs().stream()
-                        .map(output -> (IMachineOutputRoute) new IMachineOutputRoute() {
+                        .map(output -> (IMachineRoute) new IMachineRoute() {
                             @Override
                             public CraftKey key() {
                                 return output.key();
                             }
 
                             @Override
-                            public long pull(long amount, boolean simulate) {
+                            public Direction direction() {
+                                return Direction.OUTPUT;
+                            }
+
+                            @Override
+                            public long transfer(long amount, boolean simulate) {
                                 return amount;
                             }
                         })

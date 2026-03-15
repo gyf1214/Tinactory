@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -206,22 +205,27 @@ class CraftExecutorTest {
         private final Map<CraftKey, Long> pushed = new HashMap<>();
         private final Map<CraftKey, Long> produced = new HashMap<>();
         private final Map<CraftKey, Long> requiredInputs = new HashMap<>();
-        private final List<IMachineInputRoute> inputRoutes;
-        private final List<IMachineOutputRoute> outputRoutes;
+        private final List<IMachineRoute> inputRoutes;
+        private final List<IMachineRoute> outputRoutes;
         private boolean released;
 
         private SimulatedLease(CraftStep step) {
             for (var input : step.pattern().inputs()) {
                 requiredInputs.put(input.key(), input.amount() * step.runs());
             }
-            inputRoutes = step.pattern().inputs().stream().map(input -> (IMachineInputRoute) new IMachineInputRoute() {
+            inputRoutes = step.pattern().inputs().stream().map(input -> (IMachineRoute) new IMachineRoute() {
                 @Override
                 public CraftKey key() {
                     return input.key();
                 }
 
                 @Override
-                public long push(long amount, boolean simulate) {
+                public Direction direction() {
+                    return Direction.INPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     var moved = Math.max(0L, amount);
                     if (!simulate && moved > 0L) {
                         pushed.merge(input.key(), moved, Long::sum);
@@ -231,14 +235,19 @@ class CraftExecutorTest {
                 }
             }).toList();
             outputRoutes = step.pattern().outputs().stream()
-                .map(output -> (IMachineOutputRoute) new IMachineOutputRoute() {
+                .map(output -> (IMachineRoute) new IMachineRoute() {
                     @Override
                     public CraftKey key() {
                         return output.key();
                     }
 
                     @Override
-                    public long pull(long amount, boolean simulate) {
+                    public Direction direction() {
+                        return Direction.OUTPUT;
+                    }
+
+                    @Override
+                    public long transfer(long amount, boolean simulate) {
                         var available = produced.getOrDefault(output.key(), 0L);
                         var moved = Math.min(Math.max(0L, amount), available);
                         if (!simulate && moved > 0L) {
@@ -268,12 +277,12 @@ class CraftExecutorTest {
         }
 
         @Override
-        public List<IMachineInputRoute> inputRoutes() {
+        public List<IMachineRoute> inputRoutes() {
             return inputRoutes;
         }
 
         @Override
-        public List<IMachineOutputRoute> outputRoutes() {
+        public List<IMachineRoute> outputRoutes() {
             return outputRoutes;
         }
 

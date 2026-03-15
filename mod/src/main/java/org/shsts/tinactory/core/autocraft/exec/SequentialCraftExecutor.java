@@ -311,7 +311,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (needed <= 0L) {
                 continue;
             }
-            var moved = route.pull(Math.min(remaining, needed), false);
+            var moved = route.transfer(Math.min(remaining, needed), false);
             if (moved <= 0L) {
                 continue;
             }
@@ -327,7 +327,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (remaining <= 0L) {
                 break;
             }
-            var moved = route.pull(remaining, false);
+            var moved = route.transfer(remaining, false);
             if (moved <= 0L) {
                 continue;
             }
@@ -352,7 +352,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (buffered <= 0L) {
                 continue;
             }
-            var moved = route.push(Math.min(remaining, buffered), false);
+            var moved = route.transfer(Math.min(remaining, buffered), false);
             if (moved <= 0L) {
                 continue;
             }

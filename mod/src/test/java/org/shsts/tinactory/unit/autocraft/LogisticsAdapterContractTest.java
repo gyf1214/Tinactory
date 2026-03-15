@@ -232,12 +232,12 @@ class LogisticsAdapterContractTest {
         }
 
         @Override
-        public List<org.shsts.tinactory.core.autocraft.api.IMachineInputRoute> inputRoutes() {
+        public List<org.shsts.tinactory.core.autocraft.api.IMachineRoute> inputRoutes() {
             return List.of();
         }
 
         @Override
-        public List<org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute> outputRoutes() {
+        public List<org.shsts.tinactory.core.autocraft.api.IMachineRoute> outputRoutes() {
             return List.of();
         }
 

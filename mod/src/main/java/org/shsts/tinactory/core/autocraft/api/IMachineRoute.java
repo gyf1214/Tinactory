@@ -6,8 +6,15 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftKey;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IMachineInputRoute {
+public interface IMachineRoute {
+    enum Direction {
+        INPUT,
+        OUTPUT,
+    }
+
     CraftKey key();
 
-    long push(long amount, boolean simulate);
+    Direction direction();
+
+    long transfer(long amount, boolean simulate);
 }

@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
@@ -562,8 +561,8 @@ class ExecutorStateMachineTest {
         private final UUID machineId = UUID.randomUUID();
         private final Map<CraftKey, Long> inputMove;
         private final Map<CraftKey, Long> outputMove;
-        private final List<IMachineInputRoute> inputs;
-        private final List<IMachineOutputRoute> outputs;
+        private final List<IMachineRoute> inputs;
+        private final List<IMachineRoute> outputs;
         private boolean released;
         private boolean valid;
 
@@ -571,25 +570,35 @@ class ExecutorStateMachineTest {
             this.inputMove = inputMove;
             this.outputMove = new HashMap<>(outputMove);
             this.valid = valid;
-            inputs = inputMove.keySet().stream().map(key -> (IMachineInputRoute) new IMachineInputRoute() {
+            inputs = inputMove.keySet().stream().map(key -> (IMachineRoute) new IMachineRoute() {
                 @Override
                 public CraftKey key() {
                     return key;
                 }
 
                 @Override
-                public long push(long amount, boolean simulate) {
+                public Direction direction() {
+                    return Direction.INPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     return Math.min(amount, inputMove.getOrDefault(key, 0L));
                 }
             }).toList();
-            outputs = outputMove.keySet().stream().map(key -> (IMachineOutputRoute) new IMachineOutputRoute() {
+            outputs = outputMove.keySet().stream().map(key -> (IMachineRoute) new IMachineRoute() {
                 @Override
                 public CraftKey key() {
                     return key;
                 }
 
                 @Override
-                public long pull(long amount, boolean simulate) {
+                public Direction direction() {
+                    return Direction.OUTPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     var available = RouteLease.this.outputMove.getOrDefault(key, 0L);
                     var moved = Math.min(available, amount);
                     if (!simulate) {
@@ -606,12 +615,12 @@ class ExecutorStateMachineTest {
         }
 
         @Override
-        public List<IMachineInputRoute> inputRoutes() {
+        public List<IMachineRoute> inputRoutes() {
             return inputs;
         }
 
         @Override
-        public List<IMachineOutputRoute> outputRoutes() {
+        public List<IMachineRoute> outputRoutes() {
             return outputs;
         }
 
