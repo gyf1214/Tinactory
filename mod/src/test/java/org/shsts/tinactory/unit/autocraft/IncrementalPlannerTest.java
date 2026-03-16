@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -10,10 +11,12 @@ import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlannerProgress;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -171,17 +174,63 @@ class IncrementalPlannerTest {
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
-        return key -> {
-            var out = new ArrayList<CraftPattern>();
-            for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
-                for (var output : pattern.outputs()) {
-                    if (output.key().equals(key)) {
-                        out.add(pattern);
-                        break;
+        return new IPatternRepository() {
+            @Override
+            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+                var out = new ArrayList<CraftPattern>();
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                    for (var output : pattern.outputs()) {
+                        if (output.key().equals(key)) {
+                            out.add(pattern);
+                            break;
+                        }
                     }
                 }
+                return out;
             }
-            return out;
+
+            @Override
+            public List<IIngredientKey> listRequestables() {
+                return patterns.stream()
+                    .flatMap(pattern -> pattern.outputs().stream())
+                    .map(CraftAmount::key)
+                    .distinct()
+                    .sorted()
+                    .toList();
+            }
+
+            @Override
+            public boolean containsPatternId(String patternId) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            }
+
+            @Override
+            public boolean addPattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removePattern(String patternId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean updatePattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean addCellPort(UUID machineId, int priority, int slotIndex, IPatternCellPort port) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int removeCellPorts(UUID machineId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {}
         };
     }
 }
