@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftCpuPersistenceTest {
@@ -54,17 +55,36 @@ class AutocraftCpuPersistenceTest {
     }
 
     @Test
-    void serviceShouldKeepCpuIdInSnapshot() {
+    void serviceShouldOmitCpuIdFromSerializedSnapshot() {
         var cpuId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         var plan = new CraftPlan(List.of(step("s1")));
+        var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
+
+        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.tick();
+        var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
+
+        assertFalse(snapshot.contains("cpuId"));
+    }
+
+    @Test
+    void serviceShouldIgnoreLegacyCpuIdTagWhenRestoringSnapshot() {
+        var cpuId = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        var plan = new CraftPlan(List.of(step("s1"), step("s2")));
+        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
         var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
-        var snapshot = service.snapshotRunning().orElseThrow();
+        var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
+        snapshot.putUUID("cpuId", UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"));
 
-        assertEquals(cpuId, snapshot.cpuId());
-        assertTrue(snapshot.runtimeSnapshot().nextStepIndex() >= 0);
+        var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        restored.restoreRunningSnapshot(snapshot, codec);
+
+        assertTrue(restored.getJob().isPresent());
+        assertTrue(restored.snapshotRunning().isPresent());
     }
 
     @Test
