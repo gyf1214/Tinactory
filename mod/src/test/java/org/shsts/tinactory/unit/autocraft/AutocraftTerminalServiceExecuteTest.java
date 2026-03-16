@@ -68,12 +68,7 @@ class AutocraftTerminalServiceExecuteTest {
         var previewPlanner = new StaticPlanner(planRequiring(
             new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
             new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)));
-        var jobService = new AutocraftJobService(cpu,
-            (targets, available) -> {
-                throw new IllegalStateException("planner should not be called during execute tick");
-            },
-            TestExecutor::new,
-            List::of);
+        var jobService = new AutocraftJobService(cpu, TestExecutor::new);
         var service = new AutocraftTerminalService(
             previewPlanner,
             repo(List.of()),
@@ -96,10 +91,7 @@ class AutocraftTerminalServiceExecuteTest {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
-        // TODO
-        var jobService = new AutocraftJobService(cpu,
-            (targets, available) -> PlanResult.success(new CraftPlan(List.of())),
-            TestExecutor::new, List::of) {
+        var jobService = new AutocraftJobService(cpu, TestExecutor::new) {
             @Override
             public boolean isBusy() {
                 return true;

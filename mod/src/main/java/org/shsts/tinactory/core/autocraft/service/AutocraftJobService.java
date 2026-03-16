@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
-import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
@@ -40,9 +39,7 @@ public class AutocraftJobService implements IAutocraftService {
     private static final int DEFAULT_EXECUTION_INTERVAL_TICKS = 1;
 
     private final UUID cpuId;
-    private final ICraftPlanner planner;
     private final Supplier<ICraftExecutor> executorFactory;
-    private final Supplier<List<CraftAmount>> availableSupplier;
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
 
@@ -58,36 +55,21 @@ public class AutocraftJobService implements IAutocraftService {
 
     public AutocraftJobService(
         UUID cpuId,
-        ICraftPlanner planner,
         Supplier<ICraftExecutor> executorFactory,
-        Supplier<List<CraftAmount>> availableSupplier,
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
         this.cpuId = cpuId;
-        this.planner = planner;
         this.executorFactory = executorFactory;
-        this.availableSupplier = availableSupplier;
         this.transmissionBandwidth = transmissionBandwidth;
         this.executionIntervalTicks = Math.max(1, executionIntervalTicks);
     }
 
     public AutocraftJobService(
         UUID cpuId,
-        ICraftPlanner planner,
-        Supplier<ICraftExecutor> executorFactory,
-        Supplier<List<CraftAmount>> availableSupplier) {
+        Supplier<ICraftExecutor> executorFactory) {
 
-        this(cpuId, planner, executorFactory, availableSupplier,
-            DEFAULT_TRANSMISSION_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
-    }
-
-    public AutocraftJobService(
-        ICraftPlanner planner,
-        Supplier<ICraftExecutor> executorFactory,
-        Supplier<List<CraftAmount>> availableSupplier) {
-
-        this(UUID.randomUUID(), planner, executorFactory, availableSupplier,
+        this(cpuId, executorFactory,
             DEFAULT_TRANSMISSION_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
     }
 
@@ -144,16 +126,6 @@ public class AutocraftJobService implements IAutocraftService {
 
     public void restoreRunningSnapshot(CompoundTag tag, PatternNbtCodec codec) {
         restoreRunning(deserializeSnapshot(tag, codec, codec.keyCodec()));
-    }
-
-    public UUID submit(List<CraftAmount> targets) {
-        if (isBusy()) {
-            throw new IllegalStateException("autocraft CPU is busy");
-        }
-        var id = UUID.randomUUID();
-        jobs.put(id, new AutocraftJob(id, targets, AutocraftJob.Status.QUEUED, null, null, null));
-        queued.add(id);
-        return id;
     }
 
     @Override
@@ -301,21 +273,9 @@ public class AutocraftJobService implements IAutocraftService {
             return false;
         }
 
-        var prepared = preparedPlans.remove(id);
-        var plan = prepared;
+        var plan = preparedPlans.remove(id);
         if (plan == null) {
-            var result = planner.plan(current.targets(), availableSupplier.get());
-            if (!result.isSuccess()) {
-                jobs.put(id, new AutocraftJob(
-                    id,
-                    current.targets(),
-                    AutocraftJob.Status.FAILED,
-                    result.error(),
-                    null,
-                    null));
-                return true;
-            }
-            plan = result.plan();
+            throw new IllegalStateException("prepared plan missing for queued job " + id);
         }
 
         var executor = executorFactory.get();

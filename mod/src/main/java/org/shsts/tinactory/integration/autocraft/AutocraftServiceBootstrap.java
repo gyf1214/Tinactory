@@ -40,12 +40,9 @@ public final class AutocraftServiceBootstrap {
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var subnet = network.getSubnet(blockEntity.getBlockPos());
         var allocator = new LogisticsMachineAllocator(() -> logistics.getVisiblePorts(subnet));
-        var planner = new GoalReductionPlanner(autocraft.patternRepository());
         return new AutocraftJobService(
             cpuId,
-            planner,
             () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
-            inventory::snapshotAvailable,
             transmissionBandwidth,
             executionIntervalTicks);
     }

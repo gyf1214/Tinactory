@@ -4,7 +4,6 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
-import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
@@ -13,8 +12,6 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 
@@ -31,12 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftJobServiceTest {
     @Test
     void serviceShouldTransitionQueuedRunningDone() {
-        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.COMPLETED);
-        var service = new AutocraftJobService(planner, () -> executor, List::of);
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
 
-        var id = service.submit(List.of(target));
+        var id = service.submitPrepared(List.of(target), testPlan());
 
         assertEquals(AutocraftJob.Status.QUEUED, service.job(id).status());
         service.tick();
@@ -46,25 +42,24 @@ class AutocraftJobServiceTest {
     }
 
     @Test
-    void serviceShouldTransitionToFailedOnPlanError() {
-        var planner = new TestPlanner(PlanResult.failure(PlanError.missingPattern(TestIngredientKey.item("x:y", ""))));
-        var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
+    void serviceShouldQueuePreparedPlanWithoutPlannerDependency() {
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
 
-        var id = service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)));
+        var id = service.submitPrepared(
+            List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
+            testPlan());
         service.tick();
 
-        assertEquals(AutocraftJob.Status.FAILED, service.job(id).status());
-        assertEquals(PlanError.Code.MISSING_PATTERN, service.job(id).planError().code());
+        assertEquals(AutocraftJob.Status.RUNNING, service.job(id).status());
     }
 
     @Test
     void serviceShouldRemainRunningWhenExecutorBlockedRetriably() {
-        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
         var executor = new TestExecutor(ExecutionState.BLOCKED, ExecutionState.BLOCKED, ExecutionState.COMPLETED);
         executor.blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
-        var service = new AutocraftJobService(planner, () -> executor, List::of);
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
 
-        var id = service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)));
+        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
         service.tick();
         assertEquals(AutocraftJob.Status.BLOCKED, service.job(id).status());
@@ -75,22 +70,18 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldExposeSafeLookupForMissingJob() {
-        var service = new AutocraftJobService(
-            new TestPlanner(PlanResult.success(new CraftPlan(List.of(step())))),
-            () -> new TestExecutor(ExecutionState.COMPLETED),
-            List::of);
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
 
         assertTrue(service.findJob(UUID.fromString("99999999-9999-9999-9999-999999999999")).isEmpty());
     }
 
     @Test
     void serviceShouldListJobsInSubmitOrder() {
-        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
-        var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
 
-        var first = service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)));
+        var first = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
         assertThrows(IllegalStateException.class, () ->
-            service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y2", ""), 1))));
+            service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y2", ""), 1)), testPlan()));
 
         assertEquals(
             List.of(first),
@@ -99,9 +90,8 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldCancelQueuedJob() {
-        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
-        var service = new AutocraftJobService(planner, () -> new TestExecutor(ExecutionState.COMPLETED), List::of);
-        var id = service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)));
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
+        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
         assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
@@ -109,10 +99,9 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldCancelRunningJob() {
-        var planner = new TestPlanner(PlanResult.success(new CraftPlan(List.of(step()))));
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.CANCELLED);
-        var service = new AutocraftJobService(planner, () -> executor, List::of);
-        var id = service.submit(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)));
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
+        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
 
         assertTrue(service.cancel(id));
@@ -130,11 +119,8 @@ class AutocraftJobServiceTest {
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
     }
 
-    private record TestPlanner(PlanResult result) implements ICraftPlanner {
-        @Override
-        public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
-            return result;
-        }
+    private static CraftPlan testPlan() {
+        return new CraftPlan(List.of(step()));
     }
 
     private static final class TestExecutor implements ICraftExecutor {
