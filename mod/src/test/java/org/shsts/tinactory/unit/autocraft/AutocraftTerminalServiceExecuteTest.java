@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
@@ -19,8 +21,10 @@ import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,14 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftTerminalServiceExecuteTest {
     @Test
     void listRequestablesShouldReturnDedupedOutputsFromStoredPatterns() {
+        var patterns = List.of(
+            pattern("tinactory:p1", List.of(
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1))),
+            pattern("tinactory:p2", List.of(
+                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 2),
+                new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 1000))));
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
-            () -> List.of(
-                pattern("tinactory:p1", List.of(
-                    new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1))),
-                pattern("tinactory:p2", List.of(
-                    new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 2),
-                    new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 1000)))),
+            repo(patterns),
             List::of,
             List::of,
             List::of);
@@ -68,7 +73,7 @@ class AutocraftTerminalServiceExecuteTest {
             List::of);
         var service = new AutocraftTerminalService(
             previewPlanner,
-            List::of,
+            repo(List.of()),
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
@@ -99,7 +104,7 @@ class AutocraftTerminalServiceExecuteTest {
             new StaticPlanner(planRequiring(
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1))),
-            List::of,
+            repo(List.of()),
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
@@ -117,6 +122,67 @@ class AutocraftTerminalServiceExecuteTest {
         return new CraftPattern(id, List.of(
             new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
             outputs, new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+    }
+
+    private static IPatternRepository repo(List<CraftPattern> patterns) {
+        return new IPatternRepository() {
+            @Override
+            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+                var out = new ArrayList<CraftPattern>();
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                    for (var output : pattern.outputs()) {
+                        if (output.key().equals(key)) {
+                            out.add(pattern);
+                            break;
+                        }
+                    }
+                }
+                return out;
+            }
+
+            @Override
+            public List<IIngredientKey> listRequestables() {
+                return patterns.stream()
+                    .flatMap(pattern -> pattern.outputs().stream())
+                    .map(CraftAmount::key)
+                    .distinct()
+                    .sorted()
+                    .toList();
+            }
+
+            @Override
+            public boolean containsPatternId(String patternId) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            }
+
+            @Override
+            public boolean addPattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removePattern(String patternId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean updatePattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean addCellPort(UUID machineId, int priority, int slotIndex, IPatternCellPort port) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int removeCellPorts(UUID machineId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {}
+        };
     }
 
     private static CraftPlan planRequiring(CraftAmount input, CraftAmount output) {

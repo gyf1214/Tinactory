@@ -26,6 +26,7 @@ public final class AutocraftServiceBootstrap {
         BlockEntity blockEntity,
         INetwork network,
         LogisticComponent logistics,
+        AutocraftComponent autocraft,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
         UUID cpuId,
@@ -39,7 +40,7 @@ public final class AutocraftServiceBootstrap {
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var subnet = network.getSubnet(blockEntity.getBlockPos());
         var allocator = new LogisticsMachineAllocator(() -> logistics.getVisiblePorts(subnet));
-        var planner = new GoalReductionPlanner(new LogisticsPatternRepository(logistics.listVisiblePatterns()));
+        var planner = new GoalReductionPlanner(autocraft.patternRepository());
         return new AutocraftJobService(
             cpuId,
             planner,
@@ -51,8 +52,6 @@ public final class AutocraftServiceBootstrap {
 
     public static AutocraftTerminalService createTerminalService(
         BlockEntity blockEntity,
-        INetwork network,
-        LogisticComponent logistics,
         AutocraftComponent autocraft,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort) {
@@ -62,10 +61,11 @@ public final class AutocraftServiceBootstrap {
             throw new IllegalStateException("autocraft terminal service must be created on server level");
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
-        var planner = new GoalReductionPlanner(new LogisticsPatternRepository(logistics.listVisiblePatterns()));
+        var repository = autocraft.patternRepository();
+        var planner = new GoalReductionPlanner(repository);
         return new AutocraftTerminalService(
             planner,
-            logistics::listVisiblePatterns,
+            repository,
             autocraft::listVisibleCpus,
             autocraft::listAvailableCpus,
             inventory::snapshotAvailable,

@@ -5,8 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.List;
@@ -14,13 +14,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftTerminalService {
     private final ICraftPlanner planner;
-    private final Supplier<List<CraftPattern>> patternSupplier;
+    private final IPatternRepository patternRepository;
     private final Supplier<List<UUID>> visibleCpuSupplier;
     private final Supplier<List<UUID>> availableCpuSupplier;
     private final Supplier<List<CraftAmount>> availableSupplier;
@@ -30,25 +29,25 @@ public class AutocraftTerminalService {
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
-        Supplier<List<CraftPattern>> patternSupplier,
+        IPatternRepository patternRepository,
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
         Supplier<List<CraftAmount>> availableSupplier) {
 
-        this(planner, patternSupplier, visibleCpuSupplier, availableCpuSupplier, availableSupplier,
+        this(planner, patternRepository, visibleCpuSupplier, availableCpuSupplier, availableSupplier,
             $ -> null);
     }
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
-        Supplier<List<CraftPattern>> patternSupplier,
+        IPatternRepository patternRepository,
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
         Supplier<List<CraftAmount>> availableSupplier,
         Function<UUID, IAutocraftService> jobServiceResolver) {
 
         this.planner = planner;
-        this.patternSupplier = patternSupplier;
+        this.patternRepository = patternRepository;
         this.visibleCpuSupplier = visibleCpuSupplier;
         this.availableCpuSupplier = availableCpuSupplier;
         this.availableSupplier = availableSupplier;
@@ -56,13 +55,7 @@ public class AutocraftTerminalService {
     }
 
     public List<IIngredientKey> listRequestables() {
-        var dedup = patternSupplier.get().stream()
-            .flatMap(pattern -> pattern.outputs().stream())
-            .map(CraftAmount::key)
-            .collect(Collectors.toSet());
-        return dedup.stream()
-            .sorted()
-            .toList();
+        return patternRepository.listRequestables();
     }
 
     public List<UUID> listAvailableCpus() {

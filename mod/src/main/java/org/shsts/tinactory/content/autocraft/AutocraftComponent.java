@@ -7,6 +7,8 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
+import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.shsts.tinactory.integration.network.NetworkComponent;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public class AutocraftComponent extends NetworkComponent {
     private final Map<UUID, AutocraftCpuState> autocraftCpus = new HashMap<>();
+    private final PatternRegistryCache patternRepository = new PatternRegistryCache();
 
     public AutocraftComponent(ComponentType<AutocraftComponent> type, INetwork network) {
         super(type, network);
@@ -60,9 +63,14 @@ public class AutocraftComponent extends NetworkComponent {
         return Optional.of(cpu.service());
     }
 
+    public IPatternRepository patternRepository() {
+        return patternRepository;
+    }
+
     @Override
     public void onDisconnect() {
         autocraftCpus.clear();
+        patternRepository.clear();
     }
 
     @Override

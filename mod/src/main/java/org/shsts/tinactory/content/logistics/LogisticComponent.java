@@ -10,17 +10,13 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.core.autocraft.pattern.NetworkPatternCell;
-import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,7 +35,6 @@ public class LogisticComponent extends NotifierComponent {
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
     private final Set<PortKey> storagePorts = new HashSet<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
-    private final List<NetworkPatternCell> patternCells = new ArrayList<>();
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -115,64 +110,6 @@ public class LogisticComponent extends NotifierComponent {
         }
     }
 
-    public void registerPatternCell(NetworkPatternCell cell) {
-        patternCells.removeIf(existing ->
-            existing.machineId().equals(cell.machineId()) && existing.slotIndex() == cell.slotIndex());
-        patternCells.add(cell);
-    }
-
-    public void unregisterPatternCells(UUID machineId) {
-        patternCells.removeIf(cell -> cell.machineId().equals(machineId));
-    }
-
-    public List<CraftPattern> listVisiblePatterns() {
-        var ordered = patternCells.stream()
-            .sorted(NetworkPatternCell.ORDER)
-            .toList();
-
-        var out = new ArrayList<CraftPattern>();
-        var dedup = new HashSet<String>();
-        for (var cell : ordered) {
-            for (var pattern : cell.patterns()) {
-                if (dedup.add(pattern.patternId())) {
-                    out.add(pattern);
-                } else {
-                    LOGGER.warn("duplicate autocraft pattern id {}, keep first-seen", pattern.patternId());
-                }
-            }
-        }
-        return out;
-    }
-
-    public boolean writePattern(CraftPattern pattern) {
-        var ordered = patternCells.stream()
-            .sorted(NetworkPatternCell.ORDER)
-            .toList();
-        for (var cell : ordered) {
-            if (cell.insert(pattern)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean removePattern(String patternId) {
-        var ordered = patternCells.stream()
-            .sorted(NetworkPatternCell.ORDER)
-            .toList();
-        for (var cell : ordered) {
-            if (cell.remove(patternId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean updatePattern(CraftPattern pattern) {
-        removePattern(pattern.patternId());
-        return writePattern(pattern);
-    }
-
     @Override
     public void onDisconnect() {
         super.onDisconnect();
@@ -180,7 +117,6 @@ public class LogisticComponent extends NotifierComponent {
         subnetPorts.clear();
         globalPorts.clear();
         storagePorts.clear();
-        patternCells.clear();
     }
 
     @Override

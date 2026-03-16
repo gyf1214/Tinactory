@@ -4,6 +4,7 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
@@ -19,7 +20,7 @@ class AutocraftTerminalServicePreviewTest {
     void previewShouldReturnPlan() {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
-            List::of,
+            new PatternRegistryCache(),
             List::of,
             List::of,
             List::of);

@@ -76,6 +76,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
             blockEntity,
             network,
             logistics,
+            autocraft,
             combinedItem,
             combinedFluid,
             machine.uuid(),
