@@ -37,12 +37,12 @@ class AutocraftCpuPersistenceTest {
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
 
-        var first = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var first = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         var jobId = first.submitPrepared(List.of(target), plan);
         first.tick();
         var snapshot = first.snapshotRunning().orElseThrow();
 
-        var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var restored = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         restored.restoreRunning(snapshot);
         assertEquals(AutocraftJob.Status.RUNNING, restored.getJob().orElseThrow().status());
         assertEquals(jobId, restored.getJob().orElseThrow().id());
@@ -58,7 +58,7 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldOmitCpuIdFromSerializedSnapshot() {
         var cpuId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         var plan = new CraftPlan(List.of(step("s1")));
-        var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var service = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
@@ -82,13 +82,13 @@ class AutocraftCpuPersistenceTest {
             List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)));
         var plan = new CraftPlan(List.of(step));
-        var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var service = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
         var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
-        var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var restored = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         restored.restoreRunningSnapshot(serialized, codec);
 
         var restoredStep = restored.snapshotRunning().orElseThrow().plan().steps().get(0);
@@ -102,7 +102,7 @@ class AutocraftCpuPersistenceTest {
     void tickShouldReportDirtyStateChangesOnlyWhenJobStateChanges() {
         var cpuId = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
         var plan = new CraftPlan(List.of(step("s1")));
-        var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
+        var service = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
 
         assertTrue(service.tick());

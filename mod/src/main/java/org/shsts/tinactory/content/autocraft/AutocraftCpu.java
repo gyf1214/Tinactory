@@ -74,11 +74,9 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         service = AutocraftServiceBootstrap.create(
             blockEntity,
-            network,
             logistics,
             combinedItem,
             combinedFluid,
-            machine.uuid(),
             transmissionBandwidth,
             executionIntervalTicks);
         if (pendingSnapshot != null) {

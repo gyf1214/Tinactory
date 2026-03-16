@@ -6,7 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -15,8 +14,6 @@ import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 
-import java.util.UUID;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AutocraftServiceBootstrap {
@@ -24,11 +21,9 @@ public final class AutocraftServiceBootstrap {
 
     public static AutocraftJobService create(
         BlockEntity blockEntity,
-        INetwork network,
         LogisticComponent logistics,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
-        UUID cpuId,
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
@@ -39,7 +34,6 @@ public final class AutocraftServiceBootstrap {
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var allocator = new LogisticsMachineAllocator(logistics::getAllPorts);
         return new AutocraftJobService(
-            cpuId,
             () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
             transmissionBandwidth,
             executionIntervalTicks);

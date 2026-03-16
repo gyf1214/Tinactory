@@ -17,7 +17,6 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,7 +27,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldTransitionRunningDone() {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.COMPLETED);
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
+        var service = new AutocraftJobService(() -> executor);
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
 
         var id = service.submitPrepared(List.of(target), testPlan());
@@ -41,7 +40,7 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldQueuePreparedPlanWithoutPlannerDependency() {
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
 
         var id = service.submitPrepared(
             List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
@@ -55,7 +54,7 @@ class AutocraftJobServiceTest {
     void serviceShouldRemainRunningWhenExecutorBlockedRetriably() {
         var executor = new TestExecutor(ExecutionState.BLOCKED, ExecutionState.BLOCKED, ExecutionState.COMPLETED);
         executor.blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
+        var service = new AutocraftJobService(() -> executor);
 
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
@@ -67,14 +66,14 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldExposeEmptyWhenNoCurrentJob() {
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
 
         assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldRejectSubmitWhenCurrentJobExists() {
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
         assertThrows(IllegalStateException.class, () ->
@@ -83,7 +82,7 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldCancelRunningJobBeforeFirstTick() {
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.CANCELLED));
+        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.CANCELLED));
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
@@ -94,7 +93,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldCancelRunningJob() {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.CANCELLED);
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
+        var service = new AutocraftJobService(() -> executor);
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));

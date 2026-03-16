@@ -34,7 +34,6 @@ public class AutocraftJobService implements IAutocraftService {
     private static final long DEFAULT_TRANSMISSION_BANDWIDTH = 64L;
     private static final int DEFAULT_EXECUTION_INTERVAL_TICKS = 1;
 
-    private final UUID cpuId;
     private final Supplier<ICraftExecutor> executorFactory;
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
@@ -46,27 +45,20 @@ public class AutocraftJobService implements IAutocraftService {
     private int pendingTicks;
 
     public AutocraftJobService(
-        UUID cpuId,
         Supplier<ICraftExecutor> executorFactory,
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
-        this.cpuId = cpuId;
         this.executorFactory = executorFactory;
         this.transmissionBandwidth = transmissionBandwidth;
         this.executionIntervalTicks = Math.max(1, executionIntervalTicks);
     }
 
     public AutocraftJobService(
-        UUID cpuId,
         Supplier<ICraftExecutor> executorFactory) {
 
-        this(cpuId, executorFactory,
+        this(executorFactory,
             DEFAULT_TRANSMISSION_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
-    }
-
-    public UUID cpuId() {
-        return cpuId;
     }
 
     @Override
