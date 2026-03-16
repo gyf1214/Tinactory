@@ -3,6 +3,8 @@ package org.shsts.tinactory.unit.autocraft;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
+import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
@@ -10,6 +12,8 @@ import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,8 +26,7 @@ class AutocraftTerminalServicePreviewTest {
             new StaticPlanner(),
             new PatternRegistryCache(),
             List::of,
-            List::of,
-            List::of);
+            new TestCpuRuntime());
 
         var result = service.preview(TestIngredientKey.item("minecraft:iron_ingot", ""), 3);
 
@@ -36,6 +39,23 @@ class AutocraftTerminalServicePreviewTest {
         @Override
         public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
             return PlanResult.success(new CraftPlan(List.of()));
+        }
+    }
+
+    private static final class TestCpuRuntime implements ICpuRuntime {
+        @Override
+        public List<UUID> listVisibleCpus() {
+            return List.of();
+        }
+
+        @Override
+        public List<UUID> listAvailableCpus() {
+            return List.of();
+        }
+
+        @Override
+        public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
+            return Optional.empty();
         }
     }
 }

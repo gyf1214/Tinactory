@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.logistics.IIngredientKey;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
@@ -20,38 +20,21 @@ import java.util.function.Supplier;
 public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
-    private final Supplier<List<UUID>> visibleCpuSupplier;
-    private final Supplier<List<UUID>> availableCpuSupplier;
     private final Supplier<List<CraftAmount>> availableSupplier;
+    private final ICpuRuntime cpuRuntime;
     @Nullable
     private AutocraftPreview preview;
-    private final Function<UUID, IAutocraftService> jobServiceResolver;
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
         IPatternRepository patternRepository,
-        Supplier<List<UUID>> visibleCpuSupplier,
-        Supplier<List<UUID>> availableCpuSupplier,
-        Supplier<List<CraftAmount>> availableSupplier) {
-
-        this(planner, patternRepository, visibleCpuSupplier, availableCpuSupplier, availableSupplier,
-            $ -> null);
-    }
-
-    public AutocraftTerminalService(
-        ICraftPlanner planner,
-        IPatternRepository patternRepository,
-        Supplier<List<UUID>> visibleCpuSupplier,
-        Supplier<List<UUID>> availableCpuSupplier,
         Supplier<List<CraftAmount>> availableSupplier,
-        Function<UUID, IAutocraftService> jobServiceResolver) {
+        ICpuRuntime cpuRuntime) {
 
         this.planner = planner;
         this.patternRepository = patternRepository;
-        this.visibleCpuSupplier = visibleCpuSupplier;
-        this.availableCpuSupplier = availableCpuSupplier;
         this.availableSupplier = availableSupplier;
-        this.jobServiceResolver = jobServiceResolver;
+        this.cpuRuntime = cpuRuntime;
     }
 
     public List<IIngredientKey> listRequestables() {
@@ -59,25 +42,25 @@ public class AutocraftTerminalService {
     }
 
     public List<UUID> listAvailableCpus() {
-        return List.copyOf(availableCpuSupplier.get());
+        return List.copyOf(cpuRuntime.listAvailableCpus());
     }
 
     public List<CpuStatusEntry> listCpuStatuses() {
-        var available = availableCpuSupplier.get();
-        return visibleCpuSupplier.get().stream()
+        var available = cpuRuntime.listAvailableCpus();
+        return cpuRuntime.listVisibleCpus().stream()
             .map(cpuId -> toCpuStatus(cpuId, available))
             .toList();
     }
 
     public boolean cancelCpu(UUID cpuId) {
-        var service = jobServiceResolver.apply(cpuId);
-        if (service == null) {
+        var service = cpuRuntime.findVisibleService(cpuId);
+        if (service.isEmpty()) {
             return false;
         }
-        var running = service.listJobs().stream()
+        var running = service.get().listJobs().stream()
             .filter(job -> job.status() == AutocraftJob.Status.RUNNING || job.status() == AutocraftJob.Status.BLOCKED)
             .findFirst();
-        return running.isPresent() && service.cancel(running.get().id());
+        return running.isPresent() && service.get().cancel(running.get().id());
     }
 
     public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
@@ -97,17 +80,17 @@ public class AutocraftTerminalService {
         if (preview == null) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
         }
-        var service = jobServiceResolver.apply(cpuId);
-        if (service == null) {
+        var service = cpuRuntime.findVisibleService(cpuId);
+        if (service.isEmpty()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_OFFLINE);
         }
-        if (service.isBusy()) {
+        if (service.get().isBusy()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
         }
         var preview1 = preview;
         preview = null;
         return AutocraftExecuteResult.success(
-            service.submitPrepared(preview1.targets(), preview1.planSnapshot()));
+            service.get().submitPrepared(preview1.targets(), preview1.planSnapshot()));
     }
 
     public void cancelPreview() {
@@ -119,14 +102,14 @@ public class AutocraftTerminalService {
     }
 
     private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {
-        var service = jobServiceResolver.apply(cpuId);
-        if (service == null) {
+        var service = cpuRuntime.findVisibleService(cpuId);
+        if (service.isEmpty()) {
             return new CpuStatusEntry(cpuId, false, "Offline", "N/A", "CPU service unavailable", false);
         }
 
-        var current = currentJob(service);
+        var current = currentJob(service.get());
         var target = current.map(this::formatTargetSummary).orElse("Idle");
-        var step = current.map(job -> formatCurrentStep(service, job)).orElse("Idle");
+        var step = current.map(job -> formatCurrentStep(service.get(), job)).orElse("Idle");
         var blocked = current.map(AutocraftTerminalService::formatBlockedReason).orElse("");
         var cancellable = current
             .map(job -> job.status() == AutocraftJob.Status.RUNNING || job.status() == AutocraftJob.Status.BLOCKED)

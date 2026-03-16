@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
@@ -27,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,8 +51,7 @@ class AutocraftTerminalServiceExecuteTest {
             new StaticPlanner(),
             repo(patterns),
             List::of,
-            List::of,
-            List::of);
+            new TestCpuRuntime(() -> List.of(), () -> List.of(), id -> Optional.empty()));
 
         var requestables = service.listRequestables();
 
@@ -62,6 +64,7 @@ class AutocraftTerminalServiceExecuteTest {
     void executeShouldUseStoredSnapshotAndNotInvokePlannerAgain() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
+        var visibleCpus = new ArrayList<>(List.of(cpu));
         var previewPlanner = new StaticPlanner(planRequiring(
             new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
             new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)));
@@ -74,10 +77,11 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             previewPlanner,
             repo(List.of()),
-            () -> List.copyOf(availableCpus),
-            () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
-            resolverFor(cpu, jobService));
+            new TestCpuRuntime(
+                () -> List.copyOf(visibleCpus),
+                () -> List.copyOf(availableCpus),
+                id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
 
         service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         var execute = service.execute(cpu);
@@ -91,6 +95,7 @@ class AutocraftTerminalServiceExecuteTest {
     void executeShouldFailWhenCpuUnavailable() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
+        var visibleCpus = new ArrayList<>(List.of(cpu));
         // TODO
         var jobService = new AutocraftJobService(cpu,
             (targets, available) -> PlanResult.success(new CraftPlan(List.of())),
@@ -105,10 +110,11 @@ class AutocraftTerminalServiceExecuteTest {
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1))),
             repo(List.of()),
-            () -> List.copyOf(availableCpus),
-            () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
-            resolverFor(cpu, jobService));
+            new TestCpuRuntime(
+                () -> List.copyOf(visibleCpus),
+                () -> List.copyOf(availableCpus),
+                id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
         service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         availableCpus.clear();
 
@@ -193,10 +199,24 @@ class AutocraftTerminalServiceExecuteTest {
         return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)));
     }
 
-    private static Function<UUID, IAutocraftService> resolverFor(
-        UUID cpu,
-        IAutocraftService service) {
-        return id -> id.equals(cpu) ? service : null;
+    private record TestCpuRuntime(
+        Supplier<List<UUID>> visibleCpuSupplier,
+        Supplier<List<UUID>> availableCpuSupplier,
+        Function<UUID, Optional<IAutocraftService>> serviceResolver) implements ICpuRuntime {
+        @Override
+        public List<UUID> listVisibleCpus() {
+            return visibleCpuSupplier.get();
+        }
+
+        @Override
+        public List<UUID> listAvailableCpus() {
+            return availableCpuSupplier.get();
+        }
+
+        @Override
+        public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
+            return serviceResolver.apply(cpuId);
+        }
     }
 
     private static final class StaticPlanner implements ICraftPlanner {

@@ -66,10 +66,8 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftTerminalService(
             planner,
             repository,
-            autocraft::listVisibleCpus,
-            autocraft::listAvailableCpus,
             inventory::snapshotAvailable,
-            cpuId -> autocraft.findVisibleService(cpuId).orElse(null));
+            autocraft);
     }
 
     private static final class SilentJobEvents implements IJobEvents {

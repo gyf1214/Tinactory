@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.integration.network.ComponentType;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftComponent extends NetworkComponent {
+public class AutocraftComponent extends NetworkComponent implements ICpuRuntime {
     private final Map<UUID, AutocraftCpuState> autocraftCpus = new HashMap<>();
     private final PatternRegistryCache patternRepository = new PatternRegistryCache();
 
@@ -40,6 +41,7 @@ public class AutocraftComponent extends NetworkComponent {
         return autocraftCpus.containsKey(cpuId);
     }
 
+    @Override
     public List<UUID> listVisibleCpus() {
         return autocraftCpus.values().stream()
             .map(AutocraftCpuState::cpuId)
@@ -47,6 +49,7 @@ public class AutocraftComponent extends NetworkComponent {
             .toList();
     }
 
+    @Override
     public List<UUID> listAvailableCpus() {
         return autocraftCpus.values().stream()
             .filter(cpu -> !cpu.service().isBusy())
@@ -55,6 +58,7 @@ public class AutocraftComponent extends NetworkComponent {
             .toList();
     }
 
+    @Override
     public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
         var cpu = autocraftCpus.get(cpuId);
         if (cpu == null) {
