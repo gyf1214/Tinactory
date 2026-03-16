@@ -37,8 +37,7 @@ public final class AutocraftServiceBootstrap {
             throw new IllegalStateException("autocraft service must be created on server level");
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
-        var subnet = network.getSubnet(blockEntity.getBlockPos());
-        var allocator = new LogisticsMachineAllocator(() -> logistics.getVisiblePorts(subnet));
+        var allocator = new LogisticsMachineAllocator(logistics::getAllPorts);
         return new AutocraftJobService(
             cpuId,
             () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
