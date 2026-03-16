@@ -13,14 +13,12 @@ import org.shsts.tinactory.core.logistics.IIngredientKey;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
-    private final Supplier<List<CraftAmount>> availableSupplier;
     private final ICpuRuntime cpuRuntime;
     @Nullable
     private AutocraftPreview preview;
@@ -28,12 +26,10 @@ public class AutocraftTerminalService {
     public AutocraftTerminalService(
         ICraftPlanner planner,
         IPatternRepository patternRepository,
-        Supplier<List<CraftAmount>> availableSupplier,
         ICpuRuntime cpuRuntime) {
 
         this.planner = planner;
         this.patternRepository = patternRepository;
-        this.availableSupplier = availableSupplier;
         this.cpuRuntime = cpuRuntime;
     }
 
@@ -68,7 +64,7 @@ public class AutocraftTerminalService {
             return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.INVALID_REQUEST);
         }
         var targets = List.of(new CraftAmount(target, quantity));
-        var result = planner.plan(targets, availableSupplier.get());
+        var result = planner.plan(targets);
         if (!result.isSuccess() || result.plan() == null) {
             return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.PLAN_FAILED);
         }

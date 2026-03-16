@@ -50,7 +50,6 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(patterns),
-            List::of,
             new TestCpuRuntime(() -> List.of(), () -> List.of(), id -> Optional.empty()));
 
         var requestables = service.listRequestables();
@@ -72,7 +71,6 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             previewPlanner,
             repo(List.of()),
-            () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
                 () -> List.copyOf(availableCpus),
@@ -102,7 +100,6 @@ class AutocraftTerminalServiceExecuteTest {
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
                 new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1))),
             repo(List.of()),
-            () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
                 () -> List.copyOf(availableCpus),
@@ -224,7 +221,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
+        public PlanResult plan(List<CraftAmount> targets) {
             calls++;
             return PlanResult.success(plan);
         }

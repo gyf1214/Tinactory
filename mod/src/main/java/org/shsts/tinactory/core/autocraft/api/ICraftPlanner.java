@@ -10,5 +10,5 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface ICraftPlanner {
-    PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available);
+    PlanResult plan(List<CraftAmount> targets);
 }

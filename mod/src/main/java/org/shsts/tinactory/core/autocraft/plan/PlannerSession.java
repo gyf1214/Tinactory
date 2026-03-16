@@ -8,13 +8,16 @@ import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PlannerSession {
     final List<CraftAmount> targets;
     final PlannerLedger ledger;
+    final Map<IIngredientKey, Long> cachedAvailable;
     final List<CraftStep> steps;
     final List<SearchFrame> searchStack;
     int nextTargetIndex;
@@ -22,14 +25,12 @@ public final class PlannerSession {
     @Nullable
     PlanResult result;
 
-    PlannerSession(List<CraftAmount> targets, List<CraftAmount> available) {
+    PlannerSession(List<CraftAmount> targets) {
         this.targets = List.copyOf(targets);
         this.ledger = new PlannerLedger();
+        this.cachedAvailable = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
         this.searchStack = new ArrayList<>();
-        for (var resource : available) {
-            ledger.add(resource.key(), resource.amount());
-        }
         this.nextTargetIndex = 0;
         this.nextStepId = 1L;
         this.result = null;

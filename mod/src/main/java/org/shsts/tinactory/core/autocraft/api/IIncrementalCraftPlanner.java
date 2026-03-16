@@ -11,7 +11,7 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IIncrementalCraftPlanner extends ICraftPlanner {
-    PlannerSession startSession(List<CraftAmount> targets, List<CraftAmount> available);
+    PlannerSession startSession(List<CraftAmount> targets);
 
     PlannerProgress resume(PlannerSession session, int stepBudget);
 }

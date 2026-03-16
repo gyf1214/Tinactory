@@ -25,7 +25,6 @@ class AutocraftTerminalServicePreviewTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             new PatternRegistryCache(),
-            List::of,
             new TestCpuRuntime());
 
         var result = service.preview(TestIngredientKey.item("minecraft:iron_ingot", ""), 3);
@@ -37,7 +36,7 @@ class AutocraftTerminalServicePreviewTest {
 
     private static final class StaticPlanner implements ICraftPlanner {
         @Override
-        public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
+        public PlanResult plan(List<CraftAmount> targets) {
             return PlanResult.success(new CraftPlan(List.of()));
         }
     }

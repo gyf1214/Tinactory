@@ -59,11 +59,10 @@ public final class AutocraftServiceBootstrap {
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var repository = autocraft.patternRepository();
-        var planner = new GoalReductionPlanner(repository);
+        var planner = new GoalReductionPlanner(repository, inventory);
         return new AutocraftTerminalService(
             planner,
             repository,
-            inventory::snapshotAvailable,
             autocraft);
     }
 

@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.autocraft.plan;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -18,13 +19,35 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
+    private static final IInventoryView EMPTY_INVENTORY = new IInventoryView() {
+        @Override
+        public long amountOf(IIngredientKey key) {
+            return 0L;
+        }
+
+        @Override
+        public long extract(IIngredientKey key, long amount, boolean simulate) {
+            return 0L;
+        }
+
+        @Override
+        public long insert(IIngredientKey key, long amount, boolean simulate) {
+            return 0L;
+        }
+    };
+
     private final IPatternRepository patterns;
+    private final IInventoryView inventory;
 
     public GoalReductionPlanner(IPatternRepository patterns) {
-        this.patterns = patterns;
+        this(patterns, EMPTY_INVENTORY);
     }
 
-    @Override
+    public GoalReductionPlanner(IPatternRepository patterns, IInventoryView inventory) {
+        this.patterns = patterns;
+        this.inventory = inventory;
+    }
+
     public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
         var session = startSession(targets, available);
         while (true) {
@@ -36,8 +59,28 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     @Override
+    public PlanResult plan(List<CraftAmount> targets) {
+        var session = startSession(targets);
+        while (true) {
+            var progress = resume(session, Integer.MAX_VALUE);
+            if (progress.state() != PlannerProgress.State.RUNNING) {
+                return progress.result();
+            }
+        }
+    }
+
+    @Override
+    public PlannerSession startSession(List<CraftAmount> targets) {
+        return new PlannerSession(targets);
+    }
+
     public PlannerSession startSession(List<CraftAmount> targets, List<CraftAmount> available) {
-        return new PlannerSession(targets, available);
+        var session = new PlannerSession(targets);
+        for (var resource : available) {
+            session.cachedAvailable.put(resource.key(), resource.amount());
+            session.ledger.add(resource.key(), resource.amount());
+        }
+        return session;
     }
 
     @Override
@@ -93,6 +136,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     private void runStartStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        loadAvailableAmount(session, frame.key);
         frame.remaining = frame.demand - session.ledger.consume(frame.key, frame.demand);
         if (frame.remaining <= 0L) {
             popSuccess(session);
@@ -114,6 +158,15 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         frame.firstError = null;
         frame.candidateIndex = 0;
         frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+    }
+
+    private void loadAvailableAmount(PlannerSession session, IIngredientKey key) {
+        if (session.cachedAvailable.containsKey(key)) {
+            return;
+        }
+        var available = inventory.amountOf(key);
+        session.cachedAvailable.put(key, available);
+        session.ledger.add(key, available);
     }
 
     private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {

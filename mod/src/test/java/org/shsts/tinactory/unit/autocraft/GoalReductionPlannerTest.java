@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -13,7 +14,9 @@ import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -292,6 +295,23 @@ class GoalReductionPlannerTest {
             result.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
     }
 
+    @Test
+    void plannerShouldReadAvailableAmountOncePerKeyWithinSession() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var makePlate = pattern(
+            "tinactory:plate_from_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(plate, 1)));
+        var inventory = new CountingInventory(Map.of(ore, 2L));
+        var planner = new GoalReductionPlanner(repo(List.of(makePlate)), inventory);
+
+        var result = planner.plan(List.of(new CraftAmount(plate, 2)));
+
+        assertTrue(result.isSuccess());
+        assertEquals(1, inventory.readCount(ore));
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return new CraftPattern(id, inputs, outputs,
             new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
@@ -356,5 +376,34 @@ class GoalReductionPlannerTest {
             @Override
             public void clear() {}
         };
+    }
+
+    private static final class CountingInventory implements IInventoryView {
+        private final Map<IIngredientKey, Long> amounts;
+        private final Map<IIngredientKey, Integer> reads = new HashMap<>();
+
+        private CountingInventory(Map<IIngredientKey, Long> amounts) {
+            this.amounts = amounts;
+        }
+
+        @Override
+        public long amountOf(IIngredientKey key) {
+            reads.put(key, reads.getOrDefault(key, 0) + 1);
+            return amounts.getOrDefault(key, 0L);
+        }
+
+        @Override
+        public long extract(IIngredientKey key, long amount, boolean simulate) {
+            return 0L;
+        }
+
+        @Override
+        public long insert(IIngredientKey key, long amount, boolean simulate) {
+            return 0L;
+        }
+
+        private int readCount(IIngredientKey key) {
+            return reads.getOrDefault(key, 0);
+        }
     }
 }
