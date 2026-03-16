@@ -93,6 +93,10 @@ public class LogisticComponent extends NotifierComponent {
         return keys.stream().map(ports::get).toList();
     }
 
+    public Collection<PortInfo> getAllPorts() {
+        return ports.values().stream().toList();
+    }
+
     public Collection<IPort<?>> getStoragePorts() {
         return storagePorts.stream()
             .map(ports::get)
