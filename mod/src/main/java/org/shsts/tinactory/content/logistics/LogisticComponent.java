@@ -12,7 +12,6 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.autocraft.pattern.NetworkPatternCell;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.slf4j.Logger;
 
@@ -40,7 +39,6 @@ public class LogisticComponent extends NotifierComponent {
     private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
     private final Set<PortKey> storagePorts = new HashSet<>();
     private final Set<PortKey> globalPorts = new HashSet<>();
-    private final Map<UUID, AutocraftCpuState> autocraftCpus = new HashMap<>();
     private final List<NetworkPatternCell> patternCells = new ArrayList<>();
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
@@ -117,42 +115,6 @@ public class LogisticComponent extends NotifierComponent {
         }
     }
 
-    public void registerAutocraftCpu(IMachine machine, BlockPos subnet, AutocraftJobService service) {
-        autocraftCpus.put(machine.uuid(), new AutocraftCpuState(machine, subnet, service));
-    }
-
-    public void unregisterAutocraftCpu(UUID cpuId) {
-        autocraftCpus.remove(cpuId);
-    }
-
-    public boolean isAutocraftCpuRegistered(UUID cpuId) {
-        return autocraftCpus.containsKey(cpuId);
-    }
-
-    public List<UUID> listVisibleAutocraftCpus(BlockPos subnet) {
-        return autocraftCpus.values().stream()
-            .filter(cpu -> cpu.subnet().equals(subnet))
-            .map(AutocraftCpuState::cpuId)
-            .sorted()
-            .toList();
-    }
-
-    public List<UUID> listAvailableAutocraftCpus(BlockPos subnet) {
-        return autocraftCpus.values().stream()
-            .filter(cpu -> cpu.subnet().equals(subnet) && !cpu.service().isBusy())
-            .map(AutocraftCpuState::cpuId)
-            .sorted()
-            .toList();
-    }
-
-    public Optional<AutocraftJobService> findVisibleAutocraftService(BlockPos subnet, UUID cpuId) {
-        var cpu = autocraftCpus.get(cpuId);
-        if (cpu == null || !cpu.subnet().equals(subnet)) {
-            return Optional.empty();
-        }
-        return Optional.of(cpu.service());
-    }
-
     public void registerPatternCell(NetworkPatternCell cell) {
         patternCells.removeIf(existing ->
             existing.machineId().equals(cell.machineId()) && existing.slotIndex() == cell.slotIndex());
@@ -218,18 +180,11 @@ public class LogisticComponent extends NotifierComponent {
         subnetPorts.clear();
         globalPorts.clear();
         storagePorts.clear();
-        autocraftCpus.clear();
         patternCells.clear();
     }
 
     @Override
     public void buildSchedulings(ISchedulingRegister builder) {
         // Autocraft CPUs own runtime ticking via machine lifecycle scheduling.
-    }
-
-    private record AutocraftCpuState(IMachine machine, BlockPos subnet, AutocraftJobService service) {
-        private UUID cpuId() {
-            return machine.uuid();
-        }
     }
 }

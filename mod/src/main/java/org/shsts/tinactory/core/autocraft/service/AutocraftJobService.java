@@ -6,6 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
@@ -34,7 +35,7 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftJobService {
+public class AutocraftJobService implements IAutocraftService {
     private static final long DEFAULT_TRANSMISSION_BANDWIDTH = 64L;
     private static final int DEFAULT_EXECUTION_INTERVAL_TICKS = 1;
 
@@ -94,6 +95,7 @@ public class AutocraftJobService {
         return cpuId;
     }
 
+    @Override
     public boolean isBusy() {
         return runningJobId != null || !queued.isEmpty();
     }
@@ -154,6 +156,7 @@ public class AutocraftJobService {
         return id;
     }
 
+    @Override
     public UUID submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
         if (isBusy()) {
             throw new IllegalStateException("autocraft CPU is busy");
@@ -173,10 +176,17 @@ public class AutocraftJobService {
         return Optional.ofNullable(jobs.get(id));
     }
 
+    @Override
     public List<AutocraftJob> listJobs() {
         return List.copyOf(jobs.values());
     }
 
+    @Override
+    public Optional<Integer> runningPlanStepCount() {
+        return snapshotRunning().map(snapshot -> snapshot.plan().steps().size());
+    }
+
+    @Override
     public boolean cancel(UUID id) {
         var current = jobs.get(id);
         if (current == null) {

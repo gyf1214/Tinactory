@@ -2,12 +2,12 @@ package org.shsts.tinactory.integration.autocraft;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.network.INetwork;
+import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
@@ -53,6 +53,7 @@ public final class AutocraftServiceBootstrap {
         BlockEntity blockEntity,
         INetwork network,
         LogisticComponent logistics,
+        AutocraftComponent autocraft,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort) {
 
@@ -61,15 +62,14 @@ public final class AutocraftServiceBootstrap {
             throw new IllegalStateException("autocraft terminal service must be created on server level");
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
-        BlockPos subnet = network.getSubnet(blockEntity.getBlockPos());
         var planner = new GoalReductionPlanner(new LogisticsPatternRepository(logistics.listVisiblePatterns()));
         return new AutocraftTerminalService(
             planner,
             logistics::listVisiblePatterns,
-            () -> logistics.listVisibleAutocraftCpus(subnet),
-            () -> logistics.listAvailableAutocraftCpus(subnet),
+            autocraft::listVisibleCpus,
+            autocraft::listAvailableCpus,
             inventory::snapshotAvailable,
-            cpuId -> logistics.findVisibleAutocraftService(subnet, cpuId).orElse(null));
+            cpuId -> autocraft.findVisibleService(cpuId).orElse(null));
     }
 
     private static final class SilentJobEvents implements IJobEvents {

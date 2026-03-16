@@ -3,10 +3,11 @@ package org.shsts.tinactory.core.autocraft.service;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class AutocraftTerminalService {
     private final Supplier<List<CraftAmount>> availableSupplier;
     @Nullable
     private AutocraftPreview preview;
-    private final Function<UUID, AutocraftJobService> jobServiceResolver;
+    private final Function<UUID, IAutocraftService> jobServiceResolver;
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
@@ -44,7 +45,7 @@ public class AutocraftTerminalService {
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
         Supplier<List<CraftAmount>> availableSupplier,
-        Function<UUID, AutocraftJobService> jobServiceResolver) {
+        Function<UUID, IAutocraftService> jobServiceResolver) {
 
         this.planner = planner;
         this.patternSupplier = patternSupplier;
@@ -140,7 +141,7 @@ public class AutocraftTerminalService {
         return new CpuStatusEntry(cpuId, available.contains(cpuId), target, step, blocked, cancellable);
     }
 
-    private static Optional<AutocraftJob> currentJob(AutocraftJobService service) {
+    private static Optional<AutocraftJob> currentJob(IAutocraftService service) {
         return service.listJobs().stream()
             .filter(job ->
                 job.status() == AutocraftJob.Status.RUNNING ||
@@ -157,15 +158,15 @@ public class AutocraftTerminalService {
         return first.amount() + "x " + first.key();
     }
 
-    private static String formatCurrentStep(AutocraftJobService service, AutocraftJob job) {
+    private static String formatCurrentStep(IAutocraftService service, AutocraftJob job) {
         var details = job.executionDetails();
         if (details == null) {
             return job.status() == AutocraftJob.Status.QUEUED ? "Queued" : "N/A";
         }
-        var snapshot = service.snapshotRunning();
-        if (snapshot.isPresent()) {
+        var stepCount = service.runningPlanStepCount();
+        if (stepCount.isPresent()) {
             var next = details.nextStepIndex() + 1;
-            return next + "/" + snapshot.get().plan().steps().size();
+            return next + "/" + stepCount.get();
         }
         return details.phase().name();
     }

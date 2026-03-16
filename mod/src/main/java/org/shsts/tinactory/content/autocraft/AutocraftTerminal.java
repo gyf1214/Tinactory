@@ -11,6 +11,7 @@ import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
+import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
@@ -33,10 +34,12 @@ public class AutocraftTerminal extends MEStorageAccess {
     protected void onConnect(INetwork network) {
         super.onConnect(network);
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+        var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         service = AutocraftServiceBootstrap.createTerminalService(
             blockEntity,
             network,
             logistics,
+            autocraft,
             combinedItem,
             combinedFluid);
     }

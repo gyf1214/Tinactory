@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,7 +72,7 @@ class AutocraftTerminalServiceExecuteTest {
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
-            id -> id.equals(cpu) ? jobService : null);
+            resolverFor(cpu, jobService));
 
         service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         var execute = service.execute(cpu);
@@ -101,7 +103,7 @@ class AutocraftTerminalServiceExecuteTest {
             () -> List.copyOf(availableCpus),
             () -> List.copyOf(availableCpus),
             () -> List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 64)),
-            id -> id.equals(cpu) ? jobService : null);
+            resolverFor(cpu, jobService));
         service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
         availableCpus.clear();
 
@@ -123,6 +125,12 @@ class AutocraftTerminalServiceExecuteTest {
             List.of(output),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
         return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)));
+    }
+
+    private static Function<UUID, IAutocraftService> resolverFor(
+        UUID cpu,
+        IAutocraftService service) {
+        return id -> id.equals(cpu) ? service : null;
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
