@@ -26,7 +26,6 @@ public final class AutocraftServiceBootstrap {
         BlockEntity blockEntity,
         INetwork network,
         LogisticComponent logistics,
-        AutocraftComponent autocraft,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
         UUID cpuId,
