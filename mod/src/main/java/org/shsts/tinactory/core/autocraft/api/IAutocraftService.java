@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface IAutocraftService {
     boolean isBusy();
 
-    List<AutocraftJob> listJobs();
+    Optional<AutocraftJob> getJob();
 
     boolean cancel(UUID id);
 

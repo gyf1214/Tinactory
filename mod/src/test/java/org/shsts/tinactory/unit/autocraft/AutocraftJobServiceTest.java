@@ -18,7 +18,6 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,9 +33,10 @@ class AutocraftJobServiceTest {
 
         var id = service.submitPrepared(List.of(target), testPlan());
 
-        assertEquals(AutocraftJob.Status.RUNNING, service.job(id).status());
+        assertEquals(AutocraftJob.Status.RUNNING, service.getJob().orElseThrow().status());
         service.tick();
-        assertEquals(AutocraftJob.Status.DONE, service.job(id).status());
+        assertEquals(AutocraftJob.Status.DONE, service.getJob().orElseThrow().status());
+        assertEquals(id, service.getJob().orElseThrow().id());
     }
 
     @Test
@@ -47,7 +47,8 @@ class AutocraftJobServiceTest {
             List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
             testPlan());
 
-        assertEquals(AutocraftJob.Status.RUNNING, service.job(id).status());
+        assertEquals(AutocraftJob.Status.RUNNING, service.getJob().orElseThrow().status());
+        assertEquals(id, service.getJob().orElseThrow().id());
     }
 
     @Test
@@ -58,29 +59,26 @@ class AutocraftJobServiceTest {
 
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
-        assertEquals(AutocraftJob.Status.BLOCKED, service.job(id).status());
+        assertEquals(AutocraftJob.Status.BLOCKED, service.getJob().orElseThrow().status());
         service.tick();
-        assertEquals(AutocraftJob.Status.DONE, service.job(id).status());
+        assertEquals(AutocraftJob.Status.DONE, service.getJob().orElseThrow().status());
+        assertEquals(id, service.getJob().orElseThrow().id());
     }
 
     @Test
-    void serviceShouldExposeSafeLookupForMissingJob() {
+    void serviceShouldExposeEmptyWhenNoCurrentJob() {
         var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
 
-        assertTrue(service.findJob(UUID.fromString("99999999-9999-9999-9999-999999999999")).isEmpty());
+        assertTrue(service.getJob().isEmpty());
     }
 
     @Test
-    void serviceShouldListJobsInSubmitOrder() {
+    void serviceShouldRejectSubmitWhenCurrentJobExists() {
         var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
 
-        var first = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
+        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
         assertThrows(IllegalStateException.class, () ->
             service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y2", ""), 1)), testPlan()));
-
-        assertEquals(
-            List.of(first),
-            service.listJobs().stream().map(AutocraftJob::id).collect(Collectors.toList()));
     }
 
     @Test
@@ -90,7 +88,7 @@ class AutocraftJobServiceTest {
 
         assertTrue(service.cancel(id));
         service.tick();
-        assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
+        assertEquals(AutocraftJob.Status.CANCELLED, service.getJob().orElseThrow().status());
     }
 
     @Test
@@ -101,7 +99,7 @@ class AutocraftJobServiceTest {
 
         assertTrue(service.cancel(id));
         service.tick();
-        assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
+        assertEquals(AutocraftJob.Status.CANCELLED, service.getJob().orElseThrow().status());
         assertTrue(executor.cancelled);
         assertFalse(service.cancel(id));
     }

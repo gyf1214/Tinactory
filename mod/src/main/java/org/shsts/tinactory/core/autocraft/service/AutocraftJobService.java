@@ -39,10 +39,8 @@ public class AutocraftJobService implements IAutocraftService {
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
 
-    private final Map<UUID, AutocraftJob> jobs = new LinkedHashMap<>();
-
     @Nullable
-    private UUID runningJobId;
+    private AutocraftJob currentJob;
     @Nullable
     private ICraftExecutor runningExecutor;
     private int pendingTicks;
@@ -73,27 +71,23 @@ public class AutocraftJobService implements IAutocraftService {
 
     @Override
     public boolean isBusy() {
-        return runningJobId != null;
+        return runningExecutor != null;
     }
 
     public Optional<RunningSnapshot> snapshotRunning() {
-        if (runningJobId == null || !(runningExecutor instanceof SequentialCraftExecutor sequential)) {
-            return Optional.empty();
-        }
-        var current = jobs.get(runningJobId);
-        if (current == null) {
+        if (currentJob == null || !(runningExecutor instanceof SequentialCraftExecutor sequential)) {
             return Optional.empty();
         }
         return Optional.of(new RunningSnapshot(
             cpuId,
-            current.id(),
-            current.targets(),
+            currentJob.id(),
+            currentJob.targets(),
             sequential.currentPlan(),
             sequential.snapshot()));
     }
 
     public void restoreRunning(RunningSnapshot snapshot) {
-        if (!snapshot.cpuId().equals(cpuId) || runningJobId != null) {
+        if (!snapshot.cpuId().equals(cpuId) || currentJob != null || runningExecutor != null) {
             return;
         }
         var executor = executorFactory.get();
@@ -102,14 +96,13 @@ public class AutocraftJobService implements IAutocraftService {
         }
         sequential.start(snapshot.plan(), snapshot.runtimeSnapshot().nextStepIndex(), snapshot.runtimeSnapshot());
         var details = sequential.details();
-        jobs.put(snapshot.jobId(), new AutocraftJob(
+        currentJob = new AutocraftJob(
             snapshot.jobId(),
             snapshot.targets(),
             details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED,
             null,
             sequential.error(),
-            details));
-        runningJobId = snapshot.jobId();
+            details);
         runningExecutor = executor;
         pendingTicks = 0;
     }
@@ -130,30 +123,21 @@ public class AutocraftJobService implements IAutocraftService {
         var id = UUID.randomUUID();
         var executor = executorFactory.get();
         executor.start(plan);
-        jobs.put(id, new AutocraftJob(
+        currentJob = new AutocraftJob(
             id,
             targets,
             AutocraftJob.Status.RUNNING,
             null,
             null,
-            executor.details()));
-        runningJobId = id;
+            executor.details());
         runningExecutor = executor;
         pendingTicks = 0;
         return id;
     }
 
-    public AutocraftJob job(UUID id) {
-        return jobs.get(id);
-    }
-
-    public Optional<AutocraftJob> findJob(UUID id) {
-        return Optional.ofNullable(jobs.get(id));
-    }
-
     @Override
-    public List<AutocraftJob> listJobs() {
-        return List.copyOf(jobs.values());
+    public Optional<AutocraftJob> getJob() {
+        return Optional.ofNullable(currentJob);
     }
 
     @Override
@@ -163,34 +147,30 @@ public class AutocraftJobService implements IAutocraftService {
 
     @Override
     public boolean cancel(UUID id) {
-        var current = jobs.get(id);
-        if (current == null) {
+        if (currentJob == null) {
             return false;
         }
-        if ((current.status() == AutocraftJob.Status.RUNNING || current.status() == AutocraftJob.Status.BLOCKED) &&
-            id.equals(runningJobId)) {
+        if ((currentJob.status() == AutocraftJob.Status.RUNNING ||
+            currentJob.status() == AutocraftJob.Status.BLOCKED) &&
+            currentJob.id().equals(id) &&
+            runningExecutor != null) {
 
-            if (runningExecutor != null) {
-                runningExecutor.cancel();
-                var details = runningExecutor.details();
-                jobs.put(id, new AutocraftJob(
-                    id,
-                    current.targets(),
-                    details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED,
-                    current.planError(),
-                    runningExecutor.error(),
-                    details));
-            }
+            runningExecutor.cancel();
+            var details = runningExecutor.details();
+            currentJob = new AutocraftJob(
+                id,
+                currentJob.targets(),
+                details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED,
+                currentJob.planError(),
+                runningExecutor.error(),
+                details);
             return true;
         }
         return false;
     }
 
     public boolean tick() {
-        if (runningJobId == null) {
-            return false;
-        }
-        if (runningExecutor == null) {
+        if (currentJob == null || runningExecutor == null) {
             return false;
         }
 
@@ -202,53 +182,46 @@ public class AutocraftJobService implements IAutocraftService {
 
         var changed = false;
         runningExecutor.runCycle(transmissionBandwidth);
-        var current = jobs.get(runningJobId);
-        if (current == null) {
-            runningJobId = null;
-            runningExecutor = null;
-            return true;
-        }
 
         var details = runningExecutor.details();
         var state = runningExecutor.state();
         if (state == ExecutionState.RUNNING || state == ExecutionState.IDLE || state == ExecutionState.BLOCKED) {
             var status = details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED;
-            jobs.put(current.id(), new AutocraftJob(
-                current.id(),
-                current.targets(),
+            currentJob = new AutocraftJob(
+                currentJob.id(),
+                currentJob.targets(),
                 status,
-                current.planError(),
+                currentJob.planError(),
                 runningExecutor.error(),
-                details));
+                details);
             return true;
         }
 
         if (state == ExecutionState.COMPLETED) {
-            jobs.put(current.id(), new AutocraftJob(
-                current.id(),
-                current.targets(),
+            currentJob = new AutocraftJob(
+                currentJob.id(),
+                currentJob.targets(),
                 AutocraftJob.Status.DONE,
-                current.planError(),
+                currentJob.planError(),
                 null,
-                details));
+                details);
         } else if (state == ExecutionState.CANCELLED) {
-            jobs.put(current.id(), new AutocraftJob(
-                current.id(),
-                current.targets(),
+            currentJob = new AutocraftJob(
+                currentJob.id(),
+                currentJob.targets(),
                 AutocraftJob.Status.CANCELLED,
-                current.planError(),
+                currentJob.planError(),
                 runningExecutor.error(),
-                details));
+                details);
         } else {
-            jobs.put(current.id(), new AutocraftJob(
-                current.id(),
-                current.targets(),
+            currentJob = new AutocraftJob(
+                currentJob.id(),
+                currentJob.targets(),
                 AutocraftJob.Status.FAILED,
-                current.planError(),
+                currentJob.planError(),
                 runningExecutor.error(),
-                details));
+                details);
         }
-        runningJobId = null;
         runningExecutor = null;
         changed = true;
         return changed;

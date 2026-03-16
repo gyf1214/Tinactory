@@ -43,13 +43,14 @@ class AutocraftCpuPersistenceTest {
 
         var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
         restored.restoreRunning(snapshot);
-        assertEquals(AutocraftJob.Status.RUNNING, restored.job(jobId).status());
+        assertEquals(AutocraftJob.Status.RUNNING, restored.getJob().orElseThrow().status());
+        assertEquals(jobId, restored.getJob().orElseThrow().id());
 
-        while (restored.job(jobId).status() == AutocraftJob.Status.RUNNING ||
-            restored.job(jobId).status() == AutocraftJob.Status.BLOCKED) {
+        while (restored.getJob().orElseThrow().status() == AutocraftJob.Status.RUNNING ||
+            restored.getJob().orElseThrow().status() == AutocraftJob.Status.BLOCKED) {
             restored.tick();
         }
-        assertEquals(AutocraftJob.Status.DONE, restored.job(jobId).status());
+        assertEquals(AutocraftJob.Status.DONE, restored.getJob().orElseThrow().status());
     }
 
     @Test

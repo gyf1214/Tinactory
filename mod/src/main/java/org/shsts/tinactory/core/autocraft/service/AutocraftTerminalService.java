@@ -53,10 +53,15 @@ public class AutocraftTerminalService {
         if (service.isEmpty()) {
             return false;
         }
-        var running = service.get().listJobs().stream()
-            .filter(job -> job.status() == AutocraftJob.Status.RUNNING || job.status() == AutocraftJob.Status.BLOCKED)
-            .findFirst();
-        return running.isPresent() && service.get().cancel(running.get().id());
+        var job = service.get().getJob();
+        if (job.isEmpty()) {
+            return false;
+        }
+        var status = job.get().status();
+        if (status != AutocraftJob.Status.RUNNING && status != AutocraftJob.Status.BLOCKED) {
+            return false;
+        }
+        return service.get().cancel(job.get().id());
     }
 
     public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
@@ -103,7 +108,7 @@ public class AutocraftTerminalService {
             return new CpuStatusEntry(cpuId, false, "Offline", "N/A", "CPU service unavailable", false);
         }
 
-        var current = currentJob(service.get());
+        var current = service.get().getJob();
         var target = current.map(this::formatTargetSummary).orElse("Idle");
         var step = current.map(job -> formatCurrentStep(service.get(), job)).orElse("Idle");
         var blocked = current.map(AutocraftTerminalService::formatBlockedReason).orElse("");
@@ -111,14 +116,6 @@ public class AutocraftTerminalService {
             .map(job -> job.status() == AutocraftJob.Status.RUNNING || job.status() == AutocraftJob.Status.BLOCKED)
             .orElse(false);
         return new CpuStatusEntry(cpuId, available.contains(cpuId), target, step, blocked, cancellable);
-    }
-
-    private static Optional<AutocraftJob> currentJob(IAutocraftService service) {
-        return service.listJobs().stream()
-            .filter(job ->
-                job.status() == AutocraftJob.Status.RUNNING ||
-                    job.status() == AutocraftJob.Status.BLOCKED)
-            .findFirst();
     }
 
     private String formatTargetSummary(AutocraftJob job) {

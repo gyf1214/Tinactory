@@ -7,7 +7,10 @@ import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AutocraftRuntimeApiTest {
@@ -30,5 +33,14 @@ class AutocraftRuntimeApiTest {
                 IMachine.class,
                 BlockPos.class,
                 IAutocraftService.class));
+    }
+
+    @Test
+    void autocraftServiceShouldExposeSingleCurrentJobApi() {
+        var method = assertDoesNotThrow(() -> IAutocraftService.class.getMethod("getJob"));
+        assertThrows(
+            NoSuchMethodException.class,
+            () -> IAutocraftService.class.getMethod("listJobs"));
+        assertEquals(Optional.class, method.getReturnType());
     }
 }
