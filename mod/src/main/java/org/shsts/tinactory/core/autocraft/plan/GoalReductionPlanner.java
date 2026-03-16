@@ -112,7 +112,6 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             return;
         }
         frame.firstError = null;
-        frame.candidateStartIndex = 0;
         frame.candidateIndex = 0;
         frame.stage = PlannerSession.Stage.SELECT_PATTERN;
     }
@@ -123,8 +122,6 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             popFailure(session, error);
             return;
         }
-        var pattern = frame.candidates.get(frame.candidateIndex);
-        frame.candidateStartIndex = frame.candidateIndex;
         frame.ledgerSnapshot = session.ledger.copy();
         frame.stepCountSnapshot = session.steps.size();
         frame.stepIdSnapshot = session.nextStepId;
@@ -222,15 +219,6 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         return patterns.findPatternsProducing(key).stream()
             .sorted(Comparator.comparing(CraftPattern::patternId))
             .toList();
-    }
-
-    private static long getProducedAmount(CraftPattern pattern, IIngredientKey key) {
-        for (var output : pattern.outputs()) {
-            if (output.key().equals(key)) {
-                return output.amount();
-            }
-        }
-        throw new IllegalArgumentException("pattern does not produce target key: " + pattern.patternId());
     }
 
     private static CraftPlan buildPlan(PlannerSession session) {
