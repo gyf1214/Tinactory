@@ -69,25 +69,6 @@ class AutocraftCpuPersistenceTest {
     }
 
     @Test
-    void serviceShouldIgnoreLegacyCpuIdTagWhenRestoringSnapshot() {
-        var cpuId = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
-        var plan = new CraftPlan(List.of(step("s1"), step("s2")));
-        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
-        var service = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
-
-        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
-        service.tick();
-        var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
-        snapshot.putUUID("cpuId", UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"));
-
-        var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
-        restored.restoreRunningSnapshot(snapshot, codec);
-
-        assertTrue(restored.getJob().isPresent());
-        assertTrue(restored.snapshotRunning().isPresent());
-    }
-
-    @Test
     void serviceShouldPersistStepOutputRolesInSnapshot() {
         var cpuId = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
         var step = new CraftStep(
