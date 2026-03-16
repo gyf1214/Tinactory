@@ -1,9 +1,9 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -14,9 +14,7 @@ import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,9 +35,11 @@ class GoalReductionPlannerTest {
             "tinactory:gear_from_plate",
             List.of(new CraftAmount(plate, 1)),
             List.of(new CraftAmount(gear, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(platePattern, gearPattern)));
+        var planner = planner(
+            repo(List.of(platePattern, gearPattern)),
+            List.of(new CraftAmount(ingot, 2)));
 
-        var result = planner.plan(List.of(new CraftAmount(gear, 1)), List.of(new CraftAmount(ingot, 2)));
+        var result = planner.plan(List.of(new CraftAmount(gear, 1)));
 
         assertTrue(result.isSuccess());
         var steps = result.plan().steps();
@@ -62,11 +62,11 @@ class GoalReductionPlannerTest {
             "tinactory:z_dust_to_plate",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(plate, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(zPattern, aPattern)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(plate, 1)),
+        var planner = planner(
+            repo(List.of(zPattern, aPattern)),
             List.of(new CraftAmount(ore, 1), new CraftAmount(dust, 1)));
+
+        var result = planner.plan(List.of(new CraftAmount(plate, 1)));
 
         assertTrue(result.isSuccess());
         assertEquals("tinactory:a_ore_to_plate", result.plan().steps().get(0).pattern().patternId());
@@ -87,11 +87,9 @@ class GoalReductionPlannerTest {
             "tinactory:residue_to_carbon",
             List.of(new CraftAmount(residue, 1)),
             List.of(new CraftAmount(carbon, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(refine, residueToCarbon)));
+        var planner = planner(repo(List.of(refine, residueToCarbon)), List.of(new CraftAmount(crude, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(plastic, 1), new CraftAmount(carbon, 1)),
-            List.of(new CraftAmount(crude, 1)));
+        var result = planner.plan(List.of(new CraftAmount(plastic, 1), new CraftAmount(carbon, 1)));
 
         assertTrue(result.isSuccess());
         assertEquals(2, result.plan().steps().size());
@@ -120,11 +118,9 @@ class GoalReductionPlannerTest {
             "tinactory:make_final",
             List.of(new CraftAmount(part, 1)),
             List.of(new CraftAmount(finalKey, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(makePart, makeFinal)));
+        var planner = planner(repo(List.of(makePart, makeFinal)), List.of(new CraftAmount(base, 2)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(finalKey, 1), new CraftAmount(part, 1)),
-            List.of(new CraftAmount(base, 2)));
+        var result = planner.plan(List.of(new CraftAmount(finalKey, 1), new CraftAmount(part, 1)));
 
         assertTrue(result.isSuccess());
         var partStep = result.plan().steps().get(0);
@@ -151,11 +147,9 @@ class GoalReductionPlannerTest {
             "tinactory:machine_b_from_part",
             List.of(new CraftAmount(part, 1)),
             List.of(new CraftAmount(machineB, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(makePart, makeMachineA, makeMachineB)));
+        var planner = planner(repo(List.of(makePart, makeMachineA, makeMachineB)), List.of(new CraftAmount(ore, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(machineA, 1), new CraftAmount(machineB, 1)),
-            List.of(new CraftAmount(ore, 1)));
+        var result = planner.plan(List.of(new CraftAmount(machineA, 1), new CraftAmount(machineB, 1)));
 
         assertTrue(result.isSuccess());
         var steps = result.plan().steps();
@@ -187,11 +181,11 @@ class GoalReductionPlannerTest {
             "tinactory:machine_from_part",
             List.of(new CraftAmount(part, 2)),
             List.of(new CraftAmount(machine, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(partFromOre, partFromPlate, machineFromPart)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(machine, 1)),
+        var planner = planner(
+            repo(List.of(partFromOre, partFromPlate, machineFromPart)),
             List.of(new CraftAmount(ore, 1), new CraftAmount(plate, 1)));
+
+        var result = planner.plan(List.of(new CraftAmount(machine, 1)));
 
         assertTrue(result.isSuccess());
         var steps = result.plan().steps();
@@ -224,11 +218,11 @@ class GoalReductionPlannerTest {
             "tinactory:machine_from_part",
             List.of(new CraftAmount(part, 3)),
             List.of(new CraftAmount(machine, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(partFromOre, partFromPlate, machineFromPart)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(machine, 1)),
+        var planner = planner(
+            repo(List.of(partFromOre, partFromPlate, machineFromPart)),
             List.of(new CraftAmount(ore, 2), new CraftAmount(plate, 1)));
+
+        var result = planner.plan(List.of(new CraftAmount(machine, 1)));
 
         assertTrue(result.isSuccess());
         var steps = result.plan().steps();
@@ -253,11 +247,9 @@ class GoalReductionPlannerTest {
             "tinactory:b_plate_from_dust",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(plate, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(first, second)));
+        var planner = planner(repo(List.of(first, second)), List.of(new CraftAmount(dust, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(plate, 1)),
-            List.of(new CraftAmount(dust, 1)));
+        var result = planner.plan(List.of(new CraftAmount(plate, 1)));
 
         assertTrue(result.isSuccess());
         assertEquals(List.of("tinactory:b_plate_from_dust"),
@@ -283,11 +275,11 @@ class GoalReductionPlannerTest {
             "tinactory:b_ingot_from_dust",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(ingot, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(gearFromIngot, ingotFromOre, ingotFromDust)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(gear, 1)),
+        var planner = planner(
+            repo(List.of(gearFromIngot, ingotFromOre, ingotFromDust)),
             List.of(new CraftAmount(dust, 1)));
+
+        var result = planner.plan(List.of(new CraftAmount(gear, 1)));
 
         assertTrue(result.isSuccess());
         assertEquals(
@@ -303,13 +295,17 @@ class GoalReductionPlannerTest {
             "tinactory:plate_from_ore",
             List.of(new CraftAmount(ore, 1)),
             List.of(new CraftAmount(plate, 1)));
-        var inventory = new CountingInventory(Map.of(ore, 2L));
+        var inventory = TestInventoryView.fromAmounts(List.of(new CraftAmount(ore, 2)));
         var planner = new GoalReductionPlanner(repo(List.of(makePlate)), inventory);
 
         var result = planner.plan(List.of(new CraftAmount(plate, 2)));
 
         assertTrue(result.isSuccess());
         assertEquals(1, inventory.readCount(ore));
+    }
+
+    private static GoalReductionPlanner planner(IPatternRepository repo, List<CraftAmount> available) {
+        return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -378,32 +374,4 @@ class GoalReductionPlannerTest {
         };
     }
 
-    private static final class CountingInventory implements IInventoryView {
-        private final Map<IIngredientKey, Long> amounts;
-        private final Map<IIngredientKey, Integer> reads = new HashMap<>();
-
-        private CountingInventory(Map<IIngredientKey, Long> amounts) {
-            this.amounts = amounts;
-        }
-
-        @Override
-        public long amountOf(IIngredientKey key) {
-            reads.put(key, reads.getOrDefault(key, 0) + 1);
-            return amounts.getOrDefault(key, 0L);
-        }
-
-        @Override
-        public long extract(IIngredientKey key, long amount, boolean simulate) {
-            return 0L;
-        }
-
-        @Override
-        public long insert(IIngredientKey key, long amount, boolean simulate) {
-            return 0L;
-        }
-
-        private int readCount(IIngredientKey key) {
-            return reads.getOrDefault(key, 0);
-        }
-    }
 }
