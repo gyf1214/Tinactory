@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
@@ -192,6 +193,12 @@ class AutocraftTerminalServiceExecuteTest {
         Supplier<List<UUID>> visibleCpuSupplier,
         Supplier<List<UUID>> availableCpuSupplier,
         Function<UUID, Optional<IAutocraftService>> serviceResolver) implements ICpuRuntime {
+        @Override
+        public void registerCpu(IMachine machine, IAutocraftService service) {}
+
+        @Override
+        public void unregisterCpu(UUID cpuId) {}
+
         @Override
         public List<UUID> listVisibleCpus() {
             return visibleCpuSupplier.get();

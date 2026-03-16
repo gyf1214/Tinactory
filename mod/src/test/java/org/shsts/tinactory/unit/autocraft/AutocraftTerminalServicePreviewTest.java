@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
@@ -42,6 +43,12 @@ class AutocraftTerminalServicePreviewTest {
     }
 
     private static final class TestCpuRuntime implements ICpuRuntime {
+        @Override
+        public void registerCpu(IMachine machine, IAutocraftService service) {}
+
+        @Override
+        public void unregisterCpu(UUID cpuId) {}
+
         @Override
         public List<UUID> listVisibleCpus() {
             return List.of();

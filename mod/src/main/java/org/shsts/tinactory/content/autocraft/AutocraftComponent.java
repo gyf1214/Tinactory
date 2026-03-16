@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.autocraft;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
@@ -29,10 +28,12 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
         super(type, network);
     }
 
-    public void registerCpu(IMachine machine, BlockPos subnet, IAutocraftService service) {
-        autocraftCpus.put(machine.uuid(), new AutocraftCpuState(machine, subnet, service));
+    @Override
+    public void registerCpu(IMachine machine, IAutocraftService service) {
+        autocraftCpus.put(machine.uuid(), new AutocraftCpuState(machine, service));
     }
 
+    @Override
     public void unregisterCpu(UUID cpuId) {
         autocraftCpus.remove(cpuId);
     }
@@ -80,7 +81,7 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
     @Override
     public void buildSchedulings(ISchedulingRegister builder) {}
 
-    private record AutocraftCpuState(IMachine machine, BlockPos subnet, IAutocraftService service) {
+    private record AutocraftCpuState(IMachine machine, IAutocraftService service) {
         private UUID cpuId() {
             return machine.uuid();
         }

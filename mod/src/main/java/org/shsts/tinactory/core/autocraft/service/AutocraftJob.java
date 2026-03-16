@@ -25,7 +25,6 @@ public record AutocraftJob(
     }
 
     public enum Status {
-        QUEUED,
         RUNNING,
         BLOCKED,
         FAILED,

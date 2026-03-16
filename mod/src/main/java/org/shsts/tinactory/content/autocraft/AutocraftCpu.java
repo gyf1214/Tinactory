@@ -86,7 +86,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;
         }
-        autocraft.registerCpu(machine, network.getSubnet(blockEntity.getBlockPos()), service);
+        autocraft.registerCpu(machine, service);
         blockEntity.setChanged();
     }
 

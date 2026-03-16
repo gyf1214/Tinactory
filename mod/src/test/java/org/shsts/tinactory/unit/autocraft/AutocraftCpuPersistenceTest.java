@@ -39,17 +39,16 @@ class AutocraftCpuPersistenceTest {
         var first = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
         var jobId = first.submitPrepared(List.of(target), plan);
         first.tick();
-        first.tick();
-        first.tick();
         var snapshot = first.snapshotRunning().orElseThrow();
 
         var restored = new AutocraftJobService(cpuId, AutocraftCpuPersistenceTest::executor);
         restored.restoreRunning(snapshot);
         assertEquals(AutocraftJob.Status.RUNNING, restored.job(jobId).status());
 
-        restored.tick();
-        restored.tick();
-        restored.tick();
+        while (restored.job(jobId).status() == AutocraftJob.Status.RUNNING ||
+            restored.job(jobId).status() == AutocraftJob.Status.BLOCKED) {
+            restored.tick();
+        }
         assertEquals(AutocraftJob.Status.DONE, restored.job(jobId).status());
     }
 
@@ -106,7 +105,7 @@ class AutocraftCpuPersistenceTest {
 
         assertTrue(service.tick());
         assertTrue(service.tick());
-        assertTrue(service.tick());
+        assertTrue(!service.tick());
         assertTrue(!service.tick());
     }
 

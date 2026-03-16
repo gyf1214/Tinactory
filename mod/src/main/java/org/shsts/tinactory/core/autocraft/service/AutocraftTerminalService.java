@@ -117,8 +117,7 @@ public class AutocraftTerminalService {
         return service.listJobs().stream()
             .filter(job ->
                 job.status() == AutocraftJob.Status.RUNNING ||
-                    job.status() == AutocraftJob.Status.BLOCKED ||
-                    job.status() == AutocraftJob.Status.QUEUED)
+                    job.status() == AutocraftJob.Status.BLOCKED)
             .findFirst();
     }
 
@@ -133,7 +132,7 @@ public class AutocraftTerminalService {
     private static String formatCurrentStep(IAutocraftService service, AutocraftJob job) {
         var details = job.executionDetails();
         if (details == null) {
-            return job.status() == AutocraftJob.Status.QUEUED ? "Queued" : "N/A";
+            return "N/A";
         }
         var stepCount = service.runningPlanStepCount();
         if (stepCount.isPresent()) {

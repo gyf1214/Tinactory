@@ -55,15 +55,19 @@ public final class PatternNbtCodec {
         return list;
     }
 
-    private CraftAmount decodeAmount(CompoundTag tag) {
+    public CraftAmount decodeAmount(CompoundTag tag) {
         var key = CodecHelper.parseTag(keyCodec, tag.get("key"));
         return new CraftAmount(key, tag.getLong("amount"));
     }
 
-    private CompoundTag encodeAmount(CraftAmount amount) {
+    public CompoundTag encodeAmount(CraftAmount amount) {
+        return encodeAmount(amount.key(), amount.amount());
+    }
+
+    public CompoundTag encodeAmount(IIngredientKey key, long amount) {
         var tag = new CompoundTag();
-        tag.put("key", CodecHelper.encodeTag(keyCodec, amount.key()));
-        tag.putLong("amount", amount.amount());
+        tag.put("key", CodecHelper.encodeTag(keyCodec, key));
+        tag.putLong("amount", amount);
         return tag;
     }
 

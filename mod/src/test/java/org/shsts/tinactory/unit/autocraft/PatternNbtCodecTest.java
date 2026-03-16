@@ -96,6 +96,19 @@ class PatternNbtCodecTest {
         assertEquals(pattern, decoded);
     }
 
+    @Test
+    void codecShouldRoundTripCraftAmountWithOverloads() {
+        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
+        var expected = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
+
+        var fromAmount = codec.encodeAmount(expected);
+        var fromKeyAndAmount = codec.encodeAmount(expected.key(), expected.amount());
+
+        assertEquals(expected, codec.decodeAmount(fromAmount));
+        assertEquals(expected, codec.decodeAmount(fromKeyAndAmount));
+        assertEquals(fromAmount, fromKeyAndAmount);
+    }
+
     private record TestConstraint(String value) implements IMachineConstraint {
         @Override
         public String typeId() {

@@ -27,15 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftJobServiceTest {
     @Test
-    void serviceShouldTransitionQueuedRunningDone() {
+    void serviceShouldTransitionRunningDone() {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.COMPLETED);
         var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
 
         var id = service.submitPrepared(List.of(target), testPlan());
 
-        assertEquals(AutocraftJob.Status.QUEUED, service.job(id).status());
-        service.tick();
         assertEquals(AutocraftJob.Status.RUNNING, service.job(id).status());
         service.tick();
         assertEquals(AutocraftJob.Status.DONE, service.job(id).status());
@@ -48,7 +46,6 @@ class AutocraftJobServiceTest {
         var id = service.submitPrepared(
             List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
             testPlan());
-        service.tick();
 
         assertEquals(AutocraftJob.Status.RUNNING, service.job(id).status());
     }
@@ -61,9 +58,7 @@ class AutocraftJobServiceTest {
 
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
-        service.tick();
         assertEquals(AutocraftJob.Status.BLOCKED, service.job(id).status());
-        service.tick();
         service.tick();
         assertEquals(AutocraftJob.Status.DONE, service.job(id).status());
     }
@@ -89,11 +84,12 @@ class AutocraftJobServiceTest {
     }
 
     @Test
-    void serviceShouldCancelQueuedJob() {
-        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.COMPLETED));
+    void serviceShouldCancelRunningJobBeforeFirstTick() {
+        var service = new AutocraftJobService(UUID.randomUUID(), () -> new TestExecutor(ExecutionState.CANCELLED));
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
+        service.tick();
         assertEquals(AutocraftJob.Status.CANCELLED, service.job(id).status());
     }
 
@@ -102,7 +98,6 @@ class AutocraftJobServiceTest {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.CANCELLED);
         var service = new AutocraftJobService(UUID.randomUUID(), () -> executor);
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
-        service.tick();
 
         assertTrue(service.cancel(id));
         service.tick();
