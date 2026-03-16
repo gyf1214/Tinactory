@@ -79,7 +79,6 @@ public class AutocraftJobService implements IAutocraftService {
             return Optional.empty();
         }
         return Optional.of(new RunningSnapshot(
-            cpuId,
             currentJob.id(),
             currentJob.targets(),
             sequential.currentPlan(),
@@ -87,7 +86,7 @@ public class AutocraftJobService implements IAutocraftService {
     }
 
     public void restoreRunning(RunningSnapshot snapshot) {
-        if (!snapshot.cpuId().equals(cpuId) || currentJob != null || runningExecutor != null) {
+        if (currentJob != null || runningExecutor != null) {
             return;
         }
         var executor = executorFactory.get();
@@ -228,7 +227,6 @@ public class AutocraftJobService implements IAutocraftService {
     }
 
     public record RunningSnapshot(
-        UUID cpuId,
         UUID jobId,
         List<CraftAmount> targets,
         CraftPlan plan,
@@ -238,7 +236,6 @@ public class AutocraftJobService implements IAutocraftService {
         RunningSnapshot snapshot,
         PatternNbtCodec codec) {
         var tag = new CompoundTag();
-        tag.putUUID("cpuId", snapshot.cpuId());
         tag.putUUID("jobId", snapshot.jobId());
         tag.put("targets", serializeAmounts(snapshot.targets(), codec));
         tag.put("plan", serializePlan(snapshot.plan(), codec));
@@ -250,7 +247,6 @@ public class AutocraftJobService implements IAutocraftService {
         CompoundTag tag,
         PatternNbtCodec codec) {
         return new RunningSnapshot(
-            tag.getUUID("cpuId"),
             tag.getUUID("jobId"),
             deserializeAmounts(tag.getList("targets", TAG_COMPOUND), codec),
             deserializePlan(tag.getCompound("plan"), codec),
