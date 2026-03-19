@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraintRegistry;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -18,11 +17,11 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PatternNbtCodec {
-    private final IMachineConstraintRegistry constraints;
+    private final Codec<IMachineConstraint> constraintCodec;
     private final Codec<IIngredientKey> keyCodec;
 
-    public PatternNbtCodec(IMachineConstraintRegistry constraints, Codec<IIngredientKey> keyCodec) {
-        this.constraints = constraints;
+    public PatternNbtCodec(Codec<IMachineConstraint> constraintCodec, Codec<IIngredientKey> keyCodec) {
+        this.constraintCodec = constraintCodec;
         this.keyCodec = keyCodec;
     }
 
@@ -86,11 +85,7 @@ public final class PatternNbtCodec {
 
         var constraintsTag = new ListTag();
         for (var constraint : requirement.constraints()) {
-            var encoded = constraints.encode(constraint);
-            var entry = new CompoundTag();
-            entry.putString("typeId", encoded.typeId());
-            entry.putString("payload", encoded.payload());
-            constraintsTag.add(entry);
+            constraintsTag.add(CodecHelper.encodeTag(constraintCodec, constraint));
         }
         tag.put("constraints", constraintsTag);
         return tag;
@@ -100,8 +95,7 @@ public final class PatternNbtCodec {
         var constraintsTag = tag.getList("constraints", TAG_COMPOUND);
         var constraintsOut = new ArrayList<IMachineConstraint>(constraintsTag.size());
         for (var i = 0; i < constraintsTag.size(); i++) {
-            var entry = constraintsTag.getCompound(i);
-            constraintsOut.add(constraints.decode(entry.getString("typeId"), entry.getString("payload")));
+            constraintsOut.add(CodecHelper.parseTag(constraintCodec, constraintsTag.get(i)));
         }
         return new MachineRequirement(
             new ResourceLocation(tag.getString("recipeTypeId")),

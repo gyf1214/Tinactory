@@ -1,11 +1,10 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
 
 import java.util.Locale;
 
@@ -14,6 +13,10 @@ import java.util.Locale;
 public record InputPortConstraint(int inputSlotIndex, @Nullable Integer portIndex, @Nullable Direction direction)
     implements IMachineConstraint {
     public static final String TYPE_ID = "tinactory:input_port";
+    public static final Codec<InputPortConstraint> CODEC = Codec.STRING.xmap(
+        InputPortConstraint::decode,
+        InputPortConstraint::encode
+    );
 
     public InputPortConstraint {
         if (inputSlotIndex < 0) {
@@ -45,40 +48,24 @@ public record InputPortConstraint(int inputSlotIndex, @Nullable Integer portInde
         }
     }
 
-    public static final class Type implements IMachineConstraintType<InputPortConstraint> {
-        @Override
-        public String id() {
-            return TYPE_ID;
-        }
-
-        @Override
-        public Class<InputPortConstraint> constraintClass() {
-            return InputPortConstraint.class;
-        }
+    private static String encode(InputPortConstraint constraint) {
+        var portSelector = constraint.portIndex() == null ? "" : Integer.toString(constraint.portIndex());
+        var directionSelector = constraint.direction() == null ? "" : constraint.direction().encode();
+        return constraint.inputSlotIndex() + "," + portSelector + "," + directionSelector;
     }
 
-    public static final class Codec implements IMachineConstraintCodec<InputPortConstraint> {
-        @Override
-        public String encode(InputPortConstraint constraint) {
-            var portSelector = constraint.portIndex() == null ? "" : Integer.toString(constraint.portIndex());
-            var directionSelector = constraint.direction() == null ? "" : constraint.direction().encode();
-            return constraint.inputSlotIndex() + "," + portSelector + "," + directionSelector;
+    private static InputPortConstraint decode(String payload) {
+        var fields = payload.split(",", -1);
+        if (fields.length != 3) {
+            throw new IllegalArgumentException("invalid input port constraint payload");
         }
-
-        @Override
-        public InputPortConstraint decode(String payload) {
-            var fields = payload.split(",", -1);
-            if (fields.length != 3) {
-                throw new IllegalArgumentException("invalid input port constraint payload");
-            }
-            try {
-                var slotIndex = Integer.parseInt(fields[0]);
-                var portIndex = fields[1].isEmpty() ? null : Integer.valueOf(fields[1]);
-                var direction = fields[2].isEmpty() ? null : Direction.decode(fields[2]);
-                return new InputPortConstraint(slotIndex, portIndex, direction);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("invalid input port constraint payload", e);
-            }
+        try {
+            var slotIndex = Integer.parseInt(fields[0]);
+            var portIndex = fields[1].isEmpty() ? null : Integer.valueOf(fields[1]);
+            var direction = fields[2].isEmpty() ? null : Direction.decode(fields[2]);
+            return new InputPortConstraint(slotIndex, portIndex, direction);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("invalid input port constraint payload", e);
         }
     }
 }

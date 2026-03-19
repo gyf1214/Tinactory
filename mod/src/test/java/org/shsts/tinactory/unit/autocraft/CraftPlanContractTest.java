@@ -1,12 +1,11 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import com.mojang.serialization.Codec;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraintCodec;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraintType;
-import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
@@ -15,6 +14,8 @@ import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,35 +86,36 @@ class CraftPlanContractTest {
     }
 
     @Test
-    void machineConstraintRegistryShouldRoundTripByTypeId() {
-        var registry = new MachineConstraintRegistry();
-        var type = new TestConstraintType();
-        var codec = new TestConstraintCodec();
-        registry.register(type, codec);
+    void machineConstraintCodecShouldRoundTripByTypeId() {
+        var codec = Codec.STRING.dispatch(
+            IMachineConstraint::typeId,
+            id -> switch (id) {
+                case "test:constraint" -> Codec.STRING.xmap(TestConstraint::new, TestConstraint::value);
+                default -> throw new IllegalArgumentException("unknown machine constraint type id: " + id);
+            }
+        );
 
-        var decoded = registry.decode("test:constraint", "payload");
+        var decoded = CodecHelper.parseTag(codec, CodecHelper.encodeTag(codec, new TestConstraint("payload")));
         assertEquals("payload", ((TestConstraint) decoded).value());
 
-        var encoded = registry.encode(new TestConstraint("abc"));
-        assertEquals("abc", encoded.payload());
-        assertEquals("test:constraint", encoded.typeId());
-        assertThrows(IllegalArgumentException.class, () -> registry.decode("test:unknown", "x"));
+        var unknown = new CompoundTag();
+        unknown.putString("type", "test:unknown");
+        unknown.putString("value", "x");
+        assertThrows(RuntimeException.class, () -> CodecHelper.parseTag(codec, unknown));
     }
 
     @Test
-    void machineConstraintRegistryShouldPreserveSlotScopedPortConstraints() {
-        var registry = new MachineConstraintRegistry();
-        registry.register(new InputPortConstraint.Type(), new InputPortConstraint.Codec());
-        registry.register(new OutputPortConstraint.Type(), new OutputPortConstraint.Codec());
-
+    void machineConstraintCodecShouldPreserveSlotScopedPortConstraints() {
         var inputConstraint = new InputPortConstraint(1, 4, InputPortConstraint.Direction.INPUT);
-        var inputEncoded = registry.encode(inputConstraint);
-        var inputDecoded = registry.decode(inputEncoded.typeId(), inputEncoded.payload());
+        var inputDecoded = CodecHelper.parseTag(
+            MachineConstraintCodecHelper.CODEC,
+            CodecHelper.encodeTag(MachineConstraintCodecHelper.CODEC, inputConstraint));
         assertEquals(inputConstraint, inputDecoded);
 
         var outputConstraint = new OutputPortConstraint(2, 6, OutputPortConstraint.Direction.OUTPUT);
-        var outputEncoded = registry.encode(outputConstraint);
-        var outputDecoded = registry.decode(outputEncoded.typeId(), outputEncoded.payload());
+        var outputDecoded = CodecHelper.parseTag(
+            MachineConstraintCodecHelper.CODEC,
+            CodecHelper.encodeTag(MachineConstraintCodecHelper.CODEC, outputConstraint));
         assertEquals(outputConstraint, outputDecoded);
     }
 
@@ -121,30 +123,6 @@ class CraftPlanContractTest {
         @Override
         public String typeId() {
             return "test:constraint";
-        }
-    }
-
-    private static final class TestConstraintType implements IMachineConstraintType<TestConstraint> {
-        @Override
-        public String id() {
-            return "test:constraint";
-        }
-
-        @Override
-        public Class<TestConstraint> constraintClass() {
-            return TestConstraint.class;
-        }
-    }
-
-    private static final class TestConstraintCodec implements IMachineConstraintCodec<TestConstraint> {
-        @Override
-        public String encode(TestConstraint constraint) {
-            return constraint.value();
-        }
-
-        @Override
-        public TestConstraint decode(String payload) {
-            return new TestConstraint(payload);
         }
     }
 }

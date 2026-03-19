@@ -8,7 +8,6 @@ import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -19,6 +18,7 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +59,7 @@ class AutocraftCpuPersistenceTest {
         var cpuId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
-        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
@@ -83,7 +83,7 @@ class AutocraftCpuPersistenceTest {
             List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)));
         var plan = new CraftPlan(List.of(step));
         var service = new AutocraftJobService(AutocraftCpuPersistenceTest::executor);
-        var codec = new PatternNbtCodec(new MachineConstraintRegistry(), TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();

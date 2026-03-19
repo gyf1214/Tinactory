@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PatternCellIntegrationTest {
     @Test
     void patternCellCapabilityShouldUseFixedByteAccounting() {
-        var port = new PatternCellPortState(2048, TestIngredientKey.CODEC);
+        var port = new PatternCellPortState(2048, MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -31,7 +32,7 @@ class PatternCellIntegrationTest {
 
     @Test
     void patternCellCapabilityShouldPersistToItemTag() {
-        var port = new PatternCellPortState(2048, TestIngredientKey.CODEC);
+        var port = new PatternCellPortState(2048, MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -39,7 +40,7 @@ class PatternCellIntegrationTest {
         assertTrue(port.insert(second));
         assertTrue(port.remove(first.patternId()));
 
-        var clonedPort = new PatternCellPortState(2048, TestIngredientKey.CODEC);
+        var clonedPort = new PatternCellPortState(2048, MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
         clonedPort.deserialize(port.serialize());
 
         assertEquals(List.of(second), clonedPort.patterns());

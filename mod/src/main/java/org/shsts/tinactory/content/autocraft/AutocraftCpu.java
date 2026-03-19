@@ -9,12 +9,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
-import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -34,7 +32,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
     private final PatternNbtCodec snapshotCodec =
-        new PatternNbtCodec(createConstraintRegistry(), IngredientKeyCodecHelper.CODEC);
+        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, IngredientKeyCodecHelper.CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable
@@ -57,13 +55,6 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         long transmissionBandwidth,
         int executionIntervalTicks) {
         return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
-    }
-
-    public static MachineConstraintRegistry createConstraintRegistry() {
-        var registry = new MachineConstraintRegistry();
-        registry.register(new InputPortConstraint.Type(), new InputPortConstraint.Codec());
-        registry.register(new OutputPortConstraint.Type(), new OutputPortConstraint.Codec());
-        return registry;
     }
 
     @Override

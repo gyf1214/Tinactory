@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 
 import java.util.List;
@@ -68,7 +69,10 @@ public class MEPatternCell extends CapabilityItem {
 
         private PatternCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
-            this.state = new PatternCellPortState(bytesLimit, IngredientKeyCodecHelper.CODEC);
+            this.state = new PatternCellPortState(
+                bytesLimit,
+                MachineConstraintCodecHelper.CODEC,
+                IngredientKeyCodecHelper.CODEC);
             this.patternCap = LazyOptional.of(() -> this);
         }
 
