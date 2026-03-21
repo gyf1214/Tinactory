@@ -119,6 +119,18 @@ class CraftPlanContractTest {
         assertEquals(outputConstraint, outputDecoded);
     }
 
+    @Test
+    void machineConstraintCodecShouldEncodeStructuredPortConstraintPayload() {
+        var encoded = (CompoundTag) CodecHelper.encodeTag(
+            MachineConstraintCodecHelper.CODEC,
+            new InputPortConstraint(1, 4, InputPortConstraint.Direction.INPUT));
+
+        assertEquals(InputPortConstraint.TYPE_ID, encoded.getString("type"));
+        assertEquals(1, encoded.getInt("inputSlotIndex"));
+        assertEquals(4, encoded.getInt("portIndex"));
+        assertEquals("input", encoded.getString("direction"));
+    }
+
     private record TestConstraint(String value) implements IMachineConstraint {
         @Override
         public String typeId() {
