@@ -1,14 +1,14 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 
 import java.util.List;
 
@@ -60,35 +60,24 @@ class AutocraftModelTest {
     }
 
     @Test
-    void inputPortConstraintShouldValidateSelectorsAndIndices() {
-        var constraint = new InputPortConstraint(0, 2, null);
-        assertEquals(0, constraint.inputSlotIndex());
+    void portConstraintShouldValidateDirectionAndIndices() {
+        var constraint = new PortConstraint(PortDirection.INPUT, 0, 2);
+        assertEquals(PortDirection.INPUT, constraint.direction());
+        assertEquals(0, constraint.slotIndex());
         assertEquals(2, constraint.portIndex());
-        assertEquals("tinactory:input_port", constraint.typeId());
+        assertEquals("tinactory:port", constraint.typeId());
 
-        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(-1, 0, null));
-        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(0, -1, null));
-        assertThrows(IllegalArgumentException.class, () -> new InputPortConstraint(0, null, null));
+        assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.INPUT, -1, 0));
+        assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.INPUT, 0, -1));
+        assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.NONE, 0, null));
     }
 
     @Test
-    void outputPortConstraintShouldValidateSelectorsAndIndices() {
-        var constraint = new OutputPortConstraint(1, null, OutputPortConstraint.Direction.OUTPUT);
-        assertEquals(1, constraint.outputSlotIndex());
-        assertEquals(OutputPortConstraint.Direction.OUTPUT, constraint.direction());
-        assertEquals("tinactory:output_port", constraint.typeId());
-
-        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(-1, 0, null));
-        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(0, -1, null));
-        assertThrows(IllegalArgumentException.class, () -> new OutputPortConstraint(0, null, null));
-    }
-
-    @Test
-    void slotScopedConstraintsShouldDisambiguateDuplicateCraftKeysByIndex() {
-        var input0 = new InputPortConstraint(0, 1, null);
-        var input1 = new InputPortConstraint(1, 1, null);
-        var output0 = new OutputPortConstraint(0, 3, null);
-        var output1 = new OutputPortConstraint(1, 3, null);
+    void slotScopedConstraintsShouldDisambiguateByDirectionAndSlotIndex() {
+        var input0 = new PortConstraint(PortDirection.INPUT, 0, 1);
+        var input1 = new PortConstraint(PortDirection.INPUT, 1, 1);
+        var output0 = new PortConstraint(PortDirection.OUTPUT, 0, 3);
+        var output1 = new PortConstraint(PortDirection.OUTPUT, 1, 3);
 
         assertThrows(AssertionError.class, () -> assertEquals(input0, input1));
         assertThrows(AssertionError.class, () -> assertEquals(output0, output1));

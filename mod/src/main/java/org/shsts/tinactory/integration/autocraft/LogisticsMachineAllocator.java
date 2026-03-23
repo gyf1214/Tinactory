@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
@@ -15,8 +16,7 @@ import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
@@ -127,9 +127,9 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     private Optional<IMachineRoute> buildInputRoute(
         IIngredientKey key,
         List<LogisticComponent.PortInfo> ports,
-        List<InputPortConstraint> constraints) {
+        List<PortConstraint> constraints) {
         for (var info : ports) {
-            if (!matchesInputConstraints(key, info, constraints)) {
+            if (!matchesConstraints(info, constraints)) {
                 continue;
             }
             var route = switch (key.type()) {
@@ -147,9 +147,9 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     private Optional<IMachineRoute> buildOutputRoute(
         IIngredientKey key,
         List<LogisticComponent.PortInfo> ports,
-        List<OutputPortConstraint> constraints) {
+        List<PortConstraint> constraints) {
         for (var info : ports) {
-            if (!matchesOutputConstraints(key, info, constraints)) {
+            if (!matchesConstraints(info, constraints)) {
                 continue;
             }
             var route = switch (key.type()) {
@@ -164,64 +164,38 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return Optional.empty();
     }
 
-    private static List<InputPortConstraint> inputConstraints(CraftStep step, int slotIndex) {
+    private static List<PortConstraint> inputConstraints(CraftStep step, int slotIndex) {
         return step.pattern().machineRequirement().constraints().stream()
-            .filter(InputPortConstraint.class::isInstance)
-            .map(InputPortConstraint.class::cast)
-            .filter(constraint -> constraint.inputSlotIndex() == slotIndex)
+            .filter(PortConstraint.class::isInstance)
+            .map(PortConstraint.class::cast)
+            .filter(constraint -> constraint.direction() == PortDirection.INPUT)
+            .filter(constraint -> constraint.slotIndex() == slotIndex)
             .toList();
     }
 
-    private static List<OutputPortConstraint> outputConstraints(CraftStep step, int slotIndex) {
+    private static List<PortConstraint> outputConstraints(CraftStep step, int slotIndex) {
         return step.pattern().machineRequirement().constraints().stream()
-            .filter(OutputPortConstraint.class::isInstance)
-            .map(OutputPortConstraint.class::cast)
-            .filter(constraint -> constraint.outputSlotIndex() == slotIndex)
+            .filter(PortConstraint.class::isInstance)
+            .map(PortConstraint.class::cast)
+            .filter(constraint -> constraint.direction() == PortDirection.OUTPUT)
+            .filter(constraint -> constraint.slotIndex() == slotIndex)
             .toList();
     }
 
-    private static boolean matchesInputConstraints(
-        IIngredientKey key,
+    private static boolean matchesConstraints(
         LogisticComponent.PortInfo info,
-        List<InputPortConstraint> constraints) {
+        List<PortConstraint> constraints) {
         for (var constraint : constraints) {
             if (constraint.portIndex() != null && constraint.portIndex() != info.portIndex()) {
                 return false;
             }
-            if (constraint.direction() != null &&
-                !matchesDirection(key, info.port(), constraint.direction() == InputPortConstraint.Direction.INPUT)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean matchesOutputConstraints(
-        IIngredientKey key,
-        LogisticComponent.PortInfo info,
-        List<OutputPortConstraint> constraints) {
-        for (var constraint : constraints) {
-            if (constraint.portIndex() != null && constraint.portIndex() != info.portIndex()) {
-                return false;
-            }
-            if (constraint.direction() != null &&
-                !matchesDirection(key, info.port(), constraint.direction() == OutputPortConstraint.Direction.INPUT)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean matchesDirection(IIngredientKey key, IPort<?> port, boolean inputDirection) {
-        if (!inputDirection) {
-            return port.acceptOutput();
         }
         return true;
     }
 
     private static Optional<IMachineRoute> buildItemInputRoute(IPort<?> port, IIngredientKey key) {
         return itemChannel(port)
-            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.INPUT, channel));
+            .map(channel -> new ChannelMachineRoute<>(key, PortDirection.INPUT, channel));
     }
 
     private static Optional<IMachineRoute> buildItemOutputRoute(IPort<?> port, IIngredientKey key) {
@@ -229,12 +203,12 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             return Optional.empty();
         }
         return itemChannel(port)
-            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.OUTPUT, channel));
+            .map(channel -> new ChannelMachineRoute<>(key, PortDirection.OUTPUT, channel));
     }
 
     private static Optional<IMachineRoute> buildFluidInputRoute(IPort<?> port, IIngredientKey key) {
         return fluidChannel(port)
-            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.INPUT, channel));
+            .map(channel -> new ChannelMachineRoute<>(key, PortDirection.INPUT, channel));
     }
 
     private static Optional<IMachineRoute> buildFluidOutputRoute(IPort<?> port, IIngredientKey key) {
@@ -242,7 +216,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             return Optional.empty();
         }
         return fluidChannel(port)
-            .map(channel -> new ChannelMachineRoute<>(key, IMachineRoute.Direction.OUTPUT, channel));
+            .map(channel -> new ChannelMachineRoute<>(key, PortDirection.OUTPUT, channel));
     }
 
     private static Optional<CraftPortChannel<ItemStack>> itemChannel(IPort<?> port) {

@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
@@ -221,8 +222,8 @@ class CraftExecutorTest {
                 }
 
                 @Override
-                public Direction direction() {
-                    return Direction.INPUT;
+                public PortDirection direction() {
+                    return PortDirection.INPUT;
                 }
 
                 @Override
@@ -243,8 +244,8 @@ class CraftExecutorTest {
                     }
 
                     @Override
-                    public Direction direction() {
-                        return Direction.OUTPUT;
+                    public PortDirection direction() {
+                        return PortDirection.OUTPUT;
                     }
 
                     @Override

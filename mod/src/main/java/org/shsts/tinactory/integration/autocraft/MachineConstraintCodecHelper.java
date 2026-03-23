@@ -4,8 +4,7 @@ import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,8 +18,7 @@ public final class MachineConstraintCodecHelper {
 
     private static Codec<? extends IMachineConstraint> codec(String typeId) {
         return switch (typeId) {
-            case InputPortConstraint.TYPE_ID -> InputPortConstraint.CODEC;
-            case OutputPortConstraint.TYPE_ID -> OutputPortConstraint.CODEC;
+            case PortConstraint.TYPE_ID -> PortConstraint.CODEC;
             default -> throw new IllegalArgumentException("unknown machine constraint type id: " + typeId);
         };
     }

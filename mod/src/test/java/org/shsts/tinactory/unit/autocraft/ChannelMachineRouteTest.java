@@ -2,9 +2,9 @@ package org.shsts.tinactory.unit.autocraft;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
-import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ class ChannelMachineRouteTest {
         var port = new RecordingPort();
         var route = new ChannelMachineRoute<>(
             key,
-            IMachineRoute.Direction.INPUT,
+            PortDirection.INPUT,
             TestStack.ADAPTER,
             port);
 
@@ -36,7 +36,7 @@ class ChannelMachineRouteTest {
         var port = new RecordingPort();
         var route = new ChannelMachineRoute<>(
             key,
-            IMachineRoute.Direction.OUTPUT,
+            PortDirection.OUTPUT,
             TestStack.ADAPTER,
             port);
 

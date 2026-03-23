@@ -1,6 +1,7 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import com.mojang.serialization.Codec;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -8,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -106,27 +106,21 @@ class CraftPlanContractTest {
 
     @Test
     void machineConstraintCodecShouldPreserveSlotScopedPortConstraints() {
-        var inputConstraint = new InputPortConstraint(1, 4, InputPortConstraint.Direction.INPUT);
-        var inputDecoded = CodecHelper.parseTag(
+        var inputConstraint = new PortConstraint(PortDirection.INPUT, 1, 4);
+        var inputOutputDecoded = CodecHelper.parseTag(
             MachineConstraintCodecHelper.CODEC,
             CodecHelper.encodeTag(MachineConstraintCodecHelper.CODEC, inputConstraint));
-        assertEquals(inputConstraint, inputDecoded);
-
-        var outputConstraint = new OutputPortConstraint(2, 6, OutputPortConstraint.Direction.OUTPUT);
-        var outputDecoded = CodecHelper.parseTag(
-            MachineConstraintCodecHelper.CODEC,
-            CodecHelper.encodeTag(MachineConstraintCodecHelper.CODEC, outputConstraint));
-        assertEquals(outputConstraint, outputDecoded);
+        assertEquals(inputConstraint, inputOutputDecoded);
     }
 
     @Test
     void machineConstraintCodecShouldEncodeStructuredPortConstraintPayload() {
         var encoded = (CompoundTag) CodecHelper.encodeTag(
             MachineConstraintCodecHelper.CODEC,
-            new InputPortConstraint(1, 4, InputPortConstraint.Direction.INPUT));
+            new PortConstraint(PortDirection.INPUT, 1, 4));
 
-        assertEquals(InputPortConstraint.TYPE_ID, encoded.getString("type"));
-        assertEquals(1, encoded.getInt("inputSlotIndex"));
+        assertEquals(PortConstraint.TYPE_ID, encoded.getString("type"));
+        assertEquals(1, encoded.getInt("slotIndex"));
         assertEquals(4, encoded.getInt("portIndex"));
         assertEquals("input", encoded.getString("direction"));
     }

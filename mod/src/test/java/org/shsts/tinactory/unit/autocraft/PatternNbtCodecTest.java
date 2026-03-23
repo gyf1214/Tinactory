@@ -1,6 +1,7 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import com.mojang.serialization.Codec;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -9,10 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.InputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
-import org.shsts.tinactory.core.autocraft.pattern.OutputPortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
@@ -91,10 +91,10 @@ class PatternNbtCodecTest {
                 new ResourceLocation("tinactory", "press"),
                 1,
                 List.of(
-                    new InputPortConstraint(0, 2, null),
-                    new InputPortConstraint(1, null, InputPortConstraint.Direction.INPUT),
-                    new OutputPortConstraint(0, 5, null),
-                    new OutputPortConstraint(1, null, OutputPortConstraint.Direction.OUTPUT))));
+                    new PortConstraint(PortDirection.INPUT, 0, 2),
+                    new PortConstraint(PortDirection.INPUT, 1, null),
+                    new PortConstraint(PortDirection.OUTPUT, 0, 5),
+                    new PortConstraint(PortDirection.OUTPUT, 1, null))));
 
         var decoded = codec.decodePattern(codec.encodePattern(pattern));
 
