@@ -33,8 +33,9 @@ public final class AutocraftServiceBootstrap {
         }
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var allocator = new LogisticsMachineAllocator(logistics::getAllPorts);
+        var executor = new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents());
         return new AutocraftJobService(
-            () -> new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents()),
+            executor,
             transmissionBandwidth,
             executionIntervalTicks);
     }

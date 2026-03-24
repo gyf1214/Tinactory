@@ -11,7 +11,6 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
-import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 
@@ -34,67 +32,61 @@ public class AutocraftJobService implements IAutocraftService {
     private static final long DEFAULT_TRANSMISSION_BANDWIDTH = 64L;
     private static final int DEFAULT_EXECUTION_INTERVAL_TICKS = 1;
 
-    private final Supplier<ICraftExecutor> executorFactory;
+    private final ICraftExecutor executor;
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
 
     @Nullable
     private AutocraftJob currentJob;
-    @Nullable
-    private ICraftExecutor runningExecutor;
     private int pendingTicks;
 
     public AutocraftJobService(
-        Supplier<ICraftExecutor> executorFactory,
+        ICraftExecutor executor,
         long transmissionBandwidth,
         int executionIntervalTicks) {
 
-        this.executorFactory = executorFactory;
+        this.executor = executor;
         this.transmissionBandwidth = transmissionBandwidth;
         this.executionIntervalTicks = Math.max(1, executionIntervalTicks);
     }
 
     public AutocraftJobService(
-        Supplier<ICraftExecutor> executorFactory) {
+        ICraftExecutor executor) {
 
-        this(executorFactory,
+        this(executor,
             DEFAULT_TRANSMISSION_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
     }
 
     @Override
     public boolean isBusy() {
-        return runningExecutor != null;
+        return currentJob != null &&
+            (currentJob.status() == AutocraftJob.Status.RUNNING || currentJob.status() == AutocraftJob.Status.BLOCKED);
     }
 
     public Optional<RunningSnapshot> snapshotRunning() {
-        if (currentJob == null || !(runningExecutor instanceof SequentialCraftExecutor sequential)) {
+        if (!isBusy()) {
             return Optional.empty();
         }
         return Optional.of(new RunningSnapshot(
             currentJob.id(),
             currentJob.targets(),
-            sequential.currentPlan(),
-            sequential.snapshot()));
+            executor.currentPlan(),
+            executor.snapshot()));
     }
 
     public void restoreRunning(RunningSnapshot snapshot) {
-        if (currentJob != null || runningExecutor != null) {
+        if (currentJob != null || isBusy()) {
             return;
         }
-        var executor = executorFactory.get();
-        if (!(executor instanceof SequentialCraftExecutor sequential)) {
-            return;
-        }
-        sequential.start(snapshot.plan(), snapshot.runtimeSnapshot().nextStepIndex(), snapshot.runtimeSnapshot());
-        var details = sequential.details();
+        executor.restore(snapshot.plan(), snapshot.runtimeSnapshot());
+        var details = executor.details();
         currentJob = new AutocraftJob(
             snapshot.jobId(),
             snapshot.targets(),
             details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED,
             null,
-            sequential.error(),
+            executor.error(),
             details);
-        runningExecutor = executor;
         pendingTicks = 0;
     }
 
@@ -112,7 +104,6 @@ public class AutocraftJobService implements IAutocraftService {
             throw new IllegalStateException("autocraft CPU is busy");
         }
         var id = UUID.randomUUID();
-        var executor = executorFactory.get();
         executor.start(plan);
         currentJob = new AutocraftJob(
             id,
@@ -121,7 +112,6 @@ public class AutocraftJobService implements IAutocraftService {
             null,
             null,
             executor.details());
-        runningExecutor = executor;
         pendingTicks = 0;
         return id;
     }
@@ -144,16 +134,16 @@ public class AutocraftJobService implements IAutocraftService {
         if ((currentJob.status() == AutocraftJob.Status.RUNNING ||
             currentJob.status() == AutocraftJob.Status.BLOCKED) &&
             currentJob.id().equals(id) &&
-            runningExecutor != null) {
+            isBusy()) {
 
-            runningExecutor.cancel();
-            var details = runningExecutor.details();
+            executor.cancel();
+            var details = executor.details();
             currentJob = new AutocraftJob(
                 id,
                 currentJob.targets(),
                 details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED,
                 currentJob.planError(),
-                runningExecutor.error(),
+                executor.error(),
                 details);
             return true;
         }
@@ -161,7 +151,7 @@ public class AutocraftJobService implements IAutocraftService {
     }
 
     public boolean tick() {
-        if (currentJob == null || runningExecutor == null) {
+        if (!isBusy()) {
             return false;
         }
 
@@ -172,10 +162,10 @@ public class AutocraftJobService implements IAutocraftService {
         pendingTicks = 0;
 
         var changed = false;
-        runningExecutor.runCycle(transmissionBandwidth);
+        executor.runCycle(transmissionBandwidth);
 
-        var details = runningExecutor.details();
-        var state = runningExecutor.state();
+        var details = executor.details();
+        var state = executor.state();
         if (state == ExecutionState.RUNNING || state == ExecutionState.IDLE || state == ExecutionState.BLOCKED) {
             var status = details.blockedReason() == null ? AutocraftJob.Status.RUNNING : AutocraftJob.Status.BLOCKED;
             currentJob = new AutocraftJob(
@@ -183,7 +173,7 @@ public class AutocraftJobService implements IAutocraftService {
                 currentJob.targets(),
                 status,
                 currentJob.planError(),
-                runningExecutor.error(),
+                executor.error(),
                 details);
             return true;
         }
@@ -202,7 +192,7 @@ public class AutocraftJobService implements IAutocraftService {
                 currentJob.targets(),
                 AutocraftJob.Status.CANCELLED,
                 currentJob.planError(),
-                runningExecutor.error(),
+                executor.error(),
                 details);
         } else {
             currentJob = new AutocraftJob(
@@ -210,10 +200,9 @@ public class AutocraftJobService implements IAutocraftService {
                 currentJob.targets(),
                 AutocraftJob.Status.FAILED,
                 currentJob.planError(),
-                runningExecutor.error(),
+                executor.error(),
                 details);
         }
-        runningExecutor = null;
         changed = true;
         return changed;
     }

@@ -13,6 +13,7 @@ import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
+import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
@@ -68,7 +69,7 @@ class AutocraftTerminalServiceExecuteTest {
         var previewPlanner = new StaticPlanner(planRequiring(
             new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
             new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)));
-        var jobService = new AutocraftJobService(TestExecutor::new);
+        var jobService = new AutocraftJobService(new TestExecutor());
         var service = new AutocraftTerminalService(
             previewPlanner,
             repo(List.of()),
@@ -90,7 +91,7 @@ class AutocraftTerminalServiceExecuteTest {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
-        var jobService = new AutocraftJobService(TestExecutor::new) {
+        var jobService = new AutocraftJobService(new TestExecutor()) {
             @Override
             public boolean isBusy() {
                 return true;
@@ -239,6 +240,9 @@ class AutocraftTerminalServiceExecuteTest {
         public void start(CraftPlan plan) {}
 
         @Override
+        public void restore(CraftPlan plan, ExecutorRuntimeSnapshot snapshot) {}
+
+        @Override
         public void runCycle(long transmissionBandwidth) {}
 
         @Override
@@ -258,6 +262,34 @@ class AutocraftTerminalServiceExecuteTest {
         public ExecutionDetails details() {
             return new ExecutionDetails(
                 ExecutionDetails.Phase.RUN_STEP, null, null, 0, Map.of(), Map.of(), Map.of(), null);
+        }
+
+        @Override
+        public CraftPlan currentPlan() {
+            return new CraftPlan(List.of());
+        }
+
+        @Override
+        public int nextStepIndex() {
+            return 0;
+        }
+
+        @Override
+        public ExecutorRuntimeSnapshot snapshot() {
+            return new ExecutorRuntimeSnapshot(
+                state(),
+                details().phase(),
+                error(),
+                details().blockedReason(),
+                details().pendingTerminalState(),
+                0,
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                null);
         }
     }
 }

@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
+import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
@@ -27,7 +28,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldTransitionRunningDone() {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.COMPLETED);
-        var service = new AutocraftJobService(() -> executor);
+        var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
 
         var id = service.submitPrepared(List.of(target), testPlan());
@@ -40,7 +41,7 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldQueuePreparedPlanWithoutPlannerDependency() {
-        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(new TestExecutor(ExecutionState.COMPLETED));
 
         var id = service.submitPrepared(
             List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
@@ -54,7 +55,7 @@ class AutocraftJobServiceTest {
     void serviceShouldRemainRunningWhenExecutorBlockedRetriably() {
         var executor = new TestExecutor(ExecutionState.BLOCKED, ExecutionState.BLOCKED, ExecutionState.COMPLETED);
         executor.blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
-        var service = new AutocraftJobService(() -> executor);
+        var service = new AutocraftJobService(executor);
 
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
         service.tick();
@@ -66,14 +67,14 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldExposeEmptyWhenNoCurrentJob() {
-        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(new TestExecutor(ExecutionState.COMPLETED));
 
         assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldRejectSubmitWhenCurrentJobExists() {
-        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.COMPLETED));
+        var service = new AutocraftJobService(new TestExecutor(ExecutionState.COMPLETED));
 
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
         assertThrows(IllegalStateException.class, () ->
@@ -82,7 +83,7 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldCancelRunningJobBeforeFirstTick() {
-        var service = new AutocraftJobService(() -> new TestExecutor(ExecutionState.CANCELLED));
+        var service = new AutocraftJobService(new TestExecutor(ExecutionState.CANCELLED));
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
@@ -93,7 +94,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldCancelRunningJob() {
         var executor = new TestExecutor(ExecutionState.RUNNING, ExecutionState.CANCELLED);
-        var service = new AutocraftJobService(() -> executor);
+        var service = new AutocraftJobService(executor);
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
@@ -101,6 +102,52 @@ class AutocraftJobServiceTest {
         assertEquals(AutocraftJob.Status.CANCELLED, service.getJob().orElseThrow().status());
         assertTrue(executor.cancelled);
         assertFalse(service.cancel(id));
+    }
+
+    @Test
+    void serviceShouldExposeRunningSnapshotFromExecutorInterface() {
+        var executor = new TestExecutor(ExecutionState.RUNNING);
+        var service = new AutocraftJobService(executor);
+        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+
+        var jobId = service.submitPrepared(List.of(target), testPlan());
+        var snapshot = service.snapshotRunning().orElseThrow();
+
+        assertEquals(jobId, snapshot.jobId());
+        assertEquals(testPlan(), snapshot.plan());
+        assertEquals(executor.snapshot(), snapshot.runtimeSnapshot());
+    }
+
+    @Test
+    void serviceShouldRestoreRunningSnapshotThroughExecutorInterface() {
+        var executor = new TestExecutor(ExecutionState.RUNNING);
+        var service = new AutocraftJobService(executor);
+        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+        var snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.RUNNING,
+            ExecutionDetails.Phase.RUN_STEP,
+            null,
+            null,
+            null,
+            0,
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        service.restoreRunning(new AutocraftJobService.RunningSnapshot(
+            java.util.UUID.randomUUID(),
+            List.of(target),
+            testPlan(),
+            snapshot));
+
+        assertTrue(executor.restoreCalled);
+        assertEquals(testPlan(), executor.currentPlan());
+        assertTrue(service.isBusy());
+        assertEquals(AutocraftJob.Status.RUNNING, service.getJob().orElseThrow().status());
     }
 
     private static CraftStep step() {
@@ -119,14 +166,53 @@ class AutocraftJobServiceTest {
         private final List<ExecutionState> states;
         private int index;
         private boolean cancelled;
+        private boolean restoreCalled;
         private ExecutionError.Code blockedReason;
+        private CraftPlan currentPlan = new CraftPlan(List.of());
+        private ExecutorRuntimeSnapshot snapshot = new ExecutorRuntimeSnapshot(
+            ExecutionState.IDLE,
+            ExecutionDetails.Phase.TERMINAL,
+            null,
+            null,
+            null,
+            0,
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
 
         private TestExecutor(ExecutionState... states) {
             this.states = List.of(states);
         }
 
         @Override
-        public void start(CraftPlan plan) {}
+        public void start(CraftPlan plan) {
+            currentPlan = plan;
+            snapshot = new ExecutorRuntimeSnapshot(
+                state(),
+                details().phase(),
+                error(),
+                details().blockedReason(),
+                details().pendingTerminalState(),
+                0,
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                null);
+        }
+
+        @Override
+        public void restore(CraftPlan plan, ExecutorRuntimeSnapshot snapshot) {
+            restoreCalled = true;
+            currentPlan = plan;
+            this.snapshot = snapshot;
+        }
 
         @Override
         public void runCycle(long transmissionBandwidth) {
@@ -165,6 +251,21 @@ class AutocraftJobServiceTest {
                 Map.of(),
                 Map.of(),
                 null);
+        }
+
+        @Override
+        public CraftPlan currentPlan() {
+            return currentPlan;
+        }
+
+        @Override
+        public int nextStepIndex() {
+            return 0;
+        }
+
+        @Override
+        public ExecutorRuntimeSnapshot snapshot() {
+            return snapshot;
         }
     }
 }

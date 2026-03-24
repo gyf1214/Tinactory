@@ -28,8 +28,90 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExecutorStateMachineTest {
+    @Test
+    void startShouldRejectRestartWhileRunning() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
+            new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:press", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1))));
+
+        assertThrows(IllegalStateException.class, () ->
+            executor.start(new CraftPlan(List.of(
+                new CraftStep(
+                    "s2",
+                    pattern("tinactory:press_2", List.of(), List.of(new CraftAmount(plate, 1))),
+                    1)))));
+    }
+
+    @Test
+    void startShouldRejectRestartWhileBlocked() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            step -> Optional.empty(),
+            new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:blocks", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1))));
+        executor.runCycle(1);
+
+        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertThrows(IllegalStateException.class, () ->
+            executor.start(new CraftPlan(List.of(
+                new CraftStep(
+                    "s2",
+                    pattern("tinactory:retry", List.of(), List.of(new CraftAmount(plate, 1))),
+                    1)))));
+    }
+
+    @Test
+    void restoreShouldRejectWhileRunning() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
+            new NoOpEvents());
+        var plan = new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:press", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1)));
+
+        executor.start(plan);
+
+        assertThrows(IllegalStateException.class, () ->
+            executor.restore(plan, new ExecutorRuntimeSnapshot(
+                ExecutionState.RUNNING,
+                ExecutionDetails.Phase.RUN_STEP,
+                null,
+                null,
+                null,
+                0,
+                Map.of(ore, 1L),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                null)));
+    }
+
     @Test
     void reservationShouldConsumeBufferedInputsBeforeNetworkExtraction() {
         var ingot = TestIngredientKey.item("tinactory:ingot", "");
@@ -58,7 +140,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.restore(new CraftPlan(List.of(step)), snapshot);
         executor.runCycle(0);
 
         assertEquals(ExecutionState.RUNNING, executor.state());
@@ -95,7 +177,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.restore(new CraftPlan(List.of(step)), snapshot);
         executor.runCycle(0);
 
         assertEquals(ExecutionState.BLOCKED, executor.state());
@@ -400,7 +482,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.restore(new CraftPlan(List.of(firstStep, secondStep)), snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);
@@ -454,7 +536,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.restore(new CraftPlan(List.of(firstStep, secondStep)), snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);

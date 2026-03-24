@@ -56,10 +56,18 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
     @Override
     public void start(CraftPlan plan) {
-        start(plan, 0, null);
+        ensureNotActive("start");
+        initializeRun(plan, 0);
     }
 
-    public void start(CraftPlan plan, int nextStepIndex, @Nullable ExecutorRuntimeSnapshot snapshot) {
+    @Override
+    public void restore(CraftPlan plan, ExecutorRuntimeSnapshot snapshot) {
+        ensureNotActive("restore");
+        initializeRun(plan, snapshot.nextStepIndex());
+        restoreSnapshot(snapshot);
+    }
+
+    private void initializeRun(CraftPlan plan, int nextStepIndex) {
         this.plan = plan;
         nextStep = nextStepIndex;
         if (plan.steps().isEmpty() || nextStep >= plan.steps().size()) {
@@ -74,10 +82,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         releaseLease();
         clearStepState();
         flushStepBufferInPhase = false;
-
-        if (snapshot != null) {
-            restoreSnapshot(snapshot);
-        }
     }
 
     @Override
@@ -180,14 +184,17 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             leasedMachineId);
     }
 
+    @Override
     public CraftPlan currentPlan() {
         return plan;
     }
 
+    @Override
     public int nextStepIndex() {
         return nextStep;
     }
 
+    @Override
     public ExecutorRuntimeSnapshot snapshot() {
         return new ExecutorRuntimeSnapshot(
             state,
@@ -219,6 +226,12 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         transmittedInputs.putAll(snapshot.transmittedInputs());
         transmittedRequiredOutputs.putAll(snapshot.transmittedRequiredOutputs());
         leasedMachineId = snapshot.leasedMachineId();
+    }
+
+    private void ensureNotActive(String action) {
+        if (state == ExecutionState.RUNNING || state == ExecutionState.BLOCKED) {
+            throw new IllegalStateException("cannot " + action + " active executor");
+        }
     }
 
     private boolean ensureStepReady() {
