@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
@@ -19,7 +20,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
@@ -229,9 +230,9 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public PlanResult plan(List<CraftAmount> targets) {
+        public PlannerSnapshot plan(List<CraftAmount> targets) {
             calls++;
-            return PlanResult.success(plan);
+            return new PlannerSnapshot(PlanningState.COMPLETED, plan, null);
         }
     }
 

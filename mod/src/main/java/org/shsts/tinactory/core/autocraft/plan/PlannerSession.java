@@ -23,7 +23,7 @@ public final class PlannerSession {
     int nextTargetIndex;
     long nextStepId;
     @Nullable
-    PlanResult result;
+    PlannerSnapshot result;
 
     PlannerSession(List<CraftAmount> targets) {
         this.targets = List.copyOf(targets);

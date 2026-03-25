@@ -6,10 +6,11 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
-import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 
 import java.util.List;
@@ -37,8 +38,8 @@ class AutocraftTerminalServicePreviewTest {
 
     private static final class StaticPlanner implements ICraftPlanner {
         @Override
-        public PlanResult plan(List<CraftAmount> targets) {
-            return PlanResult.success(new CraftPlan(List.of()));
+        public PlannerSnapshot plan(List<CraftAmount> targets) {
+            return new PlannerSnapshot(PlanningState.COMPLETED, new CraftPlan(List.of()), null);
         }
     }
 

@@ -4,13 +4,14 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
-import org.shsts.tinactory.core.autocraft.plan.PlannerProgress;
+import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
@@ -20,10 +21,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IncrementalPlannerTest {
     @Test
@@ -34,8 +33,9 @@ class IncrementalPlannerTest {
 
         var progress = planner.resume(session, 0);
 
-        assertEquals(PlannerProgress.State.RUNNING, progress.state());
-        assertNull(progress.result());
+        assertEquals(PlanningState.RUNNING, progress.state());
+        assertNull(progress.plan());
+        assertNull(progress.error());
     }
 
     @Test
@@ -58,17 +58,16 @@ class IncrementalPlannerTest {
         var first = planner.resume(session, 1);
         var progress = runUntilTerminal(planner, session, 64);
 
-        assertEquals(PlannerProgress.State.RUNNING, first.state());
-        assertEquals(PlannerProgress.State.DONE, progress.state());
-        assertNotNull(progress.result());
-        assertTrue(progress.result().isSuccess());
-        var plannedPlateIntermediate = progress.result().plan().steps().stream()
+        assertEquals(PlanningState.RUNNING, first.state());
+        assertEquals(PlanningState.COMPLETED, progress.state());
+        assertNotNull(progress.plan());
+        var plannedPlateIntermediate = progress.plan().steps().stream()
             .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
             .flatMap(step -> step.requiredIntermediateOutputs().stream())
             .filter(amount -> amount.key().equals(plate))
             .mapToLong(CraftAmount::amount)
             .sum();
-        var plannedPlateFinal = progress.result().plan().steps().stream()
+        var plannedPlateFinal = progress.plan().steps().stream()
             .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
             .flatMap(step -> step.requiredFinalOutputs().stream())
             .filter(amount -> amount.key().equals(plate))
@@ -78,7 +77,7 @@ class IncrementalPlannerTest {
         assertEquals(1L, plannedPlateFinal);
         assertEquals(
             planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1))).plan(),
-            progress.result().plan());
+            progress.plan());
     }
 
     @Test
@@ -90,9 +89,8 @@ class IncrementalPlannerTest {
         var progress = planner.resume(session, 1);
         var sync = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertEquals(PlannerProgress.State.FAILED, progress.state());
-        assertFalse(progress.result().isSuccess());
-        assertEquals(sync.error(), progress.result().error());
+        assertEquals(PlanningState.FAILED, progress.state());
+        assertEquals(sync.error(), progress.error());
     }
 
     @Test
@@ -121,7 +119,7 @@ class IncrementalPlannerTest {
 
         assertEquals(firstRunA.state(), secondRunA.state());
         assertEquals(firstRunB.state(), secondRunB.state());
-        assertEquals(firstRunB.result(), secondRunB.result());
+        assertEquals(firstRunB, secondRunB);
     }
 
     @Test
@@ -144,24 +142,24 @@ class IncrementalPlannerTest {
         var first = planner.resume(session, 1);
         var progress = runUntilTerminal(planner, session, 64);
 
-        assertEquals(PlannerProgress.State.RUNNING, first.state());
-        assertEquals(PlannerProgress.State.DONE, progress.state());
-        assertNotNull(progress.result());
+        assertEquals(PlanningState.RUNNING, first.state());
+        assertEquals(PlanningState.COMPLETED, progress.state());
+        assertNotNull(progress.plan());
         assertEquals(
             planner.plan(List.of(new CraftAmount(gear, 1))),
-            progress.result());
+            progress);
     }
 
     private static GoalReductionPlanner planner(IPatternRepository repo, List<CraftAmount> available) {
         return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
     }
 
-    private static PlannerProgress runUntilTerminal(
+    private static PlannerSnapshot runUntilTerminal(
         GoalReductionPlanner planner,
         PlannerSession session,
         int maxSteps) {
-        var progress = PlannerProgress.running();
-        for (var i = 0; i < maxSteps && progress.state() == PlannerProgress.State.RUNNING; i++) {
+        var progress = new PlannerSnapshot(PlanningState.RUNNING, null, null);
+        for (var i = 0; i < maxSteps && progress.state() == PlanningState.RUNNING; i++) {
             progress = planner.resume(session, 1);
         }
         return progress;

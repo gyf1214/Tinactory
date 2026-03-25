@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -28,12 +29,12 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     @Override
-    public PlanResult plan(List<CraftAmount> targets) {
+    public PlannerSnapshot plan(List<CraftAmount> targets) {
         var session = startSession(targets);
         while (true) {
-            var progress = resume(session, Integer.MAX_VALUE);
-            if (progress.state() != PlannerProgress.State.RUNNING) {
-                return progress.result();
+            var snapshot = resume(session, Integer.MAX_VALUE);
+            if (snapshot.state() != PlanningState.RUNNING) {
+                return snapshot;
             }
         }
     }
@@ -44,21 +45,20 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     @Override
-    public PlannerProgress resume(PlannerSession session, int stepBudget) {
+    public PlannerSnapshot resume(PlannerSession session, int stepBudget) {
         if (session.result != null) {
-            return session.result.isSuccess() ?
-                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+            return session.result;
         }
         if (stepBudget <= 0) {
-            return PlannerProgress.running();
+            return PlannerSnapshot.running();
         }
 
         var budget = stepBudget;
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlanResult.success(buildPlan(session));
-                    return PlannerProgress.done(session.result);
+                    session.result = PlannerSnapshot.completed(buildPlan(session));
+                    return session.result;
                 }
                 var target = session.targets.get(session.nextTargetIndex);
                 session.searchStack.add(new PlannerSession.SearchFrame(target.key(), target.amount(), true));
@@ -67,14 +67,13 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             budget--;
         }
         if (session.result != null) {
-            return session.result.isSuccess() ?
-                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+            return session.result;
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlanResult.success(buildPlan(session));
-            return PlannerProgress.done(session.result);
+            session.result = PlannerSnapshot.completed(buildPlan(session));
+            return session.result;
         }
-        return PlannerProgress.running();
+        return PlannerSnapshot.running();
     }
 
     private void processOneSearchStep(PlannerSession session) {
@@ -206,7 +205,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private void popFailure(PlannerSession session, PlanError error) {
         session.searchStack.remove(session.searchStack.size() - 1);
         if (session.searchStack.isEmpty()) {
-            session.result = PlanResult.failure(error);
+            session.result = PlannerSnapshot.failed(error);
             return;
         }
         var parent = peekFrame(session);

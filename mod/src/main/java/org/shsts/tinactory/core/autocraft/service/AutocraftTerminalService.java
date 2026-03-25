@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
@@ -69,11 +70,11 @@ public class AutocraftTerminalService {
             return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.INVALID_REQUEST);
         }
         var targets = List.of(new CraftAmount(target, quantity));
-        var result = planner.plan(targets);
-        if (!result.isSuccess() || result.plan() == null) {
+        var snapshot = planner.plan(targets);
+        if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
             return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.PLAN_FAILED);
         }
-        preview = new AutocraftPreview(targets, result.plan());
+        preview = new AutocraftPreview(targets, snapshot.plan());
         return AutocraftPreviewResult.success(preview);
     }
 

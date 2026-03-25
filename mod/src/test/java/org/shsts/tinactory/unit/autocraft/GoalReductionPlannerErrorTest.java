@@ -4,6 +4,7 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -28,12 +29,12 @@ class GoalReductionPlannerErrorTest {
         var loop = pattern("tinactory:a_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(a, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(loop)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(a, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.CYCLE_DETECTED, result.error().code());
-        assertNotNull(result.error().cyclePath());
-        assertEquals(a, result.error().cyclePath().get(0));
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
+        assertNotNull(snapshot.error().cyclePath());
+        assertEquals(a, snapshot.error().cyclePath().get(0));
     }
 
     @Test
@@ -47,11 +48,11 @@ class GoalReductionPlannerErrorTest {
         var cFromA = pattern("tinactory:c_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(c, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(aFromB, bFromC, cFromA)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(a, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.CYCLE_DETECTED, result.error().code());
-        assertEquals(List.of(a, b, c, a), result.error().cyclePath());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
+        assertEquals(List.of(a, b, c, a), snapshot.error().cyclePath());
     }
 
     @Test
@@ -59,11 +60,11 @@ class GoalReductionPlannerErrorTest {
         var missing = TestIngredientKey.item("tinactory:unknown", "");
         var planner = new GoalReductionPlanner(repo(List.of()), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(missing, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(missing, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
-        assertEquals(missing, result.error().targetKey());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.MISSING_PATTERN, snapshot.error().code());
+        assertEquals(missing, snapshot.error().targetKey());
     }
 
     @Test
@@ -76,11 +77,11 @@ class GoalReductionPlannerErrorTest {
             List.of(new CraftAmount(gear, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(gearPattern)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(gear, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, result.error().code());
-        assertEquals(ingot, result.error().targetKey());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
+        assertEquals(ingot, snapshot.error().targetKey());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
