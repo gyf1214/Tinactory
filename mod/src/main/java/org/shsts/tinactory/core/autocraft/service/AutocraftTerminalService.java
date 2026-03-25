@@ -3,10 +3,10 @@ package org.shsts.tinactory.core.autocraft.service;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -58,11 +58,11 @@ public class AutocraftTerminalService {
         if (job.isEmpty()) {
             return false;
         }
-        var status = job.get().status();
-        if (status != AutocraftJob.Status.RUNNING && status != AutocraftJob.Status.BLOCKED) {
+        var status = job.get().execution().state();
+        if (status != JobState.RUNNING && status != JobState.BLOCKED) {
             return false;
         }
-        return service.get().cancel(job.get().id());
+        return service.get().cancel(job.get().jobId());
     }
 
     public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
@@ -111,38 +111,34 @@ public class AutocraftTerminalService {
 
         var current = service.get().getJob();
         var target = current.map(this::formatTargetSummary).orElse("Idle");
-        var step = current.map(job -> formatCurrentStep(service.get(), job)).orElse("Idle");
+        var step = current.map(AutocraftTerminalService::formatCurrentStep).orElse("Idle");
         var blocked = current.map(AutocraftTerminalService::formatBlockedReason).orElse("");
         var cancellable = current
-            .map(job -> job.status() == AutocraftJob.Status.RUNNING || job.status() == AutocraftJob.Status.BLOCKED)
+            .map(job -> job.execution().state() == JobState.RUNNING || job.execution().state() == JobState.BLOCKED)
             .orElse(false);
         return new CpuStatusEntry(cpuId, available.contains(cpuId), target, step, blocked, cancellable);
     }
 
-    private String formatTargetSummary(AutocraftJob job) {
+    private String formatTargetSummary(AutocraftJobSnapshot job) {
         if (job.targets().isEmpty()) {
-            return job.status().name();
+            return job.execution().state().name();
         }
         var first = job.targets().get(0);
         return first.amount() + "x " + first.key();
     }
 
-    private static String formatCurrentStep(IAutocraftService service, AutocraftJob job) {
-        var details = job.executionDetails();
-        if (details == null) {
-            return "N/A";
+    private static String formatCurrentStep(AutocraftJobSnapshot job) {
+        var execution = job.execution();
+        var stepCount = execution.plan().steps().size();
+        if (stepCount <= 0) {
+            return execution.phase().name();
         }
-        var stepCount = service.runningPlanStepCount();
-        if (stepCount.isPresent()) {
-            var next = details.nextStepIndex() + 1;
-            return next + "/" + stepCount.get();
-        }
-        return details.phase().name();
+        return execution.nextStepIndex() + 1 + "/" + stepCount;
     }
 
-    private static String formatBlockedReason(AutocraftJob job) {
-        var details = job.executionDetails();
-        return details == null || details.blockedReason() == null ? "" : details.blockedReason().name();
+    private static String formatBlockedReason(AutocraftJobSnapshot job) {
+        var error = job.execution().error();
+        return error == null ? "" : error.code().name();
     }
 
     public record CpuStatusEntry(

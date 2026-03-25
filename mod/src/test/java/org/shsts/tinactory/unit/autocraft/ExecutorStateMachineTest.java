@@ -4,15 +4,15 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
+import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -70,7 +70,7 @@ class ExecutorStateMachineTest {
                 1))));
         executor.runCycle(1);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertThrows(IllegalStateException.class, () ->
             executor.start(new CraftPlan(List.of(
                 new CraftStep(
@@ -96,12 +96,12 @@ class ExecutorStateMachineTest {
         executor.start(plan);
 
         assertThrows(IllegalStateException.class, () ->
-            executor.restore(plan, new ExecutorRuntimeSnapshot(
-                ExecutionState.RUNNING,
-                ExecutionDetails.Phase.RUN_STEP,
+            executor.restore(new ExecutorSnapshot(
+                JobState.RUNNING,
+                ExecutionPhase.RUN_STEP,
                 null,
                 null,
-                null,
+                plan,
                 0,
                 Map.of(ore, 1L),
                 Map.of(),
@@ -125,12 +125,12 @@ class ExecutorStateMachineTest {
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
             null,
             null,
-            null,
+            new CraftPlan(List.of(step)),
             0,
             Map.of(ingot, 1L),
             Map.of(),
@@ -140,12 +140,12 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.restore(new CraftPlan(List.of(step)), snapshot);
+        executor.restore(snapshot);
         executor.runCycle(0);
 
-        assertEquals(ExecutionState.RUNNING, executor.state());
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
         assertEquals(0L, inventory.amountOf(ingot));
-        assertEquals(2L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(2L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
@@ -162,12 +162,12 @@ class ExecutorStateMachineTest {
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
             null,
             null,
-            null,
+            new CraftPlan(List.of(step)),
             0,
             Map.of(ingot, 1L),
             Map.of(),
@@ -177,13 +177,13 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.restore(new CraftPlan(List.of(step)), snapshot);
+        executor.restore(snapshot);
         executor.runCycle(0);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.error().code());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.snapshot().error().code());
         assertEquals(2L, inventory.amountOf(ingot));
-        assertEquals(1L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
@@ -213,7 +213,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(plate));
         assertEquals(0L, inventory.amountOf(waste));
     }
@@ -240,10 +240,10 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(ingot));
         assertEquals(1L, inventory.amountOf(coal));
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.error().code());
+        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.snapshot().error().code());
     }
 
     @Test
@@ -267,9 +267,9 @@ class ExecutorStateMachineTest {
         firstLease.valid = false;
         executor.runCycle(1);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED, executor.error().code());
-        assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED, executor.snapshot().error().code());
+        assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
     }
 
     @Test
@@ -292,7 +292,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
     }
 
     @Test
@@ -340,8 +340,8 @@ class ExecutorStateMachineTest {
         executor.runCycle(64);
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.MACHINE_UNAVAILABLE, executor.error().code());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.Code.MACHINE_UNAVAILABLE, executor.snapshot().error().code());
         assertEquals(0L, inventory.amountOf(part));
     }
 
@@ -383,7 +383,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machineA));
         assertEquals(1L, inventory.amountOf(machineB));
         assertEquals(0L, inventory.amountOf(part));
@@ -433,7 +433,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualInserted(part));
@@ -467,12 +467,12 @@ class ExecutorStateMachineTest {
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
         var inventory = new MutableInventory(Map.of(ore, 1L));
         var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
             null,
             null,
-            null,
+            new CraftPlan(List.of(firstStep, secondStep)),
             0,
             Map.of(part, 1L),
             Map.of(),
@@ -482,7 +482,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.restore(new CraftPlan(List.of(firstStep, secondStep)), snapshot);
+        executor.restore(snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);
@@ -491,7 +491,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualExtracted(part));
@@ -521,12 +521,12 @@ class ExecutorStateMachineTest {
         var inventory = new MutableInventory(Map.of(ore, 1L));
         inventory.rejectInsertKeys.add(carry);
         var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
             null,
             null,
-            null,
+            new CraftPlan(List.of(firstStep, secondStep)),
             0,
             Map.of(carry, 1L),
             Map.of(),
@@ -536,14 +536,14 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.restore(new CraftPlan(List.of(firstStep, secondStep)), snapshot);
+        executor.restore(snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.RUNNING, executor.state());
-        assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
-        assertEquals(1, executor.details().nextStepIndex());
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
+        assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
+        assertEquals(1, executor.snapshot().nextStepIndex());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {

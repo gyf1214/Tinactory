@@ -3,6 +3,9 @@ package org.shsts.tinactory.core.autocraft.exec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
+import org.shsts.tinactory.core.autocraft.api.JobState;
+import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.Map;
@@ -10,12 +13,12 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record ExecutorRuntimeSnapshot(
-    ExecutionState state,
-    ExecutionDetails.Phase phase,
+public record ExecutorSnapshot(
+    JobState state,
+    ExecutionPhase phase,
     @Nullable ExecutionError error,
-    @Nullable ExecutionError.Code blockedReason,
-    @Nullable ExecutionState pendingTerminalState,
+    @Nullable JobState pendingTerminalState,
+    CraftPlan plan,
     int nextStepIndex,
     Map<IIngredientKey, Long> stepBuffer,
     Map<IIngredientKey, Long> stepProducedOutputs,
@@ -25,7 +28,7 @@ public record ExecutorRuntimeSnapshot(
     Map<IIngredientKey, Long> transmittedRequiredOutputs,
     @Nullable UUID leasedMachineId) {
 
-    public ExecutorRuntimeSnapshot {
+    public ExecutorSnapshot {
         stepBuffer = Map.copyOf(stepBuffer);
         stepProducedOutputs = Map.copyOf(stepProducedOutputs);
         stepRequiredOutputs = Map.copyOf(stepRequiredOutputs);

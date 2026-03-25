@@ -4,12 +4,13 @@ import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -53,7 +54,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertTrue(inventory.insertCalls > 0);
         assertEquals(List.of("start:s1", "done:s1", "start:s2", "done:s2"), events.events);
@@ -73,8 +74,8 @@ class CraftExecutorTest {
 
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals("s1", executor.error().stepId());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals("s1", executor.snapshot().error().stepId());
     }
 
     @Test
@@ -92,7 +93,7 @@ class CraftExecutorTest {
         executor.cancel();
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.CANCELLED, executor.state());
+        assertEquals(JobState.CANCELLED, executor.snapshot().state());
         assertEquals(0L, inventory.amountOf(plate));
     }
 
@@ -128,11 +129,32 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(1L, inventory.amountOf(waste));
         assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+    }
+
+    @Test
+    void snapshotShouldExposeExecutionStateThroughSinglePayload() {
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ingot, 2L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+
+        executor.start(new CraftPlan(List.of(step)));
+
+        var snapshot = executor.snapshot();
+
+        assertEquals(JobState.RUNNING, snapshot.state());
+        assertEquals(ExecutionPhase.RUN_STEP, snapshot.phase());
+        assertEquals(0, snapshot.nextStepIndex());
+        assertEquals(1, snapshot.plan().steps().size());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {

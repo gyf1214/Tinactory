@@ -9,16 +9,16 @@ import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.service.AutocraftJob;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
 import java.util.HashMap;
@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftCpuPersistenceTest {
     @Test
     void serviceShouldResumeFromRunningSnapshot() {
-        var cpuId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
 
@@ -45,19 +44,18 @@ class AutocraftCpuPersistenceTest {
 
         var restored = new AutocraftJobService(executor());
         restored.restoreRunning(snapshot);
-        assertEquals(AutocraftJob.Status.RUNNING, restored.getJob().orElseThrow().status());
-        assertEquals(jobId, restored.getJob().orElseThrow().id());
+        assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().execution().state());
+        assertEquals(jobId, restored.getJob().orElseThrow().jobId());
 
-        while (restored.getJob().orElseThrow().status() == AutocraftJob.Status.RUNNING ||
-            restored.getJob().orElseThrow().status() == AutocraftJob.Status.BLOCKED) {
+        while (restored.getJob().orElseThrow().execution().state() == JobState.RUNNING ||
+            restored.getJob().orElseThrow().execution().state() == JobState.BLOCKED) {
             restored.tick();
         }
-        assertEquals(AutocraftJob.Status.DONE, restored.getJob().orElseThrow().status());
+        assertEquals(JobState.COMPLETED, restored.getJob().orElseThrow().execution().state());
     }
 
     @Test
-    void serviceShouldOmitCpuIdFromSerializedSnapshot() {
-        var cpuId = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+    void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(executor());
         var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
@@ -66,12 +64,13 @@ class AutocraftCpuPersistenceTest {
         service.tick();
         var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
 
-        assertFalse(snapshot.contains("cpuId"));
+        assertTrue(snapshot.contains("execution"));
+        assertFalse(snapshot.contains("plan"));
+        assertFalse(snapshot.contains("runtime"));
     }
 
     @Test
-    void serviceShouldPersistStepOutputRolesInSnapshot() {
-        var cpuId = UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc");
+    void serviceShouldPersistStepOutputRolesInExecutionPlan() {
         var step = new CraftStep(
             "s1",
             new CraftPattern(
@@ -92,7 +91,7 @@ class AutocraftCpuPersistenceTest {
         var restored = new AutocraftJobService(executor());
         restored.restoreRunningSnapshot(serialized, codec);
 
-        var restoredStep = restored.snapshotRunning().orElseThrow().plan().steps().get(0);
+        var restoredStep = restored.snapshotRunning().orElseThrow().execution().plan().steps().get(0);
         assertEquals(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
             restoredStep.requiredIntermediateOutputs());
         assertEquals(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
@@ -100,16 +99,15 @@ class AutocraftCpuPersistenceTest {
     }
 
     @Test
-    void tickShouldReportDirtyStateChangesOnlyWhenJobStateChanges() {
-        var cpuId = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
+    void tickShouldReportDirtyStateChangesOnlyWhenJobIsStillBusy() {
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(executor());
         service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
 
         assertTrue(service.tick());
         assertTrue(service.tick());
-        assertTrue(!service.tick());
-        assertTrue(!service.tick());
+        assertFalse(service.tick());
+        assertFalse(service.tick());
     }
 
     private static CraftStep step(String id) {
@@ -209,8 +207,7 @@ class AutocraftCpuPersistenceTest {
                 }
 
                 @Override
-                public void release() {
-                }
+                public void release() {}
             });
         }
     }
