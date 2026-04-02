@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.UUID;
 
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 
@@ -68,7 +68,9 @@ public class AutocraftRequestPanel extends Panel {
         return parseIndex(cpuIndexInput.getValue(), size);
     }
 
-    public void updateSelectionSummary(List<IIngredientKey> requestables, List<UUID> cpus) {
+    public void updateSelectionSummary(
+        List<IIngredientKey> requestables,
+        List<AutocraftTerminalService.CpuStatusEntry> cpus) {
         targetSummary.setLine(0, new TextComponent(formatTargetSummary(requestables)));
         cpuSummary.setLine(0, new TextComponent(formatCpuSummary(cpus)));
     }
@@ -95,11 +97,12 @@ public class AutocraftRequestPanel extends Panel {
         return "Target[" + index.getAsInt() + "]: " + key;
     }
 
-    private String formatCpuSummary(List<UUID> cpus) {
+    private String formatCpuSummary(List<AutocraftTerminalService.CpuStatusEntry> cpus) {
         var index = cpuIndex(cpus.size());
         if (index.isEmpty()) {
             return "CPU index: select 0.." + Math.max(0, cpus.size() - 1);
         }
-        return "CPU[" + index.getAsInt() + "]: " + cpus.get(index.getAsInt());
+        var cpu = cpus.get(index.getAsInt());
+        return "CPU[" + index.getAsInt() + "]: " + cpu.cpuId() + " (" + cpu.state().name() + ")";
     }
 }

@@ -13,6 +13,8 @@ import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -38,9 +40,9 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     private List<IIngredientKey> requestables = List.of();
     private List<UUID> availableCpus = List.of();
-    private List<AutocraftCpuSyncPacket.Row> cpuStatuses = List.of();
-    @Nullable
-    private UUID previewPlanId;
+    private List<AutocraftTerminalService.CpuStatusEntry> availableCpuStatuses = List.of();
+    private List<AutocraftTerminalService.CpuStatusEntry> cpuStatuses = List.of();
+    private AutocraftPreviewSyncPacket.PreviewState previewState = AutocraftPreviewSyncPacket.PreviewState.EMPTY;
 
     public AutocraftTerminalScreen(AutocraftTerminalMenu menu, Component title) {
         super(menu, title);
@@ -77,7 +79,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     public void executePreview() {
         var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
-        if (previewPlanId == null || cpuIndex.isEmpty()) {
+        if (previewState != AutocraftPreviewSyncPacket.PreviewState.PREVIEW_READY || cpuIndex.isEmpty()) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION,
@@ -85,7 +87,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     public void cancelPreview() {
-        if (previewPlanId == null) {
+        if (previewState == AutocraftPreviewSyncPacket.PreviewState.EMPTY) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, AutocraftEventPacket::cancel);
@@ -109,32 +111,38 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     private void onCpuStatusSync(AutocraftCpuSyncPacket packet) {
-        cpuStatuses = packet.rows();
-        availableCpus = cpuStatuses.stream()
-            .filter(AutocraftCpuSyncPacket.Row::available)
-            .map(AutocraftCpuSyncPacket.Row::cpuId)
+        cpuStatuses = packet.entries();
+        availableCpuStatuses = cpuStatuses.stream()
+            .filter(AutocraftTerminalService.CpuStatusEntry::available)
+            .toList();
+        availableCpus = availableCpuStatuses.stream()
+            .map(AutocraftTerminalService.CpuStatusEntry::cpuId)
             .toList();
         refreshRequestTitle();
         cpuStatusPanel.refreshSummary(cpuStatuses);
     }
 
     private void onPreviewSync(AutocraftPreviewSyncPacket packet) {
-        if (packet.previewError() != null) {
-            previewPanel.setSummary(new TextComponent("Preview error: " + packet.previewError().name()));
-            return;
-        }
-        if (packet.executeError() != null) {
-            previewPanel.setSummary(new TextComponent("Execute error: " + packet.executeError().name()));
-            return;
-        }
-        if (packet.targets() != null) {
-            previewPanel.setSummary(new TextComponent("Plan outputs: " + packet.targets().size()));
+        previewState = packet.state();
+        switch (packet.state()) {
+            case EMPTY -> previewPanel.setSummary(new TextComponent("No Preview"));
+            case PREVIEW_READY -> previewPanel.setSummary(
+                new TextComponent("Plan outputs: " + packet.targets().size()));
+            case PREVIEW_FAILED -> previewPanel.setSummary(
+                new TextComponent("Preview error: " + formatPlanError(packet.error())));
         }
     }
 
     private void refreshRequestTitle() {
         requestPanel.setTitle(new TextComponent(
             "Requestables: " + requestables.size() + ", CPUs: " + availableCpus.size()));
-        requestPanel.updateSelectionSummary(requestables, availableCpus);
+        requestPanel.updateSelectionSummary(requestables, availableCpuStatuses);
+    }
+
+    private static String formatPlanError(@Nullable PlanError error) {
+        if (error == null) {
+            return PlanError.Code.NONE.name();
+        }
+        return error.code().name();
     }
 }

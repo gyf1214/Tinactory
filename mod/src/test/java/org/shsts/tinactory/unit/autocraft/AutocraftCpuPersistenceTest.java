@@ -67,6 +67,7 @@ class AutocraftCpuPersistenceTest {
         assertTrue(snapshot.contains("execution"));
         assertFalse(snapshot.contains("plan"));
         assertFalse(snapshot.contains("runtime"));
+        assertEquals("NONE", snapshot.getCompound("execution").getCompound("error").getString("value"));
     }
 
     @Test

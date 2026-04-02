@@ -3,11 +3,13 @@ package org.shsts.tinactory.core.autocraft.service;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
+import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
@@ -21,8 +23,7 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    @Nullable
-    private AutocraftPreview preview;
+    private AutocraftPreviewResult previewResult = AutocraftPreviewResult.empty();
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
@@ -67,18 +68,21 @@ public class AutocraftTerminalService {
 
     public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
         if (quantity <= 0L) {
-            return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.INVALID_REQUEST);
+            previewResult = AutocraftPreviewResult.empty();
+            return previewResult;
         }
         var targets = List.of(new CraftAmount(target, quantity));
         var snapshot = planner.plan(targets);
         if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
-            return AutocraftPreviewResult.failure(AutocraftPreviewResult.Code.PLAN_FAILED);
+            previewResult = AutocraftPreviewResult.failure(snapshot.error());
+            return previewResult;
         }
-        preview = new AutocraftPreview(targets, snapshot.plan());
-        return AutocraftPreviewResult.success(preview);
+        previewResult = AutocraftPreviewResult.success(new AutocraftPreview(targets, snapshot.plan()));
+        return previewResult;
     }
 
     public AutocraftExecuteResult execute(UUID cpuId) {
+        var preview = previewResult.preview();
         if (preview == null) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
         }
@@ -89,63 +93,72 @@ public class AutocraftTerminalService {
         if (service.get().isBusy()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
         }
-        var preview1 = preview;
-        preview = null;
-        return AutocraftExecuteResult.success(
-            service.get().submitPrepared(preview1.targets(), preview1.planSnapshot()));
+        previewResult = AutocraftPreviewResult.empty();
+        return AutocraftExecuteResult.success(service.get().submitPrepared(preview.targets(), preview.planSnapshot()));
     }
 
     public void cancelPreview() {
-        preview = null;
+        previewResult = AutocraftPreviewResult.empty();
     }
 
     public Optional<AutocraftPreview> preview() {
-        return Optional.ofNullable(preview);
+        return Optional.ofNullable(previewResult.preview());
+    }
+
+    public AutocraftPreviewResult previewResult() {
+        return previewResult;
     }
 
     private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return new CpuStatusEntry(cpuId, false, "Offline", "N/A", "CPU service unavailable", false);
+            return CpuStatusEntry.idle(cpuId, false);
         }
 
         var current = service.get().getJob();
-        var target = current.map(this::formatTargetSummary).orElse("Idle");
-        var step = current.map(AutocraftTerminalService::formatCurrentStep).orElse("Idle");
-        var blocked = current.map(AutocraftTerminalService::formatBlockedReason).orElse("");
-        var cancellable = current
-            .map(job -> job.execution().state() == JobState.RUNNING || job.execution().state() == JobState.BLOCKED)
-            .orElse(false);
-        return new CpuStatusEntry(cpuId, available.contains(cpuId), target, step, blocked, cancellable);
-    }
-
-    private String formatTargetSummary(AutocraftJobSnapshot job) {
-        if (job.targets().isEmpty()) {
-            return job.execution().state().name();
+        if (current.isEmpty()) {
+            return CpuStatusEntry.idle(cpuId, available.contains(cpuId));
         }
-        var first = job.targets().get(0);
-        return first.amount() + "x " + first.key();
-    }
-
-    private static String formatCurrentStep(AutocraftJobSnapshot job) {
-        var execution = job.execution();
-        var stepCount = execution.plan().steps().size();
-        if (stepCount <= 0) {
-            return execution.phase().name();
-        }
-        return execution.nextStepIndex() + 1 + "/" + stepCount;
-    }
-
-    private static String formatBlockedReason(AutocraftJobSnapshot job) {
-        var error = job.execution().error();
-        return error == null ? "" : error.code().name();
+        var execution = current.get().execution();
+        var state = execution.state();
+        return new CpuStatusEntry(
+            cpuId,
+            available.contains(cpuId),
+            current.get().targets(),
+            state,
+            state == JobState.IDLE ? null : execution.phase(),
+            execution.nextStepIndex(),
+            execution.plan().steps().size(),
+            execution.error(),
+            state == JobState.RUNNING || state == JobState.BLOCKED);
     }
 
     public record CpuStatusEntry(
         UUID cpuId,
         boolean available,
-        String targetSummary,
-        String currentStep,
-        String blockedReason,
-        boolean cancellable) {}
+        List<CraftAmount> targets,
+        JobState state,
+        @Nullable ExecutionPhase phase,
+        int nextStepIndex,
+        int stepCount,
+        ExecutionError error,
+        boolean cancellable) {
+
+        public CpuStatusEntry {
+            targets = List.copyOf(targets);
+        }
+
+        public static CpuStatusEntry idle(UUID cpuId, boolean available) {
+            return new CpuStatusEntry(
+                cpuId,
+                available,
+                List.of(),
+                JobState.IDLE,
+                null,
+                0,
+                0,
+                ExecutionError.NONE,
+                false);
+        }
+    }
 }

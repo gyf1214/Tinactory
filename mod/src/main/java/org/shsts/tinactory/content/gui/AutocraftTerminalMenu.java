@@ -11,8 +11,6 @@ import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
-import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -33,11 +31,6 @@ public class AutocraftTerminalMenu extends MenuBase {
     @Nullable
     private final AutocraftTerminalService service;
     private final ActiveScheduler<AutocraftPreviewSyncPacket> previewScheduler;
-
-    @Nullable
-    private AutocraftPreviewResult previewResult = null;
-    @Nullable
-    private AutocraftExecuteResult executeResult = null;
 
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
@@ -65,24 +58,13 @@ public class AutocraftTerminalMenu extends MenuBase {
         if (service == null) {
             return new AutocraftCpuSyncPacket(List.of());
         }
-        return new AutocraftCpuSyncPacket(service.listCpuStatuses().stream().map(
-            status -> new AutocraftCpuSyncPacket.Row(
-                status.cpuId(),
-                status.available(),
-                status.targetSummary(),
-                status.currentStep(),
-                status.blockedReason(),
-                status.cancellable())).toList());
+        return new AutocraftCpuSyncPacket(service.listCpuStatuses());
     }
 
     private AutocraftPreviewSyncPacket previewPacket() {
-        if (previewResult != null) {
-            return AutocraftPreviewSyncPacket.preview(previewResult);
-        } else if (executeResult != null) {
-            return AutocraftPreviewSyncPacket.execute(executeResult);
-        } else {
-            return AutocraftPreviewSyncPacket.cancel();
-        }
+        return service == null ?
+            AutocraftPreviewSyncPacket.empty() :
+            AutocraftPreviewSyncPacket.of(service.previewResult());
     }
 
     private void onAction(AutocraftEventPacket packet) {
@@ -91,21 +73,19 @@ public class AutocraftTerminalMenu extends MenuBase {
         }
         if (packet.action() == AutocraftEventPacket.Action.PREVIEW &&
             packet.target() != null) {
-            previewResult = service.preview(packet.target(), packet.quantity());
-            executeResult = null;
+            service.preview(packet.target(), packet.quantity());
             previewScheduler.invokeUpdate();
             return;
         }
         if (packet.action() == AutocraftEventPacket.Action.EXECUTE &&
             packet.cpuId() != null) {
-            previewResult = null;
-            executeResult = service.execute(packet.cpuId());
-            previewScheduler.invokeUpdate();
+            if (service.execute(packet.cpuId()).isSuccess()) {
+                previewScheduler.invokeUpdate();
+            }
             return;
         }
         if (packet.action() == AutocraftEventPacket.Action.CANCEL) {
-            previewResult = null;
-            executeResult = null;
+            service.cancelPreview();
             previewScheduler.invokeUpdate();
             return;
         }

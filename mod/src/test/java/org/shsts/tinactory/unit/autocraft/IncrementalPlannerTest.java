@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -35,7 +36,7 @@ class IncrementalPlannerTest {
 
         assertEquals(PlanningState.RUNNING, progress.state());
         assertNull(progress.plan());
-        assertNull(progress.error());
+        assertEquals(PlanError.none(), progress.error());
     }
 
     @Test
@@ -158,7 +159,7 @@ class IncrementalPlannerTest {
         GoalReductionPlanner planner,
         PlannerSession session,
         int maxSteps) {
-        var progress = new PlannerSnapshot(PlanningState.RUNNING, null, null);
+        var progress = PlannerSnapshot.running();
         for (var i = 0; i < maxSteps && progress.state() == PlanningState.RUNNING; i++) {
             progress = planner.resume(session, 1);
         }

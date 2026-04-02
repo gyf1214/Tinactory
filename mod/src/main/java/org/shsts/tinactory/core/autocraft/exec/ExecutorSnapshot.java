@@ -16,7 +16,7 @@ import java.util.UUID;
 public record ExecutorSnapshot(
     JobState state,
     ExecutionPhase phase,
-    @Nullable ExecutionError error,
+    ExecutionError error,
     @Nullable JobState pendingTerminalState,
     CraftPlan plan,
     int nextStepIndex,
@@ -29,6 +29,7 @@ public record ExecutorSnapshot(
     @Nullable UUID leasedMachineId) {
 
     public ExecutorSnapshot {
+        error = error == null ? ExecutionError.NONE : error;
         stepBuffer = Map.copyOf(stepBuffer);
         stepProducedOutputs = Map.copyOf(stepProducedOutputs);
         stepRequiredOutputs = Map.copyOf(stepRequiredOutputs);

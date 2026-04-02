@@ -194,9 +194,7 @@ public class AutocraftJobService implements IAutocraftService {
         var tag = new CompoundTag();
         tag.putString("state", snapshot.state().name());
         tag.putString("phase", snapshot.phase().name());
-        if (snapshot.error() != null) {
-            tag.put("error", serializeError(snapshot.error()));
-        }
+        tag.put("error", serializeError(snapshot.error()));
         if (snapshot.pendingTerminalState() != null) {
             tag.putString("pendingTerminalState", snapshot.pendingTerminalState().name());
         }
@@ -218,7 +216,7 @@ public class AutocraftJobService implements IAutocraftService {
         return new ExecutorSnapshot(
             JobState.valueOf(tag.getString("state")),
             ExecutionPhase.valueOf(tag.getString("phase")),
-            tag.contains("error", TAG_COMPOUND) ? deserializeError(tag.getCompound("error")) : null,
+            tag.contains("error", TAG_COMPOUND) ? deserializeError(tag.getCompound("error")) : ExecutionError.NONE,
             tag.contains("pendingTerminalState") ? JobState.valueOf(tag.getString("pendingTerminalState")) : null,
             deserializePlan(tag.getCompound("plan"), codec),
             tag.getInt("nextStepIndex"),
@@ -233,17 +231,12 @@ public class AutocraftJobService implements IAutocraftService {
 
     private static CompoundTag serializeError(ExecutionError error) {
         var tag = new CompoundTag();
-        tag.putString("code", error.code().name());
-        tag.putString("stepId", error.stepId());
-        tag.putString("message", error.message());
+        tag.putString("value", error.name());
         return tag;
     }
 
     private static ExecutionError deserializeError(CompoundTag tag) {
-        return new ExecutionError(
-            ExecutionError.Code.valueOf(tag.getString("code")),
-            tag.getString("stepId"),
-            tag.getString("message"));
+        return ExecutionError.valueOf(tag.getString("value"));
     }
 
     private static ListTag serializeKeyedAmounts(Map<IIngredientKey, Long> amounts, PatternNbtCodec codec) {

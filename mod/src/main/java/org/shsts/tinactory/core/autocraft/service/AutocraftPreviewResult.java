@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
 
 import java.util.List;
 
@@ -12,18 +13,26 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public record AutocraftPreviewResult(
     @Nullable AutocraftPreview preview,
-    @Nullable Code errorCode) {
+    PlanError error) {
 
-    public static AutocraftPreviewResult success(AutocraftPreview preview) {
-        return new AutocraftPreviewResult(preview, null);
+    public static AutocraftPreviewResult empty() {
+        return new AutocraftPreviewResult(null, PlanError.none());
     }
 
-    public static AutocraftPreviewResult failure(Code errorCode) {
-        return new AutocraftPreviewResult(null, errorCode);
+    public static AutocraftPreviewResult success(AutocraftPreview preview) {
+        return new AutocraftPreviewResult(preview, PlanError.none());
+    }
+
+    public static AutocraftPreviewResult failure(PlanError error) {
+        return new AutocraftPreviewResult(null, error);
     }
 
     public boolean isSuccess() {
         return preview != null;
+    }
+
+    public boolean isEmpty() {
+        return preview == null && error.code() == PlanError.Code.NONE;
     }
 
     @Nullable
@@ -34,12 +43,5 @@ public record AutocraftPreviewResult(
     @Nullable
     public CraftPlan planSnapshot() {
         return preview != null ? preview.planSnapshot() : null;
-    }
-
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
-    public enum Code {
-        INVALID_REQUEST,
-        PLAN_FAILED
     }
 }

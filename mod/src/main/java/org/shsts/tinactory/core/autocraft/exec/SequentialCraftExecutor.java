@@ -32,10 +32,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private ExecutionPhase phase = ExecutionPhase.TERMINAL;
     @Nullable
     private JobState pendingTerminalState;
-    @Nullable
-    private ExecutionError error;
-    @Nullable
-    private ExecutionError.Code blockedReason;
+    private ExecutionError error = ExecutionError.NONE;
     @Nullable
     private IMachineLease lease;
     @Nullable
@@ -78,8 +75,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             state = JobState.RUNNING;
         }
         phase = state == JobState.RUNNING ? ExecutionPhase.RUN_STEP : ExecutionPhase.TERMINAL;
-        error = null;
-        blockedReason = null;
+        error = ExecutionError.NONE;
         pendingTerminalState = null;
         releaseLease();
         clearStepState();
@@ -106,11 +102,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         var step = plan.steps().get(nextStep);
         if (!ensureStepReady()) {
-            jobEvents.onStepBlocked(step, error == null ? "step blocked" : error.message());
+            jobEvents.onStepBlocked(step, blockedMessage(error));
             return;
         }
         if (!ensureLease(step)) {
-            jobEvents.onStepBlocked(step, error == null ? "machine unavailable" : error.message());
+            jobEvents.onStepBlocked(step, blockedMessage(error));
             return;
         }
 
@@ -128,8 +124,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             clearStepProgressState();
             jobEvents.onStepCompleted(completedStep);
             nextStep++;
-            blockedReason = null;
-            error = null;
+            error = ExecutionError.NONE;
             state = JobState.RUNNING;
 
             if (!flushStepBufferNow(flushCandidates)) {
@@ -137,11 +132,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 phase = ExecutionPhase.FLUSHING;
                 pendingTerminalState = JobState.RUNNING;
                 state = JobState.BLOCKED;
-                blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
-                error = new ExecutionError(
-                    ExecutionError.Code.FLUSH_BACKPRESSURE,
-                    completedStep.stepId(),
-                    "Flush blocked by storage backpressure");
+                error = ExecutionError.FLUSH_BACKPRESSURE;
                 flushStepBufferInPhase = false;
                 return;
             }
@@ -158,7 +149,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
         beginFlushing(
             JobState.CANCELLED,
-            new ExecutionError(ExecutionError.Code.CANCELLED, nextStepId(), "Execution cancelled"),
+            ExecutionError.NONE,
             null,
             true);
     }
@@ -185,7 +176,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         state = snapshot.state();
         phase = snapshot.phase();
         error = snapshot.error();
-        blockedReason = error == null ? null : error.code();
         pendingTerminalState = snapshot.pendingTerminalState();
         nextStep = snapshot.nextStepIndex();
         stepBuffer.putAll(snapshot.stepBuffer());
@@ -228,7 +218,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (simulated < missing) {
                 rollbackReservations(inventoryReservations);
                 rollbackBufferedReservations(bufferedReservations);
-                blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
+                blockStep(ExecutionError.INPUT_UNAVAILABLE);
                 return false;
             }
             var extracted = inventory.extract(required.getKey(), missing, false);
@@ -238,7 +228,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 }
                 rollbackReservations(inventoryReservations);
                 rollbackBufferedReservations(bufferedReservations);
-                blockStep(ExecutionError.Code.INPUT_UNAVAILABLE, "Input resources are unavailable");
+                blockStep(ExecutionError.INPUT_UNAVAILABLE);
                 return false;
             }
             inventoryReservations.put(required.getKey(), extracted);
@@ -246,8 +236,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             stepBuffer.merge(required.getKey(), extracted, Long::sum);
         }
         jobEvents.onStepStarted(step);
-        blockedReason = null;
-        error = null;
+        error = ExecutionError.NONE;
         state = JobState.RUNNING;
         return true;
     }
@@ -259,8 +248,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             }
             if (!canReassignAfterMachineLoss()) {
                 blockStep(
-                    ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED,
-                    "Machine reassignment blocked by in-flight transfer");
+                    ExecutionError.MACHINE_REASSIGNMENT_BLOCKED);
                 return false;
             }
             releaseLease();
@@ -268,13 +256,12 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         var allocated = machineAllocator.allocate(step);
         if (allocated.isEmpty()) {
-            blockStep(ExecutionError.Code.MACHINE_UNAVAILABLE, "Machine requirement is unavailable");
+            blockStep(ExecutionError.MACHINE_UNAVAILABLE);
             return false;
         }
         lease = allocated.get();
         leasedMachineId = lease.machineId();
-        blockedReason = null;
-        error = null;
+        error = ExecutionError.NONE;
         state = JobState.RUNNING;
         return true;
     }
@@ -391,13 +378,12 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private void beginFlushing(
         JobState terminalState,
         @Nullable ExecutionError terminalError,
-        @Nullable ExecutionError.Code flushBlockedReason,
+        @Nullable ExecutionError flushBlockedReason,
         boolean includeStepBuffer) {
         releaseLease();
         pendingTerminalState = terminalState;
         phase = ExecutionPhase.FLUSHING;
-        error = terminalError;
-        blockedReason = flushBlockedReason;
+        error = terminalError == null ? ExecutionError.NONE : terminalError;
         flushStepBufferInPhase = includeStepBuffer;
         state = flushBlockedReason == null ? JobState.RUNNING : JobState.BLOCKED;
     }
@@ -416,31 +402,26 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         if (done) {
             var terminalState = pendingTerminalState == null ? JobState.COMPLETED : pendingTerminalState;
             state = terminalState;
-            blockedReason = null;
             pendingTerminalState = null;
             if (terminalState == JobState.RUNNING) {
                 phase = ExecutionPhase.RUN_STEP;
-                if (error != null && error.code() == ExecutionError.Code.FLUSH_BACKPRESSURE) {
-                    error = null;
+                if (error == ExecutionError.FLUSH_BACKPRESSURE) {
+                    error = ExecutionError.NONE;
                 }
             } else {
                 phase = ExecutionPhase.TERMINAL;
+                error = ExecutionError.NONE;
                 clearStepState();
             }
             flushStepBufferInPhase = false;
             return;
         }
         if (remaining > 0L) {
-            blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
-            error = new ExecutionError(
-                ExecutionError.Code.FLUSH_BACKPRESSURE,
-                nextStepId(),
-                "Flush blocked by storage backpressure");
+            error = ExecutionError.FLUSH_BACKPRESSURE;
             state = JobState.BLOCKED;
         } else {
-            blockedReason = null;
-            if (error != null && error.code() == ExecutionError.Code.FLUSH_BACKPRESSURE) {
-                error = null;
+            if (error == ExecutionError.FLUSH_BACKPRESSURE) {
+                error = ExecutionError.NONE;
             }
             state = JobState.RUNNING;
         }
@@ -516,17 +497,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private void blockStep(ExecutionError.Code code, String message) {
-        error = new ExecutionError(code, nextStepId(), message);
-        blockedReason = code;
+    private void blockStep(ExecutionError code) {
+        error = code;
         state = JobState.BLOCKED;
-    }
-
-    private String nextStepId() {
-        if (nextStep >= plan.steps().size()) {
-            return "complete";
-        }
-        return plan.steps().get(nextStep).stepId();
     }
 
     private void releaseLease() {
@@ -572,5 +545,15 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return 0L;
         }
         return (numerator + denominator - 1L) / denominator;
+    }
+
+    private static String blockedMessage(ExecutionError error) {
+        return switch (error) {
+            case INPUT_UNAVAILABLE -> "Input resources are unavailable";
+            case MACHINE_UNAVAILABLE -> "Machine requirement is unavailable";
+            case MACHINE_REASSIGNMENT_BLOCKED -> "Machine reassignment blocked by in-flight transfer";
+            case FLUSH_BACKPRESSURE -> "Flush blocked by storage backpressure";
+            case NONE -> "step blocked";
+        };
     }
 }

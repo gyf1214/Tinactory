@@ -53,7 +53,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldRemainBusyWhenExecutorBlockedRetriably() {
         var executor = new TestExecutor(JobState.BLOCKED, JobState.BLOCKED, JobState.COMPLETED);
-        executor.blockedReason = ExecutionError.Code.FLUSH_BACKPRESSURE;
+        executor.blockedReason = ExecutionError.FLUSH_BACKPRESSURE;
         var service = new AutocraftJobService(executor);
 
         var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
@@ -127,7 +127,7 @@ class AutocraftJobServiceTest {
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
-            null,
+            ExecutionError.NONE,
             null,
             testPlan(),
             0,
@@ -167,7 +167,7 @@ class AutocraftJobServiceTest {
         private int index;
         private boolean cancelled;
         private boolean restoreCalled;
-        private ExecutionError.Code blockedReason;
+        private ExecutionError blockedReason;
         private CraftPlan currentPlan = new CraftPlan(List.of());
         private ExecutorSnapshot snapshot = snapshotFor(JobState.IDLE, currentPlan, null);
 
@@ -216,7 +216,7 @@ class AutocraftJobServiceTest {
                 state,
                 state == JobState.CANCELLED ? ExecutionPhase.TERMINAL : ExecutionPhase.RUN_STEP,
                 error,
-                state == JobState.CANCELLED ? JobState.CANCELLED : null,
+                null,
                 plan,
                 0,
                 Map.of(),
@@ -229,11 +229,10 @@ class AutocraftJobServiceTest {
         }
 
         private ExecutionError errorFor(JobState state) {
-            if (state != JobState.BLOCKED && state != JobState.CANCELLED) {
-                return null;
+            if (state == JobState.BLOCKED) {
+                return blockedReason == null ? ExecutionError.MACHINE_UNAVAILABLE : blockedReason;
             }
-            var code = state == JobState.CANCELLED ? ExecutionError.Code.CANCELLED : blockedReason;
-            return new ExecutionError(code == null ? ExecutionError.Code.MACHINE_UNAVAILABLE : code, "s1", "blocked");
+            return ExecutionError.NONE;
         }
     }
 

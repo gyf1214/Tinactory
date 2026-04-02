@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
+import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
@@ -75,7 +76,7 @@ class CraftExecutorTest {
         executor.runCycle(64);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals("s1", executor.snapshot().error().stepId());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
     }
 
     @Test
@@ -94,6 +95,7 @@ class CraftExecutorTest {
         executor.runCycle(64);
 
         assertEquals(JobState.CANCELLED, executor.snapshot().state());
+        assertEquals(ExecutionError.NONE, executor.snapshot().error());
         assertEquals(0L, inventory.amountOf(plate));
     }
 

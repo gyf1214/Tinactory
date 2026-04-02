@@ -99,7 +99,7 @@ class ExecutorStateMachineTest {
             executor.restore(new ExecutorSnapshot(
                 JobState.RUNNING,
                 ExecutionPhase.RUN_STEP,
-                null,
+                ExecutionError.NONE,
                 null,
                 plan,
                 0,
@@ -128,7 +128,7 @@ class ExecutorStateMachineTest {
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
-            null,
+            ExecutionError.NONE,
             null,
             new CraftPlan(List.of(step)),
             0,
@@ -165,7 +165,7 @@ class ExecutorStateMachineTest {
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
-            null,
+            ExecutionError.NONE,
             null,
             new CraftPlan(List.of(step)),
             0,
@@ -181,7 +181,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(0);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.snapshot().error().code());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
         assertEquals(2L, inventory.amountOf(ingot));
         assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
@@ -243,7 +243,7 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(ingot));
         assertEquals(1L, inventory.amountOf(coal));
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.snapshot().error().code());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
     }
 
     @Test
@@ -268,7 +268,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(1);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED, executor.snapshot().error().code());
+        assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.snapshot().error());
         assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
     }
 
@@ -341,7 +341,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(64);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.Code.MACHINE_UNAVAILABLE, executor.snapshot().error().code());
+        assertEquals(ExecutionError.MACHINE_UNAVAILABLE, executor.snapshot().error());
         assertEquals(0L, inventory.amountOf(part));
     }
 
@@ -470,7 +470,7 @@ class ExecutorStateMachineTest {
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
-            null,
+            ExecutionError.NONE,
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
             0,
@@ -524,7 +524,7 @@ class ExecutorStateMachineTest {
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
-            null,
+            ExecutionError.NONE,
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
             0,
