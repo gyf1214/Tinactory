@@ -6,12 +6,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftServiceBootstrap;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftTerminalService;
+import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
-import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -32,11 +32,9 @@ public class AutocraftTerminal extends MEStorageAccess {
     @Override
     protected void onConnect(INetwork network) {
         super.onConnect(network);
-        var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+        var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         service = AutocraftServiceBootstrap.createTerminalService(
-            blockEntity,
-            network,
-            logistics,
+            autocraft,
             combinedItem,
             combinedFluid);
     }

@@ -1,27 +1,31 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GoalReductionPlannerTest {
     @Test
     void plannerShouldBuildSimpleChainInDependencyOrder() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
 
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
@@ -31,12 +35,14 @@ class GoalReductionPlannerTest {
             "tinactory:gear_from_plate",
             List.of(new CraftAmount(plate, 1)),
             List.of(new CraftAmount(gear, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(platePattern, gearPattern)));
+        var planner = planner(
+            repo(List.of(platePattern, gearPattern)),
+            List.of(new CraftAmount(ingot, 2)));
 
-        var result = planner.plan(List.of(new CraftAmount(gear, 1)), List.of(new CraftAmount(ingot, 2)));
+        var snapshot = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertTrue(result.isSuccess());
-        var steps = result.plan().steps();
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var steps = snapshot.plan().steps();
         assertEquals(2, steps.size());
         assertEquals("tinactory:plate_from_ingot", steps.get(0).pattern().patternId());
         assertEquals("tinactory:gear_from_plate", steps.get(1).pattern().patternId());
@@ -44,9 +50,9 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldUseDeterministicTieBreakByPatternId() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var dust = CraftKey.item("tinactory:dust", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var dust = TestIngredientKey.item("tinactory:dust", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
 
         var aPattern = pattern(
             "tinactory:a_ore_to_plate",
@@ -56,22 +62,22 @@ class GoalReductionPlannerTest {
             "tinactory:z_dust_to_plate",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(plate, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(zPattern, aPattern)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(plate, 1)),
+        var planner = planner(
+            repo(List.of(zPattern, aPattern)),
             List.of(new CraftAmount(ore, 1), new CraftAmount(dust, 1)));
 
-        assertTrue(result.isSuccess());
-        assertEquals("tinactory:a_ore_to_plate", result.plan().steps().get(0).pattern().patternId());
+        var snapshot = planner.plan(List.of(new CraftAmount(plate, 1)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        assertEquals("tinactory:a_ore_to_plate", snapshot.plan().steps().get(0).pattern().patternId());
     }
 
     @Test
     void plannerShouldReuseByproductsFromEarlierSteps() {
-        var crude = CraftKey.fluid("tinactory:crude_oil", "");
-        var plastic = CraftKey.item("tinactory:plastic", "");
-        var residue = CraftKey.item("tinactory:residue", "");
-        var carbon = CraftKey.item("tinactory:carbon", "");
+        var crude = TestIngredientKey.fluid("tinactory:crude_oil", "");
+        var plastic = TestIngredientKey.item("tinactory:plastic", "");
+        var residue = TestIngredientKey.item("tinactory:residue", "");
+        var carbon = TestIngredientKey.item("tinactory:carbon", "");
 
         var refine = pattern(
             "tinactory:refine_oil",
@@ -81,31 +87,29 @@ class GoalReductionPlannerTest {
             "tinactory:residue_to_carbon",
             List.of(new CraftAmount(residue, 1)),
             List.of(new CraftAmount(carbon, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(refine, residueToCarbon)));
+        var planner = planner(repo(List.of(refine, residueToCarbon)), List.of(new CraftAmount(crude, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(plastic, 1), new CraftAmount(carbon, 1)),
-            List.of(new CraftAmount(crude, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(plastic, 1), new CraftAmount(carbon, 1)));
 
-        assertTrue(result.isSuccess());
-        assertEquals(2, result.plan().steps().size());
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        assertEquals(2, snapshot.plan().steps().size());
         assertEquals(
             List.of("tinactory:refine_oil", "tinactory:residue_to_carbon"),
-            result.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
+            snapshot.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
         assertEquals(List.of(new CraftAmount(residue, 1)),
-            result.plan().steps().get(0).requiredIntermediateOutputs());
+            snapshot.plan().steps().get(0).requiredIntermediateOutputs());
         assertEquals(List.of(new CraftAmount(plastic, 1)),
-            result.plan().steps().get(0).requiredFinalOutputs());
-        assertEquals(List.of(), result.plan().steps().get(1).requiredIntermediateOutputs());
+            snapshot.plan().steps().get(0).requiredFinalOutputs());
+        assertEquals(List.of(), snapshot.plan().steps().get(1).requiredIntermediateOutputs());
         assertEquals(List.of(new CraftAmount(carbon, 1)),
-            result.plan().steps().get(1).requiredFinalOutputs());
+            snapshot.plan().steps().get(1).requiredFinalOutputs());
     }
 
     @Test
     void plannerShouldAggregateDuplicateOutputsByRole() {
-        var base = CraftKey.item("tinactory:base", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var finalKey = CraftKey.item("tinactory:final", "");
+        var base = TestIngredientKey.item("tinactory:base", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var finalKey = TestIngredientKey.item("tinactory:final", "");
         var makePart = pattern(
             "tinactory:make_part",
             List.of(new CraftAmount(base, 2)),
@@ -114,24 +118,22 @@ class GoalReductionPlannerTest {
             "tinactory:make_final",
             List.of(new CraftAmount(part, 1)),
             List.of(new CraftAmount(finalKey, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(makePart, makeFinal)));
+        var planner = planner(repo(List.of(makePart, makeFinal)), List.of(new CraftAmount(base, 2)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(finalKey, 1), new CraftAmount(part, 1)),
-            List.of(new CraftAmount(base, 2)));
+        var snapshot = planner.plan(List.of(new CraftAmount(finalKey, 1), new CraftAmount(part, 1)));
 
-        assertTrue(result.isSuccess());
-        var partStep = result.plan().steps().get(0);
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var partStep = snapshot.plan().steps().get(0);
         assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredIntermediateOutputs());
         assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredFinalOutputs());
     }
 
     @Test
     void plannerShouldMarkBranchProducerOutputAsIntermediate() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machineA = CraftKey.item("tinactory:machine_a", "");
-        var machineB = CraftKey.item("tinactory:machine_b", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machineA = TestIngredientKey.item("tinactory:machine_a", "");
+        var machineB = TestIngredientKey.item("tinactory:machine_b", "");
 
         var makePart = pattern(
             "tinactory:part_from_ore",
@@ -145,14 +147,12 @@ class GoalReductionPlannerTest {
             "tinactory:machine_b_from_part",
             List.of(new CraftAmount(part, 1)),
             List.of(new CraftAmount(machineB, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(makePart, makeMachineA, makeMachineB)));
+        var planner = planner(repo(List.of(makePart, makeMachineA, makeMachineB)), List.of(new CraftAmount(ore, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(machineA, 1), new CraftAmount(machineB, 1)),
-            List.of(new CraftAmount(ore, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(machineA, 1), new CraftAmount(machineB, 1)));
 
-        assertTrue(result.isSuccess());
-        var steps = result.plan().steps();
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var steps = snapshot.plan().steps();
         assertEquals(List.of(
                 "tinactory:part_from_ore",
                 "tinactory:machine_a_from_part",
@@ -164,10 +164,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldSupportFanInForSharedIntermediateDemand() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machine = CraftKey.item("tinactory:machine", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machine = TestIngredientKey.item("tinactory:machine", "");
 
         var partFromOre = pattern(
             "tinactory:part_from_ore",
@@ -181,14 +181,14 @@ class GoalReductionPlannerTest {
             "tinactory:machine_from_part",
             List.of(new CraftAmount(part, 2)),
             List.of(new CraftAmount(machine, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(partFromOre, partFromPlate, machineFromPart)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(machine, 1)),
+        var planner = planner(
+            repo(List.of(partFromOre, partFromPlate, machineFromPart)),
             List.of(new CraftAmount(ore, 1), new CraftAmount(plate, 1)));
 
-        assertTrue(result.isSuccess());
-        var steps = result.plan().steps();
+        var snapshot = planner.plan(List.of(new CraftAmount(machine, 1)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var steps = snapshot.plan().steps();
         assertEquals(3, steps.size());
         assertEquals("tinactory:part_from_ore", steps.get(0).pattern().patternId());
         assertEquals("tinactory:part_from_plate", steps.get(1).pattern().patternId());
@@ -201,10 +201,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldMixSecondProducerWhenFirstHasInsufficientInput() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machine = CraftKey.item("tinactory:machine", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machine = TestIngredientKey.item("tinactory:machine", "");
 
         var partFromOre = pattern(
             "tinactory:a_part_from_ore",
@@ -218,14 +218,14 @@ class GoalReductionPlannerTest {
             "tinactory:machine_from_part",
             List.of(new CraftAmount(part, 3)),
             List.of(new CraftAmount(machine, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(partFromOre, partFromPlate, machineFromPart)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(machine, 1)),
+        var planner = planner(
+            repo(List.of(partFromOre, partFromPlate, machineFromPart)),
             List.of(new CraftAmount(ore, 2), new CraftAmount(plate, 1)));
 
-        assertTrue(result.isSuccess());
-        var steps = result.plan().steps();
+        var snapshot = planner.plan(List.of(new CraftAmount(machine, 1)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var steps = snapshot.plan().steps();
         assertEquals(4, steps.size());
         assertEquals("tinactory:a_part_from_ore", steps.get(0).pattern().patternId());
         assertEquals("tinactory:a_part_from_ore", steps.get(1).pattern().patternId());
@@ -235,9 +235,9 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldBacktrackToSecondRootCandidate() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var dust = CraftKey.item("tinactory:dust", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var dust = TestIngredientKey.item("tinactory:dust", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
 
         var first = pattern(
             "tinactory:a_plate_from_missing_ore",
@@ -247,23 +247,21 @@ class GoalReductionPlannerTest {
             "tinactory:b_plate_from_dust",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(plate, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(first, second)));
+        var planner = planner(repo(List.of(first, second)), List.of(new CraftAmount(dust, 1)));
 
-        var result = planner.plan(
-            List.of(new CraftAmount(plate, 1)),
-            List.of(new CraftAmount(dust, 1)));
+        var snapshot = planner.plan(List.of(new CraftAmount(plate, 1)));
 
-        assertTrue(result.isSuccess());
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
         assertEquals(List.of("tinactory:b_plate_from_dust"),
-            result.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+            snapshot.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
     }
 
     @Test
     void plannerShouldBacktrackNestedCandidate() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var dust = CraftKey.item("tinactory:dust", "");
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var dust = TestIngredientKey.item("tinactory:dust", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
 
         var gearFromIngot = pattern(
             "tinactory:gear_from_ingot",
@@ -277,16 +275,37 @@ class GoalReductionPlannerTest {
             "tinactory:b_ingot_from_dust",
             List.of(new CraftAmount(dust, 1)),
             List.of(new CraftAmount(ingot, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(gearFromIngot, ingotFromOre, ingotFromDust)));
-
-        var result = planner.plan(
-            List.of(new CraftAmount(gear, 1)),
+        var planner = planner(
+            repo(List.of(gearFromIngot, ingotFromOre, ingotFromDust)),
             List.of(new CraftAmount(dust, 1)));
 
-        assertTrue(result.isSuccess());
+        var snapshot = planner.plan(List.of(new CraftAmount(gear, 1)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
         assertEquals(
             List.of("tinactory:b_ingot_from_dust", "tinactory:gear_from_ingot"),
-            result.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+            snapshot.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+    }
+
+    @Test
+    void plannerShouldReadAvailableAmountOncePerKeyWithinSession() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var makePlate = pattern(
+            "tinactory:plate_from_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(plate, 1)));
+        var inventory = TestInventoryView.fromAmounts(List.of(new CraftAmount(ore, 2)));
+        var planner = new GoalReductionPlanner(repo(List.of(makePlate)), inventory);
+
+        var snapshot = planner.plan(List.of(new CraftAmount(plate, 2)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        assertEquals(1, inventory.readCount(ore));
+    }
+
+    private static GoalReductionPlanner planner(IPatternRepository repo, List<CraftAmount> available) {
+        return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -295,17 +314,64 @@ class GoalReductionPlannerTest {
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
-        return key -> {
-            var out = new ArrayList<CraftPattern>();
-            for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
-                for (var output : pattern.outputs()) {
-                    if (output.key().equals(key)) {
-                        out.add(pattern);
-                        break;
+        return new IPatternRepository() {
+            @Override
+            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+                var out = new ArrayList<CraftPattern>();
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                    for (var output : pattern.outputs()) {
+                        if (output.key().equals(key)) {
+                            out.add(pattern);
+                            break;
+                        }
                     }
                 }
+                return out;
             }
-            return out;
+
+            @Override
+            public List<IIngredientKey> listRequestables() {
+                return patterns.stream()
+                    .flatMap(pattern -> pattern.outputs().stream())
+                    .map(CraftAmount::key)
+                    .distinct()
+                    .sorted()
+                    .toList();
+            }
+
+            @Override
+            public boolean containsPatternId(String patternId) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            }
+
+            @Override
+            public boolean addPattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removePattern(String patternId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean updatePattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean addCellPort(UUID machineId, int priority, int slotIndex, IPatternCellPort port) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int removeCellPorts(UUID machineId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {}
         };
     }
+
 }

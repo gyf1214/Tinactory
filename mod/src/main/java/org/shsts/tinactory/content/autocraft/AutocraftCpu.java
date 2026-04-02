@@ -9,12 +9,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
-import org.shsts.tinactory.core.autocraft.api.MachineConstraintRegistry;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftJobService;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftServiceBootstrap;
-import org.shsts.tinactory.core.autocraft.integration.PatternNbtCodec;
-import org.shsts.tinactory.core.autocraft.model.InputPortConstraint;
-import org.shsts.tinactory.core.autocraft.model.OutputPortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -22,6 +21,7 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 
@@ -31,7 +31,8 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
-    private final PatternNbtCodec snapshotCodec = new PatternNbtCodec(createConstraintRegistry());
+    private final PatternNbtCodec snapshotCodec =
+        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, IngredientKeyCodecHelper.CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable
@@ -56,32 +57,23 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
     }
 
-    public static MachineConstraintRegistry createConstraintRegistry() {
-        var registry = new MachineConstraintRegistry();
-        registry.register(new InputPortConstraint.Type(), new InputPortConstraint.Codec());
-        registry.register(new OutputPortConstraint.Type(), new OutputPortConstraint.Codec());
-        return registry;
-    }
-
     @Override
     protected void onConnect(INetwork network) {
         super.onConnect(network);
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+        var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         service = AutocraftServiceBootstrap.create(
-            blockEntity,
-            network,
             logistics,
             combinedItem,
             combinedFluid,
-            machine.uuid(),
             transmissionBandwidth,
             executionIntervalTicks);
         if (pendingSnapshot != null) {
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;
         }
-        logistics.registerAutocraftCpu(machine, network.getSubnet(blockEntity.getBlockPos()), service);
+        autocraft.registerCpu(machine, service);
         blockEntity.setChanged();
     }
 
@@ -94,9 +86,9 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         }
     }
 
-    private void unregisterFromLogistics() {
+    private void unregisterFromAutocraft() {
         machine.network().ifPresent(network ->
-            network.getComponent(LOGISTIC_COMPONENT.get()).unregisterAutocraftCpu(machine.uuid()));
+            network.getComponent(AUTOCRAFT_COMPONENT.get()).unregisterCpu(machine.uuid()));
     }
 
     @Override
@@ -104,8 +96,8 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         super.subscribeEvents(eventManager);
         eventManager.subscribe(BUILD_SCHEDULING.get(), builder ->
             builder.add(LOGISTICS_SCHEDULING.get(), (world, network) -> onTick()));
-        eventManager.subscribe(REMOVED_BY_CHUNK.get(), world -> unregisterFromLogistics());
-        eventManager.subscribe(REMOVED_IN_WORLD.get(), world -> unregisterFromLogistics());
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), world -> unregisterFromAutocraft());
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), world -> unregisterFromAutocraft());
     }
 
     @Override

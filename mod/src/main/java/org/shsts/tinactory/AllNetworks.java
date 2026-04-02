@@ -3,6 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.SignalComponent;
@@ -29,6 +30,7 @@ public final class AllNetworks {
 
     public static final IEntry<ComponentType<ElectricComponent>> ELECTRIC_COMPONENT;
     public static final IEntry<ComponentType<LogisticComponent>> LOGISTIC_COMPONENT;
+    public static final IEntry<ComponentType<AutocraftComponent>> AUTOCRAFT_COMPONENT;
     public static final IEntry<ComponentType<SignalComponent>> SIGNAL_COMPONENT;
 
     static {
@@ -51,6 +53,7 @@ public final class AllNetworks {
 
         ELECTRIC_COMPONENT = componentType("electric", ElectricComponent.class, ElectricComponent::new);
         LOGISTIC_COMPONENT = componentType("logistics", LogisticComponent.class, LogisticComponent::new);
+        AUTOCRAFT_COMPONENT = componentType("autocraft", AutocraftComponent.class, AutocraftComponent::new);
         SIGNAL_COMPONENT = componentType("signal", SignalComponent.class, SignalComponent::new);
     }
 

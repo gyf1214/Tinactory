@@ -3,10 +3,13 @@ package org.shsts.tinactory.core.autocraft.plan;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.IInventoryView;
+import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,45 +19,46 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCraftPlanner {
+public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private final IPatternRepository patterns;
+    private final IInventoryView inventory;
 
-    public GoalReductionPlanner(IPatternRepository patterns) {
+    public GoalReductionPlanner(IPatternRepository patterns, IInventoryView inventory) {
         this.patterns = patterns;
+        this.inventory = inventory;
     }
 
     @Override
-    public PlanResult plan(List<CraftAmount> targets, List<CraftAmount> available) {
-        var session = startSession(targets, available);
+    public PlannerSnapshot plan(List<CraftAmount> targets) {
+        var session = startSession(targets);
         while (true) {
-            var progress = resume(session, Integer.MAX_VALUE);
-            if (progress.state() != PlannerProgress.State.RUNNING) {
-                return progress.result();
+            var snapshot = resume(session, Integer.MAX_VALUE);
+            if (snapshot.state() != PlanningState.RUNNING) {
+                return snapshot;
             }
         }
     }
 
     @Override
-    public PlannerSession startSession(List<CraftAmount> targets, List<CraftAmount> available) {
-        return new PlannerSession(targets, available);
+    public PlannerSession startSession(List<CraftAmount> targets) {
+        return new PlannerSession(targets);
     }
 
     @Override
-    public PlannerProgress resume(PlannerSession session, int stepBudget) {
+    public PlannerSnapshot resume(PlannerSession session, int stepBudget) {
         if (session.result != null) {
-            return session.result.isSuccess() ?
-                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+            return session.result;
         }
         if (stepBudget <= 0) {
-            return PlannerProgress.running();
+            return PlannerSnapshot.running();
         }
 
         var budget = stepBudget;
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlanResult.success(buildPlan(session));
-                    return PlannerProgress.done(session.result);
+                    session.result = PlannerSnapshot.completed(buildPlan(session));
+                    return session.result;
                 }
                 var target = session.targets.get(session.nextTargetIndex);
                 session.searchStack.add(new PlannerSession.SearchFrame(target.key(), target.amount(), true));
@@ -63,14 +67,13 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             budget--;
         }
         if (session.result != null) {
-            return session.result.isSuccess() ?
-                PlannerProgress.done(session.result) : PlannerProgress.failed(session.result);
+            return session.result;
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlanResult.success(buildPlan(session));
-            return PlannerProgress.done(session.result);
+            session.result = PlannerSnapshot.completed(buildPlan(session));
+            return session.result;
         }
-        return PlannerProgress.running();
+        return PlannerSnapshot.running();
     }
 
     private void processOneSearchStep(PlannerSession session) {
@@ -92,6 +95,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
     }
 
     private void runStartStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+        loadAvailableAmount(session, frame.key);
         frame.remaining = frame.demand - session.ledger.consume(frame.key, frame.demand);
         if (frame.remaining <= 0L) {
             popSuccess(session);
@@ -111,9 +115,17 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             return;
         }
         frame.firstError = null;
-        frame.candidateStartIndex = 0;
         frame.candidateIndex = 0;
         frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+    }
+
+    private void loadAvailableAmount(PlannerSession session, IIngredientKey key) {
+        if (session.cachedAvailable.containsKey(key)) {
+            return;
+        }
+        var available = inventory.amountOf(key);
+        session.cachedAvailable.put(key, available);
+        session.ledger.add(key, available);
     }
 
     private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
@@ -122,8 +134,6 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
             popFailure(session, error);
             return;
         }
-        var pattern = frame.candidates.get(frame.candidateIndex);
-        frame.candidateStartIndex = frame.candidateIndex;
         frame.ledgerSnapshot = session.ledger.copy();
         frame.stepCountSnapshot = session.steps.size();
         frame.stepIdSnapshot = session.nextStepId;
@@ -195,7 +205,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
     private void popFailure(PlannerSession session, PlanError error) {
         session.searchStack.remove(session.searchStack.size() - 1);
         if (session.searchStack.isEmpty()) {
-            session.result = PlanResult.failure(error);
+            session.result = PlannerSnapshot.failed(error);
             return;
         }
         var parent = peekFrame(session);
@@ -207,7 +217,7 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         var current = stack.get(stack.size() - 1);
         for (var i = 0; i < stack.size() - 1; i++) {
             if (stack.get(i).key.equals(current.key)) {
-                var cyclePath = new ArrayList<CraftKey>();
+                var cyclePath = new ArrayList<IIngredientKey>();
                 for (var j = i; j < stack.size(); j++) {
                     cyclePath.add(stack.get(j).key);
                 }
@@ -217,19 +227,10 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         return null;
     }
 
-    private List<CraftPattern> choosePatterns(CraftKey key) {
+    private List<CraftPattern> choosePatterns(IIngredientKey key) {
         return patterns.findPatternsProducing(key).stream()
             .sorted(Comparator.comparing(CraftPattern::patternId))
             .toList();
-    }
-
-    private static long getProducedAmount(CraftPattern pattern, CraftKey key) {
-        for (var output : pattern.outputs()) {
-            if (output.key().equals(key)) {
-                return output.amount();
-            }
-        }
-        throw new IllegalArgumentException("pattern does not produce target key: " + pattern.patternId());
     }
 
     private static CraftPlan buildPlan(PlannerSession session) {
@@ -237,8 +238,8 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
     }
 
     private static List<CraftStep> classifyStepOutputRoles(List<CraftStep> steps, List<CraftAmount> targets) {
-        var remainingIntermediateDemand = new LinkedHashMap<CraftKey, Long>();
-        var remainingFinalDemand = new LinkedHashMap<CraftKey, Long>();
+        var remainingIntermediateDemand = new LinkedHashMap<IIngredientKey, Long>();
+        var remainingFinalDemand = new LinkedHashMap<IIngredientKey, Long>();
         for (var target : targets) {
             addDemand(remainingFinalDemand, target.key(), target.amount());
         }
@@ -277,22 +278,22 @@ public final class GoalReductionPlanner implements ICraftPlanner, IIncrementalCr
         return out;
     }
 
-    private static Map<CraftKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
-        var aggregated = new LinkedHashMap<CraftKey, Long>();
+    private static Map<IIngredientKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
+        var aggregated = new LinkedHashMap<IIngredientKey, Long>();
         for (var output : outputs) {
             addDemand(aggregated, output.key(), output.amount() * runs);
         }
         return aggregated;
     }
 
-    private static void addDemand(Map<CraftKey, Long> demandMap, CraftKey key, long amount) {
+    private static void addDemand(Map<IIngredientKey, Long> demandMap, IIngredientKey key, long amount) {
         if (amount <= 0L) {
             return;
         }
         demandMap.put(key, demandMap.getOrDefault(key, 0L) + amount);
     }
 
-    private static long consumeDemand(Map<CraftKey, Long> demandMap, CraftKey key, long availableAmount) {
+    private static long consumeDemand(Map<IIngredientKey, Long> demandMap, IIngredientKey key, long availableAmount) {
         if (availableAmount <= 0L) {
             return 0L;
         }

@@ -5,7 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.UUID;
 
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 
@@ -33,7 +33,7 @@ public class AutocraftRequestPanel extends Panel {
         super(screen);
         this.title = new Label(menu, new TextComponent("Autocraft Request"));
         this.targetSummary = new Label(menu, new TextComponent("Target: not selected"));
-        this.cpuSummary = new Label(menu, new TextComponent("CPU: not selected"));
+        this.cpuSummary = new Label(menu, new TextComponent("CPU: optional until execute"));
         this.quantityInput = Widgets.editBox();
         this.targetIndexInput = Widgets.editBox();
         this.cpuIndexInput = Widgets.editBox();
@@ -68,7 +68,9 @@ public class AutocraftRequestPanel extends Panel {
         return parseIndex(cpuIndexInput.getValue(), size);
     }
 
-    public void updateSelectionSummary(List<AutocraftRequestableEntry> requestables, List<UUID> cpus) {
+    public void updateSelectionSummary(
+        List<IIngredientKey> requestables,
+        List<CpuStatusEntry> cpus) {
         targetSummary.setLine(0, new TextComponent(formatTargetSummary(requestables)));
         cpuSummary.setLine(0, new TextComponent(formatCpuSummary(cpus)));
     }
@@ -86,20 +88,21 @@ public class AutocraftRequestPanel extends Panel {
         }
     }
 
-    private String formatTargetSummary(List<AutocraftRequestableEntry> requestables) {
+    private String formatTargetSummary(List<IIngredientKey> requestables) {
         var index = targetIndex(requestables.size());
         if (index.isEmpty()) {
             return "Target index: select 0.." + Math.max(0, requestables.size() - 1);
         }
-        var key = requestables.get(index.getAsInt()).key();
-        return "Target[" + index.getAsInt() + "]: " + key.id();
+        var key = requestables.get(index.getAsInt());
+        return "Target[" + index.getAsInt() + "]: " + key;
     }
 
-    private String formatCpuSummary(List<UUID> cpus) {
+    private String formatCpuSummary(List<CpuStatusEntry> cpus) {
         var index = cpuIndex(cpus.size());
         if (index.isEmpty()) {
-            return "CPU index: select 0.." + Math.max(0, cpus.size() - 1);
+            return "CPU index: optional for execute 0.." + Math.max(0, cpus.size() - 1);
         }
-        return "CPU[" + index.getAsInt() + "]: " + cpus.get(index.getAsInt());
+        var cpu = cpus.get(index.getAsInt());
+        return "CPU[" + index.getAsInt() + "]: " + cpu.cpuId() + " (" + cpu.state().name() + ")";
     }
 }

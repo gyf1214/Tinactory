@@ -1,22 +1,23 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionDetails;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutorRuntimeSnapshot;
+import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
@@ -27,12 +28,94 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExecutorStateMachineTest {
     @Test
+    void startShouldRejectRestartWhileRunning() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
+            new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:press", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1))));
+
+        assertThrows(IllegalStateException.class, () ->
+            executor.start(new CraftPlan(List.of(
+                new CraftStep(
+                    "s2",
+                    pattern("tinactory:press_2", List.of(), List.of(new CraftAmount(plate, 1))),
+                    1)))));
+    }
+
+    @Test
+    void startShouldRejectRestartWhileBlocked() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            step -> Optional.empty(),
+            new NoOpEvents());
+
+        executor.start(new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:blocks", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1))));
+        executor.runCycle(1);
+
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertThrows(IllegalStateException.class, () ->
+            executor.start(new CraftPlan(List.of(
+                new CraftStep(
+                    "s2",
+                    pattern("tinactory:retry", List.of(), List.of(new CraftAmount(plate, 1))),
+                    1)))));
+    }
+
+    @Test
+    void restoreShouldRejectWhileRunning() {
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var executor = new SequentialCraftExecutor(
+            new MutableInventory(Map.of(ore, 1L)),
+            new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
+            new NoOpEvents());
+        var plan = new CraftPlan(List.of(
+            new CraftStep(
+                "s1",
+                pattern("tinactory:press", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+                1)));
+
+        executor.start(plan);
+
+        assertThrows(IllegalStateException.class, () ->
+            executor.restore(new ExecutorSnapshot(
+                JobState.RUNNING,
+                ExecutionPhase.RUN_STEP,
+                ExecutionError.NONE,
+                null,
+                plan,
+                0,
+                Map.of(ore, 1L),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                Map.of(),
+                null)));
+    }
+
+    @Test
     void reservationShouldConsumeBufferedInputsBeforeNetworkExtraction() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var step = new CraftStep(
             "s1",
             pattern("tinactory:press", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -42,12 +125,12 @@ class ExecutorStateMachineTest {
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
+            ExecutionError.NONE,
             null,
-            null,
-            null,
+            new CraftPlan(List.of(step)),
             0,
             Map.of(ingot, 1L),
             Map.of(),
@@ -57,18 +140,18 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.restore(snapshot);
         executor.runCycle(0);
 
-        assertEquals(ExecutionState.RUNNING, executor.state());
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
         assertEquals(0L, inventory.amountOf(ingot));
-        assertEquals(2L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(2L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
     void reservationShouldRollbackWhenBufferedFirstNetworkExtractionIsPartial() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var step = new CraftStep(
             "s1",
             pattern("tinactory:press", List.of(new CraftAmount(ingot, 3)), List.of(new CraftAmount(plate, 1))),
@@ -79,12 +162,12 @@ class ExecutorStateMachineTest {
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
+            ExecutionError.NONE,
             null,
-            null,
-            null,
+            new CraftPlan(List.of(step)),
             0,
             Map.of(ingot, 1L),
             Map.of(),
@@ -94,20 +177,20 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(step)), 0, snapshot);
+        executor.restore(snapshot);
         executor.runCycle(0);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.error().code());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
         assertEquals(2L, inventory.amountOf(ingot));
-        assertEquals(1L, executor.details().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
     void stepCompletionShouldUseRequiredOutputsOnly() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var waste = CraftKey.item("tinactory:waste", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var waste = TestIngredientKey.item("tinactory:waste", "");
         var step = new CraftStep(
             "s1",
             pattern(
@@ -130,16 +213,16 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(plate));
         assertEquals(0L, inventory.amountOf(waste));
     }
 
     @Test
     void reservationShouldRollbackWhenActualExtractionFails() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var coal = CraftKey.item("tinactory:coal", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var coal = TestIngredientKey.item("tinactory:coal", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var step = new CraftStep(
             "s1",
             pattern(
@@ -157,16 +240,16 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(ingot));
         assertEquals(1L, inventory.amountOf(coal));
-        assertEquals(ExecutionError.Code.INPUT_UNAVAILABLE, executor.error().code());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
     }
 
     @Test
     void machineLossShouldBlockWhenReassignmentGateFails() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var step = new CraftStep(
             "s1",
             pattern("tinactory:press", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -184,15 +267,15 @@ class ExecutorStateMachineTest {
         firstLease.valid = false;
         executor.runCycle(1);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.MACHINE_REASSIGNMENT_BLOCKED, executor.error().code());
-        assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.snapshot().error());
+        assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
     }
 
     @Test
     void reservationShouldNotBlockWhenOnlyBufferLimitWouldOverflow() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var step = new CraftStep(
             "s1",
             pattern("tinactory:press", List.of(new CraftAmount(ingot, 3)), List.of(new CraftAmount(plate, 1))),
@@ -209,14 +292,14 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
     }
 
     @Test
     void stepBoundaryShouldKeepIntermediateOutputsBufferedForDownstreamStep() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var firstStep = new CraftStep(
             "s1",
             pattern(
@@ -257,17 +340,17 @@ class ExecutorStateMachineTest {
         executor.runCycle(64);
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.Code.MACHINE_UNAVAILABLE, executor.error().code());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.MACHINE_UNAVAILABLE, executor.snapshot().error());
         assertEquals(0L, inventory.amountOf(part));
     }
 
     @Test
     void branchingDownstreamStepsShouldConsumeAllBufferedIntermediates() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machineA = CraftKey.item("tinactory:machine_a", "");
-        var machineB = CraftKey.item("tinactory:machine_b", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machineA = TestIngredientKey.item("tinactory:machine_a", "");
+        var machineB = TestIngredientKey.item("tinactory:machine_b", "");
 
         var firstStep = new CraftStep(
             "s1",
@@ -300,7 +383,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machineA));
         assertEquals(1L, inventory.amountOf(machineB));
         assertEquals(0L, inventory.amountOf(part));
@@ -308,10 +391,10 @@ class ExecutorStateMachineTest {
 
     @Test
     void fanInStepsShouldAccumulateBufferedIntermediatesForSingleConsumerStep() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machine = CraftKey.item("tinactory:machine", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machine = TestIngredientKey.item("tinactory:machine", "");
 
         var firstStep = new CraftStep(
             "s1",
@@ -350,7 +433,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualInserted(part));
@@ -359,9 +442,9 @@ class ExecutorStateMachineTest {
 
     @Test
     void stepBoundaryFlushShouldKeepCarriedBufferForSameKeyOutput() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var machine = CraftKey.item("tinactory:machine", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var machine = TestIngredientKey.item("tinactory:machine", "");
 
         var firstStep = new CraftStep(
             "s1",
@@ -384,12 +467,12 @@ class ExecutorStateMachineTest {
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
         var inventory = new MutableInventory(Map.of(ore, 1L));
         var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
+            ExecutionError.NONE,
             null,
-            null,
-            null,
+            new CraftPlan(List.of(firstStep, secondStep)),
             0,
             Map.of(part, 1L),
             Map.of(),
@@ -399,7 +482,7 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.restore(snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);
@@ -408,7 +491,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualExtracted(part));
@@ -416,10 +499,10 @@ class ExecutorStateMachineTest {
 
     @Test
     void stepBoundaryFlushShouldIgnoreUnrelatedBufferedKeys() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
-        var carry = CraftKey.item("tinactory:carry", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var carry = TestIngredientKey.item("tinactory:carry", "");
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
@@ -438,12 +521,12 @@ class ExecutorStateMachineTest {
         var inventory = new MutableInventory(Map.of(ore, 1L));
         inventory.rejectInsertKeys.add(carry);
         var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
-        var snapshot = new ExecutorRuntimeSnapshot(
-            ExecutionState.RUNNING,
-            ExecutionDetails.Phase.RUN_STEP,
+        var snapshot = new ExecutorSnapshot(
+            JobState.RUNNING,
+            ExecutionPhase.RUN_STEP,
+            ExecutionError.NONE,
             null,
-            null,
-            null,
+            new CraftPlan(List.of(firstStep, secondStep)),
             0,
             Map.of(carry, 1L),
             Map.of(),
@@ -453,14 +536,14 @@ class ExecutorStateMachineTest {
             Map.of(),
             null);
 
-        executor.start(new CraftPlan(List.of(firstStep, secondStep)), 0, snapshot);
+        executor.restore(snapshot);
         executor.runCycle(64);
         executor.runCycle(64);
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.RUNNING, executor.state());
-        assertEquals(ExecutionDetails.Phase.RUN_STEP, executor.details().phase());
-        assertEquals(1, executor.details().nextStepIndex());
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
+        assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
+        assertEquals(1, executor.snapshot().nextStepIndex());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -469,25 +552,25 @@ class ExecutorStateMachineTest {
     }
 
     private static final class MutableInventory implements IInventoryView {
-        private final Map<CraftKey, Long> amounts = new HashMap<>();
-        private final java.util.Set<CraftKey> rejectInsertKeys = new java.util.HashSet<>();
-        private final Map<CraftKey, Long> forcedActualExtract = new HashMap<>();
-        private final Map<CraftKey, Long> actualExtracted = new HashMap<>();
-        private final Map<CraftKey, Long> actualInserted = new HashMap<>();
+        private final Map<IIngredientKey, Long> amounts = new HashMap<>();
+        private final java.util.Set<IIngredientKey> rejectInsertKeys = new java.util.HashSet<>();
+        private final Map<IIngredientKey, Long> forcedActualExtract = new HashMap<>();
+        private final Map<IIngredientKey, Long> actualExtracted = new HashMap<>();
+        private final Map<IIngredientKey, Long> actualInserted = new HashMap<>();
         private int extractCount;
         private boolean failSecondExtract;
 
-        private MutableInventory(Map<CraftKey, Long> initial) {
+        private MutableInventory(Map<IIngredientKey, Long> initial) {
             amounts.putAll(initial);
         }
 
         @Override
-        public long amountOf(CraftKey key) {
+        public long amountOf(IIngredientKey key) {
             return amounts.getOrDefault(key, 0L);
         }
 
         @Override
-        public long extract(CraftKey key, long amount, boolean simulate) {
+        public long extract(IIngredientKey key, long amount, boolean simulate) {
             var available = amountOf(key);
             var moved = Math.min(available, amount);
             if (!simulate) {
@@ -505,7 +588,7 @@ class ExecutorStateMachineTest {
         }
 
         @Override
-        public long insert(CraftKey key, long amount, boolean simulate) {
+        public long insert(IIngredientKey key, long amount, boolean simulate) {
             var moved = Math.max(0L, amount);
             if (rejectInsertKeys.contains(key)) {
                 return 0L;
@@ -517,11 +600,11 @@ class ExecutorStateMachineTest {
             return moved;
         }
 
-        private long actualExtracted(CraftKey key) {
+        private long actualExtracted(IIngredientKey key) {
             return actualExtracted.getOrDefault(key, 0L);
         }
 
-        private long actualInserted(CraftKey key) {
+        private long actualInserted(IIngredientKey key) {
             return actualInserted.getOrDefault(key, 0L);
         }
     }
@@ -560,36 +643,46 @@ class ExecutorStateMachineTest {
 
     private static final class RouteLease implements IMachineLease {
         private final UUID machineId = UUID.randomUUID();
-        private final Map<CraftKey, Long> inputMove;
-        private final Map<CraftKey, Long> outputMove;
-        private final List<IMachineInputRoute> inputs;
-        private final List<IMachineOutputRoute> outputs;
+        private final Map<IIngredientKey, Long> inputMove;
+        private final Map<IIngredientKey, Long> outputMove;
+        private final List<IMachineRoute> inputs;
+        private final List<IMachineRoute> outputs;
         private boolean released;
         private boolean valid;
 
-        private RouteLease(Map<CraftKey, Long> inputMove, Map<CraftKey, Long> outputMove, boolean valid) {
+        private RouteLease(Map<IIngredientKey, Long> inputMove, Map<IIngredientKey, Long> outputMove, boolean valid) {
             this.inputMove = inputMove;
             this.outputMove = new HashMap<>(outputMove);
             this.valid = valid;
-            inputs = inputMove.keySet().stream().map(key -> (IMachineInputRoute) new IMachineInputRoute() {
+            inputs = inputMove.keySet().stream().map(key -> (IMachineRoute) new IMachineRoute() {
                 @Override
-                public CraftKey key() {
+                public IIngredientKey key() {
                     return key;
                 }
 
                 @Override
-                public long push(long amount, boolean simulate) {
+                public PortDirection direction() {
+                    return PortDirection.INPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     return Math.min(amount, inputMove.getOrDefault(key, 0L));
                 }
             }).toList();
-            outputs = outputMove.keySet().stream().map(key -> (IMachineOutputRoute) new IMachineOutputRoute() {
+            outputs = outputMove.keySet().stream().map(key -> (IMachineRoute) new IMachineRoute() {
                 @Override
-                public CraftKey key() {
+                public IIngredientKey key() {
                     return key;
                 }
 
                 @Override
-                public long pull(long amount, boolean simulate) {
+                public PortDirection direction() {
+                    return PortDirection.OUTPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     var available = RouteLease.this.outputMove.getOrDefault(key, 0L);
                     var moved = Math.min(available, amount);
                     if (!simulate) {
@@ -606,12 +699,12 @@ class ExecutorStateMachineTest {
         }
 
         @Override
-        public List<IMachineInputRoute> inputRoutes() {
+        public List<IMachineRoute> inputRoutes() {
             return inputs;
         }
 
         @Override
-        public List<IMachineOutputRoute> outputRoutes() {
+        public List<IMachineRoute> outputRoutes() {
             return outputs;
         }
 

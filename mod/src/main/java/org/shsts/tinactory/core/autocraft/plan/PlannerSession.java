@@ -3,45 +3,45 @@ package org.shsts.tinactory.core.autocraft.plan;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PlannerSession {
     final List<CraftAmount> targets;
     final PlannerLedger ledger;
+    final Map<IIngredientKey, Long> cachedAvailable;
     final List<CraftStep> steps;
     final List<SearchFrame> searchStack;
     int nextTargetIndex;
     long nextStepId;
     @Nullable
-    PlanResult result;
+    PlannerSnapshot result;
 
-    PlannerSession(List<CraftAmount> targets, List<CraftAmount> available) {
+    PlannerSession(List<CraftAmount> targets) {
         this.targets = List.copyOf(targets);
         this.ledger = new PlannerLedger();
+        this.cachedAvailable = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
         this.searchStack = new ArrayList<>();
-        for (var resource : available) {
-            ledger.add(resource.key(), resource.amount());
-        }
         this.nextTargetIndex = 0;
         this.nextStepId = 1L;
         this.result = null;
     }
 
     static final class SearchFrame {
-        final CraftKey key;
+        final IIngredientKey key;
         final long demand;
         final boolean rootDemand;
         long remaining;
         List<CraftPattern> candidates;
-        int candidateStartIndex;
         int candidateIndex;
         int inputIndex;
         long runs;
@@ -54,13 +54,12 @@ public final class PlannerSession {
         PlanError childError;
         Stage stage;
 
-        SearchFrame(CraftKey key, long demand, boolean rootDemand) {
+        SearchFrame(IIngredientKey key, long demand, boolean rootDemand) {
             this.key = key;
             this.demand = demand;
             this.rootDemand = rootDemand;
             this.remaining = 0L;
             this.candidates = List.of();
-            this.candidateStartIndex = 0;
             this.candidateIndex = 0;
             this.inputIndex = 0;
             this.runs = 0L;

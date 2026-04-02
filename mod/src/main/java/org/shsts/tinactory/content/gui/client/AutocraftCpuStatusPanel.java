@@ -4,7 +4,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.TextComponent;
-import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
+import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
@@ -13,6 +16,7 @@ import org.shsts.tinactory.core.gui.client.Widgets;
 
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 
@@ -46,15 +50,39 @@ public class AutocraftCpuStatusPanel extends Panel {
         }
     }
 
-    public void refreshSummary(List<AutocraftCpuSyncPacket.Row> rows) {
+    public void refreshSummary(List<CpuStatusEntry> rows) {
         var index = selectedIndex(rows.size());
         if (index.isEmpty()) {
             summary.setLine(0, new TextComponent("CPU index: select 0.." + Math.max(0, rows.size() - 1)));
             return;
         }
-        var row = rows.get(index.getAsInt());
-        var blocked = row.blockedReason().isEmpty() ? "-" : row.blockedReason();
+        var entry = rows.get(index.getAsInt());
         summary.setLine(0, new TextComponent("[" + index.getAsInt() + "] " +
-            row.cpuId() + " | " + row.targetSummary() + " | step " + row.currentStep() + " | blocked " + blocked));
+            entry.cpuId() + " | " + formatTargets(entry.targets()) + " | step " + formatStep(entry) +
+            " | error " + formatError(entry.error())));
+    }
+
+    private static String formatTargets(List<CraftAmount> targets) {
+        if (targets.isEmpty()) {
+            return "Idle";
+        }
+        return targets.stream()
+            .map(amount -> amount.amount() + "x " + amount.key())
+            .collect(Collectors.joining(", "));
+    }
+
+    private static String formatStep(CpuStatusEntry entry) {
+        if (entry.phase() == null) {
+            return entry.state().name();
+        }
+        if (entry.stepCount() <= 0) {
+            return entry.phase().name();
+        }
+        var displayIndex = entry.phase() == ExecutionPhase.TERMINAL ? entry.stepCount() : entry.nextStepIndex() + 1;
+        return displayIndex + "/" + entry.stepCount() + " " + entry.phase().name();
+    }
+
+    private static String formatError(ExecutionError error) {
+        return error == ExecutionError.NONE ? "-" : error.name();
     }
 }

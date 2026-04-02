@@ -1,18 +1,23 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,63 +25,63 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class GoalReductionPlannerErrorTest {
     @Test
     void plannerShouldDetectDirectCycle() {
-        var a = CraftKey.item("tinactory:a", "");
+        var a = TestIngredientKey.item("tinactory:a", "");
         var loop = pattern("tinactory:a_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(a, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(loop)));
+        var planner = new GoalReductionPlanner(repo(List.of(loop)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(a, 1)), List.of());
+        var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.CYCLE_DETECTED, result.error().code());
-        assertNotNull(result.error().cyclePath());
-        assertEquals(a, result.error().cyclePath().get(0));
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
+        assertNotNull(snapshot.error().cyclePath());
+        assertEquals(a, snapshot.error().cyclePath().get(0));
     }
 
     @Test
     void plannerShouldDetectIndirectCycleWithPath() {
-        var a = CraftKey.item("tinactory:a", "");
-        var b = CraftKey.item("tinactory:b", "");
-        var c = CraftKey.item("tinactory:c", "");
+        var a = TestIngredientKey.item("tinactory:a", "");
+        var b = TestIngredientKey.item("tinactory:b", "");
+        var c = TestIngredientKey.item("tinactory:c", "");
 
         var aFromB = pattern("tinactory:a_from_b", List.of(new CraftAmount(b, 1)), List.of(new CraftAmount(a, 1)));
         var bFromC = pattern("tinactory:b_from_c", List.of(new CraftAmount(c, 1)), List.of(new CraftAmount(b, 1)));
         var cFromA = pattern("tinactory:c_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(c, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(aFromB, bFromC, cFromA)));
+        var planner = new GoalReductionPlanner(repo(List.of(aFromB, bFromC, cFromA)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(a, 1)), List.of());
+        var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.CYCLE_DETECTED, result.error().code());
-        assertEquals(List.of(a, b, c, a), result.error().cyclePath());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
+        assertEquals(List.of(a, b, c, a), snapshot.error().cyclePath());
     }
 
     @Test
     void plannerShouldReportMissingPatternForTarget() {
-        var missing = CraftKey.item("tinactory:unknown", "");
-        var planner = new GoalReductionPlanner(repo(List.of()));
+        var missing = TestIngredientKey.item("tinactory:unknown", "");
+        var planner = new GoalReductionPlanner(repo(List.of()), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(missing, 1)), List.of());
+        var snapshot = planner.plan(List.of(new CraftAmount(missing, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
-        assertEquals(missing, result.error().targetKey());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.MISSING_PATTERN, snapshot.error().code());
+        assertEquals(missing, snapshot.error().targetKey());
     }
 
     @Test
     void plannerShouldReportUnsatisfiedBaseResource() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var gearPattern = pattern(
             "tinactory:gear_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
             List.of(new CraftAmount(gear, 1)));
-        var planner = new GoalReductionPlanner(repo(List.of(gearPattern)));
+        var planner = new GoalReductionPlanner(repo(List.of(gearPattern)), TestInventoryView.empty());
 
-        var result = planner.plan(List.of(new CraftAmount(gear, 1)), List.of());
+        var snapshot = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertEquals(false, result.isSuccess());
-        assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, result.error().code());
-        assertEquals(ingot, result.error().targetKey());
+        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
+        assertEquals(ingot, snapshot.error().targetKey());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -85,17 +90,63 @@ class GoalReductionPlannerErrorTest {
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
-        return key -> {
-            var out = new ArrayList<CraftPattern>();
-            for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
-                for (var output : pattern.outputs()) {
-                    if (output.key().equals(key)) {
-                        out.add(pattern);
-                        break;
+        return new IPatternRepository() {
+            @Override
+            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+                var out = new ArrayList<CraftPattern>();
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                    for (var output : pattern.outputs()) {
+                        if (output.key().equals(key)) {
+                            out.add(pattern);
+                            break;
+                        }
                     }
                 }
+                return out;
             }
-            return out;
+
+            @Override
+            public List<IIngredientKey> listRequestables() {
+                return patterns.stream()
+                    .flatMap(pattern -> pattern.outputs().stream())
+                    .map(CraftAmount::key)
+                    .distinct()
+                    .sorted()
+                    .toList();
+            }
+
+            @Override
+            public boolean containsPatternId(String patternId) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            }
+
+            @Override
+            public boolean addPattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removePattern(String patternId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean updatePattern(CraftPattern pattern) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean addCellPort(UUID machineId, int priority, int slotIndex, IPatternCellPort port) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int removeCellPorts(UUID machineId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {}
         };
     }
 }

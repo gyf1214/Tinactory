@@ -11,9 +11,9 @@ import java.util.UUID;
 public interface IMachineLease {
     UUID machineId();
 
-    List<IMachineInputRoute> inputRoutes();
+    List<IMachineRoute> inputRoutes();
 
-    List<IMachineOutputRoute> outputRoutes();
+    List<IMachineRoute> outputRoutes();
 
     boolean isValid();
 

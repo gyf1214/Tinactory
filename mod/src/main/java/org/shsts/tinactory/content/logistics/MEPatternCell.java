@@ -13,11 +13,13 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
-import org.shsts.tinactory.core.autocraft.integration.PatternCellPortState;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
+import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 
 import java.util.List;
 import java.util.function.Function;
@@ -67,7 +69,10 @@ public class MEPatternCell extends CapabilityItem {
 
         private PatternCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
-            this.state = new PatternCellPortState(bytesLimit);
+            this.state = new PatternCellPortState(
+                bytesLimit,
+                MachineConstraintCodecHelper.CODEC,
+                IngredientKeyCodecHelper.CODEC);
             this.patternCap = LazyOptional.of(() -> this);
         }
 

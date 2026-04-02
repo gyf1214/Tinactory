@@ -3,9 +3,11 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableKey;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.UUID;
@@ -22,43 +24,39 @@ public class AutocraftEventPacket implements IPacket {
 
     private Action action;
     @Nullable
-    private AutocraftRequestableKey target;
+    private IIngredientKey target;
     private long quantity;
     @Nullable
     private UUID cpuId;
-    @Nullable
-    private UUID planId;
 
     public AutocraftEventPacket() {}
 
     private AutocraftEventPacket(
         Action action,
-        @Nullable AutocraftRequestableKey target,
+        @Nullable IIngredientKey target,
         long quantity,
-        @Nullable UUID cpuId,
-        @Nullable UUID planId) {
+        @Nullable UUID cpuId) {
 
         this.action = action;
         this.target = target;
         this.quantity = quantity;
         this.cpuId = cpuId;
-        this.planId = planId;
     }
 
-    public static AutocraftEventPacket preview(AutocraftRequestableKey target, long quantity, UUID cpuId) {
-        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, cpuId, null);
+    public static AutocraftEventPacket preview(IIngredientKey target, long quantity) {
+        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, null);
     }
 
-    public static AutocraftEventPacket execute(UUID planId, UUID cpuId) {
-        return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId, planId);
+    public static AutocraftEventPacket execute(UUID cpuId) {
+        return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
     }
 
-    public static AutocraftEventPacket cancel(UUID planId) {
-        return new AutocraftEventPacket(Action.CANCEL, null, 0L, null, planId);
+    public static AutocraftEventPacket cancel() {
+        return new AutocraftEventPacket(Action.CANCEL, null, 0L, null);
     }
 
     public static AutocraftEventPacket cancelCpu(UUID cpuId) {
-        return new AutocraftEventPacket(Action.CANCEL_CPU, null, 0L, cpuId, null);
+        return new AutocraftEventPacket(Action.CANCEL_CPU, null, 0L, cpuId);
     }
 
     public Action action() {
@@ -66,7 +64,7 @@ public class AutocraftEventPacket implements IPacket {
     }
 
     @Nullable
-    public AutocraftRequestableKey target() {
+    public IIngredientKey target() {
         return target;
     }
 
@@ -79,40 +77,27 @@ public class AutocraftEventPacket implements IPacket {
         return cpuId;
     }
 
-    @Nullable
-    public UUID planId() {
-        return planId;
-    }
-
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(action);
         buf.writeBoolean(target != null);
         if (target != null) {
-            buf.writeEnum(target.type());
-            buf.writeUtf(target.id());
-            buf.writeUtf(target.nbt());
+            buf.writeNbt((CompoundTag) CodecHelper.encodeTag(IngredientKeyCodecHelper.CODEC, target));
         }
         buf.writeLong(quantity);
         buf.writeBoolean(cpuId != null);
         if (cpuId != null) {
             buf.writeUUID(cpuId);
         }
-        buf.writeBoolean(planId != null);
-        if (planId != null) {
-            buf.writeUUID(planId);
-        }
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        target = buf.readBoolean() ? new AutocraftRequestableKey(
-            buf.readEnum(CraftKey.Type.class),
-            buf.readUtf(),
-            buf.readUtf()) : null;
+        target = buf.readBoolean() ?
+            CodecHelper.parseTag(IngredientKeyCodecHelper.CODEC, buf.readNbt()) :
+            null;
         quantity = buf.readLong();
         cpuId = buf.readBoolean() ? buf.readUUID() : null;
-        planId = buf.readBoolean() ? buf.readUUID() : null;
     }
 }

@@ -1,0 +1,40 @@
+package org.shsts.tinactory.core.autocraft.exec;
+
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
+import org.shsts.tinactory.core.autocraft.api.JobState;
+import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+
+import java.util.Map;
+import java.util.UUID;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public record ExecutorSnapshot(
+    JobState state,
+    ExecutionPhase phase,
+    ExecutionError error,
+    @Nullable JobState pendingTerminalState,
+    CraftPlan plan,
+    int nextStepIndex,
+    Map<IIngredientKey, Long> stepBuffer,
+    Map<IIngredientKey, Long> stepProducedOutputs,
+    Map<IIngredientKey, Long> stepRequiredOutputs,
+    Map<IIngredientKey, Long> stepRequiredInputs,
+    Map<IIngredientKey, Long> transmittedInputs,
+    Map<IIngredientKey, Long> transmittedRequiredOutputs,
+    @Nullable UUID leasedMachineId) {
+
+    public ExecutorSnapshot {
+        error = error == null ? ExecutionError.NONE : error;
+        stepBuffer = Map.copyOf(stepBuffer);
+        stepProducedOutputs = Map.copyOf(stepProducedOutputs);
+        stepRequiredOutputs = Map.copyOf(stepRequiredOutputs);
+        stepRequiredInputs = Map.copyOf(stepRequiredInputs);
+        transmittedInputs = Map.copyOf(transmittedInputs);
+        transmittedRequiredOutputs = Map.copyOf(transmittedRequiredOutputs);
+    }
+}

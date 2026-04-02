@@ -17,7 +17,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.gui.client.SmeltingRecipeBookItem;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
-import org.shsts.tinactory.core.autocraft.integration.SmeltingRecipePatternSource;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
@@ -41,10 +40,12 @@ import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
 import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
+    private static final ResourceLocation RECIPE_TYPE_LOC = mcLoc("smelting");
     private static final Voltage BASE_VOLTAGE = Voltage.ULV;
 
     private final int inputPort;
@@ -102,7 +103,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
 
     @Override
     public ResourceLocation recipeTypeId() {
-        return SmeltingRecipePatternSource.SMELTING_RECIPE_TYPE_ID;
+        return RECIPE_TYPE_LOC;
     }
 
     @Override

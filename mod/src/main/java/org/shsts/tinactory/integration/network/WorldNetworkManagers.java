@@ -5,8 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import org.shsts.tinactory.core.network.NetworkManager;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.core.network.NetworkManager;
 import org.slf4j.Logger;
 
 import java.util.HashMap;

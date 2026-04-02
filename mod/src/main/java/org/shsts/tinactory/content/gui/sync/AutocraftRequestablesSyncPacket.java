@@ -2,10 +2,11 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableKey;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
@@ -15,34 +16,30 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftRequestablesSyncPacket implements IPacket {
-    private final List<AutocraftRequestableEntry> requestables = new ArrayList<>();
+    private final List<IIngredientKey> requestables = new ArrayList<>();
 
     public AutocraftRequestablesSyncPacket() {}
 
-    public AutocraftRequestablesSyncPacket(List<AutocraftRequestableEntry> requestables) {
+    public AutocraftRequestablesSyncPacket(List<IIngredientKey> requestables) {
         this.requestables.addAll(requestables);
     }
 
-    public List<AutocraftRequestableEntry> requestables() {
-        return List.copyOf(requestables);
+    public List<IIngredientKey> requestables() {
+        return requestables;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(requestables, (buf1, entry) -> {
-            buf1.writeEnum(entry.key().type());
-            buf1.writeUtf(entry.key().id());
-            buf1.writeUtf(entry.key().nbt());
-            buf1.writeLong(entry.producerCount());
-        });
+        buf.writeCollection(requestables,
+            (buf1, entry) ->
+                buf1.writeNbt((CompoundTag) CodecHelper.encodeTag(IngredientKeyCodecHelper.CODEC, entry)));
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         requestables.clear();
-        requestables.addAll(buf.readList(buf1 -> new AutocraftRequestableEntry(
-            new AutocraftRequestableKey(buf1.readEnum(CraftKey.Type.class), buf1.readUtf(), buf1.readUtf()),
-            buf1.readLong())));
+        requestables.addAll(
+            buf.readList(buf1 -> CodecHelper.parseTag(IngredientKeyCodecHelper.CODEC, buf1.readNbt())));
     }
 
     @Override

@@ -18,8 +18,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
-import org.shsts.tinactory.core.autocraft.integration.IPatternCellPort;
-import org.shsts.tinactory.core.autocraft.integration.NetworkPatternCell;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.CombinedPort;
@@ -52,6 +51,7 @@ import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
@@ -200,9 +200,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         combinedFluids.setComposes(fluids);
         if (machine != null) {
             machine.network().ifPresent(network -> {
-                var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-                logistics.unregisterPatternCells(machine.uuid());
-                var subnet = network.getSubnet(blockEntity.getBlockPos());
+                var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
+                patternRepository.removeCellPorts(machine.uuid());
                 var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
                 for (var i = 0; i < slots; i++) {
                     var stack = storages.getStackInSlot(i);
@@ -211,8 +210,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
                     }
                     var slotIndex = i;
                     stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
-                        logistics.registerPatternCell(new NetworkPatternCell(
-                            machine.uuid(), subnet, priority, slotIndex, port)));
+                        patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
                 }
             });
         }

@@ -1,19 +1,22 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
+import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
-import org.shsts.tinactory.core.autocraft.api.IMachineInputRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
-import org.shsts.tinactory.core.autocraft.api.IMachineOutputRoute;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionState;
+import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
+import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
-import org.shsts.tinactory.core.autocraft.model.CraftPattern;
-import org.shsts.tinactory.core.autocraft.model.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
@@ -30,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CraftExecutorTest {
     @Test
     void executorShouldRunPlanSequentiallyThroughMachineRoutes() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
 
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var events = new RecordingEvents();
@@ -52,7 +55,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertTrue(inventory.insertCalls > 0);
         assertEquals(List.of("start:s1", "done:s1", "start:s2", "done:s2"), events.events);
@@ -60,8 +63,8 @@ class CraftExecutorTest {
 
     @Test
     void executorShouldBlockWhenPreconditionsMissing() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of());
         var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
@@ -72,14 +75,14 @@ class CraftExecutorTest {
 
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.BLOCKED, executor.state());
-        assertEquals("s1", executor.error().stepId());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
     }
 
     @Test
     void executorShouldCancelRunningJob() {
-        var ingot = CraftKey.item("tinactory:ingot", "");
-        var plate = CraftKey.item("tinactory:plate", "");
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
@@ -91,16 +94,17 @@ class CraftExecutorTest {
         executor.cancel();
         executor.runCycle(64);
 
-        assertEquals(ExecutionState.CANCELLED, executor.state());
+        assertEquals(JobState.CANCELLED, executor.snapshot().state());
+        assertEquals(ExecutionError.NONE, executor.snapshot().error());
         assertEquals(0L, inventory.amountOf(plate));
     }
 
     @Test
     void executorShouldRetainIntermediateOutputsAndFlushFinalSurplus() {
-        var ore = CraftKey.item("tinactory:ore", "");
-        var part = CraftKey.item("tinactory:part", "");
-        var waste = CraftKey.item("tinactory:waste", "");
-        var gear = CraftKey.item("tinactory:gear", "");
+        var ore = TestIngredientKey.item("tinactory:ore", "");
+        var part = TestIngredientKey.item("tinactory:part", "");
+        var waste = TestIngredientKey.item("tinactory:waste", "");
+        var gear = TestIngredientKey.item("tinactory:gear", "");
         var inventory = new FakeInventory(Map.of(ore, 1L));
         var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var firstStep = new CraftStep(
@@ -127,11 +131,32 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(ExecutionState.COMPLETED, executor.state());
+        assertEquals(JobState.COMPLETED, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(1L, inventory.amountOf(waste));
         assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+    }
+
+    @Test
+    void snapshotShouldExposeExecutionStateThroughSinglePayload() {
+        var ingot = TestIngredientKey.item("tinactory:ingot", "");
+        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ingot, 2L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
+            1);
+
+        executor.start(new CraftPlan(List.of(step)));
+
+        var snapshot = executor.snapshot();
+
+        assertEquals(JobState.RUNNING, snapshot.state());
+        assertEquals(ExecutionPhase.RUN_STEP, snapshot.phase());
+        assertEquals(0, snapshot.nextStepIndex());
+        assertEquals(1, snapshot.plan().steps().size());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -140,21 +165,21 @@ class CraftExecutorTest {
     }
 
     private static final class FakeInventory implements IInventoryView {
-        private final Map<CraftKey, Long> stock = new HashMap<>();
-        private final Map<CraftKey, Integer> extractCallsByKey = new HashMap<>();
+        private final Map<IIngredientKey, Long> stock = new HashMap<>();
+        private final Map<IIngredientKey, Integer> extractCallsByKey = new HashMap<>();
         private int insertCalls;
 
-        private FakeInventory(Map<CraftKey, Long> initial) {
+        private FakeInventory(Map<IIngredientKey, Long> initial) {
             stock.putAll(initial);
         }
 
         @Override
-        public long amountOf(CraftKey key) {
+        public long amountOf(IIngredientKey key) {
             return stock.getOrDefault(key, 0L);
         }
 
         @Override
-        public long extract(CraftKey key, long amount, boolean simulate) {
+        public long extract(IIngredientKey key, long amount, boolean simulate) {
             var available = amountOf(key);
             var moved = Math.min(available, amount);
             if (!simulate && moved > 0L) {
@@ -165,7 +190,7 @@ class CraftExecutorTest {
         }
 
         @Override
-        public long insert(CraftKey key, long amount, boolean simulate) {
+        public long insert(IIngredientKey key, long amount, boolean simulate) {
             var moved = Math.max(0L, amount);
             if (!simulate && moved > 0L) {
                 insertCalls++;
@@ -203,25 +228,30 @@ class CraftExecutorTest {
 
     private static final class SimulatedLease implements IMachineLease {
         private final UUID machineId = UUID.randomUUID();
-        private final Map<CraftKey, Long> pushed = new HashMap<>();
-        private final Map<CraftKey, Long> produced = new HashMap<>();
-        private final Map<CraftKey, Long> requiredInputs = new HashMap<>();
-        private final List<IMachineInputRoute> inputRoutes;
-        private final List<IMachineOutputRoute> outputRoutes;
+        private final Map<IIngredientKey, Long> pushed = new HashMap<>();
+        private final Map<IIngredientKey, Long> produced = new HashMap<>();
+        private final Map<IIngredientKey, Long> requiredInputs = new HashMap<>();
+        private final List<IMachineRoute> inputRoutes;
+        private final List<IMachineRoute> outputRoutes;
         private boolean released;
 
         private SimulatedLease(CraftStep step) {
             for (var input : step.pattern().inputs()) {
                 requiredInputs.put(input.key(), input.amount() * step.runs());
             }
-            inputRoutes = step.pattern().inputs().stream().map(input -> (IMachineInputRoute) new IMachineInputRoute() {
+            inputRoutes = step.pattern().inputs().stream().map(input -> (IMachineRoute) new IMachineRoute() {
                 @Override
-                public CraftKey key() {
+                public IIngredientKey key() {
                     return input.key();
                 }
 
                 @Override
-                public long push(long amount, boolean simulate) {
+                public PortDirection direction() {
+                    return PortDirection.INPUT;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
                     var moved = Math.max(0L, amount);
                     if (!simulate && moved > 0L) {
                         pushed.merge(input.key(), moved, Long::sum);
@@ -231,14 +261,19 @@ class CraftExecutorTest {
                 }
             }).toList();
             outputRoutes = step.pattern().outputs().stream()
-                .map(output -> (IMachineOutputRoute) new IMachineOutputRoute() {
+                .map(output -> (IMachineRoute) new IMachineRoute() {
                     @Override
-                    public CraftKey key() {
+                    public IIngredientKey key() {
                         return output.key();
                     }
 
                     @Override
-                    public long pull(long amount, boolean simulate) {
+                    public PortDirection direction() {
+                        return PortDirection.OUTPUT;
+                    }
+
+                    @Override
+                    public long transfer(long amount, boolean simulate) {
                         var available = produced.getOrDefault(output.key(), 0L);
                         var moved = Math.min(Math.max(0L, amount), available);
                         if (!simulate && moved > 0L) {
@@ -268,12 +303,12 @@ class CraftExecutorTest {
         }
 
         @Override
-        public List<IMachineInputRoute> inputRoutes() {
+        public List<IMachineRoute> inputRoutes() {
             return inputRoutes;
         }
 
         @Override
-        public List<IMachineOutputRoute> outputRoutes() {
+        public List<IMachineRoute> outputRoutes() {
             return outputRoutes;
         }
 

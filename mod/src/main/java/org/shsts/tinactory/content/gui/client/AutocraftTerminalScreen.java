@@ -13,7 +13,9 @@ import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftRequestableEntry;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -36,11 +38,11 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private final AutocraftPreviewPanel previewPanel;
     private final Tab tabs;
 
-    private List<AutocraftRequestableEntry> requestables = List.of();
+    private List<IIngredientKey> requestables = List.of();
     private List<UUID> availableCpus = List.of();
-    private List<AutocraftCpuSyncPacket.Row> cpuStatuses = List.of();
-    @Nullable
-    private UUID previewPlanId;
+    private List<CpuStatusEntry> availableCpuStatuses = List.of();
+    private List<CpuStatusEntry> cpuStatuses = List.of();
+    private AutocraftPreviewSyncPacket.PreviewState previewState = AutocraftPreviewSyncPacket.PreviewState.EMPTY;
 
     public AutocraftTerminalScreen(AutocraftTerminalMenu menu, Component title) {
         super(menu, title);
@@ -64,31 +66,29 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     public void requestPreview() {
         var targetIndex = requestPanel.targetIndex(requestables.size());
-        var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
         var quantity = requestPanel.quantity();
-        if (targetIndex.isEmpty() || cpuIndex.isEmpty() || quantity.isEmpty()) {
+        if (targetIndex.isEmpty() || quantity.isEmpty()) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftEventPacket.preview(
-            requestables.get(targetIndex.getAsInt()).key(),
-            quantity.getAsLong(),
-            availableCpus.get(cpuIndex.getAsInt())));
+            requestables.get(targetIndex.getAsInt()),
+            quantity.getAsLong()));
     }
 
     public void executePreview() {
         var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
-        if (previewPlanId == null || cpuIndex.isEmpty()) {
+        if (previewState != AutocraftPreviewSyncPacket.PreviewState.PREVIEW_READY || cpuIndex.isEmpty()) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION,
-            () -> AutocraftEventPacket.execute(previewPlanId, availableCpus.get(cpuIndex.getAsInt())));
+            () -> AutocraftEventPacket.execute(availableCpus.get(cpuIndex.getAsInt())));
     }
 
     public void cancelPreview() {
-        if (previewPlanId == null) {
+        if (previewState == AutocraftPreviewSyncPacket.PreviewState.EMPTY) {
             return;
         }
-        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftEventPacket.cancel(previewPlanId));
+        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, AutocraftEventPacket::cancel);
     }
 
     public void cancelCpuJob() {
@@ -109,36 +109,38 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     private void onCpuStatusSync(AutocraftCpuSyncPacket packet) {
-        cpuStatuses = packet.rows();
-        availableCpus = cpuStatuses.stream()
-            .filter(AutocraftCpuSyncPacket.Row::available)
-            .map(AutocraftCpuSyncPacket.Row::cpuId)
+        cpuStatuses = packet.entries();
+        availableCpuStatuses = cpuStatuses.stream()
+            .filter(CpuStatusEntry::available)
+            .toList();
+        availableCpus = availableCpuStatuses.stream()
+            .map(CpuStatusEntry::cpuId)
             .toList();
         refreshRequestTitle();
         cpuStatusPanel.refreshSummary(cpuStatuses);
     }
 
     private void onPreviewSync(AutocraftPreviewSyncPacket packet) {
-        previewPlanId = packet.planId();
-        if (packet.previewError() != null) {
-            previewPanel.setSummary(new TextComponent("Preview error: " + packet.previewError().name()));
-            return;
-        }
-        if (packet.executeError() != null) {
-            previewPanel.setSummary(new TextComponent("Execute error: " + packet.executeError().name()));
-            return;
-        }
-        if (previewPlanId != null) {
-            previewPanel.setSummary(new TextComponent(
-                "Plan " + previewPlanId + " outputs: " + packet.summaryOutputs().size()));
-        } else {
-            previewPanel.setSummary(new TextComponent("No Preview"));
+        previewState = packet.state();
+        switch (packet.state()) {
+            case EMPTY -> previewPanel.setSummary(new TextComponent("No Preview"));
+            case PREVIEW_READY -> previewPanel.setSummary(
+                new TextComponent("Plan outputs: " + packet.targets().size()));
+            case PREVIEW_FAILED -> previewPanel.setSummary(
+                new TextComponent("Preview error: " + formatPlanError(packet.error())));
         }
     }
 
     private void refreshRequestTitle() {
         requestPanel.setTitle(new TextComponent(
             "Requestables: " + requestables.size() + ", CPUs: " + availableCpus.size()));
-        requestPanel.updateSelectionSummary(requestables, availableCpus);
+        requestPanel.updateSelectionSummary(requestables, availableCpuStatuses);
+    }
+
+    private static String formatPlanError(@Nullable PlanError error) {
+        if (error == null) {
+            return PlanError.Code.NONE.name();
+        }
+        return error.code().name();
     }
 }

@@ -1,98 +1,185 @@
 package org.shsts.tinactory.content.gui.sync;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftExecuteErrorCode;
-import org.shsts.tinactory.core.autocraft.integration.AutocraftPreviewErrorCode;
-import org.shsts.tinactory.core.autocraft.model.CraftAmount;
-import org.shsts.tinactory.core.autocraft.model.CraftKey;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
+import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftPreviewSyncPacket implements IPacket {
+    private final Codec<IIngredientKey> ingredientKeyCodec;
+    private PreviewState state = PreviewState.EMPTY;
     @Nullable
-    private UUID planId;
-    private final List<CraftAmount> summaryOutputs = new ArrayList<>();
+    private List<CraftAmount> targets;
     @Nullable
-    private AutocraftPreviewErrorCode previewError;
-    @Nullable
-    private AutocraftExecuteErrorCode executeError;
+    private PlanError error;
 
-    public AutocraftPreviewSyncPacket() {}
+    public AutocraftPreviewSyncPacket() {
+        this(IngredientKeyCodecHelper.CODEC);
+    }
 
-    public AutocraftPreviewSyncPacket(
-        @Nullable UUID planId,
-        List<CraftAmount> summaryOutputs,
-        @Nullable AutocraftPreviewErrorCode previewError,
-        @Nullable AutocraftExecuteErrorCode executeError) {
+    public AutocraftPreviewSyncPacket(Codec<IIngredientKey> ingredientKeyCodec) {
+        this.ingredientKeyCodec = ingredientKeyCodec;
+    }
 
-        this.planId = planId;
-        this.summaryOutputs.addAll(summaryOutputs);
-        this.previewError = previewError;
-        this.executeError = executeError;
+    private AutocraftPreviewSyncPacket(
+        Codec<IIngredientKey> ingredientKeyCodec,
+        PreviewState state,
+        @Nullable List<CraftAmount> targets,
+        @Nullable PlanError error) {
+        this.ingredientKeyCodec = ingredientKeyCodec;
+        this.state = state;
+        this.targets = targets != null ? List.copyOf(targets) : null;
+        this.error = error;
+    }
+
+    public static AutocraftPreviewSyncPacket of(AutocraftPreviewResult result) {
+        if (result.isSuccess()) {
+            return ready(result.targets());
+        }
+        if (!result.isEmpty()) {
+            return failed(result.error());
+        }
+        return empty();
+    }
+
+    public static AutocraftPreviewSyncPacket empty() {
+        return new AutocraftPreviewSyncPacket(IngredientKeyCodecHelper.CODEC, PreviewState.EMPTY, null, null);
+    }
+
+    public static AutocraftPreviewSyncPacket ready(List<CraftAmount> targets) {
+        return new AutocraftPreviewSyncPacket(
+            IngredientKeyCodecHelper.CODEC,
+            PreviewState.PREVIEW_READY,
+            targets,
+            null);
+    }
+
+    public static AutocraftPreviewSyncPacket failed(PlanError error) {
+        return new AutocraftPreviewSyncPacket(
+            IngredientKeyCodecHelper.CODEC,
+            PreviewState.PREVIEW_FAILED,
+            null,
+            error);
+    }
+
+    public static AutocraftPreviewSyncPacket empty(Codec<IIngredientKey> ingredientKeyCodec) {
+        return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.EMPTY, null, null);
+    }
+
+    public static AutocraftPreviewSyncPacket ready(
+        Codec<IIngredientKey> ingredientKeyCodec,
+        List<CraftAmount> targets) {
+        return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.PREVIEW_READY, targets, null);
+    }
+
+    public static AutocraftPreviewSyncPacket failed(Codec<IIngredientKey> ingredientKeyCodec, PlanError error) {
+        return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.PREVIEW_FAILED, null, error);
+    }
+
+    public PreviewState state() {
+        return state;
     }
 
     @Nullable
-    public UUID planId() {
-        return planId;
-    }
-
-    public List<CraftAmount> summaryOutputs() {
-        return List.copyOf(summaryOutputs);
+    public List<CraftAmount> targets() {
+        return targets;
     }
 
     @Nullable
-    public AutocraftPreviewErrorCode previewError() {
-        return previewError;
-    }
-
-    @Nullable
-    public AutocraftExecuteErrorCode executeError() {
-        return executeError;
+    public PlanError error() {
+        return error;
     }
 
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeBoolean(planId != null);
-        if (planId != null) {
-            buf.writeUUID(planId);
+        buf.writeEnum(state);
+        buf.writeBoolean(targets != null);
+        if (targets != null) {
+            buf.writeCollection(targets, (buf1, amount) -> {
+                buf1.writeNbt(encodeIngredientKey(ingredientKeyCodec, amount.key()));
+                buf1.writeLong(amount.amount());
+            });
         }
-        buf.writeCollection(summaryOutputs, (buf1, amount) -> {
-            buf1.writeEnum(amount.key().type());
-            buf1.writeUtf(amount.key().id());
-            buf1.writeUtf(amount.key().nbt());
-            buf1.writeLong(amount.amount());
-        });
-        buf.writeBoolean(previewError != null);
-        if (previewError != null) {
-            buf.writeEnum(previewError);
-        }
-        buf.writeBoolean(executeError != null);
-        if (executeError != null) {
-            buf.writeEnum(executeError);
+        buf.writeBoolean(error != null);
+        if (error != null) {
+            buf.writeNbt(serializeError(error, ingredientKeyCodec));
         }
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        planId = buf.readBoolean() ? buf.readUUID() : null;
-        summaryOutputs.clear();
-        summaryOutputs.addAll(buf.readList(buf1 -> {
-            var type = buf1.readEnum(CraftKey.Type.class);
-            var id = buf1.readUtf();
-            var nbt = buf1.readUtf();
+        state = buf.readEnum(PreviewState.class);
+        targets = buf.readBoolean() ? buf.readList(buf1 -> {
+            var key = decodeIngredientKey(ingredientKeyCodec, buf1.readNbt());
             var amount = buf1.readLong();
-            var key = type == CraftKey.Type.FLUID ? CraftKey.fluid(id, nbt) : CraftKey.item(id, nbt);
             return new CraftAmount(key, amount);
-        }));
-        previewError = buf.readBoolean() ? buf.readEnum(AutocraftPreviewErrorCode.class) : null;
-        executeError = buf.readBoolean() ? buf.readEnum(AutocraftExecuteErrorCode.class) : null;
+        }) : null;
+        error = buf.readBoolean() ? deserializeError(buf.readNbt(), ingredientKeyCodec) : null;
+    }
+
+    private static CompoundTag serializeError(PlanError error, Codec<IIngredientKey> ingredientKeyCodec) {
+        var tag = new CompoundTag();
+        tag.putString("code", error.code().name());
+        if (error.targetKey() != null) {
+            tag.put("targetKey", encodeIngredientKey(ingredientKeyCodec, error.targetKey()));
+        }
+        var cyclePath = new ListTag();
+        for (var key : error.cyclePath()) {
+            cyclePath.add(encodeIngredientKey(ingredientKeyCodec, key));
+        }
+        tag.put("cyclePath", cyclePath);
+        return tag;
+    }
+
+    private static PlanError deserializeError(@Nullable CompoundTag tag, Codec<IIngredientKey> ingredientKeyCodec) {
+        if (tag == null) {
+            return PlanError.none();
+        }
+        var cyclePathTag = tag.getList("cyclePath", TAG_COMPOUND);
+        var cyclePath = new java.util.ArrayList<org.shsts.tinactory.core.logistics.IIngredientKey>(cyclePathTag.size());
+        for (var i = 0; i < cyclePathTag.size(); i++) {
+            cyclePath.add(decodeIngredientKey(ingredientKeyCodec, cyclePathTag.getCompound(i)));
+        }
+        var targetKey = tag.contains("targetKey", TAG_COMPOUND) ?
+            decodeIngredientKey(ingredientKeyCodec, tag.getCompound("targetKey")) :
+            null;
+        return new PlanError(PlanError.Code.valueOf(tag.getString("code")), targetKey, cyclePath);
+    }
+
+    private static CompoundTag encodeIngredientKey(Codec<IIngredientKey> ingredientKeyCodec, IIngredientKey key) {
+        var tag = new CompoundTag();
+        tag.put("value", CodecHelper.encodeTag(ingredientKeyCodec, key));
+        return tag;
+    }
+
+    private static IIngredientKey decodeIngredientKey(
+        Codec<IIngredientKey> ingredientKeyCodec,
+        @Nullable CompoundTag tag) {
+        if (tag == null) {
+            throw new IllegalArgumentException("Missing ingredient key payload");
+        }
+        return CodecHelper.parseTag(ingredientKeyCodec, tag.get("value"));
+    }
+
+    public enum PreviewState {
+        EMPTY,
+        PREVIEW_READY,
+        PREVIEW_FAILED
     }
 }
