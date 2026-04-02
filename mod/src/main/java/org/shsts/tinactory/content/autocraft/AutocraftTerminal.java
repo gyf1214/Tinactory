@@ -34,7 +34,6 @@ public class AutocraftTerminal extends MEStorageAccess {
         super.onConnect(network);
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         service = AutocraftServiceBootstrap.createTerminalService(
-            blockEntity,
             autocraft,
             combinedItem,
             combinedFluid);
