@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -33,7 +33,7 @@ public class AutocraftRequestPanel extends Panel {
         super(screen);
         this.title = new Label(menu, new TextComponent("Autocraft Request"));
         this.targetSummary = new Label(menu, new TextComponent("Target: not selected"));
-        this.cpuSummary = new Label(menu, new TextComponent("CPU: not selected"));
+        this.cpuSummary = new Label(menu, new TextComponent("CPU: optional until execute"));
         this.quantityInput = Widgets.editBox();
         this.targetIndexInput = Widgets.editBox();
         this.cpuIndexInput = Widgets.editBox();
@@ -70,7 +70,7 @@ public class AutocraftRequestPanel extends Panel {
 
     public void updateSelectionSummary(
         List<IIngredientKey> requestables,
-        List<AutocraftTerminalService.CpuStatusEntry> cpus) {
+        List<CpuStatusEntry> cpus) {
         targetSummary.setLine(0, new TextComponent(formatTargetSummary(requestables)));
         cpuSummary.setLine(0, new TextComponent(formatCpuSummary(cpus)));
     }
@@ -97,10 +97,10 @@ public class AutocraftRequestPanel extends Panel {
         return "Target[" + index.getAsInt() + "]: " + key;
     }
 
-    private String formatCpuSummary(List<AutocraftTerminalService.CpuStatusEntry> cpus) {
+    private String formatCpuSummary(List<CpuStatusEntry> cpus) {
         var index = cpuIndex(cpus.size());
         if (index.isEmpty()) {
-            return "CPU index: select 0.." + Math.max(0, cpus.size() - 1);
+            return "CPU index: optional for execute 0.." + Math.max(0, cpus.size() - 1);
         }
         var cpu = cpus.get(index.getAsInt());
         return "CPU[" + index.getAsInt() + "]: " + cpu.cpuId() + " (" + cpu.state().name() + ")";

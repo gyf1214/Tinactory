@@ -43,8 +43,8 @@ public class AutocraftEventPacket implements IPacket {
         this.cpuId = cpuId;
     }
 
-    public static AutocraftEventPacket preview(IIngredientKey target, long quantity, UUID cpuId) {
-        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, cpuId);
+    public static AutocraftEventPacket preview(IIngredientKey target, long quantity) {
+        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, null);
     }
 
     public static AutocraftEventPacket execute(UUID cpuId) {

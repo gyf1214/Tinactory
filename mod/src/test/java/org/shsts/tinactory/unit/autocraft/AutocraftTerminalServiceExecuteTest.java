@@ -25,6 +25,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
 import java.util.ArrayList;
@@ -152,6 +153,7 @@ class AutocraftTerminalServiceExecuteTest {
         var statuses = service.listCpuStatuses();
 
         assertEquals(1, statuses.size());
+        assertTrue(statuses.get(0) instanceof CpuStatusEntry);
         assertEquals(cpu, statuses.get(0).cpuId());
         assertFalse(statuses.get(0).available());
         assertEquals(targets, statuses.get(0).targets());

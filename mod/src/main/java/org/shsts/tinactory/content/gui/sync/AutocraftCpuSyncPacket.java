@@ -9,7 +9,7 @@ import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
@@ -23,7 +23,7 @@ import java.util.Objects;
 @MethodsReturnNonnullByDefault
 public class AutocraftCpuSyncPacket implements IPacket {
     private final Codec<IIngredientKey> ingredientKeyCodec;
-    private final List<AutocraftTerminalService.CpuStatusEntry> entries = new ArrayList<>();
+    private final List<CpuStatusEntry> entries = new ArrayList<>();
 
     public AutocraftCpuSyncPacket() {
         this(IngredientKeyCodecHelper.CODEC);
@@ -33,18 +33,18 @@ public class AutocraftCpuSyncPacket implements IPacket {
         this.ingredientKeyCodec = ingredientKeyCodec;
     }
 
-    public AutocraftCpuSyncPacket(List<AutocraftTerminalService.CpuStatusEntry> entries) {
+    public AutocraftCpuSyncPacket(List<CpuStatusEntry> entries) {
         this(IngredientKeyCodecHelper.CODEC, entries);
     }
 
     public AutocraftCpuSyncPacket(
         Codec<IIngredientKey> ingredientKeyCodec,
-        List<AutocraftTerminalService.CpuStatusEntry> entries) {
+        List<CpuStatusEntry> entries) {
         this.ingredientKeyCodec = ingredientKeyCodec;
         this.entries.addAll(entries);
     }
 
-    public List<AutocraftTerminalService.CpuStatusEntry> entries() {
+    public List<CpuStatusEntry> entries() {
         return List.copyOf(entries);
     }
 
@@ -72,7 +72,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         entries.clear();
-        entries.addAll(buf.readList(buf1 -> new AutocraftTerminalService.CpuStatusEntry(
+        entries.addAll(buf.readList(buf1 -> new CpuStatusEntry(
             buf1.readUUID(),
             buf1.readBoolean(),
             buf1.readList(buf2 -> {

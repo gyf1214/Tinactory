@@ -1,15 +1,12 @@
 package org.shsts.tinactory.core.autocraft.service;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 
@@ -133,32 +130,4 @@ public class AutocraftTerminalService {
             state == JobState.RUNNING || state == JobState.BLOCKED);
     }
 
-    public record CpuStatusEntry(
-        UUID cpuId,
-        boolean available,
-        List<CraftAmount> targets,
-        JobState state,
-        @Nullable ExecutionPhase phase,
-        int nextStepIndex,
-        int stepCount,
-        ExecutionError error,
-        boolean cancellable) {
-
-        public CpuStatusEntry {
-            targets = List.copyOf(targets);
-        }
-
-        public static CpuStatusEntry idle(UUID cpuId, boolean available) {
-            return new CpuStatusEntry(
-                cpuId,
-                available,
-                List.of(),
-                JobState.IDLE,
-                null,
-                0,
-                0,
-                ExecutionError.NONE,
-                false);
-        }
-    }
 }

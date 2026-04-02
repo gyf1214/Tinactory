@@ -14,7 +14,7 @@ import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.logistics.IIngredientKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -40,8 +40,8 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     private List<IIngredientKey> requestables = List.of();
     private List<UUID> availableCpus = List.of();
-    private List<AutocraftTerminalService.CpuStatusEntry> availableCpuStatuses = List.of();
-    private List<AutocraftTerminalService.CpuStatusEntry> cpuStatuses = List.of();
+    private List<CpuStatusEntry> availableCpuStatuses = List.of();
+    private List<CpuStatusEntry> cpuStatuses = List.of();
     private AutocraftPreviewSyncPacket.PreviewState previewState = AutocraftPreviewSyncPacket.PreviewState.EMPTY;
 
     public AutocraftTerminalScreen(AutocraftTerminalMenu menu, Component title) {
@@ -66,15 +66,13 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
 
     public void requestPreview() {
         var targetIndex = requestPanel.targetIndex(requestables.size());
-        var cpuIndex = requestPanel.cpuIndex(availableCpus.size());
         var quantity = requestPanel.quantity();
-        if (targetIndex.isEmpty() || cpuIndex.isEmpty() || quantity.isEmpty()) {
+        if (targetIndex.isEmpty() || quantity.isEmpty()) {
             return;
         }
         menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> AutocraftEventPacket.preview(
             requestables.get(targetIndex.getAsInt()),
-            quantity.getAsLong(),
-            availableCpus.get(cpuIndex.getAsInt())));
+            quantity.getAsLong()));
     }
 
     public void executePreview() {
@@ -113,10 +111,10 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private void onCpuStatusSync(AutocraftCpuSyncPacket packet) {
         cpuStatuses = packet.entries();
         availableCpuStatuses = cpuStatuses.stream()
-            .filter(AutocraftTerminalService.CpuStatusEntry::available)
+            .filter(CpuStatusEntry::available)
             .toList();
         availableCpus = availableCpuStatuses.stream()
-            .map(AutocraftTerminalService.CpuStatusEntry::cpuId)
+            .map(CpuStatusEntry::cpuId)
             .toList();
         refreshRequestTitle();
         cpuStatusPanel.refreshSummary(cpuStatuses);
