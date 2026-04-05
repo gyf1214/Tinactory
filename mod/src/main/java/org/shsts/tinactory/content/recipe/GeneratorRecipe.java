@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
@@ -27,15 +26,15 @@ public class GeneratorRecipe extends DisplayInputRecipe {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
+    public boolean matches(IMachine machine) {
         if (exactVoltage) {
-            return super.matches(machine, world);
+            return super.matches(machine);
         }
         var machineVoltage = (long) machine.electric().map(IElectricMachine::getVoltage).orElse(0L);
         if (machineVoltage < voltage) {
             return false;
         }
-        return matches(machine, world, (int) (machineVoltage / voltage));
+        return matches(machine, (int) (machineVoltage / voltage));
     }
 
     @Override

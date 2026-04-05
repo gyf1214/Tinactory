@@ -88,7 +88,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         if (processing.isPresent()) {
             var recipe = processing.get();
             setFilterRecipe(machine, recipe);
-            if (recipe.matches(machine, world)) {
+            if (recipe.matches(machine)) {
                 var random = world.random;
                 emptyRecipe = random.nextDouble() > recipe.rate;
                 return processing;

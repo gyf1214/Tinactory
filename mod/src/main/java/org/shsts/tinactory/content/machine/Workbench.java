@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
@@ -195,6 +196,12 @@ public class Workbench extends CapabilityProvider implements
             return;
         }
         output = stack;
+    }
+
+    public Level world() {
+        var ret = blockEntity.getLevel();
+        assert ret != null;
+        return ret;
     }
 
     public void onTake(Player player, ItemStack stack) {

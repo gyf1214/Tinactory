@@ -9,7 +9,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -131,16 +130,16 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
-        return matches(machine, world, 1);
+    public boolean matches(IMachine machine) {
+        return matches(machine, 1);
     }
 
-    public boolean matches(IMachine machine, Level world, int parallel) {
+    public boolean matches(IMachine machine, int parallel) {
         var container = machine.container();
         var autoVoid = machine.config().getBoolean(VOID_KEY, VOID_DEFAULT);
         return canCraft(machine) && container
             .filter($ -> matchInputs(machine, $, parallel) &&
-                (autoVoid || matchOutputs(machine, $, parallel, world.random)))
+                (autoVoid || matchOutputs(machine, $, parallel, machine.random())))
             .isPresent();
     }
 

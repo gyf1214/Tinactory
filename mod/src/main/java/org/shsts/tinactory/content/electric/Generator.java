@@ -24,7 +24,7 @@ public class Generator extends ProcessingMachine<ProcessingRecipe> {
         var r = maxParallel + 1;
         while (r - l > 1) {
             var m = (l + r) / 2;
-            if (recipe.matches(machine, world, m * recipeParallel)) {
+            if (recipe.matches(machine, m * recipeParallel)) {
                 l = m;
             } else {
                 r = m;

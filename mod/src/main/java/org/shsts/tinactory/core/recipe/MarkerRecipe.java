@@ -15,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -77,7 +76,7 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world, int parallel) {
+    public boolean matches(IMachine machine, int parallel) {
         return false;
     }
 

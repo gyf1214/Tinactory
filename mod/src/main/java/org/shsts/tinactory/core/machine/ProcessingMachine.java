@@ -251,7 +251,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         var processing = recipeManager.byLoc(recipeType, target);
         if (processing.isPresent()) {
             setFilterRecipe(machine, processing.get());
-            return processing.filter($ -> $.matches(machine, world));
+            return processing.filter($ -> $.matches(machine));
         }
 
         var marker = recipeManager.byLoc(MARKER, target);
@@ -273,7 +273,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         var r = maxParallel + 1;
         while (r - l > 1) {
             var m = (l + r) / 2;
-            if (recipe.matches(machine, world, m)) {
+            if (recipe.matches(machine, m)) {
                 l = m;
             } else {
                 r = m;

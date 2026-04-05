@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -50,6 +51,10 @@ public interface IMachine {
         var ret = blockEntity().getLevel();
         assert ret != null;
         return ret;
+    }
+
+    default Random random() {
+        return world().random;
     }
 
     Optional<BlockState> workBlock();
