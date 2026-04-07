@@ -91,7 +91,7 @@ class ProcessingObjectCodecTest {
         var roundTrip = serializer.fromJson(type, loc, json, ICondition.IContext.EMPTY);
 
         assertEquals(recipe.markerOutputs, roundTrip.markerOutputs);
-        assertInstanceOf(FakeIngredient.class, roundTrip.getDisplayObject());
+        assertInstanceOf(FakeIngredient.class, roundTrip.displayIngredient().orElseThrow());
     }
 
     private record FakeIngredient(String key, int amount) implements IProcessingIngredient {

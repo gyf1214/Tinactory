@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -17,23 +16,16 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.gui.client.IRectRenderable;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,37 +163,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
-    }
-
-    protected Optional<String> getDescriptionId() {
-        return Optional.empty();
-    }
-
-    public Optional<List<Component>> getDescription() {
-        return getDescriptionId().map($ -> List.of((Component) I18n.tr($)))
-            .or(() -> ProcessingResults.mapItemOrFluid(getDisplayObject(),
-                ClientUtil::itemTooltip, fluid -> ClientUtil.fluidTooltip(fluid, false)));
-    }
-
-    public IProcessingObject getDisplayObject() {
-        if (!outputs.isEmpty()) {
-            return outputs.stream().min(Comparator.comparingInt(Output::port)).get().result;
-        } else if (!inputs.isEmpty()) {
-            return inputs.stream().min(Comparator.comparingInt(Input::port)).get().ingredient;
-        } else {
-            return ProcessingResults.EMPTY;
-        }
-    }
-
-    public DistLazy<IRectRenderable> getDisplay() {
-        return () -> () -> (poseStack, rect, z) -> {
-            var object = getDisplayObject();
-            var x = rect.x();
-            var y = rect.y();
-            RenderUtil.renderIngredient(object,
-                stack -> RenderUtil.renderItem(stack, x, y),
-                stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
-        };
     }
 
     @Override

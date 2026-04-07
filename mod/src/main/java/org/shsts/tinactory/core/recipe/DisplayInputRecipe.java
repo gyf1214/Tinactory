@@ -3,7 +3,6 @@ package org.shsts.tinactory.core.recipe;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
@@ -11,11 +10,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 public class DisplayInputRecipe extends ProcessingRecipe {
     protected DisplayInputRecipe(BuilderBase<?, ?> builder) {
         super(builder);
-    }
-
-    @Override
-    public IProcessingObject getDisplayObject() {
-        return inputs.get(0).ingredient();
     }
 
     public static Builder builder(IRecipeType<Builder> parent, ResourceLocation loc) {

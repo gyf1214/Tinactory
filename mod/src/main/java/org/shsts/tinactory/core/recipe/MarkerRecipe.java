@@ -17,13 +17,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.IRectRenderable;
-import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -57,25 +53,12 @@ public class MarkerRecipe extends ProcessingRecipe {
         this.markerOutputs = builder.markerOutputs;
     }
 
-    @Override
-    public Optional<String> getDescriptionId() {
-        return Optional.of(getDescriptionId(loc));
+    public Optional<IProcessingIngredient> displayIngredient() {
+        return Optional.ofNullable(displayIngredient);
     }
 
-    @Override
-    public IProcessingObject getDisplayObject() {
-        if (displayIngredient != null) {
-            return displayIngredient;
-        }
-        return super.getDisplayObject();
-    }
-
-    @Override
-    public DistLazy<IRectRenderable> getDisplay() {
-        if (displayTex != null) {
-            return () -> () -> Renderables.texture(displayTex);
-        }
-        return super.getDisplay();
+    public Optional<Texture> displayTexture() {
+        return Optional.ofNullable(displayTex);
     }
 
     @Override
