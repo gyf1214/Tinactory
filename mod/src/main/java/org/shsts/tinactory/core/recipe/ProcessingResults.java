@@ -12,9 +12,11 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,6 +32,13 @@ import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
+
+    static <T> Optional<T> insertScaledPort(IPort<T> port, T stack, IStackAdapter<T> adapter, int parallel,
+        boolean simulate) {
+        var stack1 = adapter.withAmount(stack, adapter.amount(stack) * parallel);
+        return port.acceptInput(stack1) && adapter.isEmpty(port.insert(stack1, simulate)) ?
+            Optional.of(stack1) : Optional.empty();
+    }
 
     public abstract static class RatedResult<T> implements IProcessingResult {
         public final double rate;
@@ -97,9 +106,8 @@ public final class ProcessingResults {
         @Override
         protected Optional<IProcessingResult> doInsertPort(IPort<ItemStack> port, int parallel,
             Random random, boolean simulate) {
-            var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
-            return port.acceptInput(stack1) && port.insert(stack1, simulate).isEmpty() ?
-                Optional.of(new ItemResult(stack1)) : Optional.empty();
+            return insertScaledPort(port, stack, ItemPortAdapter.INSTANCE, parallel, simulate)
+                .map(ItemResult::new);
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -130,9 +138,8 @@ public final class ProcessingResults {
         @Override
         protected Optional<IProcessingResult> doInsertPort(IPort<FluidStack> port, int parallel,
             Random random, boolean simulate) {
-            var stack1 = StackHelper.copyWithAmount(stack, stack.getAmount() * parallel);
-            return port.acceptInput(stack1) && port.insert(stack1, simulate).isEmpty() ?
-                Optional.of(new FluidResult(stack1)) : Optional.empty();
+            return insertScaledPort(port, stack, FluidPortAdapter.INSTANCE, parallel, simulate)
+                .map(FluidResult::new);
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -152,12 +159,24 @@ public final class ProcessingResults {
     public static final Codec<IProcessingResult> CODEC =
         Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
 
+    public static Codec<IProcessingResult> codec() {
+        return CODEC;
+    }
+
+    public static IProcessingResult fromJson(Codec<IProcessingResult> codec, JsonElement je) {
+        return CodecHelper.parseJson(codec, je);
+    }
+
     public static IProcessingResult fromJson(JsonElement je) {
-        return CodecHelper.parseJson(CODEC, je);
+        return fromJson(CODEC, je);
+    }
+
+    public static JsonElement toJson(Codec<IProcessingResult> codec, IProcessingResult ingredient) {
+        return CodecHelper.encodeJson(codec, ingredient);
     }
 
     public static JsonElement toJson(IProcessingResult ingredient) {
-        return CodecHelper.encodeJson(CODEC, ingredient);
+        return toJson(CODEC, ingredient);
     }
 
     public static <V> Optional<V> mapItemsOrFluid(IProcessingObject obj, Function<List<ItemStack>, V> itemsMapper,

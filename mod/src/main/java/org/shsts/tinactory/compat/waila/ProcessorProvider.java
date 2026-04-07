@@ -24,6 +24,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
+import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -117,7 +118,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 var line = new ArrayList<IElement>();
                 line.add(helper.text(tr("inputs")));
                 for (var tag1 : listTag) {
-                    var input = CodecHelper.parseTag(ProcessingIngredients.CODEC, tag1);
+                    var input = CodecHelper.parseTag(ProcessingInfo.ingredientCodec(), tag1);
                     if (input instanceof ProcessingIngredients.ItemIngredient item) {
                         itemElement(line, item.stack());
                     } else if (input instanceof ProcessingIngredients.FluidIngredient fluid) {
@@ -134,7 +135,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 var line = new ArrayList<IElement>();
                 line.add(helper.text(tr("outputs")));
                 for (var tag1 : listTag) {
-                    var output = CodecHelper.parseTag(ProcessingResults.CODEC, tag1);
+                    var output = CodecHelper.parseTag(ProcessingInfo.resultCodec(), tag1);
                     if (output instanceof ProcessingResults.ItemResult item) {
                         itemElement(line, item.stack);
                     } else if (output instanceof ProcessingResults.FluidResult fluid) {
@@ -174,9 +175,9 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             var outputs = new ListTag();
             for (var info : machine.getAllInfo()) {
                 if (info instanceof IProcessingIngredient ingredient) {
-                    inputs.add(CodecHelper.encodeTag(ProcessingIngredients.CODEC, ingredient));
+                    inputs.add(CodecHelper.encodeTag(ProcessingInfo.ingredientCodec(), ingredient));
                 } else if (info instanceof IProcessingResult result) {
-                    outputs.add(CodecHelper.encodeTag(ProcessingResults.CODEC, result));
+                    outputs.add(CodecHelper.encodeTag(ProcessingInfo.resultCodec(), result));
                 }
             }
             tag.put("tinactoryInputs", inputs);

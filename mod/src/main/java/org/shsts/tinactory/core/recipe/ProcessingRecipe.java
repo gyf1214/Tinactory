@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -23,6 +24,7 @@ import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.core.DistLazy;
@@ -295,18 +297,26 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     protected static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
         implements IRecipeSerializer<R, B> {
+        protected Codec<IProcessingIngredient> ingredientCodec() {
+            return ProcessingIngredients.codec();
+        }
+
+        protected Codec<IProcessingResult> resultCodec() {
+            return ProcessingResults.codec();
+        }
+
         protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.input(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
+                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "ingredient"))));
             Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.output(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingResults.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                    CodecHelper.parseJson(resultCodec(), GsonHelper.getAsJsonObject(je, "result"))));
             return builder
                 .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                 .voltage(GsonHelper.getAsLong(jo, "voltage"))
@@ -325,7 +335,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
                 .map(input -> {
                     var je = new JsonObject();
                     je.addProperty("port", input.port);
-                    je.add("ingredient", ProcessingIngredients.toJson(input.ingredient));
+                    je.add("ingredient", CodecHelper.encodeJson(ingredientCodec(), input.ingredient));
                     return je;
                 }).forEach(inputs::add);
             var outputs = new JsonArray();
@@ -333,7 +343,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
                 .map(output -> {
                     var je = new JsonObject();
                     je.addProperty("port", output.port);
-                    je.add("result", ProcessingResults.toJson(output.result));
+                    je.add("result", CodecHelper.encodeJson(resultCodec(), output.result));
                     return je;
                 }).forEach(outputs::add);
             jo.add("inputs", inputs);

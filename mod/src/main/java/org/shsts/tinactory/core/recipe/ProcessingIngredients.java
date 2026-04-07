@@ -15,8 +15,10 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
+import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,32 @@ import java.util.function.Predicate;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ProcessingIngredients {
+    static <T> Optional<T> findMatchingPort(IPort<T> port, Predicate<T> ingredient, IStackAdapter<T> adapter) {
+        return port.getAllStorages().stream()
+            .filter(ingredient)
+            .findFirst()
+            .map(stack -> adapter.withAmount(stack, 1));
+    }
+
+    static <T> Optional<T> consumeMatchingPort(IPort<T> port, Predicate<T> ingredient,
+        IStackAdapter<T> adapter, int count, boolean simulate) {
+        for (var stack : port.getAllStorages()) {
+            if (!ingredient.test(stack) || adapter.amount(stack) < count) {
+                continue;
+            }
+            var expected = adapter.withAmount(stack, count);
+            var extracted = port.extract(expected, true);
+            if (adapter.amount(extracted) < count) {
+                continue;
+            }
+            if (simulate) {
+                return Optional.of(extracted);
+            }
+            return Optional.of(port.extract(expected, false));
+        }
+        return Optional.empty();
+    }
+
     public record ItemIngredient(ItemStack stack) implements IProcessingIngredient {
         private static final String CODEC_NAME = "item_ingredient";
 
@@ -50,7 +78,7 @@ public final class ProcessingIngredients {
                 return Optional.empty();
             }
             var item = port.asItem();
-            var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
+            var stack1 = ItemPortAdapter.INSTANCE.withAmount(stack, stack.getCount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
             var extracted = item.extract(stack1, simulate);
             return extracted.getCount() >= stack1.getCount() ?
@@ -87,10 +115,9 @@ public final class ProcessingIngredients {
             }
             var item = port.asItem();
             if (amount <= 0) {
-                return StackHelper.hasItem(item, ingredient)
-                    .map($ -> new ItemIngredient(StackHelper.copyWithCount($, 1)));
+                return findMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE).map(ItemIngredient::new);
             } else {
-                return StackHelper.consumeItemPort(item, ingredient, amount * parallel, simulate)
+                return consumeMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE, amount * parallel, simulate)
                     .map(ItemIngredient::new);
             }
         }
@@ -153,7 +180,7 @@ public final class ProcessingIngredients {
                 return Optional.empty();
             }
             var fluidPort = port.asFluid();
-            var fluid1 = StackHelper.copyWithAmount(fluid, fluid.getAmount() * parallel);
+            var fluid1 = FluidPortAdapter.INSTANCE.withAmount(fluid, fluid.getAmount() * parallel);
             // it is assumed that the simulation is already done if simulate = false
             var extracted = fluidPort.extract(fluid1, simulate);
             return extracted.getAmount() >= fluid1.getAmount() ?
@@ -176,11 +203,23 @@ public final class ProcessingIngredients {
     public static final Codec<IProcessingIngredient> CODEC =
         Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
 
+    public static Codec<IProcessingIngredient> codec() {
+        return CODEC;
+    }
+
+    public static IProcessingIngredient fromJson(Codec<IProcessingIngredient> codec, JsonElement je) {
+        return CodecHelper.parseJson(codec, je);
+    }
+
     public static IProcessingIngredient fromJson(JsonElement je) {
-        return CodecHelper.parseJson(CODEC, je);
+        return fromJson(CODEC, je);
+    }
+
+    public static JsonElement toJson(Codec<IProcessingIngredient> codec, IProcessingIngredient ingredient) {
+        return CodecHelper.encodeJson(codec, ingredient);
     }
 
     public static JsonElement toJson(IProcessingIngredient ingredient) {
-        return CodecHelper.encodeJson(CODEC, ingredient);
+        return toJson(CODEC, ingredient);
     }
 }

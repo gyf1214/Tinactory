@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.recipe;
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -16,6 +17,7 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -29,7 +31,7 @@ public class ResearchRecipe extends ProcessingRecipe {
     public final ResourceLocation target;
     public final long progress;
 
-    private ResearchRecipe(Builder builder) {
+    protected ResearchRecipe(Builder builder) {
         super(builder);
         this.target = builder.getTarget();
         this.progress = builder.progress;
@@ -99,13 +101,17 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer implements IRecipeSerializer<ResearchRecipe, Builder> {
+    public static class Serializer implements IRecipeSerializer<ResearchRecipe, Builder> {
+        protected Codec<IProcessingIngredient> ingredientCodec() {
+            return ProcessingIngredients.codec();
+        }
+
         @Override
         public ResearchRecipe fromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo,
             ICondition.IContext context) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                .map(je -> ProcessingIngredients.fromJson(je.getAsJsonObject()))
+                .map(je -> CodecHelper.parseJson(ingredientCodec(), je.getAsJsonObject()))
                 .forEach(builder::input);
             return builder.target(new ResourceLocation(GsonHelper.getAsString(jo, "target")))
                 .progress(GsonHelper.getAsLong(jo, "progress"))
@@ -119,7 +125,7 @@ public class ResearchRecipe extends ProcessingRecipe {
         public void toJson(JsonObject jo, ResearchRecipe recipe) {
             var inputs = new JsonArray();
             recipe.inputs.stream()
-                .map(input -> ProcessingIngredients.toJson(input.ingredient()))
+                .map(input -> CodecHelper.encodeJson(ingredientCodec(), input.ingredient()))
                 .forEach(inputs::add);
             jo.add("inputs", inputs);
             jo.addProperty("target", recipe.target.toString());

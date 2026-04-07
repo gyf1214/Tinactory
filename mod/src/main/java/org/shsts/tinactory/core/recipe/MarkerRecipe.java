@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.IRectRenderable;
 import org.shsts.tinactory.core.gui.client.Renderables;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -34,6 +35,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipe extends ProcessingRecipe {
+    private final ResourceLocation baseTypeId;
     private final RecipeType<?> baseType;
     private final String prefix;
     private final boolean requireMultiblock;
@@ -44,8 +46,9 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public final List<Input> markerOutputs;
 
-    private MarkerRecipe(Builder builder) {
+    protected MarkerRecipe(Builder builder) {
         super(builder);
+        this.baseTypeId = builder.getBaseTypeId();
         this.baseType = builder.getBaseType();
         this.prefix = builder.prefix;
         this.requireMultiblock = builder.requireMultiblock;
@@ -163,6 +166,11 @@ public class MarkerRecipe extends ProcessingRecipe {
             return type;
         }
 
+        protected ResourceLocation getBaseTypeId() {
+            assert baseType != null;
+            return baseType;
+        }
+
         @Override
         protected void validate() {}
 
@@ -172,7 +180,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
+    public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo)
@@ -182,7 +190,7 @@ public class MarkerRecipe extends ProcessingRecipe {
             if (jo.has("display")) {
                 if (jo.get("display").isJsonObject()) {
                     var jo1 = GsonHelper.getAsJsonObject(jo, "display");
-                    builder.display(ProcessingIngredients.fromJson(jo1));
+                    builder.display(CodecHelper.parseJson(ingredientCodec(), jo1));
                 } else {
                     var tex = new ResourceLocation(GsonHelper.getAsString(jo, "display"));
                     builder.display(tex);
@@ -192,27 +200,27 @@ public class MarkerRecipe extends ProcessingRecipe {
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.output(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "result"))));
             return builder;
         }
 
         @Override
         public void toJson(JsonObject jo, MarkerRecipe recipe) {
             super.toJson(jo, recipe);
-            jo.addProperty("base_type", recipe.baseType.toString());
+            jo.addProperty("base_type", recipe.baseTypeId.toString());
             jo.addProperty("prefix", recipe.prefix);
             jo.addProperty("require_multiblock", recipe.requireMultiblock);
             if (recipe.displayTex != null) {
                 jo.addProperty("display", recipe.displayTex.loc().toString());
             } else if (recipe.displayIngredient != null) {
-                jo.add("display", ProcessingIngredients.toJson(recipe.displayIngredient));
+                jo.add("display", CodecHelper.encodeJson(ingredientCodec(), recipe.displayIngredient));
             }
             var markerOutputs = new JsonArray();
             recipe.markerOutputs.stream()
                 .map(output -> {
                     var je = new JsonObject();
                     je.addProperty("port", output.port());
-                    je.add("result", ProcessingIngredients.toJson(output.ingredient()));
+                    je.add("result", CodecHelper.encodeJson(ingredientCodec(), output.ingredient()));
                     return je;
                 }).forEach(markerOutputs::add);
             jo.add("marker_outputs", markerOutputs);
