@@ -95,12 +95,8 @@ public final class TestPort implements IPort<Object>, ILimitedPort {
     }
 
     public record TestPortSnapshot(String key, int amount) {
-        public TestProcessingIngredient asIngredient() {
-            return new TestProcessingIngredient(key, amount);
-        }
-
-        public TestProcessingResult asResult() {
-            return new TestProcessingResult(key, amount);
+        public TestProcessingObject asObject() {
+            return new TestProcessingObject(key, amount);
         }
     }
 }

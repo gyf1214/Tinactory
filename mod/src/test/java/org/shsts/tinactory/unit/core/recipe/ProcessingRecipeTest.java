@@ -9,8 +9,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
-import org.shsts.tinactory.unit.fixture.TestProcessingIngredient;
-import org.shsts.tinactory.unit.fixture.TestProcessingResult;
+import org.shsts.tinactory.unit.fixture.TestProcessingObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +24,9 @@ class ProcessingRecipeTest {
     @Test
     void shouldMatchInputsWhenEveryIngredientCanBeConsumed() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingIngredient("ore", 2))
-            .input(1, new TestProcessingIngredient("coolant", 1))
-            .output(2, new TestProcessingResult("ingot", 1))
+            .input(0, new TestProcessingObject("ore", 2))
+            .input(1, new TestProcessingObject("coolant", 1))
+            .output(2, new TestProcessingObject("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
@@ -41,9 +40,9 @@ class ProcessingRecipeTest {
     @Test
     void shouldRespectOutputPortLimitWhenCheckingOutputSpace() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingIngredient("ore", 1))
-            .output(2, new TestProcessingResult("ingot", 1))
-            .output(2, new TestProcessingResult("ingot", 1))
+            .input(0, new TestProcessingObject("ore", 1))
+            .output(2, new TestProcessingObject("ingot", 1))
+            .output(2, new TestProcessingObject("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
@@ -55,25 +54,25 @@ class ProcessingRecipeTest {
     @Test
     void shouldEmitConsumeAndInsertCallbacksWithProcessingInfo() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingIngredient("ore", 2))
-            .input(1, new TestProcessingIngredient("coolant", 1))
-            .output(2, new TestProcessingResult("ingot", 3))
+            .input(0, new TestProcessingObject("ore", 2))
+            .input(1, new TestProcessingObject("coolant", 1))
+            .output(2, new TestProcessingObject("ingot", 3))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
             .port(1, PortDirection.INPUT, new TestPort("coolant", 10, 2))
             .port(2, PortDirection.OUTPUT, new TestPort("ingot", 10, 0));
         var consumed = new ArrayList<ProcessingInfo>();
-        var inserted = new ArrayList<TestProcessingResult>();
+        var inserted = new ArrayList<TestProcessingObject>();
 
         recipe.consumeInputs(container, 1, consumed::add);
-        recipe.insertOutputs(container, 1, new Random(2L), result -> inserted.add((TestProcessingResult) result));
+        recipe.insertOutputs(container, 1, new Random(2L), result -> inserted.add((TestProcessingObject) result));
 
         assertIterableEquals(List.of(
-            new ProcessingInfo(0, new TestProcessingIngredient("ore", 2)),
-            new ProcessingInfo(1, new TestProcessingIngredient("coolant", 1))
+            new ProcessingInfo(0, new TestProcessingObject("ore", 2)),
+            new ProcessingInfo(1, new TestProcessingObject("coolant", 1))
         ), consumed);
-        assertEquals(List.of(new TestProcessingResult("ingot", 3)), inserted);
+        assertEquals(List.of(new TestProcessingObject("ingot", 3)), inserted);
         assertEquals(2, container.getTestPort(0).stored());
         assertEquals(1, container.getTestPort(1).stored());
         assertEquals(3, container.getTestPort(2).stored());
@@ -82,8 +81,8 @@ class ProcessingRecipeTest {
     @Test
     void shouldRequireEnoughMachineVoltageToCraft() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingIngredient("ore", 1))
-            .output(1, new TestProcessingResult("ingot", 1))
+            .input(0, new TestProcessingObject("ore", 1))
+            .output(1, new TestProcessingObject("ingot", 1))
             .voltage(120)
             .buildObject();
 
@@ -94,8 +93,8 @@ class ProcessingRecipeTest {
     @Test
     void shouldBypassOutputChecksWhenAutoVoidIsEnabled() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingIngredient("ore", 1))
-            .output(1, new TestProcessingResult("ingot", 1))
+            .input(0, new TestProcessingObject("ore", 1))
+            .output(1, new TestProcessingObject("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 1))

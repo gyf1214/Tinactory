@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -16,7 +15,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
@@ -205,21 +203,5 @@ public final class ProcessingIngredients {
 
     public static Codec<IProcessingIngredient> codec() {
         return CODEC;
-    }
-
-    public static IProcessingIngredient fromJson(Codec<IProcessingIngredient> codec, JsonElement je) {
-        return CodecHelper.parseJson(codec, je);
-    }
-
-    public static IProcessingIngredient fromJson(JsonElement je) {
-        return fromJson(CODEC, je);
-    }
-
-    public static JsonElement toJson(Codec<IProcessingIngredient> codec, IProcessingIngredient ingredient) {
-        return CodecHelper.encodeJson(codec, ingredient);
-    }
-
-    public static JsonElement toJson(IProcessingIngredient ingredient) {
-        return toJson(CODEC, ingredient);
     }
 }

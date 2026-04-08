@@ -1,6 +1,5 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -13,7 +12,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
@@ -161,22 +159,6 @@ public final class ProcessingResults {
 
     public static Codec<IProcessingResult> codec() {
         return CODEC;
-    }
-
-    public static IProcessingResult fromJson(Codec<IProcessingResult> codec, JsonElement je) {
-        return CodecHelper.parseJson(codec, je);
-    }
-
-    public static IProcessingResult fromJson(JsonElement je) {
-        return fromJson(CODEC, je);
-    }
-
-    public static JsonElement toJson(Codec<IProcessingResult> codec, IProcessingResult ingredient) {
-        return CodecHelper.encodeJson(codec, ingredient);
-    }
-
-    public static JsonElement toJson(IProcessingResult ingredient) {
-        return toJson(CODEC, ingredient);
     }
 
     public static <V> Optional<V> mapItemsOrFluid(IProcessingObject obj, Function<List<ItemStack>, V> itemsMapper,
