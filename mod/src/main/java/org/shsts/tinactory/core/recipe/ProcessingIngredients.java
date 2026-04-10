@@ -21,6 +21,7 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -36,6 +37,11 @@ public final class ProcessingIngredients {
         @Override
         public PortType type() {
             return PortType.ITEM;
+        }
+
+        @Override
+        public Predicate<?> filter() {
+            return (Predicate<ItemStack>) stack1 -> StackHelper.canItemsStack(stack1, stack);
         }
 
         @Override
@@ -67,6 +73,11 @@ public final class ProcessingIngredients {
         @Override
         public PortType type() {
             return PortType.ITEM;
+        }
+
+        @Override
+        public Predicate<?> filter() {
+            return ingredient;
         }
 
         @Override
@@ -129,6 +140,11 @@ public final class ProcessingIngredients {
         @Override
         public PortType type() {
             return PortType.FLUID;
+        }
+
+        @Override
+        public Predicate<?> filter() {
+            return (Predicate<FluidStack>) fluid1 -> fluid1.isFluidEqual(fluid);
         }
 
         @Override

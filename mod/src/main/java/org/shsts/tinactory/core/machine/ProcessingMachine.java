@@ -8,9 +8,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -22,7 +20,6 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -131,8 +128,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     private void setFilters(IContainer container, PortDirection direction,
-        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
-        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
+        ListMultimap<Integer, Predicate<?>> filters) {
         for (var i = 0; i < container.portSize(); i++) {
             if (!container.hasPort(i)) {
                 continue;
@@ -142,46 +138,25 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
                 continue;
             }
             var port = container.getPort(i, ContainerAccess.INTERNAL);
-            switch (port.type()) {
-                case ITEM -> port.asItem().asFilter().setFilters(itemFilters.get(i));
-                case FLUID -> port.asFluid().asFilter().setFilters(fluidFilters.get(i));
-            }
+            port.asFilter().setRawFilters(filters.get(i));
         }
     }
 
     private void addFiltersFromInput(List<ProcessingRecipe.Input> inputs,
-        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
-        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
+        ListMultimap<Integer, Predicate<?>> filters) {
         for (var input : inputs) {
             var idx = input.port();
             var ingredient = input.ingredient();
-
-            if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
-                itemFilters.put(idx, item.ingredient);
-            } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                var stack1 = item.stack();
-                itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
-            } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                var stack1 = fluid.fluid();
-                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
-            }
+            filters.put(idx, ingredient.filter());
         }
     }
 
     private void addFiltersFromOutput(List<ProcessingRecipe.Output> outputs,
-        ListMultimap<Integer, Predicate<ItemStack>> itemFilters,
-        ListMultimap<Integer, Predicate<FluidStack>> fluidFilters) {
+        ListMultimap<Integer, Predicate<?>> filters) {
         for (var output : outputs) {
             var idx = output.port();
             var result = output.result();
-
-            if (result instanceof ProcessingResults.ItemResult item) {
-                var stack1 = item.stack;
-                itemFilters.put(idx, stack -> StackHelper.canItemsStack(stack, stack1));
-            } else if (result instanceof ProcessingResults.FluidResult fluid) {
-                var stack1 = fluid.stack;
-                fluidFilters.put(idx, stack -> stack.isFluidEqual(stack1));
-            }
+            filters.put(idx, result.filter());
         }
     }
 
@@ -191,27 +166,25 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             return;
         }
 
-        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+        var filters = ArrayListMultimap.<Integer, Predicate<?>>create();
 
-        addFiltersFromInput(recipe.inputs, itemFilters, fluidFilters);
-        setFilters(container, PortDirection.INPUT, itemFilters, fluidFilters);
+        addFiltersFromInput(recipe.inputs, filters);
+        setFilters(container, PortDirection.INPUT, filters);
     }
 
     private void setOutputFilters(ProcessingRecipe recipe, IContainer container) {
-        var itemFilters = ArrayListMultimap.<Integer, Predicate<ItemStack>>create();
-        var fluidFilters = ArrayListMultimap.<Integer, Predicate<FluidStack>>create();
+        var filters = ArrayListMultimap.<Integer, Predicate<?>>create();
 
         if (recipe instanceof MarkerRecipe marker) {
             // if marker does not have markerOutputs, don't set output filter
             if (marker.markerOutputs.isEmpty()) {
                 return;
             }
-            addFiltersFromInput(marker.markerOutputs, itemFilters, fluidFilters);
+            addFiltersFromInput(marker.markerOutputs, filters);
         } else {
-            addFiltersFromOutput(recipe.outputs, itemFilters, fluidFilters);
+            addFiltersFromOutput(recipe.outputs, filters);
         }
-        setFilters(container, PortDirection.OUTPUT, itemFilters, fluidFilters);
+        setFilters(container, PortDirection.OUTPUT, filters);
     }
 
     private Optional<ProcessingRecipe> getTargetRecipe(Level world, ResourceLocation loc) {

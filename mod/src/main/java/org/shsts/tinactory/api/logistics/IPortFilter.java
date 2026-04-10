@@ -11,5 +11,10 @@ import java.util.function.Predicate;
 public interface IPortFilter<T> {
     void setFilters(List<? extends Predicate<T>> filters);
 
+    @SuppressWarnings("unchecked")
+    default void setRawFilters(List<? extends Predicate<?>> filters) {
+        setFilters((List<? extends Predicate<T>>) filters);
+    }
+
     void resetFilters();
 }

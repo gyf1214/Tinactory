@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -89,6 +90,11 @@ public final class ProcessingResults {
         }
 
         @Override
+        public Predicate<?> filter() {
+            return (Predicate<ItemStack>) stack1 -> StackHelper.canItemsStack(stack1, stack);
+        }
+
+        @Override
         protected Optional<IProcessingResult> doInsertPort(IPort<ItemStack> port, int parallel,
             Random random, boolean simulate) {
             var stack1 = StackHelper.copyWithCount(stack, stack.getCount() * parallel);
@@ -114,6 +120,11 @@ public final class ProcessingResults {
 
         public FluidResult(FluidStack stack) {
             this(1d, stack);
+        }
+
+        @Override
+        public Predicate<?> filter() {
+            return (Predicate<FluidStack>) stack1 -> stack1.isFluidEqual(stack);
         }
 
         @Override
