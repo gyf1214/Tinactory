@@ -23,6 +23,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -112,6 +113,11 @@ class ProcessingObjectCodecTest {
         }
 
         @Override
+        public Predicate<?> filter() {
+            return (Predicate<Object>) stack -> false;
+        }
+
+        @Override
         public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
             return Optional.empty();
         }
@@ -132,6 +138,11 @@ class ProcessingObjectCodecTest {
         @Override
         public PortType type() {
             return PortType.ITEM;
+        }
+
+        @Override
+        public Predicate<?> filter() {
+            return (Predicate<Object>) stack -> false;
         }
 
         @Override

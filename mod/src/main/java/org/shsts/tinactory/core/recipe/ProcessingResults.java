@@ -98,7 +98,7 @@ public final class ProcessingResults {
 
         @Override
         public Predicate<?> filter() {
-            return (Predicate<ItemStack>) stack1 -> StackHelper.canItemsStack(stack1, stack);
+            return (Predicate<ItemStack>) stack1 -> ItemPortAdapter.INSTANCE.canStack(stack1, stack);
         }
 
         @Override

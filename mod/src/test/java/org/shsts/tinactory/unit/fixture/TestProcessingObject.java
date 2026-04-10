@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public record TestProcessingObject(String key, int amount)
     implements IProcessingIngredient, IProcessingResult {
@@ -19,6 +20,12 @@ public record TestProcessingObject(String key, int amount)
     @Override
     public PortType type() {
         return PortType.ITEM;
+    }
+
+    @Override
+    public Predicate<?> filter() {
+        return (Predicate<Object>) stack -> stack instanceof TestProcessingObject obj && key.equals(obj.key) ||
+            stack instanceof TestStack testStack && key.equals(testStack.id());
     }
 
     @Override
