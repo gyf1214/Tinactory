@@ -3,15 +3,21 @@ package org.shsts.tinactory.unit.core.recipe;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.StackIngredient;
+import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -76,6 +82,36 @@ class ProcessingRecipeTest {
         assertEquals(2, container.getTestPort(0).stored());
         assertEquals(1, container.getTestPort(1).stored());
         assertEquals(3, container.getTestPort(2).stored());
+    }
+
+    @Test
+    void shouldConsumeAndInsertGenericExactStacksThroughRecipePolicy() {
+        var recipe = recipeBuilder()
+            .input(0, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
+                TestStack.item("ore", 2), TestStack.ADAPTER))
+            .output(1, new StackResult<>("test_stack_result", PortType.ITEM, 1d,
+                TestStack.item("ingot", 3), TestStack.ADAPTER))
+            .buildObject();
+        var container = new TestStackContainer()
+            .port(0, PortDirection.INPUT, new TestStackPort(PortType.ITEM, "ore", "", 4, 16))
+            .port(1, PortDirection.OUTPUT, new TestStackPort(PortType.ITEM, "ingot", "", 0, 16));
+        var machine = new TestMachine(container);
+        var consumed = new ArrayList<ProcessingInfo>();
+        var inserted = new ArrayList<Object>();
+
+        assertTrue(recipe.matchesForTest(machine, 1, new Random(1L)));
+
+        recipe.consumeInputs(container, 1, consumed::add);
+        recipe.insertOutputs(container, 1, new Random(2L), inserted::add);
+
+        assertIterableEquals(List.of(
+            new ProcessingInfo(0, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
+                TestStack.item("ore", 2), TestStack.ADAPTER))
+        ), consumed);
+        assertEquals(List.of(new StackResult<>("test_stack_result", PortType.ITEM, 1d,
+            TestStack.item("ingot", 3), TestStack.ADAPTER)), inserted);
+        assertEquals(2, container.port(0).storedAmount());
+        assertEquals(3, container.port(1).storedAmount());
     }
 
     @Test
@@ -144,6 +180,118 @@ class ProcessingRecipeTest {
             protected TestRecipe createObject() {
                 return new TestRecipe(this);
             }
+        }
+    }
+
+    private static final class TestStackContainer implements IContainer {
+        private final java.util.Map<Integer, TestStackPort> ports = new java.util.HashMap<>();
+        private final java.util.Map<Integer, PortDirection> directions = new java.util.HashMap<>();
+
+        private TestStackContainer port(int index, PortDirection direction, TestStackPort port) {
+            ports.put(index, port);
+            directions.put(index, direction);
+            return this;
+        }
+
+        private TestStackPort port(int index) {
+            return ports.get(index);
+        }
+
+        @Override
+        public int portSize() {
+            return ports.size();
+        }
+
+        @Override
+        public boolean hasPort(int port) {
+            return ports.containsKey(port);
+        }
+
+        @Override
+        public PortDirection portDirection(int port) {
+            return directions.getOrDefault(port, PortDirection.NONE);
+        }
+
+        @Override
+        public IPort<?> getPort(int port, org.shsts.tinactory.api.logistics.ContainerAccess access) {
+            return ports.containsKey(port) ? ports.get(port) : IPort.empty();
+        }
+    }
+
+    private static final class TestStackPort implements IPort<TestStack> {
+        private final PortType type;
+        private final String id;
+        private final String nbt;
+        private final int capacity;
+        private int storedAmount;
+
+        private TestStackPort(PortType type, String id, String nbt, int storedAmount, int capacity) {
+            this.type = type;
+            this.id = id;
+            this.nbt = nbt;
+            this.storedAmount = storedAmount;
+            this.capacity = capacity;
+        }
+
+        @Override
+        public PortType type() {
+            return type;
+        }
+
+        @Override
+        public boolean acceptInput(TestStack stack) {
+            return type == stack.type() &&
+                id.equals(stack.id()) &&
+                nbt.equals(stack.nbt()) &&
+                storedAmount < capacity;
+        }
+
+        @Override
+        public TestStack insert(TestStack stack, boolean simulate) {
+            if (!acceptInput(stack)) {
+                return stack;
+            }
+            var inserted = Math.min(stack.amount(), capacity - storedAmount);
+            if (!simulate) {
+                storedAmount += inserted;
+            }
+            return TestStack.ADAPTER.withAmount(stack, stack.amount() - inserted);
+        }
+
+        @Override
+        public TestStack extract(TestStack stack, boolean simulate) {
+            if (type != stack.type() || !id.equals(stack.id()) || !nbt.equals(stack.nbt()) || storedAmount <= 0) {
+                return TestStack.ADAPTER.empty();
+            }
+            var moved = Math.min(stack.amount(), storedAmount);
+            if (!simulate) {
+                storedAmount -= moved;
+            }
+            return TestStack.ADAPTER.withAmount(stack, moved);
+        }
+
+        @Override
+        public TestStack extract(int limit, boolean simulate) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getStorageAmount(TestStack stack) {
+            return type == stack.type() && id.equals(stack.id()) && nbt.equals(stack.nbt()) ? storedAmount : 0;
+        }
+
+        @Override
+        public Collection<TestStack> getAllStorages() {
+            return storedAmount > 0 ? List.of(new TestStack(type, id, nbt, storedAmount)) : List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return storedAmount > 0;
+        }
+
+        private int storedAmount() {
+            return storedAmount;
         }
     }
 

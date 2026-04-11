@@ -7,12 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
@@ -21,64 +19,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class ProcessingResults {
     public static final IProcessingResult EMPTY = new ItemResult(0d, ItemStack.EMPTY);
 
-    static <T> Optional<T> insertScaledPort(IPort<T> port, T stack, IStackAdapter<T> adapter, int parallel,
-        boolean simulate) {
-        var stack1 = adapter.withAmount(stack, adapter.amount(stack) * parallel);
-        return port.acceptInput(stack1) && adapter.isEmpty(port.insert(stack1, simulate)) ?
-            Optional.of(stack1) : Optional.empty();
-    }
-
-    public abstract static class RatedResult<T> implements IProcessingResult {
+    public abstract static class RatedResult<T> extends StackResult<T> {
         public final double rate;
-        private final PortType portType;
-        private final String codecName;
 
-        public RatedResult(double rate, PortType portType, String codecName) {
+        public RatedResult(double rate, PortType portType, String codecName, T stack, IStackAdapter<T> adapter) {
+            super(codecName, portType, rate, stack, adapter);
             this.rate = rate;
-            this.portType = portType;
-            this.codecName = codecName;
-        }
-
-        @Override
-        public String codecName() {
-            return codecName;
-        }
-
-        @Override
-        public PortType type() {
-            return portType;
-        }
-
-        protected abstract Optional<IProcessingResult> doInsertPort(IPort<T> port, int parallel,
-            Random random, boolean simulate);
-
-        @Override
-        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel,
-            Random random, boolean simulate) {
-            if (port.type() != portType) {
-                return Optional.empty();
-            }
-            @SuppressWarnings("unchecked")
-            var port1 = (IPort<T>) port;
-            if (rate < 1d && !simulate) {
-                var parallel1 = MathUtil.sampleBinomial(parallel, rate, random);
-                if (parallel1 <= 0) {
-                    return Optional.empty();
-                }
-                return doInsertPort(port1, parallel1, random, false);
-            } else {
-                return doInsertPort(port1, parallel, random, simulate);
-            }
         }
     }
 
@@ -88,24 +42,12 @@ public final class ProcessingResults {
         public final ItemStack stack;
 
         public ItemResult(double rate, ItemStack stack) {
-            super(rate, PortType.ITEM, CODEC_NAME);
+            super(rate, PortType.ITEM, CODEC_NAME, stack, ItemPortAdapter.INSTANCE);
             this.stack = stack;
         }
 
         public ItemResult(ItemStack stack) {
             this(1d, stack);
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<ItemStack>) stack1 -> ItemPortAdapter.INSTANCE.canStack(stack1, stack);
-        }
-
-        @Override
-        protected Optional<IProcessingResult> doInsertPort(IPort<ItemStack> port, int parallel,
-            Random random, boolean simulate) {
-            return insertScaledPort(port, stack, ItemPortAdapter.INSTANCE, parallel, simulate)
-                .map(ItemResult::new);
         }
 
         private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -120,24 +62,12 @@ public final class ProcessingResults {
         public final FluidStack stack;
 
         public FluidResult(double rate, FluidStack stack) {
-            super(rate, PortType.FLUID, CODEC_NAME);
+            super(rate, PortType.FLUID, CODEC_NAME, stack, FluidPortAdapter.INSTANCE);
             this.stack = stack;
         }
 
         public FluidResult(FluidStack stack) {
             this(1d, stack);
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<FluidStack>) stack1 -> stack1.isFluidEqual(stack);
-        }
-
-        @Override
-        protected Optional<IProcessingResult> doInsertPort(IPort<FluidStack> port, int parallel,
-            Random random, boolean simulate) {
-            return insertScaledPort(port, stack, FluidPortAdapter.INSTANCE, parallel, simulate)
-                .map(FluidResult::new);
         }
 
         private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -169,7 +99,7 @@ public final class ProcessingResults {
         } else if (obj instanceof ProcessingIngredients.ItemsIngredientBase items) {
             return Optional.of(itemsMapper.apply(Arrays.asList(items.ingredient.getItems())));
         } else if (obj instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return Optional.of(fluidMapper.apply(fluid.fluid()));
+            return Optional.of(fluidMapper.apply(fluid.stack()));
         } else if (obj instanceof ProcessingResults.ItemResult item) {
             return Optional.of(itemsMapper.apply(List.of(item.stack)));
         } else if (obj instanceof ProcessingResults.FluidResult fluid) {
@@ -200,7 +130,7 @@ public final class ProcessingResults {
                 return Optional.of(itemsMapper.apply(itemList[0]));
             }
         } else if (obj instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return Optional.of(fluidMapper.apply(fluid.fluid()));
+            return Optional.of(fluidMapper.apply(fluid.stack()));
         } else if (obj instanceof ProcessingResults.ItemResult item) {
             return Optional.of(itemsMapper.apply(item.stack));
         } else if (obj instanceof ProcessingResults.FluidResult fluid) {

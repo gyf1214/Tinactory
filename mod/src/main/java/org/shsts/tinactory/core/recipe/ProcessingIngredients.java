@@ -52,35 +52,11 @@ public final class ProcessingIngredients {
         return Optional.empty();
     }
 
-    public record ItemIngredient(ItemStack stack) implements IProcessingIngredient {
+    public static final class ItemIngredient extends StackIngredient<ItemStack> {
         private static final String CODEC_NAME = "item_ingredient";
 
-        @Override
-        public String codecName() {
-            return CODEC_NAME;
-        }
-
-        @Override
-        public PortType type() {
-            return PortType.ITEM;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<ItemStack>) stack1 -> ItemPortAdapter.INSTANCE.canStack(stack1, stack);
-        }
-
-        @Override
-        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            if (port.type() != PortType.ITEM) {
-                return Optional.empty();
-            }
-            var item = port.asItem();
-            var stack1 = ItemPortAdapter.INSTANCE.withAmount(stack, stack.getCount() * parallel);
-            // it is assumed that the simulation is already done if simulate = false
-            var extracted = item.extract(stack1, simulate);
-            return extracted.getCount() >= stack1.getCount() ?
-                Optional.of(new ItemIngredient(stack1)) : Optional.empty();
+        public ItemIngredient(ItemStack stack) {
+            super(CODEC_NAME, PortType.ITEM, stack, ItemPortAdapter.INSTANCE);
         }
 
         private static final Codec<ItemIngredient> CODEC =
@@ -154,39 +130,19 @@ public final class ProcessingIngredients {
         ).apply(instance, TagIngredient::new));
     }
 
-    public record FluidIngredient(FluidStack fluid) implements IProcessingIngredient {
+    public static final class FluidIngredient extends StackIngredient<FluidStack> {
         private static final String CODEC_NAME = "fluid_ingredient";
 
-        @Override
-        public String codecName() {
-            return CODEC_NAME;
+        public FluidIngredient(FluidStack fluid) {
+            super(CODEC_NAME, PortType.FLUID, fluid, FluidPortAdapter.INSTANCE);
         }
 
-        @Override
-        public PortType type() {
-            return PortType.FLUID;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<FluidStack>) fluid1 -> fluid1.isFluidEqual(fluid);
-        }
-
-        @Override
-        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            if (port.type() != PortType.FLUID) {
-                return Optional.empty();
-            }
-            var fluidPort = port.asFluid();
-            var fluid1 = FluidPortAdapter.INSTANCE.withAmount(fluid, fluid.getAmount() * parallel);
-            // it is assumed that the simulation is already done if simulate = false
-            var extracted = fluidPort.extract(fluid1, simulate);
-            return extracted.getAmount() >= fluid1.getAmount() ?
-                Optional.of(new FluidIngredient(extracted)) : Optional.empty();
+        public FluidStack fluid() {
+            return stack();
         }
 
         private static final Codec<FluidIngredient> CODEC =
-            FluidStack.CODEC.xmap(FluidIngredient::new, FluidIngredient::fluid);
+            FluidStack.CODEC.xmap(FluidIngredient::new, FluidIngredient::stack);
     }
 
     private static final Map<String, Codec<? extends IProcessingIngredient>> CODECS;
