@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -17,11 +18,12 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.recipe.TagIngredient;
 import org.shsts.tinycorelib.api.core.ILoc;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -129,7 +131,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         public Builder display(TagKey<Item> tag) {
-            return display(new ProcessingIngredients.TagIngredient(tag, 1));
+            return display(new TagIngredient(tag, 1));
         }
 
         public Builder display(ResourceLocation tex) {
@@ -164,6 +166,10 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo)
@@ -210,5 +216,4 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final IRecipeSerializer<MarkerRecipe, Builder> SERIALIZER = new Serializer();
 }

@@ -1,14 +1,14 @@
 package org.shsts.tinactory.core.machine;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
-import com.mojang.serialization.Codec;
+import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
+import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
 
 import static org.shsts.tinactory.core.util.CodecHelper.encodeTag;
 import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
@@ -17,11 +17,11 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 @MethodsReturnNonnullByDefault
 public record ProcessingInfo(int port, IProcessingObject object) {
     public static Codec<IProcessingIngredient> ingredientCodec() {
-        return ProcessingIngredients.CODEC;
+        return ProcessingIngredientCodecs.CODEC;
     }
 
     public static Codec<IProcessingResult> resultCodec() {
-        return ProcessingResults.CODEC;
+        return ProcessingResultCodecs.CODEC;
     }
 
     public CompoundTag serializeNBT() {

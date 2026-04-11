@@ -13,9 +13,9 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +57,7 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
         var outputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == outputPort)
             .findFirst().orElseThrow();
-        var ingredient = ProcessingIngredients.ItemsIngredientBase.of(recipe.getIngredients().get(0), 1);
+        var ingredient = ItemsIngredient.of(recipe.getIngredients().get(0), 1);
         var result = new ProcessingResults.ItemResult(1d, recipe.getResultItem());
         ingredientCons.accept(inputSlot, ingredient);
         ingredientCons.accept(outputSlot, result);

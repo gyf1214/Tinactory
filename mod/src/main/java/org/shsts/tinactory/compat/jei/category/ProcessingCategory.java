@@ -27,6 +27,7 @@ import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -110,7 +111,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
         if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             builder.itemInput(slot, item.stack());
-        } else if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase item) {
+        } else if (ingredient instanceof ItemsIngredient item) {
             if (item.amount <= 0) {
                 builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
             } else {

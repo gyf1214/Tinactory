@@ -102,8 +102,14 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     public static class Serializer implements IRecipeSerializer<ResearchRecipe, Builder> {
+        private final Codec<IProcessingIngredient> ingredientCodec;
+
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec) {
+            this.ingredientCodec = ingredientCodec;
+        }
+
         protected Codec<IProcessingIngredient> ingredientCodec() {
-            return ProcessingIngredients.codec();
+            return ingredientCodec;
         }
 
         @Override
@@ -136,5 +142,4 @@ public class ResearchRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final IRecipeSerializer<ResearchRecipe, Builder> SERIALIZER = new Serializer();
 }

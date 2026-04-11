@@ -1,13 +1,18 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
+import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -46,7 +51,11 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer extends ProcessingRecipe.Serializer<BlastFurnaceRecipe, Builder> {
+    public static class Serializer extends ProcessingRecipe.Serializer<BlastFurnaceRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
@@ -60,5 +69,6 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final IRecipeSerializer<BlastFurnaceRecipe, Builder> SERIALIZER = new Serializer();
+    public static final IRecipeSerializer<BlastFurnaceRecipe, Builder> SERIALIZER =
+        new Serializer(ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec());
 }

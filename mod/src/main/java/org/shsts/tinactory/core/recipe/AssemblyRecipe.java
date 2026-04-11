@@ -4,12 +4,14 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -58,8 +60,12 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    protected static class Serializer<R extends AssemblyRecipe, B extends BuilderBase<R, B>> extends
+    public static class Serializer<R extends AssemblyRecipe, B extends BuilderBase<R, B>> extends
         ProcessingRecipe.Serializer<R, B> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo);
@@ -80,5 +86,4 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    public static final IRecipeSerializer<AssemblyRecipe, Builder> SERIALIZER = new Serializer<>();
 }

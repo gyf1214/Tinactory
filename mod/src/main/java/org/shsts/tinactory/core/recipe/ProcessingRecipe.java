@@ -256,14 +256,22 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    protected static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
+    public static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
         implements IRecipeSerializer<R, B> {
+        private final Codec<IProcessingIngredient> ingredientCodec;
+        private final Codec<IProcessingResult> resultCodec;
+
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            this.ingredientCodec = ingredientCodec;
+            this.resultCodec = resultCodec;
+        }
+
         protected Codec<IProcessingIngredient> ingredientCodec() {
-            return ProcessingIngredients.codec();
+            return ingredientCodec;
         }
 
         protected Codec<IProcessingResult> resultCodec() {
-            return ProcessingResults.codec();
+            return resultCodec;
         }
 
         protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
@@ -315,5 +323,4 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    public static final IRecipeSerializer<ProcessingRecipe, Builder> SERIALIZER = new Serializer<>();
 }

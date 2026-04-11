@@ -31,7 +31,8 @@ class ProcessingObjectCodecTest {
     void shouldRoundTripProcessingRecipeWithInjectedCodecs() {
         var type = new TestRecipeType<>("test_processing_recipe", InjectedRecipe.Builder::new);
         var loc = new ResourceLocation("tinactory", "codec_processing_recipe");
-        var serializer = new InjectedRecipe.Serializer();
+        var serializer = new ProcessingRecipe.Serializer<InjectedRecipe, InjectedRecipe.Builder>(
+            TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
         var recipe = type.getBuilder(loc)
             .input(0, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
                 TestStack.item("ore", 2), TestStack.ADAPTER))
@@ -57,7 +58,7 @@ class ProcessingObjectCodecTest {
     void shouldRoundTripResearchRecipeWithInjectedIngredientCodec() {
         var type = new TestRecipeType<ResearchRecipe.Builder>("test_research_recipe", ResearchRecipe.Builder::new);
         var loc = new ResourceLocation("tinactory", "codec_research_recipe");
-        var serializer = new InjectedResearchSerializer();
+        var serializer = new ResearchRecipe.Serializer(TEST_INGREDIENT_CODEC);
         var recipe = type.getBuilder(loc)
             .input(new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
                 TestStack.item("scan", 1), TestStack.ADAPTER))
@@ -81,7 +82,7 @@ class ProcessingObjectCodecTest {
     void shouldRoundTripMarkerRecipeWithInjectedIngredientCodec() {
         var type = new TestRecipeType<MarkerRecipe.Builder>("test_marker_recipe", TestMarkerBuilder::new);
         var loc = new ResourceLocation("tinactory", "codec_marker_recipe");
-        var serializer = new InjectedMarkerSerializer();
+        var serializer = new MarkerRecipe.Serializer(TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
         var recipe = type.getBuilder(loc)
             .baseType(new ResourceLocation("minecraft", "smelting"))
             .display(new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
@@ -129,37 +130,6 @@ class ProcessingObjectCodecTest {
             protected InjectedRecipe createObject() {
                 return new InjectedRecipe(this);
             }
-        }
-
-        private static final class Serializer extends ProcessingRecipe.Serializer<InjectedRecipe, Builder> {
-            @Override
-            protected Codec<IProcessingIngredient> ingredientCodec() {
-                return TEST_INGREDIENT_CODEC;
-            }
-
-            @Override
-            protected Codec<IProcessingResult> resultCodec() {
-                return TEST_RESULT_CODEC;
-            }
-        }
-    }
-
-    private static final class InjectedResearchSerializer extends ResearchRecipe.Serializer {
-        @Override
-        protected Codec<IProcessingIngredient> ingredientCodec() {
-            return TEST_INGREDIENT_CODEC;
-        }
-    }
-
-    private static final class InjectedMarkerSerializer extends MarkerRecipe.Serializer {
-        @Override
-        protected Codec<IProcessingIngredient> ingredientCodec() {
-            return TEST_INGREDIENT_CODEC;
-        }
-
-        @Override
-        protected Codec<IProcessingResult> resultCodec() {
-            return TEST_RESULT_CODEC;
         }
     }
 

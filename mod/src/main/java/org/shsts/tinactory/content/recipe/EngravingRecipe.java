@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.content.multiblock.Lithography;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class EngravingRecipe extends CleanRecipe {
 
     private boolean matchLens(Lithography lithography, IProcessingIngredient ingredient) {
         var lens = lithography.getLens();
-        if (ingredient instanceof ProcessingIngredients.ItemsIngredientBase items) {
+        if (ingredient instanceof ItemsIngredient items) {
             return lens.stream().anyMatch($ -> items.ingredient.test(new ItemStack($)));
         } else if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
             return lens.stream().anyMatch($ -> item.stack().is($));

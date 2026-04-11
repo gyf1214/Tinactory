@@ -13,11 +13,10 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,7 +36,7 @@ public final class ProcessingResults {
     }
 
     public static class ItemResult extends RatedResult<ItemStack> {
-        private static final String CODEC_NAME = "item_result";
+        public static final String CODEC_NAME = "item_result";
 
         public final ItemStack stack;
 
@@ -50,14 +49,16 @@ public final class ProcessingResults {
             this(1d, stack);
         }
 
-        private static final Codec<ItemResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
-            ItemStack.CODEC.fieldOf("item").forGetter($ -> $.stack)
-        ).apply(instance, ItemResult::new));
+        public static Codec<ItemResult> codec() {
+            return RecordCodecBuilder.create(instance -> instance.group(
+                Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
+                ItemStack.CODEC.fieldOf("item").forGetter($ -> $.stack)
+            ).apply(instance, ItemResult::new));
+        }
     }
 
     public static class FluidResult extends RatedResult<FluidStack> {
-        private static final String CODEC_NAME = "fluid_result";
+        public static final String CODEC_NAME = "fluid_result";
 
         public final FluidStack stack;
 
@@ -70,25 +71,12 @@ public final class ProcessingResults {
             this(1d, stack);
         }
 
-        private static final Codec<FluidResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
-            FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
-        ).apply(instance, FluidResult::new));
-    }
-
-    private static final Map<String, Codec<? extends IProcessingResult>> CODECS;
-
-    static {
-        CODECS = new HashMap<>();
-        CODECS.put(ItemResult.CODEC_NAME, ItemResult.CODEC);
-        CODECS.put(FluidResult.CODEC_NAME, FluidResult.CODEC);
-    }
-
-    public static final Codec<IProcessingResult> CODEC =
-        Codec.STRING.dispatch(IProcessingObject::codecName, CODECS::get);
-
-    public static Codec<IProcessingResult> codec() {
-        return CODEC;
+        public static Codec<FluidResult> codec() {
+            return RecordCodecBuilder.create(instance -> instance.group(
+                Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate),
+                FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
+            ).apply(instance, FluidResult::new));
+        }
     }
 
     public static <V> Optional<V> mapItemsOrFluid(IProcessingObject obj, Function<List<ItemStack>, V> itemsMapper,
@@ -96,7 +84,7 @@ public final class ProcessingResults {
 
         if (obj instanceof ProcessingIngredients.ItemIngredient item) {
             return Optional.of(itemsMapper.apply(List.of(item.stack())));
-        } else if (obj instanceof ProcessingIngredients.ItemsIngredientBase items) {
+        } else if (obj instanceof ItemsIngredient items) {
             return Optional.of(itemsMapper.apply(Arrays.asList(items.ingredient.getItems())));
         } else if (obj instanceof ProcessingIngredients.FluidIngredient fluid) {
             return Optional.of(fluidMapper.apply(fluid.stack()));
@@ -124,7 +112,7 @@ public final class ProcessingResults {
 
         if (obj instanceof ProcessingIngredients.ItemIngredient item) {
             return Optional.of(itemsMapper.apply(item.stack()));
-        } else if (obj instanceof ProcessingIngredients.ItemsIngredientBase items) {
+        } else if (obj instanceof ItemsIngredient items) {
             var itemList = items.ingredient.getItems();
             if (itemList.length > 0) {
                 return Optional.of(itemsMapper.apply(itemList[0]));

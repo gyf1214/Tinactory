@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ProcessingResults
+import org.shsts.tinactory.integration.recipe.TagIngredient
 
 open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builder: B) {
     var voltage: Voltage? = null
@@ -42,7 +43,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     private fun defaultSub(name: String) = defaultSub(getMaterial(name))
 
     fun input(tag: TagKey<Item>, amount: Int = 1, port: Int = defaultInputItem!!) {
-        builder.input(port) { ProcessingIngredients.TagIngredient(tag, amount) }
+        builder.input(port) { TagIngredient(tag, amount) }
     }
 
     fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {

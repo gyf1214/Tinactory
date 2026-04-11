@@ -14,6 +14,7 @@ import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.integration.recipe.TagIngredient
 
 class MarkerBuilder(builder: MarkerRecipe.Builder) :
     ProcessingRecipeBuilder<MarkerRecipe.Builder>(builder) {
@@ -63,7 +64,7 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     fun output(tag: TagKey<Item>, port: Int) {
-        builder.output(port, ProcessingIngredients.TagIngredient(tag, 1))
+        builder.output(port, TagIngredient(tag, 1))
     }
 
     override fun output(mat: MaterialSet, sub: String, amount: Number, port: Int?, rate: Double) {
