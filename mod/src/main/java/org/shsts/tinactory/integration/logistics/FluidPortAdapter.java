@@ -1,13 +1,13 @@
 package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -24,12 +24,9 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
     private static final Codec<? extends IIngredientKey> KEY_CODEC =
         RecordCodecBuilder.<FluidKey>create(instance -> instance.group(
-            Codec.STRING.fieldOf("id").forGetter(FluidKey::id),
+            ForgeRegistries.FLUIDS.getCodec().fieldOf("id").forGetter(FluidKey::fluid),
             CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidKey::nbtOptional)
-        ).apply(instance, FluidKey::new)).comapFlatMap(
-            FluidPortAdapter::validateKey,
-            FluidPortAdapter::asFluidKey
-        );
+        ).apply(instance, FluidKey::new));
 
     private FluidPortAdapter() {}
 
@@ -71,7 +68,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
     @Override
     public FluidStack stackOf(IIngredientKey key, long amount) {
         var typed = asFluidKey(key);
-        return stackFrom(typed.id(), typed.nbt(), Math.toIntExact(amount));
+        var stack = new FluidStack(typed.fluid(), Math.toIntExact(amount));
+        if (typed.nbt() != null) {
+            stack.setTag(typed.nbtOptional().orElseThrow());
+        }
+        return stack;
     }
 
     public static Codec<? extends IIngredientKey> keyCodec() {
@@ -85,37 +86,26 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         throw new IllegalArgumentException("Expected fluid key but got: " + key.getClass().getName());
     }
 
-    private static DataResult<FluidKey> validateKey(FluidKey key) {
-        var location = ResourceLocation.tryParse(key.id());
-        if (location == null) {
-            return DataResult.error("Invalid fluid id: " + key.id());
-        }
-        if (!ForgeRegistries.FLUIDS.containsKey(location)) {
-            return DataResult.error("Unknown fluid id: " + key.id());
-        }
-        return DataResult.success(key);
-    }
-
     private static final class FluidKey implements IIngredientKey {
-        private final String id;
+        private final Fluid fluid;
         @Nullable
         private final CompoundTag nbt;
 
-        private FluidKey(String id, Optional<CompoundTag> nbt) {
-            this(id, nbt.orElse(null));
+        private FluidKey(Fluid fluid, Optional<CompoundTag> nbt) {
+            this(fluid, nbt.orElse(null));
         }
 
-        private FluidKey(String id, @Nullable CompoundTag nbt) {
-            this.id = id;
+        private FluidKey(Fluid fluid, @Nullable CompoundTag nbt) {
+            this.fluid = fluid;
             this.nbt = normalizeNbt(nbt);
         }
 
         private static FluidKey of(FluidStack stack) {
-            return new FluidKey(fluidId(stack), stack.getTag());
+            return new FluidKey(stack.getFluid(), stack.getTag());
         }
 
-        private String id() {
-            return id;
+        private Fluid fluid() {
+            return fluid;
         }
 
         @Nullable
@@ -140,7 +130,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             if (!(other instanceof FluidKey typed)) {
                 throw new IllegalArgumentException("Expected fluid key for FLUID type comparison");
             }
-            var byId = id.compareTo(typed.id);
+            var byId = fluidId(fluid).compareTo(fluidId(typed.fluid));
             if (byId != 0) {
                 return byId;
             }
@@ -150,35 +140,28 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         @Override
         public boolean equals(Object other) {
             return this == other || (other instanceof FluidKey key &&
-                id.equals(key.id) &&
+                fluid.equals(key.fluid) &&
                 Objects.equals(nbt, key.nbt));
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(id, nbt);
+            return Objects.hash(fluid, nbt);
         }
 
         @Override
         public String toString() {
+            var id = fluidId(fluid).toString();
             return nbt == null ? id : id + nbt;
         }
     }
 
-    private static String fluidId(FluidStack stack) {
-        var key = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
+    private static ResourceLocation fluidId(Fluid fluid) {
+        var key = fluid.getRegistryName();
         if (key == null) {
-            throw new IllegalArgumentException("Fluid stack has no registry id");
+            throw new IllegalArgumentException("Fluid has no registry id");
         }
-        return key.toString();
-    }
-
-    @Nullable
-    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
-        if (nbt == null || nbt.isEmpty()) {
-            return null;
-        }
-        return nbt.copy();
+        return key;
     }
 
     @Nullable
@@ -190,19 +173,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         return nbt != null ? nbt.toString() : "";
     }
 
-    private static FluidStack stackFrom(String id, @Nullable CompoundTag nbt, int amount) {
-        var location = ResourceLocation.tryParse(id);
-        if (location == null) {
-            throw new IllegalArgumentException("Invalid fluid id: " + id);
+    @Nullable
+    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
+        if (nbt == null || nbt.isEmpty()) {
+            return null;
         }
-        var fluid = ForgeRegistries.FLUIDS.getValue(location);
-        if (fluid == null) {
-            throw new IllegalArgumentException("Unknown fluid id: " + id);
-        }
-        var stack = new FluidStack(fluid, amount);
-        if (nbt != null) {
-            stack.setTag(nbt.copy());
-        }
-        return stack;
+        return nbt.copy();
     }
 }

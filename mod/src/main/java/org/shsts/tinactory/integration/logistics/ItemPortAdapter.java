@@ -1,13 +1,13 @@
 package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -24,12 +24,9 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
     private static final Codec<? extends IIngredientKey> KEY_CODEC =
         RecordCodecBuilder.<ItemKey>create(instance -> instance.group(
-            Codec.STRING.fieldOf("id").forGetter(ItemKey::id),
+            ForgeRegistries.ITEMS.getCodec().fieldOf("id").forGetter(ItemKey::item),
             CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(ItemKey::nbtOptional)
-        ).apply(instance, ItemKey::new)).comapFlatMap(
-            ItemPortAdapter::validateKey,
-            ItemPortAdapter::asItemKey
-        );
+        ).apply(instance, ItemKey::new));
 
     private ItemPortAdapter() {}
 
@@ -71,7 +68,11 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     @Override
     public ItemStack stackOf(IIngredientKey key, long amount) {
         var typed = asItemKey(key);
-        return stackFrom(typed.id(), typed.nbt(), Math.toIntExact(amount));
+        var stack = new ItemStack(typed.item(), Math.toIntExact(amount));
+        if (typed.nbt() != null) {
+            stack.setTag(typed.nbtOptional().orElseThrow());
+        }
+        return stack;
     }
 
     public static Codec<? extends IIngredientKey> keyCodec() {
@@ -85,37 +86,26 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         throw new IllegalArgumentException("Expected item key but got: " + key.getClass().getName());
     }
 
-    private static DataResult<ItemKey> validateKey(ItemKey key) {
-        var location = ResourceLocation.tryParse(key.id());
-        if (location == null) {
-            return DataResult.error("Invalid item id: " + key.id());
-        }
-        if (!ForgeRegistries.ITEMS.containsKey(location)) {
-            return DataResult.error("Unknown item id: " + key.id());
-        }
-        return DataResult.success(key);
-    }
-
     private static final class ItemKey implements IIngredientKey {
-        private final String id;
+        private final Item item;
         @Nullable
         private final CompoundTag nbt;
 
-        private ItemKey(String id, Optional<CompoundTag> nbt) {
-            this(id, nbt.orElse(null));
+        private ItemKey(Item item, Optional<CompoundTag> nbt) {
+            this(item, nbt.orElse(null));
         }
 
-        private ItemKey(String id, @Nullable CompoundTag nbt) {
-            this.id = id;
+        private ItemKey(Item item, @Nullable CompoundTag nbt) {
+            this.item = item;
             this.nbt = normalizeNbt(nbt);
         }
 
         private static ItemKey of(ItemStack stack) {
-            return new ItemKey(itemId(stack), stack.getTag());
+            return new ItemKey(stack.getItem(), stack.getTag());
         }
 
-        private String id() {
-            return id;
+        private Item item() {
+            return item;
         }
 
         @Nullable
@@ -140,7 +130,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             if (!(other instanceof ItemKey typed)) {
                 throw new IllegalArgumentException("Expected item key for ITEM type comparison");
             }
-            var byId = id.compareTo(typed.id);
+            var byId = itemId(item).compareTo(itemId(typed.item));
             if (byId != 0) {
                 return byId;
             }
@@ -149,34 +139,28 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
         @Override
         public boolean equals(Object other) {
-            return this == other || (other instanceof ItemKey key && id.equals(key.id) && Objects.equals(nbt, key.nbt));
+            return this == other ||
+                (other instanceof ItemKey key && item.equals(key.item) && Objects.equals(nbt, key.nbt));
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(id, nbt);
+            return Objects.hash(item, nbt);
         }
 
         @Override
         public String toString() {
+            var id = itemId(item).toString();
             return nbt == null ? id : id + nbt;
         }
     }
 
-    private static String itemId(ItemStack stack) {
-        var key = ForgeRegistries.ITEMS.getKey(stack.getItem());
+    private static ResourceLocation itemId(Item item) {
+        var key = item.getRegistryName();
         if (key == null) {
-            throw new IllegalArgumentException("Item stack has no registry id");
+            throw new IllegalArgumentException("Item has no registry id");
         }
-        return key.toString();
-    }
-
-    @Nullable
-    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
-        if (nbt == null || nbt.isEmpty()) {
-            return null;
-        }
-        return nbt.copy();
+        return key;
     }
 
     @Nullable
@@ -188,19 +172,11 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         return nbt != null ? nbt.toString() : "";
     }
 
-    private static ItemStack stackFrom(String id, @Nullable CompoundTag nbt, int amount) {
-        var location = ResourceLocation.tryParse(id);
-        if (location == null) {
-            throw new IllegalArgumentException("Invalid item id: " + id);
+    @Nullable
+    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
+        if (nbt == null || nbt.isEmpty()) {
+            return null;
         }
-        var item = ForgeRegistries.ITEMS.getValue(location);
-        if (item == null) {
-            throw new IllegalArgumentException("Unknown item id: " + id);
-        }
-        var stack = new ItemStack(item, amount);
-        if (nbt != null) {
-            stack.setTag(nbt.copy());
-        }
-        return stack;
+        return nbt.copy();
     }
 }

@@ -1,11 +1,15 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import com.mojang.serialization.Codec;
 import io.netty.buffer.Unpooled;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.fluids.FluidStack;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
@@ -17,6 +21,9 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinactory.unit.fixture.TestIngredientKey;
 
@@ -94,6 +101,20 @@ class AutocraftTerminalSyncPacketTest {
         assertEquals(cpuId, cancelCpu.cpuId());
     }
 
+    @Test
+    void ingredientKeyCodecsShouldKeepStringIdField() {
+        assertEncodedId(
+            castCodec(ItemPortAdapter.keyCodec()),
+            ItemPortAdapter.INSTANCE.keyOf(new ItemStack(Items.IRON_INGOT)),
+            "minecraft:iron_ingot"
+        );
+        assertEncodedId(
+            castCodec(FluidPortAdapter.keyCodec()),
+            FluidPortAdapter.INSTANCE.keyOf(new FluidStack(Fluids.WATER, 250)),
+            "minecraft:water"
+        );
+    }
+
     private static AutocraftPreviewSyncPacket roundTrip(AutocraftPreviewSyncPacket packet) {
         var buf = new FriendlyByteBuf(Unpooled.buffer());
         var decoded = new AutocraftPreviewSyncPacket(TestIngredientKey.CODEC);
@@ -110,5 +131,17 @@ class AutocraftTerminalSyncPacketTest {
         packet.serializeToBuf(buf);
         decoded.deserializeFromBuf(buf);
         return decoded;
+    }
+
+    private static void assertEncodedId(Codec<IIngredientKey> codec, IIngredientKey key, String expectedId) {
+        var tag = (CompoundTag) CodecHelper.encodeTag(codec, key);
+
+        assertEquals(expectedId, tag.getString("id"));
+        assertEquals(key, CodecHelper.parseTag(codec, tag));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Codec<IIngredientKey> castCodec(Codec<? extends IIngredientKey> codec) {
+        return (Codec<IIngredientKey>) codec;
     }
 }
