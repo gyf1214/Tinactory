@@ -22,6 +22,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
 import org.shsts.tinactory.integration.recipe.TagIngredient;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -127,7 +128,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         public Builder display(ItemLike item) {
-            return display(new ProcessingIngredients.ItemIngredient(new ItemStack(item)));
+            return display(ProcessingStackHelper.itemIngredient(new ItemStack(item)));
         }
 
         public Builder display(TagKey<Item> tag) {

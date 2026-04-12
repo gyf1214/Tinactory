@@ -5,12 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.core.recipe.StackIngredient;
+import org.shsts.tinactory.core.recipe.StackResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +49,14 @@ public class MetricsManager {
     }
 
     public static void reportProcessingObject(String action, IMachine machine, IProcessingObject object) {
-        if (object instanceof ProcessingIngredients.ItemIngredient item) {
-            reportItem("item_" + action, machine, item.stack());
-        } else if (object instanceof ProcessingIngredients.FluidIngredient fluid) {
-            reportFluid("fluid_" + action, machine, fluid.fluid());
-        } else if (object instanceof ProcessingResults.ItemResult item) {
-            reportItem("item_" + action, machine, item.stack);
-        } else if (object instanceof ProcessingResults.FluidResult fluid) {
-            reportFluid("fluid_" + action, machine, fluid.stack);
+        if (object instanceof StackIngredient<?> ingredient && ingredient.type() == PortType.ITEM) {
+            reportItem("item_" + action, machine, (ItemStack) ingredient.stack());
+        } else if (object instanceof StackIngredient<?> ingredient && ingredient.type() == PortType.FLUID) {
+            reportFluid("fluid_" + action, machine, (FluidStack) ingredient.stack());
+        } else if (object instanceof StackResult<?> result && result.type() == PortType.ITEM) {
+            reportItem("item_" + action, machine, (ItemStack) result.stack());
+        } else if (object instanceof StackResult<?> result && result.type() == PortType.FLUID) {
+            reportFluid("fluid_" + action, machine, (FluidStack) result.stack());
         }
     }
 }

@@ -9,10 +9,9 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
+import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,19 +24,13 @@ public final class ProcessingDisplayHelper {
     private ProcessingDisplayHelper() {}
 
     public static Optional<List<Component>> tooltip(IProcessingObject object) {
-        if (object instanceof ProcessingIngredients.ItemIngredient item) {
-            return Optional.of(ClientUtil.itemTooltip(item.stack()));
-        } else if (object instanceof ItemsIngredient items) {
+        if (object instanceof ItemsIngredient items) {
             return RenderUtil.selectItemFromItems(Arrays.asList(items.ingredient.getItems()))
                 .map(ClientUtil::itemTooltip);
-        } else if (object instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return Optional.of(ClientUtil.fluidTooltip(fluid.fluid(), false));
-        } else if (object instanceof ProcessingResults.ItemResult item) {
-            return Optional.of(ClientUtil.itemTooltip(item.stack));
-        } else if (object instanceof ProcessingResults.FluidResult fluid) {
-            return Optional.of(ClientUtil.fluidTooltip(fluid.stack, false));
         }
-        return Optional.empty();
+        return ProcessingStackHelper.itemStack(object).map(ClientUtil::itemTooltip)
+            .or(() -> ProcessingStackHelper.fluidStack(object)
+                .map(fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
     public static void render(IProcessingObject object, PoseStack poseStack, Rect rect, int z) {
@@ -48,16 +41,12 @@ public final class ProcessingDisplayHelper {
 
     public static void renderIngredient(IProcessingObject object, Consumer<ItemStack> itemRenderer,
         Consumer<FluidStack> fluidRenderer) {
-        if (object instanceof ProcessingIngredients.ItemIngredient item) {
-            itemRenderer.accept(item.stack());
-        } else if (object instanceof ItemsIngredient items) {
+        if (object instanceof ItemsIngredient items) {
             RenderUtil.selectItemFromItems(Arrays.asList(items.ingredient.getItems())).ifPresent(itemRenderer);
-        } else if (object instanceof ProcessingIngredients.FluidIngredient fluid) {
-            fluidRenderer.accept(fluid.fluid());
-        } else if (object instanceof ProcessingResults.ItemResult item) {
-            itemRenderer.accept(item.stack);
-        } else if (object instanceof ProcessingResults.FluidResult fluid) {
-            fluidRenderer.accept(fluid.stack);
+        } else if (ProcessingStackHelper.itemStack(object).isPresent()) {
+            itemRenderer.accept(ProcessingStackHelper.itemStack(object).orElseThrow());
+        } else {
+            ProcessingStackHelper.fluidStack(object).ifPresent(fluidRenderer);
         }
     }
 }

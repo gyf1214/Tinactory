@@ -22,9 +22,8 @@ import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
@@ -245,12 +244,12 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         parallel = calculateParallel(port, ingredient, maxParallel);
         StackHelper.consumeItemPort(port, ingredient, parallel, false)
             .ifPresent($ -> callback.accept(new ProcessingInfo(inputPort,
-                new ProcessingIngredients.ItemIngredient($))));
+                ProcessingStackHelper.itemIngredient($))));
 
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
         callback.accept(new ProcessingInfo(outputPort,
-            new ProcessingResults.ItemResult(1d, result1)));
+            ProcessingStackHelper.itemResult(1d, result1)));
 
         calculateFactors(machine, parallel);
     }
@@ -269,7 +268,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var port = getOutputPort(machine.container().orElseThrow());
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
-        callback.accept(new ProcessingResults.ItemResult(1d, result1));
+        callback.accept(ProcessingStackHelper.itemResult(1d, result1));
         port.insert(result1, false);
     }
 

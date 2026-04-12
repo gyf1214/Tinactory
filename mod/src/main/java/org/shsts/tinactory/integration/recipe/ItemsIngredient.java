@@ -6,7 +6,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
 import java.util.Optional;
@@ -40,11 +39,11 @@ public abstract class ItemsIngredient implements IProcessingIngredient {
         }
         var item = port.asItem();
         if (amount <= 0) {
-            return ProcessingIngredients.findMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE)
-                .map(ProcessingIngredients.ItemIngredient::new);
+            return ProcessingStackHelper.findMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE)
+                .map(ProcessingStackHelper::itemIngredient);
         } else {
-            return ProcessingIngredients.consumeMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE,
-                amount * parallel, simulate).map(ProcessingIngredients.ItemIngredient::new);
+            return ProcessingStackHelper.consumeMatchingPort(item, ingredient, ItemPortAdapter.INSTANCE,
+                amount * parallel, simulate).map(ProcessingStackHelper::itemIngredient);
         }
     }
 

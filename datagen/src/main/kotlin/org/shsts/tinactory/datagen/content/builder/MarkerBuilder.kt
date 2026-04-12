@@ -10,10 +10,10 @@ import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.MarkerRecipe
-import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.integration.recipe.ProcessingStackHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 
 class MarkerBuilder(builder: MarkerRecipe.Builder) :
@@ -52,11 +52,11 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     override fun output(item: ItemLike, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingIngredients.ItemIngredient(ItemStack(item, amount)))
+        builder.output(port, ProcessingStackHelper.itemIngredient(ItemStack(item, amount)))
     }
 
     override fun output(fluid: Fluid, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingIngredients.FluidIngredient(FluidStack(fluid, amount)))
+        builder.output(port, ProcessingStackHelper.fluidIngredient(FluidStack(fluid, amount)))
     }
 
     fun output(fluid: Fluid, port: Int) {

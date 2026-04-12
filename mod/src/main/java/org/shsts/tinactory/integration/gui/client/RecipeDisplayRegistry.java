@@ -12,8 +12,8 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -111,7 +111,7 @@ public final class RecipeDisplayRegistry {
             return recipe.inputs.stream().min(java.util.Comparator.comparingInt(ProcessingRecipe.Input::port))
                 .orElseThrow().ingredient();
         }
-        return ProcessingResults.EMPTY;
+        return ProcessingStackHelper.EMPTY;
     }
 
     private static IProcessingObject displayInputObject(DisplayInputRecipe recipe) {
