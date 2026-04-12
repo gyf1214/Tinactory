@@ -20,16 +20,6 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
-    public static final FluidPortAdapter INSTANCE = new FluidPortAdapter();
-
-    private static final Codec<? extends IStackKey> KEY_CODEC =
-        RecordCodecBuilder.<FluidKey>create(instance -> instance.group(
-            ForgeRegistries.FLUIDS.getCodec().fieldOf("id").forGetter(FluidKey::fluid),
-            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidKey::nbtOptional)
-        ).apply(instance, FluidKey::new));
-
-    private FluidPortAdapter() {}
-
     @Override
     public FluidStack empty() {
         return FluidStack.EMPTY;
@@ -67,23 +57,12 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
     @Override
     public FluidStack stackOf(IStackKey key, long amount) {
-        var typed = asFluidKey(key);
+        var typed = (FluidKey) key;
         var stack = new FluidStack(typed.fluid(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
             stack.setTag(typed.nbt().copy());
         }
         return stack;
-    }
-
-    public static Codec<? extends IStackKey> keyCodec() {
-        return KEY_CODEC;
-    }
-
-    private static FluidKey asFluidKey(IStackKey key) {
-        if (key instanceof FluidKey typed) {
-            return typed;
-        }
-        throw new IllegalArgumentException("Expected fluid key but got: " + key.getClass().getName());
     }
 
     private static final class FluidKey implements IStackKey {
@@ -165,4 +144,10 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             return nbt == null ? id : id + nbt;
         }
     }
+
+    public static final Codec<? extends IStackKey> KEY_CODEC =
+        RecordCodecBuilder.<FluidKey>create(instance -> instance.group(
+            ForgeRegistries.FLUIDS.getCodec().fieldOf("id").forGetter(FluidKey::fluid),
+            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidKey::nbtOptional)
+        ).apply(instance, FluidKey::new));
 }

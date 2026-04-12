@@ -10,9 +10,9 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
     private final List<CpuStatusEntry> entries = new ArrayList<>();
 
     public AutocraftCpuSyncPacket() {
-        this(IngredientKeyCodecHelper.CODEC);
+        this(StackHelper.KEY_CODEC);
     }
 
     public AutocraftCpuSyncPacket(Codec<IStackKey> ingredientKeyCodec) {
@@ -34,7 +34,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
     }
 
     public AutocraftCpuSyncPacket(List<CpuStatusEntry> entries) {
-        this(IngredientKeyCodecHelper.CODEC, entries);
+        this(StackHelper.KEY_CODEC, entries);
     }
 
     public AutocraftCpuSyncPacket(

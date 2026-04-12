@@ -18,7 +18,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import snownee.jade.Jade;
 import snownee.jade.JadeCommonConfig;
@@ -103,7 +102,7 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
                 continue;
             }
 
-            var key = ItemPortAdapter.INSTANCE.keyOf(stack);
+            var key = StackHelper.ITEM_ADAPTER.keyOf(stack);
             if (itemMap.containsKey(key)) {
                 var stack1 = itemMap.get(key);
                 stack1.grow(stack.getCount());

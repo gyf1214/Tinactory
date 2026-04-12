@@ -10,8 +10,7 @@ import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
 import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -26,8 +25,8 @@ public final class LogisticsInventoryView implements IInventoryView {
 
     public LogisticsInventoryView(IPort<ItemStack> itemPort, IPort<FluidStack> fluidPort) {
         channels = new EnumMap<>(PortType.class);
-        channels.put(PortType.ITEM, new CraftPortChannel<>(ItemPortAdapter.INSTANCE, itemPort));
-        channels.put(PortType.FLUID, new CraftPortChannel<>(FluidPortAdapter.INSTANCE, fluidPort));
+        channels.put(PortType.ITEM, new CraftPortChannel<>(StackHelper.ITEM_ADAPTER, itemPort));
+        channels.put(PortType.FLUID, new CraftPortChannel<>(StackHelper.FLUID_ADAPTER, fluidPort));
     }
 
     @Override

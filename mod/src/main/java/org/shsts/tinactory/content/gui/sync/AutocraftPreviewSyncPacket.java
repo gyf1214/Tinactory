@@ -9,10 +9,10 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
 import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
-import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     private PlanError error;
 
     public AutocraftPreviewSyncPacket() {
-        this(IngredientKeyCodecHelper.CODEC);
+        this(StackHelper.KEY_CODEC);
     }
 
     public AutocraftPreviewSyncPacket(Codec<IStackKey> ingredientKeyCodec) {
@@ -59,12 +59,12 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     }
 
     public static AutocraftPreviewSyncPacket empty() {
-        return new AutocraftPreviewSyncPacket(IngredientKeyCodecHelper.CODEC, PreviewState.EMPTY, null, null);
+        return new AutocraftPreviewSyncPacket(StackHelper.KEY_CODEC, PreviewState.EMPTY, null, null);
     }
 
     public static AutocraftPreviewSyncPacket ready(List<CraftAmount> targets) {
         return new AutocraftPreviewSyncPacket(
-            IngredientKeyCodecHelper.CODEC,
+            StackHelper.KEY_CODEC,
             PreviewState.PREVIEW_READY,
             targets,
             null);
@@ -72,7 +72,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
 
     public static AutocraftPreviewSyncPacket failed(PlanError error) {
         return new AutocraftPreviewSyncPacket(
-            IngredientKeyCodecHelper.CODEC,
+            StackHelper.KEY_CODEC,
             PreviewState.PREVIEW_FAILED,
             null,
             error);

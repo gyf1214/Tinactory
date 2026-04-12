@@ -11,16 +11,15 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
-import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.ArrayList;
@@ -224,7 +223,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             return Optional.empty();
         }
         return Optional.of(new CraftPortChannel<>(
-            ItemPortAdapter.INSTANCE,
+            StackHelper.ITEM_ADAPTER,
             port.asItem()));
     }
 
@@ -233,7 +232,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             return Optional.empty();
         }
         return Optional.of(new CraftPortChannel<>(
-            FluidPortAdapter.INSTANCE,
+            StackHelper.FLUID_ADAPTER,
             port.asFluid()));
     }
 

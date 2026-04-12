@@ -20,16 +20,6 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
-    public static final ItemPortAdapter INSTANCE = new ItemPortAdapter();
-
-    private static final Codec<? extends IStackKey> KEY_CODEC =
-        RecordCodecBuilder.<ItemKey>create(instance -> instance.group(
-            ForgeRegistries.ITEMS.getCodec().fieldOf("id").forGetter(ItemKey::item),
-            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(ItemKey::nbtOptional)
-        ).apply(instance, ItemKey::new));
-
-    private ItemPortAdapter() {}
-
     @Override
     public ItemStack empty() {
         return ItemStack.EMPTY;
@@ -67,23 +57,12 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
     @Override
     public ItemStack stackOf(IStackKey key, long amount) {
-        var typed = asItemKey(key);
+        var typed = (ItemKey) key;
         var stack = new ItemStack(typed.item(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
             stack.setTag(typed.nbt().copy());
         }
         return stack;
-    }
-
-    public static Codec<? extends IStackKey> keyCodec() {
-        return KEY_CODEC;
-    }
-
-    private static ItemKey asItemKey(IStackKey key) {
-        if (key instanceof ItemKey typed) {
-            return typed;
-        }
-        throw new IllegalArgumentException("Expected item key but got: " + key.getClass().getName());
     }
 
     private static final class ItemKey implements IStackKey {
@@ -106,6 +85,12 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
         private Item item() {
             return item;
+        }
+
+        private ResourceLocation id() {
+            var id = item.getRegistryName();
+            assert id != null;
+            return id;
         }
 
         @Nullable
@@ -134,7 +119,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             if (!(other instanceof ItemKey typed)) {
                 throw new IllegalArgumentException("Expected item key for ITEM type comparison");
             }
-            var byId = itemId(item).compareTo(itemId(typed.item));
+            var byId = id().compareTo(typed.id());
             if (byId != 0) {
                 return byId;
             }
@@ -154,16 +139,14 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
         @Override
         public String toString() {
-            var id = itemId(item).toString();
+            var id = id().toString();
             return nbt == null ? id : id + nbt;
         }
     }
 
-    private static ResourceLocation itemId(Item item) {
-        var key = item.getRegistryName();
-        if (key == null) {
-            throw new IllegalArgumentException("Item has no registry id");
-        }
-        return key;
-    }
+    public static final Codec<? extends IStackKey> KEY_CODEC =
+        RecordCodecBuilder.<ItemKey>create(instance -> instance.group(
+            ForgeRegistries.ITEMS.getCodec().fieldOf("id").forGetter(ItemKey::item),
+            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(ItemKey::nbtOptional)
+        ).apply(instance, ItemKey::new));
 }

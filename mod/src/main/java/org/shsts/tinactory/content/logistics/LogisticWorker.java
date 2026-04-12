@@ -22,8 +22,6 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.logistics.PortTransmitter;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
-import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -51,9 +49,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "logistics/logistic_worker";
     private static final PortTransmitter<ItemStack> ITEM_TRANSMITTER =
-        new PortTransmitter<>(ItemPortAdapter.INSTANCE);
+        new PortTransmitter<>(StackHelper.ITEM_ADAPTER);
     private static final PortTransmitter<FluidStack> FLUID_TRANSMITTER =
-        new PortTransmitter<>(FluidPortAdapter.INSTANCE);
+        new PortTransmitter<>(StackHelper.FLUID_ADAPTER);
 
     private final BlockEntity blockEntity;
     public final int workerSlots;

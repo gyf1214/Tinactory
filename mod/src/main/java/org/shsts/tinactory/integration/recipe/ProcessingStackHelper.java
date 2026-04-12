@@ -12,8 +12,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
-import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -57,15 +56,15 @@ public final class ProcessingStackHelper {
     }
 
     public static StackIngredient<ItemStack> itemIngredient(ItemStack stack) {
-        return new StackIngredient<>(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, stack, ItemPortAdapter.INSTANCE);
+        return new StackIngredient<>(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, stack, StackHelper.ITEM_ADAPTER);
     }
 
     public static StackIngredient<FluidStack> fluidIngredient(FluidStack stack) {
-        return new StackIngredient<>(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID, stack, FluidPortAdapter.INSTANCE);
+        return new StackIngredient<>(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID, stack, StackHelper.FLUID_ADAPTER);
     }
 
     public static StackResult<ItemStack> itemResult(double rate, ItemStack stack) {
-        return new StackResult<>(ITEM_RESULT_CODEC_NAME, PortType.ITEM, rate, stack, ItemPortAdapter.INSTANCE);
+        return new StackResult<>(ITEM_RESULT_CODEC_NAME, PortType.ITEM, rate, stack, StackHelper.ITEM_ADAPTER);
     }
 
     public static StackResult<ItemStack> itemResult(ItemStack stack) {
@@ -73,7 +72,7 @@ public final class ProcessingStackHelper {
     }
 
     public static StackResult<FluidStack> fluidResult(double rate, FluidStack stack) {
-        return new StackResult<>(FLUID_RESULT_CODEC_NAME, PortType.FLUID, rate, stack, FluidPortAdapter.INSTANCE);
+        return new StackResult<>(FLUID_RESULT_CODEC_NAME, PortType.FLUID, rate, stack, StackHelper.FLUID_ADAPTER);
     }
 
     public static StackResult<FluidStack> fluidResult(FluidStack stack) {
@@ -82,20 +81,20 @@ public final class ProcessingStackHelper {
 
     public static Codec<StackIngredient<ItemStack>> itemIngredientCodec() {
         return StackIngredient.codec(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC,
-            ItemPortAdapter.INSTANCE);
+            StackHelper.ITEM_ADAPTER);
     }
 
     public static Codec<StackIngredient<FluidStack>> fluidIngredientCodec() {
         return StackIngredient.codec(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC,
-            FluidPortAdapter.INSTANCE);
+            StackHelper.FLUID_ADAPTER);
     }
 
     public static Codec<StackResult<ItemStack>> itemResultCodec() {
-        return StackResult.codec(ITEM_RESULT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC, ItemPortAdapter.INSTANCE);
+        return StackResult.codec(ITEM_RESULT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC, StackHelper.ITEM_ADAPTER);
     }
 
     public static Codec<StackResult<FluidStack>> fluidResultCodec() {
-        return StackResult.codec(FLUID_RESULT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC, FluidPortAdapter.INSTANCE);
+        return StackResult.codec(FLUID_RESULT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC, StackHelper.FLUID_ADAPTER);
     }
 
     @SuppressWarnings("unchecked")
