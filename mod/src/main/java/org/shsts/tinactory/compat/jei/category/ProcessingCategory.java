@@ -21,19 +21,14 @@ import org.shsts.tinactory.compat.jei.ingredient.TechIngredientRenderer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.recipe.ItemsIngredient;
+import org.shsts.tinactory.integration.recipe.ProcessingJeiHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.shsts.tinactory.AllTags.machine;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -92,6 +87,10 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         return y;
     }
 
+    protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
+        ProcessingJeiHelper.addIngredient(builder, slot, ingredient);
+    }
+
     @Override
     protected void drawExtra(R recipe, ICategoryDrawHelper helper,
         IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
@@ -108,40 +107,16 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         drawTextLine(stack, tr("duration", duration), y);
     }
 
-    protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
-        if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-            builder.itemInput(slot, item.stack());
-        } else if (ingredient instanceof ItemsIngredient item) {
-            if (item.amount <= 0) {
-                builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
-            } else {
-                var items = Arrays.stream(item.ingredient.getItems())
-                    .map(stack -> StackHelper.copyWithCount(stack, item.amount))
-                    .toList();
-                builder.itemInput(slot, items);
-            }
-        } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-            builder.fluidInput(slot, fluid.fluid());
-        } else if (ingredient instanceof ProcessingResults.ItemResult item) {
-            builder.itemOutput(slot, item.stack, item.rate);
-        } else if (ingredient instanceof ProcessingResults.FluidResult fluid) {
-            builder.fluidOutput(slot, fluid.stack, fluid.rate);
-        } else {
-            throw new IllegalArgumentException("Unknown processing ingredient type %s"
-                .formatted(ingredient.getClass()));
-        }
-    }
-
     @Override
     protected void setRecipe(R recipe, IIngredientBuilder builder) {
         var inputs = layout.getProcessingInputs(recipe);
         var outputs = layout.getProcessingOutputs(recipe);
 
         for (var input : inputs) {
-            addIngredient(builder, input.slot(), input.val());
+            ProcessingJeiHelper.addIngredient(builder, input.slot(), input.val());
         }
         for (var output : outputs) {
-            addIngredient(builder, output.slot(), output.val());
+            ProcessingJeiHelper.addIngredient(builder, output.slot(), output.val());
         }
     }
 

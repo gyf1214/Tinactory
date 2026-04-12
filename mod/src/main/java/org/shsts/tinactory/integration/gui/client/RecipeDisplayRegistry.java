@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingResults;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.util.HashMap;
@@ -32,27 +31,23 @@ public final class RecipeDisplayRegistry {
         register(ProcessingRecipe.class, new IRecipeDisplayProvider<>() {
             @Override
             public Optional<List<Component>> tooltip(ProcessingRecipe recipe) {
-                return ProcessingResults.mapItemOrFluid(baseDisplayObject(recipe),
-                    ClientUtil::itemTooltip,
-                    fluid -> ClientUtil.fluidTooltip(fluid, false));
+                return ProcessingDisplayHelper.tooltip(baseDisplayObject(recipe));
             }
 
             @Override
             public void render(ProcessingRecipe recipe, PoseStack poseStack, Rect rect, int z) {
-                renderObject(baseDisplayObject(recipe), poseStack, rect, z);
+                ProcessingDisplayHelper.render(baseDisplayObject(recipe), poseStack, rect, z);
             }
         });
         register(DisplayInputRecipe.class, new IRecipeDisplayProvider<>() {
             @Override
             public Optional<List<Component>> tooltip(DisplayInputRecipe recipe) {
-                return ProcessingResults.mapItemOrFluid(displayInputObject(recipe),
-                    ClientUtil::itemTooltip,
-                    fluid -> ClientUtil.fluidTooltip(fluid, false));
+                return ProcessingDisplayHelper.tooltip(displayInputObject(recipe));
             }
 
             @Override
             public void render(DisplayInputRecipe recipe, PoseStack poseStack, Rect rect, int z) {
-                renderObject(displayInputObject(recipe), poseStack, rect, z);
+                ProcessingDisplayHelper.render(displayInputObject(recipe), poseStack, rect, z);
             }
         });
         register(MarkerRecipe.class, new IRecipeDisplayProvider<>() {
@@ -68,7 +63,7 @@ public final class RecipeDisplayRegistry {
                     .orElseGet(() -> baseDisplayObject(recipe));
                 recipe.displayTexture().ifPresentOrElse(
                     tex -> RenderUtil.blit(poseStack, tex, z, rect),
-                    () -> renderObject(displayObject, poseStack, rect, z)
+                    () -> ProcessingDisplayHelper.render(displayObject, poseStack, rect, z)
                 );
             }
         });
@@ -121,11 +116,5 @@ public final class RecipeDisplayRegistry {
 
     private static IProcessingObject displayInputObject(DisplayInputRecipe recipe) {
         return recipe.inputs.get(0).ingredient();
-    }
-
-    private static void renderObject(IProcessingObject object, PoseStack poseStack, Rect rect, int z) {
-        RenderUtil.renderIngredient(object,
-            stack -> RenderUtil.renderItem(stack, rect.x(), rect.y()),
-            stack -> RenderUtil.renderFluid(poseStack, stack, rect.x(), rect.y(), z));
     }
 }

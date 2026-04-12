@@ -4,22 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
-import org.shsts.tinactory.integration.recipe.ItemsIngredient;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -77,53 +68,5 @@ public final class ProcessingResults {
                 FluidStack.CODEC.fieldOf("fluid").forGetter($ -> $.stack)
             ).apply(instance, FluidResult::new));
         }
-    }
-
-    public static <V> Optional<V> mapItemsOrFluid(IProcessingObject obj, Function<List<ItemStack>, V> itemsMapper,
-        Function<FluidStack, V> fluidMapper) {
-
-        if (obj instanceof ProcessingIngredients.ItemIngredient item) {
-            return Optional.of(itemsMapper.apply(List.of(item.stack())));
-        } else if (obj instanceof ItemsIngredient items) {
-            return Optional.of(itemsMapper.apply(Arrays.asList(items.ingredient.getItems())));
-        } else if (obj instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return Optional.of(fluidMapper.apply(fluid.stack()));
-        } else if (obj instanceof ProcessingResults.ItemResult item) {
-            return Optional.of(itemsMapper.apply(List.of(item.stack)));
-        } else if (obj instanceof ProcessingResults.FluidResult fluid) {
-            return Optional.of(fluidMapper.apply(fluid.stack));
-        }
-        return Optional.empty();
-    }
-
-    public static void consumeItemsOrFluid(IProcessingObject obj, Consumer<List<ItemStack>> itemsConsumer,
-        Consumer<FluidStack> fluidConsumer) {
-        mapItemsOrFluid(obj, items -> {
-            itemsConsumer.accept(items);
-            return Unit.INSTANCE;
-        }, fluid -> {
-            fluidConsumer.accept(fluid);
-            return Unit.INSTANCE;
-        });
-    }
-
-    public static <V> Optional<V> mapItemOrFluid(IProcessingObject obj, Function<ItemStack, V> itemsMapper,
-        Function<FluidStack, V> fluidMapper) {
-
-        if (obj instanceof ProcessingIngredients.ItemIngredient item) {
-            return Optional.of(itemsMapper.apply(item.stack()));
-        } else if (obj instanceof ItemsIngredient items) {
-            var itemList = items.ingredient.getItems();
-            if (itemList.length > 0) {
-                return Optional.of(itemsMapper.apply(itemList[0]));
-            }
-        } else if (obj instanceof ProcessingIngredients.FluidIngredient fluid) {
-            return Optional.of(fluidMapper.apply(fluid.stack()));
-        } else if (obj instanceof ProcessingResults.ItemResult item) {
-            return Optional.of(itemsMapper.apply(item.stack));
-        } else if (obj instanceof ProcessingResults.FluidResult fluid) {
-            return Optional.of(fluidMapper.apply(fluid.stack));
-        }
-        return Optional.empty();
     }
 }

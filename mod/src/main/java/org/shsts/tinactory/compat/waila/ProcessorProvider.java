@@ -25,11 +25,10 @@ import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingWailaHelper;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -119,11 +118,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 line.add(helper.text(tr("inputs")));
                 for (var tag1 : listTag) {
                     var input = CodecHelper.parseTag(ProcessingInfo.ingredientCodec(), tag1);
-                    if (input instanceof ProcessingIngredients.ItemIngredient item) {
-                        itemElement(line, item.stack());
-                    } else if (input instanceof ProcessingIngredients.FluidIngredient fluid) {
-                        fluidElement(line, fluid.fluid());
-                    }
+                    ProcessingWailaHelper.appendElement(line, input, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
                     add(line);
@@ -136,11 +131,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 line.add(helper.text(tr("outputs")));
                 for (var tag1 : listTag) {
                     var output = CodecHelper.parseTag(ProcessingInfo.resultCodec(), tag1);
-                    if (output instanceof ProcessingResults.ItemResult item) {
-                        itemElement(line, item.stack);
-                    } else if (output instanceof ProcessingResults.FluidResult fluid) {
-                        fluidElement(line, fluid.stack);
-                    }
+                    ProcessingWailaHelper.appendElement(line, output, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
                     add(line);
