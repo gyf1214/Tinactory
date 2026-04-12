@@ -1,6 +1,10 @@
 archivesBaseName = "tinactory"
 apply plugin: 'jacoco'
 
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+}
+
 minecraft {
     runs {
         client {
