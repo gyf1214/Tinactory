@@ -30,8 +30,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.metrics.MetricsManager;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
@@ -93,12 +91,7 @@ public class MachineProcessor extends CapabilityProvider implements
             infoList.clear();
             processor.onWorkBegin(recipe, machine, maxParallel, info -> {
                 infoList.add(info);
-                var ingredient = info.object();
-                if (ingredient instanceof ProcessingIngredients.ItemIngredient item) {
-                    MetricsManager.reportItem("item_consumed", machine, item.stack());
-                } else if (ingredient instanceof ProcessingIngredients.FluidIngredient fluid) {
-                    MetricsManager.reportFluid("fluid_consumed", machine, fluid.fluid());
-                }
+                MetricsManager.reportProcessingObject("consumed", machine, info.object());
             });
         }
 
@@ -111,13 +104,8 @@ public class MachineProcessor extends CapabilityProvider implements
         }
 
         public void onWorkDone(IMachine machine, Random random) {
-            processor.onWorkDone(recipe, machine, random, result -> {
-                if (result instanceof ProcessingResults.ItemResult item) {
-                    MetricsManager.reportItem("item_produced", machine, item.stack);
-                } else if (result instanceof ProcessingResults.FluidResult fluid) {
-                    MetricsManager.reportFluid("fluid_produced", machine, fluid.stack);
-                }
-            });
+            processor.onWorkDone(recipe, machine, random,
+                result -> MetricsManager.reportProcessingObject("produced", machine, result));
         }
 
         public long maxProgress() {

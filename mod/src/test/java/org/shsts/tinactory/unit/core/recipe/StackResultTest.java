@@ -17,6 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StackResultTest {
     @Test
+    void shouldCreateDeterministicScaledPreview() {
+        var result = new StackResult<>("test_stack_result", PortType.FLUID, 0.25d,
+            new TestStack(PortType.FLUID, "steam", "hot", 1000), TestStack.ADAPTER);
+
+        var preview = assertInstanceOf(StackResult.class, result.scaledPreview(3));
+
+        assertEquals(new StackResult<>("test_stack_result", PortType.FLUID, 1d,
+            new TestStack(PortType.FLUID, "steam", "hot", 3000), TestStack.ADAPTER), preview);
+    }
+
+    @Test
     void shouldInsertScaledExactStackIntoMatchingPort() {
         var port = new TestStackPort(PortType.ITEM, TestStack.item("ingot", 1), 16);
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 1d,

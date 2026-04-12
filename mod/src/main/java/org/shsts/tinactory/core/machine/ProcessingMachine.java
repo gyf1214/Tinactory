@@ -21,8 +21,6 @@ import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
@@ -257,14 +255,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
 
     protected void addOutputInfo(R recipe, int parallel, Consumer<ProcessingInfo> info) {
         for (var output : recipe.outputs) {
-            var result = output.result();
-            if (result instanceof ProcessingResults.ItemResult item) {
-                var stack1 = StackHelper.copyWithCount(item.stack, parallel * item.stack.getCount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.ItemResult(stack1)));
-            } else if (result instanceof ProcessingResults.FluidResult fluid) {
-                var stack1 = StackHelper.copyWithAmount(fluid.stack, parallel * fluid.stack.getAmount());
-                info.accept(new ProcessingInfo(output.port(), new ProcessingResults.FluidResult(stack1)));
-            }
+            info.accept(new ProcessingInfo(output.port(), output.result().scaledPreview(parallel)));
         }
     }
 

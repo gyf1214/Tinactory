@@ -7,7 +7,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.recipe.ProcessingIngredients;
+import org.shsts.tinactory.core.recipe.ProcessingResults;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,18 @@ public class MetricsManager {
     public static void reportFluid(String name, IMachine machine, FluidStack fluid) {
         if (!fluid.isEmpty()) {
             report(name, List.of(ownerName(machine), fluid.getTranslationKey()), fluid.getAmount());
+        }
+    }
+
+    public static void reportProcessingObject(String action, IMachine machine, IProcessingObject object) {
+        if (object instanceof ProcessingIngredients.ItemIngredient item) {
+            reportItem("item_" + action, machine, item.stack());
+        } else if (object instanceof ProcessingIngredients.FluidIngredient fluid) {
+            reportFluid("fluid_" + action, machine, fluid.fluid());
+        } else if (object instanceof ProcessingResults.ItemResult item) {
+            reportItem("item_" + action, machine, item.stack);
+        } else if (object instanceof ProcessingResults.FluidResult fluid) {
+            reportFluid("fluid_" + action, machine, fluid.stack);
         }
     }
 }
