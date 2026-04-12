@@ -11,8 +11,8 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         var typed = asFluidKey(key);
         var stack = new FluidStack(typed.fluid(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
-            stack.setTag(typed.nbtOptional().orElseThrow());
+            stack.setTag(typed.nbt().copy());
         }
         return stack;
     }
@@ -97,7 +97,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
         private FluidKey(Fluid fluid, @Nullable CompoundTag nbt) {
             this.fluid = fluid;
-            this.nbt = normalizeNbt(nbt);
+            this.nbt = nbt == null || nbt.isEmpty() ? null : nbt;
         }
 
         private static FluidKey of(FluidStack stack) {
@@ -108,13 +108,23 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             return fluid;
         }
 
+        private ResourceLocation id() {
+            var id = fluid.getRegistryName();
+            assert id != null;
+            return id;
+        }
+
         @Nullable
         private CompoundTag nbt() {
             return nbt;
         }
 
+        private String nbtString() {
+            return nbt != null ? nbt.toString() : "";
+        }
+
         private Optional<CompoundTag> nbtOptional() {
-            return Optional.ofNullable(copyNbt(nbt));
+            return Optional.ofNullable(nbt);
         }
 
         @Override
@@ -130,11 +140,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             if (!(other instanceof FluidKey typed)) {
                 throw new IllegalArgumentException("Expected fluid key for FLUID type comparison");
             }
-            var byId = fluidId(fluid).compareTo(fluidId(typed.fluid));
+            var byId = id().compareTo(typed.id());
             if (byId != 0) {
                 return byId;
             }
-            return nbtString(nbt).compareTo(nbtString(typed.nbt));
+            return nbtString().compareTo(typed.nbtString());
         }
 
         @Override
@@ -151,33 +161,8 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
         @Override
         public String toString() {
-            var id = fluidId(fluid).toString();
+            var id = id().toString();
             return nbt == null ? id : id + nbt;
         }
-    }
-
-    private static ResourceLocation fluidId(Fluid fluid) {
-        var key = fluid.getRegistryName();
-        if (key == null) {
-            throw new IllegalArgumentException("Fluid has no registry id");
-        }
-        return key;
-    }
-
-    @Nullable
-    private static CompoundTag copyNbt(@Nullable CompoundTag nbt) {
-        return nbt != null ? nbt.copy() : null;
-    }
-
-    private static String nbtString(@Nullable CompoundTag nbt) {
-        return nbt != null ? nbt.toString() : "";
-    }
-
-    @Nullable
-    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
-        if (nbt == null || nbt.isEmpty()) {
-            return null;
-        }
-        return nbt.copy();
     }
 }

@@ -11,8 +11,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         var typed = asItemKey(key);
         var stack = new ItemStack(typed.item(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
-            stack.setTag(typed.nbtOptional().orElseThrow());
+            stack.setTag(typed.nbt().copy());
         }
         return stack;
     }
@@ -97,7 +97,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
         private ItemKey(Item item, @Nullable CompoundTag nbt) {
             this.item = item;
-            this.nbt = normalizeNbt(nbt);
+            this.nbt = nbt == null || nbt.isEmpty() ? null : nbt;
         }
 
         private static ItemKey of(ItemStack stack) {
@@ -113,8 +113,12 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             return nbt;
         }
 
+        private String nbtString() {
+            return nbt != null ? nbt.toString() : "";
+        }
+
         private Optional<CompoundTag> nbtOptional() {
-            return Optional.ofNullable(copyNbt(nbt));
+            return Optional.ofNullable(nbt);
         }
 
         @Override
@@ -134,7 +138,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             if (byId != 0) {
                 return byId;
             }
-            return nbtString(nbt).compareTo(nbtString(typed.nbt));
+            return nbtString().compareTo(typed.nbtString());
         }
 
         @Override
@@ -161,22 +165,5 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             throw new IllegalArgumentException("Item has no registry id");
         }
         return key;
-    }
-
-    @Nullable
-    private static CompoundTag copyNbt(@Nullable CompoundTag nbt) {
-        return nbt != null ? nbt.copy() : null;
-    }
-
-    private static String nbtString(@Nullable CompoundTag nbt) {
-        return nbt != null ? nbt.toString() : "";
-    }
-
-    @Nullable
-    private static CompoundTag normalizeNbt(@Nullable CompoundTag nbt) {
-        if (nbt == null || nbt.isEmpty()) {
-            return null;
-        }
-        return nbt.copy();
     }
 }
