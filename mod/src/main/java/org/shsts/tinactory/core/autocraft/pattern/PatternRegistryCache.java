@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -27,16 +27,16 @@ public final class PatternRegistryCache implements IPatternRepository {
     private final Map<CellKey, CellState> cellsByKey = new HashMap<>();
     private final NavigableSet<CellKey> orderedCells = new TreeSet<>();
     private final Map<String, PatternEntry> byPatternId = new HashMap<>();
-    private final Map<IIngredientKey, List<CraftPattern>> byOutput = new HashMap<>();
+    private final Map<IStackKey, List<CraftPattern>> byOutput = new HashMap<>();
     private final Map<UUID, Integer> machinePriority = new HashMap<>();
 
     @Override
-    public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+    public List<CraftPattern> findPatternsProducing(IStackKey key) {
         return List.copyOf(byOutput.getOrDefault(key, List.of()));
     }
 
     @Override
-    public List<IIngredientKey> listRequestables() {
+    public List<IStackKey> listRequestables() {
         return byOutput.keySet().stream().sorted().toList();
     }
 

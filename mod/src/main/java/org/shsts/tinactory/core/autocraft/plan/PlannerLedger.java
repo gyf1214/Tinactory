@@ -2,7 +2,7 @@ package org.shsts.tinactory.core.autocraft.plan;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PlannerLedger {
-    private final Map<IIngredientKey, Long> stock = new HashMap<>();
+    private final Map<IStackKey, Long> stock = new HashMap<>();
 
     public PlannerLedger copy() {
         var copy = new PlannerLedger();
@@ -23,18 +23,18 @@ public final class PlannerLedger {
         stock.putAll(snapshot.stock);
     }
 
-    public long get(IIngredientKey key) {
+    public long get(IStackKey key) {
         return stock.getOrDefault(key, 0L);
     }
 
-    public void add(IIngredientKey key, long amount) {
+    public void add(IStackKey key, long amount) {
         if (amount <= 0L) {
             return;
         }
         stock.merge(key, amount, Long::sum);
     }
 
-    public long consume(IIngredientKey key, long amount) {
+    public long consume(IStackKey key, long amount) {
         if (amount <= 0L) {
             return 0L;
         }

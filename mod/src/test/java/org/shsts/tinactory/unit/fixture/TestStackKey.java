@@ -3,28 +3,28 @@ package org.shsts.tinactory.unit.fixture;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
-public record TestIngredientKey(PortType type, String id, String nbt) implements IIngredientKey {
-    private static final Codec<TestIngredientKey> RAW_CODEC = Codec.STRING.comapFlatMap(
-        TestIngredientKey::decode,
-        TestIngredientKey::encode
+public record TestStackKey(PortType type, String id, String nbt) implements IStackKey {
+    private static final Codec<TestStackKey> RAW_CODEC = Codec.STRING.comapFlatMap(
+        TestStackKey::decode,
+        TestStackKey::encode
     );
 
-    public static final Codec<IIngredientKey> CODEC = RAW_CODEC.xmap(
+    public static final Codec<IStackKey> CODEC = RAW_CODEC.xmap(
         key -> key,
-        key -> (TestIngredientKey) key
+        key -> (TestStackKey) key
     );
 
-    public static TestIngredientKey item(String id, String nbt) {
-        return new TestIngredientKey(PortType.ITEM, id, nbt);
+    public static TestStackKey item(String id, String nbt) {
+        return new TestStackKey(PortType.ITEM, id, nbt);
     }
 
-    public static TestIngredientKey fluid(String id, String nbt) {
-        return new TestIngredientKey(PortType.FLUID, id, nbt);
+    public static TestStackKey fluid(String id, String nbt) {
+        return new TestStackKey(PortType.FLUID, id, nbt);
     }
 
-    private static DataResult<TestIngredientKey> decode(String encoded) {
+    private static DataResult<TestStackKey> decode(String encoded) {
         var parts = encoded.split("\\|", 3);
         if (parts.length != 3) {
             return DataResult.error("Invalid test key encoding: " + encoded);
@@ -37,10 +37,10 @@ public record TestIngredientKey(PortType type, String id, String nbt) implements
         if (type == null) {
             return DataResult.error("Invalid test key type: " + parts[0]);
         }
-        return DataResult.success(new TestIngredientKey(type, parts[1], parts[2]));
+        return DataResult.success(new TestStackKey(type, parts[1], parts[2]));
     }
 
-    private static String encode(TestIngredientKey key) {
+    private static String encode(TestStackKey key) {
         var typeName = switch (key.type()) {
             case ITEM -> "item";
             case FLUID -> "fluid";
@@ -50,8 +50,8 @@ public record TestIngredientKey(PortType type, String id, String nbt) implements
     }
 
     @Override
-    public int compareTo(IIngredientKey other) {
-        if (!(other instanceof TestIngredientKey typed)) {
+    public int compareTo(IStackKey other) {
+        if (!(other instanceof TestStackKey typed)) {
             throw new IllegalArgumentException("Expected TestIngredientKey");
         }
         var byType = Integer.compare(type.ordinal(), typed.type.ordinal());

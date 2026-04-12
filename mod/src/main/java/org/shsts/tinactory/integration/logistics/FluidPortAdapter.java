@@ -11,7 +11,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 import java.util.Objects;
@@ -22,7 +22,7 @@ import java.util.Optional;
 public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
     public static final FluidPortAdapter INSTANCE = new FluidPortAdapter();
 
-    private static final Codec<? extends IIngredientKey> KEY_CODEC =
+    private static final Codec<? extends IStackKey> KEY_CODEC =
         RecordCodecBuilder.<FluidKey>create(instance -> instance.group(
             ForgeRegistries.FLUIDS.getCodec().fieldOf("id").forGetter(FluidKey::fluid),
             CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidKey::nbtOptional)
@@ -61,12 +61,12 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
     }
 
     @Override
-    public IIngredientKey keyOf(FluidStack stack) {
+    public IStackKey keyOf(FluidStack stack) {
         return FluidKey.of(stack);
     }
 
     @Override
-    public FluidStack stackOf(IIngredientKey key, long amount) {
+    public FluidStack stackOf(IStackKey key, long amount) {
         var typed = asFluidKey(key);
         var stack = new FluidStack(typed.fluid(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
@@ -75,18 +75,18 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         return stack;
     }
 
-    public static Codec<? extends IIngredientKey> keyCodec() {
+    public static Codec<? extends IStackKey> keyCodec() {
         return KEY_CODEC;
     }
 
-    private static FluidKey asFluidKey(IIngredientKey key) {
+    private static FluidKey asFluidKey(IStackKey key) {
         if (key instanceof FluidKey typed) {
             return typed;
         }
         throw new IllegalArgumentException("Expected fluid key but got: " + key.getClass().getName());
     }
 
-    private static final class FluidKey implements IIngredientKey {
+    private static final class FluidKey implements IStackKey {
         private final Fluid fluid;
         @Nullable
         private final CompoundTag nbt;
@@ -123,7 +123,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         }
 
         @Override
-        public int compareTo(IIngredientKey other) {
+        public int compareTo(IStackKey other) {
             if (type() != other.type()) {
                 return Integer.compare(type().ordinal(), other.type().ordinal());
             }

@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
@@ -38,7 +38,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     private final AutocraftPreviewPanel previewPanel;
     private final Tab tabs;
 
-    private List<IIngredientKey> requestables = List.of();
+    private List<IStackKey> requestables = List.of();
     private List<UUID> availableCpus = List.of();
     private List<CpuStatusEntry> availableCpuStatuses = List.of();
     private List<CpuStatusEntry> cpuStatuses = List.of();

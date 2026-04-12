@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.ChannelMachineRoute;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
@@ -125,7 +125,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     private Optional<IMachineRoute> buildInputRoute(
-        IIngredientKey key,
+        IStackKey key,
         List<LogisticComponent.PortInfo> ports,
         List<PortConstraint> constraints) {
         for (var info : ports) {
@@ -145,7 +145,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     private Optional<IMachineRoute> buildOutputRoute(
-        IIngredientKey key,
+        IStackKey key,
         List<LogisticComponent.PortInfo> ports,
         List<PortConstraint> constraints) {
         for (var info : ports) {
@@ -193,12 +193,12 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
         return true;
     }
 
-    private static Optional<IMachineRoute> buildItemInputRoute(IPort<?> port, IIngredientKey key) {
+    private static Optional<IMachineRoute> buildItemInputRoute(IPort<?> port, IStackKey key) {
         return itemChannel(port)
             .map(channel -> new ChannelMachineRoute<>(key, PortDirection.INPUT, channel));
     }
 
-    private static Optional<IMachineRoute> buildItemOutputRoute(IPort<?> port, IIngredientKey key) {
+    private static Optional<IMachineRoute> buildItemOutputRoute(IPort<?> port, IStackKey key) {
         if (!port.acceptOutput()) {
             return Optional.empty();
         }
@@ -206,12 +206,12 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             .map(channel -> new ChannelMachineRoute<>(key, PortDirection.OUTPUT, channel));
     }
 
-    private static Optional<IMachineRoute> buildFluidInputRoute(IPort<?> port, IIngredientKey key) {
+    private static Optional<IMachineRoute> buildFluidInputRoute(IPort<?> port, IStackKey key) {
         return fluidChannel(port)
             .map(channel -> new ChannelMachineRoute<>(key, PortDirection.INPUT, channel));
     }
 
-    private static Optional<IMachineRoute> buildFluidOutputRoute(IPort<?> port, IIngredientKey key) {
+    private static Optional<IMachineRoute> buildFluidOutputRoute(IPort<?> port, IStackKey key) {
         if (!port.acceptOutput()) {
             return Optional.empty();
         }

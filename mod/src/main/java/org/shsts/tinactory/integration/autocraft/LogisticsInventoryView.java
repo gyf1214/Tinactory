@@ -9,7 +9,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 
@@ -31,17 +31,17 @@ public final class LogisticsInventoryView implements IInventoryView {
     }
 
     @Override
-    public long amountOf(IIngredientKey key) {
+    public long amountOf(IStackKey key) {
         return channel(key.type()).amountOf(key);
     }
 
     @Override
-    public long extract(IIngredientKey key, long amount, boolean simulate) {
+    public long extract(IStackKey key, long amount, boolean simulate) {
         return channel(key.type()).extract(key, amount, simulate);
     }
 
     @Override
-    public long insert(IIngredientKey key, long amount, boolean simulate) {
+    public long insert(IStackKey key, long amount, boolean simulate) {
         return channel(key.type()).insert(key, amount, simulate);
     }
 

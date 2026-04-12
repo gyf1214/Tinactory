@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.fixture;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 import java.util.Objects;
@@ -50,13 +50,13 @@ public record TestStack(PortType type, String id, String nbt, int amount) {
         }
 
         @Override
-        public IIngredientKey keyOf(TestStack stack) {
-            return new TestIngredientKey(stack.type(), stack.id(), stack.nbt());
+        public IStackKey keyOf(TestStack stack) {
+            return new TestStackKey(stack.type(), stack.id(), stack.nbt());
         }
 
         @Override
-        public TestStack stackOf(IIngredientKey key, long amount) {
-            var typed = (TestIngredientKey) key;
+        public TestStack stackOf(IStackKey key, long amount) {
+            var typed = (TestStackKey) key;
             return new TestStack(typed.type(), typed.id(), typed.nbt(), (int) amount);
         }
     };

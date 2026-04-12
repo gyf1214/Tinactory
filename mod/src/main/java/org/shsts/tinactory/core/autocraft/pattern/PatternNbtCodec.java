@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayList;
@@ -18,14 +18,14 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 @MethodsReturnNonnullByDefault
 public final class PatternNbtCodec {
     private final Codec<IMachineConstraint> constraintCodec;
-    private final Codec<IIngredientKey> keyCodec;
+    private final Codec<IStackKey> keyCodec;
 
-    public PatternNbtCodec(Codec<IMachineConstraint> constraintCodec, Codec<IIngredientKey> keyCodec) {
+    public PatternNbtCodec(Codec<IMachineConstraint> constraintCodec, Codec<IStackKey> keyCodec) {
         this.constraintCodec = constraintCodec;
         this.keyCodec = keyCodec;
     }
 
-    public Codec<IIngredientKey> keyCodec() {
+    public Codec<IStackKey> keyCodec() {
         return keyCodec;
     }
 
@@ -63,7 +63,7 @@ public final class PatternNbtCodec {
         return encodeAmount(amount.key(), amount.amount());
     }
 
-    public CompoundTag encodeAmount(IIngredientKey key, long amount) {
+    public CompoundTag encodeAmount(IStackKey key, long amount) {
         var tag = new CompoundTag();
         tag.put("key", CodecHelper.encodeTag(keyCodec, key));
         tag.putLong("amount", amount);

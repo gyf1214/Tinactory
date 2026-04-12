@@ -1,7 +1,7 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AutocraftModelTest {
     @Test
     void craftKeyShouldUseExactNbtIdentity() {
-        var base = TestIngredientKey.item("tinactory:gear", "{quality:1}");
-        var same = TestIngredientKey.item("tinactory:gear", "{quality:1}");
-        var differentNbt = TestIngredientKey.item("tinactory:gear", "{quality:2}");
+        var base = TestStackKey.item("tinactory:gear", "{quality:1}");
+        var same = TestStackKey.item("tinactory:gear", "{quality:1}");
+        var differentNbt = TestStackKey.item("tinactory:gear", "{quality:2}");
 
         assertEquals(base, same);
         assertThrows(AssertionError.class, () -> assertEquals(base, differentNbt));
@@ -28,9 +28,9 @@ class AutocraftModelTest {
 
     @Test
     void craftPatternShouldKeepOrderedInputsAndOutputs() {
-        var ore = new CraftAmount(TestIngredientKey.item("tinactory:ore", ""), 1);
-        var plate = new CraftAmount(TestIngredientKey.item("tinactory:plate", ""), 2);
-        var slag = new CraftAmount(TestIngredientKey.item("tinactory:slag", ""), 1);
+        var ore = new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1);
+        var plate = new CraftAmount(TestStackKey.item("tinactory:plate", ""), 2);
+        var slag = new CraftAmount(TestStackKey.item("tinactory:slag", ""), 1);
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "crusher"), 2,
             List.of(new TestConstraint("tooling")));
 
@@ -49,14 +49,14 @@ class AutocraftModelTest {
             List.of(new TestConstraint("frame")));
         var pattern = new CraftPattern(
             "tinactory:part",
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:part", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:part", ""), 1)),
             requirement);
 
         assertThrows(UnsupportedOperationException.class, () -> pattern.inputs().add(
-            new CraftAmount(TestIngredientKey.item("tinactory:other", ""), 1)));
+            new CraftAmount(TestStackKey.item("tinactory:other", ""), 1)));
         assertThrows(IllegalArgumentException.class,
-            () -> new CraftAmount(TestIngredientKey.item("tinactory:invalid", ""), 0));
+            () -> new CraftAmount(TestStackKey.item("tinactory:invalid", ""), 0));
     }
 
     @Test

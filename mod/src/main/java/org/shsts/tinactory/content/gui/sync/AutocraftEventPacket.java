@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -24,7 +24,7 @@ public class AutocraftEventPacket implements IPacket {
 
     private Action action;
     @Nullable
-    private IIngredientKey target;
+    private IStackKey target;
     private long quantity;
     @Nullable
     private UUID cpuId;
@@ -33,7 +33,7 @@ public class AutocraftEventPacket implements IPacket {
 
     private AutocraftEventPacket(
         Action action,
-        @Nullable IIngredientKey target,
+        @Nullable IStackKey target,
         long quantity,
         @Nullable UUID cpuId) {
 
@@ -43,7 +43,7 @@ public class AutocraftEventPacket implements IPacket {
         this.cpuId = cpuId;
     }
 
-    public static AutocraftEventPacket preview(IIngredientKey target, long quantity) {
+    public static AutocraftEventPacket preview(IStackKey target, long quantity) {
         return new AutocraftEventPacket(Action.PREVIEW, target, quantity, null);
     }
 
@@ -64,7 +64,7 @@ public class AutocraftEventPacket implements IPacket {
     }
 
     @Nullable
-    public IIngredientKey target() {
+    public IStackKey target() {
         return target;
     }
 

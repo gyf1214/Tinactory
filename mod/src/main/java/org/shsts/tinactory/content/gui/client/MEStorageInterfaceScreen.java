@@ -17,7 +17,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
 import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
@@ -124,7 +124,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
     }
 
     private void onSync(MEStorageInterfaceSyncPacket packet) {
-        var itemsMap = new HashMap<IIngredientKey, ItemStack>();
+        var itemsMap = new HashMap<IStackKey, ItemStack>();
         for (var newItem : packet.items()) {
             var key = ItemPortAdapter.INSTANCE.keyOf(newItem);
             if (itemsMap.containsKey(key)) {
@@ -137,7 +137,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         items.addAll(itemsMap.values());
         items.sort(Comparator.comparing($ -> $.getItem().getRegistryName()));
 
-        var fluidsMap = new HashMap<IIngredientKey, FluidStack>();
+        var fluidsMap = new HashMap<IStackKey, FluidStack>();
         for (var newFluid : packet.fluids()) {
             var key = FluidPortAdapter.INSTANCE.keyOf(newFluid);
             if (fluidsMap.containsKey(key)) {

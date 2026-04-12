@@ -5,25 +5,25 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ChannelMachineRoute<T> implements IMachineRoute {
-    private final IIngredientKey key;
+    private final IStackKey key;
     private final PortDirection direction;
     private final CraftPortChannel<T> channel;
 
     public ChannelMachineRoute(
-        IIngredientKey key,
+        IStackKey key,
         PortDirection direction,
         IStackAdapter<T> stackAdapter,
         IPort<T> port) {
         this(key, direction, new CraftPortChannel<>(stackAdapter, port));
     }
 
-    public ChannelMachineRoute(IIngredientKey key, PortDirection direction, CraftPortChannel<T> channel) {
+    public ChannelMachineRoute(IStackKey key, PortDirection direction, CraftPortChannel<T> channel) {
         if (direction == PortDirection.NONE) {
             throw new IllegalArgumentException("direction must not be NONE");
         }
@@ -33,7 +33,7 @@ public final class ChannelMachineRoute<T> implements IMachineRoute {
     }
 
     @Override
-    public IIngredientKey key() {
+    public IStackKey key() {
         return key;
     }
 

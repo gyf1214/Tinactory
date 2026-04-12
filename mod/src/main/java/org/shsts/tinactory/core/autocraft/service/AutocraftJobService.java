@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -239,7 +239,7 @@ public class AutocraftJobService implements IAutocraftService {
         return ExecutionError.valueOf(tag.getString("value"));
     }
 
-    private static ListTag serializeKeyedAmounts(Map<IIngredientKey, Long> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeKeyedAmounts(Map<IStackKey, Long> amounts, PatternNbtCodec codec) {
         var out = new ListTag();
         for (var entry : amounts.entrySet()) {
             out.add(codec.encodeAmount(entry.getKey(), entry.getValue()));
@@ -247,8 +247,8 @@ public class AutocraftJobService implements IAutocraftService {
         return out;
     }
 
-    private static Map<IIngredientKey, Long> deserializeKeyedAmounts(ListTag tags, PatternNbtCodec codec) {
-        var out = new LinkedHashMap<IIngredientKey, Long>();
+    private static Map<IStackKey, Long> deserializeKeyedAmounts(ListTag tags, PatternNbtCodec codec) {
+        var out = new LinkedHashMap<IStackKey, Long>();
         for (var i = 0; i < tags.size(); i++) {
             var amount = codec.decodeAmount(tags.getCompound(i));
             out.put(amount.key(), amount.amount());

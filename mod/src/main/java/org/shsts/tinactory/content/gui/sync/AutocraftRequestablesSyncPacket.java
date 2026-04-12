@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -16,15 +16,15 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftRequestablesSyncPacket implements IPacket {
-    private final List<IIngredientKey> requestables = new ArrayList<>();
+    private final List<IStackKey> requestables = new ArrayList<>();
 
     public AutocraftRequestablesSyncPacket() {}
 
-    public AutocraftRequestablesSyncPacket(List<IIngredientKey> requestables) {
+    public AutocraftRequestablesSyncPacket(List<IStackKey> requestables) {
         this.requestables.addAll(requestables);
     }
 
-    public List<IIngredientKey> requestables() {
+    public List<IStackKey> requestables() {
         return requestables;
     }
 

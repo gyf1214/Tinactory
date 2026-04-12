@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 import java.util.Objects;
@@ -22,7 +22,7 @@ import java.util.Optional;
 public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     public static final ItemPortAdapter INSTANCE = new ItemPortAdapter();
 
-    private static final Codec<? extends IIngredientKey> KEY_CODEC =
+    private static final Codec<? extends IStackKey> KEY_CODEC =
         RecordCodecBuilder.<ItemKey>create(instance -> instance.group(
             ForgeRegistries.ITEMS.getCodec().fieldOf("id").forGetter(ItemKey::item),
             CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(ItemKey::nbtOptional)
@@ -61,12 +61,12 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     }
 
     @Override
-    public IIngredientKey keyOf(ItemStack stack) {
+    public IStackKey keyOf(ItemStack stack) {
         return ItemKey.of(stack);
     }
 
     @Override
-    public ItemStack stackOf(IIngredientKey key, long amount) {
+    public ItemStack stackOf(IStackKey key, long amount) {
         var typed = asItemKey(key);
         var stack = new ItemStack(typed.item(), Math.toIntExact(amount));
         if (typed.nbt() != null) {
@@ -75,18 +75,18 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         return stack;
     }
 
-    public static Codec<? extends IIngredientKey> keyCodec() {
+    public static Codec<? extends IStackKey> keyCodec() {
         return KEY_CODEC;
     }
 
-    private static ItemKey asItemKey(IIngredientKey key) {
+    private static ItemKey asItemKey(IStackKey key) {
         if (key instanceof ItemKey typed) {
             return typed;
         }
         throw new IllegalArgumentException("Expected item key but got: " + key.getClass().getName());
     }
 
-    private static final class ItemKey implements IIngredientKey {
+    private static final class ItemKey implements IStackKey {
         private final Item item;
         @Nullable
         private final CompoundTag nbt;
@@ -123,7 +123,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         }
 
         @Override
-        public int compareTo(IIngredientKey other) {
+        public int compareTo(IStackKey other) {
             if (type() != other.type()) {
                 return Integer.compare(type().ordinal(), other.type().ordinal());
             }

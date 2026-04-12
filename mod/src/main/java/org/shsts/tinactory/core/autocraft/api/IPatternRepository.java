@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.autocraft.api;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,9 +11,9 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IPatternRepository {
-    List<CraftPattern> findPatternsProducing(IIngredientKey key);
+    List<CraftPattern> findPatternsProducing(IStackKey key);
 
-    List<IIngredientKey> listRequestables();
+    List<IStackKey> listRequestables();
 
     boolean containsPatternId(String patternId);
 
