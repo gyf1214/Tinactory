@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.recipe;
+package org.shsts.tinactory.integration.recipe;
 
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
@@ -21,9 +21,8 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
-import org.shsts.tinactory.integration.recipe.TagIngredient;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -216,5 +215,4 @@ public class MarkerRecipe extends ProcessingRecipe {
             jo.add("marker_outputs", markerOutputs);
         }
     }
-
 }

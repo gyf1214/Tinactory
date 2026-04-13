@@ -9,10 +9,10 @@ import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.core.material.MaterialSet
-import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.integration.recipe.MarkerRecipe
 import org.shsts.tinactory.integration.recipe.ProcessingStackHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 

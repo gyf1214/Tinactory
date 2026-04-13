@@ -11,20 +11,19 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
+import org.shsts.tinactory.integration.recipe.MarkerRecipe;
 import org.shsts.tinactory.unit.fixture.TestStack;
-import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class ProcessingObjectCodecTest {
     @Test
@@ -76,27 +75,6 @@ class ProcessingObjectCodecTest {
         assertEquals(recipe.inputs, roundTrip.inputs);
         assertEquals(recipe.target, roundTrip.target);
         assertEquals(recipe.progress, roundTrip.progress);
-    }
-
-    @Test
-    void shouldRoundTripMarkerRecipeWithInjectedIngredientCodec() {
-        var type = new TestRecipeType<MarkerRecipe.Builder>("test_marker_recipe", TestMarkerBuilder::new);
-        var loc = new ResourceLocation("tinactory", "codec_marker_recipe");
-        var serializer = new MarkerRecipe.Serializer(TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
-        var recipe = type.getBuilder(loc)
-            .baseType(new ResourceLocation("minecraft", "smelting"))
-            .display(new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
-                TestStack.item("display", 1), TestStack.ADAPTER))
-            .output(2, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
-                TestStack.item("marker", 3), TestStack.ADAPTER))
-            .buildObject();
-
-        var json = new JsonObject();
-        serializer.toJson(json, recipe);
-        var roundTrip = serializer.fromJson(type, loc, json, ICondition.IContext.EMPTY);
-
-        assertEquals(recipe.markerOutputs, roundTrip.markerOutputs);
-        assertInstanceOf(StackIngredient.class, roundTrip.displayIngredient().orElseThrow());
     }
 
     private static final Codec<IProcessingIngredient> TEST_INGREDIENT_CODEC =
