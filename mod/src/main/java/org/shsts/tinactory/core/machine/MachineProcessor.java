@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
@@ -141,10 +142,13 @@ public class MachineProcessor extends CapabilityProvider implements
 
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
 
-    public MachineProcessor(BlockEntity blockEntity, Collection<? extends IRecipeProcessor<?>> processors,
+    public MachineProcessor(BlockEntity blockEntity,
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe) {
         this.blockEntity = blockEntity;
-        this.processors = new ArrayList<>(processors);
+        this.processors = processorFactories.stream()
+            .map(factory -> factory.apply(blockEntity))
+            .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         this.autoRecipe = autoRecipe;
     }
 

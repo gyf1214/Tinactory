@@ -11,13 +11,15 @@ import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MultiblockProcessor extends MachineProcessor {
     public MultiblockProcessor(BlockEntity blockEntity,
-        Collection<? extends IRecipeProcessor<?>> processors, boolean autoRecipe) {
-        super(blockEntity, processors, autoRecipe);
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
+        boolean autoRecipe) {
+        super(blockEntity, processorFactories, autoRecipe);
     }
 
     private Optional<MultiblockInterface> getInterface() {
