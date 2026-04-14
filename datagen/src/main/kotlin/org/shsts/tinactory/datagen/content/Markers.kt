@@ -25,9 +25,9 @@ object Markers {
             // base markers, i.e. marking all recipes in baseType for multi-use multiblocks
             recipe("smelting") {
                 baseType(RecipeType.SMELTING)
+                display(Items.FURNACE)
                 extra {
                     requireMultiblock(true)
-                    display(Items.FURNACE)
                 }
             }
             baseMarker("alloy_smelter")
@@ -97,9 +97,7 @@ object Markers {
         recipe(id) {
             baseType(id)
             prefix()
-            extra {
-                display(typeInfo.icon.get())
-            }
+            display(typeInfo.icon.get())
         }
     }
 
@@ -108,9 +106,7 @@ object Markers {
             baseType("extruder")
             prefix("material/$sub")
             input(AllTags.EXTRUDER_INPUT, port = 0)
-            extra {
-                display(gregtech("items/metaitems/shape.extruder.$shape"))
-            }
+            display(gregtech("items/metaitems/shape.extruder.$shape"))
         }
     }
 
@@ -118,12 +114,10 @@ object Markers {
         recipe("fluid_solidifier/material/$sub") {
             baseType("fluid_solidifier")
             prefix("material/$sub")
-            extra {
-                if (fromMod) {
-                    display(modLoc("items/metaitems/shape.mold.$shape"))
-                } else {
-                    display(gregtech("items/metaitems/shape.mold.$shape"))
-                }
+            if (fromMod) {
+                display(modLoc("items/metaitems/shape.mold.$shape"))
+            } else {
+                display(gregtech("items/metaitems/shape.mold.$shape"))
             }
         }
     }

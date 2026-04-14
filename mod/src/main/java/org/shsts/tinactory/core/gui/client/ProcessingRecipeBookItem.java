@@ -10,9 +10,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.gui.client.RecipeDisplayRegistry;
-import org.shsts.tinactory.integration.recipe.MarkerRecipe;
 
 import java.util.List;
 import java.util.Optional;

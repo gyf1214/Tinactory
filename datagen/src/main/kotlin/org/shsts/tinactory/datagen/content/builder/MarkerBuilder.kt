@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
@@ -9,10 +10,10 @@ import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.core.material.MaterialSet
+import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
-import org.shsts.tinactory.integration.recipe.MarkerRecipe
 import org.shsts.tinactory.integration.recipe.ProcessingStackHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 
@@ -32,11 +33,11 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
 
     fun baseType(id: String) {
         baseType = id
-        builder.baseType(modLoc(id))
+        builder.baseType(checkNotNull(Registry.RECIPE_TYPE.get(modLoc(id))) { id })
     }
 
     fun baseType(type: RecipeType<*>) {
-        builder.baseType(ResourceLocation(type.toString()))
+        builder.baseType(type)
     }
 
     fun prefix(value: String) {
@@ -49,6 +50,22 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
 
     fun prefix() {
         builder.prefix(baseType!!).requireMultiblock(true)
+    }
+
+    fun requireMultiblock(value: Boolean) {
+        builder.requireMultiblock(value)
+    }
+
+    fun display(value: ItemLike) {
+        builder.display(ProcessingStackHelper.itemIngredient(ItemStack(value)))
+    }
+
+    fun display(tag: TagKey<Item>) {
+        builder.display(TagIngredient(tag, 1))
+    }
+
+    fun display(tex: ResourceLocation) {
+        builder.display(tex)
     }
 
     override fun output(item: ItemLike, amount: Int, port: Int, rate: Double) {

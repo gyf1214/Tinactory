@@ -6,6 +6,7 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -14,7 +15,7 @@ import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.integration.recipe.MarkerRecipe;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
 import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -49,7 +50,9 @@ public final class AllRecipes {
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
             .recipeClass(MarkerRecipe.class)
             .serializer(new MarkerRecipe.Serializer(
-                ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                ProcessingIngredientCodecs.codec(),
+                ProcessingResultCodecs.codec(),
+                Registry.RECIPE_TYPE::get))
             .register();
     }
 

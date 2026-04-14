@@ -10,9 +10,9 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.integration.recipe.MarkerRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
 
 import java.util.HashMap;

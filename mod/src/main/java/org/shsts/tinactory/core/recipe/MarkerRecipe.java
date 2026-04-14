@@ -1,4 +1,4 @@
-package org.shsts.tinactory.integration.recipe;
+package org.shsts.tinactory.core.recipe;
 
 import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
@@ -10,18 +10,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.ItemLike;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -29,6 +24,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -93,7 +89,9 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
         @Nullable
-        private ResourceLocation baseType;
+        private ResourceLocation baseTypeId;
+        @Nullable
+        private RecipeType<?> baseType;
         private String prefix = "";
         private boolean requireMultiblock = false;
         @Nullable
@@ -106,7 +104,12 @@ public class MarkerRecipe extends ProcessingRecipe {
             super(parent, loc);
         }
 
-        public Builder baseType(ResourceLocation value) {
+        public Builder baseType(RecipeType<?> value) {
+            return baseType(RecipeTypeIdResolver.DEFAULT.apply(value), value);
+        }
+
+        protected Builder baseType(ResourceLocation id, RecipeType<?> value) {
+            baseTypeId = id;
             baseType = value;
             return this;
         }
@@ -123,19 +126,13 @@ public class MarkerRecipe extends ProcessingRecipe {
 
         public Builder display(IProcessingIngredient value) {
             this.displayIngredient = value;
+            this.displayTex = null;
             return this;
         }
 
-        public Builder display(ItemLike item) {
-            return display(ProcessingStackHelper.itemIngredient(new ItemStack(item)));
-        }
-
-        public Builder display(TagKey<Item> tag) {
-            return display(new TagIngredient(tag, 1));
-        }
-
         public Builder display(ResourceLocation tex) {
-            displayTex = tex;
+            this.displayTex = tex;
+            this.displayIngredient = null;
             return this;
         }
 
@@ -144,20 +141,21 @@ public class MarkerRecipe extends ProcessingRecipe {
             return this;
         }
 
-        public RecipeType<?> getBaseType() {
-            assert baseType != null;
-            var type = Registry.RECIPE_TYPE.get(baseType);
-            assert type != null;
-            return type;
+        protected ResourceLocation getBaseTypeId() {
+            assert baseTypeId != null;
+            return baseTypeId;
         }
 
-        protected ResourceLocation getBaseTypeId() {
+        protected RecipeType<?> getBaseType() {
             assert baseType != null;
             return baseType;
         }
 
         @Override
-        protected void validate() {}
+        protected void validate() {
+            assert baseTypeId != null : loc;
+            assert baseType != null : loc;
+        }
 
         @Override
         protected MarkerRecipe createObject() {
@@ -166,23 +164,28 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+        private final Function<ResourceLocation, RecipeType<?>> recipeTypeResolver;
+
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec,
+            Codec<IProcessingResult> resultCodec,
+            Function<ResourceLocation, RecipeType<?>> recipeTypeResolver) {
             super(ingredientCodec, resultCodec);
+            this.recipeTypeResolver = recipeTypeResolver;
         }
 
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
+            var baseTypeId = new ResourceLocation(GsonHelper.getAsString(jo, "base_type"));
             var builder = super.buildFromJson(type, loc, jo)
-                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")))
+                .baseType(baseTypeId, recipeTypeResolver.apply(baseTypeId))
                 .prefix(GsonHelper.getAsString(jo, "prefix", ""))
                 .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
             if (jo.has("display")) {
                 if (jo.get("display").isJsonObject()) {
-                    var jo1 = GsonHelper.getAsJsonObject(jo, "display");
-                    builder.display(CodecHelper.parseJson(ingredientCodec(), jo1));
+                    builder.display(CodecHelper.parseJson(
+                        ingredientCodec(), GsonHelper.getAsJsonObject(jo, "display")));
                 } else {
-                    var tex = new ResourceLocation(GsonHelper.getAsString(jo, "display"));
-                    builder.display(tex);
+                    builder.display(new ResourceLocation(GsonHelper.getAsString(jo, "display")));
                 }
             }
             Streams.stream(GsonHelper.getAsJsonArray(jo, "marker_outputs"))
@@ -214,5 +217,16 @@ public class MarkerRecipe extends ProcessingRecipe {
                 }).forEach(markerOutputs::add);
             jo.add("marker_outputs", markerOutputs);
         }
+    }
+
+    private static final class RecipeTypeIdResolver {
+        private static final Function<RecipeType<?>, ResourceLocation> DEFAULT =
+            type -> {
+                var id = Registry.RECIPE_TYPE.getKey(type);
+                assert id != null;
+                return id;
+            };
+
+        private RecipeTypeIdResolver() {}
     }
 }

@@ -15,7 +15,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
-import org.shsts.tinactory.integration.recipe.MarkerRecipe;
 import org.shsts.tinactory.unit.fixture.TestStack;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
@@ -111,18 +110,6 @@ class ProcessingObjectCodecTest {
         }
     }
 
-    private static final class TestMarkerBuilder extends MarkerRecipe.Builder {
-        @SuppressWarnings("unchecked")
-        private TestMarkerBuilder(IRecipeType<MarkerRecipe.Builder> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        @Override
-        public RecipeType<?> getBaseType() {
-            return null;
-        }
-    }
-
     private static final class TestRecipeType<B extends IRecipeBuilderBase<?>> implements IRecipeType<B> {
         private final ResourceLocation loc;
         private final BiFunction<IRecipeType<B>, ResourceLocation, B> builderFactory;
@@ -162,4 +149,5 @@ class ProcessingObjectCodecTest {
             throw new UnsupportedOperationException();
         }
     }
+
 }
