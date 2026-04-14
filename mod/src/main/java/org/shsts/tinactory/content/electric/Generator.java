@@ -2,22 +2,24 @@ package org.shsts.tinactory.content.electric;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Generator extends ProcessingMachine<ProcessingRecipe> {
-    public Generator(IRecipeType<ProcessingRecipe.Builder> recipeType) {
-        super(recipeType);
+    public Generator(IRecipeType<ProcessingRecipe.Builder> recipeType,
+        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        super(recipeType, recipeManager, markerType);
     }
 
     @Override
-    protected int calculateParallel(ProcessingRecipe recipe, Level world, IMachine machine, int maxParallel) {
+    protected int calculateParallel(ProcessingRecipe recipe, IMachine machine, int maxParallel) {
         var voltage = machineVoltage(machine);
         var recipeParallel = (int) (voltage / recipe.voltage);
         var l = 1;

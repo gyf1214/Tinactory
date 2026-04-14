@@ -178,11 +178,10 @@ public class MachineProcessor extends CapabilityProvider implements
         if (machine.isEmpty()) {
             return () -> Collections::emptyList;
         }
-        var world = world();
         return () -> () -> {
             var ret = new ArrayList<IRecipeBookItem>();
             for (var processor : processors) {
-                var items = processor.recipeBookItems(world, machine.get()).getValue();
+                var items = processor.recipeBookItems(machine.get()).getValue();
                 ret.addAll(items);
             }
 
@@ -208,15 +207,15 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     private void setTargetRecipe(ResourceLocation loc) {
-        var world = world();
         var machine = machine().orElseThrow();
+        var isClientSide = world().isClientSide;
 
         // first clear the filter
         clearFilters(PortDirection.INPUT);
         for (var processor : processors) {
-            if (processor.allowTargetRecipe(world, loc, machine)) {
+            if (processor.allowTargetRecipe(isClientSide, loc, machine)) {
                 LOGGER.debug("{}: update target recipe = {}", blockEntity, loc);
-                processor.setTargetRecipe(world, loc, machine);
+                processor.setTargetRecipe(loc, machine);
                 return;
             }
         }
@@ -232,12 +231,12 @@ public class MachineProcessor extends CapabilityProvider implements
         targetRecipe().ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
-    private <T> boolean newRecipe(int index, IRecipeProcessor<T> processor, Level world,
-        IMachine machine, Optional<ResourceLocation> target) {
+    private <T> boolean newRecipe(int index, IRecipeProcessor<T> processor, IMachine machine,
+        Optional<ResourceLocation> target) {
         if (!autoRecipe && target.isEmpty()) {
             return false;
         }
-        var recipe = processor.newRecipe(world, machine, target);
+        var recipe = processor.newRecipe(machine, target);
         // newRecipe may set outputFilters, we clear it now.
         clearFilters(PortDirection.OUTPUT);
         if (recipe.isPresent()) {
@@ -293,7 +292,6 @@ public class MachineProcessor extends CapabilityProvider implements
             return;
         }
 
-        var world = world();
         var machine = machine();
         if (machine.isEmpty()) {
             return;
@@ -302,7 +300,7 @@ public class MachineProcessor extends CapabilityProvider implements
         var target = targetRecipe();
         for (var i = 0; i < processors.size(); i++) {
             var processor = processors.get(i);
-            if (newRecipe(i, processor, world, machine.get(), target)) {
+            if (newRecipe(i, processor, machine.get(), target)) {
                 break;
             }
         }
@@ -401,9 +399,8 @@ public class MachineProcessor extends CapabilityProvider implements
         return currentRecipe == null ? 0 : currentRecipe.powerCons();
     }
 
-    private <T> void recoverRecipe(int index, IRecipeProcessor<T> processor,
-        Level world, ResourceLocation loc) {
-        processor.byLoc(world, loc).ifPresent(recipe ->
+    private <T> void recoverRecipe(int index, IRecipeProcessor<T> processor, ResourceLocation loc) {
+        processor.byLoc(loc).ifPresent(recipe ->
             currentRecipe = new ProcessorRecipe<>(index, processor, recipe));
     }
 
@@ -415,7 +412,7 @@ public class MachineProcessor extends CapabilityProvider implements
         currentRecipe = null;
         if (currentRecipeLoc != null) {
             var processor = processors.get(processorIndex);
-            recoverRecipe(processorIndex, processor, world(), currentRecipeLoc);
+            recoverRecipe(processorIndex, processor, currentRecipeLoc);
             currentRecipeLoc = null;
         }
 

@@ -2,17 +2,20 @@ package org.shsts.tinactory.unit.fixture;
 
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.PortType;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
-public final class TestPort implements IPort<Object>, ILimitedPort {
+public final class TestPort implements IPort<Object>, IPortFilter<Object>, ILimitedPort {
     private final String key;
     private final int capacity;
     private final int portLimit;
     private int stored;
+    private List<Predicate<Object>> filters = List.of();
 
     public TestPort(String key, int capacity, int stored) {
         this(key, capacity, stored, Integer.MAX_VALUE);
@@ -70,8 +73,22 @@ public final class TestPort implements IPort<Object>, ILimitedPort {
         return portLimit;
     }
 
+    @Override
+    public void setFilters(List<? extends Predicate<Object>> filters) {
+        this.filters = List.copyOf(filters);
+    }
+
+    @Override
+    public void resetFilters() {
+        filters = List.of();
+    }
+
     public int stored() {
         return stored;
+    }
+
+    public List<Predicate<Object>> filters() {
+        return filters;
     }
 
     public Optional<TestPortSnapshot> consume(String expectedKey, int amount, boolean simulate) {

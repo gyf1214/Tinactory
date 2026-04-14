@@ -63,10 +63,10 @@ class ProcessingMachineTest {
 
         var items = processor.recipeBookItems(machine).getValue();
 
-        assertEquals(List.of(marker.loc(), alpha.loc(), beta.loc()), items.stream().map($ -> $.loc()).toList());
-        assertTrue(items.get(0).isMarker());
+        assertEquals(List.of(alpha.loc(), beta.loc(), marker.loc()), items.stream().map($ -> $.loc()).toList());
+        assertFalse(items.get(0).isMarker());
         assertFalse(items.get(1).isMarker());
-        assertFalse(items.get(2).isMarker());
+        assertTrue(items.get(2).isMarker());
     }
 
     @Test
@@ -146,7 +146,7 @@ class ProcessingMachineTest {
 
     private static final class TestProcessingMachine extends ProcessingMachine<TestRecipe> {
         private TestProcessingMachine() {
-            super(RECIPE_TYPE);
+            this(new TestRecipeManager());
         }
 
         private TestProcessingMachine(TestRecipeManager recipeManager) {
@@ -220,6 +220,9 @@ class ProcessingMachineTest {
 
         @Override
         public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
+            if (port instanceof org.shsts.tinactory.unit.fixture.TestPort testPort) {
+                return testPort.insert(name, amount * parallel, simulate).map($ -> this);
+            }
             throw new UnsupportedOperationException();
         }
 

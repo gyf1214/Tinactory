@@ -30,7 +30,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
@@ -55,7 +55,8 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static class Executor extends MachineMeta.Executor {
-        private final List<Supplier<? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
+        private final List<Function<net.minecraft.world.level.block.entity.BlockEntity,
+            ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
 
         public Executor(ResourceLocation loc, JsonObject jo) {
@@ -208,7 +209,8 @@ public class MultiblockMeta extends MachineMeta {
             return spec.build();
         }
 
-        private Supplier<? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
+        private Function<net.minecraft.world.level.block.entity.BlockEntity,
+            ? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
             if (recipeTypeStr.equals("electric_furnace")) {
                 return RecipeProcessors.electricFurnace(
                     GsonHelper.getAsInt(jo, "inputPort"),

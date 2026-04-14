@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
@@ -243,7 +244,9 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
-            var processor = RecipeProcessors.processing(recipeType());
+            Function<net.minecraft.world.level.block.entity.BlockEntity,
+                ? extends org.shsts.tinactory.core.machine.IRecipeProcessor<?>> processor =
+                RecipeProcessors.processing(recipeType());
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
@@ -260,7 +263,8 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
-            var processor = switch (recipeTypeStr) {
+            Function<net.minecraft.world.level.block.entity.BlockEntity,
+                ? extends org.shsts.tinactory.core.machine.IRecipeProcessor<?>> processor = switch (recipeTypeStr) {
                 case "electric_furnace" -> RecipeProcessors.electricFurnace(
                     GsonHelper.getAsInt(jo, "inputPort"),
                     GsonHelper.getAsInt(jo, "outputPort"),

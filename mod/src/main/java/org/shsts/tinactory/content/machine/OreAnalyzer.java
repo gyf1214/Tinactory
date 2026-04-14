@@ -4,12 +4,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
+import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
@@ -17,25 +18,23 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.AllRecipes.MARKER;
-import static org.shsts.tinactory.Tinactory.CORE;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
-    public OreAnalyzer(IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
-        super(recipeType);
+    public OreAnalyzer(IRecipeType<OreAnalyzerRecipe.Builder> recipeType,
+        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        super(recipeType, recipeManager, markerType);
     }
 
-    private Optional<OreAnalyzerRecipe> newRecipe(List<OreAnalyzerRecipe> matches, Level world) {
+    private Optional<OreAnalyzerRecipe> newRecipe(List<OreAnalyzerRecipe> matches, IMachine machine) {
         var size = matches.size();
         if (size == 0) {
             return Optional.empty();
         }
 
-        var random = world.random;
+        var random = machine.random();
 
         var emptyRate = 1d;
         for (var match : matches) {
@@ -64,24 +63,22 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     }
 
     @Override
-    public Optional<OreAnalyzerRecipe> newRecipe(Level world, IMachine machine) {
-        var recipeManager = CORE.recipeManager(world);
+    public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
-        var matches = recipeManager.getRecipesFor(recipeType, machine, world);
-        return newRecipe(matches, world);
+        var matches = recipeManager.getRecipesFor(recipeType, machine, machine.world());
+        return newRecipe(matches, machine);
     }
 
     @Override
-    public Optional<OreAnalyzerRecipe> newRecipe(Level world, IMachine machine, ResourceLocation target) {
-        var recipeManager = CORE.recipeManager(world);
-        var marker = recipeManager.byLoc(MARKER, target);
+    public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine, ResourceLocation target) {
+        var marker = recipeManager.byLoc(markerType, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
             setFilterRecipe(machine, recipe);
-            var matches = recipeManager.getRecipesFor(recipeType, machine, world)
+            var matches = recipeManager.getRecipesFor(recipeType, machine, machine.world())
                 .stream().filter(recipe::matches)
                 .toList();
-            return newRecipe(matches, world);
+            return newRecipe(matches, machine);
         }
 
         var processing = recipeManager.byLoc(recipeType, target);
@@ -89,7 +86,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
             var recipe = processing.get();
             setFilterRecipe(machine, recipe);
             if (recipe.matches(machine)) {
-                var random = world.random;
+                var random = machine.random();
                 emptyRecipe = random.nextDouble() > recipe.rate;
                 return processing;
             }

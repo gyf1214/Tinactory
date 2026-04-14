@@ -20,11 +20,13 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
     private final TestMachineConfig config = new TestMachineConfig();
+    private final Random random = new Random(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
 
@@ -105,6 +107,11 @@ public final class TestMachine implements IMachine {
     @Override
     public Optional<IElectricMachine> electric() {
         return electric;
+    }
+
+    @Override
+    public Random random() {
+        return random;
     }
 
     @Override

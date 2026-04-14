@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -47,6 +48,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     private static final ResourceLocation RECIPE_TYPE_LOC = mcLoc("smelting");
     private static final Voltage BASE_VOLTAGE = Voltage.ULV;
 
+    private final BlockEntity blockEntity;
     private final int inputPort;
     private final int outputPort;
     private final double basePower;
@@ -55,11 +57,19 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     private double workFactor = 1d;
     private double energyFactor = 1d;
 
-    public ElectricFurnace(int inputPort, int outputPort, double amperage, int baseTemperature) {
+    public ElectricFurnace(BlockEntity blockEntity, int inputPort, int outputPort,
+        double amperage, int baseTemperature) {
+        this.blockEntity = blockEntity;
         this.inputPort = inputPort;
         this.outputPort = outputPort;
         this.basePower = BASE_VOLTAGE.value * amperage;
         this.baseTemperature = baseTemperature;
+    }
+
+    private Level world() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        return world;
     }
 
     private IPort<ItemStack> getInputPort(IContainer container) {
@@ -106,8 +116,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public Optional<SmeltingRecipe> byLoc(Level world, ResourceLocation loc) {
-        return world.getRecipeManager().byKey(loc)
+    public Optional<SmeltingRecipe> byLoc(ResourceLocation loc) {
+        return world().getRecipeManager().byKey(loc)
             .flatMap(r -> r instanceof SmeltingRecipe smelting ?
                 Optional.of(smelting) : Optional.empty());
     }
@@ -118,7 +128,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
+    public DistLazy<List<IRecipeBookItem>> recipeBookItems(IMachine machine) {
+        var world = world();
         var recipeManager = CORE.recipeManager(world);
         var markers = recipeManager.getAllRecipesFor(MARKER).stream()
             .filter($ -> $.matchesType(RECIPE_TYPE_LOC) && $.canCraft(machine))
@@ -138,7 +149,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public boolean allowTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
+    public boolean allowTargetRecipe(boolean isClientSide, ResourceLocation loc, IMachine machine) {
+        var world = world();
         var marker = CORE.recipeManager(world).byLoc(MARKER, loc);
         if (marker.isPresent()) {
             var recipe = marker.get();
@@ -151,8 +163,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public void setTargetRecipe(Level world, ResourceLocation loc, IMachine machine) {
-        var recipe = world.getRecipeManager().byKey(loc);
+    public void setTargetRecipe(ResourceLocation loc, IMachine machine) {
+        var recipe = world().getRecipeManager().byKey(loc);
         if (recipe.isEmpty() || !(recipe.get() instanceof SmeltingRecipe smeltingRecipe)) {
             return;
         }
@@ -164,7 +176,8 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
      * Unfortunately we cannot use {@link net.minecraft.world.item.crafting.RecipeManager#getRecipeFor}.
      */
     @Override
-    public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine) {
+    public Optional<SmeltingRecipe> newRecipe(IMachine machine) {
+        var world = world();
         return machine.container().flatMap(container -> world.getRecipeManager()
             .getAllRecipesFor(RecipeType.SMELTING).stream()
             .filter($ -> matches($, machine, container))
@@ -172,12 +185,13 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     }
 
     @Override
-    public Optional<SmeltingRecipe> newRecipe(Level world, IMachine machine, ResourceLocation target) {
+    public Optional<SmeltingRecipe> newRecipe(IMachine machine, ResourceLocation target) {
         var container = machine.container();
         if (container.isEmpty()) {
             return Optional.empty();
         }
         var container1 = container.get();
+        var world = world();
         var recipeManager = world.getRecipeManager();
 
         var vanilla = recipeManager.byKey(target);
