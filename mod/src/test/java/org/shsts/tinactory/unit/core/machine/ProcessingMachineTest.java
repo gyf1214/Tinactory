@@ -4,7 +4,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
@@ -120,7 +119,8 @@ class ProcessingMachineTest {
             .add(RECIPE_TYPE, matching)
             .add(RECIPE_TYPE, other));
 
-        assertEquals(Optional.of(matching.loc()), processor.newRecipe(machine, marker.loc()).map(ProcessingRecipe::loc));
+        assertEquals(Optional.of(matching.loc()),
+            processor.newRecipe(machine, marker.loc()).map(ProcessingRecipe::loc));
         assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map(ProcessingRecipe::loc));
     }
 
@@ -165,7 +165,8 @@ class ProcessingMachineTest {
         }
 
         private static final class Builder extends BuilderBase<TestRecipe, Builder> {
-            private Builder(org.shsts.tinycorelib.api.registrate.entry.IRecipeType<Builder> type, ResourceLocation loc) {
+            private Builder(org.shsts.tinycorelib.api.registrate.entry.IRecipeType<Builder> type,
+                ResourceLocation loc) {
                 super(type, loc);
             }
 
@@ -176,7 +177,8 @@ class ProcessingMachineTest {
         }
     }
 
-    private record TestIngredient(String name, int amount) implements org.shsts.tinactory.api.recipe.IProcessingIngredient {
+    private record TestIngredient(String name, int amount)
+        implements org.shsts.tinactory.api.recipe.IProcessingIngredient {
         @Override
         public String codecName() {
             return "test_ingredient";
