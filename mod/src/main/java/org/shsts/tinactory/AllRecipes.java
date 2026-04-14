@@ -6,7 +6,6 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -51,8 +50,7 @@ public final class AllRecipes {
             .recipeClass(MarkerRecipe.class)
             .serializer(new MarkerRecipe.Serializer(
                 ProcessingIngredientCodecs.codec(),
-                ProcessingResultCodecs.codec(),
-                Registry.RECIPE_TYPE::get))
+                ProcessingResultCodecs.codec()))
             .register();
     }
 

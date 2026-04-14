@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
@@ -23,6 +24,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcessingObjectCodecTest {
     @Test
@@ -74,6 +76,35 @@ class ProcessingObjectCodecTest {
         assertEquals(recipe.inputs, roundTrip.inputs);
         assertEquals(recipe.target, roundTrip.target);
         assertEquals(recipe.progress, roundTrip.progress);
+    }
+
+    @Test
+    void shouldRoundTripMarkerRecipeWithBaseTypeId() {
+        var type = new TestRecipeType<MarkerRecipe.Builder>("test_marker_recipe", MarkerRecipe.Builder::new);
+        var baseTypeId = new ResourceLocation("tinactory", "test_marker_base");
+        var loc = new ResourceLocation("tinactory", "codec_marker_recipe");
+        var serializer = new MarkerRecipe.Serializer(TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
+        var display = new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
+            TestStack.item("ore", 1), TestStack.ADAPTER);
+        var markerOutput = new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
+            TestStack.item("dust", 2), TestStack.ADAPTER);
+        var recipe = type.getBuilder(loc)
+            .baseType(baseTypeId)
+            .prefix("test_marker_base/ores")
+            .requireMultiblock(true)
+            .display(display)
+            .output(1, markerOutput)
+            .buildObject();
+
+        var json = new JsonObject();
+        serializer.toJson(json, recipe);
+        var roundTrip = serializer.fromJson(type, loc, json, ICondition.IContext.EMPTY);
+
+        assertTrue(roundTrip.matchesType(new TestRecipeType<>("test_marker_base", InjectedRecipe.Builder::new)));
+        assertTrue(roundTrip.matchesType(baseTypeId));
+        assertEquals(display, roundTrip.displayIngredient().orElseThrow());
+        assertEquals(recipe.markerOutputs, roundTrip.markerOutputs);
+        assertTrue(roundTrip.matches(new TestLoc("test_marker_base/ores/test")));
     }
 
     private static final Codec<IProcessingIngredient> TEST_INGREDIENT_CODEC =
@@ -147,6 +178,13 @@ class ProcessingObjectCodecTest {
         @Override
         public RecipeType<?> get() {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private record TestLoc(String id) implements org.shsts.tinycorelib.api.core.ILoc {
+        @Override
+        public ResourceLocation loc() {
+            return new ResourceLocation("tinactory", id);
         }
     }
 

@@ -121,7 +121,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(Level world, IMachine machine) {
         var recipeManager = CORE.recipeManager(world);
         var markers = recipeManager.getAllRecipesFor(MARKER).stream()
-            .filter($ -> $.matchesType(RecipeType.SMELTING) && $.canCraft(machine))
+            .filter($ -> $.matchesType(RECIPE_TYPE_LOC) && $.canCraft(machine))
             .toList();
         var recipes = world.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING);
 
@@ -142,7 +142,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var marker = CORE.recipeManager(world).byLoc(MARKER, loc);
         if (marker.isPresent()) {
             var recipe = marker.get();
-            return recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine);
+            return recipe.matchesType(RECIPE_TYPE_LOC) && recipe.canCraft(machine);
         }
 
         return world.getRecipeManager().byKey(loc)
@@ -188,7 +188,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var marker = CORE.recipeManager(world).byLoc(MARKER, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
-            if (recipe.matchesType(RecipeType.SMELTING) && recipe.canCraft(machine)) {
+            if (recipe.matchesType(RECIPE_TYPE_LOC) && recipe.canCraft(machine)) {
                 return recipeManager.getAllRecipesFor(RecipeType.SMELTING).stream()
                     .filter($ -> matches($, machine, container1))
                     .findFirst();

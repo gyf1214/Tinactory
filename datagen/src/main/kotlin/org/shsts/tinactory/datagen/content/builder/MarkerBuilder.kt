@@ -33,11 +33,11 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
 
     fun baseType(id: String) {
         baseType = id
-        builder.baseType(checkNotNull(Registry.RECIPE_TYPE.get(modLoc(id))) { id })
+        builder.baseType(modLoc(id))
     }
 
     fun baseType(type: RecipeType<*>) {
-        builder.baseType(type)
+        builder.baseType(checkNotNull(Registry.RECIPE_TYPE.getKey(type)) { type.toString() })
     }
 
     fun prefix(value: String) {

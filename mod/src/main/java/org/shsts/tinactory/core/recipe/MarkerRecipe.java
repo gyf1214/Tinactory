@@ -8,10 +8,8 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -24,13 +22,11 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipe extends ProcessingRecipe {
     private final ResourceLocation baseTypeId;
-    private final RecipeType<?> baseType;
     private final String prefix;
     private final boolean requireMultiblock;
     @Nullable
@@ -43,7 +39,6 @@ public class MarkerRecipe extends ProcessingRecipe {
     protected MarkerRecipe(Builder builder) {
         super(builder);
         this.baseTypeId = builder.getBaseTypeId();
-        this.baseType = builder.getBaseType();
         this.prefix = builder.prefix;
         this.requireMultiblock = builder.requireMultiblock;
         this.displayIngredient = builder.displayIngredient;
@@ -71,11 +66,11 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public boolean matchesType(IRecipeType<?> type) {
-        return baseType == type.get();
+        return baseTypeId.equals(type.loc());
     }
 
-    public boolean matchesType(RecipeType<?> type) {
-        return baseType == type;
+    public boolean matchesType(ResourceLocation type) {
+        return baseTypeId.equals(type);
     }
 
     public boolean matches(ILoc recipe) {
@@ -90,8 +85,6 @@ public class MarkerRecipe extends ProcessingRecipe {
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
         @Nullable
         private ResourceLocation baseTypeId;
-        @Nullable
-        private RecipeType<?> baseType;
         private String prefix = "";
         private boolean requireMultiblock = false;
         @Nullable
@@ -104,13 +97,8 @@ public class MarkerRecipe extends ProcessingRecipe {
             super(parent, loc);
         }
 
-        public Builder baseType(RecipeType<?> value) {
-            return baseType(RecipeTypeIdResolver.DEFAULT.apply(value), value);
-        }
-
-        protected Builder baseType(ResourceLocation id, RecipeType<?> value) {
-            baseTypeId = id;
-            baseType = value;
+        public Builder baseType(ResourceLocation value) {
+            baseTypeId = value;
             return this;
         }
 
@@ -146,15 +134,9 @@ public class MarkerRecipe extends ProcessingRecipe {
             return baseTypeId;
         }
 
-        protected RecipeType<?> getBaseType() {
-            assert baseType != null;
-            return baseType;
-        }
-
         @Override
         protected void validate() {
             assert baseTypeId != null : loc;
-            assert baseType != null : loc;
         }
 
         @Override
@@ -164,20 +146,14 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
-        private final Function<ResourceLocation, RecipeType<?>> recipeTypeResolver;
-
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec,
-            Codec<IProcessingResult> resultCodec,
-            Function<ResourceLocation, RecipeType<?>> recipeTypeResolver) {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
             super(ingredientCodec, resultCodec);
-            this.recipeTypeResolver = recipeTypeResolver;
         }
 
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
-            var baseTypeId = new ResourceLocation(GsonHelper.getAsString(jo, "base_type"));
             var builder = super.buildFromJson(type, loc, jo)
-                .baseType(baseTypeId, recipeTypeResolver.apply(baseTypeId))
+                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")))
                 .prefix(GsonHelper.getAsString(jo, "prefix", ""))
                 .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
             if (jo.has("display")) {
@@ -217,16 +193,5 @@ public class MarkerRecipe extends ProcessingRecipe {
                 }).forEach(markerOutputs::add);
             jo.add("marker_outputs", markerOutputs);
         }
-    }
-
-    private static final class RecipeTypeIdResolver {
-        private static final Function<RecipeType<?>, ResourceLocation> DEFAULT =
-            type -> {
-                var id = Registry.RECIPE_TYPE.getKey(type);
-                assert id != null;
-                return id;
-            };
-
-        private RecipeTypeIdResolver() {}
     }
 }
