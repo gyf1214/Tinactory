@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
@@ -11,8 +12,10 @@ import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
+import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,8 +91,8 @@ class ProcessingMachineTest {
     @Test
     void shouldPreserveFilterTargetAcrossSerialization() {
         var machine = new TestMachine(new TestContainer()
-            .port(INPUT_PORT, INPUT, new org.shsts.tinactory.unit.fixture.TestPort("ore", 16, 4))
-            .port(OUTPUT_PORT, OUTPUT, new org.shsts.tinactory.unit.fixture.TestPort("dust", 16, 0)));
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 4))
+            .port(OUTPUT_PORT, OUTPUT, new TestPort("dust", 16, 0)));
         var target = recipe("targeted", 0);
         var processor = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
 
@@ -109,8 +112,8 @@ class ProcessingMachineTest {
     @Test
     void shouldSelectRecipesThroughInjectedTargetLookups() {
         var machine = new TestMachine(new TestContainer()
-            .port(INPUT_PORT, INPUT, new org.shsts.tinactory.unit.fixture.TestPort("ore", 16, 4))
-            .port(OUTPUT_PORT, OUTPUT, new org.shsts.tinactory.unit.fixture.TestPort("dust", 16, 0)));
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 4))
+            .port(OUTPUT_PORT, OUTPUT, new TestPort("dust", 16, 0)));
         var marker = marker("ore", 0);
         var matching = recipe("ore/matching", 0);
         var other = recipe("other", 0);
@@ -165,8 +168,7 @@ class ProcessingMachineTest {
         }
 
         private static final class Builder extends BuilderBase<TestRecipe, Builder> {
-            private Builder(org.shsts.tinycorelib.api.registrate.entry.IRecipeType<Builder> type,
-                ResourceLocation loc) {
+            private Builder(IRecipeType<Builder> type, ResourceLocation loc) {
                 super(type, loc);
             }
 
@@ -177,8 +179,7 @@ class ProcessingMachineTest {
         }
     }
 
-    private record TestIngredient(String name, int amount)
-        implements org.shsts.tinactory.api.recipe.IProcessingIngredient {
+    private record TestIngredient(String name, int amount) implements IProcessingIngredient {
         @Override
         public String codecName() {
             return "test_ingredient";
@@ -195,9 +196,9 @@ class ProcessingMachineTest {
         }
 
         @Override
-        public Optional<org.shsts.tinactory.api.recipe.IProcessingIngredient> consumePort(
+        public Optional<IProcessingIngredient> consumePort(
             IPort<?> port, int parallel, boolean simulate) {
-            if (port instanceof org.shsts.tinactory.unit.fixture.TestPort testPort) {
+            if (port instanceof TestPort testPort) {
                 return testPort.consume(name, amount * parallel, simulate).map($ -> this);
             }
             throw new UnsupportedOperationException();
@@ -222,7 +223,7 @@ class ProcessingMachineTest {
 
         @Override
         public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
-            if (port instanceof org.shsts.tinactory.unit.fixture.TestPort testPort) {
+            if (port instanceof TestPort testPort) {
                 return testPort.insert(name, amount * parallel, simulate).map($ -> this);
             }
             throw new UnsupportedOperationException();
