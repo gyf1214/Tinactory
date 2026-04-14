@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.core.recipe;
+package org.shsts.tinactory.unit.recipe;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IPort;

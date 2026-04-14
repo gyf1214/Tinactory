@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.core.recipe;
+package org.shsts.tinactory.unit.recipe;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -294,5 +294,4 @@ class ProcessingRecipeTest {
             return storedAmount;
         }
     }
-
 }

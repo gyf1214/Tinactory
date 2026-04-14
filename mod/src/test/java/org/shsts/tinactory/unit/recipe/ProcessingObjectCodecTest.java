@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.core.recipe;
+package org.shsts.tinactory.unit.recipe;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
@@ -56,7 +56,7 @@ class ProcessingObjectCodecTest {
 
     @Test
     void shouldRoundTripResearchRecipeWithInjectedIngredientCodec() {
-        var type = new TestRecipeType<ResearchRecipe.Builder>("test_research_recipe", ResearchRecipe.Builder::new);
+        var type = new TestRecipeType<>("test_research_recipe", ResearchRecipe.Builder::new);
         var loc = new ResourceLocation("tinactory", "codec_research_recipe");
         var serializer = new ResearchRecipe.Serializer(TEST_INGREDIENT_CODEC);
         var recipe = type.getBuilder(loc)
@@ -80,7 +80,7 @@ class ProcessingObjectCodecTest {
 
     @Test
     void shouldRoundTripMarkerRecipeWithBaseTypeId() {
-        var type = new TestRecipeType<MarkerRecipe.Builder>("test_marker_recipe", MarkerRecipe.Builder::new);
+        var type = new TestRecipeType<>("test_marker_recipe", MarkerRecipe.Builder::new);
         var baseTypeId = new ResourceLocation("tinactory", "test_marker_base");
         var loc = new ResourceLocation("tinactory", "codec_marker_recipe");
         var serializer = new MarkerRecipe.Serializer(TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
@@ -187,5 +187,4 @@ class ProcessingObjectCodecTest {
             return new ResourceLocation("tinactory", id);
         }
     }
-
 }
