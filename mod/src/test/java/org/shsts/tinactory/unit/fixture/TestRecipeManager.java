@@ -1,7 +1,6 @@
 package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
@@ -25,14 +24,14 @@ public final class TestRecipeManager implements IRecipeManager {
 
     @Override
     public <C, R extends IRecipe<C>, B extends IRecipeBuilderBase<R>> Optional<R> getRecipeFor(
-        IRecipeType<B> recipeType, C context, Level world) {
-        return getRecipesFor(recipeType, context, world).stream().findFirst();
+        IRecipeType<B> recipeType, C context) {
+        return getRecipesFor(recipeType, context).stream().findFirst();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <C, R extends IRecipe<C>, B extends IRecipeBuilderBase<R>> List<R> getRecipesFor(
-        IRecipeType<B> recipeType, C context, Level world) {
+        IRecipeType<B> recipeType, C context) {
         return getAllRecipesFor(recipeType).stream()
             .filter($ -> $.matches(context))
             .map($ -> (R) $)

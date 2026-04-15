@@ -65,7 +65,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     @Override
     public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
-        var matches = recipeManager.getRecipesFor(recipeType, machine, machine.world());
+        var matches = recipeManager.getRecipesFor(recipeType, machine);
         return newRecipe(matches, machine);
     }
 
@@ -75,7 +75,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         if (marker.isPresent()) {
             var recipe = marker.get();
             setFilterRecipe(machine, recipe);
-            var matches = recipeManager.getRecipesFor(recipeType, machine, machine.world())
+            var matches = recipeManager.getRecipesFor(recipeType, machine)
                 .stream().filter(recipe::matches)
                 .toList();
             return newRecipe(matches, machine);

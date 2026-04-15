@@ -82,7 +82,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         var decay = Math.max(0, heat - baseHeat) * baseDecay;
 
         var recipeManager = CORE.recipeManager(world);
-        var recipe = recipeManager.getRecipeFor(BOILER, this, world);
+        var recipe = recipeManager.getRecipeFor(BOILER, this);
         // hidden progress is lost if the recipe is interrupted
         if (recipe.isEmpty()) {
             lastRecipe = null;

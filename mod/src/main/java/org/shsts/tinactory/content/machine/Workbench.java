@@ -164,7 +164,7 @@ public class Workbench extends CapabilityProvider implements
         var recipeManager = CORE.recipeManager(world);
         var vanillaRecipes = world.getRecipeManager();
 
-        currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this, world)
+        currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this)
             .map($ -> (Object) $)
             .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack, world))
             .orElse(null);

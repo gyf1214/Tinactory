@@ -207,7 +207,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public Optional<R> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
-        return recipeManager.getRecipeFor(recipeType, machine, machine.world());
+        return recipeManager.getRecipeFor(recipeType, machine);
     }
 
     @Override
