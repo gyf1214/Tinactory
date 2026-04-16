@@ -12,6 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
@@ -24,7 +25,6 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -202,10 +202,10 @@ public class MachineRecipeBook extends Panel {
     private void refreshRecipes() {
         recipes.clear();
         var processor = MACHINE.tryGet(blockEntity).flatMap(IMachine::processor);
-        if (processor.isEmpty() || !(processor.get() instanceof MachineProcessor machineProcessor)) {
+        if (processor.isEmpty() || !(processor.get() instanceof IMachineProcessor machineProcessor)) {
             return;
         }
-        var items = machineProcessor.targetRecipes().getValue();
+        var items = machineProcessor.recipeBookItems().getValue();
         recipes.addAll(items);
     }
 

@@ -177,7 +177,8 @@ public class MachineProcessor extends CapabilityProvider implements
         return machine().flatMap($ -> $.config().getLoc("targetRecipe"));
     }
 
-    public DistLazy<List<IRecipeBookItem>> targetRecipes() {
+    @Override
+    public DistLazy<List<IRecipeBookItem>> recipeBookItems() {
         var machine = machine();
         if (machine.isEmpty()) {
             return () -> Collections::emptyList;

@@ -44,4 +44,9 @@ public record TestProcessingObject(String key, int amount)
         }
         return testPort.insert(key, amount * parallel, simulate).map(TestPort.TestPortSnapshot::asObject);
     }
+
+    @Override
+    public IProcessingResult scaledPreview(int parallel) {
+        return new TestProcessingObject(key, amount * parallel);
+    }
 }

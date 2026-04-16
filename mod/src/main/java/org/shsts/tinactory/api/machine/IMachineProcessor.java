@@ -4,6 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +23,9 @@ public interface IMachineProcessor extends IProcessor {
 
     double workSpeed();
 
-    default boolean supportsRecipeType(ResourceLocation recipeTypeId) {
-        return false;
-    }
+    boolean supportsRecipeType(ResourceLocation recipeTypeId);
+
+    DistLazy<List<IRecipeBookItem>> recipeBookItems();
 
     @Override
     default double getProgress() {

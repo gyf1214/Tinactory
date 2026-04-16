@@ -2,8 +2,13 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.core.DistLazy;
+
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -22,5 +27,15 @@ public interface IBoiler extends IMachineProcessor {
 
     default double heatProgress() {
         return MathUtil.clamp((heat() - minHeat()) / (maxHeat() - minHeat()), 0d, 1d);
+    }
+
+    @Override
+    default boolean supportsRecipeType(ResourceLocation recipeTypeId) {
+        return false;
+    }
+
+    @Override
+    default DistLazy<List<IRecipeBookItem>> recipeBookItems() {
+        return () -> List::of;
     }
 }
