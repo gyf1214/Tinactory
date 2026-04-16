@@ -31,6 +31,7 @@ import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.integration.recipe.ProcessingInfoCodecs;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.DistLazy;
@@ -56,7 +57,9 @@ import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
+import static org.shsts.tinactory.core.util.CodecHelper.encodeTag;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
+import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -483,13 +486,15 @@ public class MachineProcessor extends CapabilityProvider implements
             tag.putInt("processorIndex", currentRecipe.index());
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", currentRecipe.processor().serializeNBT());
-            tag.put("processorInfo", encodeList(infoList, ProcessingInfo::serializeNBT));
+            tag.put("processorInfo", encodeList(infoList,
+                info -> encodeTag(ProcessingInfoCodecs.CODEC, info)));
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", processors.get(processorIndex).serializeNBT());
-            tag.put("processorInfo", encodeList(infoList, ProcessingInfo::serializeNBT));
+            tag.put("processorInfo", encodeList(infoList,
+                info -> encodeTag(ProcessingInfoCodecs.CODEC, info)));
         }
         return tag;
     }
@@ -506,7 +511,7 @@ public class MachineProcessor extends CapabilityProvider implements
             var processor = processors.get(processorIndex);
             processor.deserializeNBT(data);
             parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
-                $ -> ProcessingInfo.fromNBT((CompoundTag) $), infoList::add);
+                value -> parseTag(ProcessingInfoCodecs.CODEC, value), infoList::add);
             buildInfoMap();
         } else {
             currentRecipeLoc = null;
