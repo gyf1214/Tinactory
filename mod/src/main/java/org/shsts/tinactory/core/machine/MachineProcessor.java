@@ -333,7 +333,7 @@ public class MachineProcessor extends CapabilityProvider implements
         workSpeed = currentRecipe.processor.workSpeed(partial);
         // We clear currentRecipe and info in the next onPreWork
         if (workProgress >= currentRecipe.maxProgress()) {
-            currentRecipe.onWorkDone(machine.get(), world().random);
+            currentRecipe.onWorkDone(machine.get(), machine.get().random());
             // onWorkDone may set outputFilters, we clear it now.
             clearFilters(PortDirection.OUTPUT);
             // make sure getProgress never overflows
