@@ -65,6 +65,10 @@ public interface IMachine {
 
     Optional<IElectricMachine> electric();
 
+    default int parallel() {
+        return 1;
+    }
+
     Optional<INetwork> network();
 
     /**
