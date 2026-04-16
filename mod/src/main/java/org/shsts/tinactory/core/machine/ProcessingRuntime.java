@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -84,6 +85,18 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
 
         public ResourceLocation loc() {
             return processor.toLoc(recipe);
+        }
+
+        public ElectricMachineType machineType() {
+            return processor.electricMachineType(recipe);
+        }
+
+        public double powerGen() {
+            return processor.powerGen(recipe);
+        }
+
+        public double powerCons() {
+            return processor.powerCons(recipe);
         }
     }
 
@@ -327,6 +340,18 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
     @Override
     public boolean isWorking(double partial) {
         return currentRecipe != null && workSpeed > 0;
+    }
+
+    public ElectricMachineType machineType() {
+        return currentRecipe == null ? ElectricMachineType.NONE : currentRecipe.machineType();
+    }
+
+    public double powerGen() {
+        return currentRecipe == null ? 0d : currentRecipe.powerGen();
+    }
+
+    public double powerCons() {
+        return currentRecipe == null ? 0d : currentRecipe.powerCons();
     }
 
     @Override

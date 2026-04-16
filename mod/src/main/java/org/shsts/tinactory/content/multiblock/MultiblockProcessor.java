@@ -5,9 +5,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.machine.MachineProcessor;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -29,10 +29,5 @@ public class MultiblockProcessor extends MachineProcessor {
     @Override
     protected Optional<IMachine> machine() {
         return getInterface().map($ -> $);
-    }
-
-    @Override
-    protected int maxParallel() {
-        return getInterface().map(MultiblockInterface::parallel).orElse(1);
     }
 }

@@ -34,8 +34,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
-import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
+import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_DEFAULT;
+import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
