@@ -24,7 +24,6 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;

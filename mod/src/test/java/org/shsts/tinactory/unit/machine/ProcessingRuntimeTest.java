@@ -32,7 +32,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcessingRuntimeTest {

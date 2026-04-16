@@ -23,7 +23,8 @@ public record ProcessingInfo(int port, IProcessingObject object) {
             info -> encode(info, ingredientCodec, resultCodec));
     }
 
-    public CompoundTag serializeNBT(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+    public CompoundTag serializeNBT(
+        Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
         return (CompoundTag) encodeTag(codec(ingredientCodec, resultCodec), this);
     }
 
