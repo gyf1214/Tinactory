@@ -86,7 +86,7 @@ class NetworkRuntimeTest {
     void shouldNotTouchMinecraftBoundMethodsInRuntimePaths() {
         var events = new ArrayList<String>();
         var scheduling = new NetworkRuntimeFixtures.SchedulingFixture("S");
-        var machine = new NetworkRuntimeFixtures.ThrowOnTouchMachine(
+        var machine = new NetworkRuntimeFixtures.MachineFixture(
             "00000000-0000-0000-0000-000000000333",
             events,
             scheduling
