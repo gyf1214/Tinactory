@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.fixture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -29,6 +30,7 @@ public final class TestMachine implements IMachine {
     private final Random random = new Random(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
+    private int parallel = 1;
 
     public TestMachine(IContainer container) {
         this.container = Optional.of(container);
@@ -46,6 +48,16 @@ public final class TestMachine implements IMachine {
 
     public TestMachine electricVoltage(long value) {
         electric = Optional.of(new TestElectricMachine(value));
+        return this;
+    }
+
+    public TestMachine targetRecipe(ResourceLocation loc) {
+        config.stringValue("targetRecipe", loc.toString());
+        return this;
+    }
+
+    public TestMachine parallel(int value) {
+        parallel = value;
         return this;
     }
 
@@ -110,6 +122,11 @@ public final class TestMachine implements IMachine {
     }
 
     @Override
+    public int parallel() {
+        return parallel;
+    }
+
+    @Override
     public Random random() {
         return random;
     }
@@ -140,9 +157,14 @@ public final class TestMachine implements IMachine {
 
     private static final class TestMachineConfig implements IMachineConfig {
         private final Map<String, Boolean> booleans = new java.util.HashMap<>();
+        private final Map<String, String> strings = new java.util.HashMap<>();
 
         private void booleanValue(String key, boolean value) {
             booleans.put(key, value);
+        }
+
+        private void stringValue(String key, String value) {
+            strings.put(key, value);
         }
 
         @Override
@@ -152,7 +174,7 @@ public final class TestMachine implements IMachine {
 
         @Override
         public boolean contains(String key, int tagType) {
-            return false;
+            return booleans.containsKey(key) || strings.containsKey(key);
         }
 
         @Override
@@ -167,7 +189,7 @@ public final class TestMachine implements IMachine {
 
         @Override
         public Optional<String> getString(String key) {
-            return Optional.empty();
+            return Optional.ofNullable(strings.get(key));
         }
 
         @Override
