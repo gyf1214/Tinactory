@@ -18,6 +18,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
@@ -29,10 +30,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.core.util.CodecHelper.encodeTag;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
-import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
+import static org.shsts.tinactory.core.util.CodecHelper.encodeTag;
 import static org.shsts.tinactory.core.util.CodecHelper.parseList;
+import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

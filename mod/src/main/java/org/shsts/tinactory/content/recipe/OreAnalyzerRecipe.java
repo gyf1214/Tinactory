@@ -9,8 +9,7 @@ import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
-import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -61,6 +60,6 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         }
     }
 
-    public static final IRecipeSerializer<OreAnalyzerRecipe, Builder> SERIALIZER =
-        new Serializer(ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec());
+    public static final IRecipeSerializer<OreAnalyzerRecipe, Builder> SERIALIZER
+        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

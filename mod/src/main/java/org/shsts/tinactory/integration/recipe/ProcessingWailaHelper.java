@@ -17,9 +17,9 @@ public final class ProcessingWailaHelper {
 
     public static void appendElement(List<IElement> line, IProcessingObject object,
         BiConsumer<List<IElement>, ItemStack> itemAppender, BiConsumer<List<IElement>, FluidStack> fluidAppender) {
-        ProcessingStackHelper.itemStack(object).ifPresentOrElse(
+        ProcessingHelper.itemStack(object).ifPresentOrElse(
             item -> itemAppender.accept(line, item),
-            () -> ProcessingStackHelper.fluidStack(object).ifPresent(fluid -> fluidAppender.accept(line, fluid))
+            () -> ProcessingHelper.fluidStack(object).ifPresent(fluid -> fluidAppender.accept(line, fluid))
         );
     }
 }

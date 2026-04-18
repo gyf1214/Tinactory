@@ -15,8 +15,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
-import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
@@ -113,6 +112,6 @@ public class CleanRecipe extends ProcessingRecipe {
         }
     }
 
-    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER =
-        new Serializer(ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec());
+    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER
+        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

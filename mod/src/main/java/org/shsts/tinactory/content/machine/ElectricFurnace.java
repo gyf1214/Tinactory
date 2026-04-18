@@ -22,9 +22,9 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.gui.client.ProcessingRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
@@ -36,11 +36,11 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_DEFAULT;
-import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_KEY;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_DEFAULT;
+import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -258,12 +258,12 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         parallel = calculateParallel(port, ingredient, maxParallel);
         StackHelper.consumeItemPort(port, ingredient, parallel, false)
             .ifPresent($ -> callback.accept(new ProcessingInfo(inputPort,
-                ProcessingStackHelper.itemIngredient($))));
+                ProcessingHelper.itemIngredient($))));
 
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
         callback.accept(new ProcessingInfo(outputPort,
-            ProcessingStackHelper.itemResult(1d, result1)));
+            ProcessingHelper.itemResult(1d, result1)));
 
         calculateFactors(machine, parallel);
     }
@@ -282,7 +282,7 @@ public class ElectricFurnace implements IRecipeProcessor<SmeltingRecipe> {
         var port = getOutputPort(machine.container().orElseThrow());
         var result = getResult(recipe);
         var result1 = StackHelper.copyWithCount(result, parallel * result.getCount());
-        callback.accept(ProcessingStackHelper.itemResult(1d, result1));
+        callback.accept(ProcessingHelper.itemResult(1d, result1));
         port.insert(result1, false);
     }
 

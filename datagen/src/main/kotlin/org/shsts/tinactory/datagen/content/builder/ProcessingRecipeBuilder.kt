@@ -10,7 +10,7 @@ import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper
+import org.shsts.tinactory.integration.recipe.ProcessingHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 
 open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builder: B) {
@@ -46,11 +46,11 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     }
 
     fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {
-        builder.input(port) { ProcessingStackHelper.itemIngredient(ItemStack(item, amount)) }
+        builder.input(port) { ProcessingHelper.itemIngredient(ItemStack(item, amount)) }
     }
 
     fun input(fluid: Fluid, amount: Int, port: Int = defaultInputFluid!!) {
-        builder.input(port) { ProcessingStackHelper.fluidIngredient(FluidStack(fluid, amount)) }
+        builder.input(port) { ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)) }
     }
 
     fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, port: Int? = null) {
@@ -68,13 +68,13 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
 
     open fun output(item: ItemLike, amount: Int = 1, port: Int = defaultOutputItem!!, rate: Double = 1.0) {
         builder.output(port) {
-            ProcessingStackHelper.itemResult(rate, ItemStack(item, amount))
+            ProcessingHelper.itemResult(rate, ItemStack(item, amount))
         }
     }
 
     open fun output(fluid: Fluid, amount: Int, port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
         builder.output(port) {
-            ProcessingStackHelper.fluidResult(rate, FluidStack(fluid, amount))
+            ProcessingHelper.fluidResult(rate, FluidStack(fluid, amount))
         }
     }
 

@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.integration.recipe.ProcessingInfoCodecs;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class MachineProcessor extends CapabilityProvider implements
             this::machine,
             world().isClientSide,
             blockEntity::setChanged,
-            ProcessingInfoCodecs.CODEC);
+            ProcessingHelper.INFO_CODEC);
     }
 
     private Level world() {

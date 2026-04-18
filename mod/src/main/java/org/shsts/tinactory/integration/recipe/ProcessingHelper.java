@@ -7,19 +7,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public final class ProcessingStackHelper {
+public final class ProcessingHelper {
     public static final String ITEM_INGREDIENT_CODEC_NAME = "item_ingredient";
     public static final String FLUID_INGREDIENT_CODEC_NAME = "fluid_ingredient";
     public static final String ITEM_RESULT_CODEC_NAME = "item_result";
@@ -27,7 +30,26 @@ public final class ProcessingStackHelper {
 
     public static final IProcessingResult EMPTY = itemResult(0d, ItemStack.EMPTY);
 
-    private ProcessingStackHelper() {}
+    public static final Codec<IProcessingIngredient> INGREDIENT_CODEC;
+    public static final Codec<IProcessingResult> RESULT_CODEC;
+    public static final Codec<ProcessingInfo> INFO_CODEC;
+
+    static {
+        var ingredientCodecs = Map.of(
+            ITEM_INGREDIENT_CODEC_NAME, itemIngredientCodec(),
+            TagIngredient.CODEC_NAME, TagIngredient.codec(),
+            FLUID_INGREDIENT_CODEC_NAME, fluidIngredientCodec());
+        INGREDIENT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, ingredientCodecs::get);
+
+        var resultCodecs = Map.of(
+            ITEM_RESULT_CODEC_NAME, itemResultCodec(),
+            FLUID_RESULT_CODEC_NAME, fluidResultCodec());
+        RESULT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, resultCodecs::get);
+
+        INFO_CODEC = ProcessingInfo.codec(INGREDIENT_CODEC, RESULT_CODEC);
+    }
+
+    private ProcessingHelper() {}
 
     public static <T> Optional<T> findMatchingPort(IPort<T> port, Predicate<T> ingredient, IStackAdapter<T> adapter) {
         return port.getAllStorages().stream()
@@ -79,21 +101,21 @@ public final class ProcessingStackHelper {
         return fluidResult(1d, stack);
     }
 
-    public static Codec<StackIngredient<ItemStack>> itemIngredientCodec() {
+    private static Codec<StackIngredient<ItemStack>> itemIngredientCodec() {
         return StackIngredient.codec(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC,
             StackHelper.ITEM_ADAPTER);
     }
 
-    public static Codec<StackIngredient<FluidStack>> fluidIngredientCodec() {
+    private static Codec<StackIngredient<FluidStack>> fluidIngredientCodec() {
         return StackIngredient.codec(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC,
             StackHelper.FLUID_ADAPTER);
     }
 
-    public static Codec<StackResult<ItemStack>> itemResultCodec() {
+    private static Codec<StackResult<ItemStack>> itemResultCodec() {
         return StackResult.codec(ITEM_RESULT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC, StackHelper.ITEM_ADAPTER);
     }
 
-    public static Codec<StackResult<FluidStack>> fluidResultCodec() {
+    private static Codec<StackResult<FluidStack>> fluidResultCodec() {
         return StackResult.codec(FLUID_RESULT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC, StackHelper.FLUID_ADAPTER);
     }
 

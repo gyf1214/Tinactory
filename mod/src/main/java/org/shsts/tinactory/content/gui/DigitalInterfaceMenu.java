@@ -14,7 +14,7 @@ import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.Optional;
 
@@ -112,11 +112,11 @@ public class DigitalInterfaceMenu extends MachineMenu {
     }
 
     private ItemStack getInfoItem(int port, int index) {
-        return getInfo(port, index).flatMap(ProcessingStackHelper::itemStack).orElse(ItemStack.EMPTY);
+        return getInfo(port, index).flatMap(ProcessingHelper::itemStack).orElse(ItemStack.EMPTY);
     }
 
     private FluidStack getInfoFluid(int port, int index) {
-        return getInfo(port, index).flatMap(ProcessingStackHelper::fluidStack).orElse(FluidStack.EMPTY);
+        return getInfo(port, index).flatMap(ProcessingHelper::fluidStack).orElse(FluidStack.EMPTY);
     }
 
     public static class BoilerMenu extends DigitalInterfaceMenu {

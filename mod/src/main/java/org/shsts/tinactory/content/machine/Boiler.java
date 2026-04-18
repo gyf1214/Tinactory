@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -102,12 +102,12 @@ public class Boiler implements INBTSerializable<CompoundTag> {
 
     public Optional<IProcessingObject> inputInfo() {
         return lastInput.isEmpty() ? Optional.empty() :
-            Optional.of(ProcessingStackHelper.fluidIngredient(lastInput));
+            Optional.of(ProcessingHelper.fluidIngredient(lastInput));
     }
 
     public Optional<IProcessingObject> outputInfo() {
         return lastOutput.isEmpty() ? Optional.empty() :
-            Optional.of(ProcessingStackHelper.fluidResult(lastOutput));
+            Optional.of(ProcessingHelper.fluidResult(lastOutput));
     }
 
     public void addAllInfo(Consumer<IProcessingObject> cons) {

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.machine;
+package org.shsts.tinactory.core.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;

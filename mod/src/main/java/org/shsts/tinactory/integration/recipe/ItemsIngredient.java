@@ -39,11 +39,11 @@ public abstract class ItemsIngredient implements IProcessingIngredient {
         }
         var item = port.asItem();
         if (amount <= 0) {
-            return ProcessingStackHelper.findMatchingPort(item, ingredient, StackHelper.ITEM_ADAPTER)
-                .map(ProcessingStackHelper::itemIngredient);
+            return ProcessingHelper.findMatchingPort(item, ingredient, StackHelper.ITEM_ADAPTER)
+                .map(ProcessingHelper::itemIngredient);
         } else {
-            return ProcessingStackHelper.consumeMatchingPort(item, ingredient, StackHelper.ITEM_ADAPTER,
-                amount * parallel, simulate).map(ProcessingStackHelper::itemIngredient);
+            return ProcessingHelper.consumeMatchingPort(item, ingredient, StackHelper.ITEM_ADAPTER,
+                amount * parallel, simulate).map(ProcessingHelper::itemIngredient);
         }
     }
 

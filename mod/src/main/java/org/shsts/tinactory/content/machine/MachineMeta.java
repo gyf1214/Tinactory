@@ -45,8 +45,6 @@ import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
-import org.shsts.tinactory.integration.recipe.ProcessingIngredientCodecs;
-import org.shsts.tinactory.integration.recipe.ProcessingResultCodecs;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
@@ -73,6 +71,8 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.recipe.ProcessingHelper.INGREDIENT_CODEC;
+import static org.shsts.tinactory.integration.recipe.ProcessingHelper.RESULT_CODEC;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -171,8 +171,7 @@ public class MachineMeta extends MetaConsumer {
             Class<? extends ProcessingRecipe> clazz) {
             return REGISTRATE.recipeType(recipeTypeId, builderFactory)
                 .recipeClass(clazz)
-                .serializer(new ProcessingRecipe.Serializer<>(
-                    ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                .serializer(new ProcessingRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC))
                 .register();
         }
 
@@ -182,43 +181,36 @@ public class MachineMeta extends MetaConsumer {
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
                 case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.Builder::new)
                     .recipeClass(GeneratorRecipe.class)
-                    .serializer(new GeneratorRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new GeneratorRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
                 case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
                     .recipeClass(ResearchRecipe.class)
-                    .serializer(new ResearchRecipe.Serializer(ProcessingIngredientCodecs.codec()))
+                    .serializer(new ResearchRecipe.Serializer(INGREDIENT_CODEC))
                     .register();
                 case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.Builder::new)
                     .recipeClass(AssemblyRecipe.class)
-                    .serializer(new AssemblyRecipe.Serializer<>(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new AssemblyRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
                     .recipeClass(CleanRecipe.class)
-                    .serializer(new CleanRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new CleanRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe::builder)
                     .recipeClass(EngravingRecipe.class)
-                    .serializer(new CleanRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new CleanRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)
                     .recipeClass(OreAnalyzerRecipe.class)
-                    .serializer(new OreAnalyzerRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new OreAnalyzerRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.Builder::new)
                     .recipeClass(ChemicalReactorRecipe.class)
-                    .serializer(new ChemicalReactorRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new ChemicalReactorRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.Builder::new)
                     .recipeClass(BlastFurnaceRecipe.class)
-                    .serializer(new BlastFurnaceRecipe.Serializer(
-                        ProcessingIngredientCodecs.codec(), ProcessingResultCodecs.codec()))
+                    .serializer(new BlastFurnaceRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);

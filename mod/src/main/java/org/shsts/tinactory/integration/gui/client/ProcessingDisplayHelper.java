@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +28,8 @@ public final class ProcessingDisplayHelper {
             return RenderUtil.selectItemFromItems(Arrays.asList(items.ingredient.getItems()))
                 .map(ClientUtil::itemTooltip);
         }
-        return ProcessingStackHelper.itemStack(object).map(ClientUtil::itemTooltip)
-            .or(() -> ProcessingStackHelper.fluidStack(object)
+        return ProcessingHelper.itemStack(object).map(ClientUtil::itemTooltip)
+            .or(() -> ProcessingHelper.fluidStack(object)
                 .map(fluid -> ClientUtil.fluidTooltip(fluid, false)));
     }
 
@@ -43,10 +43,10 @@ public final class ProcessingDisplayHelper {
         Consumer<FluidStack> fluidRenderer) {
         if (object instanceof ItemsIngredient items) {
             RenderUtil.selectItemFromItems(Arrays.asList(items.ingredient.getItems())).ifPresent(itemRenderer);
-        } else if (ProcessingStackHelper.itemStack(object).isPresent()) {
-            itemRenderer.accept(ProcessingStackHelper.itemStack(object).orElseThrow());
+        } else if (ProcessingHelper.itemStack(object).isPresent()) {
+            itemRenderer.accept(ProcessingHelper.itemStack(object).orElseThrow());
         } else {
-            ProcessingStackHelper.fluidStack(object).ifPresent(fluidRenderer);
+            ProcessingHelper.fluidStack(object).ifPresent(fluidRenderer);
         }
     }
 }

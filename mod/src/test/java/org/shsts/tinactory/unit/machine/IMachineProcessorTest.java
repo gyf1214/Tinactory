@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit;
+package org.shsts.tinactory.unit.machine;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;

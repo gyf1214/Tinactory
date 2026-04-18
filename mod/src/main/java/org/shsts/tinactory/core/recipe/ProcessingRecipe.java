@@ -19,7 +19,6 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -322,5 +321,4 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             jo.addProperty("power", recipe.power);
         }
     }
-
 }

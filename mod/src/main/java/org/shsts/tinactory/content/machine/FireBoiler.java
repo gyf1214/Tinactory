@@ -15,7 +15,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -206,7 +206,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
             return Optional.empty();
         }
         return switch (port) {
-            case 0 -> Optional.of(ProcessingStackHelper.itemIngredient(burningItem));
+            case 0 -> Optional.of(ProcessingHelper.itemIngredient(burningItem));
             case 1 -> inputInfo();
             case 2 -> outputInfo();
             default -> Optional.empty();
@@ -216,7 +216,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     @Override
     public List<IProcessingObject> getAllInfo() {
         var ret = new ArrayList<IProcessingObject>();
-        ret.add(ProcessingStackHelper.itemIngredient(burningItem));
+        ret.add(ProcessingHelper.itemIngredient(burningItem));
         addAllInfo(ret::add);
         return ret;
     }

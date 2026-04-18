@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
-import org.shsts.tinactory.integration.recipe.ProcessingStackHelper
+import org.shsts.tinactory.integration.recipe.ProcessingHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 
 class MarkerBuilder(builder: MarkerRecipe.Builder) :
@@ -57,7 +57,7 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     fun display(value: ItemLike) {
-        builder.display(ProcessingStackHelper.itemIngredient(ItemStack(value)))
+        builder.display(ProcessingHelper.itemIngredient(ItemStack(value)))
     }
 
     fun display(tag: TagKey<Item>) {
@@ -69,11 +69,11 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     override fun output(item: ItemLike, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingStackHelper.itemIngredient(ItemStack(item, amount)))
+        builder.output(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
     }
 
     override fun output(fluid: Fluid, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingStackHelper.fluidIngredient(FluidStack(fluid, amount)))
+        builder.output(port, ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)))
     }
 
     fun output(fluid: Fluid, port: Int) {

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.machine;
+package org.shsts.tinactory.unit.recipe;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundTag;
@@ -8,7 +8,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 
 import java.util.Objects;
 import java.util.Optional;

@@ -9,6 +9,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.shsts.tinactory.unit.machine;
 
-import com.mojang.serialization.Codec;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -12,12 +12,12 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
+import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinycorelib.api.core.DistLazy;
