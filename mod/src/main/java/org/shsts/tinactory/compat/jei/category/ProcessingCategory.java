@@ -13,6 +13,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.compat.jei.ComposeDrawable;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
@@ -22,13 +24,18 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.StackIngredient;
+import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.integration.recipe.ProcessingJeiHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.shsts.tinactory.AllTags.machine;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -87,8 +94,31 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         return y;
     }
 
-    protected void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot, IProcessingObject ingredient) {
-        ProcessingJeiHelper.addIngredient(builder, slot, ingredient);
+    protected static void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot,
+        IProcessingObject ingredient) {
+        if (ingredient instanceof StackIngredient<?> stackIngredient && stackIngredient.type() == PortType.ITEM) {
+            builder.itemInput(slot, (ItemStack) stackIngredient.stack());
+        } else if (ingredient instanceof ItemsIngredient item) {
+            if (item.amount <= 0) {
+                builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
+            } else {
+                var items = Arrays.stream(item.ingredient.getItems())
+                    .map(stack -> StackHelper.copyWithCount(stack, item.amount))
+                    .toList();
+                builder.itemInput(slot, items);
+            }
+        } else if (
+            ingredient instanceof StackIngredient<?> stackIngredient && stackIngredient.type() == PortType.FLUID
+        ) {
+            builder.fluidInput(slot, (FluidStack) stackIngredient.stack());
+        } else if (ingredient instanceof StackResult<?> stackResult && stackResult.type() == PortType.ITEM) {
+            builder.itemOutput(slot, (ItemStack) stackResult.stack(), stackResult.rate());
+        } else if (ingredient instanceof StackResult<?> stackResult && stackResult.type() == PortType.FLUID) {
+            builder.fluidOutput(slot, (FluidStack) stackResult.stack(), stackResult.rate());
+        } else {
+            throw new IllegalArgumentException("Unknown processing ingredient type %s"
+                .formatted(ingredient.getClass()));
+        }
     }
 
     @Override
@@ -113,10 +143,10 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         var outputs = layout.getProcessingOutputs(recipe);
 
         for (var input : inputs) {
-            ProcessingJeiHelper.addIngredient(builder, input.slot(), input.val());
+            addIngredient(builder, input.slot(), input.val());
         }
         for (var output : outputs) {
-            ProcessingJeiHelper.addIngredient(builder, output.slot(), output.val());
+            addIngredient(builder, output.slot(), output.val());
         }
     }
 

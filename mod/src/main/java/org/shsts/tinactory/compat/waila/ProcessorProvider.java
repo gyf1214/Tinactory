@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
@@ -28,13 +29,13 @@ import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinactory.integration.recipe.ProcessingWailaHelper;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
@@ -78,6 +79,15 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
         line.add(helper.spacer(1, 0));
     }
 
+    public static void appendElement(List<IElement> line, IProcessingObject object,
+        BiConsumer<List<IElement>, ItemStack> itemAppender,
+        BiConsumer<List<IElement>, FluidStack> fluidAppender) {
+        ProcessingHelper.itemStack(object).ifPresentOrElse(
+            item -> itemAppender.accept(line, item),
+            () -> ProcessingHelper.fluidStack(object).ifPresent(fluid -> fluidAppender.accept(line, fluid))
+        );
+    }
+
     @Override
     protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
         if (config.get(HEAT) && tag.contains("tinactoryHeat", Tag.TAG_DOUBLE)) {
@@ -118,7 +128,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 line.add(helper.text(tr("inputs")));
                 for (var tag1 : listTag) {
                     var input = CodecHelper.parseTag(ProcessingHelper.INGREDIENT_CODEC, tag1);
-                    ProcessingWailaHelper.appendElement(line, input, this::itemElement, this::fluidElement);
+                    appendElement(line, input, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
                     add(line);
@@ -131,7 +141,7 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
                 line.add(helper.text(tr("outputs")));
                 for (var tag1 : listTag) {
                     var output = CodecHelper.parseTag(ProcessingHelper.RESULT_CODEC, tag1);
-                    ProcessingWailaHelper.appendElement(line, output, this::itemElement, this::fluidElement);
+                    appendElement(line, output, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
                     add(line);
