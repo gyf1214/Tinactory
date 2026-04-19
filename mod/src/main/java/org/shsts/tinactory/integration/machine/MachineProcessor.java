@@ -20,7 +20,6 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.Machine;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;

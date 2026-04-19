@@ -25,7 +25,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
-import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;

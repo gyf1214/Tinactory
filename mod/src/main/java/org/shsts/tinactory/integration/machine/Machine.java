@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.machine;
+package org.shsts.tinactory.integration.machine;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
@@ -31,6 +31,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.core.machine.MachineConfig;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
