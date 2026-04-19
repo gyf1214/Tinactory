@@ -284,6 +284,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
+    public int parallel() {
+        return 1;
+    }
+
+    @Override
     public void assignNetwork(INetwork net) {
         LOGGER.trace("{}: assign to network {}", blockEntity, net);
         if (network == net) {

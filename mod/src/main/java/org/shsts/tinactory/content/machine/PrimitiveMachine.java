@@ -174,6 +174,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     }
 
     @Override
+    public int parallel() {
+        return 1;
+    }
+
+    @Override
     public void assignNetwork(INetwork network) {}
 
     @Override

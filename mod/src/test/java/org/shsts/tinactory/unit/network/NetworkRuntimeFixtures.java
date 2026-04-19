@@ -214,6 +214,11 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
+        public int parallel() {
+            return 0;
+        }
+
+        @Override
         public Optional<INetwork> network() {
             return network;
         }
