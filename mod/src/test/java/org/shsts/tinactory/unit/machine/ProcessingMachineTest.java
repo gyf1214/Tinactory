@@ -10,7 +10,6 @@ import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
-import org.shsts.tinactory.unit.fixture.TestProcessingObject;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
@@ -45,8 +44,7 @@ class ProcessingMachineTest {
 
         new TestProcessingMachine().addOutputInfoForTest(recipe, 3, info::add);
 
-        assertEquals(1, info.size());
-        assertProcessingInfo(2, TestResult.class, "dust", 6, info.get(0));
+        assertEquals(List.of(new ProcessingInfo(2, new TestResult("dust", 6))), info);
     }
 
     @Test
@@ -142,15 +140,6 @@ class ProcessingMachineTest {
             .voltage(voltage)
             .power(8)
             .buildObject();
-    }
-
-    private static void assertProcessingInfo(int port, Class<? extends TestProcessingObject> type,
-        String key, int amount, ProcessingInfo info) {
-        assertEquals(port, info.port());
-        var object = (TestProcessingObject) info.object();
-        assertTrue(type.isInstance(object));
-        assertEquals(key, object.key());
-        assertEquals(amount, object.amount());
     }
 
     private static final class TestProcessingMachine extends ProcessingMachine<TestRecipe> {

@@ -1,13 +1,11 @@
 package org.shsts.tinactory.unit.machine;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.serialization.Codec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Layout;
@@ -36,21 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ProcessingRuntimeTest {
     private static final ResourceLocation PROCESSING_TYPE = new ResourceLocation("tinactory", "test_processing");
     private static final ResourceLocation RECIPE_ID = new ResourceLocation("tinactory", "runtime_recipe");
-    private static final Codec<IProcessingIngredient> INGREDIENT_CODEC =
-        Codec.STRING.dispatch(IProcessingObject::codecName, name -> {
-            if ("test_ingredient".equals(name)) {
-                return TestIngredient.CODEC;
-            }
-            throw new IllegalArgumentException("Unknown ingredient codec: " + name);
-        });
-    private static final Codec<IProcessingResult> RESULT_CODEC =
-        Codec.STRING.dispatch(IProcessingObject::codecName, name -> {
-            if ("test_result".equals(name)) {
-                return TestResult.CODEC;
-            }
-            throw new IllegalArgumentException("Unknown result codec: " + name);
-        });
-    private static final Codec<ProcessingInfo> INFO_CODEC = ProcessingInfo.codec(INGREDIENT_CODEC, RESULT_CODEC);
 
     @Test
     void shouldAggregateRecipeBookItemsAcrossProcessors() {
@@ -83,12 +66,8 @@ class ProcessingRuntimeTest {
         assertEquals(3, processor.beginParallel());
         assertEquals(10L, runtime.progressTicks());
         assertEquals(10L, runtime.maxProgressTicks());
-        assertEquals(1, runtime.getAllInfo().size());
-        assertProcessingObject(TestIngredient.class, "ore", 2,
-            (TestProcessingObject) runtime.getAllInfo().get(0));
-        assertEquals(1, processor.doneResults().size());
-        assertProcessingObject(TestResult.class, "dust", 1,
-            (TestProcessingObject) processor.doneResults().get(0));
+        assertEquals(List.of(new TestIngredient("ore", 2)), runtime.getAllInfo());
+        assertEquals(List.of(new TestResult("dust", 1)), processor.doneResults());
         assertTrue(runtime.isWorking(1d));
     }
 
@@ -116,9 +95,7 @@ class ProcessingRuntimeTest {
 
         assertTrue(restoredProcessor.continued());
         assertEquals(4L, restored.progressTicks());
-        assertEquals(1, restored.getAllInfo().size());
-        assertProcessingObject(TestIngredient.class, "ore", 1,
-            (TestProcessingObject) restored.getAllInfo().get(0));
+        assertEquals(List.of(new TestIngredient("ore", 1)), restored.getAllInfo());
     }
 
     @Test
@@ -127,7 +104,7 @@ class ProcessingRuntimeTest {
         var machine = new TestMachine(new TestContainer()).targetRecipe(RECIPE_ID);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
         var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
-            false, updates::incrementAndGet, INFO_CODEC);
+            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
 
@@ -137,14 +114,7 @@ class ProcessingRuntimeTest {
 
     private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
         return new ProcessingRuntime(List.of(processors), true, () -> Optional.of(machine),
-            false, () -> {}, INFO_CODEC);
-    }
-
-    private static void assertProcessingObject(Class<? extends TestProcessingObject> type,
-        String key, int amount, TestProcessingObject object) {
-        assertTrue(type.isInstance(object));
-        assertEquals(key, object.key());
-        assertEquals(amount, object.amount());
+            false, () -> {}, TestProcessingObject.INFO_CODEC);
     }
 
     private static final class TestRecipeProcessor implements IRecipeProcessor<ResourceLocation> {

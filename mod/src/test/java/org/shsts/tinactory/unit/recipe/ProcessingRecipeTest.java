@@ -77,11 +77,11 @@ class ProcessingRecipeTest {
         recipe.consumeInputs(container, 1, consumed::add);
         recipe.insertOutputs(container, 1, new Random(2L), result -> inserted.add((TestProcessingObject) result));
 
-        assertEquals(2, consumed.size());
-        assertProcessingInfo(0, TestIngredient.class, "ore", 2, consumed.get(0));
-        assertProcessingInfo(1, TestIngredient.class, "coolant", 1, consumed.get(1));
-        assertEquals(1, inserted.size());
-        assertProcessingObject(TestResult.class, "ingot", 3, inserted.get(0));
+        assertIterableEquals(List.of(
+            new ProcessingInfo(0, new TestIngredient("ore", 2)),
+            new ProcessingInfo(1, new TestIngredient("coolant", 1))
+        ), consumed);
+        assertEquals(List.of(new TestResult("ingot", 3)), inserted);
         assertEquals(2, container.getTestPort(0).stored());
         assertEquals(1, container.getTestPort(1).stored());
         assertEquals(3, container.getTestPort(2).stored());
@@ -283,19 +283,6 @@ class ProcessingRecipeTest {
             .baseType(new ResourceLocation("tinactory", "test_base"))
             .workTicks(20L)
             .power(8L);
-    }
-
-    private static void assertProcessingInfo(int port, Class<? extends TestProcessingObject> type,
-        String key, int amount, ProcessingInfo info) {
-        assertEquals(port, info.port());
-        assertProcessingObject(type, key, amount, (TestProcessingObject) info.object());
-    }
-
-    private static void assertProcessingObject(Class<? extends TestProcessingObject> type,
-        String key, int amount, TestProcessingObject object) {
-        assertTrue(type.isInstance(object));
-        assertEquals(key, object.key());
-        assertEquals(amount, object.amount());
     }
 
     private static final class TestRecipe extends ProcessingRecipe {
