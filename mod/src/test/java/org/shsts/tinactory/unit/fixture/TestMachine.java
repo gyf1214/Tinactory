@@ -8,8 +8,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.gui.client.IRenderable;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -17,11 +19,18 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinycorelib.api.core.DistLazy;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 public final class TestMachine implements IMachine {
@@ -30,6 +39,7 @@ public final class TestMachine implements IMachine {
     private final Random random = new Random(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
+    private Optional<TestTeamProfile> owner = Optional.empty();
     private int parallel = 1;
 
     public TestMachine(IContainer container) {
@@ -56,6 +66,12 @@ public final class TestMachine implements IMachine {
         return this;
     }
 
+    public TestTeamProfile team() {
+        var team = new TestTeamProfile();
+        owner = Optional.of(team);
+        return team;
+    }
+
     public TestMachine parallel(int value) {
         parallel = value;
         return this;
@@ -68,7 +84,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public Optional<ITeamProfile> owner() {
-        return Optional.empty();
+        return owner.map(team -> team);
     }
 
     @Override
@@ -226,6 +242,124 @@ public final class TestMachine implements IMachine {
         @Override
         public double getPowerCons() {
             return 0;
+        }
+    }
+
+    public static final class TestTeamProfile implements IServerTeamProfile {
+        private final Map<ResourceLocation, Long> progress = new HashMap<>();
+        private final Set<ResourceLocation> available = new HashSet<>();
+        private final Set<ResourceLocation> finished = new HashSet<>();
+        private Optional<TestTechnology> target = Optional.empty();
+
+        public TestTeamProfile available(ResourceLocation tech) {
+            available.add(tech);
+            return this;
+        }
+
+        public TestTeamProfile finished(ResourceLocation tech) {
+            finished.add(tech);
+            return this;
+        }
+
+        public TestTeamProfile progress(ResourceLocation tech, long value) {
+            progress.put(tech, value);
+            return this;
+        }
+
+        public TestTeamProfile target(ResourceLocation tech, long maxProgress) {
+            target = Optional.of(new TestTechnology(tech, maxProgress));
+            return available(tech);
+        }
+
+        @Override
+        public PlayerTeam getPlayerTeam() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public long getTechProgress(ResourceLocation tech) {
+            return progress.getOrDefault(tech, 0L);
+        }
+
+        @Override
+        public boolean isTechFinished(ResourceLocation tech) {
+            return finished.contains(tech);
+        }
+
+        @Override
+        public boolean isTechAvailable(ResourceLocation tech) {
+            return available.contains(tech);
+        }
+
+        @Override
+        public boolean canResearch(ResourceLocation tech, long value) {
+            return target.map($ -> $.getLoc().equals(tech) &&
+                isTechAvailable(tech) &&
+                getTechProgress(tech) + value <= $.getMaxProgress())
+                .orElse(false);
+        }
+
+        @Override
+        public Optional<ITechnology> getTargetTech() {
+            return target.map(tech -> tech);
+        }
+
+        @Override
+        public int getModifier(String key) {
+            return 0;
+        }
+
+        @Override
+        public void advanceTechProgress(ITechnology tech, long value) {
+            advanceTechProgress(tech.getLoc(), value);
+        }
+
+        @Override
+        public void advanceTechProgress(ResourceLocation tech, long value) {
+            progress.put(tech, getTechProgress(tech) + value);
+        }
+
+        @Override
+        public void setTargetTech(ITechnology tech) {
+            target = Optional.of(new TestTechnology(tech.getLoc(), tech.getMaxProgress()));
+            available(tech.getLoc());
+        }
+
+        @Override
+        public void resetTargetTech() {
+            target = Optional.empty();
+        }
+    }
+
+    private record TestTechnology(ResourceLocation loc, long maxProgress) implements ITechnology {
+        @Override
+        public ResourceLocation getLoc() {
+            return loc;
+        }
+
+        @Override
+        public List<ITechnology> getDepends() {
+            return List.of();
+        }
+
+        @Override
+        public Map<String, Integer> getModifiers() {
+            return Map.of();
+        }
+
+        @Override
+        public long getMaxProgress() {
+            return maxProgress;
+        }
+
+        @Override
+        public DistLazy<? extends IRenderable> getDisplay() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int compareTo(ITechnology other) {
+            return loc.compareTo(other.getLoc());
         }
     }
 }

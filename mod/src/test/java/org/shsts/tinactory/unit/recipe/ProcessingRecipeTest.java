@@ -6,8 +6,10 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.unit.fixture.TestContainer;
@@ -142,8 +144,103 @@ class ProcessingRecipeTest {
         assertTrue(recipe.matchesForTest(autoVoidMachine, 1, new Random(3L)));
     }
 
+    @Test
+    void shouldAllowAssemblyRecipeWithoutRequiredTech() {
+        var recipe = assemblyBuilder()
+            .buildObject();
+
+        assertTrue(recipe.canCraft(new TestMachine(new TestContainer())));
+    }
+
+    @Test
+    void shouldRejectAssemblyRecipeWhenRequiredTechIsMissing() {
+        var tech = new ResourceLocation("tinactory", "assembler");
+        var recipe = assemblyBuilder()
+            .requireTech(tech)
+            .buildObject();
+        var machine = new TestMachine(new TestContainer());
+        machine.team();
+
+        assertFalse(recipe.canCraft(machine));
+    }
+
+    @Test
+    void shouldAcceptAssemblyRecipeWhenRequiredTechIsFinished() {
+        var tech = new ResourceLocation("tinactory", "assembler");
+        var recipe = assemblyBuilder()
+            .requireTech(tech)
+            .buildObject();
+        var machine = new TestMachine(new TestContainer());
+        machine.team().finished(tech);
+
+        assertTrue(recipe.canCraft(machine));
+    }
+
+    @Test
+    void shouldRequireActiveMatchingResearchTarget() {
+        var target = new ResourceLocation("tinactory", "research_target");
+        var other = new ResourceLocation("tinactory", "other_research");
+        var recipe = researchBuilder(target)
+            .buildObject();
+        var missingTargetMachine = new TestMachine(new TestContainer());
+        missingTargetMachine.team().available(target);
+        var otherTargetMachine = new TestMachine(new TestContainer());
+        otherTargetMachine.team().target(other, 100L);
+        var targetMachine = new TestMachine(new TestContainer());
+        targetMachine.team().target(target, 100L);
+
+        assertFalse(recipe.canCraft(missingTargetMachine));
+        assertFalse(recipe.canCraft(otherTargetMachine));
+        assertTrue(recipe.canCraft(targetMachine));
+    }
+
+    @Test
+    void shouldCheckResearchCapacityForParallelProgress() {
+        var target = new ResourceLocation("tinactory", "research_target");
+        var recipe = researchBuilder(target)
+            .progress(4L)
+            .buildObject();
+        var machine = new TestMachine(new TestContainer());
+        machine.team()
+            .target(target, 10L)
+            .progress(target, 3L);
+
+        assertTrue(recipe.matches(machine, 1));
+        assertFalse(recipe.matches(machine, 2));
+    }
+
+    @Test
+    void shouldAdvanceServerSideTechProgressWhenResearchOutputsAreInserted() {
+        var target = new ResourceLocation("tinactory", "research_target");
+        var recipe = researchBuilder(target)
+            .progress(4L)
+            .buildObject();
+        var machine = new TestMachine(new TestContainer());
+        var team = machine.team()
+            .target(target, 100L)
+            .progress(target, 2L);
+
+        recipe.insertOutputs(machine, 3, new Random(4L), result -> {});
+
+        assertEquals(14L, team.getTechProgress(target));
+    }
+
     private static TestRecipe.Builder recipeBuilder() {
         return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_recipe"));
+    }
+
+    private static AssemblyRecipe.Builder assemblyBuilder() {
+        return new AssemblyRecipe.Builder(null, new ResourceLocation("tinactory", "test_assembly"))
+            .output(0, new TestProcessingObject("assembly", 1))
+            .workTicks(20L)
+            .power(8L);
+    }
+
+    private static ResearchRecipe.Builder researchBuilder(ResourceLocation target) {
+        return new ResearchRecipe.Builder(null, new ResourceLocation("tinactory", "test_research"))
+            .target(target)
+            .workTicks(20L)
+            .power(8L);
     }
 
     private static final class TestRecipe extends ProcessingRecipe {
