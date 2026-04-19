@@ -38,6 +38,9 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<CompoundTag> {
+    public static final String VOID_KEY = "void";
+    public static final boolean VOID_DEFAULT = false;
+
     private final List<IRecipeProcessor<?>> processors;
     private final boolean autoRecipe;
     private final Supplier<Optional<IMachine>> machineSupplier;

@@ -282,6 +282,7 @@ public class MultiblockInterface extends Machine {
         return 1;
     }
 
+    @Override
     public int parallel() {
         var maxParallel = maxParallel();
         return Math.min(maxParallel, config.getInt(PARALLEL_KEY, maxParallel));

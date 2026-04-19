@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.machine.MachineProcessor;
 
 import java.util.Collection;
@@ -22,12 +21,8 @@ public class MultiblockProcessor extends MachineProcessor {
         super(blockEntity, processorFactories, autoRecipe);
     }
 
-    private Optional<MultiblockInterface> getInterface() {
-        return Multiblock.get(blockEntity).getInterface();
-    }
-
     @Override
     protected Optional<IMachine> machine() {
-        return getInterface().map($ -> $);
+        return Multiblock.get(blockEntity).getInterface().map($ -> $);
     }
 }

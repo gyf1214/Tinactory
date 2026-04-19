@@ -38,9 +38,9 @@ import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
+import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
+import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_KEY;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
-import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_DEFAULT;
-import static org.shsts.tinactory.integration.machine.MachineProcessor.VOID_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
