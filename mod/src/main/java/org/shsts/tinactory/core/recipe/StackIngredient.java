@@ -8,6 +8,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -68,5 +69,18 @@ public class StackIngredient<T> implements IProcessingIngredient {
             stack -> new StackIngredient<>(codecName, type, stack, adapter),
             StackIngredient::stack
         );
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof StackIngredient<?> ingredient &&
+            codecName.equals(ingredient.codecName) &&
+            type == ingredient.type &&
+            Objects.equals(stack, ingredient.stack));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codecName, type, stack);
     }
 }

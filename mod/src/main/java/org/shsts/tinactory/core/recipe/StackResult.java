@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.util.MathUtil;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -88,5 +89,19 @@ public class StackResult<T> implements IProcessingResult {
             Codec.DOUBLE.fieldOf("rate").forGetter(StackResult::rate),
             stackCodec.fieldOf("stack").forGetter(StackResult::stack)
         ).apply(instance, (rate, stack) -> new StackResult<>(codecName, type, rate, stack, adapter)));
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return this == other || (other instanceof StackResult<?> result &&
+            codecName.equals(result.codecName) &&
+            type == result.type &&
+            Double.compare(rate, result.rate) == 0 &&
+            Objects.equals(stack, result.stack));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codecName, type, rate, stack);
     }
 }
