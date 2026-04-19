@@ -40,6 +40,7 @@ public final class TestMachine implements IMachine {
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
     private Optional<TestTeamProfile> owner = Optional.empty();
+    private boolean multiblock = false;
     private int parallel = 1;
 
     public TestMachine(IContainer container) {
@@ -70,6 +71,16 @@ public final class TestMachine implements IMachine {
         var team = new TestTeamProfile();
         owner = Optional.of(team);
         return team;
+    }
+
+    public TestMachine multiblock(boolean value) {
+        multiblock = value;
+        return this;
+    }
+
+    @Override
+    public boolean isMultiblock() {
+        return multiblock;
     }
 
     public TestMachine parallel(int value) {

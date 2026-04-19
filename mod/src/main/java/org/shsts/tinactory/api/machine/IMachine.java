@@ -67,6 +67,8 @@ public interface IMachine {
 
     int parallel();
 
+    boolean isMultiblock();
+
     Optional<INetwork> network();
 
     /**

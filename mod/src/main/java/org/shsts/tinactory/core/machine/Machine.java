@@ -289,6 +289,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
+    public boolean isMultiblock() {
+        return false;
+    }
+
+    @Override
     public void assignNetwork(INetwork net) {
         LOGGER.trace("{}: assign to network {}", blockEntity, net);
         if (network == net) {

@@ -289,6 +289,11 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
+    public boolean isMultiblock() {
+        return true;
+    }
+
+    @Override
     public Component title() {
         if (config.contains("name", Tag.TAG_STRING) || multiblock == null) {
             return super.title();

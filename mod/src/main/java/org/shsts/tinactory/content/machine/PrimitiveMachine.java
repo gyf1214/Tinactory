@@ -179,6 +179,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     }
 
     @Override
+    public boolean isMultiblock() {
+        return false;
+    }
+
+    @Override
     public void assignNetwork(INetwork network) {}
 
     @Override

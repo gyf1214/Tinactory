@@ -219,6 +219,11 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
+        public boolean isMultiblock() {
+            return false;
+        }
+
+        @Override
         public Optional<INetwork> network() {
             return network;
         }

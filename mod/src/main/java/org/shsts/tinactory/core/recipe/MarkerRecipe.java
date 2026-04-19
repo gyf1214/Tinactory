@@ -14,7 +14,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -62,7 +61,7 @@ public class MarkerRecipe extends ProcessingRecipe {
     @Override
     public boolean canCraft(IMachine machine) {
         return super.canCraft(machine) &&
-            (!requireMultiblock || machine instanceof MultiblockInterface);
+            (!requireMultiblock || machine.isMultiblock());
     }
 
     public boolean matchesType(IRecipeType<?> type) {

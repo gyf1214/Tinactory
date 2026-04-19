@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
@@ -225,6 +226,40 @@ class ProcessingRecipeTest {
         assertEquals(14L, team.getTechProgress(target));
     }
 
+    @Test
+    void shouldRejectNonMultiblockMachineWhenMarkerRequiresMultiblock() {
+        var recipe = markerBuilder()
+            .requireMultiblock(true)
+            .buildObject();
+
+        assertFalse(recipe.canCraft(new TestMachine(new TestContainer())));
+    }
+
+    @Test
+    void shouldAcceptExplicitMultiblockMachineWhenMarkerRequiresMultiblock() {
+        var recipe = markerBuilder()
+            .requireMultiblock(true)
+            .buildObject();
+
+        assertTrue(recipe.canCraft(new TestMachine(new TestContainer()).multiblock(true)));
+    }
+
+    @Test
+    void shouldMatchMarkerBaseTypeAndPrefixByLocation() {
+        var baseType = new ResourceLocation("tinactory", "base_type");
+        var otherType = new ResourceLocation("tinactory", "other_type");
+        var recipe = markerBuilder()
+            .baseType(baseType)
+            .prefix("ore")
+            .buildObject();
+
+        assertTrue(recipe.matchesType(baseType));
+        assertFalse(recipe.matchesType(otherType));
+        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore")));
+        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore/copper")));
+        assertFalse(recipe.matches(() -> new ResourceLocation("tinactory", "dust/copper")));
+    }
+
     private static TestRecipe.Builder recipeBuilder() {
         return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_recipe"));
     }
@@ -239,6 +274,13 @@ class ProcessingRecipeTest {
     private static ResearchRecipe.Builder researchBuilder(ResourceLocation target) {
         return new ResearchRecipe.Builder(null, new ResourceLocation("tinactory", "test_research"))
             .target(target)
+            .workTicks(20L)
+            .power(8L);
+    }
+
+    private static MarkerRecipe.Builder markerBuilder() {
+        return new MarkerRecipe.Builder(null, new ResourceLocation("tinactory", "test_marker"))
+            .baseType(new ResourceLocation("tinactory", "test_base"))
             .workTicks(20L)
             .power(8L);
     }
