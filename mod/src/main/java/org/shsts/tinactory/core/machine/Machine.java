@@ -405,12 +405,6 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 
-    public static Optional<IProcessor> getProcessor(BlockEntity be) {
-        var machine = MACHINE.tryGet(be);
-        return machine.map(IMachine::processor)
-            .orElseGet(() -> PROCESSOR.tryGet(be));
-    }
-
     public static void registerStopSignal(INetwork network, IMachine machine,
         Consumer<Boolean> setter) {
         var signal = network.getComponent(SIGNAL_COMPONENT.get());

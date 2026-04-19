@@ -2,21 +2,25 @@ package org.shsts.tinactory.core.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
-import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -81,5 +85,11 @@ public class LayoutMenu extends InventoryMenu {
 
     public Layout layout() {
         return layout;
+    }
+
+    public static Optional<IProcessor> getProcessor(BlockEntity be) {
+        var machine = MACHINE.tryGet(be);
+        return machine.map(IMachine::processor)
+            .orElseGet(() -> PROCESSOR.tryGet(be));
     }
 }

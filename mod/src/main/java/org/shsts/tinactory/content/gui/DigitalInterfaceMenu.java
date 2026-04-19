@@ -118,11 +118,4 @@ public class DigitalInterfaceMenu extends MachineMenu {
     private FluidStack getInfoFluid(int port, int index) {
         return getInfo(port, index).flatMap(ProcessingHelper::fluidStack).orElse(FluidStack.EMPTY);
     }
-
-    public static class BoilerMenu extends DigitalInterfaceMenu {
-        public BoilerMenu(Properties properties) {
-            super(properties);
-            org.shsts.tinactory.content.gui.BoilerMenu.addProgressSlots(this);
-        }
-    }
 }
