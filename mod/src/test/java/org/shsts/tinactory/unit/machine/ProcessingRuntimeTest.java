@@ -6,8 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -19,17 +17,18 @@ import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.unit.fixture.TestContainer;
+import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
+import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,8 +83,12 @@ class ProcessingRuntimeTest {
         assertEquals(3, processor.beginParallel());
         assertEquals(10L, runtime.progressTicks());
         assertEquals(10L, runtime.maxProgressTicks());
-        assertEquals(List.of(new TestIngredient("ore", 2)), runtime.getAllInfo());
-        assertEquals(List.of(new TestResult("dust", 1)), processor.doneResults());
+        assertEquals(1, runtime.getAllInfo().size());
+        assertProcessingObject(TestIngredient.class, "ore", 2,
+            (TestProcessingObject) runtime.getAllInfo().get(0));
+        assertEquals(1, processor.doneResults().size());
+        assertProcessingObject(TestResult.class, "dust", 1,
+            (TestProcessingObject) processor.doneResults().get(0));
         assertTrue(runtime.isWorking(1d));
     }
 
@@ -113,7 +116,9 @@ class ProcessingRuntimeTest {
 
         assertTrue(restoredProcessor.continued());
         assertEquals(4L, restored.progressTicks());
-        assertEquals(List.of(new TestIngredient("ore", 1)), restored.getAllInfo());
+        assertEquals(1, restored.getAllInfo().size());
+        assertProcessingObject(TestIngredient.class, "ore", 1,
+            (TestProcessingObject) restored.getAllInfo().get(0));
     }
 
     @Test
@@ -135,67 +140,11 @@ class ProcessingRuntimeTest {
             false, () -> {}, INFO_CODEC);
     }
 
-    private record TestIngredient(String name, int amount) implements IProcessingIngredient {
-        private static final Codec<TestIngredient> CODEC = Codec.STRING.xmap(
-            value -> {
-                var parts = value.split(":");
-                return new TestIngredient(parts[0], Integer.parseInt(parts[1]));
-            },
-            value -> value.name + ":" + value.amount);
-
-        @Override
-        public String codecName() {
-            return "test_ingredient";
-        }
-
-        @Override
-        public PortType type() {
-            return PortType.ITEM;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<TestResult>) other -> Objects.equals(name, other.name);
-        }
-
-        @Override
-        public Optional<IProcessingIngredient> consumePort(IPort<?> port, int parallel, boolean simulate) {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private record TestResult(String name, int amount) implements IProcessingResult {
-        private static final Codec<TestResult> CODEC = Codec.STRING.xmap(
-            value -> {
-                var parts = value.split(":");
-                return new TestResult(parts[0], Integer.parseInt(parts[1]));
-            },
-            value -> value.name + ":" + value.amount);
-
-        @Override
-        public String codecName() {
-            return "test_result";
-        }
-
-        @Override
-        public PortType type() {
-            return PortType.ITEM;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<TestResult>) other -> Objects.equals(name, other.name);
-        }
-
-        @Override
-        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public IProcessingResult scaledPreview(int parallel) {
-            return new TestResult(name, amount * parallel);
-        }
+    private static void assertProcessingObject(Class<? extends TestProcessingObject> type,
+        String key, int amount, TestProcessingObject object) {
+        assertTrue(type.isInstance(object));
+        assertEquals(key, object.key());
+        assertEquals(amount, object.amount());
     }
 
     private static final class TestRecipeProcessor implements IRecipeProcessor<ResourceLocation> {

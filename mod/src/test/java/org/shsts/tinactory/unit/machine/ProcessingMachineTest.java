@@ -2,27 +2,23 @@ package org.shsts.tinactory.unit.machine;
 
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.unit.fixture.TestContainer;
+import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
+import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,7 +45,8 @@ class ProcessingMachineTest {
 
         new TestProcessingMachine().addOutputInfoForTest(recipe, 3, info::add);
 
-        assertEquals(List.of(new ProcessingInfo(2, new TestResult("dust", 6))), info);
+        assertEquals(1, info.size());
+        assertProcessingInfo(2, TestResult.class, "dust", 6, info.get(0));
     }
 
     @Test
@@ -147,6 +144,15 @@ class ProcessingMachineTest {
             .buildObject();
     }
 
+    private static void assertProcessingInfo(int port, Class<? extends TestProcessingObject> type,
+        String key, int amount, ProcessingInfo info) {
+        assertEquals(port, info.port());
+        var object = (TestProcessingObject) info.object();
+        assertTrue(type.isInstance(object));
+        assertEquals(key, object.key());
+        assertEquals(amount, object.amount());
+    }
+
     private static final class TestProcessingMachine extends ProcessingMachine<TestRecipe> {
         private TestProcessingMachine() {
             this(new TestRecipeManager());
@@ -176,62 +182,6 @@ class ProcessingMachineTest {
             protected TestRecipe createObject() {
                 return new TestRecipe(this);
             }
-        }
-    }
-
-    private record TestIngredient(String name, int amount) implements IProcessingIngredient {
-        @Override
-        public String codecName() {
-            return "test_ingredient";
-        }
-
-        @Override
-        public PortType type() {
-            return PortType.ITEM;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<TestResult>) other -> Objects.equals(name, other.name);
-        }
-
-        @Override
-        public Optional<IProcessingIngredient> consumePort(
-            IPort<?> port, int parallel, boolean simulate) {
-            if (port instanceof TestPort testPort) {
-                return testPort.consume(name, amount * parallel, simulate).map($ -> this);
-            }
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private record TestResult(String name, int amount) implements IProcessingResult {
-        @Override
-        public String codecName() {
-            return "test_result";
-        }
-
-        @Override
-        public PortType type() {
-            return PortType.ITEM;
-        }
-
-        @Override
-        public Predicate<?> filter() {
-            return (Predicate<TestResult>) other -> Objects.equals(name, other.name);
-        }
-
-        @Override
-        public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
-            if (port instanceof TestPort testPort) {
-                return testPort.insert(name, amount * parallel, simulate).map($ -> this);
-            }
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public IProcessingResult scaledPreview(int parallel) {
-            return new TestResult(name, amount * parallel);
         }
     }
 }

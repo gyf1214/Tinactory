@@ -5,67 +5,117 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.PortType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Predicate;
 
-public final class TestPort implements IPort<Object>, IPortFilter<Object>, ILimitedPort {
-    private final String key;
+public final class TestPort implements IPort<TestStack>, IPortFilter<TestStack>, ILimitedPort {
+    private final PortType type;
+    private final String id;
+    private final String nbt;
     private final int capacity;
     private final int portLimit;
-    private int stored;
-    private List<Predicate<Object>> filters = List.of();
+    private int storedAmount;
+    private Predicate<TestStack> filter = $ -> true;
 
-    public TestPort(String key, int capacity, int stored) {
-        this(key, capacity, stored, Integer.MAX_VALUE);
+    public TestPort(String id, int capacity, int storedAmount) {
+        this(id, capacity, storedAmount, Integer.MAX_VALUE);
     }
 
-    public TestPort(String key, int capacity, int stored, int portLimit) {
-        this.key = key;
+    public TestPort(String id, int capacity, int storedAmount, int portLimit) {
+        this(PortType.ITEM, id, "", storedAmount, capacity, portLimit);
+    }
+
+    public TestPort(PortType type, TestStack stored, int capacity) {
+        this(type, stored.id(), stored.nbt(), stored.amount(), capacity, Integer.MAX_VALUE);
+    }
+
+    public TestPort(PortType type, String id, String nbt, int storedAmount, int capacity) {
+        this(type, id, nbt, storedAmount, capacity, Integer.MAX_VALUE);
+    }
+
+    private TestPort(PortType type, String id, String nbt, int storedAmount, int capacity, int portLimit) {
+        this.type = type;
+        this.id = id;
+        this.nbt = nbt;
         this.capacity = capacity;
-        this.stored = stored;
+        this.storedAmount = storedAmount;
         this.portLimit = portLimit;
     }
 
     @Override
     public PortType type() {
-        return PortType.ITEM;
+        return type;
     }
 
     @Override
-    public boolean acceptInput(Object stack) {
-        return false;
+    public boolean acceptInput(TestStack stack) {
+        return stack.amount() > 0 &&
+            type == stack.type() &&
+            Objects.equals(id, stack.id()) &&
+            Objects.equals(nbt, stack.nbt()) &&
+            storedAmount < capacity &&
+            filter.test(stack);
     }
 
     @Override
-    public Object insert(Object stack, boolean simulate) {
-        return stack;
+    public TestStack insert(TestStack stack, boolean simulate) {
+        if (!acceptInput(stack)) {
+            return stack;
+        }
+        var inserted = Math.min(stack.amount(), capacity - storedAmount);
+        if (!simulate) {
+            storedAmount += inserted;
+        }
+        return TestStack.ADAPTER.withAmount(stack, stack.amount() - inserted);
     }
 
     @Override
-    public Object extract(Object stack, boolean simulate) {
-        return stack;
+    public TestStack extract(TestStack stack, boolean simulate) {
+        if (type != stack.type() || !Objects.equals(id, stack.id()) ||
+            !Objects.equals(nbt, stack.nbt()) || stack.amount() <= 0 || storedAmount <= 0) {
+            return TestStack.ADAPTER.empty();
+        }
+        var moved = Math.min(stack.amount(), storedAmount);
+        if (!simulate) {
+            storedAmount -= moved;
+        }
+        return TestStack.ADAPTER.withAmount(stack, moved);
     }
 
     @Override
-    public Object extract(int limit, boolean simulate) {
-        throw new UnsupportedOperationException();
+    public TestStack extract(int limit, boolean simulate) {
+        if (limit <= 0 || storedAmount <= 0) {
+            return TestStack.ADAPTER.empty();
+        }
+        var moved = Math.min(limit, storedAmount);
+        if (!simulate) {
+            storedAmount -= moved;
+        }
+        return new TestStack(type, id, nbt, moved);
     }
 
     @Override
-    public int getStorageAmount(Object stack) {
-        return stored;
+    public int getStorageAmount(TestStack stack) {
+        return type == stack.type() && Objects.equals(id, stack.id()) && Objects.equals(nbt, stack.nbt()) ?
+            storedAmount : 0;
     }
 
     @Override
-    public Collection<Object> getAllStorages() {
-        return List.of();
+    public Collection<TestStack> getAllStorages() {
+        if (storedAmount <= 0) {
+            return List.of();
+        }
+        var ret = new ArrayList<TestStack>();
+        ret.add(new TestStack(type, id, nbt, storedAmount));
+        return ret;
     }
 
     @Override
     public boolean acceptOutput() {
-        return stored > 0;
+        return storedAmount > 0;
     }
 
     @Override
@@ -74,46 +124,20 @@ public final class TestPort implements IPort<Object>, IPortFilter<Object>, ILimi
     }
 
     @Override
-    public void setFilters(List<? extends Predicate<Object>> filters) {
-        this.filters = List.copyOf(filters);
+    public void setFilters(List<? extends Predicate<TestStack>> filters) {
+        filter = stack -> filters.stream().anyMatch($ -> $.test(stack));
     }
 
     @Override
     public void resetFilters() {
-        filters = List.of();
+        filter = $ -> true;
     }
 
     public int stored() {
-        return stored;
+        return storedAmount;
     }
 
-    public List<Predicate<Object>> filters() {
-        return filters;
-    }
-
-    public Optional<TestPortSnapshot> consume(String expectedKey, int amount, boolean simulate) {
-        if (!key.equals(expectedKey) || amount <= 0 || stored < amount) {
-            return Optional.empty();
-        }
-        if (!simulate) {
-            stored -= amount;
-        }
-        return Optional.of(new TestPortSnapshot(key, amount));
-    }
-
-    public Optional<TestPortSnapshot> insert(String expectedKey, int amount, boolean simulate) {
-        if (!key.equals(expectedKey) || amount <= 0 || stored + amount > capacity) {
-            return Optional.empty();
-        }
-        if (!simulate) {
-            stored += amount;
-        }
-        return Optional.of(new TestPortSnapshot(key, amount));
-    }
-
-    public record TestPortSnapshot(String key, int amount) {
-        public TestProcessingObject asObject() {
-            return new TestProcessingObject(key, amount);
-        }
+    public TestStack storedStack() {
+        return new TestStack(type, id, nbt, storedAmount);
     }
 }

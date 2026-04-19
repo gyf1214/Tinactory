@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.recipe;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -14,13 +13,14 @@ import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.unit.fixture.TestContainer;
+import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -33,9 +33,9 @@ class ProcessingRecipeTest {
     @Test
     void shouldMatchInputsWhenEveryIngredientCanBeConsumed() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingObject("ore", 2))
-            .input(1, new TestProcessingObject("coolant", 1))
-            .output(2, new TestProcessingObject("ingot", 1))
+            .input(0, new TestIngredient("ore", 2))
+            .input(1, new TestIngredient("coolant", 1))
+            .output(2, new TestResult("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
@@ -49,9 +49,9 @@ class ProcessingRecipeTest {
     @Test
     void shouldRespectOutputPortLimitWhenCheckingOutputSpace() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingObject("ore", 1))
-            .output(2, new TestProcessingObject("ingot", 1))
-            .output(2, new TestProcessingObject("ingot", 1))
+            .input(0, new TestIngredient("ore", 1))
+            .output(2, new TestResult("ingot", 1))
+            .output(2, new TestResult("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
@@ -63,9 +63,9 @@ class ProcessingRecipeTest {
     @Test
     void shouldEmitConsumeAndInsertCallbacksWithProcessingInfo() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingObject("ore", 2))
-            .input(1, new TestProcessingObject("coolant", 1))
-            .output(2, new TestProcessingObject("ingot", 3))
+            .input(0, new TestIngredient("ore", 2))
+            .input(1, new TestIngredient("coolant", 1))
+            .output(2, new TestResult("ingot", 3))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
@@ -77,11 +77,11 @@ class ProcessingRecipeTest {
         recipe.consumeInputs(container, 1, consumed::add);
         recipe.insertOutputs(container, 1, new Random(2L), result -> inserted.add((TestProcessingObject) result));
 
-        assertIterableEquals(List.of(
-            new ProcessingInfo(0, new TestProcessingObject("ore", 2)),
-            new ProcessingInfo(1, new TestProcessingObject("coolant", 1))
-        ), consumed);
-        assertEquals(List.of(new TestProcessingObject("ingot", 3)), inserted);
+        assertEquals(2, consumed.size());
+        assertProcessingInfo(0, TestIngredient.class, "ore", 2, consumed.get(0));
+        assertProcessingInfo(1, TestIngredient.class, "coolant", 1, consumed.get(1));
+        assertEquals(1, inserted.size());
+        assertProcessingObject(TestResult.class, "ingot", 3, inserted.get(0));
         assertEquals(2, container.getTestPort(0).stored());
         assertEquals(1, container.getTestPort(1).stored());
         assertEquals(3, container.getTestPort(2).stored());
@@ -95,9 +95,9 @@ class ProcessingRecipeTest {
             .output(1, new StackResult<>("test_stack_result", PortType.ITEM, 1d,
                 TestStack.item("ingot", 3), TestStack.ADAPTER))
             .buildObject();
-        var container = new TestStackContainer()
-            .port(0, PortDirection.INPUT, new TestStackPort(PortType.ITEM, "ore", "", 4, 16))
-            .port(1, PortDirection.OUTPUT, new TestStackPort(PortType.ITEM, "ingot", "", 0, 16));
+        var container = new TestContainer()
+            .port(0, PortDirection.INPUT, new TestPort(PortType.ITEM, "ore", "", 4, 16))
+            .port(1, PortDirection.OUTPUT, new TestPort(PortType.ITEM, "ingot", "", 0, 16));
         var machine = new TestMachine(container);
         var consumed = new ArrayList<ProcessingInfo>();
         var inserted = new ArrayList<Object>();
@@ -113,15 +113,15 @@ class ProcessingRecipeTest {
         ), consumed);
         assertEquals(List.of(new StackResult<>("test_stack_result", PortType.ITEM, 1d,
             TestStack.item("ingot", 3), TestStack.ADAPTER)), inserted);
-        assertEquals(2, container.port(0).storedAmount());
-        assertEquals(3, container.port(1).storedAmount());
+        assertEquals(2, container.getTestPort(0).stored());
+        assertEquals(3, container.getTestPort(1).stored());
     }
 
     @Test
     void shouldRequireEnoughMachineVoltageToCraft() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingObject("ore", 1))
-            .output(1, new TestProcessingObject("ingot", 1))
+            .input(0, new TestIngredient("ore", 1))
+            .output(1, new TestResult("ingot", 1))
             .voltage(120)
             .buildObject();
 
@@ -132,8 +132,8 @@ class ProcessingRecipeTest {
     @Test
     void shouldBypassOutputChecksWhenAutoVoidIsEnabled() {
         var recipe = recipeBuilder()
-            .input(0, new TestProcessingObject("ore", 1))
-            .output(1, new TestProcessingObject("ingot", 1))
+            .input(0, new TestIngredient("ore", 1))
+            .output(1, new TestResult("ingot", 1))
             .buildObject();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 1))
@@ -266,7 +266,7 @@ class ProcessingRecipeTest {
 
     private static AssemblyRecipe.Builder assemblyBuilder() {
         return new AssemblyRecipe.Builder(null, new ResourceLocation("tinactory", "test_assembly"))
-            .output(0, new TestProcessingObject("assembly", 1))
+            .output(0, new TestResult("assembly", 1))
             .workTicks(20L)
             .power(8L);
     }
@@ -283,6 +283,19 @@ class ProcessingRecipeTest {
             .baseType(new ResourceLocation("tinactory", "test_base"))
             .workTicks(20L)
             .power(8L);
+    }
+
+    private static void assertProcessingInfo(int port, Class<? extends TestProcessingObject> type,
+        String key, int amount, ProcessingInfo info) {
+        assertEquals(port, info.port());
+        assertProcessingObject(type, key, amount, (TestProcessingObject) info.object());
+    }
+
+    private static void assertProcessingObject(Class<? extends TestProcessingObject> type,
+        String key, int amount, TestProcessingObject object) {
+        assertTrue(type.isInstance(object));
+        assertEquals(key, object.key());
+        assertEquals(amount, object.amount());
     }
 
     private static final class TestRecipe extends ProcessingRecipe {
@@ -319,118 +332,6 @@ class ProcessingRecipeTest {
             protected TestRecipe createObject() {
                 return new TestRecipe(this);
             }
-        }
-    }
-
-    private static final class TestStackContainer implements IContainer {
-        private final java.util.Map<Integer, TestStackPort> ports = new java.util.HashMap<>();
-        private final java.util.Map<Integer, PortDirection> directions = new java.util.HashMap<>();
-
-        private TestStackContainer port(int index, PortDirection direction, TestStackPort port) {
-            ports.put(index, port);
-            directions.put(index, direction);
-            return this;
-        }
-
-        private TestStackPort port(int index) {
-            return ports.get(index);
-        }
-
-        @Override
-        public int portSize() {
-            return ports.size();
-        }
-
-        @Override
-        public boolean hasPort(int port) {
-            return ports.containsKey(port);
-        }
-
-        @Override
-        public PortDirection portDirection(int port) {
-            return directions.getOrDefault(port, PortDirection.NONE);
-        }
-
-        @Override
-        public IPort<?> getPort(int port, org.shsts.tinactory.api.logistics.ContainerAccess access) {
-            return ports.containsKey(port) ? ports.get(port) : IPort.empty();
-        }
-    }
-
-    private static final class TestStackPort implements IPort<TestStack> {
-        private final PortType type;
-        private final String id;
-        private final String nbt;
-        private final int capacity;
-        private int storedAmount;
-
-        private TestStackPort(PortType type, String id, String nbt, int storedAmount, int capacity) {
-            this.type = type;
-            this.id = id;
-            this.nbt = nbt;
-            this.storedAmount = storedAmount;
-            this.capacity = capacity;
-        }
-
-        @Override
-        public PortType type() {
-            return type;
-        }
-
-        @Override
-        public boolean acceptInput(TestStack stack) {
-            return type == stack.type() &&
-                id.equals(stack.id()) &&
-                nbt.equals(stack.nbt()) &&
-                storedAmount < capacity;
-        }
-
-        @Override
-        public TestStack insert(TestStack stack, boolean simulate) {
-            if (!acceptInput(stack)) {
-                return stack;
-            }
-            var inserted = Math.min(stack.amount(), capacity - storedAmount);
-            if (!simulate) {
-                storedAmount += inserted;
-            }
-            return TestStack.ADAPTER.withAmount(stack, stack.amount() - inserted);
-        }
-
-        @Override
-        public TestStack extract(TestStack stack, boolean simulate) {
-            if (type != stack.type() || !id.equals(stack.id()) || !nbt.equals(stack.nbt()) || storedAmount <= 0) {
-                return TestStack.ADAPTER.empty();
-            }
-            var moved = Math.min(stack.amount(), storedAmount);
-            if (!simulate) {
-                storedAmount -= moved;
-            }
-            return TestStack.ADAPTER.withAmount(stack, moved);
-        }
-
-        @Override
-        public TestStack extract(int limit, boolean simulate) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getStorageAmount(TestStack stack) {
-            return type == stack.type() && id.equals(stack.id()) && nbt.equals(stack.nbt()) ? storedAmount : 0;
-        }
-
-        @Override
-        public Collection<TestStack> getAllStorages() {
-            return storedAmount > 0 ? List.of(new TestStack(type, id, nbt, storedAmount)) : List.of();
-        }
-
-        @Override
-        public boolean acceptOutput() {
-            return storedAmount > 0;
-        }
-
-        private int storedAmount() {
-            return storedAmount;
         }
     }
 }
