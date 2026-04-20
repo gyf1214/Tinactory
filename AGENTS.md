@@ -11,18 +11,25 @@
   `libs/tinactory_extra_resources_v1.zip`).
 - Run `runData` once before testing/packaging, or whenever `datagen` changes.
 
-## Test
+## Unit Test
+
+- Unit Test only applies to `mod/src/main`.
+- Do not add unit test to `datagen` or `mod/src/test`.
+- Never bootstrap Minecraft in a unit test.
+- Prefer not to add unit tests for `integration.*` and `content.*`.
+- When unit test does not apply, use constrained TDD with compile/verification coverage unless the user explicitly asks
+  for different test coverage.
+
+## Format Validation
+
+- Before committing any code changes, run `./gradlew :mod:checkSource checkstyleMain checkstyleTest` as the required
+  format validation task.
+- `checkSource` result is in `mod/build/reports/checkSource`
+
+## Integration Test
 
 - `mod`: run `./gradlew runGameTestServer` (server exits after all tests finish).
 - `datagen`: `./gradlew runData` serves as the test. No separate test for `datagen`.
-- Never bootstrap Minecraft in a unit test.
-- Prefer not to add unit tests for `integration.*`; default to constrained TDD with compile/verification coverage unless
-  the user explicitly asks for different test coverage.
-
-## Validation
-
-- Before committing any code changes, run `./gradlew checkstyleMain checkstyleTest` as the required format validation
-  task.
 
 ## Coding Rules
 
