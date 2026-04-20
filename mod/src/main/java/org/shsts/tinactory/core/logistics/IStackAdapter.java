@@ -20,7 +20,5 @@ public interface IStackAdapter<T> {
 
     IStackKey keyOf(T stack);
 
-    default T stackOf(IStackKey key, long amount) {
-        throw new UnsupportedOperationException("stackOf is not implemented");
-    }
+    T stackOf(IStackKey key, long amount);
 }
