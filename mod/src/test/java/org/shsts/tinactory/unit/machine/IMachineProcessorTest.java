@@ -4,8 +4,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,11 +62,6 @@ class IMachineProcessorTest {
         @Override
         public boolean supportsRecipeType(ResourceLocation recipeTypeId) {
             return false;
-        }
-
-        @Override
-        public DistLazy<List<IRecipeBookItem>> recipeBookItems() {
-            return () -> List::of;
         }
     }
 }

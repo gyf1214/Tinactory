@@ -128,6 +128,23 @@ test {
     }
 }
 
+def checkSourceReportFile = layout.buildDirectory.file('reports/checkSource/violations.txt')
+
+tasks.register('checkSource', JavaExec) {
+    group = 'verification'
+    description = 'Checks source architecture boundaries.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.check.CheckSource'
+    inputs.files sourceSets.main.java.srcDirs
+    outputs.file checkSourceReportFile
+    args '--source-root', file('src/main/java').absolutePath,
+        '--top-package', 'org.shsts.tinactory',
+        '--report-file', checkSourceReportFile.get().asFile.absolutePath
+}
+
+check.dependsOn tasks.named('checkSource')
+
 jacocoTestReport {
     dependsOn test
     reports {

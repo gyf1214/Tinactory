@@ -4,11 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
-import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinycorelib.api.core.DistLazy;
-
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -34,8 +30,4 @@ public interface IBoiler extends IMachineProcessor {
         return false;
     }
 
-    @Override
-    default DistLazy<List<IRecipeBookItem>> recipeBookItems() {
-        return () -> List::of;
-    }
 }
