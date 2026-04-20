@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.metrics;
+package org.shsts.tinactory.integration.metrics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
