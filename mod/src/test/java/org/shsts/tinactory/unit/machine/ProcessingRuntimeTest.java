@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -72,20 +73,25 @@ class ProcessingRuntimeTest {
     }
 
     @Test
-    void shouldReportCompletedProcessingResultsThroughCallback() {
-        var reportedResults = new ArrayList<IProcessingResult>();
+    void shouldReportConsumedAndProducedObjectsThroughCallback() {
+        var reportedObjects = new ArrayList<Report>();
         var machine = new TestMachine(new TestContainer());
+        var ingredient = new TestIngredient("ore", 2);
         var result = new TestResult("dust", 1);
         var processor = new TestRecipeProcessor()
             .recipe(RECIPE_ID)
+            .inputInfo(new ProcessingInfo(0, ingredient))
             .doneResult(result);
         var runtime = new ProcessingRuntime(List.of(processor), true, () -> Optional.of(machine),
-            false, () -> {}, reportedResults::add, TestProcessingObject.INFO_CODEC);
+            false, () -> {}, (direction, object) -> reportedObjects.add(new Report(direction, object)),
+            TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
         runtime.onWorkTick(1d);
 
-        assertEquals(List.of(result), reportedResults);
+        assertEquals(List.of(
+            new Report(PortDirection.INPUT, ingredient),
+            new Report(PortDirection.OUTPUT, result)), reportedObjects);
     }
 
     @Test
@@ -301,6 +307,9 @@ class ProcessingRuntimeTest {
         @Override
         public void deserializeNBT(CompoundTag nbt) {
         }
+    }
+
+    private record Report(PortDirection direction, IProcessingObject object) {
     }
 
     private record TestRecipeBookItem(ResourceLocation loc) implements IRecipeBookItem {

@@ -13,11 +13,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
@@ -65,7 +66,7 @@ public class MachineProcessor extends CapabilityProvider implements
             this::machine,
             world.isClientSide,
             blockEntity::setChanged,
-            this::reportProcessingResult,
+            this::reportProcessingObject,
             ProcessingHelper.INFO_CODEC);
         this.processorCap = LazyOptional.of(() -> runtime);
     }
@@ -74,8 +75,13 @@ public class MachineProcessor extends CapabilityProvider implements
         return MACHINE.tryGet(blockEntity);
     }
 
-    private void reportProcessingResult(IProcessingResult result) {
-        machine().ifPresent(machine -> MetricsManager.reportProcessingObject("produced", machine, result));
+    private void reportProcessingObject(PortDirection direction, IProcessingObject object) {
+        var action = switch (direction) {
+            case INPUT -> "consumed";
+            case OUTPUT -> "produced";
+            case NONE -> throw new IllegalArgumentException("unexpected processing direction: " + direction);
+        };
+        machine().ifPresent(machine -> MetricsManager.reportProcessingObject(action, machine, object));
     }
 
     private void onTechChange(ITeamProfile team) {

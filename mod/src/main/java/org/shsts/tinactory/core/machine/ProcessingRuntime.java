@@ -17,7 +17,6 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
@@ -29,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
@@ -48,7 +47,7 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
     private final Supplier<Optional<IMachine>> machineSupplier;
     private final boolean isClientSide;
     private final Runnable onUpdate;
-    private final Consumer<IProcessingResult> onProcessingResult;
+    private final BiConsumer<PortDirection, IProcessingObject> onReportObject;
     private final Codec<ProcessingInfo> processingInfoCodec;
     private final List<ProcessingInfo> infoList = new ArrayList<>();
     private final ListMultimap<Integer, IProcessingObject> infoMap = ArrayListMultimap.create();
@@ -64,9 +63,13 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
     private long workProgress = 0L;
 
     private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
-        public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> infoList) {
+        public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> infoList,
+            BiConsumer<PortDirection, IProcessingObject> onReportObject) {
             infoList.clear();
-            processor.onWorkBegin(recipe, machine, maxParallel, infoList::add);
+            processor.onWorkBegin(recipe, machine, maxParallel, info -> {
+                infoList.add(info);
+                onReportObject.accept(PortDirection.INPUT, info.object());
+            });
         }
 
         public void onWorkContinue(IMachine machine) {
@@ -78,8 +81,9 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
         }
 
         public void onWorkDone(IMachine machine, Random random,
-            Consumer<IProcessingResult> onProcessingResult) {
-            processor.onWorkDone(recipe, machine, random, onProcessingResult);
+            BiConsumer<PortDirection, IProcessingObject> onReportObject) {
+            processor.onWorkDone(recipe, machine, random,
+                result -> onReportObject.accept(PortDirection.OUTPUT, result));
         }
 
         public long maxProgress() {
@@ -110,20 +114,20 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
     public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
         boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, boolean isClientSide,
         Runnable onUpdate, Codec<ProcessingInfo> processingInfoCodec) {
-        this(processors, autoRecipe, machineSupplier, isClientSide, onUpdate, result -> {},
+        this(processors, autoRecipe, machineSupplier, isClientSide, onUpdate, (direction, object) -> {},
             processingInfoCodec);
     }
 
     public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
         boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, boolean isClientSide,
-        Runnable onUpdate, Consumer<IProcessingResult> onProcessingResult,
+        Runnable onUpdate, BiConsumer<PortDirection, IProcessingObject> onReportObject,
         Codec<ProcessingInfo> processingInfoCodec) {
         this.processors = List.copyOf(processors);
         this.autoRecipe = autoRecipe;
         this.machineSupplier = machineSupplier;
         this.isClientSide = isClientSide;
         this.onUpdate = onUpdate;
-        this.onProcessingResult = onProcessingResult;
+        this.onReportObject = onReportObject;
         this.processingInfoCodec = processingInfoCodec;
     }
 
@@ -290,7 +294,8 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
             }
         }
         if (currentRecipe != null) {
-            currentRecipe.onWorkBegin(machine.get(), machine.get().parallel(), infoList);
+            currentRecipe.onWorkBegin(machine.get(), machine.get().parallel(), infoList,
+                onReportObject);
             buildInfoMap();
         }
         needUpdate = false;
@@ -309,7 +314,7 @@ public class ProcessingRuntime implements IMachineProcessor, INBTSerializable<Co
         workProgress += currentRecipe.onWorkProcess(partial);
         workSpeed = currentRecipe.processor.workSpeed(partial);
         if (workProgress >= currentRecipe.maxProgress()) {
-            currentRecipe.onWorkDone(machine.get(), machine.get().random(), onProcessingResult);
+            currentRecipe.onWorkDone(machine.get(), machine.get().random(), onReportObject);
             clearFilters(PortDirection.OUTPUT);
             workProgress = currentRecipe.maxProgress();
         }
