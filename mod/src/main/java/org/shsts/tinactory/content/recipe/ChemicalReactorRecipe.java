@@ -9,7 +9,6 @@ import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
@@ -28,7 +27,7 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
     @Override
     public boolean canCraft(IMachine machine) {
         return super.canCraft(machine) &&
-            (!requireMultiblock || machine instanceof MultiblockInterface);
+            (!requireMultiblock || machine.isMultiblock());
     }
 
     public static class Builder extends BuilderBase<ChemicalReactorRecipe, Builder> {
