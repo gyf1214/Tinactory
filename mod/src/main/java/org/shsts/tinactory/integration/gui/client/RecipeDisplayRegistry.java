@@ -16,6 +16,7 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -104,11 +105,11 @@ public final class RecipeDisplayRegistry {
 
     private static IProcessingObject baseDisplayObject(ProcessingRecipe recipe) {
         if (!recipe.outputs.isEmpty()) {
-            return recipe.outputs.stream().min(java.util.Comparator.comparingInt(ProcessingRecipe.Output::port))
+            return recipe.outputs.stream().min(Comparator.comparingInt(ProcessingRecipe.Output::port))
                 .orElseThrow().result();
         }
         if (!recipe.inputs.isEmpty()) {
-            return recipe.inputs.stream().min(java.util.Comparator.comparingInt(ProcessingRecipe.Input::port))
+            return recipe.inputs.stream().min(Comparator.comparingInt(ProcessingRecipe.Input::port))
                 .orElseThrow().ingredient();
         }
         return ProcessingHelper.EMPTY;

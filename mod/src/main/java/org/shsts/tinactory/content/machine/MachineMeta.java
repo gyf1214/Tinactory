@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
@@ -38,6 +39,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
@@ -236,8 +238,7 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
-            Function<net.minecraft.world.level.block.entity.BlockEntity,
-                ? extends org.shsts.tinactory.core.machine.IRecipeProcessor<?>> processor =
+            Function<BlockEntity, ? extends IRecipeProcessor<?>> processor =
                 RecipeProcessors.processing(recipeType());
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
@@ -255,8 +256,7 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
-            Function<net.minecraft.world.level.block.entity.BlockEntity,
-                ? extends org.shsts.tinactory.core.machine.IRecipeProcessor<?>> processor = switch (recipeTypeStr) {
+            Function<BlockEntity, ? extends IRecipeProcessor<?>> processor = switch (recipeTypeStr) {
                 case "electric_furnace" -> RecipeProcessors.electricFurnace(
                     GsonHelper.getAsInt(jo, "inputPort"),
                     GsonHelper.getAsInt(jo, "outputPort"),

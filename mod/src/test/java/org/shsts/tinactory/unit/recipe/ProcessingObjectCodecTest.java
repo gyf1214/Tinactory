@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.unit.fixture.TestStack;
+import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -181,7 +182,7 @@ class ProcessingObjectCodecTest {
         }
     }
 
-    private record TestLoc(String id) implements org.shsts.tinycorelib.api.core.ILoc {
+    private record TestLoc(String id) implements ILoc {
         @Override
         public ResourceLocation loc() {
             return new ResourceLocation("tinactory", id);

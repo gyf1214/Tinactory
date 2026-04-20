@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllTags;
@@ -55,8 +56,7 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static class Executor extends MachineMeta.Executor {
-        private final List<Function<net.minecraft.world.level.block.entity.BlockEntity,
-            ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
+        private final List<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
 
         public Executor(ResourceLocation loc, JsonObject jo) {
@@ -209,8 +209,7 @@ public class MultiblockMeta extends MachineMeta {
             return spec.build();
         }
 
-        private Function<net.minecraft.world.level.block.entity.BlockEntity,
-            ? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
+        private Function<BlockEntity, ? extends IRecipeProcessor<?>> getProcessor(JsonObject jo, String machineType) {
             if (recipeTypeStr.equals("electric_furnace")) {
                 return RecipeProcessors.electricFurnace(
                     GsonHelper.getAsInt(jo, "inputPort"),

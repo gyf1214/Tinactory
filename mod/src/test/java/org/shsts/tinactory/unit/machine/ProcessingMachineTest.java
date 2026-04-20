@@ -18,6 +18,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -151,8 +152,7 @@ class ProcessingMachineTest {
             super(RECIPE_TYPE, recipeManager, MARKER_TYPE);
         }
 
-        private void addOutputInfoForTest(TestRecipe recipe, int parallel,
-            java.util.function.Consumer<ProcessingInfo> info) {
+        private void addOutputInfoForTest(TestRecipe recipe, int parallel, Consumer<ProcessingInfo> info) {
             addOutputInfo(recipe, parallel, info);
         }
     }

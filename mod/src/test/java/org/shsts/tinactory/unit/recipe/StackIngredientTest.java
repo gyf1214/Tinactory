@@ -6,6 +6,8 @@ import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
+import java.util.function.Predicate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -42,7 +44,7 @@ class StackIngredientTest {
             new TestStack(PortType.ITEM, "ore", "nbt", 2), TestStack.ADAPTER);
 
         @SuppressWarnings("unchecked")
-        var filter = (java.util.function.Predicate<TestStack>) ingredient.filter();
+        var filter = (Predicate<TestStack>) ingredient.filter();
 
         assertTrue(filter.test(new TestStack(PortType.ITEM, "ore", "nbt", 1)));
         assertFalse(filter.test(new TestStack(PortType.ITEM, "ore", "", 1)));

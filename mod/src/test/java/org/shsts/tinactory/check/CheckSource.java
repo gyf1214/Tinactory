@@ -1,9 +1,11 @@
 package org.shsts.tinactory.check;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +22,17 @@ public final class CheckSource {
 
     static int run(String[] args, PrintWriter output) throws IOException {
         var options = parseArgs(args);
-        var sourceRoot = requiredPath(options, "source-root");
+        var sourceRoots = requiredPaths(options, "source-roots");
         var topPackage = required(options, "top-package");
         var reportFile = requiredPath(options, "report-file");
 
         Files.createDirectories(reportFile.getParent());
-        var checker = new SourceBoundaryChecker(sourceRoot, topPackage, Map.of(
+        var checker = new SourceBoundaryChecker(sourceRoots.get(0), topPackage, Map.of(
             "api", List.of("core", "content"),
             "core", List.of("content")));
+        for (var sourceRoot : sourceRoots.subList(1, sourceRoots.size())) {
+            checker.addSourceRoot(sourceRoot);
+        }
         int violations;
         try (var writer = Files.newBufferedWriter(reportFile)) {
             violations = checker.check(writer);
@@ -61,5 +66,11 @@ public final class CheckSource {
 
     private static Path requiredPath(Map<String, String> options, String key) {
         return Path.of(required(options, key));
+    }
+
+    private static List<Path> requiredPaths(Map<String, String> options, String key) {
+        return Arrays.stream(required(options, key).split(File.pathSeparator))
+            .map(Path::of)
+            .toList();
     }
 }

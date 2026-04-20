@@ -7,6 +7,7 @@ import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.Random;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,7 +58,7 @@ class StackResultTest {
             new TestStack(PortType.FLUID, "steam", "hot", 1000), TestStack.ADAPTER);
 
         @SuppressWarnings("unchecked")
-        var filter = (java.util.function.Predicate<TestStack>) result.filter();
+        var filter = (Predicate<TestStack>) result.filter();
 
         assertTrue(filter.test(new TestStack(PortType.FLUID, "steam", "hot", 250)));
         assertFalse(filter.test(new TestStack(PortType.FLUID, "steam", "", 250)));

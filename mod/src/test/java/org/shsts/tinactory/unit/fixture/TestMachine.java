@@ -183,8 +183,8 @@ public final class TestMachine implements IMachine {
     }
 
     private static final class TestMachineConfig implements IMachineConfig {
-        private final Map<String, Boolean> booleans = new java.util.HashMap<>();
-        private final Map<String, String> strings = new java.util.HashMap<>();
+        private final Map<String, Boolean> booleans = new HashMap<>();
+        private final Map<String, String> strings = new HashMap<>();
 
         private void booleanValue(String key, boolean value) {
             booleans.put(key, value);

@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -210,7 +211,7 @@ class AutocraftJobServiceTest {
             return states.get(index);
         }
 
-        private ExecutorSnapshot snapshotFor(JobState state, CraftPlan plan, java.util.UUID leasedMachineId) {
+        private ExecutorSnapshot snapshotFor(JobState state, CraftPlan plan, UUID leasedMachineId) {
             var error = errorFor(state);
             return new ExecutorSnapshot(
                 state,
@@ -237,12 +238,12 @@ class AutocraftJobServiceTest {
     }
 
     private static final class UUIDs {
-        private static java.util.UUID fixed() {
-            return java.util.UUID.fromString("11111111-1111-1111-1111-111111111111");
+        private static UUID fixed() {
+            return UUID.fromString("11111111-1111-1111-1111-111111111111");
         }
 
-        private static java.util.UUID other() {
-            return java.util.UUID.fromString("22222222-2222-2222-2222-222222222222");
+        private static UUID other() {
+            return UUID.fromString("22222222-2222-2222-2222-222222222222");
         }
     }
 }

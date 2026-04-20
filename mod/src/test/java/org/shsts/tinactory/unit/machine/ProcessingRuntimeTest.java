@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.machine;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -245,7 +247,7 @@ class ProcessingRuntimeTest {
 
         @Override
         public void onWorkBegin(ResourceLocation recipe, IMachine machine, int maxParallel,
-            java.util.function.Consumer<ProcessingInfo> callback) {
+            Consumer<ProcessingInfo> callback) {
             beginParallel = maxParallel;
             inputInfo.forEach(callback);
         }
@@ -262,7 +264,7 @@ class ProcessingRuntimeTest {
 
         @Override
         public void onWorkDone(ResourceLocation recipe, IMachine machine, Random random,
-            java.util.function.Consumer<IProcessingResult> callback) {
+            Consumer<IProcessingResult> callback) {
             results.forEach(result -> {
                 doneResults.add(result);
                 callback.accept(result);
@@ -328,7 +330,7 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Optional<List<net.minecraft.network.chat.Component>> buttonToolTip() {
+        public Optional<List<Component>> buttonToolTip() {
             return Optional.empty();
         }
     }

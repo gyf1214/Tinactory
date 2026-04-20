@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
@@ -152,7 +153,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
             return PlanError.none();
         }
         var cyclePathTag = tag.getList("cyclePath", TAG_COMPOUND);
-        var cyclePath = new java.util.ArrayList<IStackKey>(cyclePathTag.size());
+        var cyclePath = new ArrayList<IStackKey>(cyclePathTag.size());
         for (var i = 0; i < cyclePathTag.size(); i++) {
             cyclePath.add(decodeIngredientKey(ingredientKeyCodec, cyclePathTag.getCompound(i)));
         }

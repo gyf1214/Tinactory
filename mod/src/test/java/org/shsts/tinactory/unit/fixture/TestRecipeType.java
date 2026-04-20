@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -46,7 +47,7 @@ public final class TestRecipeType<B extends IRecipeBuilderBase<?>> implements IR
     }
 
     @Override
-    public net.minecraft.world.item.crafting.RecipeType<?> get() {
+    public RecipeType<?> get() {
         throw new UnsupportedOperationException();
     }
 }

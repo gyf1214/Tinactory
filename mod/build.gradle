@@ -129,6 +129,11 @@ test {
 }
 
 def checkSourceReportFile = layout.buildDirectory.file('reports/checkSource/violations.txt')
+def checkSourceRoots = files(
+    file('src/main/java'),
+    file('src/test/java'),
+    rootProject.file('datagen/src/main/java'),
+    rootProject.file('datagen/src/main/kotlin'))
 
 tasks.register('checkSource', JavaExec) {
     group = 'verification'
@@ -136,9 +141,9 @@ tasks.register('checkSource', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'org.shsts.tinactory.check.CheckSource'
-    inputs.files sourceSets.main.java.srcDirs
+    inputs.files checkSourceRoots
     outputs.file checkSourceReportFile
-    args '--source-root', file('src/main/java').absolutePath,
+    args '--source-roots', checkSourceRoots.files.collect { it.absolutePath }.join(File.pathSeparator),
         '--top-package', 'org.shsts.tinactory',
         '--report-file', checkSourceReportFile.get().asFile.absolutePath
 }

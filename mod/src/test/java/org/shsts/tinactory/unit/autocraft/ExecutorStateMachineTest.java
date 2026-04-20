@@ -22,9 +22,11 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -553,7 +555,7 @@ class ExecutorStateMachineTest {
 
     private static final class MutableInventory implements IInventoryView {
         private final Map<IStackKey, Long> amounts = new HashMap<>();
-        private final java.util.Set<IStackKey> rejectInsertKeys = new java.util.HashSet<>();
+        private final Set<IStackKey> rejectInsertKeys = new HashSet<>();
         private final Map<IStackKey, Long> forcedActualExtract = new HashMap<>();
         private final Map<IStackKey, Long> actualExtracted = new HashMap<>();
         private final Map<IStackKey, Long> actualInserted = new HashMap<>();
