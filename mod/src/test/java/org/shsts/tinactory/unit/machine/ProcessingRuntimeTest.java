@@ -72,6 +72,23 @@ class ProcessingRuntimeTest {
     }
 
     @Test
+    void shouldReportCompletedProcessingResultsThroughCallback() {
+        var reportedResults = new ArrayList<IProcessingResult>();
+        var machine = new TestMachine(new TestContainer());
+        var result = new TestResult("dust", 1);
+        var processor = new TestRecipeProcessor()
+            .recipe(RECIPE_ID)
+            .doneResult(result);
+        var runtime = new ProcessingRuntime(List.of(processor), true, () -> Optional.of(machine),
+            false, () -> {}, reportedResults::add, TestProcessingObject.INFO_CODEC);
+
+        runtime.onPreWork();
+        runtime.onWorkTick(1d);
+
+        assertEquals(List.of(result), reportedResults);
+    }
+
+    @Test
     void shouldRecoverSerializedStateAndContinueRecipe() {
         var machine = new TestMachine(new TestContainer()).targetRecipe(RECIPE_ID);
         var originalProcessor = new TestRecipeProcessor()

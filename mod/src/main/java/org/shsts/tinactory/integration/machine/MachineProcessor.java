@@ -17,10 +17,12 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
+import org.shsts.tinactory.core.metrics.MetricsManager;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -63,12 +65,17 @@ public class MachineProcessor extends CapabilityProvider implements
             this::machine,
             world.isClientSide,
             blockEntity::setChanged,
+            this::reportProcessingResult,
             ProcessingHelper.INFO_CODEC);
         this.processorCap = LazyOptional.of(() -> runtime);
     }
 
     protected Optional<IMachine> machine() {
         return MACHINE.tryGet(blockEntity);
+    }
+
+    private void reportProcessingResult(IProcessingResult result) {
+        machine().ifPresent(machine -> MetricsManager.reportProcessingObject("produced", machine, result));
     }
 
     private void onTechChange(ITeamProfile team) {
