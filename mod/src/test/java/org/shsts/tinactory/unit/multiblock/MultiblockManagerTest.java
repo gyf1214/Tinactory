@@ -2,13 +2,11 @@ package org.shsts.tinactory.unit.multiblock;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.multiblock.IMultiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.multiblock.MultiblockRuntime;
+import org.shsts.tinactory.unit.fixture.TestMultiblock;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,8 +31,8 @@ public class MultiblockManagerTest {
         first.host.empty();
         first.runtime.tick(manager);
 
-        assertEquals(1, first.host.invalidates);
-        assertEquals(0, second.host.registers);
+        assertEquals(1, first.host.invalidates());
+        assertEquals(0, second.host.registers());
     }
 
     @Test
@@ -51,10 +49,10 @@ public class MultiblockManagerTest {
         first.runtime.tick(manager);
         second.runtime.tick(manager);
 
-        assertEquals(1, first.host.checks);
-        assertEquals(1, first.host.invalidates);
-        assertEquals(0, second.host.checks);
-        assertEquals(0, second.host.invalidates);
+        assertEquals(1, first.host.checks());
+        assertEquals(1, first.host.invalidates());
+        assertEquals(0, second.host.checks());
+        assertEquals(0, second.host.invalidates());
     }
 
     @Test
@@ -97,51 +95,9 @@ public class MultiblockManagerTest {
     }
 
     private static RuntimeFixture runtime(String id, BlockPos... blocks) {
-        var host = new FakeHost(id).structure(blocks);
+        var host = new TestMultiblock(id).structure(blocks);
         return new RuntimeFixture(host, new MultiblockRuntime(host, 2));
     }
 
-    private record RuntimeFixture(FakeHost host, MultiblockRuntime runtime) {}
-
-    private static final class FakeHost implements IMultiblock {
-        private final String id;
-        private Optional<Collection<BlockPos>> structure = Optional.empty();
-        private int checks;
-        private int registers;
-        private int invalidates;
-
-        private FakeHost(String id) {
-            this.id = id;
-        }
-
-        private FakeHost structure(BlockPos... blocks) {
-            structure = Optional.of(List.of(blocks));
-            return this;
-        }
-
-        private void empty() {
-            structure = Optional.empty();
-        }
-
-        @Override
-        public Optional<Collection<BlockPos>> checkStructure() {
-            checks++;
-            return structure;
-        }
-
-        @Override
-        public void onRegisterStructure() {
-            registers++;
-        }
-
-        @Override
-        public void onInvalidateStructure() {
-            invalidates++;
-        }
-
-        @Override
-        public String toString() {
-            return id;
-        }
-    }
+    private record RuntimeFixture(TestMultiblock host, MultiblockRuntime runtime) {}
 }
