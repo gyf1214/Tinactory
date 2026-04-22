@@ -41,8 +41,8 @@ public class LargeTurbine extends Multiblock {
     }
 
     @Override
-    protected void onRegister() {
-        super.onRegister();
+    public void onRegisterStructure() {
+        super.onRegisterStructure();
         var world = blockEntity.getLevel();
         assert world != null;
         setBladeBlocks(world, blockEntity.getBlockState());

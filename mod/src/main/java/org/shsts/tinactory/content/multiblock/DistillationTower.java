@@ -31,8 +31,8 @@ public class DistillationTower extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             slots = (int) ctx.getProperty("height") - minHeight + 1;
             layout = layouts.get(slots - 1);

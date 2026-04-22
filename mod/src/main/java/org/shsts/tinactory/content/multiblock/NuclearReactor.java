@@ -160,8 +160,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             var i = (int) ctx.getProperty("height") - properties.minHeight;
             rows = properties.rows[i];
@@ -186,8 +186,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    protected void onInvalidate() {
-        super.onInvalidate();
+    public void onInvalidateStructure() {
+        super.onInvalidateStructure();
         boiler.resetContainer();
     }
 

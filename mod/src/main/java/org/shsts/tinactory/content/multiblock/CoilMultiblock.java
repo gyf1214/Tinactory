@@ -28,8 +28,8 @@ public class CoilMultiblock extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (ctx.hasProperty("coil") && ctx.getProperty("coil") instanceof CoilBlock coil) {
             coilBlock = coil;
         } else {

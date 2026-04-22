@@ -77,8 +77,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             boilParallel = (int) ctx.getProperty("height") - 2;
             fireboxes.clear();
@@ -97,8 +97,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void onInvalidate() {
-        super.onInvalidate();
+    public void onInvalidateStructure() {
+        super.onInvalidateStructure();
         boiler.resetContainer();
         var world = blockEntity.getLevel();
         if (world != null) {
@@ -119,8 +119,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     /**
-     * We don't need to call {@link #setBoilerContainer} in {@link #onRegister}. This is because
-     * {@link MultiblockInterface#setMultiblock} is always called before {@link #onRegister} on server.
+     * We don't need to call {@link #setBoilerContainer} in {@link #onRegisterStructure}. This is because
+     * {@link MultiblockInterface#setMultiblock} is always called before {@link #onRegisterStructure} on server.
      */
     @Override
     public void onContainerReady() {

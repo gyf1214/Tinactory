@@ -20,10 +20,13 @@ import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockCheckCtx;
+import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.IBuilder;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -39,15 +42,24 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
+import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Multiblock extends MultiblockBase {
+public class Multiblock extends UpdatableCapabilityProvider implements IEventSubscriber, IMultiblock {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "multiblock";
 
+    public final BlockEntity blockEntity;
+    @Nullable
+    protected MultiblockManager manager = null;
+    protected final MultiblockRuntime runtime;
     @Nullable
     protected Layout layout;
     private final Consumer<IMultiblockCheckCtx<BlockState>> checker;
@@ -61,13 +73,14 @@ public class Multiblock extends MultiblockBase {
     @Nullable
     protected BlockPos multiblockInterfacePos = null;
     /**
-     * must set this during checkMultiblock, or fail
+     * must set this during checkStructure, or fail
      */
     @Nullable
     protected MultiblockInterface multiblockInterface = null;
 
     public Multiblock(BlockEntity blockEntity, Builder<?> builder) {
-        super(blockEntity);
+        this.blockEntity = blockEntity;
+        this.runtime = new MultiblockRuntime(this, CONFIG.multiblockCheckCycle.get());
         this.layout = builder.layout;
         this.checker = Objects.requireNonNull(builder.checker);
         this.appearance = Objects.requireNonNull(builder.appearance);
@@ -86,18 +99,18 @@ public class Multiblock extends MultiblockBase {
         return Optional.ofNullable(layout);
     }
 
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
         checker.accept(ctx);
     }
 
     @Override
-    protected Optional<Collection<BlockPos>> checkMultiblock() {
+    public Optional<Collection<BlockPos>> checkStructure() {
         LOGGER.trace("{}: check multiblock", this.blockEntity);
 
         var world = blockEntity.getLevel();
         assert world != null;
         var context = new WorldMultiblockCheckCtx(world, blockEntity.getBlockPos());
-        doCheckMultiblock(context);
+        doCheckStructure(context);
         var machine = context.hasProperty("interface") ? context.getProperty("interface") : null;
         var ok = !context.isFailed() && machine instanceof MultiblockInterface inter &&
             (multiblockInterface == null || inter == multiblockInterface);
@@ -115,7 +128,7 @@ public class Multiblock extends MultiblockBase {
      * connect between Multiblock and MultiblockInterface.
      */
     @Override
-    protected void onRegister() {
+    public void onRegisterStructure() {
         assert multiblockInterface != null;
         multiblockInterface.setMultiblock(this);
         sendUpdate(blockEntity);
@@ -123,7 +136,7 @@ public class Multiblock extends MultiblockBase {
     }
 
     @Override
-    protected void onInvalidate() {
+    public void onInvalidateStructure() {
         if (multiblockInterface != null) {
             multiblockInterface.resetMultiblock();
         }
@@ -190,6 +203,23 @@ public class Multiblock extends MultiblockBase {
         world.setBlock(blockEntity.getBlockPos(), state, 19);
     }
 
+    private void onServerLoad(Level world) {
+        manager = WorldMultiblockManagers.get(world);
+    }
+
+    private void onRemove() {
+        runtime.invalidate();
+    }
+
+    private void onServerTickEvent() {
+        if (manager != null) {
+            runtime.tick(manager);
+        }
+        onServerTick();
+    }
+
+    protected void onServerTick() {}
+
     private void onClientTick() {
         if (!firstTick) {
             updateMultiblockInterface();
@@ -199,7 +229,10 @@ public class Multiblock extends MultiblockBase {
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        super.subscribeEvents(eventManager);
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemove());
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemove());
+        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTickEvent());
         eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
     }
 

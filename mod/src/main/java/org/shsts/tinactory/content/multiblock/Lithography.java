@@ -31,8 +31,8 @@ public class Lithography extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (ctx.hasProperty("lens") && ctx.getProperty("lens") instanceof LensBlock block) {
             lensBlock = block;
         } else {

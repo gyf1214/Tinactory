@@ -40,8 +40,8 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
     }
 
     @Override
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (ctx.hasProperty("height") && ctx.hasProperty("power") &&
             ctx.getProperty("power") instanceof PowerBlock block) {
             var height = (int) ctx.getProperty("height") - 2;

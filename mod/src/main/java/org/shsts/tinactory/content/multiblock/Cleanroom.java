@@ -69,8 +69,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             w = (int) ctx.getProperty("w");
             d = (int) ctx.getProperty("d");
@@ -81,9 +81,10 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     }
 
     @Override
-    protected void onRegister() {
-        super.onRegister();
-        registerCleanroom(blockEntity.getBlockPos(), w, d, h);
+    public void onRegisterStructure() {
+        super.onRegisterStructure();
+        assert manager != null;
+        manager.registerCleanroom(runtime, blockEntity.getBlockPos(), w, d, h);
     }
 
     @Override
