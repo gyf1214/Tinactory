@@ -1,17 +1,13 @@
 package org.shsts.tinactory.core.multiblock;
 
-import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
-import org.shsts.tinactory.core.common.WeakMap;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
-import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -25,48 +21,44 @@ import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MultiblockBase extends UpdatableCapabilityProvider
-    implements IEventSubscriber {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
+    implements IEventSubscriber, IMultiblock {
     public final BlockEntity blockEntity;
     protected MultiblockManager manager;
-    @Nullable
-    private WeakMap.Ref<MultiblockBase> ref = null;
-    private int checkTick = 0;
-    private boolean preInvalid = false;
+    protected final MultiblockRuntime runtime;
 
     public MultiblockBase(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
-    }
-
-    public <K> void addToMap(WeakMap<K, MultiblockBase> map, K key) {
-        if (ref == null) {
-            ref = map.put(key, this);
-        } else {
-            map.put(key, ref);
-        }
+        this.runtime = new MultiblockRuntime(this, CONFIG.multiblockCheckCycle.get());
     }
 
     protected abstract Optional<Collection<BlockPos>> checkMultiblock();
 
     protected void onInvalidate() {}
 
-    public void markPreInvalid() {
-        LOGGER.trace("{} mark pre invalid", this);
-        preInvalid = true;
-    }
-
     public void invalidate() {
-        if (ref != null) {
-            LOGGER.debug("{} invalidate", this);
-            ref.invalidate();
-            ref = null;
-            checkTick = CONFIG.multiblockCheckCycle.get();
-            onInvalidate();
-        }
+        runtime.invalidate();
     }
 
     protected void onRegister() {}
+
+    @Override
+    public Optional<Collection<BlockPos>> checkStructure() {
+        return checkMultiblock();
+    }
+
+    @Override
+    public void onRegisterStructure() {
+        onRegister();
+    }
+
+    @Override
+    public void onInvalidateStructure() {
+        onInvalidate();
+    }
+
+    protected void registerCleanroom(BlockPos center, int w, int d, int h) {
+        manager.registerCleanroom(runtime, center, w, d, h);
+    }
 
     private void onServerLoad(Level world) {
         manager = MultiblockManager.get(world);
@@ -77,20 +69,7 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
     }
 
     protected void onServerTick() {
-        if (preInvalid && checkMultiblock().isEmpty()) {
-            invalidate();
-        }
-        preInvalid = false;
-        if (ref != null) {
-            return;
-        }
-        if (--checkTick < 0) {
-            checkMultiblock().ifPresent(blocks -> {
-                manager.register(this, blocks);
-                onRegister();
-            });
-            checkTick = CONFIG.multiblockCheckCycle.get();
-        }
+        runtime.tick(manager);
     }
 
     @Override

@@ -83,7 +83,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     @Override
     protected void onRegister() {
         super.onRegister();
-        manager.registerCleanroom(this, blockEntity.getBlockPos(), w, d, h);
+        registerCleanroom(blockEntity.getBlockPos(), w, d, h);
     }
 
     @Override
