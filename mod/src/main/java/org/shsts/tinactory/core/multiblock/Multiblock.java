@@ -22,7 +22,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.multiblock.LevelMultiblockCheckCtx;
+import org.shsts.tinactory.integration.multiblock.WorldMultiblockCheckCtx;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.IBuilder;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -96,7 +96,7 @@ public class Multiblock extends MultiblockBase {
 
         var world = blockEntity.getLevel();
         assert world != null;
-        var context = new LevelMultiblockCheckCtx(world, blockEntity.getBlockPos());
+        var context = new WorldMultiblockCheckCtx(world, blockEntity.getBlockPos());
         doCheckMultiblock(context);
         var machine = context.hasProperty("interface") ? context.getProperty("interface") : null;
         var ok = !context.isFailed() && machine instanceof MultiblockInterface inter &&

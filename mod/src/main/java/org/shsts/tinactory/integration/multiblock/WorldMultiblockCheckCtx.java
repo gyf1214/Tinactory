@@ -16,10 +16,10 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class LevelMultiblockCheckCtx extends MultiblockCheckCtx<BlockState> {
+public class WorldMultiblockCheckCtx extends MultiblockCheckCtx<BlockState> {
     private final Level world;
 
-    public LevelMultiblockCheckCtx(Level world, BlockPos center) {
+    public WorldMultiblockCheckCtx(Level world, BlockPos center) {
         super(center);
         this.world = world;
     }
