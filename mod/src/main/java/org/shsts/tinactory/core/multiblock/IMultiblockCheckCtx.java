@@ -3,14 +3,14 @@ package org.shsts.tinactory.core.multiblock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import org.shsts.tinactory.api.machine.IMachine;
 
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IMultiblockCheckCtx {
+public interface IMultiblockCheckCtx<S> {
     boolean isFailed();
 
     void setFailed(boolean val);
@@ -21,9 +21,11 @@ public interface IMultiblockCheckCtx {
 
     BlockPos getCenter();
 
-    Optional<BlockState> getBlock(BlockPos pos);
+    Optional<S> getBlock(BlockPos pos);
 
-    Optional<BlockEntity> getBlockEntity(BlockPos pos);
+    Optional<IMachine> getMachine(BlockPos pos);
+
+    Optional<Direction> getFacing();
 
     void addBlock(BlockPos pos);
 
