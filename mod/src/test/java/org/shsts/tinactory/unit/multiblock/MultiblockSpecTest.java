@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
+import org.shsts.tinactory.unit.fixture.TestBlock;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestMultiblockCheckCtx;
@@ -30,8 +31,8 @@ public class MultiblockSpecTest {
             .checkBlock('G', block -> block == TestBlock.GLASS);
     }
 
-    private static TestMultiblockCheckCtx<TestBlock> contextWithCenter() {
-        return new TestMultiblockCheckCtx<TestBlock>(CENTER)
+    private static TestMultiblockCheckCtx contextWithCenter() {
+        return new TestMultiblockCheckCtx(CENTER)
             .block(CENTER, TestBlock.BASE);
     }
 

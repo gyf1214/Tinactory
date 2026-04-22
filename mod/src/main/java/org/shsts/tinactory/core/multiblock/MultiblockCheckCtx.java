@@ -5,13 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MultiblockCheckCtx<S> implements IMultiblockCheckCtx<S> {
+public abstract class MultiblockCheckCtx<U> implements IMultiblockCheckCtx<U> {
     private boolean failed = false;
     private final BlockPos center;
     private final List<BlockPos> blocks = new ArrayList<>();

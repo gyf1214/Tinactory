@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IMultiblockCheckCtx<S> {
+public interface IMultiblockCheckCtx<U> {
     boolean isFailed();
 
     void setFailed(boolean val);
@@ -21,7 +21,7 @@ public interface IMultiblockCheckCtx<S> {
 
     BlockPos getCenter();
 
-    Optional<S> getBlock(BlockPos pos);
+    Optional<U> getBlock(BlockPos pos);
 
     Optional<IMachine> getMachine(BlockPos pos);
 

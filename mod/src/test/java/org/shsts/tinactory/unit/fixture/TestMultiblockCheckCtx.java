@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class TestMultiblockCheckCtx<S> extends MultiblockCheckCtx<S> {
-    private final Map<BlockPos, S> blocks = new HashMap<>();
+public final class TestMultiblockCheckCtx extends MultiblockCheckCtx<TestBlock> {
+    private final Map<BlockPos, TestBlock> blocks = new HashMap<>();
     private final Map<BlockPos, IMachine> machines = new HashMap<>();
     private Optional<Direction> facing = Optional.empty();
 
@@ -18,23 +18,23 @@ public final class TestMultiblockCheckCtx<S> extends MultiblockCheckCtx<S> {
         super(center);
     }
 
-    public TestMultiblockCheckCtx<S> block(BlockPos pos, S block) {
+    public TestMultiblockCheckCtx block(BlockPos pos, TestBlock block) {
         blocks.put(pos, block);
         return this;
     }
 
-    public TestMultiblockCheckCtx<S> machine(BlockPos pos, IMachine machine) {
+    public TestMultiblockCheckCtx machine(BlockPos pos, IMachine machine) {
         machines.put(pos, machine);
         return this;
     }
 
-    public TestMultiblockCheckCtx<S> facing(Direction value) {
+    public TestMultiblockCheckCtx facing(Direction value) {
         facing = Optional.of(value);
         return this;
     }
 
     @Override
-    public Optional<S> getBlock(BlockPos pos) {
+    public Optional<TestBlock> getBlock(BlockPos pos) {
         return Optional.ofNullable(blocks.get(pos));
     }
 

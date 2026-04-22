@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.multiblock;
+package org.shsts.tinactory.unit.fixture;
 
 public record TestBlock(String id) {
     public static final TestBlock AIR = new TestBlock("air");
