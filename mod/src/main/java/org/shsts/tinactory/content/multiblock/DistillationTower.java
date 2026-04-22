@@ -5,8 +5,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class DistillationTower extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             slots = (int) ctx.getProperty("height") - minHeight + 1;

@@ -7,8 +7,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 
 import java.util.OptionalInt;
@@ -26,7 +28,7 @@ public class CoilMultiblock extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         super.doCheckMultiblock(ctx);
         if (ctx.hasProperty("coil") && ctx.getProperty("coil") instanceof CoilBlock coil) {
             coilBlock = coil;

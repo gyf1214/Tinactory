@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -22,6 +23,7 @@ import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -158,7 +160,7 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             var i = (int) ctx.getProperty("height") - properties.minHeight;

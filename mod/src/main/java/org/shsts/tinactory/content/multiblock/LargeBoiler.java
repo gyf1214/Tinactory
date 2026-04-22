@@ -19,9 +19,10 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.machine.FireBoiler;
-import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -76,12 +77,12 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         super.doCheckMultiblock(ctx);
         if (!ctx.isFailed()) {
             boilParallel = (int) ctx.getProperty("height") - 2;
             fireboxes.clear();
-            for (var pos : ctx.blocks) {
+            for (var pos : ctx.blocks()) {
                 var block = ctx.getBlock(pos);
                 if (block.isPresent() && block.get().getBlock() instanceof FixedBlock) {
                     fireboxes.add(pos);

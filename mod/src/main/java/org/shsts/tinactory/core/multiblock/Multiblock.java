@@ -22,17 +22,14 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.multiblock.LevelMultiblockCheckCtx;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.IBuilder;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -53,7 +50,7 @@ public class Multiblock extends MultiblockBase {
 
     @Nullable
     protected Layout layout;
-    private final Consumer<IMultiblockCheckCtx> checker;
+    private final Consumer<IMultiblockCheckCtx<BlockState>> checker;
     private final Supplier<BlockState> appearance;
 
     /**
@@ -89,78 +86,7 @@ public class Multiblock extends MultiblockBase {
         return Optional.ofNullable(layout);
     }
 
-    protected static class CheckContext implements IMultiblockCheckCtx {
-        private boolean failed = false;
-        private final Level world;
-        private final BlockPos center;
-        public final List<BlockPos> blocks = new ArrayList<>();
-        private final Map<String, Object> properties = new HashMap<>();
-
-        protected CheckContext(Level world, BlockPos center) {
-            this.world = world;
-            this.center = center;
-        }
-
-        @Override
-        public boolean isFailed() {
-            return failed;
-        }
-
-        @Override
-        public void setFailed(boolean val) {
-            failed = val;
-        }
-
-        @Override
-        public BlockPos getCenter() {
-            return center;
-        }
-
-        @Override
-        public Optional<BlockState> getBlock(BlockPos pos) {
-            if (!world.isLoaded(pos)) {
-                return Optional.empty();
-            }
-            return Optional.of(world.getBlockState(pos));
-        }
-
-        @Override
-        public Optional<BlockEntity> getBlockEntity(BlockPos pos) {
-            if (!world.isLoaded(pos)) {
-                return Optional.empty();
-            }
-            return Optional.ofNullable(world.getBlockEntity(pos));
-        }
-
-        @Override
-        public void addBlock(BlockPos pos) {
-            blocks.add(pos);
-        }
-
-        @Override
-        public Object getProperty(String key) {
-            var val = properties.get(key);
-            assert val != null;
-            return val;
-        }
-
-        @Override
-        public void setProperty(String key, Object val) {
-            properties.put(key, val);
-        }
-
-        @Override
-        public void deleteProperty(String key) {
-            properties.remove(key);
-        }
-
-        @Override
-        public boolean hasProperty(String key) {
-            return properties.containsKey(key);
-        }
-    }
-
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         checker.accept(ctx);
     }
 
@@ -170,13 +96,14 @@ public class Multiblock extends MultiblockBase {
 
         var world = blockEntity.getLevel();
         assert world != null;
-        var context = new CheckContext(world, blockEntity.getBlockPos());
+        var context = new LevelMultiblockCheckCtx(world, blockEntity.getBlockPos());
         doCheckMultiblock(context);
-        var ok = !context.failed && context.hasProperty("interface") &&
-            (multiblockInterface == null || context.getProperty("interface") == multiblockInterface);
+        var machine = context.hasProperty("interface") ? context.getProperty("interface") : null;
+        var ok = !context.isFailed() && machine instanceof MultiblockInterface inter &&
+            (multiblockInterface == null || inter == multiblockInterface);
         if (ok) {
-            multiblockInterface = (MultiblockInterface) context.getProperty("interface");
-            return Optional.of(context.blocks);
+            multiblockInterface = (MultiblockInterface) machine;
+            return Optional.of(context.blocks());
         } else {
             return Optional.empty();
         }
@@ -308,7 +235,7 @@ public class Multiblock extends MultiblockBase {
         @Nullable
         private Layout layout = null;
         @Nullable
-        private Consumer<IMultiblockCheckCtx> checker = null;
+        private Consumer<IMultiblockCheckCtx<BlockState>> checker = null;
 
         public Builder(IBlockEntityTypeBuilder<P> parent,
             BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
@@ -332,12 +259,12 @@ public class Multiblock extends MultiblockBase {
             return appearance(() -> val.get().defaultBlockState());
         }
 
-        public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx>, Builder<P>, S>> S spec(
+        public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx<BlockState>>, Builder<P>, S>> S spec(
             Function<Builder<P>, S> child) {
             return child(child).onCreateObject($ -> this.checker = $);
         }
 
-        public MultiblockSpec.Builder<Builder<P>> spec() {
+        public MultiblockSpec.Builder<BlockState, Builder<P>> spec() {
             return spec(MultiblockSpec::builder);
         }
 

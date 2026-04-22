@@ -8,7 +8,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +31,7 @@ public class Lithography extends Multiblock {
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
+    protected void doCheckMultiblock(MultiblockCheckCtx<BlockState> ctx) {
         super.doCheckMultiblock(ctx);
         if (ctx.hasProperty("lens") && ctx.getProperty("lens") instanceof LensBlock block) {
             lensBlock = block;

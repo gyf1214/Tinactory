@@ -249,7 +249,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
         @Override
         protected MultiblockSpec<S> createObject() {
             validate();
-            return new MultiblockSpec(this);
+            return new MultiblockSpec<>(this);
         }
     }
 
