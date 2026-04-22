@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
+import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -61,7 +62,7 @@ public abstract class MultiblockBase extends UpdatableCapabilityProvider
     }
 
     private void onServerLoad(Level world) {
-        manager = MultiblockManager.get(world);
+        manager = WorldMultiblockManagers.get(world);
     }
 
     private void onRemove() {

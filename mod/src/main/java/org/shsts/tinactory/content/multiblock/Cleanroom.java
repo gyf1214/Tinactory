@@ -27,10 +27,10 @@ import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -511,7 +511,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     public static double getCleanness(Level world, BlockPos pos) {
         assert !world.isClientSide;
-        return MultiblockManager.get(world).getCleanroom(pos)
+        return WorldMultiblockManagers.get(world).getCleanroom(pos)
             .map($ -> ((Cleanroom) $).cleanness).orElse(0d);
     }
 }

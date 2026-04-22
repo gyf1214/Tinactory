@@ -11,8 +11,6 @@ import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -76,22 +74,5 @@ public final class MultiblockManager {
 
     public Optional<IMultiblock> getCleanroom(BlockPos pos) {
         return cleanroomMap.get(pos).map(MultiblockRuntime::host);
-    }
-
-    private static final Map<ResourceKey<Level>, MultiblockManager> INSTANCES = new HashMap<>();
-
-    public static MultiblockManager get(Level world) {
-        assert !world.isClientSide;
-        var dimension = world.dimension();
-        return INSTANCES.computeIfAbsent(dimension, MultiblockManager::new);
-    }
-
-    public static void onUnload(Level world) {
-        LOGGER.debug("remove multi block manager for {}", world.dimension().location());
-        var manager = INSTANCES.get(world.dimension());
-        if (manager != null) {
-            manager.destroy();
-            INSTANCES.remove(world.dimension());
-        }
     }
 }
