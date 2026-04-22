@@ -211,14 +211,11 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
         runtime.invalidate();
     }
 
-    private void onServerTickEvent() {
+    protected void onServerTick() {
         if (manager != null) {
             runtime.tick(manager);
         }
-        onServerTick();
     }
-
-    protected void onServerTick() {}
 
     private void onClientTick() {
         if (!firstTick) {
@@ -232,7 +229,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
         eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemove());
         eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemove());
-        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTickEvent());
+        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTick());
         eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
     }
 
