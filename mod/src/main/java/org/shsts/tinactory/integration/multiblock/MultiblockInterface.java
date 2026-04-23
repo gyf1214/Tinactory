@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.multiblock;
+package org.shsts.tinactory.integration.multiblock;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
@@ -28,8 +28,6 @@ import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.machine.Machine;
-import org.shsts.tinactory.integration.multiblock.Multiblock;
-import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;

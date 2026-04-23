@@ -19,8 +19,6 @@ import java.util.function.Supplier;
 
 /**
  * Machine block that does not have a "front" facing, only IO facing.
- * <p>
- * This moves to core because MultiblockInterfaceBlock is inherited from this class.
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

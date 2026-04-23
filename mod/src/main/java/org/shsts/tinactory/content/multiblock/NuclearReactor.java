@@ -23,12 +23,12 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
