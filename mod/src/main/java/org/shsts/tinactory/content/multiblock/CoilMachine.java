@@ -4,8 +4,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -13,8 +15,9 @@ import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class CoilMachine<R extends ProcessingRecipe> extends ProcessingMachine<R> {
-    public CoilMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
-        super(recipeType);
+    public CoilMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
+        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        super(recipeType, recipeManager, markerType);
     }
 
     private int getTemperature(IMachine machine) {

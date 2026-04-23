@@ -12,9 +12,9 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.datagen.provider.TechProvider;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
@@ -165,7 +165,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
             var type = REGISTRATE.<ResearchRecipe.Builder>getRecipeType("research_bench");
             type.recipe(DATA_GEN, loc)
                 .target(loc)
-                .input(new ProcessingIngredients.ItemIngredient(new ItemStack(input, 1)))
+                .input(ProcessingHelper.itemIngredient(new ItemStack(input, 1)))
                 .voltage(voltage.value)
                 .power((long) (0.25 * voltage.value))
                 .workTicks(200)

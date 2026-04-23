@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AutocraftCpuPersistenceTest {
     @Test
     void serviceShouldResumeFromRunningSnapshot() {
-        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
 
         var first = new AutocraftJobService(executor());
@@ -58,9 +58,9 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
 
-        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
         var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
 
@@ -76,26 +76,26 @@ class AutocraftCpuPersistenceTest {
             "s1",
             new CraftPattern(
                 "tinactory:s1",
-                List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 2)),
-                List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 2)),
+                List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 2)),
+                List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2)),
                 new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())),
             1,
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)));
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)));
         var plan = new CraftPlan(List.of(step));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
 
-        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
         var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
         var restored = new AutocraftJobService(executor());
         restored.restoreRunningSnapshot(serialized, codec);
 
         var restoredStep = restored.snapshotRunning().orElseThrow().execution().plan().steps().get(0);
-        assertEquals(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+        assertEquals(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             restoredStep.requiredIntermediateOutputs());
-        assertEquals(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+        assertEquals(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             restoredStep.requiredFinalOutputs());
     }
 
@@ -103,7 +103,7 @@ class AutocraftCpuPersistenceTest {
     void tickShouldReportDirtyStateChangesOnlyWhenJobIsStillBusy() {
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(executor());
-        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
 
         assertTrue(service.tick());
         assertTrue(service.tick());
@@ -114,8 +114,8 @@ class AutocraftCpuPersistenceTest {
     private static CraftStep step(String id) {
         return new CraftStep(id, new CraftPattern(
             "tinactory:" + id,
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
     }
 
@@ -124,15 +124,15 @@ class AutocraftCpuPersistenceTest {
     }
 
     private static final class NoOpInventory implements IInventoryView {
-        private final Map<IIngredientKey, Long> amounts = new HashMap<>();
+        private final Map<IStackKey, Long> amounts = new HashMap<>();
 
         @Override
-        public long amountOf(IIngredientKey key) {
+        public long amountOf(IStackKey key) {
             return amounts.computeIfAbsent(key, $ -> 64L);
         }
 
         @Override
-        public long extract(IIngredientKey key, long amount, boolean simulate) {
+        public long extract(IStackKey key, long amount, boolean simulate) {
             var current = amountOf(key);
             var moved = Math.min(current, amount);
             if (!simulate) {
@@ -142,7 +142,7 @@ class AutocraftCpuPersistenceTest {
         }
 
         @Override
-        public long insert(IIngredientKey key, long amount, boolean simulate) {
+        public long insert(IStackKey key, long amount, boolean simulate) {
             var moved = Math.max(0L, amount);
             if (!simulate) {
                 amounts.put(key, amountOf(key) + moved);
@@ -164,7 +164,7 @@ class AutocraftCpuPersistenceTest {
                 public List<IMachineRoute> inputRoutes() {
                     return step.pattern().inputs().stream().map(input -> (IMachineRoute) new IMachineRoute() {
                         @Override
-                        public IIngredientKey key() {
+                        public IStackKey key() {
                             return input.key();
                         }
 
@@ -185,7 +185,7 @@ class AutocraftCpuPersistenceTest {
                     return step.pattern().outputs().stream()
                         .map(output -> (IMachineRoute) new IMachineRoute() {
                             @Override
-                            public IIngredientKey key() {
+                            public IStackKey key() {
                                 return output.key();
                             }
 

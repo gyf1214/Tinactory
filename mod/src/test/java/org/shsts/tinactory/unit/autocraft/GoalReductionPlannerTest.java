@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GoalReductionPlannerTest {
     @Test
     void plannerShouldBuildSimpleChainInDependencyOrder() {
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
 
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
@@ -50,9 +50,9 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldUseDeterministicTieBreakByPatternId() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var dust = TestIngredientKey.item("tinactory:dust", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var dust = TestStackKey.item("tinactory:dust", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
 
         var aPattern = pattern(
             "tinactory:a_ore_to_plate",
@@ -74,10 +74,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldReuseByproductsFromEarlierSteps() {
-        var crude = TestIngredientKey.fluid("tinactory:crude_oil", "");
-        var plastic = TestIngredientKey.item("tinactory:plastic", "");
-        var residue = TestIngredientKey.item("tinactory:residue", "");
-        var carbon = TestIngredientKey.item("tinactory:carbon", "");
+        var crude = TestStackKey.fluid("tinactory:crude_oil", "");
+        var plastic = TestStackKey.item("tinactory:plastic", "");
+        var residue = TestStackKey.item("tinactory:residue", "");
+        var carbon = TestStackKey.item("tinactory:carbon", "");
 
         var refine = pattern(
             "tinactory:refine_oil",
@@ -107,9 +107,9 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldAggregateDuplicateOutputsByRole() {
-        var base = TestIngredientKey.item("tinactory:base", "");
-        var part = TestIngredientKey.item("tinactory:part", "");
-        var finalKey = TestIngredientKey.item("tinactory:final", "");
+        var base = TestStackKey.item("tinactory:base", "");
+        var part = TestStackKey.item("tinactory:part", "");
+        var finalKey = TestStackKey.item("tinactory:final", "");
         var makePart = pattern(
             "tinactory:make_part",
             List.of(new CraftAmount(base, 2)),
@@ -130,10 +130,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldMarkBranchProducerOutputAsIntermediate() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var part = TestIngredientKey.item("tinactory:part", "");
-        var machineA = TestIngredientKey.item("tinactory:machine_a", "");
-        var machineB = TestIngredientKey.item("tinactory:machine_b", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var part = TestStackKey.item("tinactory:part", "");
+        var machineA = TestStackKey.item("tinactory:machine_a", "");
+        var machineB = TestStackKey.item("tinactory:machine_b", "");
 
         var makePart = pattern(
             "tinactory:part_from_ore",
@@ -164,10 +164,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldSupportFanInForSharedIntermediateDemand() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var part = TestIngredientKey.item("tinactory:part", "");
-        var machine = TestIngredientKey.item("tinactory:machine", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var part = TestStackKey.item("tinactory:part", "");
+        var machine = TestStackKey.item("tinactory:machine", "");
 
         var partFromOre = pattern(
             "tinactory:part_from_ore",
@@ -201,10 +201,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldMixSecondProducerWhenFirstHasInsufficientInput() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var part = TestIngredientKey.item("tinactory:part", "");
-        var machine = TestIngredientKey.item("tinactory:machine", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var part = TestStackKey.item("tinactory:part", "");
+        var machine = TestStackKey.item("tinactory:machine", "");
 
         var partFromOre = pattern(
             "tinactory:a_part_from_ore",
@@ -235,9 +235,9 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldBacktrackToSecondRootCandidate() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var dust = TestIngredientKey.item("tinactory:dust", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var dust = TestStackKey.item("tinactory:dust", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
 
         var first = pattern(
             "tinactory:a_plate_from_missing_ore",
@@ -258,10 +258,10 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldBacktrackNestedCandidate() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var dust = TestIngredientKey.item("tinactory:dust", "");
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var dust = TestStackKey.item("tinactory:dust", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
 
         var gearFromIngot = pattern(
             "tinactory:gear_from_ingot",
@@ -289,8 +289,8 @@ class GoalReductionPlannerTest {
 
     @Test
     void plannerShouldReadAvailableAmountOncePerKeyWithinSession() {
-        var ore = TestIngredientKey.item("tinactory:ore", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
         var makePlate = pattern(
             "tinactory:plate_from_ore",
             List.of(new CraftAmount(ore, 1)),
@@ -316,7 +316,7 @@ class GoalReductionPlannerTest {
     private static IPatternRepository repo(List<CraftPattern> patterns) {
         return new IPatternRepository() {
             @Override
-            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+            public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
                 for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
                     for (var output : pattern.outputs()) {
@@ -330,7 +330,7 @@ class GoalReductionPlannerTest {
             }
 
             @Override
-            public List<IIngredientKey> listRequestables() {
+            public List<IStackKey> listRequestables() {
                 return patterns.stream()
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)

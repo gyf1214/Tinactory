@@ -21,9 +21,7 @@ public interface IMachineProcessor extends IProcessor {
 
     double workSpeed();
 
-    default boolean supportsRecipeType(ResourceLocation recipeTypeId) {
-        return false;
-    }
+    boolean supportsRecipeType(ResourceLocation recipeTypeId);
 
     @Override
     default double getProgress() {

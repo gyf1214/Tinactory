@@ -8,7 +8,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +27,7 @@ public final class PatternCellPortState implements IPatternCellPort {
     public PatternCellPortState(
         int bytesLimit,
         Codec<IMachineConstraint> constraintCodec,
-        Codec<IIngredientKey> keyCodec) {
+        Codec<IStackKey> keyCodec) {
         this(bytesLimit, new PatternNbtCodec(constraintCodec, keyCodec));
     }
 

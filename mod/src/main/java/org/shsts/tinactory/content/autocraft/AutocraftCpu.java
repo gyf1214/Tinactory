@@ -13,7 +13,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
-import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -32,7 +32,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
     private final PatternNbtCodec snapshotCodec =
-        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, IngredientKeyCodecHelper.CODEC);
+        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, StackHelper.KEY_CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable

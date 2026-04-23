@@ -36,8 +36,8 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.ProcessingDisplayHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -299,10 +299,7 @@ public final class RenderUtil {
 
     public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
         Consumer<FluidStack> fluidRenderer) {
-
-        ProcessingResults.consumeItemsOrFluid(ingredient,
-            items -> selectItemFromItems(items).ifPresent(itemRenderer),
-            fluidRenderer);
+        ProcessingDisplayHelper.renderIngredient(ingredient, itemRenderer, fluidRenderer);
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {

@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -52,6 +53,10 @@ public interface IMachine {
         return ret;
     }
 
+    default Random random() {
+        return world().random;
+    }
+
     Optional<BlockState> workBlock();
 
     Optional<IProcessor> processor();
@@ -59,6 +64,10 @@ public interface IMachine {
     Optional<IContainer> container();
 
     Optional<IElectricMachine> electric();
+
+    int parallel();
+
+    boolean isMultiblock();
 
     Optional<INetwork> network();
 

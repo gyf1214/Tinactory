@@ -1,13 +1,16 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -24,7 +27,7 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
     @Override
     public boolean canCraft(IMachine machine) {
         return super.canCraft(machine) &&
-            (!requireMultiblock || machine instanceof MultiblockInterface);
+            (!requireMultiblock || machine.isMultiblock());
     }
 
     public static class Builder extends BuilderBase<ChemicalReactorRecipe, Builder> {
@@ -45,7 +48,11 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
         }
     }
 
-    protected static class Serializer extends AssemblyRecipe.Serializer<ChemicalReactorRecipe, Builder> {
+    public static class Serializer extends AssemblyRecipe.Serializer<ChemicalReactorRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
@@ -59,5 +66,6 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
         }
     }
 
-    public static IRecipeSerializer<ChemicalReactorRecipe, Builder> SERIALIZER = new Serializer();
+    public static IRecipeSerializer<ChemicalReactorRecipe, Builder> SERIALIZER
+        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

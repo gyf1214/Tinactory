@@ -4,28 +4,18 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.IRectRenderable;
-import org.shsts.tinactory.core.gui.client.Renderables;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -35,7 +25,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MarkerRecipe extends ProcessingRecipe {
-    private final RecipeType<?> baseType;
+    private final ResourceLocation baseTypeId;
     private final String prefix;
     private final boolean requireMultiblock;
     @Nullable
@@ -45,9 +35,9 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public final List<Input> markerOutputs;
 
-    private MarkerRecipe(Builder builder) {
+    protected MarkerRecipe(Builder builder) {
         super(builder);
-        this.baseType = builder.getBaseType();
+        this.baseTypeId = builder.getBaseTypeId();
         this.prefix = builder.prefix;
         this.requireMultiblock = builder.requireMultiblock;
         this.displayIngredient = builder.displayIngredient;
@@ -55,44 +45,31 @@ public class MarkerRecipe extends ProcessingRecipe {
         this.markerOutputs = builder.markerOutputs;
     }
 
-    @Override
-    public Optional<String> getDescriptionId() {
-        return Optional.of(getDescriptionId(loc));
+    public Optional<IProcessingIngredient> displayIngredient() {
+        return Optional.ofNullable(displayIngredient);
+    }
+
+    public Optional<Texture> displayTexture() {
+        return Optional.ofNullable(displayTex);
     }
 
     @Override
-    public IProcessingObject getDisplayObject() {
-        if (displayIngredient != null) {
-            return displayIngredient;
-        }
-        return super.getDisplayObject();
-    }
-
-    @Override
-    public DistLazy<IRectRenderable> getDisplay() {
-        if (displayTex != null) {
-            return () -> () -> Renderables.texture(displayTex);
-        }
-        return super.getDisplay();
-    }
-
-    @Override
-    public boolean matches(IMachine machine, Level world, int parallel) {
+    public boolean matches(IMachine machine, int parallel) {
         return false;
     }
 
     @Override
     public boolean canCraft(IMachine machine) {
         return super.canCraft(machine) &&
-            (!requireMultiblock || machine instanceof MultiblockInterface);
+            (!requireMultiblock || machine.isMultiblock());
     }
 
     public boolean matchesType(IRecipeType<?> type) {
-        return baseType == type.get();
+        return baseTypeId.equals(type.loc());
     }
 
-    public boolean matchesType(RecipeType<?> type) {
-        return baseType == type;
+    public boolean matchesType(ResourceLocation type) {
+        return baseTypeId.equals(type);
     }
 
     public boolean matches(ILoc recipe) {
@@ -106,7 +83,7 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
         @Nullable
-        private ResourceLocation baseType;
+        private ResourceLocation baseTypeId;
         private String prefix = "";
         private boolean requireMultiblock = false;
         @Nullable
@@ -120,7 +97,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
 
         public Builder baseType(ResourceLocation value) {
-            baseType = value;
+            baseTypeId = value;
             return this;
         }
 
@@ -136,19 +113,13 @@ public class MarkerRecipe extends ProcessingRecipe {
 
         public Builder display(IProcessingIngredient value) {
             this.displayIngredient = value;
+            this.displayTex = null;
             return this;
         }
 
-        public Builder display(ItemLike item) {
-            return display(new ProcessingIngredients.ItemIngredient(new ItemStack(item)));
-        }
-
-        public Builder display(TagKey<Item> tag) {
-            return display(new ProcessingIngredients.TagIngredient(tag, 1));
-        }
-
         public Builder display(ResourceLocation tex) {
-            displayTex = tex;
+            this.displayTex = tex;
+            this.displayIngredient = null;
             return this;
         }
 
@@ -157,15 +128,15 @@ public class MarkerRecipe extends ProcessingRecipe {
             return this;
         }
 
-        public RecipeType<?> getBaseType() {
-            assert baseType != null;
-            var type = Registry.RECIPE_TYPE.get(baseType);
-            assert type != null;
-            return type;
+        protected ResourceLocation getBaseTypeId() {
+            assert baseTypeId != null;
+            return baseTypeId;
         }
 
         @Override
-        protected void validate() {}
+        protected void validate() {
+            assert baseTypeId != null : loc;
+        }
 
         @Override
         protected MarkerRecipe createObject() {
@@ -173,7 +144,11 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
     }
 
-    private static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
+    public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo)
@@ -182,43 +157,40 @@ public class MarkerRecipe extends ProcessingRecipe {
                 .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
             if (jo.has("display")) {
                 if (jo.get("display").isJsonObject()) {
-                    var jo1 = GsonHelper.getAsJsonObject(jo, "display");
-                    builder.display(ProcessingIngredients.fromJson(jo1));
+                    builder.display(CodecHelper.parseJson(
+                        ingredientCodec(), GsonHelper.getAsJsonObject(jo, "display")));
                 } else {
-                    var tex = new ResourceLocation(GsonHelper.getAsString(jo, "display"));
-                    builder.display(tex);
+                    builder.display(new ResourceLocation(GsonHelper.getAsString(jo, "display")));
                 }
             }
             Streams.stream(GsonHelper.getAsJsonArray(jo, "marker_outputs"))
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.output(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "result"))));
             return builder;
         }
 
         @Override
         public void toJson(JsonObject jo, MarkerRecipe recipe) {
             super.toJson(jo, recipe);
-            jo.addProperty("base_type", recipe.baseType.toString());
+            jo.addProperty("base_type", recipe.baseTypeId.toString());
             jo.addProperty("prefix", recipe.prefix);
             jo.addProperty("require_multiblock", recipe.requireMultiblock);
             if (recipe.displayTex != null) {
                 jo.addProperty("display", recipe.displayTex.loc().toString());
             } else if (recipe.displayIngredient != null) {
-                jo.add("display", ProcessingIngredients.toJson(recipe.displayIngredient));
+                jo.add("display", CodecHelper.encodeJson(ingredientCodec(), recipe.displayIngredient));
             }
             var markerOutputs = new JsonArray();
             recipe.markerOutputs.stream()
                 .map(output -> {
                     var je = new JsonObject();
                     je.addProperty("port", output.port());
-                    je.add("result", ProcessingIngredients.toJson(output.ingredient()));
+                    je.add("result", CodecHelper.encodeJson(ingredientCodec(), output.ingredient()));
                     return je;
                 }).forEach(markerOutputs::add);
             jo.add("marker_outputs", markerOutputs);
         }
     }
-
-    public static final IRecipeSerializer<MarkerRecipe, Builder> SERIALIZER = new Serializer();
 }

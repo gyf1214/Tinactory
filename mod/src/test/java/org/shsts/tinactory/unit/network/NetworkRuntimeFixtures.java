@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -181,7 +180,7 @@ final class NetworkRuntimeFixtures {
 
         @Override
         public Component title() {
-            return new TextComponent("machine");
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -196,7 +195,7 @@ final class NetworkRuntimeFixtures {
 
         @Override
         public Optional<BlockState> workBlock() {
-            return Optional.empty();
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -212,6 +211,16 @@ final class NetworkRuntimeFixtures {
         @Override
         public Optional<IElectricMachine> electric() {
             return Optional.empty();
+        }
+
+        @Override
+        public int parallel() {
+            return 0;
+        }
+
+        @Override
+        public boolean isMultiblock() {
+            return false;
         }
 
         @Override
@@ -238,22 +247,6 @@ final class NetworkRuntimeFixtures {
         @Override
         public void buildSchedulings(ISchedulingRegister builder) {
             builder.add(scheduling, (world, network) -> events.add("machine.tick"));
-        }
-    }
-
-    static final class ThrowOnTouchMachine extends MachineFixture {
-        ThrowOnTouchMachine(String id, List<String> events, IScheduling scheduling) {
-            super(id, events, scheduling);
-        }
-
-        @Override
-        public Component title() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Optional<BlockState> workBlock() {
-            throw new UnsupportedOperationException();
         }
     }
 }

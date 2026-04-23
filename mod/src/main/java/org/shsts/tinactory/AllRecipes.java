@@ -15,6 +15,7 @@ import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -46,7 +47,9 @@ public final class AllRecipes {
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
             .recipeClass(MarkerRecipe.class)
-            .serializer(MarkerRecipe.SERIALIZER)
+            .serializer(new MarkerRecipe.Serializer(
+                ProcessingHelper.INGREDIENT_CODEC,
+                ProcessingHelper.RESULT_CODEC))
             .register();
     }
 

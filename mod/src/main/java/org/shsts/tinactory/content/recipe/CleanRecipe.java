@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -9,10 +10,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
@@ -89,7 +92,11 @@ public class CleanRecipe extends ProcessingRecipe {
         }
     }
 
-    protected static class Serializer extends ProcessingRecipe.Serializer<CleanRecipe, Builder> {
+    public static class Serializer extends ProcessingRecipe.Serializer<CleanRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
@@ -105,5 +112,6 @@ public class CleanRecipe extends ProcessingRecipe {
         }
     }
 
-    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER = new Serializer();
+    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER
+        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

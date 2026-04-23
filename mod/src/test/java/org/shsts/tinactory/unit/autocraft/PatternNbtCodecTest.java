@@ -2,7 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import com.mojang.serialization.Codec;
 import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -34,11 +34,11 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripPattern() {
-        var codec = new PatternNbtCodec(TEST_CONSTRAINT_CODEC, TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(TEST_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             "tinactory:test",
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
-            List.of(new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 250)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
+            List.of(new CraftAmount(TestStackKey.fluid("minecraft:water", ""), 250)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 2,
                 List.of(new TestConstraint("v1"))));
 
@@ -50,15 +50,15 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRejectUnknownConstraintType() {
-        var codec = new PatternNbtCodec(TEST_CONSTRAINT_CODEC, TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(TEST_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
         tag.putString("patternId", "tinactory:bad");
         tag.put("inputs", new ListTag());
         var outputs = new ListTag();
         var out = new CompoundTag();
         out.put("key", CodecHelper.encodeTag(
-            TestIngredientKey.CODEC,
-            TestIngredientKey.item("minecraft:iron_ingot", "")));
+            TestStackKey.CODEC,
+            TestStackKey.item("minecraft:iron_ingot", "")));
         out.putLong("amount", 1);
         outputs.add(out);
         tag.put("outputs", outputs);
@@ -78,15 +78,15 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             "tinactory:slot_constraints",
             List.of(
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1),
-                new CraftAmount(TestIngredientKey.item("minecraft:slag", ""), 1)),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:slag", ""), 1)),
             new MachineRequirement(
                 new ResourceLocation("tinactory", "press"),
                 1,
@@ -103,8 +103,8 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripCraftAmountWithOverloads() {
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestIngredientKey.CODEC);
-        var expected = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
+        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
+        var expected = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
 
         var fromAmount = codec.encodeAmount(expected);
         var fromKeyAndAmount = codec.encodeAmount(expected.key(), expected.amount());

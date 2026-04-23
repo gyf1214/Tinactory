@@ -10,9 +10,9 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
-import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
@@ -22,23 +22,23 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftCpuSyncPacket implements IPacket {
-    private final Codec<IIngredientKey> ingredientKeyCodec;
+    private final Codec<IStackKey> ingredientKeyCodec;
     private final List<CpuStatusEntry> entries = new ArrayList<>();
 
     public AutocraftCpuSyncPacket() {
-        this(IngredientKeyCodecHelper.CODEC);
+        this(StackHelper.KEY_CODEC);
     }
 
-    public AutocraftCpuSyncPacket(Codec<IIngredientKey> ingredientKeyCodec) {
+    public AutocraftCpuSyncPacket(Codec<IStackKey> ingredientKeyCodec) {
         this.ingredientKeyCodec = ingredientKeyCodec;
     }
 
     public AutocraftCpuSyncPacket(List<CpuStatusEntry> entries) {
-        this(IngredientKeyCodecHelper.CODEC, entries);
+        this(StackHelper.KEY_CODEC, entries);
     }
 
     public AutocraftCpuSyncPacket(
-        Codec<IIngredientKey> ingredientKeyCodec,
+        Codec<IStackKey> ingredientKeyCodec,
         List<CpuStatusEntry> entries) {
         this.ingredientKeyCodec = ingredientKeyCodec;
         this.entries.addAll(entries);
@@ -104,13 +104,13 @@ public class AutocraftCpuSyncPacket implements IPacket {
         return Objects.hash(entries);
     }
 
-    private CompoundTag encodeIngredientKey(IIngredientKey key) {
+    private CompoundTag encodeIngredientKey(IStackKey key) {
         var tag = new CompoundTag();
         tag.put("value", CodecHelper.encodeTag(ingredientKeyCodec, key));
         return tag;
     }
 
-    private IIngredientKey decodeIngredientKey(CompoundTag tag) {
+    private IStackKey decodeIngredientKey(CompoundTag tag) {
         return CodecHelper.parseTag(ingredientKeyCodec, tag.get("value"));
     }
 }

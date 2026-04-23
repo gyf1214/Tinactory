@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
@@ -10,10 +11,11 @@ import net.minecraft.world.level.material.Fluid
 import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.core.recipe.MarkerRecipe
-import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
+import org.shsts.tinactory.integration.recipe.ProcessingHelper
+import org.shsts.tinactory.integration.recipe.TagIngredient
 
 class MarkerBuilder(builder: MarkerRecipe.Builder) :
     ProcessingRecipeBuilder<MarkerRecipe.Builder>(builder) {
@@ -35,7 +37,7 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     fun baseType(type: RecipeType<*>) {
-        builder.baseType(ResourceLocation(type.toString()))
+        builder.baseType(checkNotNull(Registry.RECIPE_TYPE.getKey(type)) { type.toString() })
     }
 
     fun prefix(value: String) {
@@ -50,12 +52,28 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
         builder.prefix(baseType!!).requireMultiblock(true)
     }
 
+    fun requireMultiblock(value: Boolean) {
+        builder.requireMultiblock(value)
+    }
+
+    fun display(value: ItemLike) {
+        builder.display(ProcessingHelper.itemIngredient(ItemStack(value)))
+    }
+
+    fun display(tag: TagKey<Item>) {
+        builder.display(TagIngredient(tag, 1))
+    }
+
+    fun display(tex: ResourceLocation) {
+        builder.display(tex)
+    }
+
     override fun output(item: ItemLike, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingIngredients.ItemIngredient(ItemStack(item, amount)))
+        builder.output(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
     }
 
     override fun output(fluid: Fluid, amount: Int, port: Int, rate: Double) {
-        builder.output(port, ProcessingIngredients.FluidIngredient(FluidStack(fluid, amount)))
+        builder.output(port, ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)))
     }
 
     fun output(fluid: Fluid, port: Int) {
@@ -63,7 +81,7 @@ class MarkerBuilder(builder: MarkerRecipe.Builder) :
     }
 
     fun output(tag: TagKey<Item>, port: Int) {
-        builder.output(port, ProcessingIngredients.TagIngredient(tag, 1))
+        builder.output(port, TagIngredient(tag, 1))
     }
 
     override fun output(mat: MaterialSet, sub: String, amount: Number, port: Int?, rate: Double) {

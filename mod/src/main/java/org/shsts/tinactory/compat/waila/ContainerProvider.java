@@ -16,9 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import snownee.jade.Jade;
 import snownee.jade.JadeCommonConfig;
@@ -94,7 +93,7 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
         // TODO: make is configurable
         var limit = showDetails ? 9 : 4;
 
-        var itemMap = new HashMap<IIngredientKey, ItemStack>();
+        var itemMap = new HashMap<IStackKey, ItemStack>();
         var itemList = new ArrayList<ItemStack>();
 
         for (var i = 0; i < items.getSlots(); i++) {
@@ -103,7 +102,7 @@ public class ContainerProvider extends ProviderBase implements IServerDataProvid
                 continue;
             }
 
-            var key = ItemPortAdapter.INSTANCE.keyOf(stack);
+            var key = StackHelper.ITEM_ADAPTER.keyOf(stack);
             if (itemMap.containsKey(key)) {
                 var stack1 = itemMap.get(key);
                 stack1.grow(stack.getCount());

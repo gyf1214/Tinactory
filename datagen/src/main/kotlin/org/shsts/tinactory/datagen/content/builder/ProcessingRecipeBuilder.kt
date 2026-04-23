@@ -9,9 +9,9 @@ import net.minecraftforge.fluids.FluidStack
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.material.MaterialSet
-import org.shsts.tinactory.core.recipe.ProcessingIngredients
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
-import org.shsts.tinactory.core.recipe.ProcessingResults
+import org.shsts.tinactory.integration.recipe.ProcessingHelper
+import org.shsts.tinactory.integration.recipe.TagIngredient
 
 open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val builder: B) {
     var voltage: Voltage? = null
@@ -42,15 +42,15 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     private fun defaultSub(name: String) = defaultSub(getMaterial(name))
 
     fun input(tag: TagKey<Item>, amount: Int = 1, port: Int = defaultInputItem!!) {
-        builder.input(port) { ProcessingIngredients.TagIngredient(tag, amount) }
+        builder.input(port) { TagIngredient(tag, amount) }
     }
 
     fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {
-        builder.input(port) { ProcessingIngredients.ItemIngredient(ItemStack(item, amount)) }
+        builder.input(port) { ProcessingHelper.itemIngredient(ItemStack(item, amount)) }
     }
 
     fun input(fluid: Fluid, amount: Int, port: Int = defaultInputFluid!!) {
-        builder.input(port) { ProcessingIngredients.FluidIngredient(FluidStack(fluid, amount)) }
+        builder.input(port) { ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)) }
     }
 
     fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, port: Int? = null) {
@@ -68,13 +68,13 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
 
     open fun output(item: ItemLike, amount: Int = 1, port: Int = defaultOutputItem!!, rate: Double = 1.0) {
         builder.output(port) {
-            ProcessingResults.ItemResult(rate, ItemStack(item, amount))
+            ProcessingHelper.itemResult(rate, ItemStack(item, amount))
         }
     }
 
     open fun output(fluid: Fluid, amount: Int, port: Int = defaultOutputFluid!!, rate: Double = 1.0) {
         builder.output(port) {
-            ProcessingResults.FluidResult(rate, FluidStack(fluid, amount))
+            ProcessingHelper.fluidResult(rate, FluidStack(fluid, amount))
         }
     }
 

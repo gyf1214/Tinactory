@@ -18,7 +18,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -71,8 +70,8 @@ public class ToolRecipe implements IRecipe<Workbench> {
     }
 
     @Override
-    public boolean matches(Workbench container, Level world) {
-        return shapedRecipe.matches(container.getCraftingContainer(), world) &&
+    public boolean matches(Workbench container) {
+        return shapedRecipe.matches(container.getCraftingContainer(), container.world()) &&
             matchTools(container.getToolStorage());
     }
 

@@ -7,9 +7,9 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Random;

@@ -4,12 +4,11 @@ import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -17,22 +16,15 @@ import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.gui.client.IRectRenderable;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.machine.ProcessingInfo;
-import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +33,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_DEFAULT;
-import static org.shsts.tinactory.core.machine.MachineProcessor.VOID_KEY;
+import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
+import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -131,16 +123,16 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
-        return matches(machine, world, 1);
+    public boolean matches(IMachine machine) {
+        return matches(machine, 1);
     }
 
-    public boolean matches(IMachine machine, Level world, int parallel) {
+    public boolean matches(IMachine machine, int parallel) {
         var container = machine.container();
         var autoVoid = machine.config().getBoolean(VOID_KEY, VOID_DEFAULT);
         return canCraft(machine) && container
             .filter($ -> matchInputs(machine, $, parallel) &&
-                (autoVoid || matchOutputs(machine, $, parallel, world.random)))
+                (autoVoid || matchOutputs(machine, $, parallel, machine.random())))
             .isPresent();
     }
 
@@ -170,37 +162,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
-    }
-
-    protected Optional<String> getDescriptionId() {
-        return Optional.empty();
-    }
-
-    public Optional<List<Component>> getDescription() {
-        return getDescriptionId().map($ -> List.of((Component) I18n.tr($)))
-            .or(() -> ProcessingResults.mapItemOrFluid(getDisplayObject(),
-                ClientUtil::itemTooltip, fluid -> ClientUtil.fluidTooltip(fluid, false)));
-    }
-
-    public IProcessingObject getDisplayObject() {
-        if (!outputs.isEmpty()) {
-            return outputs.stream().min(Comparator.comparingInt(Output::port)).get().result;
-        } else if (!inputs.isEmpty()) {
-            return inputs.stream().min(Comparator.comparingInt(Input::port)).get().ingredient;
-        } else {
-            return ProcessingResults.EMPTY;
-        }
-    }
-
-    public DistLazy<IRectRenderable> getDisplay() {
-        return () -> () -> (poseStack, rect, z) -> {
-            var object = getDisplayObject();
-            var x = rect.x();
-            var y = rect.y();
-            RenderUtil.renderIngredient(object,
-                stack -> RenderUtil.renderItem(stack, x, y),
-                stack -> RenderUtil.renderFluid(poseStack, stack, x, y, z));
-        };
     }
 
     @Override
@@ -294,20 +255,36 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    protected static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
+    public static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
         implements IRecipeSerializer<R, B> {
+        private final Codec<IProcessingIngredient> ingredientCodec;
+        private final Codec<IProcessingResult> resultCodec;
+
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            this.ingredientCodec = ingredientCodec;
+            this.resultCodec = resultCodec;
+        }
+
+        protected Codec<IProcessingIngredient> ingredientCodec() {
+            return ingredientCodec;
+        }
+
+        protected Codec<IProcessingResult> resultCodec() {
+            return resultCodec;
+        }
+
         protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
             var builder = type.getBuilder(loc);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.input(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingIngredients.fromJson(GsonHelper.getAsJsonObject(je, "ingredient"))));
+                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "ingredient"))));
             Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
                 .map(JsonElement::getAsJsonObject)
                 .forEach(je -> builder.output(
                     GsonHelper.getAsInt(je, "port"),
-                    ProcessingResults.fromJson(GsonHelper.getAsJsonObject(je, "result"))));
+                    CodecHelper.parseJson(resultCodec(), GsonHelper.getAsJsonObject(je, "result"))));
             return builder
                 .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                 .voltage(GsonHelper.getAsLong(jo, "voltage"))
@@ -326,7 +303,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
                 .map(input -> {
                     var je = new JsonObject();
                     je.addProperty("port", input.port);
-                    je.add("ingredient", ProcessingIngredients.toJson(input.ingredient));
+                    je.add("ingredient", CodecHelper.encodeJson(ingredientCodec(), input.ingredient));
                     return je;
                 }).forEach(inputs::add);
             var outputs = new JsonArray();
@@ -334,7 +311,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
                 .map(output -> {
                     var je = new JsonObject();
                     je.addProperty("port", output.port);
-                    je.add("result", ProcessingResults.toJson(output.result));
+                    je.add("result", CodecHelper.encodeJson(resultCodec(), output.result));
                     return je;
                 }).forEach(outputs::add);
             jo.add("inputs", inputs);
@@ -344,6 +321,4 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             jo.addProperty("power", recipe.power);
         }
     }
-
-    public static final IRecipeSerializer<ProcessingRecipe, Builder> SERIALIZER = new Serializer<>();
 }

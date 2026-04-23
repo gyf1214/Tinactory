@@ -6,7 +6,6 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IBoiler;
 
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
-import static org.shsts.tinactory.core.machine.Machine.getProcessor;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -31,5 +30,12 @@ public class BoilerMenu extends MachineMenu {
         menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
             .map($ -> ((IBoiler) $).heatProgress())
             .orElse(0d)));
+    }
+
+    public static class DigitalInterface extends DigitalInterfaceMenu {
+        public DigitalInterface(Properties properties) {
+            super(properties);
+            addProgressSlots(this);
+        }
     }
 }

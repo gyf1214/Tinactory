@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -26,7 +26,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -47,10 +47,10 @@ class AutocraftTerminalServiceExecuteTest {
     void listRequestablesShouldReturnDedupedOutputsFromStoredPatterns() {
         var patterns = List.of(
             pattern("tinactory:p1", List.of(
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1))),
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1))),
             pattern("tinactory:p2", List.of(
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 2),
-                new CraftAmount(TestIngredientKey.fluid("minecraft:water", ""), 1000))));
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2),
+                new CraftAmount(TestStackKey.fluid("minecraft:water", ""), 1000))));
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(patterns),
@@ -69,8 +69,8 @@ class AutocraftTerminalServiceExecuteTest {
         var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
         var previewPlanner = new StaticPlanner(planRequiring(
-            new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
-            new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1)));
+            new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+            new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)));
         var jobService = new AutocraftJobService(new TestExecutor());
         var service = new AutocraftTerminalService(
             previewPlanner,
@@ -80,7 +80,7 @@ class AutocraftTerminalServiceExecuteTest {
                 () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
 
-        service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
+        service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
         var execute = service.execute(cpu);
 
         assertTrue(execute.isSuccess());
@@ -102,14 +102,14 @@ class AutocraftTerminalServiceExecuteTest {
         };
         var service = new AutocraftTerminalService(
             new StaticPlanner(planRequiring(
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 1))),
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
                 () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
-        service.preview(TestIngredientKey.item("minecraft:iron_plate", ""), 1);
+        service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
         availableCpus.clear();
 
         var execute = service.execute(cpu);
@@ -122,7 +122,7 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void listCpuStatusesShouldExposeStructuredJobFields() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var targets = List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 3));
+        var targets = List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3));
         var execution = new ExecutorSnapshot(
             JobState.BLOCKED,
             ExecutionPhase.FLUSHING,
@@ -131,7 +131,7 @@ class AutocraftTerminalServiceExecuteTest {
             new CraftPlan(List.of(new CraftStep(
                 "s1",
                 pattern("tinactory:test", List.of(
-                    new CraftAmount(TestIngredientKey.item("minecraft:iron_plate", ""), 3))),
+                    new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3))),
                 1L))),
             1,
             Map.of(),
@@ -167,14 +167,14 @@ class AutocraftTerminalServiceExecuteTest {
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
         return new CraftPattern(id, List.of(
-            new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
+            new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             outputs, new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
         return new IPatternRepository() {
             @Override
-            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+            public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
                 for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
                     for (var output : pattern.outputs()) {
@@ -188,7 +188,7 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
-            public List<IIngredientKey> listRequestables() {
+            public List<IStackKey> listRequestables() {
                 return patterns.stream()
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)

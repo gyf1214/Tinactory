@@ -9,9 +9,8 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
-import org.shsts.tinactory.integration.logistics.FluidPortAdapter;
-import org.shsts.tinactory.integration.logistics.ItemPortAdapter;
+import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -26,22 +25,22 @@ public final class LogisticsInventoryView implements IInventoryView {
 
     public LogisticsInventoryView(IPort<ItemStack> itemPort, IPort<FluidStack> fluidPort) {
         channels = new EnumMap<>(PortType.class);
-        channels.put(PortType.ITEM, new CraftPortChannel<>(ItemPortAdapter.INSTANCE, itemPort));
-        channels.put(PortType.FLUID, new CraftPortChannel<>(FluidPortAdapter.INSTANCE, fluidPort));
+        channels.put(PortType.ITEM, new CraftPortChannel<>(StackHelper.ITEM_ADAPTER, itemPort));
+        channels.put(PortType.FLUID, new CraftPortChannel<>(StackHelper.FLUID_ADAPTER, fluidPort));
     }
 
     @Override
-    public long amountOf(IIngredientKey key) {
+    public long amountOf(IStackKey key) {
         return channel(key.type()).amountOf(key);
     }
 
     @Override
-    public long extract(IIngredientKey key, long amount, boolean simulate) {
+    public long extract(IStackKey key, long amount, boolean simulate) {
         return channel(key.type()).extract(key, amount, simulate);
     }
 
     @Override
-    public long insert(IIngredientKey key, long amount, boolean simulate) {
+    public long insert(IStackKey key, long amount, boolean simulate) {
         return channel(key.type()).insert(key, amount, simulate);
     }
 

@@ -62,7 +62,7 @@ public final class StoragePorts {
     public static class ItemStorage extends DigitalStorage<ItemStack>
         implements IItemPort, INBTSerializable<CompoundTag> {
         private ItemStorage(IDigitalProvider provider) {
-            super(provider, ItemPortAdapter.INSTANCE, CONFIG.bytesPerItemType.get(), CONFIG.bytesPerItem.get());
+            super(provider, StackHelper.ITEM_ADAPTER, CONFIG.bytesPerItemType.get(), CONFIG.bytesPerItem.get());
         }
 
         @Override
@@ -90,7 +90,7 @@ public final class StoragePorts {
     public static class FluidStorage extends DigitalStorage<FluidStack>
         implements IFluidPort, INBTSerializable<CompoundTag> {
         private FluidStorage(IDigitalProvider provider) {
-            super(provider, FluidPortAdapter.INSTANCE, CONFIG.bytesPerFluidType.get(), CONFIG.bytesPerFluid.get());
+            super(provider, StackHelper.FLUID_ADAPTER, CONFIG.bytesPerFluidType.get(), CONFIG.bytesPerFluid.get());
         }
 
         @Override
@@ -117,21 +117,21 @@ public final class StoragePorts {
 
     private static class ItemCombinedPort extends CombinedPort<ItemStack> implements IItemPort {
         private ItemCombinedPort() {
-            super(ItemPortAdapter.INSTANCE);
+            super(StackHelper.ITEM_ADAPTER);
         }
 
         private ItemCombinedPort(Collection<IPort<ItemStack>> composes) {
-            super(ItemPortAdapter.INSTANCE, composes);
+            super(StackHelper.ITEM_ADAPTER, composes);
         }
     }
 
     private static class FluidCombinedPort extends CombinedPort<FluidStack> implements IFluidPort {
         private FluidCombinedPort() {
-            super(FluidPortAdapter.INSTANCE);
+            super(StackHelper.FLUID_ADAPTER);
         }
 
         private FluidCombinedPort(Collection<IPort<FluidStack>> composes) {
-            super(FluidPortAdapter.INSTANCE, composes);
+            super(StackHelper.FLUID_ADAPTER, composes);
         }
     }
 }

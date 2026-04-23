@@ -8,7 +8,7 @@ import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.machine.Machine;
+import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.Collection;

@@ -19,11 +19,11 @@ public final class CraftPortChannel<T> {
         this.port = port;
     }
 
-    public long amountOf(IIngredientKey key) {
+    public long amountOf(IStackKey key) {
         return port.getStorageAmount(stackAdapter.stackOf(key, 1L));
     }
 
-    public long extract(IIngredientKey key, long amount, boolean simulate) {
+    public long extract(IStackKey key, long amount, boolean simulate) {
         if (amount <= 0L) {
             return 0L;
         }
@@ -42,7 +42,7 @@ public final class CraftPortChannel<T> {
         return extractedTotal;
     }
 
-    public long insert(IIngredientKey key, long amount, boolean simulate) {
+    public long insert(IStackKey key, long amount, boolean simulate) {
         if (amount <= 0L) {
             return 0L;
         }

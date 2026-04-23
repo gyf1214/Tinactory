@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilMachine;
@@ -10,60 +11,58 @@ import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.machine.MachineProcessor;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.machine.MachineProcessor;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Collection;
-import java.util.function.Supplier;
+import java.util.function.Function;
+
+import static org.shsts.tinactory.AllRecipes.MARKER;
+import static org.shsts.tinactory.Tinactory.CORE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class RecipeProcessors {
     private static final String ID = "machine/recipe_processor";
 
-    public static <R extends ProcessingRecipe> Supplier<IRecipeProcessor<R>> processing(
+    public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> processing(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
-        return () -> new ProcessingMachine<>(recipeType);
+        return be -> new ProcessingMachine<>(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
     }
 
-    public static Supplier<IRecipeProcessor<SmeltingRecipe>> electricFurnace(
+    public static Function<BlockEntity, IRecipeProcessor<SmeltingRecipe>> electricFurnace(
         int inputPort, int outputPort, double amperage) {
         return electricFurnace(inputPort, outputPort, amperage, 0);
     }
 
-    public static Supplier<IRecipeProcessor<SmeltingRecipe>> electricFurnace(
+    public static Function<BlockEntity, IRecipeProcessor<SmeltingRecipe>> electricFurnace(
         int inputPort, int outputPort, double amperage, int baseTemperature) {
-        return () -> new ElectricFurnace(inputPort, outputPort, amperage, baseTemperature);
+        return be -> new ElectricFurnace(be, inputPort, outputPort, amperage, baseTemperature);
     }
 
-    public static Supplier<IRecipeProcessor<ProcessingRecipe>> generator(
+    public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> generator(
         IRecipeType<ProcessingRecipe.Builder> recipeType) {
-        return () -> new Generator(recipeType);
+        return be -> new Generator(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
     }
 
-    public static Supplier<IRecipeProcessor<OreAnalyzerRecipe>> oreAnalyzer(
+    public static Function<BlockEntity, IRecipeProcessor<OreAnalyzerRecipe>> oreAnalyzer(
         IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
-        return () -> new OreAnalyzer(recipeType);
+        return be -> new OreAnalyzer(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> machine(
-        Collection<Supplier<? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
-        return $ -> $.capability(ID, be -> {
-            var processors = processorFactories.stream()
-                .map(Supplier::get)
-                .toList();
-            return new MachineProcessor(be, processors, autoRecipe);
-        });
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
+        return $ -> $.capability(ID, be -> new MachineProcessor(be, processorFactories, autoRecipe));
     }
 
-    public static <R extends ProcessingRecipe> Supplier<IRecipeProcessor<R>> coil(
+    public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> coil(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, int baseTemperature) {
-        return () -> new CoilMachine<>(recipeType) {
+        return be -> new CoilMachine<>(recipeType, CORE.recipeManager(be.getLevel()), MARKER) {
             @Override
             protected int getRecipeTemperature(R recipe) {
                 return baseTemperature;
@@ -71,18 +70,13 @@ public final class RecipeProcessors {
         };
     }
 
-    public static Supplier<IRecipeProcessor<BlastFurnaceRecipe>> blastFurnace(
+    public static Function<BlockEntity, IRecipeProcessor<BlastFurnaceRecipe>> blastFurnace(
         IRecipeType<BlastFurnaceRecipe.Builder> recipeType) {
-        return () -> new BlastFurnace(recipeType);
+        return be -> new BlastFurnace(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> multiblock(
-        Collection<Supplier<? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
-        return $ -> $.capability(ID, be -> {
-            var processors = processorFactories.stream()
-                .map(Supplier::get)
-                .toList();
-            return new MultiblockProcessor(be, processors, autoRecipe);
-        });
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
+        return $ -> $.capability(ID, be -> new MultiblockProcessor(be, processorFactories, autoRecipe));
     }
 }

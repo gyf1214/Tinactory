@@ -2,7 +2,7 @@ package org.shsts.tinactory.unit.autocraft;
 
 import com.mojang.serialization.Codec;
 import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,8 @@ class CraftPlanContractTest {
     void craftPlanShouldBeImmutableStepList() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
         var step = new CraftStep("step-1", pattern, 3);
         var plan = new CraftPlan(List.of(step));
@@ -42,11 +42,11 @@ class CraftPlanContractTest {
     void craftStepShouldSplitRequiredOutputsByRole() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
-        var intermediate = List.of(new CraftAmount(TestIngredientKey.item("tinactory:half", ""), 2));
-        var finals = List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1));
+        var intermediate = List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2));
+        var finals = List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1));
 
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
 
@@ -58,11 +58,11 @@ class CraftPlanContractTest {
     void craftStepShouldDefensivelyCopyRoleOutputs() {
         var pattern = new CraftPattern(
             "tinactory:gear",
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:ingot", ""), 2)),
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
-        var intermediate = new ArrayList<>(List.of(new CraftAmount(TestIngredientKey.item("tinactory:half", ""), 2)));
-        var finals = new ArrayList<>(List.of(new CraftAmount(TestIngredientKey.item("tinactory:gear", ""), 1)));
+        var intermediate = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2)));
+        var finals = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)));
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
 
         intermediate.clear();
@@ -71,14 +71,14 @@ class CraftPlanContractTest {
         assertEquals(1, step.requiredIntermediateOutputs().size());
         assertEquals(1, step.requiredFinalOutputs().size());
         assertThrows(UnsupportedOperationException.class, () -> step.requiredIntermediateOutputs().add(new CraftAmount(
-            TestIngredientKey.item("tinactory:x", ""), 1)));
+            TestStackKey.item("tinactory:x", ""), 1)));
         assertThrows(UnsupportedOperationException.class, () -> step.requiredFinalOutputs().add(new CraftAmount(
-            TestIngredientKey.item("tinactory:y", ""), 1)));
+            TestStackKey.item("tinactory:y", ""), 1)));
     }
 
     @Test
     void planErrorShouldExposeTypedPayload() {
-        var key = TestIngredientKey.item("tinactory:missing", "");
+        var key = TestStackKey.item("tinactory:missing", "");
         var error = PlanError.missingPattern(key);
 
         assertEquals(PlanError.Code.MISSING_PATTERN, error.code());

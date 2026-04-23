@@ -1,8 +1,9 @@
 package org.shsts.tinactory.unit.logistics;
 
-import org.shsts.tinactory.unit.fixture.TestStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.logistics.PortTransmitter;
+import org.shsts.tinactory.unit.fixture.TestPort;
+import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.List;
 
@@ -18,8 +19,8 @@ class PortTransmitterTest {
         var moved = transmitter.probe(from, to, new TestStack("iron", 8), 6);
 
         assertEquals(1, moved.amount());
-        assertEquals(8, from.stored);
-        assertEquals(4, to.stored);
+        assertEquals(8, from.stored());
+        assertEquals(4, to.stored());
     }
 
     @Test
@@ -43,8 +44,8 @@ class PortTransmitterTest {
 
         var remainder = transmitter.transmit(from, to, new TestStack("iron", 4));
 
-        assertEquals(1, from.stored);
-        assertEquals(3, to.stored);
+        assertEquals(1, from.stored());
+        assertEquals(3, to.stored());
         assertEquals(3, remainder.amount());
     }
 }

@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +29,7 @@ class IncrementalPlannerTest {
     @Test
     void incrementalPlannerShouldReturnRunningWhenBudgetIsZero() {
         var planner = planner(repo(List.of()), List.of());
-        var key = TestIngredientKey.item("tinactory:gear", "");
+        var key = TestStackKey.item("tinactory:gear", "");
         var session = planner.startSession(List.of(new CraftAmount(key, 1)));
 
         var progress = planner.resume(session, 0);
@@ -41,9 +41,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldMakePartialProgressAndThenFinish() {
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -83,7 +83,7 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldMatchSynchronousFailure() {
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
         var planner = planner(repo(List.of()), List.of());
         var session = planner.startSession(List.of(new CraftAmount(gear, 1)));
 
@@ -96,9 +96,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerShouldBeDeterministicAcrossReplays() {
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -125,9 +125,9 @@ class IncrementalPlannerTest {
 
     @Test
     void incrementalPlannerBudgetShouldAdvanceWithinSingleRootTargetExpansion() {
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var plate = TestIngredientKey.item("tinactory:plate", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
         var platePattern = pattern(
             "tinactory:plate_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -174,7 +174,7 @@ class IncrementalPlannerTest {
     private static IPatternRepository repo(List<CraftPattern> patterns) {
         return new IPatternRepository() {
             @Override
-            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+            public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
                 for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
                     for (var output : pattern.outputs()) {
@@ -188,7 +188,7 @@ class IncrementalPlannerTest {
             }
 
             @Override
-            public List<IIngredientKey> listRequestables() {
+            public List<IStackKey> listRequestables() {
                 return patterns.stream()
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)

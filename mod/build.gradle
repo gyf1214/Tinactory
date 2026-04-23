@@ -1,6 +1,10 @@
 archivesBaseName = "tinactory"
 apply plugin: 'jacoco'
 
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+}
+
 minecraft {
     runs {
         client {
@@ -123,6 +127,28 @@ test {
         workingDir.mkdirs()
     }
 }
+
+def checkSourceReportFile = layout.buildDirectory.file('reports/checkSource/violations.txt')
+def checkSourceRoots = files(
+    file('src/main/java'),
+    file('src/test/java'),
+    rootProject.file('datagen/src/main/java'),
+    rootProject.file('datagen/src/main/kotlin'))
+
+tasks.register('checkSource', JavaExec) {
+    group = 'verification'
+    description = 'Checks source architecture boundaries.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.check.CheckSource'
+    inputs.files checkSourceRoots
+    outputs.file checkSourceReportFile
+    args '--source-roots', checkSourceRoots.files.collect { it.absolutePath }.join(File.pathSeparator),
+        '--top-package', 'org.shsts.tinactory',
+        '--report-file', checkSourceReportFile.get().asFile.absolutePath
+}
+
+check.dependsOn tasks.named('checkSource')
 
 jacocoTestReport {
     dependsOn test

@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,12 +20,12 @@ public record ExecutorSnapshot(
     @Nullable JobState pendingTerminalState,
     CraftPlan plan,
     int nextStepIndex,
-    Map<IIngredientKey, Long> stepBuffer,
-    Map<IIngredientKey, Long> stepProducedOutputs,
-    Map<IIngredientKey, Long> stepRequiredOutputs,
-    Map<IIngredientKey, Long> stepRequiredInputs,
-    Map<IIngredientKey, Long> transmittedInputs,
-    Map<IIngredientKey, Long> transmittedRequiredOutputs,
+    Map<IStackKey, Long> stepBuffer,
+    Map<IStackKey, Long> stepProducedOutputs,
+    Map<IStackKey, Long> stepRequiredOutputs,
+    Map<IStackKey, Long> stepRequiredInputs,
+    Map<IStackKey, Long> transmittedInputs,
+    Map<IStackKey, Long> transmittedRequiredOutputs,
     @Nullable UUID leasedMachineId) {
 
     public ExecutorSnapshot {

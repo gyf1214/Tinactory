@@ -4,30 +4,22 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.Lazy;
+import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.integration.network.PrimitiveBlock;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import static org.shsts.tinactory.AllCapabilities.MACHINE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
+public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
     public static final char IGNORED_CHAR = ' ';
     public static final char CENTER_CHAR = '$';
 
@@ -36,7 +28,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         private final int minHeight;
         private final int maxHeight;
 
-        public Layer(LayerBuilder<?> builder) {
+        public Layer(LayerBuilder<?, ?> builder) {
             this.rows = builder.rows;
             this.minHeight = builder.minHeight;
             this.maxHeight = builder.maxHeight;
@@ -48,7 +40,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
     }
 
     private final List<Layer> layers;
-    private final Map<Character, BiConsumer<IMultiblockCheckCtx, BlockPos>> checkers;
+    private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers;
     private final Layer centerLayer;
     private final int centerLayerIdx;
     private final int centerW;
@@ -56,7 +48,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
     private final int width;
     private final int depth;
 
-    private MultiblockSpec(Builder<?> builder) {
+    private MultiblockSpec(Builder<S, ?> builder) {
         this.layers = builder.layers;
         this.checkers = builder.checkers;
         this.centerLayerIdx = builder.centerLayerIdx;
@@ -67,20 +59,15 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         this.depth = builder.depth;
     }
 
-    private boolean getDirections(IMultiblockCheckCtx ctx) {
-        var blockState = ctx.getBlock(ctx.getCenter());
-        if (blockState.isEmpty()) {
-            ctx.setFailed();
-            return false;
-        }
-
+    private boolean getDirections(IMultiblockCheckCtx<S> ctx) {
         Direction dirW;
         Direction dirD;
-        if (!blockState.get().hasProperty(PrimitiveBlock.FACING)) {
+        var facing = ctx.getFacing();
+        if (facing.isEmpty()) {
             dirW = Direction.EAST;
             dirD = Direction.SOUTH;
         } else {
-            dirD = blockState.get().getValue(PrimitiveBlock.FACING);
+            dirD = facing.get();
             dirW = switch (dirD) {
                 case SOUTH -> Direction.EAST;
                 case EAST -> Direction.NORTH;
@@ -97,7 +84,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         return true;
     }
 
-    private Optional<List<BlockPos>> checkLayer(IMultiblockCheckCtx ctx, Layer layer, BlockPos base,
+    private Optional<List<BlockPos>> checkLayer(IMultiblockCheckCtx<S> ctx, Layer layer, BlockPos base,
         int y, Direction dirW, Direction dirD) {
         var blocks = new ArrayList<BlockPos>();
         for (var d = 0; d < depth; d++) {
@@ -125,7 +112,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         return Optional.of(blocks);
     }
 
-    private boolean checkLayer(IMultiblockCheckCtx ctx, Layer layer, boolean reverse) {
+    private boolean checkLayer(IMultiblockCheckCtx<S> ctx, Layer layer, boolean reverse) {
         var dirW = (Direction) ctx.getProperty("dirW");
         var dirD = (Direction) ctx.getProperty("dirD");
         var base = (BlockPos) ctx.getProperty("base");
@@ -136,7 +123,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
             var result = checkLayer(ctx, layer, base, y1, dirW, dirD);
             if (result.isPresent()) {
                 for (var pos : result.get()) {
-                    ctx.addBlock(pos);
+                    ctx.addToStructure(pos);
                 }
             } else {
                 if (h < layer.minHeight) {
@@ -153,7 +140,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
     }
 
     @Override
-    public void accept(IMultiblockCheckCtx ctx) {
+    public void accept(IMultiblockCheckCtx<S> ctx) {
         if (!getDirections(ctx)) {
             return;
         }
@@ -174,26 +161,22 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         ctx.setProperty("height", h1 - h2);
     }
 
-    public static boolean checkInterface(IMultiblockCheckCtx ctx, BlockPos pos) {
-        var be = ctx.getBlockEntity(pos);
-        if (be.isEmpty()) {
-            return false;
-        }
-        var machine = MACHINE.tryGet(be.get());
-        if (machine.isEmpty() || !(machine.get() instanceof MultiblockInterface inter)) {
+    public static <S> boolean checkInterface(IMultiblockCheckCtx<S> ctx, BlockPos pos) {
+        var machine = ctx.getMachine(pos).filter(IMachine::isMultiblock);
+        if (machine.isEmpty()) {
             return false;
         }
         if (ctx.hasProperty("interface")) {
             ctx.setFailed();
         } else {
-            ctx.setProperty("interface", inter);
+            ctx.setProperty("interface", machine.get());
         }
         return true;
     }
 
-    public static class Builder<P> extends SimpleBuilder<MultiblockSpec, P, Builder<P>> {
+    public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {
         private final List<Layer> layers = new ArrayList<>();
-        private final Map<Character, BiConsumer<IMultiblockCheckCtx, BlockPos>> checkers = new HashMap<>();
+        private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers = new HashMap<>();
         private int centerLayerIdx = -1;
         private int centerW;
         private int centerD;
@@ -204,7 +187,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
             super(parent);
         }
 
-        public LayerBuilder<P> layer() {
+        public LayerBuilder<S, P> layer() {
             return new LayerBuilder<>(this)
                 .onCreateObject(l -> {
                     layers.add(l);
@@ -219,12 +202,12 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
                 });
         }
 
-        public Builder<P> check(char ch, BiConsumer<IMultiblockCheckCtx, BlockPos> checker) {
+        public Builder<S, P> check(char ch, BiConsumer<IMultiblockCheckCtx<S>, BlockPos> checker) {
             checkers.put(ch, checker);
             return this;
         }
 
-        public Builder<P> checkBlock(char ch, Predicate<BlockState> pred) {
+        public Builder<S, P> checkBlock(char ch, Predicate<S> pred) {
             return check(ch, (ctx, pos) -> {
                 var block = ctx.getBlock(pos);
                 if (block.isEmpty() || !pred.test(block.get())) {
@@ -233,63 +216,12 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
             });
         }
 
-        private Builder<P> block(char ch, Supplier<? extends Block> block, boolean allowInterface) {
+        public Builder<S, P> interfaceSlot(char ch) {
             return check(ch, (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
-                if (allowInterface && checkInterface(ctx, pos)) {
-                    return;
-                }
-                if (block1.isEmpty() || !block1.get().is(block.get())) {
+                if (!checkInterface(ctx, pos)) {
                     ctx.setFailed();
                 }
             });
-        }
-
-        public Builder<P> block(char ch, Supplier<? extends Block> block) {
-            return block(ch, block, false);
-        }
-
-        public Builder<P> blocks(char ch, Collection<Supplier<? extends Block>> blocks) {
-            var blocks1 = Lazy.of(() -> {
-                var ret = new HashSet<Block>();
-                for (var block : blocks) {
-                    ret.add(block.get());
-                }
-                return ret;
-            });
-            return check(ch, (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !blocks1.get().contains(block1.get().getBlock())) {
-                    ctx.setFailed();
-                }
-            });
-        }
-
-        public Builder<P> tagWithSameBlock(char ch, String key, TagKey<Block> tag) {
-            return check(ch, (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !block1.get().is(tag)) {
-                    ctx.setFailed();
-                } else if (ctx.hasProperty(key)) {
-                    if (!block1.get().is((Block) ctx.getProperty(key))) {
-                        ctx.setFailed();
-                    }
-                } else {
-                    ctx.setProperty(key, block1.get().getBlock());
-                }
-            });
-        }
-
-        public Builder<P> tag(char ch, TagKey<Block> tag) {
-            return checkBlock(ch, block -> block.is(tag));
-        }
-
-        public Builder<P> air(char ch) {
-            return checkBlock(ch, BlockState::isAir);
-        }
-
-        public Builder<P> blockOrInterface(char ch, Supplier<? extends Block> block) {
-            return block(ch, block, true);
         }
 
         private void validate() {
@@ -316,35 +248,35 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         }
 
         @Override
-        protected MultiblockSpec createObject() {
+        protected MultiblockSpec<S> createObject() {
             validate();
-            return new MultiblockSpec(this);
+            return new MultiblockSpec<>(this);
         }
     }
 
-    public static class LayerBuilder<P> extends SimpleBuilder<Layer, Builder<P>, LayerBuilder<P>> {
+    public static class LayerBuilder<S, P> extends SimpleBuilder<Layer, Builder<S, P>, LayerBuilder<S, P>> {
         private final List<String> rows = new ArrayList<>();
         private int minHeight = 1;
         private int maxHeight = 1;
 
-        private LayerBuilder(Builder<P> parent) {
+        private LayerBuilder(Builder<S, P> parent) {
             super(parent);
         }
 
-        public LayerBuilder<P> height(int val) {
+        public LayerBuilder<S, P> height(int val) {
             minHeight = val;
             maxHeight = val;
             return this;
         }
 
         // TODO: deal with the problem that the "try" test will modify property
-        public LayerBuilder<P> height(int min, int max) {
+        public LayerBuilder<S, P> height(int min, int max) {
             minHeight = min;
             maxHeight = max;
             return this;
         }
 
-        public LayerBuilder<P> row(String str) {
+        public LayerBuilder<S, P> row(String str) {
             rows.add(str);
             return this;
         }
@@ -380,7 +312,7 @@ public class MultiblockSpec implements Consumer<IMultiblockCheckCtx> {
         }
     }
 
-    public static <P> Builder<P> builder(P parent) {
+    public static <S, P> Builder<S, P> builder(P parent) {
         return new Builder<>(parent);
     }
 }

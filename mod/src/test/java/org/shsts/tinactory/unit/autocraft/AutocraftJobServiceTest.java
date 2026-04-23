@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,7 +29,7 @@ class AutocraftJobServiceTest {
     void serviceShouldTransitionRunningDone() {
         var executor = new TestExecutor(JobState.RUNNING, JobState.COMPLETED);
         var service = new AutocraftJobService(executor);
-        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
         var id = service.submitPrepared(List.of(target), testPlan());
 
@@ -43,7 +44,7 @@ class AutocraftJobServiceTest {
         var service = new AutocraftJobService(new TestExecutor(JobState.COMPLETED));
 
         var id = service.submitPrepared(
-            List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)),
             testPlan());
 
         assertEquals(id, service.getJob().orElseThrow().jobId());
@@ -56,7 +57,7 @@ class AutocraftJobServiceTest {
         executor.blockedReason = ExecutionError.FLUSH_BACKPRESSURE;
         var service = new AutocraftJobService(executor);
 
-        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
+        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
         service.tick();
         assertEquals(JobState.BLOCKED, service.getJob().orElseThrow().execution().state());
         assertTrue(service.isBusy());
@@ -76,15 +77,15 @@ class AutocraftJobServiceTest {
     void serviceShouldRejectSubmitWhenCurrentJobExists() {
         var service = new AutocraftJobService(new TestExecutor(JobState.RUNNING));
 
-        service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y1", ""), 1)), testPlan());
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y1", ""), 1)), testPlan());
         assertThrows(IllegalStateException.class, () ->
-            service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y2", ""), 1)), testPlan()));
+            service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y2", ""), 1)), testPlan()));
     }
 
     @Test
     void serviceShouldCancelRunningJobBeforeFirstTick() {
         var service = new AutocraftJobService(new TestExecutor(JobState.RUNNING, JobState.CANCELLED));
-        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
+        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
         assertFalse(service.cancel(UUIDs.other()));
         assertTrue(service.cancel(id));
@@ -96,7 +97,7 @@ class AutocraftJobServiceTest {
     void serviceShouldCancelRunningJob() {
         var executor = new TestExecutor(JobState.RUNNING, JobState.CANCELLED);
         var service = new AutocraftJobService(executor);
-        var id = service.submitPrepared(List.of(new CraftAmount(TestIngredientKey.item("x:y", ""), 1)), testPlan());
+        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
         service.tick();
@@ -109,7 +110,7 @@ class AutocraftJobServiceTest {
     void serviceShouldExposeRunningSnapshotFromExecutorInterface() {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
-        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
         var jobId = service.submitPrepared(List.of(target), testPlan());
         var snapshot = service.snapshotRunning().orElseThrow();
@@ -123,7 +124,7 @@ class AutocraftJobServiceTest {
     void serviceShouldRestoreRunningSnapshotThroughExecutorInterface() {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
-        var target = new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1);
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
@@ -153,8 +154,8 @@ class AutocraftJobServiceTest {
     private static CraftStep step() {
         return new CraftStep("s1", new CraftPattern(
             "tinactory:test",
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:cobblestone", ""), 1)),
-            List.of(new CraftAmount(TestIngredientKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
     }
 
@@ -210,7 +211,7 @@ class AutocraftJobServiceTest {
             return states.get(index);
         }
 
-        private ExecutorSnapshot snapshotFor(JobState state, CraftPlan plan, java.util.UUID leasedMachineId) {
+        private ExecutorSnapshot snapshotFor(JobState state, CraftPlan plan, UUID leasedMachineId) {
             var error = errorFor(state);
             return new ExecutorSnapshot(
                 state,
@@ -237,12 +238,12 @@ class AutocraftJobServiceTest {
     }
 
     private static final class UUIDs {
-        private static java.util.UUID fixed() {
-            return java.util.UUID.fromString("11111111-1111-1111-1111-111111111111");
+        private static UUID fixed() {
+            return UUID.fromString("11111111-1111-1111-1111-111111111111");
         }
 
-        private static java.util.UUID other() {
-            return java.util.UUID.fromString("22222222-2222-2222-2222-222222222222");
+        private static UUID other() {
+            return UUID.fromString("22222222-2222-2222-2222-222222222222");
         }
     }
 }

@@ -1,6 +1,8 @@
 package org.shsts.tinactory.unit.network;
 
 import org.junit.jupiter.api.Test;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NetworkGraphEngineTest {
     @Test
     void shouldDiscoverAllReachableNodesByBfs() {
-        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var center = new BlockPos(0, 0, 0);
         var east = center.east();
         var west = center.west();
         var south = center.south();
@@ -23,9 +25,9 @@ class NetworkGraphEngineTest {
             .addNode(east, false)
             .addNode(west, false)
             .addNode(south, false)
-            .addEdge(center, net.minecraft.core.Direction.EAST)
-            .addEdge(center, net.minecraft.core.Direction.WEST)
-            .addEdge(center, net.minecraft.core.Direction.SOUTH);
+            .addEdge(center, Direction.EAST)
+            .addEdge(center, Direction.WEST)
+            .addEdge(center, Direction.SOUTH);
         var events = new NetworkGraphEngineFixtures.Events();
         var manager = new NetworkManager();
 
@@ -47,15 +49,15 @@ class NetworkGraphEngineTest {
 
     @Test
     void shouldPropagateSubnetFromParentUntilSubnetMarker() {
-        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var center = new BlockPos(0, 0, 0);
         var east = center.east();
         var eastEast = east.east();
         var graph = new NetworkGraphEngineFixtures.Graph()
             .addNode(center, false)
             .addNode(east, true)
             .addNode(eastEast, false)
-            .addEdge(center, net.minecraft.core.Direction.EAST)
-            .addEdge(east, net.minecraft.core.Direction.EAST);
+            .addEdge(center, Direction.EAST)
+            .addEdge(east, Direction.EAST);
         var events = new NetworkGraphEngineFixtures.Events();
         var manager = new NetworkManager();
 
@@ -77,12 +79,12 @@ class NetworkGraphEngineTest {
 
     @Test
     void shouldResetTraversalAfterInvalidateAndReconnect() {
-        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var center = new BlockPos(0, 0, 0);
         var east = center.east();
         var graph = new NetworkGraphEngineFixtures.Graph()
             .addNode(center, false)
             .addNode(east, false)
-            .addEdge(center, net.minecraft.core.Direction.EAST);
+            .addEdge(center, Direction.EAST);
         var events = new NetworkGraphEngineFixtures.Events();
         var manager = new NetworkManager();
 
@@ -109,7 +111,7 @@ class NetworkGraphEngineTest {
 
     @Test
     void shouldComparePriorityByUuidDeterministically() {
-        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var center = new BlockPos(0, 0, 0);
         var graph = new NetworkGraphEngineFixtures.Graph();
         var events = new NetworkGraphEngineFixtures.Events();
         var manager = new NetworkManager();
@@ -132,7 +134,7 @@ class NetworkGraphEngineTest {
 
     @Test
     void shouldResolveConflictsInEngineAndSkipDiscoverWhenLosingPriority() {
-        var center = new net.minecraft.core.BlockPos(0, 0, 0);
+        var center = new BlockPos(0, 0, 0);
         var graph = new NetworkGraphEngineFixtures.Graph().addNode(center, false);
         var manager = new NetworkManager();
         var winnerEvents = new NetworkGraphEngineFixtures.Events();

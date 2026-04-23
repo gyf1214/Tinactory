@@ -4,8 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.AllMenus;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 @ParametersAreNonnullByDefault

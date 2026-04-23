@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.gui.client.RecipeDisplayRegistry;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,11 +40,11 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return recipe.getDescription();
+        return RecipeDisplayRegistry.tooltip(recipe);
     }
 
     @Override
     public void render(PoseStack poseStack, Rect rect, int z) {
-        recipe.getDisplay().getValue().render(poseStack, rect, z);
+        RecipeDisplayRegistry.render(recipe, poseStack, rect, z);
     }
 }

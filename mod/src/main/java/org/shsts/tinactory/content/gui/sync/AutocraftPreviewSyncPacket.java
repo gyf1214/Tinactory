@@ -9,12 +9,13 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.autocraft.service.AutocraftPreviewResult;
-import org.shsts.tinactory.integration.logistics.IngredientKeyCodecHelper;
+import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
@@ -22,7 +23,7 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftPreviewSyncPacket implements IPacket {
-    private final Codec<IIngredientKey> ingredientKeyCodec;
+    private final Codec<IStackKey> ingredientKeyCodec;
     private PreviewState state = PreviewState.EMPTY;
     @Nullable
     private List<CraftAmount> targets;
@@ -30,15 +31,15 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     private PlanError error;
 
     public AutocraftPreviewSyncPacket() {
-        this(IngredientKeyCodecHelper.CODEC);
+        this(StackHelper.KEY_CODEC);
     }
 
-    public AutocraftPreviewSyncPacket(Codec<IIngredientKey> ingredientKeyCodec) {
+    public AutocraftPreviewSyncPacket(Codec<IStackKey> ingredientKeyCodec) {
         this.ingredientKeyCodec = ingredientKeyCodec;
     }
 
     private AutocraftPreviewSyncPacket(
-        Codec<IIngredientKey> ingredientKeyCodec,
+        Codec<IStackKey> ingredientKeyCodec,
         PreviewState state,
         @Nullable List<CraftAmount> targets,
         @Nullable PlanError error) {
@@ -59,12 +60,12 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     }
 
     public static AutocraftPreviewSyncPacket empty() {
-        return new AutocraftPreviewSyncPacket(IngredientKeyCodecHelper.CODEC, PreviewState.EMPTY, null, null);
+        return new AutocraftPreviewSyncPacket(StackHelper.KEY_CODEC, PreviewState.EMPTY, null, null);
     }
 
     public static AutocraftPreviewSyncPacket ready(List<CraftAmount> targets) {
         return new AutocraftPreviewSyncPacket(
-            IngredientKeyCodecHelper.CODEC,
+            StackHelper.KEY_CODEC,
             PreviewState.PREVIEW_READY,
             targets,
             null);
@@ -72,23 +73,23 @@ public class AutocraftPreviewSyncPacket implements IPacket {
 
     public static AutocraftPreviewSyncPacket failed(PlanError error) {
         return new AutocraftPreviewSyncPacket(
-            IngredientKeyCodecHelper.CODEC,
+            StackHelper.KEY_CODEC,
             PreviewState.PREVIEW_FAILED,
             null,
             error);
     }
 
-    public static AutocraftPreviewSyncPacket empty(Codec<IIngredientKey> ingredientKeyCodec) {
+    public static AutocraftPreviewSyncPacket empty(Codec<IStackKey> ingredientKeyCodec) {
         return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.EMPTY, null, null);
     }
 
     public static AutocraftPreviewSyncPacket ready(
-        Codec<IIngredientKey> ingredientKeyCodec,
+        Codec<IStackKey> ingredientKeyCodec,
         List<CraftAmount> targets) {
         return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.PREVIEW_READY, targets, null);
     }
 
-    public static AutocraftPreviewSyncPacket failed(Codec<IIngredientKey> ingredientKeyCodec, PlanError error) {
+    public static AutocraftPreviewSyncPacket failed(Codec<IStackKey> ingredientKeyCodec, PlanError error) {
         return new AutocraftPreviewSyncPacket(ingredientKeyCodec, PreviewState.PREVIEW_FAILED, null, error);
     }
 
@@ -133,7 +134,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         error = buf.readBoolean() ? deserializeError(buf.readNbt(), ingredientKeyCodec) : null;
     }
 
-    private static CompoundTag serializeError(PlanError error, Codec<IIngredientKey> ingredientKeyCodec) {
+    private static CompoundTag serializeError(PlanError error, Codec<IStackKey> ingredientKeyCodec) {
         var tag = new CompoundTag();
         tag.putString("code", error.code().name());
         if (error.targetKey() != null) {
@@ -147,12 +148,12 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return tag;
     }
 
-    private static PlanError deserializeError(@Nullable CompoundTag tag, Codec<IIngredientKey> ingredientKeyCodec) {
+    private static PlanError deserializeError(@Nullable CompoundTag tag, Codec<IStackKey> ingredientKeyCodec) {
         if (tag == null) {
             return PlanError.none();
         }
         var cyclePathTag = tag.getList("cyclePath", TAG_COMPOUND);
-        var cyclePath = new java.util.ArrayList<org.shsts.tinactory.core.logistics.IIngredientKey>(cyclePathTag.size());
+        var cyclePath = new ArrayList<IStackKey>(cyclePathTag.size());
         for (var i = 0; i < cyclePathTag.size(); i++) {
             cyclePath.add(decodeIngredientKey(ingredientKeyCodec, cyclePathTag.getCompound(i)));
         }
@@ -162,14 +163,14 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return new PlanError(PlanError.Code.valueOf(tag.getString("code")), targetKey, cyclePath);
     }
 
-    private static CompoundTag encodeIngredientKey(Codec<IIngredientKey> ingredientKeyCodec, IIngredientKey key) {
+    private static CompoundTag encodeIngredientKey(Codec<IStackKey> ingredientKeyCodec, IStackKey key) {
         var tag = new CompoundTag();
         tag.put("value", CodecHelper.encodeTag(ingredientKeyCodec, key));
         return tag;
     }
 
-    private static IIngredientKey decodeIngredientKey(
-        Codec<IIngredientKey> ingredientKeyCodec,
+    private static IStackKey decodeIngredientKey(
+        Codec<IStackKey> ingredientKeyCodec,
         @Nullable CompoundTag tag) {
         if (tag == null) {
             throw new IllegalArgumentException("Missing ingredient key payload");

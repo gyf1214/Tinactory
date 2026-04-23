@@ -16,12 +16,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.machine.FireBoiler;
-import org.shsts.tinactory.core.machine.Machine;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -76,12 +77,12 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             boilParallel = (int) ctx.getProperty("height") - 2;
             fireboxes.clear();
-            for (var pos : ctx.blocks) {
+            for (var pos : ctx.structure()) {
                 var block = ctx.getBlock(pos);
                 if (block.isPresent() && block.get().getBlock() instanceof FixedBlock) {
                     fireboxes.add(pos);
@@ -96,8 +97,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void onInvalidate() {
-        super.onInvalidate();
+    public void onInvalidateStructure() {
+        super.onInvalidateStructure();
         boiler.resetContainer();
         var world = blockEntity.getLevel();
         if (world != null) {
@@ -118,8 +119,8 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     /**
-     * We don't need to call {@link #setBoilerContainer} in {@link #onRegister}. This is because
-     * {@link MultiblockInterface#setMultiblock} is always called before {@link #onRegister} on server.
+     * We don't need to call {@link #setBoilerContainer} in {@link #onRegisterStructure}. This is because
+     * {@link MultiblockInterface#setMultiblock} is always called before {@link #onRegisterStructure} on server.
      */
     @Override
     public void onContainerReady() {

@@ -8,7 +8,7 @@ import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class AutocraftTerminalService {
         this.cpuRuntime = cpuRuntime;
     }
 
-    public List<IIngredientKey> listRequestables() {
+    public List<IStackKey> listRequestables() {
         return patternRepository.listRequestables();
     }
 
@@ -63,7 +63,7 @@ public class AutocraftTerminalService {
         return service.get().cancel(job.get().jobId());
     }
 
-    public AutocraftPreviewResult preview(IIngredientKey target, long quantity) {
+    public AutocraftPreviewResult preview(IStackKey target, long quantity) {
         if (quantity <= 0L) {
             previewResult = AutocraftPreviewResult.empty();
             return previewResult;

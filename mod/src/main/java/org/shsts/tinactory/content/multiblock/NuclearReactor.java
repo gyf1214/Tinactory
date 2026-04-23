@@ -10,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -17,16 +18,17 @@ import net.minecraftforge.items.IItemHandler;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.machine.Boiler;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.tool.INuclearItem;
-import org.shsts.tinactory.core.metrics.MetricsManager;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinactory.integration.metrics.MetricsManager;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
@@ -158,8 +160,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    protected void doCheckMultiblock(CheckContext ctx) {
-        super.doCheckMultiblock(ctx);
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
+        super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             var i = (int) ctx.getProperty("height") - properties.minHeight;
             rows = properties.rows[i];
@@ -184,8 +186,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    protected void onInvalidate() {
-        super.onInvalidate();
+    public void onInvalidateStructure() {
+        super.onInvalidateStructure();
         boiler.resetContainer();
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.Label;
@@ -69,7 +69,7 @@ public class AutocraftRequestPanel extends Panel {
     }
 
     public void updateSelectionSummary(
-        List<IIngredientKey> requestables,
+        List<IStackKey> requestables,
         List<CpuStatusEntry> cpus) {
         targetSummary.setLine(0, new TextComponent(formatTargetSummary(requestables)));
         cpuSummary.setLine(0, new TextComponent(formatCpuSummary(cpus)));
@@ -88,7 +88,7 @@ public class AutocraftRequestPanel extends Panel {
         }
     }
 
-    private String formatTargetSummary(List<IIngredientKey> requestables) {
+    private String formatTargetSummary(List<IStackKey> requestables) {
         var index = targetIndex(requestables.size());
         if (index.isEmpty()) {
             return "Target index: select 0.." + Math.max(0, requestables.size() - 1);

@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -54,7 +53,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     }
 
     @Override
-    public boolean matches(Boiler boiler, Level world) {
+    public boolean matches(Boiler boiler) {
         return boiler.heat() > minHeat && boiler.getInput()
             .filter($ -> $.extract(input, true).getAmount() >= input.getAmount())
             .isPresent();

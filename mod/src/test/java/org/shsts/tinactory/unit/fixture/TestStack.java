@@ -1,12 +1,21 @@
 package org.shsts.tinactory.unit.fixture;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
 import java.util.Objects;
 
 public record TestStack(PortType type, String id, String nbt, int amount) {
+    public static final Codec<TestStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Codec.STRING.xmap(PortType::valueOf, PortType::name).fieldOf("type").forGetter(TestStack::type),
+        Codec.STRING.fieldOf("id").forGetter(TestStack::id),
+        Codec.STRING.fieldOf("nbt").forGetter(TestStack::nbt),
+        Codec.INT.fieldOf("amount").forGetter(TestStack::amount)
+    ).apply(instance, TestStack::new));
+
     public static final IStackAdapter<TestStack> ADAPTER = new IStackAdapter<>() {
         @Override
         public TestStack empty() {
@@ -41,13 +50,13 @@ public record TestStack(PortType type, String id, String nbt, int amount) {
         }
 
         @Override
-        public IIngredientKey keyOf(TestStack stack) {
-            return new TestIngredientKey(stack.type(), stack.id(), stack.nbt());
+        public IStackKey keyOf(TestStack stack) {
+            return new TestStackKey(stack.type(), stack.id(), stack.nbt());
         }
 
         @Override
-        public TestStack stackOf(IIngredientKey key, long amount) {
-            var typed = (TestIngredientKey) key;
+        public TestStack stackOf(IStackKey key, long amount) {
+            var typed = (TestStackKey) key;
             return new TestStack(typed.type(), typed.id(), typed.nbt(), (int) amount);
         }
     };

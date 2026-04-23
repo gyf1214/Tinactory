@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllMenus;
@@ -38,14 +39,15 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
-import org.shsts.tinactory.core.multiblock.client.MultiblockInterfaceRenderer;
+import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
+import org.shsts.tinactory.integration.multiblock.client.MultiblockInterfaceRenderer;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -63,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
@@ -70,6 +73,8 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.recipe.ProcessingHelper.INGREDIENT_CODEC;
+import static org.shsts.tinactory.integration.recipe.ProcessingHelper.RESULT_CODEC;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -168,7 +173,7 @@ public class MachineMeta extends MetaConsumer {
             Class<? extends ProcessingRecipe> clazz) {
             return REGISTRATE.recipeType(recipeTypeId, builderFactory)
                 .recipeClass(clazz)
-                .serializer(ProcessingRecipe.SERIALIZER)
+                .serializer(new ProcessingRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC))
                 .register();
         }
 
@@ -178,36 +183,36 @@ public class MachineMeta extends MetaConsumer {
                 case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
                 case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.Builder::new)
                     .recipeClass(GeneratorRecipe.class)
-                    .serializer(GeneratorRecipe.SERIALIZER)
+                    .serializer(new GeneratorRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
                 case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
                     .recipeClass(ResearchRecipe.class)
-                    .serializer(ResearchRecipe.SERIALIZER)
+                    .serializer(new ResearchRecipe.Serializer(INGREDIENT_CODEC))
                     .register();
                 case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.Builder::new)
                     .recipeClass(AssemblyRecipe.class)
-                    .serializer(AssemblyRecipe.SERIALIZER)
+                    .serializer(new AssemblyRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
                     .recipeClass(CleanRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
+                    .serializer(new CleanRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe::builder)
                     .recipeClass(EngravingRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
+                    .serializer(new CleanRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)
                     .recipeClass(OreAnalyzerRecipe.class)
-                    .serializer(OreAnalyzerRecipe.SERIALIZER)
+                    .serializer(new OreAnalyzerRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.Builder::new)
                     .recipeClass(ChemicalReactorRecipe.class)
-                    .serializer(ChemicalReactorRecipe.SERIALIZER)
+                    .serializer(new ChemicalReactorRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.Builder::new)
                     .recipeClass(BlastFurnaceRecipe.class)
-                    .serializer(BlastFurnaceRecipe.SERIALIZER)
+                    .serializer(new BlastFurnaceRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC))
                     .register();
                 case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
@@ -233,7 +238,8 @@ public class MachineMeta extends MetaConsumer {
 
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
-            var processor = RecipeProcessors.processing(recipeType());
+            Function<BlockEntity, ? extends IRecipeProcessor<?>> processor =
+                RecipeProcessors.processing(recipeType());
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
@@ -250,7 +256,7 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private <P> IBlockEntityTypeBuilder<P> processor(IBlockEntityTypeBuilder<P> builder) {
-            var processor = switch (recipeTypeStr) {
+            Function<BlockEntity, ? extends IRecipeProcessor<?>> processor = switch (recipeTypeStr) {
                 case "electric_furnace" -> RecipeProcessors.electricFurnace(
                     GsonHelper.getAsInt(jo, "inputPort"),
                     GsonHelper.getAsInt(jo, "outputPort"),

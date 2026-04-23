@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.Map;
 public final class PlannerSession {
     final List<CraftAmount> targets;
     final PlannerLedger ledger;
-    final Map<IIngredientKey, Long> cachedAvailable;
+    final Map<IStackKey, Long> cachedAvailable;
     final List<CraftStep> steps;
     final List<SearchFrame> searchStack;
     int nextTargetIndex;
@@ -37,7 +37,7 @@ public final class PlannerSession {
     }
 
     static final class SearchFrame {
-        final IIngredientKey key;
+        final IStackKey key;
         final long demand;
         final boolean rootDemand;
         long remaining;
@@ -54,7 +54,7 @@ public final class PlannerSession {
         PlanError childError;
         Stage stage;
 
-        SearchFrame(IIngredientKey key, long demand, boolean rootDemand) {
+        SearchFrame(IStackKey key, long demand, boolean rootDemand) {
             this.key = key;
             this.demand = demand;
             this.rootDemand = rootDemand;

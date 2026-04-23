@@ -17,9 +17,9 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
-import org.shsts.tinactory.core.multiblock.MultiblockManager;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
+import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 
 import java.util.Random;
@@ -80,7 +80,7 @@ public final class AllForgeEvents {
         var world = (Level) event.getWorld();
         if (!world.isClientSide) {
             WorldNetworkManagers.onUnload(world);
-            MultiblockManager.onUnload(world);
+            WorldMultiblockManagers.onUnload(world);
         }
         if (world.dimension() == Level.OVERWORLD) {
             if (!world.isClientSide) {
@@ -103,6 +103,6 @@ public final class AllForgeEvents {
         if (world.isClientSide) {
             return;
         }
-        MultiblockManager.get(world).invalidate(event.getPos());
+        WorldMultiblockManagers.get(world).invalidate(event.getPos());
     }
 }

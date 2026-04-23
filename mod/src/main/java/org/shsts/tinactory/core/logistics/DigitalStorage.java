@@ -20,7 +20,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
     private final int bytesPerType;
     private final int bytesPerUnit;
     public int maxAmount = Integer.MAX_VALUE;
-    private final Map<IIngredientKey, T> contents = new HashMap<>();
+    private final Map<IStackKey, T> contents = new HashMap<>();
     private Predicate<T> filter = $ -> true;
 
     public DigitalStorage(IDigitalProvider provider, IStackAdapter<T> stackAdapter,

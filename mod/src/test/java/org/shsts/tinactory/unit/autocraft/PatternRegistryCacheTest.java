@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
@@ -37,7 +37,7 @@ class PatternRegistryCacheTest {
     void findPatternsProducingShouldReturnPatternIdSortedList() {
         var repo = new PatternRegistryCache();
         var machine = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var out = TestIngredientKey.item("tinactory:iron_plate", "");
+        var out = TestStackKey.item("tinactory:iron_plate", "");
 
         var p2 = pattern("tinactory:p2", "tinactory:iron_plate");
         var p1 = pattern("tinactory:p1", "tinactory:iron_plate");
@@ -76,7 +76,7 @@ class PatternRegistryCacheTest {
         assertTrue(repo.removePattern(existing.patternId()));
         assertFalse(repo.containsPatternId(existing.patternId()));
         assertTrue(repo.findPatternsProducing(
-            TestIngredientKey.item("tinactory:iron_plate", "")).isEmpty());
+            TestStackKey.item("tinactory:iron_plate", "")).isEmpty());
     }
 
     @Test
@@ -87,14 +87,14 @@ class PatternRegistryCacheTest {
         var updated = pattern("tinactory:p1", "tinactory:gold_plate");
         var port = new TestCellPort(List.of(original), pattern ->
             pattern.outputs().stream()
-                .anyMatch(amount -> amount.key().equals(TestIngredientKey.item("tinactory:iron_plate", ""))));
+                .anyMatch(amount -> amount.key().equals(TestStackKey.item("tinactory:iron_plate", ""))));
 
         assertTrue(repo.addCellPort(machine, 1, 0, port));
         assertFalse(repo.updatePattern(updated));
         assertTrue(repo.containsPatternId(original.patternId()));
         assertEquals(List.of(original),
-            repo.findPatternsProducing(TestIngredientKey.item("tinactory:iron_plate", "")));
-        assertTrue(repo.findPatternsProducing(TestIngredientKey.item("tinactory:gold_plate", "")).isEmpty());
+            repo.findPatternsProducing(TestStackKey.item("tinactory:iron_plate", "")));
+        assertTrue(repo.findPatternsProducing(TestStackKey.item("tinactory:gold_plate", "")).isEmpty());
     }
 
     @Test
@@ -128,8 +128,8 @@ class PatternRegistryCacheTest {
     private static CraftPattern pattern(String patternId, String outputId) {
         return new CraftPattern(
             patternId,
-            List.of(new CraftAmount(TestIngredientKey.item("tinactory:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(TestIngredientKey.item(outputId, ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item(outputId, ""), 1)),
             new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
     }
 

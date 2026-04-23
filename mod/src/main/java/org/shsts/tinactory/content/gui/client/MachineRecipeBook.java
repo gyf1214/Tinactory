@@ -24,7 +24,7 @@ import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.SimpleButton;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.machine.MachineProcessor;
+import org.shsts.tinactory.core.machine.IRecipeBookProcessor;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -202,10 +202,10 @@ public class MachineRecipeBook extends Panel {
     private void refreshRecipes() {
         recipes.clear();
         var processor = MACHINE.tryGet(blockEntity).flatMap(IMachine::processor);
-        if (processor.isEmpty() || !(processor.get() instanceof MachineProcessor machineProcessor)) {
+        if (processor.isEmpty() || !(processor.get() instanceof IRecipeBookProcessor machineProcessor)) {
             return;
         }
-        var items = machineProcessor.targetRecipes().getValue();
+        var items = machineProcessor.recipeBookItems().getValue();
         recipes.addAll(items);
     }
 

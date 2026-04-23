@@ -1,10 +1,11 @@
 package org.shsts.tinactory.unit.logistics;
 
-import org.shsts.tinactory.unit.fixture.TestStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.CombinedPort;
+import org.shsts.tinactory.unit.fixture.TestPort;
+import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,8 +33,8 @@ class CombinedPortTest {
         var remainder = combined.insert(new TestStack("iron", 8), false);
 
         assertEquals(0, remainder.amount());
-        assertEquals(3, first.stored);
-        assertEquals(5, second.stored);
+        assertEquals(3, first.stored());
+        assertEquals(5, second.stored());
     }
 
     @Test
@@ -46,8 +47,8 @@ class CombinedPortTest {
 
         assertEquals("iron", extracted.id());
         assertEquals(5, extracted.amount());
-        assertEquals(0, first.stored);
-        assertEquals(1, second.stored);
+        assertEquals(0, first.stored());
+        assertEquals(1, second.stored());
     }
 
     @Test
@@ -62,7 +63,7 @@ class CombinedPortTest {
 
         assertEquals(2, remainder.amount());
         assertEquals(0, extracted.amount());
-        assertEquals(5, port.stored);
+        assertEquals(5, port.stored());
     }
 
     @Test
@@ -76,7 +77,7 @@ class CombinedPortTest {
 
         assertEquals(0, insertRemainder.amount());
         assertEquals(4, extracted.amount());
-        assertEquals(5, first.stored);
-        assertEquals(1, second.stored);
+        assertEquals(5, first.stored());
+        assertEquals(1, second.stored());
     }
 }

@@ -1,0 +1,322 @@
+package org.shsts.tinactory.integration.multiblock;
+
+import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import org.shsts.tinactory.AllCapabilities;
+import org.shsts.tinactory.AllMenus;
+import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.logistics.IContainer;
+import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.multiblock.IMultiblock;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
+import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.multiblock.MultiblockManager;
+import org.shsts.tinactory.core.multiblock.MultiblockRuntime;
+import org.shsts.tinactory.core.multiblock.MultiblockSpec;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.blockentity.IEventManager;
+import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
+import org.shsts.tinycorelib.api.core.IBuilder;
+import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
+import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
+import org.slf4j.Logger;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
+import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
+import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllEvents.SERVER_TICK;
+import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
+import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class Multiblock extends UpdatableCapabilityProvider implements IEventSubscriber, IMultiblock {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final String ID = "multiblock";
+
+    public final BlockEntity blockEntity;
+    @Nullable
+    protected MultiblockManager manager = null;
+    protected final MultiblockRuntime runtime;
+    @Nullable
+    protected Layout layout;
+    private final Consumer<IMultiblockCheckCtx<BlockState>> checker;
+    private final Supplier<BlockState> appearance;
+
+    /**
+     * BlockEntity update may be before client load. If so, the update event needs to be delayed until the first tick.
+     * This variable is to distinguish these two scenarios.
+     */
+    private boolean firstTick = false;
+    @Nullable
+    protected BlockPos multiblockInterfacePos = null;
+    /**
+     * must set this during checkStructure, or fail
+     */
+    @Nullable
+    protected MultiblockInterface multiblockInterface = null;
+
+    public Multiblock(BlockEntity blockEntity, Builder<?> builder) {
+        this.blockEntity = blockEntity;
+        this.runtime = new MultiblockRuntime(this, CONFIG.multiblockCheckCycle.get());
+        this.layout = builder.layout;
+        this.checker = Objects.requireNonNull(builder.checker);
+        this.appearance = Objects.requireNonNull(builder.appearance);
+    }
+
+    public BlockState getAppearanceBlock() {
+        var state = appearance.get();
+        var state1 = blockEntity.getBlockState();
+        if (state.hasProperty(WORKING) && state1.hasProperty(WORKING)) {
+            return state.setValue(WORKING, state1.getValue(WORKING));
+        }
+        return state;
+    }
+
+    public Optional<Layout> getLayout() {
+        return Optional.ofNullable(layout);
+    }
+
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
+        checker.accept(ctx);
+    }
+
+    @Override
+    public Optional<Collection<BlockPos>> checkStructure() {
+        LOGGER.trace("{}: check multiblock", this.blockEntity);
+
+        var world = blockEntity.getLevel();
+        assert world != null;
+        var context = new WorldMultiblockCheckCtx(world, blockEntity.getBlockPos());
+        doCheckStructure(context);
+        var machine = context.hasProperty("interface") ? context.getProperty("interface") : null;
+        var ok = !context.isFailed() && machine instanceof MultiblockInterface inter &&
+            (multiblockInterface == null || inter == multiblockInterface);
+        if (ok) {
+            multiblockInterface = (MultiblockInterface) machine;
+            return Optional.of(context.structure());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Called only on Server.
+     * Multiblock check and registration is only performed on server. The client relies on BlockEntity update to
+     * connect between Multiblock and MultiblockInterface.
+     */
+    @Override
+    public void onRegisterStructure() {
+        assert multiblockInterface != null;
+        multiblockInterface.setMultiblock(this);
+        sendUpdate(blockEntity);
+        invoke(blockEntity, SET_MACHINE_CONFIG);
+    }
+
+    @Override
+    public void onInvalidateStructure() {
+        if (multiblockInterface != null) {
+            multiblockInterface.resetMultiblock();
+        }
+        multiblockInterface = null;
+        sendUpdate(blockEntity);
+        invoke(blockEntity, SET_MACHINE_CONFIG);
+    }
+
+    public Optional<MultiblockInterface> getInterface() {
+        return Optional.ofNullable(multiblockInterface);
+    }
+
+    public Optional<IContainer> container() {
+        return getInterface().flatMap(MultiblockInterface::container);
+    }
+
+    public Optional<IProcessor> processor() {
+        return AllCapabilities.PROCESSOR.tryGet(blockEntity);
+    }
+
+    public Optional<IElectricMachine> electric() {
+        return AllCapabilities.ELECTRIC_MACHINE.tryGet(blockEntity);
+    }
+
+    public IMenuType menu(MultiblockInterface machine) {
+        return machine.isDigital() ? AllMenus.DIGITAL_INTERFACE : AllMenus.PROCESSING_MACHINE;
+    }
+
+    /**
+     * Called only on Client during BlockEntity update.
+     * It is important to note that Multiblock and MultiblockInterface update are separate and their order is not
+     * guaranteed.
+     */
+    protected void updateMultiblockInterface() {
+        var world = blockEntity.getLevel();
+        assert world != null && world.isClientSide;
+
+        LOGGER.debug("{}: update multiblockInterface current={}, pos={}, firstTick={}",
+            this, multiblockInterface, multiblockInterfacePos, firstTick);
+
+        if (multiblockInterfacePos != null) {
+            var be1 = world.getBlockEntity(multiblockInterfacePos);
+            if (be1 == null) {
+                LOGGER.debug("cannot get blockEntity {}:{}",
+                    world.dimension().location(), multiblockInterfacePos);
+                return;
+            }
+            MACHINE.tryGet(be1).ifPresent(machine ->
+                multiblockInterface = (MultiblockInterface) machine);
+        } else {
+            multiblockInterface = null;
+        }
+        invoke(blockEntity, SET_MACHINE_CONFIG);
+    }
+
+    /**
+     * This is called on Server and Client by MultiblockInterface when the container is ready.
+     * Note that it is possible that this is called before updateMultiblockInterface.
+     */
+    public void onContainerReady() {}
+
+    public void setWorkBlock(Level world, BlockState state) {
+        // prevent updateShape on neighbor
+        world.setBlock(blockEntity.getBlockPos(), state, 19);
+    }
+
+    private void onServerLoad(Level world) {
+        manager = WorldMultiblockManagers.get(world);
+    }
+
+    private void onRemove() {
+        runtime.invalidate();
+    }
+
+    protected void onServerTick() {
+        if (manager != null) {
+            runtime.tick(manager);
+        }
+    }
+
+    private void onClientTick() {
+        if (!firstTick) {
+            updateMultiblockInterface();
+            firstTick = true;
+        }
+    }
+
+    @Override
+    public void subscribeEvents(IEventManager eventManager) {
+        eventManager.subscribe(SERVER_LOAD.get(), this::onServerLoad);
+        eventManager.subscribe(REMOVED_IN_WORLD.get(), $ -> onRemove());
+        eventManager.subscribe(REMOVED_BY_CHUNK.get(), $ -> onRemove());
+        eventManager.subscribe(SERVER_TICK.get(), $ -> onServerTick());
+        eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+        return LazyOptional.empty();
+    }
+
+    @Override
+    public CompoundTag serializeOnUpdate() {
+        var tag = new CompoundTag();
+        if (multiblockInterface != null) {
+            var pos = multiblockInterface.blockEntity().getBlockPos();
+            tag.put("interfacePos", CodecHelper.encodeBlockPos(pos));
+        }
+        return tag;
+    }
+
+    @Override
+    public void deserializeOnUpdate(CompoundTag tag) {
+        multiblockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
+            CodecHelper.parseBlockPos(tag.getCompound("interfacePos")) : null;
+        if (firstTick) {
+            updateMultiblockInterface();
+        }
+    }
+
+    public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, Multiblock>,
+        IBlockEntityTypeBuilder<P>, Builder<P>> {
+        private final BiFunction<BlockEntity, Builder<P>, Multiblock> factory;
+        @Nullable
+        private Supplier<BlockState> appearance = null;
+        @Nullable
+        private Layout layout = null;
+        @Nullable
+        private Consumer<IMultiblockCheckCtx<BlockState>> checker = null;
+
+        public Builder(IBlockEntityTypeBuilder<P> parent,
+            BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
+            super(parent);
+            this.factory = factory;
+
+            onCreateObject($ -> parent.capability(ID, $::apply));
+        }
+
+        public Builder<P> layout(Layout val) {
+            this.layout = val;
+            return self();
+        }
+
+        public Builder<P> appearance(Supplier<BlockState> val) {
+            this.appearance = val;
+            return self();
+        }
+
+        public Builder<P> appearanceBlock(Supplier<Block> val) {
+            return appearance(() -> val.get().defaultBlockState());
+        }
+
+        public <S extends IBuilder<? extends Consumer<IMultiblockCheckCtx<BlockState>>, Builder<P>, S>> S spec(
+            Function<Builder<P>, S> child) {
+            return child(child).onCreateObject($ -> this.checker = $);
+        }
+
+        public MultiblockSpec.Builder<BlockState, Builder<P>> spec() {
+            return spec(MultiblockSpec::builder);
+        }
+
+        @Override
+        protected Function<BlockEntity, Multiblock> createObject() {
+            return be -> factory.apply(be, this);
+        }
+    }
+
+    public static <P> Function<IBlockEntityTypeBuilder<P>, Builder<P>> builder(
+        BiFunction<BlockEntity, Multiblock.Builder<P>, Multiblock> factory) {
+        return $ -> new Builder<>($, factory);
+    }
+
+    public static Optional<Multiblock> tryGet(BlockEntity be) {
+        return tryGetProvider(be, ID, Multiblock.class);
+    }
+
+    public static Multiblock get(BlockEntity be) {
+        return getProvider(be, ID, Multiblock.class);
+    }
+}

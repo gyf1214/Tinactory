@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.logistics.IIngredientKey;
+import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class GoalReductionPlannerErrorTest {
     @Test
     void plannerShouldDetectDirectCycle() {
-        var a = TestIngredientKey.item("tinactory:a", "");
+        var a = TestStackKey.item("tinactory:a", "");
         var loop = pattern("tinactory:a_from_a", List.of(new CraftAmount(a, 1)), List.of(new CraftAmount(a, 1)));
         var planner = new GoalReductionPlanner(repo(List.of(loop)), TestInventoryView.empty());
 
@@ -39,9 +39,9 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldDetectIndirectCycleWithPath() {
-        var a = TestIngredientKey.item("tinactory:a", "");
-        var b = TestIngredientKey.item("tinactory:b", "");
-        var c = TestIngredientKey.item("tinactory:c", "");
+        var a = TestStackKey.item("tinactory:a", "");
+        var b = TestStackKey.item("tinactory:b", "");
+        var c = TestStackKey.item("tinactory:c", "");
 
         var aFromB = pattern("tinactory:a_from_b", List.of(new CraftAmount(b, 1)), List.of(new CraftAmount(a, 1)));
         var bFromC = pattern("tinactory:b_from_c", List.of(new CraftAmount(c, 1)), List.of(new CraftAmount(b, 1)));
@@ -57,7 +57,7 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldReportMissingPatternForTarget() {
-        var missing = TestIngredientKey.item("tinactory:unknown", "");
+        var missing = TestStackKey.item("tinactory:unknown", "");
         var planner = new GoalReductionPlanner(repo(List.of()), TestInventoryView.empty());
 
         var snapshot = planner.plan(List.of(new CraftAmount(missing, 1)));
@@ -69,8 +69,8 @@ class GoalReductionPlannerErrorTest {
 
     @Test
     void plannerShouldReportUnsatisfiedBaseResource() {
-        var ingot = TestIngredientKey.item("tinactory:ingot", "");
-        var gear = TestIngredientKey.item("tinactory:gear", "");
+        var ingot = TestStackKey.item("tinactory:ingot", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
         var gearPattern = pattern(
             "tinactory:gear_from_ingot",
             List.of(new CraftAmount(ingot, 2)),
@@ -92,7 +92,7 @@ class GoalReductionPlannerErrorTest {
     private static IPatternRepository repo(List<CraftPattern> patterns) {
         return new IPatternRepository() {
             @Override
-            public List<CraftPattern> findPatternsProducing(IIngredientKey key) {
+            public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
                 for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
                     for (var output : pattern.outputs()) {
@@ -106,7 +106,7 @@ class GoalReductionPlannerErrorTest {
             }
 
             @Override
-            public List<IIngredientKey> listRequestables() {
+            public List<IStackKey> listRequestables() {
                 return patterns.stream()
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)

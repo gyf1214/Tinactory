@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -22,6 +23,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -37,6 +39,14 @@ public final class StackHelper {
     public static final Predicate<ItemStack> FALSE_FILTER = $ -> false;
     public static final Predicate<FluidStack> TRUE_FLUID_FILTER = $ -> true;
     public static final Predicate<FluidStack> FALSE_FLUID_FILTER = $ -> false;
+
+    public static final ItemPortAdapter ITEM_ADAPTER = new ItemPortAdapter();
+    public static final FluidPortAdapter FLUID_ADAPTER = new FluidPortAdapter();
+
+    public static final Codec<IStackKey> KEY_CODEC = Codec.STRING.dispatch(
+        StackHelper::keyCodecName,
+        StackHelper::keyCodec
+    );
 
     /**
      * Use this if the itemStack can have more than 255 items.
@@ -250,5 +260,21 @@ public final class StackHelper {
                 itemHandler.setStackInSlot(i, ItemStack.EMPTY);
             }
         }
+    }
+
+    private static String keyCodecName(IStackKey key) {
+        return switch (key.type()) {
+            case ITEM -> "item";
+            case FLUID -> "fluid";
+            case NONE -> throw new IllegalArgumentException("Unsupported ingredient key type: NONE");
+        };
+    }
+
+    private static Codec<? extends IStackKey> keyCodec(String name) {
+        return switch (name) {
+            case "item" -> ItemPortAdapter.KEY_CODEC;
+            case "fluid" -> FluidPortAdapter.KEY_CODEC;
+            default -> throw new IllegalArgumentException("Unknown ingredient key codec: " + name);
+        };
     }
 }

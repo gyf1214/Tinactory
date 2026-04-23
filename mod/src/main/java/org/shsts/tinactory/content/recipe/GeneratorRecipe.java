@@ -1,15 +1,18 @@
 package org.shsts.tinactory.content.recipe;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -27,15 +30,15 @@ public class GeneratorRecipe extends DisplayInputRecipe {
     }
 
     @Override
-    public boolean matches(IMachine machine, Level world) {
+    public boolean matches(IMachine machine) {
         if (exactVoltage) {
-            return super.matches(machine, world);
+            return super.matches(machine);
         }
         var machineVoltage = (long) machine.electric().map(IElectricMachine::getVoltage).orElse(0L);
         if (machineVoltage < voltage) {
             return false;
         }
-        return matches(machine, world, (int) (machineVoltage / voltage));
+        return matches(machine, (int) (machineVoltage / voltage));
     }
 
     @Override
@@ -70,7 +73,11 @@ public class GeneratorRecipe extends DisplayInputRecipe {
         }
     }
 
-    private static class Serializer extends ProcessingRecipe.Serializer<GeneratorRecipe, Builder> {
+    public static class Serializer extends ProcessingRecipe.Serializer<GeneratorRecipe, Builder> {
+        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
+            super(ingredientCodec, resultCodec);
+        }
+
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             return super.buildFromJson(type, loc, jo)
@@ -84,5 +91,6 @@ public class GeneratorRecipe extends DisplayInputRecipe {
         }
     }
 
-    public static IRecipeSerializer<GeneratorRecipe, Builder> SERIALIZER = new Serializer();
+    public static IRecipeSerializer<GeneratorRecipe, Builder> SERIALIZER
+        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

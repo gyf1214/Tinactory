@@ -169,7 +169,7 @@ public class MachineMenu extends ProcessingMenu {
     }
 
     public static ProcessingMenu boilerDigitalInterface(Properties properties) {
-        return new DigitalInterfaceMenu.BoilerMenu(properties);
+        return new BoilerMenu.DigitalInterface(properties);
     }
 
     public static ProcessingMenu nuclearReactorDigitalInterface(Properties properties) {

@@ -1,6 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestIngredientKey;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
@@ -29,7 +29,7 @@ class AutocraftTerminalServicePreviewTest {
             new PatternRegistryCache(),
             new TestCpuRuntime());
 
-        var result = service.preview(TestIngredientKey.item("minecraft:iron_ingot", ""), 3);
+        var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
 
         assertTrue(result.isSuccess());
         assertEquals(0, result.planSnapshot().steps().size());
@@ -39,7 +39,7 @@ class AutocraftTerminalServicePreviewTest {
 
     @Test
     void previewShouldReturnStructuredPlanError() {
-        var missing = TestIngredientKey.item("minecraft:iron_ingot", "");
+        var missing = TestStackKey.item("minecraft:iron_ingot", "");
         var service = new AutocraftTerminalService(
             targets -> PlannerSnapshot.failed(PlanError.missingPattern(missing)),
             new PatternRegistryCache(),

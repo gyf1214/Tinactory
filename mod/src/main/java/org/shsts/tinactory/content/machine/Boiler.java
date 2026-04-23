@@ -10,8 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingIngredients;
-import org.shsts.tinactory.core.recipe.ProcessingResults;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -83,7 +82,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
         var decay = Math.max(0, heat - baseHeat) * baseDecay;
 
         var recipeManager = CORE.recipeManager(world);
-        var recipe = recipeManager.getRecipeFor(BOILER, this, world);
+        var recipe = recipeManager.getRecipeFor(BOILER, this);
         // hidden progress is lost if the recipe is interrupted
         if (recipe.isEmpty()) {
             lastRecipe = null;
@@ -103,12 +102,12 @@ public class Boiler implements INBTSerializable<CompoundTag> {
 
     public Optional<IProcessingObject> inputInfo() {
         return lastInput.isEmpty() ? Optional.empty() :
-            Optional.of(new ProcessingIngredients.FluidIngredient(lastInput));
+            Optional.of(ProcessingHelper.fluidIngredient(lastInput));
     }
 
     public Optional<IProcessingObject> outputInfo() {
         return lastOutput.isEmpty() ? Optional.empty() :
-            Optional.of(new ProcessingResults.FluidResult(lastOutput));
+            Optional.of(ProcessingHelper.fluidResult(lastOutput));
     }
 
     public void addAllInfo(Consumer<IProcessingObject> cons) {
