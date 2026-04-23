@@ -22,6 +22,7 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
     private static final Logger LOGGER = LogUtils.getLogger();
+
     public interface IUpdateHandler {
         void onUpdate(TeamProfile profile, TechUpdatePacket packet);
     }

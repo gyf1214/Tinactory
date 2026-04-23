@@ -1,14 +1,13 @@
 package org.shsts.tinactory.unit.tech;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

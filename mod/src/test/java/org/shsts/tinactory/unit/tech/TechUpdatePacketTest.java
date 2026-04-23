@@ -1,11 +1,10 @@
 package org.shsts.tinactory.unit.tech;
 
 import io.netty.buffer.Unpooled;
-import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.tech.TechUpdatePacket;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.tech.TechUpdatePacket;
 
 import java.util.Map;
 

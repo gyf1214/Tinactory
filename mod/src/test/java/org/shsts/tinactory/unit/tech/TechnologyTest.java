@@ -1,13 +1,12 @@
 package org.shsts.tinactory.unit.tech;
 
 import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.List;
