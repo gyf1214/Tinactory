@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class CheckSource {
-    private static final int MAX_SOURCE_VIOLATIONS = 7;
+    private static final int MAX_SOURCE_VIOLATIONS = 4;
 
     private CheckSource() {}
 

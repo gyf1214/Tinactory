@@ -1,17 +1,17 @@
-package org.shsts.tinactory.integration.autocraft;
+package org.shsts.tinactory.content.autocraft;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.integration.autocraft.LogisticsInventoryView;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
