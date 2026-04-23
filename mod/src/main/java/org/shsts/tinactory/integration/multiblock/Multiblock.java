@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.multiblock;
+package org.shsts.tinactory.integration.multiblock;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
@@ -19,12 +19,16 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.multiblock.IMultiblock;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.core.multiblock.MultiblockManager;
+import org.shsts.tinactory.core.multiblock.MultiblockRuntime;
+import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.multiblock.WorldMultiblockCheckCtx;
-import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.IBuilder;
@@ -99,7 +103,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
         return Optional.ofNullable(layout);
     }
 
-    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
         checker.accept(ctx);
     }
 
@@ -116,7 +120,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
             (multiblockInterface == null || inter == multiblockInterface);
         if (ok) {
             multiblockInterface = (MultiblockInterface) machine;
-            return Optional.of(context.blocks());
+            return Optional.of(context.structure());
         } else {
             return Optional.empty();
         }

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.multiblock;
+package org.shsts.tinactory.api.multiblock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.shsts.tinactory.api.machine.IMachine;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -27,7 +28,9 @@ public interface IMultiblockCheckCtx<U> {
 
     Optional<Direction> getFacing();
 
-    void addBlock(BlockPos pos);
+    void addToStructure(BlockPos pos);
+
+    Collection<BlockPos> structure();
 
     Object getProperty(String key);
 

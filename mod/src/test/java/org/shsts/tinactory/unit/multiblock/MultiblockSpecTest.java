@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.multiblock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.unit.fixture.TestBlock;
 import org.shsts.tinactory.unit.fixture.TestContainer;
@@ -104,7 +104,7 @@ public class MultiblockSpecTest {
         assertEquals(CENTER, ctx.getProperty("base"));
         assertEquals(Direction.EAST, ctx.getProperty("dirW"));
         assertEquals(Direction.SOUTH, ctx.getProperty("dirD"));
-        assertEquals(List.of(CENTER.east(), CENTER.south(), CENTER.south().east()), ctx.blocks());
+        assertEquals(List.of(CENTER.east(), CENTER.south(), CENTER.south().east()), ctx.structure());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class MultiblockSpecTest {
         assertFalse(ctx.isFailed());
         assertEquals(Direction.NORTH, ctx.getProperty("dirW"));
         assertEquals(Direction.EAST, ctx.getProperty("dirD"));
-        assertEquals(List.of(CENTER.north(), CENTER.east(), CENTER.east().north()), ctx.blocks());
+        assertEquals(List.of(CENTER.north(), CENTER.east(), CENTER.east().north()), ctx.structure());
     }
 
     @Test
@@ -141,7 +141,7 @@ public class MultiblockSpecTest {
 
         assertFalse(ctx.isFailed());
         assertEquals(3, ctx.getProperty("height"));
-        assertEquals(List.of(CENTER.above(), CENTER.below()), ctx.blocks());
+        assertEquals(List.of(CENTER.above(), CENTER.below()), ctx.structure());
     }
 
     @Test
@@ -158,7 +158,7 @@ public class MultiblockSpecTest {
 
         assertFalse(ctx.isFailed());
         assertEquals(3, ctx.getProperty("height"));
-        assertEquals(List.of(CENTER.below(), CENTER.below(2)), ctx.blocks());
+        assertEquals(List.of(CENTER.below(), CENTER.below(2)), ctx.structure());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class MultiblockSpecTest {
         checker.accept(ctx);
 
         assertFalse(ctx.isFailed());
-        assertEquals(List.of(CENTER.south().east()), ctx.blocks());
+        assertEquals(List.of(CENTER.south().east()), ctx.structure());
     }
 
     @Test

@@ -19,17 +19,16 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.multiblock.IMultiblockCheckCtx;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -69,7 +68,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
         super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             w = (int) ctx.getProperty("w");
@@ -277,7 +276,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                     if (x == 0 && z == 0) {
                         continue;
                     }
-                    ctx.addBlock(center.offset(x, 0, z));
+                    ctx.addToStructure(center.offset(x, 0, z));
                 }
             }
 
@@ -315,7 +314,7 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                 }
             }
             for (var pos : blocks) {
-                ctx.addBlock(pos);
+                ctx.addToStructure(pos);
             }
             return true;
         }
@@ -378,8 +377,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                         return false;
                     }
                 }
-                ctx.addBlock(pos1);
-                ctx.addBlock(pos2);
+                ctx.addToStructure(pos1);
+                ctx.addToStructure(pos2);
             }
 
             for (var z = -d + 1; z <= d - 1; z++) {
@@ -392,8 +391,8 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
                     !checkWallBlock(ctx, pos2, block2.get(), Direction.WEST)) {
                     return false;
                 }
-                ctx.addBlock(pos1);
-                ctx.addBlock(pos2);
+                ctx.addToStructure(pos1);
+                ctx.addToStructure(pos2);
             }
 
             return true;

@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.multiblock.IMultiblock;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
 

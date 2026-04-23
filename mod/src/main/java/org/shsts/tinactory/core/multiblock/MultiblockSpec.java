@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
             var result = checkLayer(ctx, layer, base, y1, dirW, dirD);
             if (result.isPresent()) {
                 for (var pos : result.get()) {
-                    ctx.addBlock(pos);
+                    ctx.addToStructure(pos);
                 }
             } else {
                 if (h < layer.minHeight) {

@@ -16,13 +16,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.machine.FireBoiler;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -77,12 +77,12 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
         super.doCheckStructure(ctx);
         if (!ctx.isFailed()) {
             boilParallel = (int) ctx.getProperty("height") - 2;
             fireboxes.clear();
-            for (var pos : ctx.blocks()) {
+            for (var pos : ctx.structure()) {
                 var block = ctx.getBlock(pos);
                 if (block.isPresent() && block.get().getBlock() instanceof FixedBlock) {
                     fireboxes.add(pos);

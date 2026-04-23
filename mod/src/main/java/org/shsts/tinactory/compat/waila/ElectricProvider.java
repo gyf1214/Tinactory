@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.electric.ElectricComponent;
-import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 
 import java.util.Optional;
 

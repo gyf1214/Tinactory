@@ -7,6 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import org.shsts.tinactory.api.multiblock.IMultiblock;
 import org.shsts.tinactory.core.common.WeakMap;
 import org.slf4j.Logger;
 

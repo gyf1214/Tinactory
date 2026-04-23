@@ -10,8 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 
 import java.util.Optional;
 

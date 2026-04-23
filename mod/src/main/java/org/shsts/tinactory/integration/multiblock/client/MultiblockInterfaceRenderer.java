@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.multiblock.client;
+package org.shsts.tinactory.integration.multiblock.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
-import org.shsts.tinactory.core.multiblock.MultiblockInterfaceBlock;
+import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;

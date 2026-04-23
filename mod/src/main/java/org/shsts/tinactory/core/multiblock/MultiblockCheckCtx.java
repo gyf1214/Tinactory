@@ -3,8 +3,10 @@ package org.shsts.tinactory.core.multiblock;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +39,12 @@ public abstract class MultiblockCheckCtx<U> implements IMultiblockCheckCtx<U> {
     }
 
     @Override
-    public void addBlock(BlockPos pos) {
+    public void addToStructure(BlockPos pos) {
         blocks.add(pos);
     }
 
-    public List<BlockPos> blocks() {
+    @Override
+    public Collection<BlockPos> structure() {
         return List.copyOf(blocks);
     }
 

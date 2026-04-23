@@ -14,11 +14,11 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.content.electric.IBatteryBox;
-import org.shsts.tinactory.core.multiblock.Multiblock;
-import org.shsts.tinactory.core.multiblock.MultiblockCheckCtx;
 import org.shsts.tinactory.core.multiblock.MultiblockInterface;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
@@ -40,7 +40,7 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
     }
 
     @Override
-    protected void doCheckStructure(MultiblockCheckCtx<BlockState> ctx) {
+    protected void doCheckStructure(IMultiblockCheckCtx<BlockState> ctx) {
         super.doCheckStructure(ctx);
         if (ctx.hasProperty("height") && ctx.hasProperty("power") &&
             ctx.getProperty("power") instanceof PowerBlock block) {

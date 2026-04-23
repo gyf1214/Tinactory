@@ -1,7 +1,7 @@
 package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.core.BlockPos;
-import org.shsts.tinactory.core.multiblock.IMultiblock;
+import org.shsts.tinactory.api.multiblock.IMultiblock;
 
 import java.util.Collection;
 import java.util.List;

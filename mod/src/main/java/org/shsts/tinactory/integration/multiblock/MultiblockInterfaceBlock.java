@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.multiblock;
+package org.shsts.tinactory.integration.multiblock;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;

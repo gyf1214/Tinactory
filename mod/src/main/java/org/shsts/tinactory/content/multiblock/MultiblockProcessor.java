@@ -5,8 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
-import org.shsts.tinactory.core.multiblock.Multiblock;
 import org.shsts.tinactory.integration.machine.MachineProcessor;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 
 import java.util.Collection;
 import java.util.Optional;

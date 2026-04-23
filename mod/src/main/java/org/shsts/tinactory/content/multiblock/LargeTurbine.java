@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.core.multiblock.Multiblock;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 
