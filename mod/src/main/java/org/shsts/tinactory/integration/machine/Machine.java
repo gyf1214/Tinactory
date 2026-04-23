@@ -32,11 +32,11 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
-import org.shsts.tinactory.core.tech.TeamProfile;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.network.Network;
+import org.shsts.tinactory.integration.tech.TechHelper;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
@@ -86,7 +86,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     @Nullable
     private String teamName = null;
     @Nullable
-    private TeamProfile team = null;
+    private ITeamProfile team = null;
 
     protected Machine(BlockEntity be) {
         this.blockEntity = be;
@@ -104,14 +104,14 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     @Override
     public Optional<ITeamProfile> owner() {
         if (world().isClientSide) {
-            return TechManager.localTeam();
+            return TechManagers.localTeam();
         }
         return Optional.ofNullable(team);
     }
 
     @Override
     public boolean canPlayerInteract(Player player) {
-        return team != null && player.getTeam() != null && team.getName().equals(player.getTeam().getName());
+        return team != null && TechHelper.isPlayerOnTeam(player, team);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
      * Only called on server
      */
     private void setPlayerTeam(Level world, Player player) {
-        TechManager.server().teamByPlayer(player).ifPresent($ -> {
+        TechManagers.server().teamByPlayer(player).ifPresent($ -> {
             team = $;
             blockEntity.setChanged();
             createNetwork(world);
@@ -196,7 +196,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     private void onServerLoad(Level world) {
-        team = teamName == null ? null : TechManager.server().teamByName(teamName).orElse(null);
+        team = teamName == null ? null : TechManagers.server().teamByName(teamName).orElse(null);
         teamName = null;
         createNetwork(world);
     }

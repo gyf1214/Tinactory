@@ -23,8 +23,8 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.gui.client.Tab;
 import org.shsts.tinactory.core.gui.client.Widgets;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
@@ -109,7 +109,7 @@ public class TechScreen extends MenuScreen<TechMenu> {
         rootPanel.addPanel(renamePanel);
         rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
-        TechManager.client().onProgressChange(onTechChange);
+        TechManagers.client().onProgressChange(onTechChange);
 
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
@@ -129,12 +129,12 @@ public class TechScreen extends MenuScreen<TechMenu> {
 
     @Override
     public void removed() {
-        TechManager.client().removeProgressChangeListener(onTechChange);
+        TechManagers.client().removeProgressChangeListener(onTechChange);
         super.removed();
     }
 
     private void refreshTeam() {
-        var localTeam = TechManager.localTeam();
+        var localTeam = TechManagers.localTeam();
         LOGGER.trace("refresh team {}", localTeam);
         if (localTeam.isPresent()) {
             welcomePanel.setActive(false);

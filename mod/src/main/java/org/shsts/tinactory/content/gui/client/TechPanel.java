@@ -26,8 +26,8 @@ import org.shsts.tinactory.core.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.client.Widgets;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,7 +208,7 @@ public class TechPanel extends Panel {
 
     public TechPanel(TechScreen screen) {
         super(screen);
-        this.techManager = TechManager.client();
+        this.techManager = TechManagers.client();
 
         var label1 = new Label(menu, tr("currentTechLabel"));
         label1.verticalAlign = Label.Alignment.MIDDLE;

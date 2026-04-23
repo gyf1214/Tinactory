@@ -23,9 +23,9 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.common.CapabilityProvider;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -111,12 +111,12 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     private void onServerLoad(Level world) {
-        TechManager.server().onProgressChange(onTechChange);
+        TechManagers.server().onProgressChange(onTechChange);
     }
 
     private void onRemoved(Level world) {
         if (!world.isClientSide) {
-            TechManager.server().removeProgressChangeListener(onTechChange);
+            TechManagers.server().removeProgressChangeListener(onTechChange);
         }
     }
 

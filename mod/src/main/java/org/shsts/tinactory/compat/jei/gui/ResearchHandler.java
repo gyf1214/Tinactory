@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
-import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.integration.tech.TechManagers;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -16,7 +16,7 @@ public class ResearchHandler extends MenuScreenHandler<ResearchBenchScreen> {
     protected @Nullable Object getIngredientHovered(Widget hovered,
         double mouseX, double mouseY) {
         if (ResearchBenchScreen.isHoveringTech(hovered)) {
-            return TechManager.localTeam()
+            return TechManagers.localTeam()
                 .flatMap(ITeamProfile::getTargetTech)
                 .map(tech -> new TechIngredient(tech.getLoc()))
                 .orElse(null);

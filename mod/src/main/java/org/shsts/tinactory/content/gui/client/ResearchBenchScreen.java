@@ -12,8 +12,8 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class ResearchBenchScreen extends MachineScreen {
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var team = TechManager.localTeam();
+            var team = TechManagers.localTeam();
             tech = team.flatMap(ITeamProfile::getTargetTech).orElse(null);
             if (tech == null) {
                 return;
