@@ -8,39 +8,47 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public interface IUpdateHandler {
+        void onUpdate(TeamProfile profile, TechUpdatePacket packet);
+    }
 
-    protected final TechManager techManager;
-    protected final PlayerTeam playerTeam;
+    private static final IUpdateHandler NO_OP_HANDLER = (profile, packet) -> {};
+
+    protected final ITechManager techManager;
+    private final IUpdateHandler updateHandler;
+    protected final String name;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
     protected final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     protected ITechnology targetTech = null;
 
-    protected TeamProfile(TechManager techManager, PlayerTeam playerTeam) {
+    public TeamProfile(ITechManager techManager, String name) {
+        this(techManager, name, NO_OP_HANDLER);
+    }
+
+    protected TeamProfile(ITechManager techManager, String name, IUpdateHandler updateHandler) {
         this.techManager = techManager;
-        this.playerTeam = playerTeam;
+        this.name = name;
+        this.updateHandler = updateHandler;
     }
 
     @Override
-    public PlayerTeam getPlayerTeam() {
-        return playerTeam;
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -55,16 +63,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     private void broadcastUpdate(TechUpdatePacket packet) {
-        TinactorySavedData.get().setDirty();
-        techManager.invokeChange(this);
-        var playerList = ServerUtil.getPlayerList();
-        for (var name : playerTeam.getPlayers()) {
-            var player = playerList.getPlayerByName(name);
-            if (player == null) {
-                continue;
-            }
-            CHANNEL.sendToPlayer(player, packet);
-        }
+        updateHandler.onUpdate(this, packet);
     }
 
     public void onTechComplete(ITechnology tech) {
@@ -144,7 +143,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.putString("name", playerTeam.getName());
+        tag.putString("name", name);
         var listTag = new ListTag();
         for (var tech : technologies.entrySet()) {
             var loc = tech.getKey();
@@ -163,6 +162,10 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        technologies.clear();
+        modifiers.clear();
+        targetTech = null;
+
         var listTag = tag.getList("tech", Tag.TAG_COMPOUND);
         for (var tag1 : listTag) {
             var tag2 = (CompoundTag) tag1;
@@ -181,25 +184,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
     }
 
-    public static TeamProfile create(PlayerTeam team) {
-        return new TeamProfile(TechManager.server(), team);
-    }
-
-    public static Optional<TeamProfile> fromTag(Tag tag) {
-        var compoundTag = (CompoundTag) tag;
-
-        var name = compoundTag.getString("name");
-        var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(name);
-        if (playerTeam == null) {
-            return Optional.empty();
-        }
-        var ret = new TeamProfile(TechManager.server(), playerTeam);
-        ret.deserializeNBT(compoundTag);
-        return Optional.of(ret);
-    }
-
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + playerTeam.getName() + "]";
+        return getClass().getSimpleName() + "[" + name + "]";
     }
 }

@@ -3,23 +3,13 @@ package org.shsts.tinactory.api.tech;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.scores.PlayerTeam;
 
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface ITeamProfile {
-    PlayerTeam getPlayerTeam();
-
-    default String getName() {
-        return getPlayerTeam().getName();
-    }
-
-    default boolean hasPlayer(Player player) {
-        return player.getTeam() != null && player.getTeam().getName().equals(getName());
-    }
+    String getName();
 
     default long getTechProgress(ITechnology tech) {
         return getTechProgress(tech.getLoc());

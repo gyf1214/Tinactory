@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -43,6 +44,7 @@ import static org.shsts.tinactory.Tinactory.CHANNEL;
 @MethodsReturnNonnullByDefault
 public class TechManager implements ITechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final String SAVED_DATA_NAME = "tinactory_saved_data";
 
     protected final Map<ResourceLocation, Technology> technologies = new HashMap<>();
     private final Set<Consumer<ITeamProfile>> changeCallbacks = new HashSet<>();
@@ -82,6 +84,8 @@ public class TechManager implements ITechManager {
 
     public static class Server extends TechManager implements IServerTechManager {
         private static final Logger LOGGER = LogUtils.getLogger();
+        @Nullable
+        private TinactorySavedData savedData = null;
 
         private class ReloadListener implements PreparableReloadListener {
             private static final String PREFIX = "technologies";
@@ -132,13 +136,47 @@ public class TechManager implements ITechManager {
             event.addListener(reloadListener);
         }
 
+        public void onLoadSavedData(ServerLevel world) {
+            savedData = world.getDataStorage().computeIfAbsent(
+                tag -> TinactorySavedData.fromTag(tag, this, this::broadcastUpdate),
+                () -> new TinactorySavedData(this, this::broadcastUpdate),
+                SAVED_DATA_NAME);
+            LOGGER.debug("load server saved data {}", savedData);
+        }
+
+        public void onUnloadSavedData() {
+            savedData = null;
+            LOGGER.debug("unload server saved data");
+        }
+
+        private TinactorySavedData savedData() {
+            assert savedData != null;
+            return savedData;
+        }
+
+        private void broadcastUpdate(TeamProfile team, TechUpdatePacket packet) {
+            savedData().setDirty();
+            invokeChange(team);
+            var playerList = ServerUtil.getPlayerList();
+            var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(team.getName());
+            if (playerTeam == null) {
+                return;
+            }
+            for (var playerName : playerTeam.getPlayers()) {
+                var player = playerList.getPlayerByName(playerName);
+                if (player != null) {
+                    CHANNEL.sendToPlayer(player, packet);
+                }
+            }
+        }
+
         @Override
         public Optional<TeamProfile> teamByPlayer(Player player) {
             var playerTeam = (PlayerTeam) player.getTeam();
             if (playerTeam == null) {
                 return Optional.empty();
             }
-            return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
+            return Optional.of(savedData().getTeamProfile(playerTeam.getName()));
         }
 
         @Override
@@ -147,12 +185,12 @@ public class TechManager implements ITechManager {
             if (playerTeam == null) {
                 return Optional.empty();
             }
-            return Optional.of(TinactorySavedData.get().getTeamProfile(playerTeam));
+            return Optional.of(savedData().getTeamProfile(name));
         }
 
         @Override
         public int nextId() {
-            return TinactorySavedData.get().nextId();
+            return savedData().nextId();
         }
 
         private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
@@ -162,8 +200,10 @@ public class TechManager implements ITechManager {
 
         @Override
         public void addPlayerToTeam(ServerPlayer player, ITeamProfile team) {
-            ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), team.getPlayerTeam());
-            sendFullUpdatePacket(player, (TeamProfile) team);
+            var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(team.getName());
+            assert playerTeam != null;
+            ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), playerTeam);
+            sendFullUpdatePacket(player, savedData().getTeamProfile(team.getName()));
         }
 
         @Override
@@ -171,7 +211,7 @@ public class TechManager implements ITechManager {
             var scoreboard = ServerUtil.getScoreboard();
             var playerTeam = scoreboard.addPlayerTeam(name);
             scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
-            var team = TinactorySavedData.get().getTeamProfile(playerTeam);
+            var team = savedData().getTeamProfile(playerTeam.getName());
             sendFullUpdatePacket(player, team);
         }
 
@@ -182,7 +222,7 @@ public class TechManager implements ITechManager {
         }
 
         public void removeTeam(PlayerTeam playerTeam) {
-            TinactorySavedData.get().removeTeamProfile(playerTeam.getName());
+            savedData().removeTeamProfile(playerTeam.getName());
             var scoreboard = ServerUtil.getScoreboard();
             scoreboard.removePlayerTeam(playerTeam);
         }
@@ -202,8 +242,12 @@ public class TechManager implements ITechManager {
         private static final Logger LOGGER = LogUtils.getLogger();
 
         private class ClientTeamProfile extends TeamProfile {
+            @Nullable
+            private final PlayerTeam playerTeam;
+
             public ClientTeamProfile(PlayerTeam playerTeam) {
-                super(Client.this, playerTeam);
+                super(Client.this, playerTeam.getName());
+                this.playerTeam = playerTeam;
             }
         }
 
@@ -286,6 +330,14 @@ public class TechManager implements ITechManager {
 
     public static Optional<ITeamProfile> localTeam() {
         return client().localTeamProfile();
+    }
+
+    public static void loadSavedData(ServerLevel world) {
+        server().onLoadSavedData(world);
+    }
+
+    public static void unloadSavedData() {
+        server().onUnloadSavedData();
     }
 
     public static void init() {

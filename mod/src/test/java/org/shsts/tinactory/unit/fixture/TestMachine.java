@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -281,8 +280,8 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public PlayerTeam getPlayerTeam() {
-            throw new UnsupportedOperationException();
+        public String getName() {
+            return "test-team";
         }
 
         @Override

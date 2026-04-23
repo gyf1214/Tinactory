@@ -111,7 +111,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public boolean canPlayerInteract(Player player) {
-        return team != null && team.hasPlayer(player);
+        return team != null && player.getTeam() != null && team.getName().equals(player.getTeam().getName());
     }
 
     @Override

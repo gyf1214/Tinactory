@@ -23,9 +23,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.ServerUtil;
 
 import java.util.Random;
 
@@ -127,7 +129,8 @@ public final class AllCommands {
         var player = ctx.getSource().getPlayerOrException();
         var manager = TechManager.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-        var playerTeam = team.getPlayerTeam();
+        var playerTeam = (PlayerTeam) player.getTeam();
+        assert playerTeam != null;
 
         if (playerTeam.getPlayers().size() != 1) {
             throw CANNOT_REMOVE_TEAM.create();
@@ -195,7 +198,12 @@ public final class AllCommands {
     private static int removeTeamAdmin(CommandContext<CommandSourceStack> ctx) {
         var teamName = StringArgumentType.getString(ctx, "team");
         var manager = TechManager.server();
-        manager.teamByName(teamName).ifPresent($ -> manager.removeTeam($.getPlayerTeam()));
+        manager.teamByName(teamName).ifPresent($ -> {
+            var playerTeam = ServerUtil.getScoreboard().getPlayerTeam($.getName());
+            if (playerTeam != null) {
+                manager.removeTeam(playerTeam);
+            }
+        });
 
         return Command.SINGLE_SUCCESS;
     }

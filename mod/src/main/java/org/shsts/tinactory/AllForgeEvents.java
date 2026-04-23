@@ -18,7 +18,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.core.common.CapabilityItem;
 import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.tech.TinactorySavedData;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 
@@ -71,7 +70,7 @@ public final class AllForgeEvents {
     public static void onLoadWorld(WorldEvent.Load event) {
         var world = (Level) event.getWorld();
         if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
-            TinactorySavedData.load((ServerLevel) world);
+            TechManager.loadSavedData((ServerLevel) world);
         }
     }
 
@@ -84,7 +83,7 @@ public final class AllForgeEvents {
         }
         if (world.dimension() == Level.OVERWORLD) {
             if (!world.isClientSide) {
-                TinactorySavedData.unload();
+                TechManager.unloadSavedData();
                 TechManager.server().unload();
             } else {
                 TechManager.client().unload();

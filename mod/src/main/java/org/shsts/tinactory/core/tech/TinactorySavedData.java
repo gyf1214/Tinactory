@@ -1,15 +1,13 @@
 package org.shsts.tinactory.core.tech;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.scores.PlayerTeam;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -19,11 +17,19 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String NAME = "tinactory_saved_data";
     private int nextId = 0;
+    private final ITechManager techManager;
+    private final TeamProfile.IUpdateHandler updateHandler;
     private final Map<String, TeamProfile> teams = new HashMap<>();
 
-    private TinactorySavedData() {}
+    public TinactorySavedData(ITechManager techManager) {
+        this(techManager, (profile, packet) -> {});
+    }
+
+    public TinactorySavedData(ITechManager techManager, TeamProfile.IUpdateHandler updateHandler) {
+        this.techManager = techManager;
+        this.updateHandler = updateHandler;
+    }
 
     public int nextId() {
         return nextId;
@@ -42,19 +48,22 @@ public class TinactorySavedData extends SavedData {
 
     private void load(CompoundTag tag) {
         teams.clear();
-        tag.getList("teams", Tag.TAG_COMPOUND).stream()
-            .flatMap(tag1 -> TeamProfile.fromTag(tag1).stream())
-            .forEach(team -> teams.put(team.getName(), team));
+        for (var rawTag : tag.getList("teams", Tag.TAG_COMPOUND)) {
+            var teamTag = (CompoundTag) rawTag;
+            var team = new TeamProfile(techManager, teamTag.getString("name"), updateHandler);
+            team.deserializeNBT(teamTag);
+            teams.put(team.getName(), team);
+        }
         nextId = tag.getInt("nextId");
     }
 
-    public TeamProfile getTeamProfile(PlayerTeam playerTeam) {
-        if (!teams.containsKey(playerTeam.getName())) {
-            teams.put(playerTeam.getName(), TeamProfile.create(playerTeam));
+    public TeamProfile getTeamProfile(String name) {
+        if (!teams.containsKey(name)) {
+            teams.put(name, new TeamProfile(techManager, name, updateHandler));
             nextId++;
             setDirty();
         }
-        return teams.get(playerTeam.getName());
+        return teams.get(name);
     }
 
     public void removeTeamProfile(String name) {
@@ -68,31 +77,15 @@ public class TinactorySavedData extends SavedData {
         super.setDirty();
     }
 
-    private static TinactorySavedData fromTag(CompoundTag tag) {
-        var data = new TinactorySavedData();
+    public static TinactorySavedData fromTag(CompoundTag tag, ITechManager techManager) {
+        return fromTag(tag, techManager, (profile, packet) -> {});
+    }
+
+    public static TinactorySavedData fromTag(CompoundTag tag, ITechManager techManager,
+        TeamProfile.IUpdateHandler updateHandler) {
+
+        var data = new TinactorySavedData(techManager, updateHandler);
         data.load(tag);
-        return data;
-    }
-
-    @Nullable
-    private static TinactorySavedData data = null;
-
-    public static void load(ServerLevel overworld) {
-        data = overworld.getDataStorage()
-            .computeIfAbsent(TinactorySavedData::fromTag, TinactorySavedData::new, NAME);
-        LOGGER.debug("load server saved data {}", data);
-    }
-
-    public static void unload() {
-        data = null;
-        LOGGER.debug("unload server saved data");
-    }
-
-    /**
-     * Must be called on Server!!
-     */
-    public static TinactorySavedData get() {
-        assert data != null;
         return data;
     }
 }
