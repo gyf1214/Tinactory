@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.gui.client.IRenderable;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -22,7 +21,6 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -364,8 +362,13 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public DistLazy<? extends IRenderable> getDisplay() {
-            throw new UnsupportedOperationException();
+        public Optional<ResourceLocation> getDisplayItem() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ResourceLocation> getDisplayTexture() {
+            return Optional.empty();
         }
 
         @Override

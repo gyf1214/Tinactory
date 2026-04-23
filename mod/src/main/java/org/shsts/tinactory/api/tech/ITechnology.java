@@ -3,11 +3,10 @@ package org.shsts.tinactory.api.tech;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.gui.client.IRenderable;
-import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -20,7 +19,9 @@ public interface ITechnology extends Comparable<ITechnology> {
 
     long getMaxProgress();
 
-    DistLazy<? extends IRenderable> getDisplay();
+    Optional<ResourceLocation> getDisplayItem();
+
+    Optional<ResourceLocation> getDisplayTexture();
 
     static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
