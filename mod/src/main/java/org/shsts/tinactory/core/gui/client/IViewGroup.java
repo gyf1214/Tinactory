@@ -7,11 +7,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
+import java.util.function.Consumer;
+
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IViewGroup extends IViewNode {
     void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child);
+
+    void forEachChild(Consumer<IViewNode> consumer);
 
     default void addChild(RectD anchor, Rect offset, IViewNode child) {
         addChild(anchor, offset, 0, child);

@@ -17,23 +17,13 @@ import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinactory.core.gui.client.ViewGroup;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     private Rect rect;
-
-    protected record Child(int zIndex, Object source, IViewNode child) {
-        public void attachToScreen(MenuScreen<?> screen) {
-            if (child instanceof IViewAdapter adapter) {
-                adapter.attach(screen);
-            }
-        }
-    }
 
     private static final class WidgetAdapter<T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         implements IViewAdapter {
@@ -88,7 +78,6 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     protected final MenuBase menu;
     protected final MenuScreen<?> screen;
     protected final ViewGroup viewGroup;
-    protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;
 
     public Panel(MenuScreen<?> screen) {
@@ -118,7 +107,6 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     @Override
     public void initView() {
         initPanel();
-        children.sort(Comparator.comparing(Child::zIndex));
         viewGroup.initView();
     }
 
@@ -143,9 +131,11 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
 
     @Override
     public void attach(MenuScreen<?> screen) {
-        for (var child : children) {
-            child.attachToScreen(screen);
-        }
+        forEachChild(child -> {
+            if (child instanceof IViewAdapter adapter) {
+                adapter.attach(screen);
+            }
+        });
     }
 
     @Override
@@ -163,27 +153,24 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         int mouseX, int mouseY) {}
 
     @Override
-    public void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child) {
-        viewGroup.addChild(anchor, offset, zIndex, child);
-        children.add(new Child(zIndex, child, child));
+    public void forEachChild(Consumer<IViewNode> consumer) {
+        viewGroup.forEachChild(consumer);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addVanillaWidget(
+    @Override
+    public void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child) {
+        viewGroup.addChild(anchor, offset, zIndex, child);
+    }
+
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> IViewNode addVanillaWidget(
         RectD anchor, Rect offset, int zIndex, T widget) {
         var adapter = new WidgetAdapter<>(widget);
         viewGroup.addChild(anchor, offset, zIndex, adapter);
-        children.add(new Child(zIndex, widget, adapter));
+        return adapter;
     }
 
-    protected void removeChild(Object source) {
-        for (var i = 0; i < children.size(); i++) {
-            var child = children.get(i);
-            if (child.source() == source) {
-                viewGroup.removeChild(child.child());
-                children.remove(i);
-                return;
-            }
-        }
+    protected void removeChild(IViewNode child) {
+        viewGroup.removeChild(child);
     }
 
     public boolean mouseIn(double mouseX, double mouseY) {

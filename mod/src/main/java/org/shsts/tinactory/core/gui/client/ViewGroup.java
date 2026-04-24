@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -36,6 +37,13 @@ public class ViewGroup implements IViewGroup {
 
     public void removeChild(IViewNode child) {
         children.removeIf(viewChild -> viewChild.child() == child);
+    }
+
+    @Override
+    public void forEachChild(Consumer<IViewNode> consumer) {
+        for (var child : children) {
+            consumer.accept(child.child());
+        }
     }
 
     @Override
