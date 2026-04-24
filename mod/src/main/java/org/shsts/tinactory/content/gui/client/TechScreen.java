@@ -17,13 +17,13 @@ import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.Tab;
 import org.shsts.tinactory.integration.gui.client.Widgets;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
 
@@ -104,10 +104,10 @@ public class TechScreen extends MenuScreen<TechMenu> {
             techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
-        rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
-        rootPanel.addPanel(techPanel);
-        rootPanel.addPanel(renamePanel);
-        rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addChild(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
+        rootPanel.addGroup(techPanel);
+        rootPanel.addGroup(renamePanel);
+        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
         TechManagers.client().onProgressChange(onTechChange);
 

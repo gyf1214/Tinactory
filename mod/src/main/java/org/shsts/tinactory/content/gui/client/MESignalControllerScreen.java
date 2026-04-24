@@ -16,12 +16,12 @@ import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.logistics.SignalConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.integration.gui.client.ButtonPanel;
-import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -175,8 +175,8 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
         var offset1 = Rect.corners(1, 1, -SIGNAL_WIDTH - MARGIN_X - 1, -1);
         var offset2 = Rect.corners(-SIGNAL_WIDTH, 0, 0, 0);
 
-        rootPanel.addPanel(offset1, machinePanel);
-        rootPanel.addPanel(RectD.corners(1d, 0d, 1d, 1d), offset2, signalPanel);
+        rootPanel.addGroup(offset1, machinePanel);
+        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 1d), offset2, signalPanel);
 
         menu.onSyncPacket(SIGNAL_SYNC, this::refreshVisibleSignals);
     }

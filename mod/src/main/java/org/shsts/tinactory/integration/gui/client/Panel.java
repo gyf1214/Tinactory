@@ -175,22 +175,6 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         children.add(new Child(zIndex, widget, adapter));
     }
 
-    public void addPanel(RectD anchor, Rect offset, int zIndex, IViewGroup panel) {
-        addChild(anchor, offset, zIndex, panel);
-    }
-
-    public void addPanel(RectD anchor, Rect offset, IViewGroup panel) {
-        addChild(anchor, offset, panel);
-    }
-
-    public void addPanel(Rect offset, IViewGroup panel) {
-        addChild(RectD.FULL, offset, panel);
-    }
-
-    public void addPanel(IViewGroup panel) {
-        addPanel(Rect.ZERO, panel);
-    }
-
     protected void removeChild(Object source) {
         for (var i = 0; i < children.size(); i++) {
             var child = children.get(i);

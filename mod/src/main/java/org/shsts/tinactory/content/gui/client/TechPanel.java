@@ -17,16 +17,16 @@ import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.client.RenderUtil;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.integration.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.gui.client.Widgets;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
@@ -225,7 +225,7 @@ public class TechPanel extends Panel {
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
         addChild(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
         addChild(anchor1, offset1, bg);
-        addPanel(anchor1, offset2, availableTechPanel);
+        addChild(anchor1, offset2, availableTechPanel);
 
         this.selectedTechPanel = new Panel(screen);
         this.selectedTechLabel = new Label(menu);
@@ -249,7 +249,7 @@ public class TechPanel extends Panel {
         selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
         selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
         selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
-        addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
+        addGroup(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
     public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,

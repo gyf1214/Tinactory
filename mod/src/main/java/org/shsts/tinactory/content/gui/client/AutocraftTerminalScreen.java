@@ -15,9 +15,9 @@ import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Tab;
 
@@ -51,10 +51,10 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         this.previewPanel = new AutocraftPreviewPanel(this);
         this.tabs = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
-        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
-        rootPanel.addPanel(new Rect(0, 0, 0, 0), tabs);
-        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(0, 56, 0, -88), previewPanel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
+        rootPanel.addGroup(tabs);
+        rootPanel.addGroup(Rect.corners(0, 56, 0, -88), previewPanel);
         this.contentHeight = 180;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, this::onRequestablesSync);

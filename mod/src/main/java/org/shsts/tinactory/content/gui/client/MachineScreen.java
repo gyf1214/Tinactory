@@ -37,7 +37,7 @@ public class MachineScreen extends ProcessingScreen {
 
         var buttonY = layout.rect.endY() + SPACING;
         this.portPanel = new PortPanel(this, layout);
-        rootPanel.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
+        rootPanel.addChild(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
         portPanel.setActive(false);
 
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
@@ -54,7 +54,7 @@ public class MachineScreen extends ProcessingScreen {
             VOID_DEFAULT, VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
 
         if (recipeBook != null) {
-            rootPanel.addPanel(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
+            rootPanel.addChild(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
             MachineRecipeBook.addButton(menu, rootPanel, recipeBook, RectD.ZERO, 0, buttonY, () -> {
                 if (recipeBook.isBookActive()) {
                     portPanel.setActive(false);

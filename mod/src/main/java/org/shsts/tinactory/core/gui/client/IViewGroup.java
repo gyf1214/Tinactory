@@ -24,4 +24,12 @@ public interface IViewGroup extends IViewNode {
     default void addChild(IViewNode child) {
         addChild(Rect.ZERO, child);
     }
+
+    default void addGroup(Rect offset, IViewGroup panel) {
+        addChild(RectD.FULL, offset, panel);
+    }
+
+    default void addGroup(IViewGroup panel) {
+        addGroup(Rect.ZERO, panel);
+    }
 }

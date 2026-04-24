@@ -24,14 +24,14 @@ import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.integration.gui.client.ButtonPanel;
-import org.shsts.tinactory.integration.gui.client.Label;
-import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Collections;
@@ -386,9 +386,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
-        rootPanel.addPanel(anchor1, offset1, configPanel);
-        rootPanel.addPanel(offset2, machinePanel);
-        rootPanel.addPanel(anchor3, offset3, portPanel);
+        rootPanel.addChild(anchor1, offset1, configPanel);
+        rootPanel.addGroup(offset2, machinePanel);
+        rootPanel.addChild(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
     }

@@ -15,16 +15,16 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.integration.gui.client.IViewAdapter;
-import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.integration.gui.client.SimpleButton;
-import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.IRecipeBookProcessor;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.SimpleButton;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -166,10 +166,10 @@ public class MachineRecipeBook extends Panel {
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
         bookPanel.addChild(RectD.FULL, Rect.ZERO, panelBg);
-        bookPanel.addPanel(BUTTON_PANEL_OFFSET, buttonPanel);
+        bookPanel.addGroup(BUTTON_PANEL_OFFSET, buttonPanel);
         bookPanel.setActive(false);
 
-        addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
+        addChild(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
         addChild(new Rect(layout.getXOffset(), 0, 0, 0), ghostRecipe);
     }
 
