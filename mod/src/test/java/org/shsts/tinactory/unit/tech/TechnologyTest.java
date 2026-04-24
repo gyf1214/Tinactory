@@ -3,16 +3,13 @@ package org.shsts.tinactory.unit.tech;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.unit.fixture.TestTechManager;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -25,7 +22,7 @@ class TechnologyTest {
         var known = technology("tinactory:known", List.of(), 1);
         var technology = technology("tinactory:target", List.of(knownLoc, ignoredLoc), 3);
 
-        technology.resolve(new TestTechManager(Map.of(knownLoc, known)));
+        technology.resolve(new TestTechManager(known));
 
         assertEquals(List.of(known), technology.getDepends());
     }
@@ -63,23 +60,5 @@ class TechnologyTest {
         var technology = new Technology(depends, 20L, Map.of(), Optional.empty(), Optional.empty(), rank);
         technology.setLoc(new ResourceLocation(loc));
         return technology;
-    }
-
-    private record TestTechManager(Map<ResourceLocation, Technology> technologies) implements ITechManager {
-        @Override
-        public Optional<Technology> techByKey(ResourceLocation loc) {
-            return Optional.ofNullable(technologies.get(loc));
-        }
-
-        @Override
-        public Collection<Technology> allTechs() {
-            return technologies.values();
-        }
-
-        @Override
-        public void onProgressChange(Consumer<ITeamProfile> callback) {}
-
-        @Override
-        public void removeProgressChangeListener(Consumer<ITeamProfile> callback) {}
     }
 }
