@@ -16,5 +16,5 @@ public interface ITechManager {
 
     void removeProgressChangeListener(Consumer<ITeamProfile> callback);
 
-    default void broadcastUpdate(ITeamProfile team, IPacket packet) {}
+    void broadcastUpdate(ITeamProfile team, IPacket packet);
 }

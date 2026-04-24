@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -36,4 +37,7 @@ public final class TestTechManager implements ITechManager {
 
     @Override
     public void removeProgressChangeListener(Consumer<ITeamProfile> callback) {}
+
+    @Override
+    public void broadcastUpdate(ITeamProfile team, IPacket packet) {}
 }

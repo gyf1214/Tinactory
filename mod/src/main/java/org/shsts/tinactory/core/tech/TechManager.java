@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechManager implements ITechManager {
+public abstract class TechManager implements ITechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected final Map<ResourceLocation, Technology> technologies = new HashMap<>();

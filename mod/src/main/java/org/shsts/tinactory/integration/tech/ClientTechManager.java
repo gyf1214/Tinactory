@@ -7,11 +7,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.tech.IClientTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
-import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -22,7 +23,6 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final class ClientTeamProfile extends TeamProfile {
-        @Nullable
         private final PlayerTeam playerTeam;
 
         private ClientTeamProfile(ClientTechManager techManager, PlayerTeam playerTeam) {
@@ -86,4 +86,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
         }
         invokeChange(team);
     }
+
+    @Override
+    public void broadcastUpdate(ITeamProfile team, IPacket packet) {}
 }
