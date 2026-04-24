@@ -12,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;

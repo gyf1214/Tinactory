@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.gui.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiComponent;
@@ -80,7 +81,7 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         }
 
         @Override
-        public void renderTooltip(MenuScreen<?> screen, com.mojang.blaze3d.vertex.PoseStack poseStack,
+        public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack,
             int mouseX, int mouseY) {}
     }
 
@@ -158,7 +159,7 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     @Override
-    public void renderTooltip(MenuScreen<?> screen, com.mojang.blaze3d.vertex.PoseStack poseStack,
+    public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack,
         int mouseX, int mouseY) {}
 
     @Override

@@ -3,6 +3,7 @@ package org.shsts.tinactory.integration.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -76,25 +77,25 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
         return menu;
     }
 
-    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         void addWidget(RectD anchor, Rect offset, int zIndex, T widget) {
 
         rootPanel.addWidget(anchor, offset, zIndex, widget);
     }
 
-    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         void addWidget(RectD anchor, Rect offset, T widget) {
 
         rootPanel.addWidget(anchor, offset, widget);
     }
 
-    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         void addWidget(Rect offset, T widget) {
 
         rootPanel.addWidget(offset, widget);
     }
 
-    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
         void addWidget(T widget) {
 
         rootPanel.addWidget(widget);
