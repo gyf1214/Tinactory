@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.client;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 import org.shsts.tinactory.integration.gui.LayoutMenu;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;

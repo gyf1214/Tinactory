@@ -16,13 +16,14 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.gui.client.IWidgetConsumer;
-import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.SimpleButton;
-import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.SimpleButton;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.IRecipeBookProcessor;
 import org.shsts.tinactory.core.util.I18n;
@@ -45,7 +46,7 @@ import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -227,7 +228,7 @@ public class MachineRecipeBook extends Panel {
         buttonPanel.refresh();
     }
 
-    public static void addButton(MenuBase menu, IWidgetConsumer parent, MachineRecipeBook recipeBook,
+    public static void addButton(MenuBase menu, MenuScreen<?> parent, MachineRecipeBook recipeBook,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON,
             I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
@@ -241,7 +242,7 @@ public class MachineRecipeBook extends Panel {
         parent.addWidget(anchor, new Rect(x, y, 20, 18), button);
     }
 
-    public static Optional<IRecipeBookItem> getHoveredRecipe(Widget widget) {
+    public static Optional<IRecipeBookItem> getHoveredRecipe(IViewAdapter widget) {
         if (!(widget instanceof ButtonPanel.ItemButton button) ||
             !(button.getParent() instanceof RecipeButtonPanel buttonPanel)) {
             return Optional.empty();

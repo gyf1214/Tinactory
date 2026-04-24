@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -18,14 +17,15 @@ import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.Button;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.Button;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
@@ -43,8 +43,8 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_BG;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -192,7 +192,7 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -359,14 +359,14 @@ public class TechPanel extends Panel {
         refresh();
     }
 
-    public static boolean isHoveringTech(Widget component) {
+    public static boolean isHoveringTech(IViewAdapter component) {
         return component instanceof TechButton ||
             component instanceof RequiredTechButtons ||
             (component instanceof ButtonPanel.ItemButton itemButton &&
                 itemButton.getParent() instanceof TechButtonPanel);
     }
 
-    public static Optional<ITechnology> getHoveredTech(Widget component, double mouseX) {
+    public static Optional<ITechnology> getHoveredTech(IViewAdapter component, double mouseX) {
         if (component instanceof TechButton button) {
             return Optional.ofNullable(button.technology);
         } else if (component instanceof RequiredTechButtons buttons) {

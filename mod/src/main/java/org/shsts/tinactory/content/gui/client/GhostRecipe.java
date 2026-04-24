@@ -10,7 +10,7 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 

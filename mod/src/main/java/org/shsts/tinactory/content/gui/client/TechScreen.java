@@ -17,12 +17,12 @@ import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.client.Tab;
-import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.Tab;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault

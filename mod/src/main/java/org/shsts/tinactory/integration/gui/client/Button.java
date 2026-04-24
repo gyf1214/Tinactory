@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,7 +33,7 @@ public abstract class Button extends MenuWidget {
     }
 
     @Override
-    protected boolean canHover() {
+    public boolean canHover() {
         return true;
     }
 

@@ -34,6 +34,10 @@ public class ViewGroup implements IViewGroup {
         children.add(new ViewChild(anchor, offset, zIndex, child));
     }
 
+    public void removeChild(IViewNode child) {
+        children.removeIf(viewChild -> viewChild.child() == child);
+    }
+
     @Override
     public void initView() {
         children.sort(Comparator.comparing(ViewChild::zIndex));

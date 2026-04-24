@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -9,6 +9,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.client.GridViewGroup;
 import org.shsts.tinactory.core.util.ClientUtil;
 
 import java.util.ArrayList;
@@ -105,7 +106,7 @@ public abstract class ButtonPanel extends Panel {
     }
 
     @Override
-    protected void setRect(Rect rect) {
+    public void setRect(Rect rect) {
         gridViewGroup.setRect(rect);
         var buttonCount = gridViewGroup.getButtonCount();
 
@@ -120,7 +121,7 @@ public abstract class ButtonPanel extends Panel {
         } else {
             for (var i = buttonCount; i < curSize; i++) {
                 var button = buttons.get(i);
-                children.removeIf(child -> child.child() == button);
+                removeChild(button);
             }
             buttons.subList(buttonCount, curSize).clear();
         }

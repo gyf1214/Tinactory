@@ -11,13 +11,13 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.IWidgetConsumer;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.SimpleButton;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.SimpleButton;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
@@ -36,7 +36,7 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 
 @OnlyIn(Dist.CLIENT)
@@ -64,7 +64,7 @@ public class PortPanel extends Panel {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -128,7 +128,7 @@ public class PortPanel extends Panel {
         }
     }
 
-    public static void addButton(MenuBase menu, IWidgetConsumer parent, PortPanel panel,
+    public static void addButton(MenuBase menu, MenuScreen<?> parent, PortPanel panel,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, SWITCH_BUTTON,
             I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {

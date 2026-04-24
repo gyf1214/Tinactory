@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 @OnlyIn(Dist.CLIENT)

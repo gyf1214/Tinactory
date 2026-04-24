@@ -8,9 +8,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.FluidSlot;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;

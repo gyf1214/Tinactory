@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget extends GuiComponent implements
-    Widget, GuiEventListener, NarratableEntry {
+    IViewAdapter, Widget, GuiEventListener, NarratableEntry {
 
     protected final MenuBase menu;
     protected Rect rect;
@@ -32,10 +33,15 @@ public abstract class MenuWidget extends GuiComponent implements
         this.setBlitOffset(0);
     }
 
-    public void setRect(Rect value) {
-        rect = value;
+    @Override
+    public void initView() {}
+
+    @Override
+    public void setRect(Rect rect) {
+        this.rect = rect;
     }
 
+    @Override
     public void setActive(boolean value) {
         active = value;
     }
@@ -49,7 +55,8 @@ public abstract class MenuWidget extends GuiComponent implements
         }
     }
 
-    protected boolean canHover() {
+    @Override
+    public boolean canHover() {
         return false;
     }
 
@@ -57,8 +64,27 @@ public abstract class MenuWidget extends GuiComponent implements
         return active && canHover() && rect.in(mouseX, mouseY);
     }
 
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        return isHovering(mouseX, mouseY);
+    }
+
     public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
         return Optional.empty();
+    }
+
+    @Override
+    public void attach(MenuScreen<?> screen) {
+        screen.addWidgetToScreen(this);
+        if (canHover()) {
+            screen.addHoverable(this);
+        }
+    }
+
+    @Override
+    public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack, int mouseX, int mouseY) {
+        getTooltip(mouseX, mouseY).ifPresent(tooltip ->
+            screen.renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
     }
 
     protected boolean canClick(int button, double mouseX, double mouseY) {

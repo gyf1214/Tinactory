@@ -18,8 +18,8 @@ import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.Tab;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Tab;
 
 import java.util.List;
 import java.util.UUID;

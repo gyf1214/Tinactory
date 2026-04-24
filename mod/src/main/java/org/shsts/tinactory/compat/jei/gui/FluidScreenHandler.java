@@ -3,18 +3,18 @@ package org.shsts.tinactory.compat.jei.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.FluidSlot;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FluidScreenHandler implements IGuiContainerHandler<AbstractContainerScreen<?>> {
-    private @Nullable Object getIngredientHovered(Widget hovered) {
+    private @Nullable Object getIngredientHovered(IViewAdapter hovered) {
         if (hovered instanceof FluidSlot slot) {
             var stack = slot.getFluidStack();
             return stack.isEmpty() ? null : stack;

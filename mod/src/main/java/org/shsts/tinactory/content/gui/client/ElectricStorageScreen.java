@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricStorageMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.content.logistics.ElectricStorage.GLOBAL_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.GLOBAL_KEY;

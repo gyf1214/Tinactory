@@ -6,9 +6,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

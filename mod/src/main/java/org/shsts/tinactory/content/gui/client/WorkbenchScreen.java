@@ -6,8 +6,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

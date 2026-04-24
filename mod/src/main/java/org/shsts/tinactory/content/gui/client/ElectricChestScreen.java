@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
@@ -59,7 +59,7 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 

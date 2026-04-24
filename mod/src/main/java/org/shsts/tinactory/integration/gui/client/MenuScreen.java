@@ -1,10 +1,8 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -14,6 +12,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
 
@@ -32,11 +31,11 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements IWidgetConsumer {
+public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
     protected static final int BG_Z = -10;
 
     protected final Panel rootPanel;
-    protected final List<Widget> hoverables = new ArrayList<>();
+    protected final List<IViewAdapter> hoverables = new ArrayList<>();
 
     protected int contentWidth;
     protected int contentHeight;
@@ -77,16 +76,53 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
         return menu;
     }
 
-    @Override
-    public void addGuiComponent(RectD anchor, Rect offset, int zIndex, GuiComponent widget) {
-        rootPanel.addGuiComponent(anchor, offset, zIndex, widget);
+    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+        void addWidget(RectD anchor, Rect offset, int zIndex, T widget) {
+
+        rootPanel.addWidget(anchor, offset, zIndex, widget);
     }
 
-    @Override
+    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+        void addWidget(RectD anchor, Rect offset, T widget) {
+
+        rootPanel.addWidget(anchor, offset, widget);
+    }
+
+    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+        void addWidget(Rect offset, T widget) {
+
+        rootPanel.addWidget(offset, widget);
+    }
+
+    public <T extends net.minecraft.client.gui.GuiComponent & Widget & GuiEventListener & NarratableEntry>
+        void addWidget(T widget) {
+
+        rootPanel.addWidget(widget);
+    }
+
+    public void addPanel(RectD anchor, Rect offset, int zIndex, Panel panel) {
+        rootPanel.addPanel(anchor, offset, zIndex, panel);
+    }
+
+    public void addPanel(RectD anchor, Rect offset, Panel panel) {
+        rootPanel.addPanel(anchor, offset, panel);
+    }
+
+    public void addPanel(Rect offset, Panel panel) {
+        rootPanel.addPanel(offset, panel);
+    }
+
+    public void addPanel(Panel panel) {
+        rootPanel.addPanel(panel);
+    }
+
     public <T extends GuiEventListener & Widget & NarratableEntry> void addWidgetToScreen(
         T widget) {
         super.addWidgetToScreen(widget);
-        hoverables.add(widget);
+    }
+
+    public void addHoverable(IViewAdapter adapter) {
+        hoverables.add(adapter);
     }
 
     protected void centerWindow() {
@@ -126,11 +162,9 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
         font.draw(poseStack, title, (float) titleLabelX, (float) titleLabelY, RenderUtil.TEXT_COLOR);
     }
 
-    public Optional<Widget> getHovered(int mouseX, int mouseY) {
+    public Optional<IViewAdapter> getHovered(int mouseX, int mouseY) {
         for (var hoverable : hoverables) {
-            if (hoverable instanceof MenuWidget widget && widget.isHovering(mouseX, mouseY)) {
-                return Optional.of(hoverable);
-            } else if (hoverable instanceof AbstractWidget widget && widget.isHoveredOrFocused()) {
+            if (hoverable.isHovered(mouseX, mouseY)) {
                 return Optional.of(hoverable);
             }
         }
@@ -144,13 +178,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> implements
             return;
         }
 
-        getHovered(mouseX, mouseY).ifPresent(hoverable -> {
-            if (hoverable instanceof MenuWidget widget) {
-                widget.getTooltip(mouseX, mouseY).ifPresent(tooltip ->
-                    renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
-            } else if (hoverable instanceof AbstractWidget widget) {
-                widget.renderToolTip(poseStack, mouseX, mouseY);
-            }
-        });
+        getHovered(mouseX, mouseY).ifPresent(hoverable ->
+            hoverable.renderTooltip(this, poseStack, mouseX, mouseY));
     }
 }

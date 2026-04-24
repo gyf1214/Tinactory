@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 import org.shsts.tinactory.integration.gui.LayoutMenu;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;

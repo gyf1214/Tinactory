@@ -4,13 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -42,7 +42,7 @@ public class ResearchBenchScreen extends MachineScreen {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -61,7 +61,7 @@ public class ResearchBenchScreen extends MachineScreen {
         addWidget(rect, new TechButton(menu));
     }
 
-    public static boolean isHoveringTech(Widget component) {
+    public static boolean isHoveringTech(IViewAdapter component) {
         return component instanceof TechButton;
     }
 }

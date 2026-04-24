@@ -9,9 +9,9 @@ import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 
 import java.util.List;
 import java.util.OptionalInt;
