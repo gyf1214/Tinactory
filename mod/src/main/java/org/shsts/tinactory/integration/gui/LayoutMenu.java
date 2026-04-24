@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui;
+package org.shsts.tinactory.integration.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -7,6 +7,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
 import java.util.Objects;

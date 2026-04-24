@@ -40,11 +40,11 @@ import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 

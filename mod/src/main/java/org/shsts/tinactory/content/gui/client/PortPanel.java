@@ -33,11 +33,11 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.PORT_TEXT_COLOR;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
+import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

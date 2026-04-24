@@ -6,11 +6,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.LayoutMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.integration.gui.LayoutMenu;
 
-import static org.shsts.tinactory.core.gui.LayoutMenu.PROGRESS_SYNC;
+import static org.shsts.tinactory.integration.gui.LayoutMenu.PROGRESS_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

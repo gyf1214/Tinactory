@@ -1,8 +1,10 @@
-package org.shsts.tinactory.core.gui;
+package org.shsts.tinactory.integration.gui;
 
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +30,7 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 public class InventoryMenu extends MenuBase {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final int INVENTORY_HEIGHT = SLOT_SIZE * 4 + SPACING * 2;
+    public static final Container EMPTY_CONTAINER = new SimpleContainer(0);
 
     protected final int beginInvSlot;
     protected final int endInvSlot;

@@ -12,7 +12,6 @@ import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
@@ -42,7 +41,7 @@ public class DigitalInterfaceMenu extends MachineMenu {
         private ItemStack stack = null;
 
         public ItemSlot(int x, int y, int port, int index) {
-            super(Menu.EMPTY_CONTAINER, 0, x, y);
+            super(EMPTY_CONTAINER, 0, x, y);
             this.port = port;
             this.index = index;
         }

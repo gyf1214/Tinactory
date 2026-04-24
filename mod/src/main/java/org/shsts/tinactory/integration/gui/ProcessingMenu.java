@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui;
+package org.shsts.tinactory.integration.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

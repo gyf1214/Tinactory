@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SYNC;
-import static org.shsts.tinactory.core.gui.LayoutMenu.FLUID_SYNC;
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
+import static org.shsts.tinactory.integration.gui.LayoutMenu.FLUID_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault

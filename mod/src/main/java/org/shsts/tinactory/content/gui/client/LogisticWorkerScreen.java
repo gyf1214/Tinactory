@@ -46,7 +46,6 @@ import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.CONFIG_WIDTH;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.gui.InventoryMenu.INVENTORY_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -60,6 +59,7 @@ import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.integration.gui.InventoryMenu.INVENTORY_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
