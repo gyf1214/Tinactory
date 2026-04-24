@@ -60,13 +60,18 @@ class LayoutTest {
             .buildObject();
 
         assertEquals(List.of(
-            new Layout.SlotWith<>(new Layout.SlotInfo(0, 10, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("ore", 1)),
-            new Layout.SlotWith<>(new Layout.SlotInfo(1, 28, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("dust", 2)),
-            new Layout.SlotWith<>(new Layout.SlotInfo(2, 10, 50, 1, SlotType.ITEM_INPUT), new TestIngredient("catalyst", 1))),
+            new Layout.SlotWith<>(
+                new Layout.SlotInfo(0, 10, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("ore", 1)),
+            new Layout.SlotWith<>(
+                new Layout.SlotInfo(1, 28, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("dust", 2)),
+            new Layout.SlotWith<>(
+                new Layout.SlotInfo(2, 10, 50, 1, SlotType.ITEM_INPUT), new TestIngredient("catalyst", 1))),
             layout.getProcessingInputs(recipe));
         assertEquals(List.of(
-            new Layout.SlotWith<>(new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("plate", 1)),
-            new Layout.SlotWith<>(new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("gear", 1))),
+            new Layout.SlotWith<>(
+                new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("plate", 1)),
+            new Layout.SlotWith<>(
+                new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("gear", 1))),
             layout.getProcessingOutputs(recipe));
 
         var marker = new MarkerRecipe.Builder(
