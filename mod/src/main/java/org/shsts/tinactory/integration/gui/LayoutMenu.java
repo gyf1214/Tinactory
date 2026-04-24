@@ -7,8 +7,8 @@ import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 
 import java.util.Objects;
 import java.util.Optional;

@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;

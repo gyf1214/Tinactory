@@ -11,8 +11,8 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
+import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.Optional;
