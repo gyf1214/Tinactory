@@ -51,10 +51,10 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         this.previewPanel = new AutocraftPreviewPanel(this);
         this.tabs = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
-        addPanel(new Rect(0, 0, 0, 0), tabs);
-        addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(0, 56, 0, -88), previewPanel);
+        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
+        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
+        rootPanel.addPanel(new Rect(0, 0, 0, 0), tabs);
+        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(0, 56, 0, -88), previewPanel);
         this.contentHeight = 180;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, this::onRequestablesSync);

@@ -3,7 +3,6 @@ package org.shsts.tinactory.integration.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -13,7 +12,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
@@ -76,44 +74,6 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
 
     public M menu() {
         return menu;
-    }
-
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addVanillaWidget(RectD anchor, Rect offset, int zIndex, T widget) {
-
-        rootPanel.addVanillaWidget(anchor, offset, zIndex, widget);
-    }
-
-    public void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child) {
-        rootPanel.addChild(anchor, offset, zIndex, child);
-    }
-
-    public void addChild(RectD anchor, Rect offset, IViewNode child) {
-        rootPanel.addChild(anchor, offset, child);
-    }
-
-    public void addChild(Rect offset, IViewNode child) {
-        rootPanel.addChild(offset, child);
-    }
-
-    public void addChild(IViewNode child) {
-        rootPanel.addChild(child);
-    }
-
-    public void addPanel(RectD anchor, Rect offset, int zIndex, Panel panel) {
-        rootPanel.addPanel(anchor, offset, zIndex, panel);
-    }
-
-    public void addPanel(RectD anchor, Rect offset, Panel panel) {
-        rootPanel.addPanel(anchor, offset, panel);
-    }
-
-    public void addPanel(Rect offset, Panel panel) {
-        rootPanel.addPanel(offset, panel);
-    }
-
-    public void addPanel(Panel panel) {
-        rootPanel.addPanel(panel);
     }
 
     public <T extends GuiEventListener & Widget & NarratableEntry> void addWidgetToScreen(

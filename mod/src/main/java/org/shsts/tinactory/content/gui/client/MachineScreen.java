@@ -37,11 +37,11 @@ public class MachineScreen extends ProcessingScreen {
 
         var buttonY = layout.rect.endY() + SPACING;
         this.portPanel = new PortPanel(this, layout);
-        addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
+        rootPanel.addPanel(PANEL_ANCHOR, PANEL_OFFSET, portPanel);
         portPanel.setActive(false);
 
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        PortPanel.addButton(menu, this, portPanel, anchor, -SLOT_SIZE, buttonY, () -> {
+        PortPanel.addButton(menu, rootPanel, portPanel, anchor, -SLOT_SIZE, buttonY, () -> {
             if (portPanel.isActive() && recipeBook != null) {
                 recipeBook.setBookActive(false);
             }
@@ -50,12 +50,12 @@ public class MachineScreen extends ProcessingScreen {
         var machine = MACHINE.get(menu.blockEntity());
         var config = machine.config();
         var offset = new Rect(-SLOT_SIZE * 2 - SPACING, buttonY, SLOT_SIZE, SLOT_SIZE);
-        addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
             VOID_DEFAULT, VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
 
         if (recipeBook != null) {
-            addPanel(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
-            MachineRecipeBook.addButton(menu, this, recipeBook, RectD.ZERO, 0, buttonY, () -> {
+            rootPanel.addPanel(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
+            MachineRecipeBook.addButton(menu, rootPanel, recipeBook, RectD.ZERO, 0, buttonY, () -> {
                 if (recipeBook.isBookActive()) {
                     portPanel.setActive(false);
                 }

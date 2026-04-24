@@ -25,7 +25,7 @@ public class MEDriveScreen extends LayoutScreen<LayoutMenu> {
 
         var config = MACHINE.get(menu.blockEntity()).config();
         var buttonY = menu.layout().rect.endY() + SPACING;
-        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE),
+        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE),
             new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 }

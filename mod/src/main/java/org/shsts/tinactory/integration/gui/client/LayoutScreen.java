@@ -28,8 +28,8 @@ public class LayoutScreen<M extends LayoutMenu> extends MenuScreen<M> {
         this.layoutBg = new Panel(this);
 
         var rect = new Rect(layout.getXOffset(), 0, 0, 0);
-        addPanel(rect, layoutPanel);
-        addPanel(RectD.FULL, rect, BG_Z, layoutBg);
+        rootPanel.addPanel(rect, layoutPanel);
+        rootPanel.addPanel(RectD.FULL, rect, BG_Z, layoutBg);
     }
 
     /**

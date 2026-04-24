@@ -381,14 +381,14 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
         var anchor3 = RectD.corners(1d, 0d, 1d, 1d);
 
-        addChild(new Label(menu, tr("configLabel")));
-        addChild(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
-        addChild(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
+        rootPanel.addChild(new Label(menu, tr("configLabel")));
+        rootPanel.addChild(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
+        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
-        addPanel(anchor1, offset1, configPanel);
-        addPanel(offset2, machinePanel);
-        addPanel(anchor3, offset3, portPanel);
+        rootPanel.addPanel(anchor1, offset1, configPanel);
+        rootPanel.addPanel(offset2, machinePanel);
+        rootPanel.addPanel(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
     }

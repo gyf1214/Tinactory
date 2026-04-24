@@ -12,7 +12,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.Label;
-import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
@@ -128,7 +127,7 @@ public class PortPanel extends Panel {
         }
     }
 
-    public static void addButton(MenuBase menu, MenuScreen<?> parent, PortPanel panel,
+    public static void addButton(MenuBase menu, Panel parent, PortPanel panel,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, SWITCH_BUTTON,
             I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {

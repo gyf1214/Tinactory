@@ -58,7 +58,7 @@ public class ResearchBenchScreen extends MachineScreen {
     public ResearchBenchScreen(ProcessingMenu menu, Component title) {
         super(menu, title);
         var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
-        addChild(rect, new TechButton(menu));
+        rootPanel.addChild(rect, new TechButton(menu));
     }
 
     public static boolean isHoveringTech(IViewAdapter component) {

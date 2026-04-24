@@ -35,15 +35,15 @@ public class ElectricStorageScreen<M extends ElectricStorageMenu> extends Layout
         var buttonY = menu.layout().rect.endY() + SPACING;
         var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        addChild(anchor, offset, new MachineConfigButton(menu, config, UNLOCK_KEY, UNLOCK_DEFAULT,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, UNLOCK_KEY, UNLOCK_DEFAULT,
             LOCK_BUTTON, 18, 0, "chestLock", "chestUnlock"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
-        addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
             VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
-        addChild(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
+        rootPanel.addChild(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
-        addChild(anchor, offset, new MachineConfigButton(menu, config, GLOBAL_KEY, GLOBAL_DEFAULT,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, GLOBAL_KEY, GLOBAL_DEFAULT,
             GLOBAL_PORT_BUTTON, 0, 18, "chestLocal", "chestGlobal"));
     }
 }

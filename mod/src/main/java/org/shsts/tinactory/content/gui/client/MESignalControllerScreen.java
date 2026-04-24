@@ -175,8 +175,8 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
         var offset1 = Rect.corners(1, 1, -SIGNAL_WIDTH - MARGIN_X - 1, -1);
         var offset2 = Rect.corners(-SIGNAL_WIDTH, 0, 0, 0);
 
-        addPanel(offset1, machinePanel);
-        addPanel(RectD.corners(1d, 0d, 1d, 1d), offset2, signalPanel);
+        rootPanel.addPanel(offset1, machinePanel);
+        rootPanel.addPanel(RectD.corners(1d, 0d, 1d, 1d), offset2, signalPanel);
 
         menu.onSyncPacket(SIGNAL_SYNC, this::refreshVisibleSignals);
     }

@@ -118,7 +118,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         this.contentHeight = menu.endY();
 
         this.panel = new StoragePanel();
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, PANEL_HEIGHT), panel);
+        rootPanel.addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, PANEL_HEIGHT), panel);
         menu.onSyncPacket(SLOT_SYNC, this::onSync);
     }
 

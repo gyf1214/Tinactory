@@ -123,8 +123,8 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         var offset1 = new Rect(-X_OFFSET, SLOT_Y_OFFSET, SLOT_SIZE, SLOT_SIZE);
         var offset2 = new Rect(X_OFFSET - EDIT_WIDTH, EDIT_Y_OFFSET, EDIT_WIDTH, EDIT_HEIGHT);
 
-        addChild(anchor, offset1, slot);
-        addVanillaWidget(anchor, offset2, 0, targetAmountEdit);
+        rootPanel.addChild(anchor, offset1, slot);
+        rootPanel.addVanillaWidget(anchor, offset2, 0, targetAmountEdit);
 
         this.contentHeight = menu.endY();
     }

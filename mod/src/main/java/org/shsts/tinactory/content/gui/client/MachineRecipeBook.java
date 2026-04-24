@@ -18,7 +18,6 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
-import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
@@ -227,7 +226,7 @@ public class MachineRecipeBook extends Panel {
         buttonPanel.refresh();
     }
 
-    public static void addButton(MenuBase menu, MenuScreen<?> parent, MachineRecipeBook recipeBook,
+    public static void addButton(MenuBase menu, Panel parent, MachineRecipeBook recipeBook,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON,
             I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
