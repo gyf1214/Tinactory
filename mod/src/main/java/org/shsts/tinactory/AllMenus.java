@@ -172,7 +172,8 @@ public final class AllMenus {
             .screen(() -> () -> AutocraftTerminalScreen::new)
             .register();
 
-        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
+        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive",
+                properties -> ProcessingMenu.primitive(properties, FluidSyncPacket::new))
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
             .register();

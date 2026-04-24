@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.gui.LayoutMenu;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -19,7 +20,7 @@ public class ElectricStorageMenu extends LayoutMenu {
     private final IMachineConfig machineConfig;
 
     protected ElectricStorageMenu(Properties properties) {
-        super(properties, SLOT_SIZE + SPACING);
+        super(properties, SLOT_SIZE + SPACING, FluidSyncPacket::new);
         this.machine = MACHINE.get(blockEntity());
         this.machineConfig = machine.config();
 

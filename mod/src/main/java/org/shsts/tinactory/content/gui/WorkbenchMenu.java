@@ -61,7 +61,7 @@ public class WorkbenchMenu extends LayoutMenu {
     private final Workbench workbench;
 
     public WorkbenchMenu(Properties properties) {
-        super(properties, AllLayouts.WORKBENCH, 0);
+        super(properties, AllLayouts.WORKBENCH, 0, null);
         addLayoutSlots(layout);
 
         this.workbench = Workbench.get(blockEntity());

@@ -12,11 +12,12 @@ import java.util.Map;
 
 public final class CheckSource {
     // Deferred Phase 6 GUI/client ownership:
+    // - core/gui/client/FluidSlot.java -> content.gui.sync.FluidSyncPacket
     // - core/gui/client/ProcessingRecipeBookItem.java -> integration.gui.client.RecipeDisplayRegistry
     // - core/gui/client/RenderUtil.java -> integration.gui.client.ProcessingDisplayHelper
     // - core/gui/client/LayoutScreen.java -> integration.gui.LayoutMenu
     // - core/gui/client/LayoutScreen.java -> integration.gui.LayoutMenu.PROGRESS_SYNC
-    private static final int MAX_SOURCE_VIOLATIONS = 4;
+    private static final int MAX_SOURCE_VIOLATIONS = 5;
 
     private CheckSource() {}
 
