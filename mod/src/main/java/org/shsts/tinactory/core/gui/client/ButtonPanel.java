@@ -10,7 +10,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +26,7 @@ public abstract class ButtonPanel extends Panel {
     private static final int PAGE_MARGIN = 12;
     private static final int BOTTOM_MARGIN = 21;
 
-    private final int buttonWidth;
-    private final int buttonHeight;
-    private final int verticalSpacing;
+    protected final GridViewGroup gridViewGroup;
     protected int page = 0;
 
     protected final List<ItemButton> buttons = new ArrayList<>();
@@ -98,39 +95,27 @@ public abstract class ButtonPanel extends Panel {
     }
 
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen);
-        this.buttonWidth = buttonWidth;
-        this.buttonHeight = buttonHeight;
-        this.verticalSpacing = verticalSpacing;
+        super(screen, createGridViewGroup(buttonWidth, buttonHeight, verticalSpacing));
+        this.gridViewGroup = (GridViewGroup) viewGroup;
         this.leftPageButton = new PageButton(15, -1);
         this.rightPageButton = new PageButton(1, 1);
 
-        addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0), leftPageButton);
-        addWidget(PAGE_ANCHOR, PAGE_OFFSET.offset(PAGE_MARGIN, 0), rightPageButton);
+        addWidget(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getLeftPageButtonOffset(), leftPageButton);
+        addWidget(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getRightPageButtonOffset(), rightPageButton);
     }
 
     @Override
     protected void setRect(Rect rect) {
-        var columns = Math.max(1, rect.width() / buttonWidth);
-        var rows = Math.max(1, (rect.height() + verticalSpacing - BOTTOM_MARGIN) /
-            (buttonHeight + verticalSpacing));
-        int horizontalSpacing = columns > 1 ? (rect.width() - columns * buttonWidth) / (columns - 1) : 0;
-        var buttonCount = rows * columns;
+        gridViewGroup.setRect(rect);
+        var buttonCount = gridViewGroup.getButtonCount();
 
         var curSize = buttons.size();
         if (curSize < buttonCount) {
             for (var i = curSize; i < buttonCount; i++) {
-                var column = i % columns;
-                var row = i / columns;
-
-                var x = column * (buttonWidth + horizontalSpacing);
-                var y = row * (buttonHeight + verticalSpacing);
-
-                var offset = new Rect(x, y, buttonWidth, buttonHeight);
                 var button = new ItemButton();
                 buttons.add(button);
                 button.setActive(active);
-                addWidget(offset, button);
+                addWidget(gridViewGroup.getButtonRect(i), button);
             }
         } else {
             for (var i = buttonCount; i < curSize; i++) {
@@ -170,29 +155,31 @@ public abstract class ButtonPanel extends Panel {
     protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
 
     protected void setPage(int index) {
-        var buttonCount = buttons.size();
-        var itemCount = getItemCount();
-        var maxPage = buttonCount > 0 ? Math.max(1, (itemCount + buttonCount - 1) / buttonCount) : 1;
-        var newPage = MathUtil.clamp(index, 0, maxPage - 1);
-        leftPageButton.setActive(newPage != 0);
-        rightPageButton.setActive(newPage != maxPage - 1);
-        var offset = newPage * buttonCount;
-        for (var i = 0; i < buttonCount; i++) {
+        gridViewGroup.setItemCount(getItemCount());
+        gridViewGroup.setPage(index);
+        leftPageButton.setActive(gridViewGroup.isLeftPageEnabled());
+        rightPageButton.setActive(gridViewGroup.isRightPageEnabled());
+        for (var i = 0; i < buttons.size(); i++) {
             var button = buttons.get(i);
-            var j = i + offset;
+            var j = gridViewGroup.getVisibleIndex(i);
 
-            if (j < itemCount) {
+            if (j >= 0) {
                 button.index = j;
                 button.setActive(true);
             } else {
                 button.setActive(false);
             }
         }
-        page = newPage;
+        page = gridViewGroup.getPage();
     }
 
     @Override
     protected void doRefresh() {
         setPage(page);
+    }
+
+    private static GridViewGroup createGridViewGroup(int buttonWidth, int buttonHeight, int verticalSpacing) {
+        return new GridViewGroup(buttonWidth, buttonHeight, verticalSpacing, BOTTOM_MARGIN,
+            PAGE_ANCHOR, PAGE_OFFSET, PAGE_MARGIN);
     }
 }

@@ -69,12 +69,18 @@ public class Panel extends GuiComponent implements IWidgetConsumer {
 
     protected final MenuBase menu;
     protected final MenuScreen<?> screen;
+    protected final ViewGroup viewGroup;
     protected final List<Child> children = new ArrayList<>();
     protected boolean active = true;
 
     public Panel(MenuScreen<?> screen) {
+        this(screen, new ViewGroup());
+    }
+
+    protected Panel(MenuScreen<?> screen, ViewGroup viewGroup) {
         this.screen = screen;
         this.menu = screen.menu();
+        this.viewGroup = viewGroup;
     }
 
     @Override
