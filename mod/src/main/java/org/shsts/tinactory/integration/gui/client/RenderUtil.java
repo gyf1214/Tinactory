@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.gui.client;
+package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -37,7 +37,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.ClientUtil;
-import org.shsts.tinactory.integration.gui.client.ProcessingDisplayHelper;
 
 import java.util.Arrays;
 import java.util.List;

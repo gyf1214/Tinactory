@@ -14,12 +14,12 @@ import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.logistics.MEStorageDetector;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.integration.gui.client.MenuScreen;
-import org.shsts.tinactory.integration.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Optional;

@@ -12,8 +12,8 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 

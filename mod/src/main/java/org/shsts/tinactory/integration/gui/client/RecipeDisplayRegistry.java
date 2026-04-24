@@ -8,15 +8,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
-import java.util.HashMap;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,7 +53,7 @@ public final class RecipeDisplayRegistry {
         register(MarkerRecipe.class, new IRecipeDisplayProvider<>() {
             @Override
             public Optional<List<Component>> tooltip(MarkerRecipe recipe) {
-                return Optional.of(List.of((Component) I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))));
+                return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))));
             }
 
             @Override

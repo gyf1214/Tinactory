@@ -8,8 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 
 import java.util.List;
 

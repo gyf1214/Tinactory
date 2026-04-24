@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
 
 import java.util.ArrayList;

@@ -10,8 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.client.RenderProperties;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;

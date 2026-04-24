@@ -8,7 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
