@@ -73,8 +73,8 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         for (var slot : layout.slots) {
             var rectBg = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
             var rect = rectBg.offset(1, 1).enlarge(-2, -2);
-            layoutBg.addWidget(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
-            layoutPanel.addWidget(rect, new TankSlot(menu, slot.index()));
+            layoutBg.addChild(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
+            layoutPanel.addChild(rect, new TankSlot(menu, slot.index()));
         }
     }
 }

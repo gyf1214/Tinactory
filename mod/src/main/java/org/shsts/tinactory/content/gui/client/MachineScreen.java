@@ -50,7 +50,7 @@ public class MachineScreen extends ProcessingScreen {
         var machine = MACHINE.get(menu.blockEntity());
         var config = machine.config();
         var offset = new Rect(-SLOT_SIZE * 2 - SPACING, buttonY, SLOT_SIZE, SLOT_SIZE);
-        addWidget(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
+        addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
             VOID_DEFAULT, VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
 
         if (recipeBook != null) {

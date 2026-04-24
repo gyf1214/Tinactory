@@ -42,7 +42,7 @@ public class MachineSelectPanel extends ButtonPanel {
     public MachineSelectPanel(MenuScreen<?> screen) {
         super(screen, BUTTON_SIZE, BUTTON_SIZE, 1);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(RectD.FULL, Rect.corners(-2, -2, 2, 2), bg);
+        addChild(RectD.FULL, Rect.corners(-2, -2, 2, 2), bg);
     }
 
     public Optional<UUID> getSelected() {

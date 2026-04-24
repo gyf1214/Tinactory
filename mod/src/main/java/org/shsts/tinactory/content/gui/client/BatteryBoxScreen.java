@@ -23,7 +23,7 @@ public class BatteryBoxScreen extends LayoutScreen<LayoutMenu> {
         var buttonY = menu.layout().rect.endY() + SPACING;
         var button = new MachineConfigButton(menu, config, DISCHARGE_KEY, DISCHARGE_DEFAULT,
             CHARGE_DISCHARGE_BUTTON, 0, 18, "batteryMode", "dischargeMode");
-        addWidget(RectD.corners(1d, 0d, 1d, 0d),
+        addChild(RectD.corners(1d, 0d, 1d, 0d),
             new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE), button);
     }
 }

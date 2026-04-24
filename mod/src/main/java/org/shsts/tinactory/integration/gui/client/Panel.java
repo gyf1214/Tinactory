@@ -168,25 +168,11 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         children.add(new Child(zIndex, child, child));
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
+    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addVanillaWidget(
         RectD anchor, Rect offset, int zIndex, T widget) {
         var adapter = new WidgetAdapter<>(widget);
         viewGroup.addChild(anchor, offset, zIndex, adapter);
         children.add(new Child(zIndex, widget, adapter));
-    }
-
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
-        RectD anchor, Rect offset, T widget) {
-        addWidget(anchor, offset, 0, widget);
-    }
-
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(
-        Rect offset, T widget) {
-        addWidget(RectD.ZERO, offset, widget);
-    }
-
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> void addWidget(T widget) {
-        addWidget(Rect.ZERO, widget);
     }
 
     public void addPanel(RectD anchor, Rect offset, int zIndex, IViewGroup panel) {

@@ -166,12 +166,12 @@ public class MachineRecipeBook extends Panel {
 
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
-        bookPanel.addWidget(RectD.FULL, Rect.ZERO, panelBg);
+        bookPanel.addChild(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addPanel(BUTTON_PANEL_OFFSET, buttonPanel);
         bookPanel.setActive(false);
 
         addPanel(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
-        addWidget(new Rect(layout.getXOffset(), 0, 0, 0), ghostRecipe);
+        addChild(new Rect(layout.getXOffset(), 0, 0, 0), ghostRecipe);
     }
 
     @Override
@@ -238,7 +238,7 @@ public class MachineRecipeBook extends Panel {
                 extraCallback.run();
             }
         };
-        parent.addWidget(anchor, new Rect(x, y, 20, 18), button);
+        parent.addChild(anchor, new Rect(x, y, 20, 18), button);
     }
 
     public static Optional<IRecipeBookItem> getHoveredRecipe(IViewAdapter widget) {

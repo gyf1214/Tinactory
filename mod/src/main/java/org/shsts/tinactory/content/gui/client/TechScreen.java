@@ -81,9 +81,9 @@ public class TechScreen extends MenuScreen<TechMenu> {
         welcomeLabel.horizontalAlign = Label.Alignment.END;
         this.welcomeEdit = Widgets.editBox();
         var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
-        welcomePanel.addWidget(welcomeLabel);
-        welcomePanel.addWidget(new Rect(0, -1, 64, EDIT_HEIGHT), welcomeEdit);
-        welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
+        welcomePanel.addChild(welcomeLabel);
+        welcomePanel.addVanillaWidget(RectD.ZERO, new Rect(0, -1, 64, EDIT_HEIGHT), 0, welcomeEdit);
+        welcomePanel.addChild(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
             welcomeButton);
 
         this.techPanel = new TechPanel(this);
@@ -92,10 +92,10 @@ public class TechScreen extends MenuScreen<TechMenu> {
         var rect = new Rect(RENAME_BASE_MARGIN, RENAME_BASE_Y, RENAME_BASE_WIDTH, 0);
         var renameEdit = Widgets.editBox();
         renameEdit.setResponder(name -> menu.triggerEvent(RENAME, () -> new RenameEventPacket(name)));
-        renamePanel.addWidget(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
-        renamePanel.addWidget(rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
-            .enlarge(0, EDIT_HEIGHT), renameEdit);
-        renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_HEIGHT + MARGIN_VERTICAL * 2 + 1)
+        renamePanel.addChild(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
+        renamePanel.addVanillaWidget(RectD.ZERO, rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
+            .enlarge(0, EDIT_HEIGHT), 0, renameEdit);
+        renamePanel.addChild(rect.offset(34, FONT_HEIGHT + EDIT_HEIGHT + MARGIN_VERTICAL * 2 + 1)
                 .enlarge(-RENAME_BASE_WIDTH + CRAFTING_ARROW.width(), CRAFTING_ARROW.height()),
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);

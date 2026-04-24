@@ -381,9 +381,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
         var anchor3 = RectD.corners(1d, 0d, 1d, 1d);
 
-        addWidget(new Label(menu, tr("configLabel")));
-        addWidget(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
+        addChild(new Label(menu, tr("configLabel")));
+        addChild(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
+        addChild(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
         addPanel(anchor1, offset1, configPanel);

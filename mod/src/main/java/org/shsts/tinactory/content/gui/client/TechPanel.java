@@ -213,8 +213,8 @@ public class TechPanel extends Panel {
         var label1 = new Label(menu, tr("currentTechLabel"));
         label1.verticalAlign = Label.Alignment.MIDDLE;
         this.currentTechButton = new TechButton(true);
-        addWidget(new Rect(0, 0, LEFT_WIDTH - TECH_SIZE - 2, TECH_SIZE), label1);
-        addWidget(new Rect(LEFT_WIDTH - TECH_SIZE - 2, 0, TECH_SIZE, TECH_SIZE), currentTechButton);
+        addChild(new Rect(0, 0, LEFT_WIDTH - TECH_SIZE - 2, TECH_SIZE), label1);
+        addChild(new Rect(LEFT_WIDTH - TECH_SIZE - 2, 0, TECH_SIZE, TECH_SIZE), currentTechButton);
 
         this.availableTechPanel = new TechButtonPanel();
         var label2 = new Label(menu, tr("availableTechLabel"));
@@ -223,8 +223,8 @@ public class TechPanel extends Panel {
         var offset1 = Rect.corners(-1, top + FONT_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
         var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
-        addWidget(anchor1, offset1, bg);
+        addChild(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
+        addChild(anchor1, offset1, bg);
         addPanel(anchor1, offset2, availableTechPanel);
 
         this.selectedTechPanel = new Panel(screen);
@@ -243,12 +243,12 @@ public class TechPanel extends Panel {
         y -= TECH_SIZE + MARGIN_VERTICAL;
         var offset4 = Rect.corners(0, FONT_HEIGHT + SPACING, 0, y);
         var offset3 = Rect.corners(0, 0, 0, FONT_HEIGHT);
-        selectedTechPanel.addWidget(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
-        selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechDetailsLabel);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
+        selectedTechPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
+        selectedTechPanel.addChild(RectD.FULL, offset4, selectedTechDetailsLabel);
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
         addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 

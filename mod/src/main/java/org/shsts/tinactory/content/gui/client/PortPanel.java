@@ -98,7 +98,7 @@ public class PortPanel extends Panel {
         this.xOffset = layout.getXOffset();
 
         var background = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
-        addWidget(RectD.FULL, Rect.ZERO, background);
+        addChild(RectD.FULL, Rect.ZERO, background);
 
         var i = 0;
         for (var port = 0; port < layout.portSlots.size(); port++) {
@@ -113,7 +113,7 @@ public class PortPanel extends Panel {
             label.color = 0xFFFFAA00;
 
             var y = (SLOT_SIZE + SPACING) * i;
-            addWidget(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
+            addChild(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
             i++;
         }
     }
@@ -141,7 +141,7 @@ public class PortPanel extends Panel {
         };
         var overlay = new StaticWidget(menu, GREGTECH_LOGO);
         var offset = new Rect(x, y, SLOT_SIZE, SLOT_SIZE);
-        parent.addWidget(anchor, offset, button);
-        parent.addWidget(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
+        parent.addChild(anchor, offset, button);
+        parent.addChild(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
     }
 }

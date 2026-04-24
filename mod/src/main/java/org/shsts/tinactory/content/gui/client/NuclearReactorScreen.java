@@ -26,6 +26,6 @@ public class NuclearReactorScreen extends MachineScreen {
         var x = SLOT_SIZE * 4 + (SLOT_SIZE - HEAT_EMPTY.width()) / 2;
         var y = (SLOT_SIZE * 5 - HEAT_EMPTY.height()) / 2;
         var rect = new Rect(x, y, HEAT_EMPTY.width(), HEAT_EMPTY.height());
-        layoutPanel.addWidget(rect, heatBar);
+        layoutPanel.addChild(rect, heatBar);
     }
 }

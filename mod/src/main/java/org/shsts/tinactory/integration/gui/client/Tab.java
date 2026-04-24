@@ -79,7 +79,7 @@ public class Tab extends Panel {
             }
 
             var button = new TabButton(menu, k, icon);
-            addWidget(new Rect(k * BUTTON_WIDTH, -BUTTON_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT), button);
+            addChild(new Rect(k * BUTTON_WIDTH, -BUTTON_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT), button);
         }
     }
 

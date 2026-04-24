@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.gui.client.MenuScreenBase;
@@ -69,7 +70,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
             int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new SlotBackground(slot);
-            rootPanel.addWidget(RectD.ZERO, new Rect(x, y, SLOT_SIZE, SLOT_SIZE), BG_Z, slotBg);
+            rootPanel.addVanillaWidget(RectD.ZERO, new Rect(x, y, SLOT_SIZE, SLOT_SIZE), BG_Z, slotBg);
         }
     }
 
@@ -78,27 +79,25 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
     }
 
     public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(RectD anchor, Rect offset, int zIndex, T widget) {
+        void addVanillaWidget(RectD anchor, Rect offset, int zIndex, T widget) {
 
-        rootPanel.addWidget(anchor, offset, zIndex, widget);
+        rootPanel.addVanillaWidget(anchor, offset, zIndex, widget);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(RectD anchor, Rect offset, T widget) {
-
-        rootPanel.addWidget(anchor, offset, widget);
+    public void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child) {
+        rootPanel.addChild(anchor, offset, zIndex, child);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(Rect offset, T widget) {
-
-        rootPanel.addWidget(offset, widget);
+    public void addChild(RectD anchor, Rect offset, IViewNode child) {
+        rootPanel.addChild(anchor, offset, child);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
-        void addWidget(T widget) {
+    public void addChild(Rect offset, IViewNode child) {
+        rootPanel.addChild(offset, child);
+    }
 
-        rootPanel.addWidget(widget);
+    public void addChild(IViewNode child) {
+        rootPanel.addChild(child);
     }
 
     public void addPanel(RectD anchor, Rect offset, int zIndex, Panel panel) {

@@ -92,7 +92,7 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
             var slot1 = layout.slots.get(i + size);
             var x = slot.x() + 1;
             var y = (slot.y() + slot1.y()) / 2 + 1;
-            layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
+            layoutPanel.addChild(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
         }
     }
 }

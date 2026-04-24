@@ -24,11 +24,11 @@ public class BoilerScreen extends MachineScreen {
         super(menu, title, false);
         var burnBar = new ProgressBar(menu, PROGRESS_BURN, BURN_SYNC);
         burnBar.direction = ProgressBar.Direction.VERTICAL;
-        layoutPanel.addWidget(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);
+        layoutPanel.addChild(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);
 
         var heatBar = new ProgressBar(menu, HEAT_EMPTY, HEAT_FULL, HEAT_SYNC);
         heatBar.direction = ProgressBar.Direction.VERTICAL;
         var rect = new Rect(SLOT_SIZE * 2, 1, HEAT_EMPTY.width(), HEAT_EMPTY.height());
-        layoutPanel.addWidget(rect, heatBar);
+        layoutPanel.addChild(rect, heatBar);
     }
 }

@@ -101,8 +101,8 @@ public abstract class ButtonPanel extends Panel {
         this.leftPageButton = new PageButton(15, -1);
         this.rightPageButton = new PageButton(1, 1);
 
-        addWidget(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getLeftPageButtonOffset(), leftPageButton);
-        addWidget(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getRightPageButtonOffset(), rightPageButton);
+        addChild(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getLeftPageButtonOffset(), leftPageButton);
+        addChild(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getRightPageButtonOffset(), rightPageButton);
     }
 
     @Override
@@ -116,7 +116,7 @@ public abstract class ButtonPanel extends Panel {
                 var button = new ItemButton();
                 buttons.add(button);
                 button.setActive(active);
-                addWidget(gridViewGroup.getButtonRect(i), button);
+                addChild(gridViewGroup.getButtonRect(i), button);
             }
         } else {
             for (var i = buttonCount; i < curSize; i++) {

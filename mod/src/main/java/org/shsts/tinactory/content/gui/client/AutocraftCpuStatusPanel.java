@@ -35,10 +35,10 @@ public class AutocraftCpuStatusPanel extends Panel {
         indexInput.setValue("");
         var cancelButton = Widgets.simpleButton(menu, new TextComponent("Cancel CPU"), null, screen::cancelCpuJob);
 
-        addWidget(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 4, -4, 12), title);
-        addWidget(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 20, -4, 26), summary);
-        addWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 50, 56, EDIT_HEIGHT), indexInput);
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-88, 48, 84, 20), cancelButton);
+        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 4, -4, 12), title);
+        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 20, -4, 26), summary);
+        addVanillaWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 50, 56, EDIT_HEIGHT), 0, indexInput);
+        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-88, 48, 84, 20), cancelButton);
     }
 
     public OptionalInt selectedIndex(int size) {

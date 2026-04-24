@@ -39,7 +39,7 @@ public class LayoutScreen<M extends LayoutMenu> extends MenuScreen<M> {
         var progressBar = layout.progressBar;
         if (progressBar != null) {
             var widget = new ProgressBar(menu, progressBar.texture(), PROGRESS_SYNC);
-            layoutPanel.addWidget(progressBar.rect(), widget);
+            layoutPanel.addChild(progressBar.rect(), widget);
         }
     }
 }
