@@ -8,13 +8,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
-import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.FluidSlot;
 import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.client.StaticWidget;
 import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;

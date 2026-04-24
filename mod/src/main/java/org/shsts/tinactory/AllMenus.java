@@ -34,13 +34,13 @@ import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
-import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
+import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
@@ -172,8 +172,7 @@ public final class AllMenus {
             .screen(() -> () -> AutocraftTerminalScreen::new)
             .register();
 
-        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive",
-                properties -> ProcessingMenu.primitive(properties, FluidSyncPacket::new))
+        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> ProcessingScreen::new)
             .register();

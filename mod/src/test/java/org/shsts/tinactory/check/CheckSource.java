@@ -12,7 +12,7 @@ import java.util.Map;
 
 public final class CheckSource {
     // Deferred Phase 6 GUI/client ownership:
-    // - core/gui/client/FluidSlot.java -> content.gui.sync.FluidSyncPacket
+    // - core/gui/client/FluidSlot.java -> integration.gui.sync.FluidSyncPacket
     // - core/gui/client/ProcessingRecipeBookItem.java -> integration.gui.client.RecipeDisplayRegistry
     // - core/gui/client/RenderUtil.java -> integration.gui.client.ProcessingDisplayHelper
     // - core/gui/client/LayoutScreen.java -> integration.gui.LayoutMenu

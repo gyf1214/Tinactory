@@ -13,7 +13,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.gui.LayoutMenu;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -35,7 +34,7 @@ public class MachineMenu extends ProcessingMenu {
     protected final IMachine machine;
 
     public MachineMenu(Properties properties) {
-        super(properties, SLOT_SIZE + SPACING, FluidSyncPacket::new);
+        super(properties, SLOT_SIZE + SPACING);
         this.machine = MACHINE.get(blockEntity());
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
         onEventPacket(PORT_CLICK, p -> onPortClick(p.getIndex(), p.getButton()));
@@ -131,7 +130,7 @@ public class MachineMenu extends ProcessingMenu {
 
     public static class Simple extends LayoutMenu {
         private Simple(Properties properties, int extraHeight) {
-            super(properties, extraHeight, null);
+            super(properties, extraHeight);
             addLayoutSlots(layout);
             addProgressBar();
             onEventPacket(SET_MACHINE_CONFIG, this::setMachineConfig);
