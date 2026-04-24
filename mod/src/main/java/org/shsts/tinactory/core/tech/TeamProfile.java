@@ -23,14 +23,7 @@ import java.util.Optional;
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public interface IUpdateHandler {
-        void onUpdate(TeamProfile profile, TechUpdatePacket packet);
-    }
-
-    private static final IUpdateHandler NO_OP_HANDLER = (profile, packet) -> {};
-
     protected final ITechManager techManager;
-    private final IUpdateHandler updateHandler;
     protected final String name;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
     protected final Map<String, Integer> modifiers = new HashMap<>();
@@ -38,13 +31,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     protected ITechnology targetTech = null;
 
     public TeamProfile(ITechManager techManager, String name) {
-        this(techManager, name, NO_OP_HANDLER);
-    }
-
-    protected TeamProfile(ITechManager techManager, String name, IUpdateHandler updateHandler) {
         this.techManager = techManager;
         this.name = name;
-        this.updateHandler = updateHandler;
     }
 
     @Override
@@ -64,7 +52,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     private void broadcastUpdate(TechUpdatePacket packet) {
-        updateHandler.onUpdate(this, packet);
+        techManager.broadcastUpdate(this, packet);
     }
 
     public void onTechComplete(ITechnology tech) {

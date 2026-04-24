@@ -19,16 +19,10 @@ public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
     private int nextId = 0;
     private final ITechManager techManager;
-    private final TeamProfile.IUpdateHandler updateHandler;
     private final Map<String, TeamProfile> teams = new HashMap<>();
 
     public TinactorySavedData(ITechManager techManager) {
-        this(techManager, (profile, packet) -> {});
-    }
-
-    public TinactorySavedData(ITechManager techManager, TeamProfile.IUpdateHandler updateHandler) {
         this.techManager = techManager;
-        this.updateHandler = updateHandler;
     }
 
     public int nextId() {
@@ -50,7 +44,7 @@ public class TinactorySavedData extends SavedData {
         teams.clear();
         for (var rawTag : tag.getList("teams", Tag.TAG_COMPOUND)) {
             var teamTag = (CompoundTag) rawTag;
-            var team = new TeamProfile(techManager, teamTag.getString("name"), updateHandler);
+            var team = new TeamProfile(techManager, teamTag.getString("name"));
             team.deserializeNBT(teamTag);
             teams.put(team.getName(), team);
         }
@@ -59,7 +53,7 @@ public class TinactorySavedData extends SavedData {
 
     public TeamProfile getTeamProfile(String name) {
         if (!teams.containsKey(name)) {
-            teams.put(name, new TeamProfile(techManager, name, updateHandler));
+            teams.put(name, new TeamProfile(techManager, name));
             nextId++;
             setDirty();
         }
@@ -78,13 +72,7 @@ public class TinactorySavedData extends SavedData {
     }
 
     public static TinactorySavedData fromTag(CompoundTag tag, ITechManager techManager) {
-        return fromTag(tag, techManager, (profile, packet) -> {});
-    }
-
-    public static TinactorySavedData fromTag(CompoundTag tag, ITechManager techManager,
-        TeamProfile.IUpdateHandler updateHandler) {
-
-        var data = new TinactorySavedData(techManager, updateHandler);
+        var data = new TinactorySavedData(techManager);
         data.load(tag);
         return data;
     }

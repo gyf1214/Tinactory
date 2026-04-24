@@ -1,6 +1,7 @@
 package org.shsts.tinactory.api.tech;
 
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -14,4 +15,6 @@ public interface ITechManager {
     void onProgressChange(Consumer<ITeamProfile> callback);
 
     void removeProgressChangeListener(Consumer<ITeamProfile> callback);
+
+    default void broadcastUpdate(ITeamProfile team, IPacket packet) {}
 }

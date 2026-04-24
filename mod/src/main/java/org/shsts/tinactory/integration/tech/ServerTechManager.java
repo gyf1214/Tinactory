@@ -16,11 +16,11 @@ import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.ServerUtil;
+import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
@@ -88,7 +88,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
         event.addListener(reloadListener);
     }
 
-    private void broadcastUpdate(TeamProfile team, TechUpdatePacket packet) {
+    @Override
+    public void broadcastUpdate(ITeamProfile team, IPacket packet) {
         TechManagers.savedData().setDirty();
         invokeChange(team);
         var playerList = ServerUtil.getPlayerList();
@@ -157,9 +158,5 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     public void onPlayerJoin(ServerPlayer player) {
         CHANNEL.sendToPlayer(player, new TechInitPacket(technologies.values()));
         syncTeam(player);
-    }
-
-    public TeamProfile.IUpdateHandler updateHandler() {
-        return this::broadcastUpdate;
     }
 }

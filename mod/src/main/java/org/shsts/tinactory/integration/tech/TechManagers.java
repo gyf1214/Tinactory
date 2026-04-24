@@ -65,8 +65,8 @@ public final class TechManagers {
 
     public static void loadSavedData(ServerLevel world) {
         savedData = world.getDataStorage().computeIfAbsent(
-            tag -> TinactorySavedData.fromTag(tag, server(), server().updateHandler()),
-            () -> new TinactorySavedData(server(), server().updateHandler()),
+            tag -> TinactorySavedData.fromTag(tag, server()),
+            () -> new TinactorySavedData(server()),
             SAVED_DATA_NAME);
     }
 
