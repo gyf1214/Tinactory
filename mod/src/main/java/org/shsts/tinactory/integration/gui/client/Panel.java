@@ -189,19 +189,19 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         addWidget(Rect.ZERO, widget);
     }
 
-    public void addPanel(RectD anchor, Rect offset, int zIndex, Panel panel) {
+    public void addPanel(RectD anchor, Rect offset, int zIndex, IViewGroup panel) {
         addChild(anchor, offset, zIndex, panel);
     }
 
-    public void addPanel(RectD anchor, Rect offset, Panel panel) {
+    public void addPanel(RectD anchor, Rect offset, IViewGroup panel) {
         addChild(anchor, offset, panel);
     }
 
-    public void addPanel(Rect offset, Panel panel) {
+    public void addPanel(Rect offset, IViewGroup panel) {
         addChild(RectD.FULL, offset, panel);
     }
 
-    public void addPanel(Panel panel) {
+    public void addPanel(IViewGroup panel) {
         addPanel(Rect.ZERO, panel);
     }
 
