@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -15,16 +16,21 @@ import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +159,32 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         for (var output : outputs) {
             insertOutput(container, output, parallel, random, false).ifPresent(callback);
         }
+    }
+
+    public IRenderDescriptor display() {
+        return getDisplayObject()
+            .filter(IProcessingDisplay.class::isInstance)
+            .map(IProcessingDisplay.class::cast)
+            .map(IProcessingDisplay::display)
+            .orElse(EmptyRenderDescriptor.INSTANCE);
+    }
+
+    public Optional<List<Component>> tooltip() {
+        return getDisplayObject()
+            .filter(IProcessingDisplay.class::isInstance)
+            .map(IProcessingDisplay.class::cast)
+            .flatMap(IProcessingDisplay::tooltip);
+    }
+
+    protected Optional<IProcessingObject> getDisplayObject() {
+        if (!outputs.isEmpty()) {
+            return outputs.stream()
+                .min(Comparator.comparingInt(Output::port))
+                .map(Output::result);
+        }
+        return inputs.stream()
+            .min(Comparator.comparingInt(Input::port))
+            .map(Input::ingredient);
     }
 
     @Override

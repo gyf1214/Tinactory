@@ -1,17 +1,22 @@
 package org.shsts.tinactory.unit.recipe;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
@@ -27,6 +32,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcessingRecipeTest {
@@ -85,6 +91,60 @@ class ProcessingRecipeTest {
         assertEquals(2, container.getTestPort(0).stored());
         assertEquals(1, container.getTestPort(1).stored());
         assertEquals(3, container.getTestPort(2).stored());
+    }
+
+    @Test
+    void shouldDisplayPrimaryOutputBeforeInputFallback() {
+        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
+        var outputTooltip = List.<Component>of(I18n.raw("output tooltip"));
+        var inputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/input"));
+        var inputTooltip = List.<Component>of(I18n.raw("input tooltip"));
+        var recipe = recipeBuilder()
+            .input(4, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))
+            .output(3, new TestResult("ingot", 1, outputDescriptor, outputTooltip))
+            .buildObject();
+
+        assertEquals(outputDescriptor, recipe.display());
+        assertEquals(outputTooltip, recipe.tooltip().orElseThrow());
+    }
+
+    @Test
+    void shouldFallbackToPrimaryInputWhenRecipeHasNoOutputs() {
+        var earlierDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/earlier"));
+        var earlierTooltip = List.<Component>of(I18n.raw("earlier tooltip"));
+        var recipe = outputlessRecipeBuilder()
+            .input(4, new TestIngredient("ore", 1,
+                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/later")),
+                List.<Component>of(I18n.raw("later tooltip"))))
+            .input(1, new TestIngredient("dust", 1, earlierDescriptor, earlierTooltip))
+            .buildObject();
+
+        assertEquals(earlierDescriptor, recipe.display());
+        assertEquals(earlierTooltip, recipe.tooltip().orElseThrow());
+    }
+
+    @Test
+    void shouldFallbackToEmptyDescriptorWhenRepresentativeObjectHasNoDisplay() {
+        var recipe = outputlessRecipeBuilder().buildObject();
+
+        assertSame(EmptyRenderDescriptor.INSTANCE, recipe.display());
+        assertTrue(recipe.tooltip().isEmpty());
+    }
+
+    @Test
+    void shouldUseFirstInputForDisplayInputRecipePresentation() {
+        var firstDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/first"));
+        var firstTooltip = List.<Component>of(I18n.raw("first tooltip"));
+        var recipe = displayInputBuilder()
+            .input(7, new TestIngredient("ore", 1, firstDescriptor, firstTooltip))
+            .input(1, new TestIngredient("dust", 1,
+                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/second")),
+                List.<Component>of(I18n.raw("second tooltip"))))
+            .output(0, new TestResult("plate", 1))
+            .buildObject();
+
+        assertEquals(firstDescriptor, recipe.display());
+        assertEquals(firstTooltip, recipe.tooltip().orElseThrow());
     }
 
     @Test
@@ -285,6 +345,19 @@ class ProcessingRecipeTest {
             .power(8L);
     }
 
+    private static TestRecipe.Builder outputlessRecipeBuilder() {
+        return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_outputless")) {
+            @Override
+            protected void validate() {}
+        };
+    }
+
+    private static DisplayInputRecipe.Builder displayInputBuilder() {
+        return DisplayInputRecipe.builder(null, new ResourceLocation("tinactory", "test_display_input"))
+            .workTicks(20L)
+            .power(8L);
+    }
+
     private static final class TestRecipe extends ProcessingRecipe {
         private TestRecipe(Builder builder) {
             super(builder);
@@ -308,7 +381,7 @@ class ProcessingRecipeTest {
                 .isPresent();
         }
 
-        private static final class Builder extends BuilderBase<TestRecipe, Builder> {
+        private static class Builder extends BuilderBase<TestRecipe, Builder> {
             private Builder(ResourceLocation loc) {
                 super(null, loc);
                 workTicks(20);
