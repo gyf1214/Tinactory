@@ -1,16 +1,13 @@
 package org.shsts.tinactory.unit.tech;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -61,9 +58,7 @@ class TechManagerTest {
     }
 
     private static Technology technology(String loc, int rank) {
-        var technology = new Technology(List.of(), 20L, Map.of(), Optional.empty(), Optional.empty(), rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return TestTechnologyHelper.technology(loc, rank);
     }
 
     private static final class StubTechManager extends TechManager {

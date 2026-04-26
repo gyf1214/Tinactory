@@ -2,15 +2,11 @@ package org.shsts.tinactory.unit.tech;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -62,8 +58,6 @@ class TinactorySavedDataTest {
     }
 
     private static Technology technology(String loc, long maxProgress, int rank) {
-        var technology = new Technology(List.of(), maxProgress, Map.of(), Optional.empty(), Optional.empty(), rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return TestTechnologyHelper.technology(loc, maxProgress, rank);
     }
 }

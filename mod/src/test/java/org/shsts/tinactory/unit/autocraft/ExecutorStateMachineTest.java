@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -16,9 +15,9 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
@@ -549,8 +548,7 @@ class ExecutorStateMachineTest {
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
-        return new CraftPattern(id, inputs, outputs,
-            new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
+        return TestAutocraftHelper.pattern(id, inputs, outputs);
     }
 
     private static final class MutableInventory implements IInventoryView {

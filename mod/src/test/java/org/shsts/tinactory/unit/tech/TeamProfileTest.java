@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
+import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,9 +60,6 @@ class TeamProfileTest {
 
     private static Technology technology(String loc, List<ResourceLocation> depends,
         long maxProgress, Map<String, Integer> modifiers, int rank) {
-
-        var technology = new Technology(depends, maxProgress, modifiers, Optional.empty(), Optional.empty(), rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return TestTechnologyHelper.technology(loc, depends, maxProgress, modifiers, rank);
     }
 }

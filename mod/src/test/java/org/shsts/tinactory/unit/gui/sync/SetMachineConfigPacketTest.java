@@ -1,10 +1,9 @@
 package org.shsts.tinactory.unit.gui.sync;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.unit.fixture.TestBufferHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +32,7 @@ class SetMachineConfigPacketTest {
             .reset("obsolete")
             .reset("legacy")
             .get();
-        var buf = new FriendlyByteBuf(Unpooled.buffer());
+        var buf = TestBufferHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new SetMachineConfigPacket();

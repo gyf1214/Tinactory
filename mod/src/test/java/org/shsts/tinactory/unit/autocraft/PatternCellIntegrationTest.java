@@ -1,13 +1,12 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
-import org.shsts.tinactory.unit.fixture.TestStackKey;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
 
@@ -49,10 +48,10 @@ class PatternCellIntegrationTest {
     }
 
     private static CraftPattern pattern(String id) {
-        return new CraftPattern(
+        return TestAutocraftHelper.pattern(
             id,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
     }
 }

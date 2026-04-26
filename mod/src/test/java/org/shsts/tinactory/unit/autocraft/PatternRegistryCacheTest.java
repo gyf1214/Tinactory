@@ -1,13 +1,12 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestStackKey;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,11 +125,11 @@ class PatternRegistryCacheTest {
     }
 
     private static CraftPattern pattern(String patternId, String outputId) {
-        return new CraftPattern(
+        return TestAutocraftHelper.pattern(
             patternId,
             List.of(new CraftAmount(TestStackKey.item("tinactory:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item(outputId, ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
     }
 
     private static final class TestCellPort implements IPatternCellPort {

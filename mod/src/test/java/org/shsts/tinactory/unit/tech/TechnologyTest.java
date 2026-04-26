@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
+import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -83,8 +84,6 @@ class TechnologyTest {
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends, int rank) {
-        var technology = new Technology(depends, 20L, Map.of(), Optional.empty(), Optional.empty(), rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return TestTechnologyHelper.technology(loc, depends, rank);
     }
 }

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
@@ -8,11 +7,11 @@ import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -167,8 +166,7 @@ class IncrementalPlannerTest {
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
-        return new CraftPattern(id, inputs, outputs,
-            new MachineRequirement(new ResourceLocation("tinactory", "machine"), 1, List.of()));
+        return TestAutocraftHelper.pattern(id, inputs, outputs);
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {

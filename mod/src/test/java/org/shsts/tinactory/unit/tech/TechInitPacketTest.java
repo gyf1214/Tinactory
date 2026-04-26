@@ -1,16 +1,15 @@
 package org.shsts.tinactory.unit.tech;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +22,7 @@ class TechInitPacketTest {
             Optional.of(new ResourceLocation("tinactory", "display_item")),
             Optional.of(new ResourceLocation("tinactory", "textures/gui/technology/target")), 2);
         var packet = new TechInitPacket(List.of(dependency, technology));
-        var buf = new FriendlyByteBuf(Unpooled.buffer());
+        var buf = TestBufferHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new TechInitPacket();
@@ -43,9 +42,6 @@ class TechInitPacketTest {
 
     private static Technology technology(String loc, List<ResourceLocation> depends,
         Optional<ResourceLocation> displayItem, Optional<ResourceLocation> displayTexture, int rank) {
-
-        var technology = new Technology(depends, 20L, Map.of("speed", rank), displayItem, displayTexture, rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return TestTechnologyHelper.technology(loc, depends, displayItem, displayTexture, rank);
     }
 }

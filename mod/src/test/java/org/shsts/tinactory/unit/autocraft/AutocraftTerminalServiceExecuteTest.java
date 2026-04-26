@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -17,7 +16,6 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
@@ -26,6 +24,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
@@ -166,9 +165,9 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
-        return new CraftPattern(id, List.of(
+        return TestAutocraftHelper.pattern(id, List.of(
             new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
-            outputs, new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+            outputs, TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
@@ -233,10 +232,10 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     private static CraftPlan planRequiring(CraftAmount input, CraftAmount output) {
-        var pattern = new CraftPattern("tinactory:test",
+        var pattern = TestAutocraftHelper.pattern("tinactory:test",
             List.of(input),
             List.of(output),
-            new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of()));
+            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
         return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)));
     }
 
