@@ -27,9 +27,10 @@ class I18nTest {
     void trFromResourceLocationConvertsSlashesToDotsWithoutBootstrappingMinecraft() {
         assertMinecraftStillNotBootstrapped();
 
-        var component = I18n.tr(new ResourceLocation("tinactory", "gui/path/example"));
+        var component = I18n.tr(new ResourceLocation("tinactory", "gui/path/example"), "arg");
 
         assertEquals("tinactory.gui.path.example", component.getKey());
+        assertArrayEquals(new Object[]{"arg"}, component.getArgs());
         assertMinecraftStillNotBootstrapped();
     }
 

@@ -77,8 +77,11 @@ public final class CodecHelper {
     }
 
     public static Component parseComponent(String json) {
-        return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json),
-            TextComponent.EMPTY);
+        try {
+            return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json), TextComponent.EMPTY);
+        } catch (RuntimeException e) {
+            return TextComponent.EMPTY;
+        }
     }
 
     public static <T> ListTag encodeList(List<T> list, Function<T, Tag> encoder) {
