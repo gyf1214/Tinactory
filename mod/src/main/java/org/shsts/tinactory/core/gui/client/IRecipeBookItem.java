@@ -5,8 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.core.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinycorelib.api.core.ILoc;
 

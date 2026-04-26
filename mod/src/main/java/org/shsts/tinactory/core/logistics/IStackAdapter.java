@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import org.shsts.tinactory.core.gui.IRenderDescriptor;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 
 import java.util.List;
 import java.util.Optional;

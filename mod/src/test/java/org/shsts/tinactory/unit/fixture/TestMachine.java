@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -21,7 +22,6 @@ import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
-import org.shsts.tinactory.core.gui.IRenderDescriptor;
 
 import java.util.HashMap;
 import java.util.HashSet;

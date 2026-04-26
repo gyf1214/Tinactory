@@ -2,12 +2,12 @@ package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.chat.Component;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
-import org.shsts.tinactory.core.gui.IRenderDescriptor;
 
 import java.util.List;
 import java.util.Optional;

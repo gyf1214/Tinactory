@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class CheckSource {
-    // Deferred violation:
-    // - core.gui.client.ProcessingRecipeBookItem.java -> integration.gui.client.RecipeDisplayRegistry
-    private static final int MAX_SOURCE_VIOLATIONS = 1;
+    private static final int MAX_SOURCE_VIOLATIONS = 0;
 
     private CheckSource() {}
 
