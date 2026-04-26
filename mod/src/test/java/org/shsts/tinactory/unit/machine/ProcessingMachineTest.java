@@ -13,6 +13,7 @@ import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
+import org.shsts.tinactory.unit.fixture.TestStack;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -123,6 +124,106 @@ class ProcessingMachineTest {
         assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map(ProcessingRecipe::loc));
     }
 
+    @Test
+    void shouldLeaveInputFiltersUnchangedWhenTargetRecipeDoesNotResolve() {
+        var input = new TestPort("ore", 16, 0);
+        var machine = new TestMachine(new TestContainer().port(INPUT_PORT, INPUT, input));
+        var processor = new TestProcessingMachine();
+
+        processor.setTargetRecipe(new ResourceLocation("tinactory", "missing"), machine);
+
+        assertTrue(input.acceptInput(TestStack.item("ore", 1)));
+    }
+
+    @Test
+    void shouldLeaveMarkerInputFiltersUnsetWhenMarkerHasNoInputs() {
+        var input = new TestPort("ore", 16, 0);
+        var machine = new TestMachine(new TestContainer().port(INPUT_PORT, INPUT, input));
+        var marker = marker("ore", 0);
+        var processor = new TestProcessingMachine(new TestRecipeManager().add(MARKER_TYPE, marker));
+
+        processor.setTargetRecipe(marker.loc(), machine);
+
+        assertTrue(input.acceptInput(TestStack.item("ore", 1)));
+    }
+
+    @Test
+    void shouldLeaveMarkerOutputFiltersUnsetWhenMarkerHasNoMarkerOutputs() {
+        var output = new TestPort("dust", 16, 0);
+        var machine = new TestMachine(new TestContainer()
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 4))
+            .port(OUTPUT_PORT, OUTPUT, output));
+        var marker = marker("ore", 0);
+        var matching = recipe("ore/matching", 0);
+        var processor = new TestProcessingMachine(new TestRecipeManager()
+            .add(MARKER_TYPE, marker)
+            .add(RECIPE_TYPE, matching));
+
+        var resolved = processor.newRecipe(machine, marker.loc());
+
+        assertEquals(Optional.of(matching.loc()), resolved.map(ProcessingRecipe::loc));
+        assertTrue(output.acceptInput(TestStack.item("dust", 1)));
+    }
+
+    @Test
+    void shouldReturnEmptyWhenMarkerTargetHasNoMatchingConcreteRecipe() {
+        var machine = new TestMachine(new TestContainer()
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 4))
+            .port(OUTPUT_PORT, OUTPUT, new TestPort("dust", 16, 0)));
+        var marker = marker("ore", 0);
+        var processor = new TestProcessingMachine(new TestRecipeManager()
+            .add(MARKER_TYPE, marker)
+            .add(RECIPE_TYPE, recipe("other", 0)));
+
+        assertTrue(processor.newRecipe(machine, marker.loc()).isEmpty());
+    }
+
+    @Test
+    void shouldCalculateParallelUsingBinarySearchLimits() {
+        var machine = new TestMachine(new TestContainer()
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 3))
+            .port(OUTPUT_PORT, OUTPUT, new TestPort("dust", 16, 0)));
+        var recipe = recipe("parallel", 0);
+        var processor = new TestProcessingMachine();
+
+        assertEquals(1, processor.calculateParallelForTest(recipe, machine, 1));
+        assertEquals(3, processor.calculateParallelForTest(recipe, machine, 4));
+    }
+
+    @Test
+    void shouldCalculateLowVoltageAndOverclockFactors() {
+        var recipe = recipe("factors", 8);
+        var lowVoltageMachine = new TestMachine(new TestContainer()).electricVoltage(8);
+        var overclockedMachine = new TestMachine(new TestContainer()).electricVoltage(128);
+        var processor = new TestProcessingMachine();
+
+        processor.calculateFactorsForTest(recipe, lowVoltageMachine, 1);
+        assertEquals(ProcessingMachine.PROGRESS_PER_TICK, processor.onWorkProgress(recipe, 1d));
+        assertEquals(8d, processor.powerCons(recipe));
+
+        processor.calculateFactorsForTest(recipe, overclockedMachine, 1);
+        assertEquals(ProcessingMachine.PROGRESS_PER_TICK * 4L, processor.onWorkProgress(recipe, 1d));
+        assertEquals(128d, processor.powerCons(recipe));
+    }
+
+    @Test
+    void shouldClearSerializedFilterRecipeWhenItCanNoLongerResolve() {
+        var machine = new TestMachine(new TestContainer()
+            .port(INPUT_PORT, INPUT, new TestPort("ore", 16, 4))
+            .port(OUTPUT_PORT, OUTPUT, new TestPort("dust", 16, 0)));
+        var target = recipe("targeted", 0);
+        var original = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
+        var recipe = original.newRecipe(machine, target.loc()).orElseThrow();
+        original.onWorkBegin(recipe, machine, 1, $ -> {});
+        var saved = original.serializeNBT();
+
+        var restored = new TestProcessingMachine(new TestRecipeManager());
+        restored.deserializeNBT(saved);
+        restored.onWorkContinue(recipe, machine);
+
+        assertFalse(restored.serializeNBT().contains("filterRecipe"));
+    }
+
     private static TestRecipe recipe(String path, long voltage) {
         return new TestRecipe.Builder(RECIPE_TYPE, new ResourceLocation("tinactory", path))
             .input(INPUT_PORT, new TestIngredient("ore", 1))
@@ -154,6 +255,14 @@ class ProcessingMachineTest {
 
         private void addOutputInfoForTest(TestRecipe recipe, int parallel, Consumer<ProcessingInfo> info) {
             addOutputInfo(recipe, parallel, info);
+        }
+
+        private int calculateParallelForTest(TestRecipe recipe, TestMachine machine, int maxParallel) {
+            return calculateParallel(recipe, machine, maxParallel);
+        }
+
+        private void calculateFactorsForTest(TestRecipe recipe, TestMachine machine, int parallel) {
+            calculateFactors(recipe, machine, parallel);
         }
     }
 
