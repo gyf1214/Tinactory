@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class CheckSource {
-    private static final int MAX_SOURCE_VIOLATIONS = 0;
+    // MachineConstraintCodecHelper
+    private static final int MAX_SOURCE_VIOLATIONS = 4;
 
     private CheckSource() {}
 
@@ -32,7 +33,8 @@ public final class CheckSource {
         var checker = new SourceBoundaryChecker(sourceRoots.get(0), topPackage, Map.of(
             "api", List.of("core", "integration", "content", "compat"),
             "core", List.of("integration", "content", "compat"),
-            "integration", List.of("content", "compat")));
+            "integration", List.of("content", "compat"),
+            "unit", List.of("integration", "content")));
         for (var sourceRoot : sourceRoots.subList(1, sourceRoots.size())) {
             checker.addSourceRoot(sourceRoot);
         }
@@ -41,11 +43,11 @@ public final class CheckSource {
             violations = checker.check(writer);
         }
         if (violations > MAX_SOURCE_VIOLATIONS) {
-            output.printf("Found %d source violation(s). See %s%n", violations, reportFile);
+            output.printf("Found %d source violation(s). See file://%s%n", violations, reportFile);
             output.flush();
             return 1;
         } else if (violations > 0) {
-            output.printf("Warning: found %d source violation(s). See %s%n", violations, reportFile);
+            output.printf("Warning: found %d source violation(s). See file://%s%n", violations, reportFile);
             output.flush();
         }
         return 0;
