@@ -8,6 +8,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +34,7 @@ public class Technology implements ITechnology {
     private final ResourceLocation displayItem;
     @Nullable
     private final ResourceLocation displayTexture;
+    private final IRenderDescriptor display;
     private final int rank;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
@@ -38,6 +44,9 @@ public class Technology implements ITechnology {
         this.maxProgress = maxProgress;
         this.displayItem = displayItem.orElse(null);
         this.displayTexture = displayTexture.orElse(null);
+        this.display = this.displayItem != null ? new ItemIdRenderDescriptor(this.displayItem) :
+            this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
+                EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
     }
 
@@ -74,13 +83,8 @@ public class Technology implements ITechnology {
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayItem() {
-        return Optional.ofNullable(displayItem);
-    }
-
-    @Override
-    public Optional<ResourceLocation> getDisplayTexture() {
-        return Optional.ofNullable(displayTexture);
+    public IRenderDescriptor getDisplay() {
+        return display;
     }
 
     /**

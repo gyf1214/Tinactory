@@ -6,17 +6,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
@@ -274,16 +271,7 @@ public class TechPanel extends Panel {
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-
-        technology.getDisplayItem()
-            .map(ForgeRegistries.ITEMS::getValue)
-            .filter(item -> item != null)
-            .map(ItemStack::new)
-            .ifPresentOrElse(
-                stack -> RenderUtil.renderItem(stack, x, y),
-                () -> technology.getDisplayTexture()
-                    .ifPresent(texture -> RenderUtil.blit(poseStack, new Texture(texture, 16, 16),
-                        z, new Rect(x, y, 16, 16))));
+        RenderUtil.render(technology.getDisplay(), poseStack, new Rect(x, y, 16, 16), z);
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,

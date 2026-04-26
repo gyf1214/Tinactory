@@ -20,6 +20,8 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -361,13 +363,8 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public Optional<ResourceLocation> getDisplayItem() {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<ResourceLocation> getDisplayTexture() {
-            return Optional.empty();
+        public IRenderDescriptor getDisplay() {
+            return EmptyRenderDescriptor.INSTANCE;
         }
 
         @Override

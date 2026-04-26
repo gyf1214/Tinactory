@@ -3,6 +3,10 @@ package org.shsts.tinactory.unit.tech;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
@@ -37,7 +41,7 @@ class TechnologyTest {
     }
 
     @Test
-    void codecRoundTripsDisplayIds() {
+    void codecRoundTripsDisplayIdsAndPrefersItemDescriptor() {
         var displayItem = new ResourceLocation("tinactory", "display_item");
         var displayTexture = new ResourceLocation("tinactory", "textures/gui/technology/display");
         var json = new JsonObject();
@@ -50,10 +54,24 @@ class TechnologyTest {
         var decoded = CodecHelper.parseJson(Technology.CODEC, json);
         var encoded = CodecHelper.encodeJson(Technology.CODEC, decoded).getAsJsonObject();
 
-        assertEquals(Optional.of(displayItem), decoded.getDisplayItem());
-        assertEquals(Optional.of(displayTexture), decoded.getDisplayTexture());
+        assertEquals(new ItemIdRenderDescriptor(displayItem), decoded.getDisplay());
         assertEquals(displayItem.toString(), encoded.get("display_item").getAsString());
         assertEquals(displayTexture.toString(), encoded.get("display_texture").getAsString());
+    }
+
+    @Test
+    void getDisplayUsesTextureDescriptorWhenNoDisplayItemExists() {
+        var displayTexture = new ResourceLocation("tinactory", "textures/gui/technology/texture_only");
+        var technology = new Technology(List.of(), 20L, Map.of(), Optional.empty(), Optional.of(displayTexture), 1);
+
+        assertEquals(new TextureRenderDescriptor(new Texture(displayTexture, 16, 16)), technology.getDisplay());
+    }
+
+    @Test
+    void getDisplayFallsBackToEmptyDescriptorWhenDisplayIdsAreMissing() {
+        var technology = new Technology(List.of(), 20L, Map.of(), Optional.empty(), Optional.empty(), 1);
+
+        assertEquals(EmptyRenderDescriptor.INSTANCE, technology.getDisplay());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends, int rank) {

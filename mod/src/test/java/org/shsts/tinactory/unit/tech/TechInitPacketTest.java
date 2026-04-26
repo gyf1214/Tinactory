@@ -4,8 +4,10 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TechInitPacketTest {
     @Test
-    void roundTripsTechnologiesWithDisplayIds() {
+    void roundTripsTechnologiesWithUnifiedDisplayAndCompatibleCodecFields() {
         var dependency = technology("tinactory:dependency", List.of(), Optional.empty(), Optional.empty(), 1);
         var technology = technology("tinactory:target", List.of(dependency.getLoc()),
             Optional.of(new ResourceLocation("tinactory", "display_item")),
@@ -31,8 +33,12 @@ class TechInitPacketTest {
         assertEquals(2, decodedTechs.size());
         assertEquals(dependency.getLoc(), decodedTechs.get(0).getLoc());
         assertEquals(technology.getLoc(), decodedTechs.get(1).getLoc());
-        assertEquals(technology.getDisplayItem(), decodedTechs.get(1).getDisplayItem());
-        assertEquals(technology.getDisplayTexture(), decodedTechs.get(1).getDisplayTexture());
+        assertEquals(new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display_item")),
+            decodedTechs.get(1).getDisplay());
+
+        var encoded = CodecHelper.encodeJson(Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();
+        assertEquals("tinactory:display_item", encoded.get("display_item").getAsString());
+        assertEquals("tinactory:textures/gui/technology/target", encoded.get("display_texture").getAsString());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends,
