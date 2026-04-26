@@ -17,7 +17,7 @@ public final class TestTechManager implements ITechManager {
 
     public TestTechManager(Technology... technologies) {
         for (var technology : technologies) {
-            this.technologies.put(technology.getLoc(), technology);
+            this.technologies.put(technology.loc(), technology);
         }
         this.technologies.values().forEach(technology -> technology.resolve(this));
     }

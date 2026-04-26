@@ -75,7 +75,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
                     .toList(), backgroundExecutor)
                 .thenAcceptAsync(techs -> {
                     technologies.clear();
-                    techs.forEach(tech -> technologies.put(tech.getLoc(), tech));
+                    techs.forEach(tech -> technologies.put(tech.loc(), tech));
                     LOGGER.debug("reload {} techs", technologies.size());
                     techs.forEach(tech -> tech.resolve(ServerTechManager.this));
                 }, backgroundExecutor);

@@ -18,7 +18,7 @@ public class ResearchHandler extends MenuScreenHandler<ResearchBenchScreen> {
         if (ResearchBenchScreen.isHoveringTech(hovered)) {
             return TechManagers.localTeam()
                 .flatMap(ITeamProfile::getTargetTech)
-                .map(tech -> new TechIngredient(tech.getLoc()))
+                .map(tech -> new TechIngredient(tech.loc()))
                 .orElse(null);
         }
         return null;

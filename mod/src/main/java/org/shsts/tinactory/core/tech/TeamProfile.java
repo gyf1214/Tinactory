@@ -42,7 +42,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        var v = technologies.getOrDefault(tech.getLoc(), 0L) + progress;
+        var v = technologies.getOrDefault(tech.loc(), 0L) + progress;
         setTechProgress(tech, v);
     }
 
@@ -68,11 +68,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
      * Can only be called on server
      */
     public void setTechProgress(ITechnology tech, long progress) {
-        var oldProgress = technologies.getOrDefault(tech.getLoc(), 0L);
+        var oldProgress = technologies.getOrDefault(tech.loc(), 0L);
         var maxProgress = tech.getMaxProgress();
         progress = Math.min(progress, maxProgress);
 
-        technologies.put(tech.getLoc(), progress);
+        technologies.put(tech.loc(), progress);
         if (oldProgress < maxProgress && progress >= maxProgress) {
             onTechComplete(tech);
         }
@@ -152,7 +152,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
         tag.put("tech", listTag);
         if (targetTech != null) {
-            tag.putString("target", targetTech.getLoc().toString());
+            tag.putString("target", targetTech.loc().toString());
         }
         return tag;
     }

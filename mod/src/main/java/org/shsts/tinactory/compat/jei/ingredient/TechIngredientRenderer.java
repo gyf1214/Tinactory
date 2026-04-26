@@ -6,9 +6,9 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
-import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
@@ -35,7 +35,7 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechIngredien
 
     @Override
     public List<Component> getTooltip(TechIngredient ingredient, TooltipFlag tooltipFlag) {
-        return List.of(I18n.tr(ITechnology.getDescriptionId(ingredient.loc())));
+        return List.of(I18n.tr(Technology.getDescriptionId(ingredient.loc())));
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.tech.ITechManager;
@@ -13,6 +14,7 @@ import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,12 +48,12 @@ public class Technology implements ITechnology {
         this.displayTexture = displayTexture.orElse(null);
         this.display = this.displayItem != null ? new ItemIdRenderDescriptor(this.displayItem) :
             this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
-                EmptyRenderDescriptor.INSTANCE;
+            EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
     }
 
     @Override
-    public ResourceLocation getLoc() {
+    public ResourceLocation loc() {
         assert loc != null;
         return loc;
     }
@@ -87,6 +89,16 @@ public class Technology implements ITechnology {
         return display;
     }
 
+    @Override
+    public Component getDescription() {
+        return I18n.tr(getDescriptionId(loc()));
+    }
+
+    @Override
+    public Component getDetails() {
+        return I18n.tr(getDetailsId(loc()));
+    }
+
     /**
      * Only compares rank, does not imply equal.
      */
@@ -115,6 +127,14 @@ public class Technology implements ITechnology {
     @Override
     public String toString() {
         return "Technology[" + loc + "]";
+    }
+
+    public static String getDescriptionId(ResourceLocation loc) {
+        return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
+    }
+
+    public static String getDetailsId(ResourceLocation loc) {
+        return getDescriptionId(loc) + ".details";
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(

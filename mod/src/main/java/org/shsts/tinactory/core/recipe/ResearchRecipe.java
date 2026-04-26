@@ -41,7 +41,7 @@ public class ResearchRecipe extends ProcessingRecipe {
     protected boolean matchTeam(Optional<ITeamProfile> team) {
         return team.filter($ -> $.canResearch(target))
             .flatMap(ITeamProfile::getTargetTech)
-            .filter(tech -> tech.getLoc().equals(target))
+            .filter(tech -> tech.loc().equals(target))
             .isPresent();
     }
 
@@ -141,5 +141,4 @@ public class ResearchRecipe extends ProcessingRecipe {
             jo.addProperty("power", recipe.power);
         }
     }
-
 }

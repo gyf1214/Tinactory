@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientType;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.I18n;
 
 @ParametersAreNonnullByDefault
@@ -25,7 +25,7 @@ public record TechIngredient(ResourceLocation loc) {
 
         @Override
         public String getDisplayName(TechIngredient ingredient) {
-            return I18n.tr(ITechnology.getDescriptionId(ingredient.loc)).toString();
+            return I18n.tr(Technology.getDescriptionId(ingredient.loc)).toString();
         }
 
         @Override

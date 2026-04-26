@@ -9,10 +9,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 import org.shsts.tinactory.integration.gui.client.MenuWidget;
-import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -51,7 +50,7 @@ public class ResearchBenchScreen extends MachineScreen {
             if (tech == null) {
                 return Optional.empty();
             }
-            return Optional.of(List.of(I18n.tr(tech.getDescriptionId())));
+            return Optional.of(List.of(tech.getDescription()));
         }
     }
 

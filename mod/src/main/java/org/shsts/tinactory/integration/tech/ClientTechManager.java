@@ -59,7 +59,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     public void handleTechInit(TechInitPacket packet) {
         technologies.clear();
         var techs = packet.getTechs();
-        techs.forEach(tech -> technologies.put(tech.getLoc(), tech));
+        techs.forEach(tech -> technologies.put(tech.loc(), tech));
         techs.forEach(tech -> tech.resolve(this));
         LOGGER.debug("reload {} techs", technologies.size());
     }

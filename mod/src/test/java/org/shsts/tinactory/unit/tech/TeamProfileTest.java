@@ -32,7 +32,7 @@ class TeamProfileTest {
     @Test
     void availabilityAndCanResearchFollowDependencyAndProgressRules() {
         var dependency = technology("tinactory:dependency", List.of(), 5L, Map.of(), 1);
-        var target = technology("tinactory:target", List.of(dependency.getLoc()), 10L, Map.of(), 2);
+        var target = technology("tinactory:target", List.of(dependency.loc()), 10L, Map.of(), 2);
         var profile = new TeamProfile(new TestTechManager(dependency, target), "alpha");
 
         assertFalse(profile.isTechAvailable(target));

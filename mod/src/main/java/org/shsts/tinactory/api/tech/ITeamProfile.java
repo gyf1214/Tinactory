@@ -12,7 +12,7 @@ public interface ITeamProfile {
     String getName();
 
     default long getTechProgress(ITechnology tech) {
-        return getTechProgress(tech.getLoc());
+        return getTechProgress(tech.loc());
     }
 
     long getTechProgress(ResourceLocation tech);

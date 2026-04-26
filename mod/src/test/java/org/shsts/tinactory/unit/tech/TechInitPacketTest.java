@@ -19,7 +19,7 @@ class TechInitPacketTest {
     @Test
     void roundTripsTechnologiesWithUnifiedDisplayAndCompatibleCodecFields() {
         var dependency = technology("tinactory:dependency", List.of(), Optional.empty(), Optional.empty(), 1);
-        var technology = technology("tinactory:target", List.of(dependency.getLoc()),
+        var technology = technology("tinactory:target", List.of(dependency.loc()),
             Optional.of(new ResourceLocation("tinactory", "display_item")),
             Optional.of(new ResourceLocation("tinactory", "textures/gui/technology/target")), 2);
         var packet = new TechInitPacket(List.of(dependency, technology));
@@ -31,8 +31,8 @@ class TechInitPacketTest {
 
         var decodedTechs = decoded.getTechs().stream().toList();
         assertEquals(2, decodedTechs.size());
-        assertEquals(dependency.getLoc(), decodedTechs.get(0).getLoc());
-        assertEquals(technology.getLoc(), decodedTechs.get(1).getLoc());
+        assertEquals(dependency.loc(), decodedTechs.get(0).loc());
+        assertEquals(technology.loc(), decodedTechs.get(1).loc());
         assertEquals(new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display_item")),
             decodedTechs.get(1).getDisplay());
 

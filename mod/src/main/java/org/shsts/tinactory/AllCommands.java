@@ -157,7 +157,7 @@ public final class AllCommands {
 
         team.setTargetTech(tech);
         player.sendMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
-            I18n.tr(tech.getDescriptionId())), Util.NIL_UUID);
+            tech.getDescription()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -190,7 +190,7 @@ public final class AllCommands {
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTechProgress(tech, progress);
-        var msg = "Set tech %s process of %s to %d".formatted(tech.getLoc(), team.getName(), progress);
+        var msg = "Set tech %s process of %s to %d".formatted(tech.loc(), team.getName(), progress);
         player.sendMessage(new TextComponent(msg), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }

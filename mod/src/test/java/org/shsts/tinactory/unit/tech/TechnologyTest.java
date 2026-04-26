@@ -74,6 +74,14 @@ class TechnologyTest {
         assertEquals(EmptyRenderDescriptor.INSTANCE, technology.getDisplay());
     }
 
+    @Test
+    void staticDescriptionAndDetailsIdsShouldFollowConventions() {
+        var loc = new ResourceLocation("tinactory", "multiblock/large_turbine");
+
+        assertEquals("tinactory.technology.multiblock.large_turbine", Technology.getDescriptionId(loc));
+        assertEquals("tinactory.technology.multiblock.large_turbine.details", Technology.getDetailsId(loc));
+    }
+
     private static Technology technology(String loc, List<ResourceLocation> depends, int rank) {
         var technology = new Technology(depends, 20L, Map.of(), Optional.empty(), Optional.empty(), rank);
         technology.setLoc(new ResourceLocation(loc));

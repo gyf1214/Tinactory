@@ -53,7 +53,7 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
         var rect = layout.images.get(0).rect();
         addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe.target);
         var requiredTech = TechManagers.client().techByKey(recipe.target)
-            .map(tech -> tech.getDepends().stream().map(ITechnology::getLoc).toList())
+            .map(tech -> tech.getDepends().stream().map(ITechnology::loc).toList())
             .orElse(Collections.emptyList());
         addRequiredTech(builder, requiredTech);
     }

@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.datagen.provider.TechProvider;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
@@ -154,8 +154,8 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
     private void onRegister(IDataHandler<TechProvider> handler) {
         var dataGen = handler.dataGen();
         handler.addCallback(p -> p.addTech(this));
-        var description = ITechnology.getDescriptionId(loc);
-        var details = ITechnology.getDetailsId(loc);
+        var description = Technology.getDescriptionId(loc);
+        var details = Technology.getDetailsId(loc);
         dataGen.trackLang(description);
         dataGen.trackLang(details);
 

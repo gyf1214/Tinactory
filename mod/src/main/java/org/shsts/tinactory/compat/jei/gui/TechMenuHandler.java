@@ -16,7 +16,7 @@ public class TechMenuHandler extends MenuScreenHandler<TechScreen> {
         double mouseX, double mouseY) {
         if (TechPanel.isHoveringTech(hovered)) {
             return TechPanel.getHoveredTech(hovered, mouseX)
-                .map(tech -> new TechIngredient(tech.getLoc()))
+                .map(tech -> new TechIngredient(tech.loc()))
                 .orElse(null);
         }
         return null;

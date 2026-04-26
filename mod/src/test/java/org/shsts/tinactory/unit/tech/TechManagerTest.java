@@ -3,8 +3,8 @@ package org.shsts.tinactory.unit.tech;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TeamProfile;
+import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -27,12 +27,12 @@ class TechManagerTest {
         var beta = technology("tinactory:beta", 2);
         var manager = new StubTechManager(alpha, beta);
 
-        assertSame(alpha, manager.techByKey(alpha.getLoc()).orElseThrow());
+        assertSame(alpha, manager.techByKey(alpha.loc()).orElseThrow());
         assertIterableEquals(Set.of(alpha, beta), Set.copyOf(manager.allTechs()));
 
         manager.unload();
 
-        assertTrue(manager.techByKey(alpha.getLoc()).isEmpty());
+        assertTrue(manager.techByKey(alpha.loc()).isEmpty());
         assertTrue(manager.allTechs().isEmpty());
     }
 
@@ -69,7 +69,7 @@ class TechManagerTest {
     private static final class StubTechManager extends TechManager {
         private StubTechManager(Technology... technologies) {
             for (var technology : technologies) {
-                this.technologies.put(technology.getLoc(), technology);
+                this.technologies.put(technology.loc(), technology);
             }
         }
 
