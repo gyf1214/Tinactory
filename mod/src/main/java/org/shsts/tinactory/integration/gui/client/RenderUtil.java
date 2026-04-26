@@ -25,7 +25,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,22 +32,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.fluids.FluidStack;
-import org.shsts.tinactory.api.recipe.IProcessingObject;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.util.ClientUtil;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class RenderUtil {
-    private static final int CYCLE_TIME = 1000;
     public static final int TEXT_COLOR = 0xFF404040;
     public static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
     public static final int WHITE = 0xFFFFFFFF;
@@ -282,23 +280,56 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static Optional<ItemStack> selectItemFromItems(List<ItemStack> items) {
-        if (items.isEmpty()) {
-            return Optional.empty();
+    public static void render(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+        if (descriptor instanceof EmptyRenderDescriptor) {
+            return;
         }
-
-        var cycle = System.currentTimeMillis() / CYCLE_TIME;
-        var idx = (int) (cycle % items.size());
-        return Optional.of(items.get(idx));
+        if (descriptor instanceof TextureRenderDescriptor texture) {
+            blit(poseStack, texture.texture(), z, rect);
+            return;
+        }
+        if (descriptor instanceof ItemIdRenderDescriptor itemId) {
+            var item = ForgeRegistries.ITEMS.getValue(itemId.itemId());
+            if (item != null) {
+                renderItem(new ItemStack(item), rect.x(), rect.y());
+            }
+            return;
+        }
+        if (descriptor instanceof ItemRenderDescriptor item) {
+            renderItem(item.stack(), rect.x(), rect.y());
+            return;
+        }
+        if (descriptor instanceof FluidRenderDescriptor fluid) {
+            renderFluid(poseStack, fluid.stack(), rect.x(), rect.y(), z);
+            return;
+        }
+        throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
-    public static Optional<ItemStack> selectItemFromItems(Ingredient ingredient) {
-        return selectItemFromItems(Arrays.asList(ingredient.getItems()));
-    }
-
-    public static void renderIngredient(IProcessingObject ingredient, Consumer<ItemStack> itemRenderer,
-        Consumer<FluidStack> fluidRenderer) {
-        ProcessingDisplayHelper.renderIngredient(ingredient, itemRenderer, fluidRenderer);
+    public static void renderGhost(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+        if (descriptor instanceof EmptyRenderDescriptor) {
+            return;
+        }
+        if (descriptor instanceof TextureRenderDescriptor texture) {
+            blit(poseStack, texture.texture(), z, rect);
+            return;
+        }
+        if (descriptor instanceof ItemIdRenderDescriptor itemId) {
+            var item = ForgeRegistries.ITEMS.getValue(itemId.itemId());
+            if (item != null) {
+                renderGhostItem(poseStack, new ItemStack(item), rect.x(), rect.y());
+            }
+            return;
+        }
+        if (descriptor instanceof ItemRenderDescriptor item) {
+            renderGhostItem(poseStack, item.stack(), rect.x(), rect.y());
+            return;
+        }
+        if (descriptor instanceof FluidRenderDescriptor fluid) {
+            renderGhostFluid(poseStack, fluid.stack(), rect, z);
+            return;
+        }
+        throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
     public static void fill(PoseStack poseStack, Rect rect, int color) {

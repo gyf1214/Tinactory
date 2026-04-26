@@ -147,7 +147,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                             .map(ItemStack::new)
                             .toList();
                     }
-                    RenderUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
+                    ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
                         RenderUtil.renderItem(stack, filterRect.x(), filterRect.y()));
                 }
             }

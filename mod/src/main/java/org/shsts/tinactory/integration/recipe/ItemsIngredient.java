@@ -2,18 +2,25 @@ package org.shsts.tinactory.integration.recipe;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
+import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class ItemsIngredient implements IProcessingIngredient {
+public abstract class ItemsIngredient implements IProcessingIngredient, IProcessingDisplay {
     public final Ingredient ingredient;
     public final int amount;
 
@@ -45,6 +52,18 @@ public abstract class ItemsIngredient implements IProcessingIngredient {
             return ProcessingHelper.consumeMatchingPort(item, ingredient, StackHelper.ITEM_ADAPTER,
                 amount * parallel, simulate).map(ProcessingHelper::itemIngredient);
         }
+    }
+
+    @Override
+    public IRenderDescriptor display() {
+        return ClientUtil.selectItemFromItems(ingredient)
+            .<IRenderDescriptor>map(ItemRenderDescriptor::new)
+            .orElse(EmptyRenderDescriptor.INSTANCE);
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip() {
+        return ClientUtil.selectItemFromItems(ingredient).map(ClientUtil::itemTooltip);
     }
 
     /**

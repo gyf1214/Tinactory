@@ -8,6 +8,8 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
+import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
@@ -145,6 +147,46 @@ class ProcessingRecipeTest {
 
         assertEquals(firstDescriptor, recipe.display());
         assertEquals(firstTooltip, recipe.tooltip().orElseThrow());
+    }
+
+    @Test
+    void shouldUseMarkerDisplayIngredientDescriptorAndRecipeTooltip() {
+        var displayDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/marker"));
+        var recipe = markerBuilder()
+            .display(new TestIngredient("display", 1, displayDescriptor,
+                List.<Component>of(I18n.raw("ignored display tooltip"))))
+            .output(0, new TestIngredient("marker_output", 1))
+            .buildObject();
+
+        assertEquals(displayDescriptor, recipe.display());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
+            recipe.tooltip().orElseThrow());
+    }
+
+    @Test
+    void shouldUseMarkerTextureDescriptorAndRecipeTooltip() {
+        var textureLoc = new ResourceLocation("tinactory", "gui/marker");
+        var recipe = markerBuilder()
+            .display(textureLoc)
+            .output(0, new TestIngredient("marker_output", 1))
+            .buildObject();
+
+        assertEquals(new TextureRenderDescriptor(new Texture(textureLoc, 16, 16)), recipe.display());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
+            recipe.tooltip().orElseThrow());
+    }
+
+    @Test
+    void shouldFallbackMarkerDescriptorToRepresentativeObjectButKeepRecipeTooltip() {
+        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
+        var recipe = markerBuilder()
+            .output(0, new TestResult("marker_output", 1, outputDescriptor,
+                List.<Component>of(I18n.raw("ignored output tooltip"))))
+            .buildObject();
+
+        assertEquals(outputDescriptor, recipe.display());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
+            recipe.tooltip().orElseThrow());
     }
 
     @Test

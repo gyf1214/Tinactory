@@ -16,12 +16,15 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -66,6 +69,20 @@ public final class ClientUtil {
 
     public static List<Component> tagTooltip(TagKey<Item> tag) {
         return List.of(I18n.tr("tinactory.tooltip.tag", tag.location()));
+    }
+
+    public static Optional<ItemStack> selectItemFromItems(List<ItemStack> items) {
+        if (items.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var cycle = System.currentTimeMillis() / 1000L;
+        var idx = (int) (cycle % items.size());
+        return Optional.of(items.get(idx));
+    }
+
+    public static Optional<ItemStack> selectItemFromItems(Ingredient ingredient) {
+        return selectItemFromItems(Arrays.asList(ingredient.getItems()));
     }
 
     public static String getNumberString(long count) {

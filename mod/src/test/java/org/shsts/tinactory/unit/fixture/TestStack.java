@@ -2,11 +2,18 @@ package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
+import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.LocHelper;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public record TestStack(PortType type, String id, String nbt, int amount) {
     public static final Codec<TestStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -58,6 +65,17 @@ public record TestStack(PortType type, String id, String nbt, int amount) {
         public TestStack stackOf(IStackKey key, long amount) {
             var typed = (TestStackKey) key;
             return new TestStack(typed.type(), typed.id(), typed.nbt(), (int) amount);
+        }
+
+        @Override
+        public IRenderDescriptor display(TestStack stack) {
+            return new ItemIdRenderDescriptor(LocHelper.modLoc(stack.id()));
+        }
+
+        @Override
+        public Optional<List<Component>> tooltip(TestStack stack) {
+            var label = stack.type() == PortType.FLUID ? "fluid" : "item";
+            return Optional.of(List.<Component>of(I18n.raw("%s %s x%d", label, stack.id(), stack.amount())));
         }
     };
 

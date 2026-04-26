@@ -6,14 +6,19 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,6 +68,16 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             stack.setTag(typed.nbt().copy());
         }
         return stack;
+    }
+
+    @Override
+    public IRenderDescriptor display(ItemStack stack) {
+        return new ItemRenderDescriptor(stack);
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip(ItemStack stack) {
+        return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.itemTooltip(stack));
     }
 
     private static final class ItemKey implements IStackKey {

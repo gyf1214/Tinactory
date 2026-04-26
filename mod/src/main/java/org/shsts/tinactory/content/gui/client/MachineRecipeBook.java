@@ -91,7 +91,7 @@ public class MachineRecipeBook extends Panel {
             if (recipe == null) {
                 RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect1);
             } else {
-                recipe.render(poseStack, rect1, z);
+                RenderUtil.render(recipe.display(), poseStack, rect1, z);
             }
         }
 

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.machine;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -10,8 +9,9 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
@@ -316,10 +316,6 @@ class ProcessingRuntimeTest {
 
     private record TestRecipeBookItem(ResourceLocation loc) implements IRecipeBookItem {
         @Override
-        public void render(PoseStack poseStack, Rect rect, int z) {
-        }
-
-        @Override
         public boolean isMarker() {
             return false;
         }
@@ -332,6 +328,11 @@ class ProcessingRuntimeTest {
         @Override
         public Optional<List<Component>> buttonToolTip() {
             return Optional.empty();
+        }
+
+        @Override
+        public IRenderDescriptor display() {
+            return EmptyRenderDescriptor.INSTANCE;
         }
     }
 }

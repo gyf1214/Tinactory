@@ -4,12 +4,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.util.MathUtil;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -17,7 +21,7 @@ import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class StackResult<T> implements IProcessingResult {
+public class StackResult<T> implements IProcessingResult, IProcessingDisplay {
     private final String codecName;
     private final PortType type;
     private final double rate;
@@ -81,6 +85,16 @@ public class StackResult<T> implements IProcessingResult {
     public IProcessingResult scaledPreview(int parallel) {
         return new StackResult<>(codecName, type, 1d,
             adapter.withAmount(stack, adapter.amount(stack) * parallel), adapter);
+    }
+
+    @Override
+    public IRenderDescriptor display() {
+        return adapter.display(stack);
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip() {
+        return adapter.tooltip(stack);
     }
 
     public static <T> Codec<StackResult<T>> codec(String codecName, PortType type,
