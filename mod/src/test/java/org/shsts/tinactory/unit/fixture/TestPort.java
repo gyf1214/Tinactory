@@ -4,6 +4,7 @@ import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.logistics.PortNotifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public final class TestPort implements IPort<TestStack>, IPortFilter<TestStack>, ILimitedPort {
+public final class TestPort extends PortNotifier implements IPort<TestStack>, IPortFilter<TestStack>, ILimitedPort {
     private final PortType type;
     private final String id;
     private final String nbt;
@@ -68,6 +69,7 @@ public final class TestPort implements IPort<TestStack>, IPortFilter<TestStack>,
         var inserted = Math.min(stack.amount(), capacity - storedAmount);
         if (!simulate) {
             storedAmount += inserted;
+            invokeUpdate();
         }
         return TestStack.ADAPTER.withAmount(stack, stack.amount() - inserted);
     }
@@ -81,6 +83,7 @@ public final class TestPort implements IPort<TestStack>, IPortFilter<TestStack>,
         var moved = Math.min(stack.amount(), storedAmount);
         if (!simulate) {
             storedAmount -= moved;
+            invokeUpdate();
         }
         return TestStack.ADAPTER.withAmount(stack, moved);
     }
@@ -93,6 +96,7 @@ public final class TestPort implements IPort<TestStack>, IPortFilter<TestStack>,
         var moved = Math.min(limit, storedAmount);
         if (!simulate) {
             storedAmount -= moved;
+            invokeUpdate();
         }
         return new TestStack(type, id, nbt, moved);
     }

@@ -45,6 +45,20 @@ class DigitalStorageTest {
     }
 
     @Test
+    void shouldDifferentiateNewTypeInsertFromExistingTypeInsert() {
+        var provider = new FakeDigitalProvider(30);
+        var storage = new TestStorage(provider, 4, 2);
+
+        var firstRemainder = storage.insert(new TestStack("iron", 3), false);
+        var secondRemainder = storage.insert(new TestStack("iron", 3), false);
+
+        assertEquals(0, firstRemainder.amount());
+        assertEquals(0, secondRemainder.amount());
+        assertEquals(6, storage.getStorageAmount(new TestStack("iron", 1)));
+        assertEquals(16, provider.bytesUsed());
+    }
+
+    @Test
     void shouldHonorFilters() {
         var provider = new FakeDigitalProvider(20);
         var storage = new TestStorage(provider, 2, 1);
@@ -57,6 +71,19 @@ class DigitalStorageTest {
         assertEquals(0, accepted.amount());
         storage.resetFilters();
         assertEquals(0, storage.insert(new TestStack("iron", 1), false).amount());
+    }
+
+    @Test
+    void shouldRejectInputWhenProviderOrMaxAmountCannotAcceptIt() {
+        var bytesLimited = new TestStorage(new FakeDigitalProvider(5), 4, 2);
+
+        assertFalse(bytesLimited.acceptInput(new TestStack("iron", 1)));
+
+        var maxAmountLimited = new TestStorage(new FakeDigitalProvider(20), 2, 1);
+        maxAmountLimited.maxAmount = 2;
+        maxAmountLimited.insert(new TestStack("iron", 2), false);
+
+        assertFalse(maxAmountLimited.acceptInput(new TestStack("iron", 1)));
     }
 
     @Test
@@ -85,6 +112,36 @@ class DigitalStorageTest {
         assertFalse(extracted.id().isEmpty());
         assertEquals(2, extracted.amount());
         assertEquals(2, storage.getStorageAmount(new TestStack("iron", 1)));
+    }
+
+    @Test
+    void extractAnyShouldHandleZeroEmptyAndFullDrainBranches() {
+        var provider = new FakeDigitalProvider(100);
+        var storage = new TestStorage(provider, 3, 1);
+
+        assertTrue(storage.extract(0, false).amount() <= 0);
+        assertTrue(storage.extract(2, false).amount() <= 0);
+
+        storage.insert(new TestStack("iron", 4), false);
+        var drained = storage.extract(4, false);
+
+        assertEquals(4, drained.amount());
+        assertEquals(0, storage.getStorageAmount(new TestStack("iron", 1)));
+        assertEquals(0, provider.bytesUsed());
+    }
+
+    @Test
+    void shouldClearContentsAndResetProviderState() {
+        var provider = new FakeDigitalProvider(100);
+        var storage = new TestStorage(provider, 3, 1);
+        storage.insert(new TestStack("iron", 2), false);
+        storage.insert(new TestStack("gold", 1), false);
+
+        storage.clear();
+
+        assertTrue(storage.getAllStorages().isEmpty());
+        assertEquals(0, storage.getStorageAmount(new TestStack("iron", 1)));
+        assertEquals(0, provider.bytesUsed());
     }
 
     private static final class FakeDigitalProvider implements IDigitalProvider {
