@@ -1,20 +1,20 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestStackKey;
-import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.unit.fixture.TestInventoryView;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;

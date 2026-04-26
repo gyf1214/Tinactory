@@ -12,9 +12,9 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 

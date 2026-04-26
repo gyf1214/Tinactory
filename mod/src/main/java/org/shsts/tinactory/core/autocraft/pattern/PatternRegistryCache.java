@@ -3,9 +3,9 @@ package org.shsts.tinactory.core.autocraft.pattern;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;

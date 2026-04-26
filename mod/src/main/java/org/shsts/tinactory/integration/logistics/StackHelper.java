@@ -23,7 +23,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.slf4j.Logger;
 
 import java.util.Objects;

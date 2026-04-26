@@ -2,7 +2,7 @@ package org.shsts.tinactory.core.autocraft.plan;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.IStackKey;
 
 import java.util.HashMap;
 import java.util.Map;

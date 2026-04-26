@@ -1,6 +1,5 @@
-package org.shsts.tinactory.core.logistics;
+package org.shsts.tinactory.api.logistics;
 
-import org.shsts.tinactory.api.logistics.PortType;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 

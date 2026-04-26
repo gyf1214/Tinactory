@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import snownee.jade.Jade;

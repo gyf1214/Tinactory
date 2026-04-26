@@ -2,8 +2,8 @@ package org.shsts.tinactory.core.autocraft.api;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,8 +1,8 @@
 package org.shsts.tinactory.unit.fixture;
 
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.LinkedHashMap;
 import java.util.List;

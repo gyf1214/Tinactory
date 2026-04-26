@@ -2,13 +2,13 @@ package org.shsts.tinactory.core.autocraft.service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.logistics.IStackKey;
 
 import java.util.List;
 import java.util.Optional;
@@ -129,5 +129,4 @@ public class AutocraftTerminalService {
             execution.error(),
             state == JobState.RUNNING || state == JobState.BLOCKED);
     }
-
 }
