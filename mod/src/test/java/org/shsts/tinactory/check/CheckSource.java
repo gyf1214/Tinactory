@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class CheckSource {
-    // MachineConstraintCodecHelper
-    private static final int MAX_SOURCE_VIOLATIONS = 4;
+    private static final int MAX_SOURCE_VIOLATIONS = 0;
 
     private CheckSource() {}
 

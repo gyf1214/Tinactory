@@ -1,10 +1,10 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
@@ -32,7 +32,7 @@ class AutocraftModelTest {
         var plate = new CraftAmount(TestStackKey.item("tinactory:plate", ""), 2);
         var slag = new CraftAmount(TestStackKey.item("tinactory:slag", ""), 1);
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "crusher"), 2,
-            List.of(new TestConstraint("tooling")));
+            List.of(new TestMachineConstraint("tooling")));
 
         var pattern = new CraftPattern("tinactory:ore_to_plate", List.of(ore), List.of(plate, slag), requirement);
 
@@ -40,13 +40,13 @@ class AutocraftModelTest {
         assertEquals(List.of(plate, slag), pattern.outputs());
         assertEquals(new ResourceLocation("tinactory", "crusher"), pattern.machineRequirement().recipeTypeId());
         assertEquals(2, pattern.machineRequirement().voltageTier());
-        assertEquals("tooling", pattern.machineRequirement().constraints().get(0).typeId());
+        assertEquals(new TestMachineConstraint("tooling"), pattern.machineRequirement().constraints().get(0));
     }
 
     @Test
     void modelValuesShouldBeImmutable() {
         var requirement = new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1,
-            List.of(new TestConstraint("frame")));
+            List.of(new TestMachineConstraint("frame")));
         var pattern = new CraftPattern(
             "tinactory:part",
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
@@ -81,8 +81,5 @@ class AutocraftModelTest {
 
         assertThrows(AssertionError.class, () -> assertEquals(input0, input1));
         assertThrows(AssertionError.class, () -> assertEquals(output0, output1));
-    }
-
-    private record TestConstraint(String typeId) implements IMachineConstraint {
     }
 }
