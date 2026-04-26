@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.util.ServerUtil;
+import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.Optional;
 

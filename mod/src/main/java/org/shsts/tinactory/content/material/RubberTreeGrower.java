@@ -8,7 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.shsts.tinactory.AllWorldGens;
-import org.shsts.tinactory.core.util.ServerUtil;
+import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.Random;
 

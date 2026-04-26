@@ -22,9 +22,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.tool.IWrenchable;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
+import org.shsts.tinactory.integration.tool.IWrenchable;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -33,8 +33,8 @@ import java.util.function.Supplier;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.TinactoryConfig.listConfig;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 /**
  * Most common machine block, have facing, IO facing and working state.

@@ -15,8 +15,8 @@ import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Objects;

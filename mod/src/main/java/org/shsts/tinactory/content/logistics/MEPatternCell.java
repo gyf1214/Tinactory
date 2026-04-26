@@ -16,18 +16,18 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
-import org.shsts.tinactory.core.common.CapabilityItem;
-import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
+import org.shsts.tinactory.integration.common.CapabilityItem;
+import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.List;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,11 +1,12 @@
-package org.shsts.tinactory.core.builder;
+package org.shsts.tinactory.integration.builder;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.ValueHolder;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;

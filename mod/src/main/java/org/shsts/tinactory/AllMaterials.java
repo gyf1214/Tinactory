@@ -3,7 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
-import org.shsts.tinactory.core.material.MaterialSet;
+import org.shsts.tinactory.integration.material.MaterialSet;
 
 import java.util.HashMap;
 import java.util.Map;

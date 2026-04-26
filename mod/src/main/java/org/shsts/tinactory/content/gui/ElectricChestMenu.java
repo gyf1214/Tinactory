@@ -14,9 +14,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllMenus.ITEM_SLOT_CLICK;
-import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

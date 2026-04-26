@@ -14,12 +14,12 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.util.ServerUtil;
+import org.shsts.tinactory.integration.util.ServerUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 

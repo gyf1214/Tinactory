@@ -12,10 +12,10 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.tool;
+package org.shsts.tinactory.integration.tool;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -13,8 +13,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

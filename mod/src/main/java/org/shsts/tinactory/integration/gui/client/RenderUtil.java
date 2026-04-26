@@ -39,7 +39,7 @@ import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.Random;
 

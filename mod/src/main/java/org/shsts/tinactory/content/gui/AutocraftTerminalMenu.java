@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
-import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

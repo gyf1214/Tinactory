@@ -10,8 +10,8 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
 
-import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 import static org.shsts.tinactory.core.util.I18n.tr;
+import static org.shsts.tinactory.integration.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

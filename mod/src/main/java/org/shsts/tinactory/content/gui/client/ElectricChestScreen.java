@@ -11,9 +11,9 @@ import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;

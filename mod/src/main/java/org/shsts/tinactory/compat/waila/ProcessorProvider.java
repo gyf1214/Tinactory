@@ -25,10 +25,10 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -45,9 +45,9 @@ import static org.shsts.tinactory.compat.waila.Waila.POWER;
 import static org.shsts.tinactory.compat.waila.Waila.PROGRESS;
 import static org.shsts.tinactory.compat.waila.Waila.RECIPE;
 import static org.shsts.tinactory.compat.waila.Waila.WORK_SPEED;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

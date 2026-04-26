@@ -4,13 +4,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.logistics.ElectricTank;
-import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

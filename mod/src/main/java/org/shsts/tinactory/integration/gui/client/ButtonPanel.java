@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.GridViewGroup;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.ArrayList;
 import java.util.List;

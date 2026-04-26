@@ -13,10 +13,10 @@ import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkRuntime;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.slf4j.Logger;
 
 import java.util.Collection;

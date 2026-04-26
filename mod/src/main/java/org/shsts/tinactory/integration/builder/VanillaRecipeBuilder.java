@@ -1,9 +1,10 @@
-package org.shsts.tinactory.core.builder;
+package org.shsts.tinactory.integration.builder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IVanillaRecipeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;

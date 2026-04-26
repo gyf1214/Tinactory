@@ -12,7 +12,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.Panel;
@@ -20,6 +19,7 @@ import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
 import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
+import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;

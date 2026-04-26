@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.common;
+package org.shsts.tinactory.integration.common;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -16,10 +16,10 @@ import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
-import static org.shsts.tinactory.core.util.ClientUtil.fluidAmount;
-import static org.shsts.tinactory.core.util.ClientUtil.fluidName;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.fluidAmount;
+import static org.shsts.tinactory.integration.util.ClientUtil.fluidName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

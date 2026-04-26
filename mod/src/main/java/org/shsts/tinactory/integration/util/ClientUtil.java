@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.util;
+package org.shsts.tinactory.integration.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,6 +19,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -136,7 +137,7 @@ public final class ClientUtil {
     public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
         var line1 = fluidName(stack);
         return showAmount ? List.of(line1, fluidAmount(stack)
-            .withStyle(ChatFormatting.GRAY)) : List.of(line1);
+                                           .withStyle(ChatFormatting.GRAY)) : List.of(line1);
     }
 
     public static void addTooltip(List<Component> tooltip, MutableComponent line) {

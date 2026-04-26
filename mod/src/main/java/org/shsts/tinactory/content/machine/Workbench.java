@@ -22,7 +22,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
-import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;

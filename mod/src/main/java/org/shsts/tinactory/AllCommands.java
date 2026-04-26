@@ -26,8 +26,8 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.core.util.ServerUtil;
 import org.shsts.tinactory.integration.tech.TechManagers;
+import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.Random;
 

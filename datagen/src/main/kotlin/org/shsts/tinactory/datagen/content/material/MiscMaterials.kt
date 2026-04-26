@@ -5,8 +5,8 @@ import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ITEM_STORAGE_CELL
-import org.shsts.tinactory.AllTags.PATTERN_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ORE_BASE_DUST
+import org.shsts.tinactory.AllTags.PATTERN_STORAGE_CELL
 import org.shsts.tinactory.AllTags.STORAGE_CELL
 import org.shsts.tinactory.AllTags.TOOL
 import org.shsts.tinactory.AllTags.TOOL_FILE
@@ -20,7 +20,6 @@ import org.shsts.tinactory.AllTags.TOOL_SHEARS
 import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.cubeTint
 import org.shsts.tinactory.datagen.content.Technologies
@@ -35,6 +34,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerato
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.integration.material.OreVariant
 
 object MiscMaterials {
     fun init() {

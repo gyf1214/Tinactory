@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.tool;
+package org.shsts.tinactory.integration.tool;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.core.BlockPos;

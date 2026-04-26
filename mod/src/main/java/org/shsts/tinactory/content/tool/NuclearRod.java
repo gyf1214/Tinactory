@@ -18,8 +18,8 @@ import org.shsts.tinactory.core.util.MathUtil;
 import java.util.List;
 
 import static org.shsts.tinactory.AllRegistries.ITEMS;
-import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

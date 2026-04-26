@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.material;
+package org.shsts.tinactory.integration.material;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
-import org.shsts.tinactory.core.tool.ToolItem;
-import org.shsts.tinactory.core.tool.UsableToolItem;
+import org.shsts.tinactory.integration.tool.ToolItem;
+import org.shsts.tinactory.integration.tool.UsableToolItem;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
