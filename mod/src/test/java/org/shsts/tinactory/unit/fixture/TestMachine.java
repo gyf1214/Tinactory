@@ -8,10 +8,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
-import org.shsts.tinactory.api.gui.client.IRenderable;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -22,7 +21,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,8 +282,8 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public PlayerTeam getPlayerTeam() {
-            throw new UnsupportedOperationException();
+        public String getName() {
+            return "test-team";
         }
 
         @Override
@@ -304,9 +303,9 @@ public final class TestMachine implements IMachine {
 
         @Override
         public boolean canResearch(ResourceLocation tech, long value) {
-            return target.map($ -> $.getLoc().equals(tech) &&
-                isTechAvailable(tech) &&
-                getTechProgress(tech) + value <= $.getMaxProgress())
+            return target.map($ -> $.loc().equals(tech) &&
+                    isTechAvailable(tech) &&
+                    getTechProgress(tech) + value <= $.getMaxProgress())
                 .orElse(false);
         }
 
@@ -322,7 +321,7 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void advanceTechProgress(ITechnology tech, long value) {
-            advanceTechProgress(tech.getLoc(), value);
+            advanceTechProgress(tech.loc(), value);
         }
 
         @Override
@@ -332,8 +331,8 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void setTargetTech(ITechnology tech) {
-            target = Optional.of(new TestTechnology(tech.getLoc(), tech.getMaxProgress()));
-            available(tech.getLoc());
+            target = Optional.of(new TestTechnology(tech.loc(), tech.getMaxProgress()));
+            available(tech.loc());
         }
 
         @Override
@@ -343,11 +342,6 @@ public final class TestMachine implements IMachine {
     }
 
     private record TestTechnology(ResourceLocation loc, long maxProgress) implements ITechnology {
-        @Override
-        public ResourceLocation getLoc() {
-            return loc;
-        }
-
         @Override
         public List<ITechnology> getDepends() {
             return List.of();
@@ -364,13 +358,23 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public DistLazy<? extends IRenderable> getDisplay() {
-            throw new UnsupportedOperationException();
+        public IRenderDescriptor getDisplay() {
+            return EmptyRenderDescriptor.INSTANCE;
+        }
+
+        @Override
+        public Component getDescription() {
+            return TextComponent.EMPTY;
+        }
+
+        @Override
+        public Component getDetails() {
+            return TextComponent.EMPTY;
         }
 
         @Override
         public int compareTo(ITechnology other) {
-            return loc.compareTo(other.getLoc());
+            return loc.compareTo(other.loc());
         }
     }
 }

@@ -7,7 +7,6 @@ import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +15,7 @@ import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +32,7 @@ public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
     }
 
     @Override
-    protected @Nullable Object getIngredientHovered(Widget hovered, double mouseX, double mouseY) {
+    protected @Nullable Object getIngredientHovered(IViewAdapter hovered, double mouseX, double mouseY) {
         return MachineRecipeBook.getHoveredRecipe(hovered)
             .map(this::getRecipeBookIngredient)
             .orElse(null);

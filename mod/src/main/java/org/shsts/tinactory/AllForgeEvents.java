@@ -15,12 +15,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.shsts.tinactory.core.common.CapabilityItem;
-import org.shsts.tinactory.core.common.ItemCapabilityProvider;
-import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.tech.TinactorySavedData;
+import org.shsts.tinactory.integration.common.CapabilityItem;
+import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
+import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.Random;
 
@@ -43,7 +42,7 @@ public final class AllForgeEvents {
 
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
-        TechManager.server().addReloadListener(event);
+        TechManagers.server().addReloadListener(event);
     }
 
     @SubscribeEvent
@@ -63,7 +62,7 @@ public final class AllForgeEvents {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
-            TechManager.server().onPlayerJoin(serverPlayer);
+            TechManagers.server().onPlayerJoin(serverPlayer);
         }
     }
 
@@ -71,7 +70,7 @@ public final class AllForgeEvents {
     public static void onLoadWorld(WorldEvent.Load event) {
         var world = (Level) event.getWorld();
         if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
-            TinactorySavedData.load((ServerLevel) world);
+            TechManagers.loadSavedData((ServerLevel) world);
         }
     }
 
@@ -84,10 +83,10 @@ public final class AllForgeEvents {
         }
         if (world.dimension() == Level.OVERWORLD) {
             if (!world.isClientSide) {
-                TinactorySavedData.unload();
-                TechManager.server().unload();
+                TechManagers.unloadSavedData();
+                TechManagers.server().unload();
             } else {
-                TechManager.client().unload();
+                TechManagers.client().unload();
             }
         }
     }

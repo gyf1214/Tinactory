@@ -1,18 +1,16 @@
 package org.shsts.tinactory.core.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinactory.integration.gui.client.RecipeDisplayRegistry;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,11 +38,11 @@ public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IReci
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return RecipeDisplayRegistry.tooltip(recipe);
+        return recipe.tooltip();
     }
 
     @Override
-    public void render(PoseStack poseStack, Rect rect, int z) {
-        RecipeDisplayRegistry.render(recipe, poseStack, rect, z);
+    public IRenderDescriptor display() {
+        return recipe.display();
     }
 }

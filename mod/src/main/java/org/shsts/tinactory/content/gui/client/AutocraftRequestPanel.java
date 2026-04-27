@@ -5,13 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -42,13 +42,13 @@ public class AutocraftRequestPanel extends Panel {
         cpuIndexInput.setValue("");
         var previewButton = Widgets.simpleButton(menu, new TextComponent("Preview"), null, screen::requestPreview);
 
-        addWidget(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 4, -4, 12), title);
-        addWidget(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 18, -4, 12), targetSummary);
-        addWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 32, 48, EDIT_HEIGHT), targetIndexInput);
-        addWidget(RectD.corners(0d, 0d, 1d, 0d), new Rect(56, 36, -4, 12), cpuSummary);
-        addWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 46, 48, EDIT_HEIGHT), cpuIndexInput);
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-124, 44, 48, EDIT_HEIGHT), quantityInput);
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-72, 42, 68, 20), previewButton);
+        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 4, -4, 12), title);
+        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 18, -4, 12), targetSummary);
+        addVanillaWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 32, 48, EDIT_HEIGHT), 0, targetIndexInput);
+        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(56, 36, -4, 12), cpuSummary);
+        addVanillaWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 46, 48, EDIT_HEIGHT), 0, cpuIndexInput);
+        addVanillaWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-124, 44, 48, EDIT_HEIGHT), 0, quantityInput);
+        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-72, 42, 68, 20), previewButton);
     }
 
     public OptionalLong quantity() {

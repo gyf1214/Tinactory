@@ -10,10 +10,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +59,7 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -92,7 +92,7 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
             var slot1 = layout.slots.get(i + size);
             var x = slot.x() + 1;
             var y = (slot.y() + slot1.y()) / 2 + 1;
-            layoutPanel.addWidget(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
+            layoutPanel.addChild(new Rect(x, y, SLOT_SIZE - 2, SLOT_SIZE - 2), new ItemSlot(i));
         }
     }
 }

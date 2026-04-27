@@ -12,8 +12,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.tool.WrenchOutlineRenderer;
-import org.shsts.tinactory.core.tool.IWrenchable;
-import org.shsts.tinactory.core.tool.UsableToolItem;
+import org.shsts.tinactory.integration.tool.IWrenchable;
+import org.shsts.tinactory.integration.tool.UsableToolItem;
 
 import static org.shsts.tinactory.Tinactory.CHANNEL;
 

@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinycorelib.api.core.ILoc;
@@ -16,10 +17,12 @@ import java.util.function.BiConsumer;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IRecipeBookItem extends ILoc, IRectRenderable {
+public interface IRecipeBookItem extends ILoc {
     boolean isMarker();
 
     void select(Layout layout, BiConsumer<Layout.SlotInfo, IProcessingObject> ingredientCons);
 
     Optional<List<Component>> buttonToolTip();
+
+    IRenderDescriptor display();
 }

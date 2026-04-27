@@ -15,7 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.shsts.tinactory.api.TinactoryKeys;
-import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.api.network.IChannel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
@@ -67,7 +67,7 @@ public class Tinactory {
             AllBlockEntities.init();
             AllMultiblocks.init();
 
-            TechManager.init();
+            TechManagers.init();
             AllWorldGens.init();
 
             REGISTRATE.register(modEventBus);
@@ -79,7 +79,7 @@ public class Tinactory {
     }
 
     public void onConstructClient() {
-        TechManager.initClient();
+        TechManagers.initClient();
 
         REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);

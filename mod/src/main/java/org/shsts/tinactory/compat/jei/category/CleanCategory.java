@@ -11,7 +11,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.util.ClientUtil.PERCENTAGE_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

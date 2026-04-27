@@ -13,11 +13,10 @@ import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkRuntime;
-import org.shsts.tinactory.core.tech.TeamProfile;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -38,11 +37,11 @@ public class Network implements INetwork {
     private final NetworkGraphEngine<BlockState> graphEngine;
 
     public final BlockPos center;
-    public final TeamProfile team;
+    public final ITeamProfile team;
 
     private int delayTicks;
 
-    public Network(Level world, UUID uuid, BlockPos center, TeamProfile team) {
+    public Network(Level world, UUID uuid, BlockPos center, ITeamProfile team) {
         this.world = world;
         this.uuid = uuid;
         this.center = center;

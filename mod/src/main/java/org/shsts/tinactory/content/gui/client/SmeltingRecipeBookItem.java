@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -8,14 +7,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,13 +65,14 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
+        return ClientUtil.selectItemFromItems(recipe.getIngredients().get(0))
             .map(ClientUtil::itemTooltip);
     }
 
     @Override
-    public void render(PoseStack poseStack, Rect rect, int z) {
-        RenderUtil.selectItemFromItems(recipe.getIngredients().get(0))
-            .ifPresent(item -> RenderUtil.renderItem(item, rect.x(), rect.y()));
+    public IRenderDescriptor display() {
+        return ClientUtil.selectItemFromItems(recipe.getIngredients().get(0))
+            .<IRenderDescriptor>map(ItemRenderDescriptor::new)
+            .orElse(EmptyRenderDescriptor.INSTANCE);
     }
 }

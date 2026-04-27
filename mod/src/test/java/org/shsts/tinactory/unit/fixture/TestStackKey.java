@@ -2,8 +2,8 @@ package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IStackKey;
 
 public record TestStackKey(PortType type, String id, String nbt) implements IStackKey {
     private static final Codec<TestStackKey> RAW_CODEC = Codec.STRING.comapFlatMap(

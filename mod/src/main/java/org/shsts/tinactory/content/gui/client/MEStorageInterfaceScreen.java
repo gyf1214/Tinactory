@@ -9,17 +9,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -118,7 +118,7 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         this.contentHeight = menu.endY();
 
         this.panel = new StoragePanel();
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, PANEL_HEIGHT), panel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, PANEL_HEIGHT), panel);
         menu.onSyncPacket(SLOT_SYNC, this::onSync);
     }
 

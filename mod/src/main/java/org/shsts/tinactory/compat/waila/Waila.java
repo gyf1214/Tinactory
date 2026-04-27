@@ -10,7 +10,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.shsts.tinactory.core.common.SmartEntityBlock;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 

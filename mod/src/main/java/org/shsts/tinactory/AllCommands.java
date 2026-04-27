@@ -23,9 +23,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.TinactoryKeys;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.tech.TechManagers;
+import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.Random;
 
@@ -49,7 +51,7 @@ public final class AllCommands {
     private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var name = StringArgumentType.getString(ctx, "name");
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
 
         if (manager.teamByPlayer(player).isPresent()) {
             throw PLAYER_HAS_TEAM.create();
@@ -89,7 +91,7 @@ public final class AllCommands {
     private static int addPlayerToTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var player2 = EntityArgument.getPlayer(ctx, "player");
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         if (manager.teamByPlayer(player2).isPresent()) {
@@ -114,7 +116,7 @@ public final class AllCommands {
 
     private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         manager.leaveTeam(player);
@@ -125,9 +127,10 @@ public final class AllCommands {
 
     private static int removeTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-        var playerTeam = team.getPlayerTeam();
+        var playerTeam = (PlayerTeam) player.getTeam();
+        assert playerTeam != null;
 
         if (playerTeam.getPlayers().size() != 1) {
             throw CANNOT_REMOVE_TEAM.create();
@@ -141,26 +144,26 @@ public final class AllCommands {
     }
 
     private static int syncTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        TechManager.server().syncTeam(ctx.getSource().getPlayerOrException());
+        TechManagers.server().syncTeam(ctx.getSource().getPlayerOrException());
         return Command.SINGLE_SUCCESS;
     }
 
     private static int setTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
         var techName = ResourceLocationArgument.getId(ctx, "tech");
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTargetTech(tech);
         player.sendMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
-            I18n.tr(tech.getDescriptionId())), Util.NIL_UUID);
+            tech.getDescription()), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int resetTargetTech(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         team.resetTargetTech();
@@ -182,20 +185,25 @@ public final class AllCommands {
         var player = ctx.getSource().getPlayerOrException();
         var techName = ResourceLocationArgument.getId(ctx, "tech");
         var progress = LongArgumentType.getLong(ctx, "progress");
-        var manager = TechManager.server();
+        var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTechProgress(tech, progress);
-        var msg = "Set tech %s process of %s to %d".formatted(tech.getLoc(), team.getName(), progress);
+        var msg = "Set tech %s process of %s to %d".formatted(tech.loc(), team.getName(), progress);
         player.sendMessage(new TextComponent(msg), Util.NIL_UUID);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int removeTeamAdmin(CommandContext<CommandSourceStack> ctx) {
         var teamName = StringArgumentType.getString(ctx, "team");
-        var manager = TechManager.server();
-        manager.teamByName(teamName).ifPresent($ -> manager.removeTeam($.getPlayerTeam()));
+        var manager = TechManagers.server();
+        manager.teamByName(teamName).ifPresent($ -> {
+            var playerTeam = ServerUtil.getScoreboard().getPlayerTeam($.getName());
+            if (playerTeam != null) {
+                manager.removeTeam(playerTeam);
+            }
+        });
 
         return Command.SINGLE_SUCCESS;
     }

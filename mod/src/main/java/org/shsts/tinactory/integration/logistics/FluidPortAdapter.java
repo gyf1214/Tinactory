@@ -6,14 +6,19 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -63,6 +68,16 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             stack.setTag(typed.nbt().copy());
         }
         return stack;
+    }
+
+    @Override
+    public IRenderDescriptor display(FluidStack stack) {
+        return new FluidRenderDescriptor(stack);
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip(FluidStack stack) {
+        return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.fluidTooltip(stack, false));
     }
 
     private static final class FluidKey implements IStackKey {

@@ -8,44 +8,41 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.scores.PlayerTeam;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
-import org.shsts.tinactory.core.util.ServerUtil;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamProfile {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected final TechManager techManager;
-    protected final PlayerTeam playerTeam;
+    protected final ITechManager techManager;
+    protected final String name;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
     protected final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     protected ITechnology targetTech = null;
 
-    protected TeamProfile(TechManager techManager, PlayerTeam playerTeam) {
+    public TeamProfile(ITechManager techManager, String name) {
         this.techManager = techManager;
-        this.playerTeam = playerTeam;
+        this.name = name;
     }
 
     @Override
-    public PlayerTeam getPlayerTeam() {
-        return playerTeam;
+    public String getName() {
+        return name;
     }
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        var v = technologies.getOrDefault(tech.getLoc(), 0L) + progress;
+        var v = technologies.getOrDefault(tech.loc(), 0L) + progress;
         setTechProgress(tech, v);
     }
 
@@ -55,16 +52,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     private void broadcastUpdate(TechUpdatePacket packet) {
-        TinactorySavedData.get().setDirty();
-        techManager.invokeChange(this);
-        var playerList = ServerUtil.getPlayerList();
-        for (var name : playerTeam.getPlayers()) {
-            var player = playerList.getPlayerByName(name);
-            if (player == null) {
-                continue;
-            }
-            CHANNEL.sendToPlayer(player, packet);
-        }
+        techManager.broadcastUpdate(this, packet);
     }
 
     public void onTechComplete(ITechnology tech) {
@@ -80,16 +68,20 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
      * Can only be called on server
      */
     public void setTechProgress(ITechnology tech, long progress) {
-        var oldProgress = technologies.getOrDefault(tech.getLoc(), 0L);
+        var oldProgress = technologies.getOrDefault(tech.loc(), 0L);
         var maxProgress = tech.getMaxProgress();
         progress = Math.min(progress, maxProgress);
 
-        technologies.put(tech.getLoc(), progress);
+        technologies.put(tech.loc(), progress);
         if (oldProgress < maxProgress && progress >= maxProgress) {
             onTechComplete(tech);
         }
 
         broadcastUpdate(TechUpdatePacket.progress(tech, progress));
+    }
+
+    public void applyProgressUpdate(ResourceLocation tech, long progress) {
+        technologies.put(tech, progress);
     }
 
     @Override
@@ -129,7 +121,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public void resetTargetTech() {
         targetTech = null;
-        broadcastUpdate(TechUpdatePacket.target(null));
+        broadcastUpdate(TechUpdatePacket.target((ResourceLocation) null));
+    }
+
+    public void applyTargetTechUpdate(@Nullable ITechnology tech) {
+        targetTech = tech;
     }
 
     @Override
@@ -144,7 +140,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        tag.putString("name", playerTeam.getName());
+        tag.putString("name", name);
         var listTag = new ListTag();
         for (var tech : technologies.entrySet()) {
             var loc = tech.getKey();
@@ -156,13 +152,17 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
         tag.put("tech", listTag);
         if (targetTech != null) {
-            tag.putString("target", targetTech.getLoc().toString());
+            tag.putString("target", targetTech.loc().toString());
         }
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
+        technologies.clear();
+        modifiers.clear();
+        targetTech = null;
+
         var listTag = tag.getList("tech", Tag.TAG_COMPOUND);
         for (var tag1 : listTag) {
             var tag2 = (CompoundTag) tag1;
@@ -181,25 +181,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
     }
 
-    public static TeamProfile create(PlayerTeam team) {
-        return new TeamProfile(TechManager.server(), team);
-    }
-
-    public static Optional<TeamProfile> fromTag(Tag tag) {
-        var compoundTag = (CompoundTag) tag;
-
-        var name = compoundTag.getString("name");
-        var playerTeam = ServerUtil.getScoreboard().getPlayerTeam(name);
-        if (playerTeam == null) {
-            return Optional.empty();
-        }
-        var ret = new TeamProfile(TechManager.server(), playerTeam);
-        ret.deserializeNBT(compoundTag);
-        return Optional.of(ret);
-    }
-
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + playerTeam.getName() + "]";
+        return getClass().getSimpleName() + "[" + name + "]";
     }
 }

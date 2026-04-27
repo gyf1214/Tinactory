@@ -11,7 +11,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.network.NetworkEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
-import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -81,7 +81,7 @@ public class TechMenu extends MenuBase {
 
     private class RenameResultSlot extends Slot {
         public RenameResultSlot(int x, int y) {
-            super(Menu.EMPTY_CONTAINER, 0, x, y);
+            super(InventoryMenu.EMPTY_CONTAINER, 0, x, y);
         }
 
         @Override

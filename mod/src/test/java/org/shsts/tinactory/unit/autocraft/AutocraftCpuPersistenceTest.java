@@ -1,8 +1,8 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -18,8 +18,8 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +58,7 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
         var plan = new CraftPlan(List.of(step("s1")));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
@@ -84,7 +84,7 @@ class AutocraftCpuPersistenceTest {
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)));
         var plan = new CraftPlan(List.of(step));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, TestStackKey.CODEC);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();

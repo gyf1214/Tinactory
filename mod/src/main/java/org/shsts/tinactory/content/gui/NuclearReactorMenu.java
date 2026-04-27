@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.NuclearReactor;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
+import org.shsts.tinactory.integration.gui.ProcessingMenu;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;

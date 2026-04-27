@@ -7,14 +7,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.gui.Menu;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.FluidSlot;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.ProcessingMenu;
 
-import static org.shsts.tinactory.core.gui.ProcessingMenu.FLUID_SYNC;
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
+import static org.shsts.tinactory.integration.gui.ProcessingMenu.FLUID_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -28,13 +28,13 @@ public class ProcessingScreen extends LayoutScreen<ProcessingMenu> {
                 var syncSlot = FLUID_SYNC + slot.index();
                 var rectBg = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
                 var rect = rectBg.offset(1, 1).enlarge(-2, -2);
-                layoutBg.addWidget(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
-                layoutPanel.addWidget(rect, new FluidSlot(menu, slot.index(), syncSlot));
+                layoutBg.addChild(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
+                layoutPanel.addChild(rect, new FluidSlot(menu, slot.index(), syncSlot));
             }
         }
 
         for (var image : layout.images) {
-            layoutBg.addWidget(image.rect(), new StaticWidget(menu, image.texture()));
+            layoutBg.addChild(image.rect(), new StaticWidget(menu, image.texture()));
         }
 
         addProgressBar();

@@ -32,7 +32,6 @@ import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
-import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
@@ -45,6 +44,7 @@ import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.util.LocHelper;
+import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.integration.multiblock.client.MultiblockInterfaceRenderer;
@@ -70,11 +70,11 @@ import java.util.function.Function;
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.integration.recipe.ProcessingHelper.INGREDIENT_CODEC;
 import static org.shsts.tinactory.integration.recipe.ProcessingHelper.RESULT_CODEC;
+import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

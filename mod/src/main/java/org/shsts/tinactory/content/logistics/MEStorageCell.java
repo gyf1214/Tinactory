@@ -15,11 +15,11 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
-import org.shsts.tinactory.core.common.CapabilityItem;
-import org.shsts.tinactory.core.common.ItemCapabilityProvider;
 import org.shsts.tinactory.core.logistics.DigitalProvider;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
+import org.shsts.tinactory.integration.common.CapabilityItem;
+import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 
 import java.util.List;
@@ -28,9 +28,9 @@ import java.util.function.Function;
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
 import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

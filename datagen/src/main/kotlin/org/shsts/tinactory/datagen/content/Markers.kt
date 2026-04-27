@@ -6,13 +6,13 @@ import net.minecraft.world.item.crafting.RecipeType
 import org.shsts.tinactory.AllRecipes.PROCESSING_TYPES
 import org.shsts.tinactory.AllRecipes.getTypeInfo
 import org.shsts.tinactory.AllTags
-import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.MarkerBuilder
 import org.shsts.tinactory.datagen.content.builder.MarkerFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.marker
+import org.shsts.tinactory.integration.material.OreVariant
 
 object Markers {
     fun init() {

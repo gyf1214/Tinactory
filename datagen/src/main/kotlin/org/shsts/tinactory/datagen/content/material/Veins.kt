@@ -1,7 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
-import org.shsts.tinactory.core.material.OreVariant
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder
+import org.shsts.tinactory.integration.material.OreVariant
 
 object Veins {
     fun init() {

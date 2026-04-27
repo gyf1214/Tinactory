@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,16 +14,16 @@ import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Button;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StretchImage;
-import org.shsts.tinactory.core.gui.client.Widgets;
-import org.shsts.tinactory.core.tech.TechManager;
-import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.Button;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.Widgets;
+import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +39,8 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_BG;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -189,7 +188,7 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -205,13 +204,13 @@ public class TechPanel extends Panel {
 
     public TechPanel(TechScreen screen) {
         super(screen);
-        this.techManager = TechManager.client();
+        this.techManager = TechManagers.client();
 
         var label1 = new Label(menu, tr("currentTechLabel"));
         label1.verticalAlign = Label.Alignment.MIDDLE;
         this.currentTechButton = new TechButton(true);
-        addWidget(new Rect(0, 0, LEFT_WIDTH - TECH_SIZE - 2, TECH_SIZE), label1);
-        addWidget(new Rect(LEFT_WIDTH - TECH_SIZE - 2, 0, TECH_SIZE, TECH_SIZE), currentTechButton);
+        addChild(new Rect(0, 0, LEFT_WIDTH - TECH_SIZE - 2, TECH_SIZE), label1);
+        addChild(new Rect(LEFT_WIDTH - TECH_SIZE - 2, 0, TECH_SIZE, TECH_SIZE), currentTechButton);
 
         this.availableTechPanel = new TechButtonPanel();
         var label2 = new Label(menu, tr("availableTechLabel"));
@@ -220,9 +219,9 @@ public class TechPanel extends Panel {
         var offset1 = Rect.corners(-1, top + FONT_HEIGHT + SPACING, LEFT_WIDTH - 1, 0);
         var offset2 = offset1.offset(PANEL_BORDER, PANEL_BORDER).enlarge(-PANEL_BORDER * 2, -PANEL_BORDER * 2);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
-        addWidget(anchor1, offset1, bg);
-        addPanel(anchor1, offset2, availableTechPanel);
+        addChild(new Rect(0, top, LEFT_WIDTH, FONT_HEIGHT), label2);
+        addChild(anchor1, offset1, bg);
+        addChild(anchor1, offset2, availableTechPanel);
 
         this.selectedTechPanel = new Panel(screen);
         this.selectedTechLabel = new Label(menu);
@@ -240,13 +239,13 @@ public class TechPanel extends Panel {
         y -= TECH_SIZE + MARGIN_VERTICAL;
         var offset4 = Rect.corners(0, FONT_HEIGHT + SPACING, 0, y);
         var offset3 = Rect.corners(0, 0, 0, FONT_HEIGHT);
-        selectedTechPanel.addWidget(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
-        selectedTechPanel.addWidget(RectD.FULL, offset4, selectedTechDetailsLabel);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
-        selectedTechPanel.addWidget(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
-        addPanel(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
+        selectedTechPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), offset3, selectedTechLabel);
+        selectedTechPanel.addChild(RectD.FULL, offset4, selectedTechDetailsLabel);
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 0d, 1d), offset5, label3);
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset5, new RequiredTechButtons());
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset6, new ProgressBar());
+        selectedTechPanel.addChild(RectD.corners(0d, 1d, 1d, 1d), offset7, startResearchButton);
+        addGroup(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
     public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,
@@ -271,8 +270,7 @@ public class TechPanel extends Panel {
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-
-        technology.getDisplay().getValue().render(poseStack, x, y, 16, 16, z);
+        RenderUtil.render(technology.getDisplay(), poseStack, new Rect(x, y, 16, 16), z);
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
@@ -284,7 +282,7 @@ public class TechPanel extends Panel {
     }
 
     private Optional<List<Component>> techTooltip(ITechnology technology) {
-        return Optional.of(List.of(I18n.tr(technology.getDescriptionId())));
+        return Optional.of(List.of(technology.getDescription()));
     }
 
     private void onSelect(ITechnology technology) {
@@ -294,7 +292,7 @@ public class TechPanel extends Panel {
 
     private void startResearch() {
         if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
-            var loc = selectedTech.getLoc().toString();
+            var loc = selectedTech.loc().toString();
             var command = "/" + TinactoryKeys.ID + " setTargetTech " + loc;
             player.chat(command);
         }
@@ -308,8 +306,8 @@ public class TechPanel extends Panel {
         selectedTechPanel.setActive(selectedTech != null);
 
         if (selectedTech != null) {
-            selectedTechLabel.setLine(0, I18n.tr(selectedTech.getDescriptionId()));
-            selectedTechDetailsLabel.setMultiline(I18n.tr(selectedTech.getDetailsId()));
+            selectedTechLabel.setLine(0, selectedTech.getDescription());
+            selectedTechDetailsLabel.setMultiline(selectedTech.getDetails());
             startResearchButton.setActive(team.canResearch(selectedTech));
         }
     }
@@ -348,14 +346,14 @@ public class TechPanel extends Panel {
         refresh();
     }
 
-    public static boolean isHoveringTech(Widget component) {
+    public static boolean isHoveringTech(IViewAdapter component) {
         return component instanceof TechButton ||
             component instanceof RequiredTechButtons ||
             (component instanceof ButtonPanel.ItemButton itemButton &&
                 itemButton.getParent() instanceof TechButtonPanel);
     }
 
-    public static Optional<ITechnology> getHoveredTech(Widget component, double mouseX) {
+    public static Optional<ITechnology> getHoveredTech(IViewAdapter component, double mouseX) {
         if (component instanceof TechButton button) {
             return Optional.ofNullable(button.technology);
         } else if (component instanceof RequiredTechButtons buttons) {

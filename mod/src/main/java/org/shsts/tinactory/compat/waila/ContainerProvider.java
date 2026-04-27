@@ -16,9 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
-import org.shsts.tinactory.core.logistics.IStackKey;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 import snownee.jade.Jade;
 import snownee.jade.JadeCommonConfig;
 import snownee.jade.VanillaPlugin;
@@ -31,8 +31,8 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.compat.waila.Waila.BYTES;
 import static org.shsts.tinactory.compat.waila.Waila.ENHANCE_ITEMS;
 import static org.shsts.tinactory.compat.waila.Waila.HIDE_EMPTY_TANK;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

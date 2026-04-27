@@ -28,9 +28,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.material.MaterialSet;
-import org.shsts.tinactory.core.tool.IWrenchable;
-import org.shsts.tinactory.core.tool.UsableToolItem;
+import org.shsts.tinactory.integration.material.MaterialSet;
+import org.shsts.tinactory.integration.tool.IWrenchable;
+import org.shsts.tinactory.integration.tool.UsableToolItem;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 
@@ -39,9 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.core.util.ClientUtil.DOUBLE_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

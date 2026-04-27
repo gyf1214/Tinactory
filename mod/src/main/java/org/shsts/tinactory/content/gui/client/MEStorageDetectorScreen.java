@@ -14,13 +14,13 @@ import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.logistics.MEStorageDetector;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.Widgets;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.Optional;
 
@@ -70,7 +70,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -123,8 +123,8 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         var offset1 = new Rect(-X_OFFSET, SLOT_Y_OFFSET, SLOT_SIZE, SLOT_SIZE);
         var offset2 = new Rect(X_OFFSET - EDIT_WIDTH, EDIT_Y_OFFSET, EDIT_WIDTH, EDIT_HEIGHT);
 
-        addWidget(anchor, offset1, slot);
-        addWidget(anchor, offset2, targetAmountEdit);
+        rootPanel.addChild(anchor, offset1, slot);
+        rootPanel.addVanillaWidget(anchor, offset2, 0, targetAmountEdit);
 
         this.contentHeight = menu.endY();
     }

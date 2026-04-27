@@ -24,15 +24,15 @@ import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +46,6 @@ import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.CONFIG_WIDTH;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.SLOT_SYNC;
 import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
-import static org.shsts.tinactory.core.gui.InventoryMenu.INVENTORY_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -60,6 +59,7 @@ import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.integration.gui.InventoryMenu.INVENTORY_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -147,7 +147,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                             .map(ItemStack::new)
                             .toList();
                     }
-                    RenderUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
+                    ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
                         RenderUtil.renderItem(stack, filterRect.x(), filterRect.y()));
                 }
             }
@@ -381,14 +381,14 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         var anchor1 = RectD.corners(0d, 0d, 0d, 1d);
         var anchor3 = RectD.corners(1d, 0d, 1d, 1d);
 
-        addWidget(new Label(menu, tr("configLabel")));
-        addWidget(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
-        addWidget(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
+        rootPanel.addChild(new Label(menu, tr("configLabel")));
+        rootPanel.addChild(new Rect(offset2.x() - 1, 0, 0, 0), new Label(menu, tr("machineLabel")));
+        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d), Rect.corners(offset3.x(), 0, 0, 0),
             new Label(menu, tr("portLabel")));
 
-        addPanel(anchor1, offset1, configPanel);
-        addPanel(offset2, machinePanel);
-        addPanel(anchor3, offset3, portPanel);
+        rootPanel.addChild(anchor1, offset1, configPanel);
+        rootPanel.addGroup(offset2, machinePanel);
+        rootPanel.addChild(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
     }

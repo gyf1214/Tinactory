@@ -33,7 +33,7 @@ public class TechInitPacket implements IPacket {
     }
 
     private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
-        buf.writeResourceLocation(tech.getLoc());
+        buf.writeResourceLocation(tech.loc());
         var je = CodecHelper.encodeJson(Technology.CODEC, tech);
         buf.writeUtf(CodecHelper.jsonToStr(je));
     }

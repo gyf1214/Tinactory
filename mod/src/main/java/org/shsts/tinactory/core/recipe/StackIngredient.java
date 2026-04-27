@@ -3,18 +3,22 @@ package org.shsts.tinactory.core.recipe;
 import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.core.logistics.IStackAdapter;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class StackIngredient<T> implements IProcessingIngredient {
+public class StackIngredient<T> implements IProcessingIngredient, IProcessingDisplay {
     private final String codecName;
     private final PortType type;
     private final T stack;
@@ -61,6 +65,16 @@ public class StackIngredient<T> implements IProcessingIngredient {
         var extracted = port1.extract(expected, simulate);
         return adapter.amount(extracted) >= adapter.amount(expected) ?
             Optional.of(new StackIngredient<>(codecName, type, extracted, adapter)) : Optional.empty();
+    }
+
+    @Override
+    public IRenderDescriptor display() {
+        return adapter.display(stack);
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip() {
+        return adapter.tooltip(stack);
     }
 
     public static <T> Codec<StackIngredient<T>> codec(String codecName, PortType type,

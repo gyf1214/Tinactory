@@ -5,9 +5,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.core.gui.ProcessingMenu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.ProgressBar;
+import org.shsts.tinactory.integration.gui.client.ProgressBar;
+import org.shsts.tinactory.integration.gui.ProcessingMenu;
 
 import static org.shsts.tinactory.content.gui.BoilerMenu.HEAT_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -26,6 +26,6 @@ public class NuclearReactorScreen extends MachineScreen {
         var x = SLOT_SIZE * 4 + (SLOT_SIZE - HEAT_EMPTY.width()) / 2;
         var y = (SLOT_SIZE * 5 - HEAT_EMPTY.height()) / 2;
         var rect = new Rect(x, y, HEAT_EMPTY.width(), HEAT_EMPTY.height());
-        layoutPanel.addWidget(rect, heatBar);
+        layoutPanel.addChild(rect, heatBar);
     }
 }

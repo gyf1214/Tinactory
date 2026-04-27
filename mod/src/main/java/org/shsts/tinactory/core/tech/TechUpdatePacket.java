@@ -22,10 +22,10 @@ public class TechUpdatePacket implements IPacket {
     public TechUpdatePacket() {}
 
     private TechUpdatePacket(Map<ResourceLocation, Long> progress, boolean updateTarget,
-        @Nullable ITechnology targetTech) {
+        @Nullable ResourceLocation targetTech) {
         this.progress = progress;
         this.updateTarget = updateTarget;
-        this.targetTech = targetTech == null ? null : targetTech.getLoc();
+        this.targetTech = targetTech;
     }
 
     public static TechUpdatePacket progress(Map<ResourceLocation, Long> progress) {
@@ -33,16 +33,25 @@ public class TechUpdatePacket implements IPacket {
     }
 
     public static TechUpdatePacket progress(ITechnology tech, long progress) {
-        return progress(Map.of(tech.getLoc(), progress));
+        return progress(Map.of(tech.loc(), progress));
+    }
+
+    public static TechUpdatePacket target(@Nullable ResourceLocation tech) {
+        return new TechUpdatePacket(Map.of(), true, tech);
     }
 
     public static TechUpdatePacket target(@Nullable ITechnology tech) {
-        return new TechUpdatePacket(Map.of(), true, tech);
+        return target(tech == null ? null : tech.loc());
+    }
+
+    public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
+        @Nullable ResourceLocation targetTech) {
+        return new TechUpdatePacket(progress, true, targetTech);
     }
 
     public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
         @Nullable ITechnology targetTech) {
-        return new TechUpdatePacket(progress, true, targetTech);
+        return full(progress, targetTech == null ? null : targetTech.loc());
     }
 
     public Map<ResourceLocation, Long> getProgress() {

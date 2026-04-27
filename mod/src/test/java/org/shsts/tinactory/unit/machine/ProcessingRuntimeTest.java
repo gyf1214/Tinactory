@@ -1,17 +1,17 @@
 package org.shsts.tinactory.unit.machine;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
@@ -27,11 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcessingRuntimeTest {
@@ -137,6 +139,122 @@ class ProcessingRuntimeTest {
         assertEquals(1, updates.get());
     }
 
+    @Test
+    void shouldNotStartRecipeWhenAutoRecipeIsDisabledWithoutTarget() {
+        var updates = new AtomicInteger();
+        var machine = new TestMachine(new TestContainer());
+        var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
+        var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
+            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+
+        runtime.onPreWork();
+
+        assertEquals(0, processor.beginParallel());
+        assertEquals(0L, runtime.progressTicks());
+        assertFalse(runtime.isWorking(1d));
+        assertEquals(1, updates.get());
+    }
+
+    @Test
+    void shouldShortCircuitPreWorkWhenStopped() {
+        var updates = new AtomicInteger();
+        var machine = new TestMachine(new TestContainer());
+        var runtime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
+            true, () -> Optional.of(machine), false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        runtime.setStopped(true);
+
+        runtime.onPreWork();
+
+        assertEquals(0L, runtime.progressTicks());
+        assertEquals(0, updates.get());
+    }
+
+    @Test
+    void shouldIgnorePreWorkAndTicksWhenMachineIsMissing() {
+        var machineRef = new AtomicReference<Optional<IMachine>>(Optional.of(new TestMachine(new TestContainer())));
+        var updates = new AtomicInteger();
+        var processor = new TestRecipeProcessor().recipe(RECIPE_ID).maxProgress(10).progressPerTick(3);
+        var runtime = new ProcessingRuntime(List.of(processor), true, machineRef::get,
+            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+
+        runtime.onPreWork();
+        machineRef.set(Optional.empty());
+        runtime.onWorkTick(1d);
+
+        assertEquals(0L, runtime.progressTicks());
+        assertEquals(1, updates.get());
+
+        var emptyRuntime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
+            true, Optional::<IMachine>empty, false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        emptyRuntime.onPreWork();
+        assertEquals(1, updates.get());
+    }
+
+    @Test
+    void shouldClearCompletedRecipeStateBeforeLookingForNextWork() {
+        var machine = new TestMachine(new TestContainer());
+        var processor = new TestRecipeProcessor()
+            .recipe(RECIPE_ID)
+            .inputInfo(new ProcessingInfo(0, new TestIngredient("ore", 1)))
+            .progressPerTick(1)
+            .maxProgress(1);
+        var runtime = runtime(machine, processor);
+
+        runtime.onPreWork();
+        runtime.onWorkTick(1d);
+        processor.noRecipe();
+        runtime.onPreWork();
+
+        assertTrue(runtime.getAllInfo().isEmpty());
+        assertEquals(0L, runtime.progressTicks());
+    }
+
+    @Test
+    void shouldExposeIdleAndActiveRuntimeMachineState() {
+        var machine = new TestMachine(new TestContainer());
+        var runtime = runtime(machine, new TestRecipeProcessor()
+            .recipe(RECIPE_ID)
+            .progressPerTick(1)
+            .maxProgress(10)
+            .machineType(ElectricMachineType.GENERATOR)
+            .powerGen(7.5d)
+            .powerCons(2.5d));
+
+        assertEquals(-1d, runtime.workSpeed());
+        assertFalse(runtime.isWorking(1d));
+        assertEquals(ElectricMachineType.NONE, runtime.machineType());
+        assertEquals(0d, runtime.powerGen());
+        assertEquals(0d, runtime.powerCons());
+
+        runtime.onPreWork();
+        runtime.onWorkTick(0.5d);
+
+        assertEquals(0.5d, runtime.workSpeed());
+        assertTrue(runtime.isWorking(1d));
+        assertEquals(ElectricMachineType.GENERATOR, runtime.machineType());
+        assertEquals(7.5d, runtime.powerGen());
+        assertEquals(2.5d, runtime.powerCons());
+    }
+
+    @Test
+    void shouldSupportKnownRecipeTypesOnly() {
+        var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
+
+        assertTrue(runtime.supportsRecipeType(PROCESSING_TYPE));
+        assertFalse(runtime.supportsRecipeType(new ResourceLocation("tinactory", "other_processing")));
+    }
+
+    @Test
+    void shouldTreatEmptySerializationTagAsIdleState() {
+        var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
+
+        runtime.deserializeNBT(new CompoundTag());
+
+        assertEquals(0L, runtime.progressTicks());
+        assertTrue(runtime.getAllInfo().isEmpty());
+        assertTrue(runtime.serializeNBT().isEmpty());
+    }
+
     private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
         return new ProcessingRuntime(List.of(processors), true, () -> Optional.of(machine),
             false, () -> {}, TestProcessingObject.INFO_CODEC);
@@ -153,9 +271,17 @@ class ProcessingRuntimeTest {
         private long maxProgress = 1L;
         private int beginParallel;
         private boolean continued;
+        private ElectricMachineType machineType = ElectricMachineType.NONE;
+        private double powerGen;
+        private double powerCons;
 
         private TestRecipeProcessor recipe(ResourceLocation value) {
             recipe = Optional.of(value);
+            return this;
+        }
+
+        private TestRecipeProcessor noRecipe() {
+            recipe = Optional.empty();
             return this;
         }
 
@@ -181,6 +307,21 @@ class ProcessingRuntimeTest {
 
         private TestRecipeProcessor maxProgress(long value) {
             maxProgress = value;
+            return this;
+        }
+
+        private TestRecipeProcessor machineType(ElectricMachineType value) {
+            machineType = value;
+            return this;
+        }
+
+        private TestRecipeProcessor powerGen(double value) {
+            powerGen = value;
+            return this;
+        }
+
+        private TestRecipeProcessor powerCons(double value) {
+            powerCons = value;
             return this;
         }
 
@@ -288,17 +429,17 @@ class ProcessingRuntimeTest {
 
         @Override
         public ElectricMachineType electricMachineType(ResourceLocation recipe) {
-            return ElectricMachineType.NONE;
+            return machineType;
         }
 
         @Override
         public double powerGen(ResourceLocation recipe) {
-            return 0d;
+            return powerGen;
         }
 
         @Override
         public double powerCons(ResourceLocation recipe) {
-            return 0d;
+            return powerCons;
         }
 
         @Override
@@ -316,10 +457,6 @@ class ProcessingRuntimeTest {
 
     private record TestRecipeBookItem(ResourceLocation loc) implements IRecipeBookItem {
         @Override
-        public void render(PoseStack poseStack, Rect rect, int z) {
-        }
-
-        @Override
         public boolean isMarker() {
             return false;
         }
@@ -332,6 +469,11 @@ class ProcessingRuntimeTest {
         @Override
         public Optional<List<Component>> buttonToolTip() {
             return Optional.empty();
+        }
+
+        @Override
+        public IRenderDescriptor display() {
+            return EmptyRenderDescriptor.INSTANCE;
         }
     }
 }

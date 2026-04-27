@@ -8,6 +8,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.gui.AutocraftTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
@@ -15,11 +16,10 @@ import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
-import org.shsts.tinactory.core.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.Tab;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Tab;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,10 +51,10 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         this.previewPanel = new AutocraftPreviewPanel(this);
         this.tabs = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
-        addPanel(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
-        addPanel(new Rect(0, 0, 0, 0), tabs);
-        addPanel(RectD.corners(0d, 0d, 1d, 1d), Rect.corners(0, 56, 0, -88), previewPanel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), requestPanel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), Rect.corners(0, 0, 0, 72), cpuStatusPanel);
+        rootPanel.addGroup(tabs);
+        rootPanel.addGroup(Rect.corners(0, 56, 0, -88), previewPanel);
         this.contentHeight = 180;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, this::onRequestablesSync);

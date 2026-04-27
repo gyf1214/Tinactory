@@ -17,14 +17,14 @@ import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.client.Tab;
-import org.shsts.tinactory.core.gui.client.Widgets;
-import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.Tab;
+import org.shsts.tinactory.integration.gui.client.Widgets;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
 
 import java.util.function.Consumer;
@@ -42,7 +42,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_HEIGHT;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -81,9 +81,9 @@ public class TechScreen extends MenuScreen<TechMenu> {
         welcomeLabel.horizontalAlign = Label.Alignment.END;
         this.welcomeEdit = Widgets.editBox();
         var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
-        welcomePanel.addWidget(welcomeLabel);
-        welcomePanel.addWidget(new Rect(0, -1, 64, EDIT_HEIGHT), welcomeEdit);
-        welcomePanel.addWidget(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
+        welcomePanel.addChild(welcomeLabel);
+        welcomePanel.addVanillaWidget(RectD.ZERO, new Rect(0, -1, 64, EDIT_HEIGHT), 0, welcomeEdit);
+        welcomePanel.addChild(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
             welcomeButton);
 
         this.techPanel = new TechPanel(this);
@@ -92,10 +92,10 @@ public class TechScreen extends MenuScreen<TechMenu> {
         var rect = new Rect(RENAME_BASE_MARGIN, RENAME_BASE_Y, RENAME_BASE_WIDTH, 0);
         var renameEdit = Widgets.editBox();
         renameEdit.setResponder(name -> menu.triggerEvent(RENAME, () -> new RenameEventPacket(name)));
-        renamePanel.addWidget(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
-        renamePanel.addWidget(rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
-            .enlarge(0, EDIT_HEIGHT), renameEdit);
-        renamePanel.addWidget(rect.offset(34, FONT_HEIGHT + EDIT_HEIGHT + MARGIN_VERTICAL * 2 + 1)
+        renamePanel.addChild(rect.enlarge(0, FONT_HEIGHT), new Label(menu, tr("rename")));
+        renamePanel.addVanillaWidget(RectD.ZERO, rect.offset(0, FONT_HEIGHT + MARGIN_VERTICAL)
+            .enlarge(0, EDIT_HEIGHT), 0, renameEdit);
+        renamePanel.addChild(rect.offset(34, FONT_HEIGHT + EDIT_HEIGHT + MARGIN_VERTICAL * 2 + 1)
                 .enlarge(-RENAME_BASE_WIDTH + CRAFTING_ARROW.width(), CRAFTING_ARROW.height()),
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);
@@ -104,12 +104,12 @@ public class TechScreen extends MenuScreen<TechMenu> {
             techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
-        rootPanel.addPanel(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
-        rootPanel.addPanel(techPanel);
-        rootPanel.addPanel(renamePanel);
-        rootPanel.addPanel(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addChild(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
+        rootPanel.addGroup(techPanel);
+        rootPanel.addGroup(renamePanel);
+        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
 
-        TechManager.client().onProgressChange(onTechChange);
+        TechManagers.client().onProgressChange(onTechChange);
 
         this.contentWidth = WIDTH;
         this.contentHeight = HEIGHT;
@@ -129,12 +129,12 @@ public class TechScreen extends MenuScreen<TechMenu> {
 
     @Override
     public void removed() {
-        TechManager.client().removeProgressChangeListener(onTechChange);
+        TechManagers.client().removeProgressChangeListener(onTechChange);
         super.removed();
     }
 
     private void refreshTeam() {
-        var localTeam = TechManager.localTeam();
+        var localTeam = TechManagers.localTeam();
         LOGGER.trace("refresh team {}", localTeam);
         if (localTeam.isPresent()) {
             welcomePanel.setActive(false);

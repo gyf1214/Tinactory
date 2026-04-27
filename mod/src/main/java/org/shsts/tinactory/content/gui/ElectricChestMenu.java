@@ -7,7 +7,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.content.logistics.ElectricChest;
-import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
@@ -15,9 +14,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllMenus.ITEM_SLOT_CLICK;
-import static org.shsts.tinactory.core.common.CapabilityProvider.getProvider;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -28,7 +27,7 @@ public class ElectricChestMenu extends ElectricStorageMenu {
         private final int slot;
 
         public InputSlot(int slot, int x, int y) {
-            super(Menu.EMPTY_CONTAINER, slot, x, y);
+            super(EMPTY_CONTAINER, slot, x, y);
             this.slot = slot;
         }
 
@@ -66,7 +65,7 @@ public class ElectricChestMenu extends ElectricStorageMenu {
         private final int slot;
 
         public OutputSlot(int slot, int x, int y) {
-            super(Menu.EMPTY_CONTAINER, slot, x, y);
+            super(EMPTY_CONTAINER, slot, x, y);
             this.slot = slot;
         }
 

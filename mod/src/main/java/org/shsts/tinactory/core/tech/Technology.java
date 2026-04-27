@@ -5,16 +5,16 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
-import org.shsts.tinactory.core.gui.client.IRectRenderable;
-import org.shsts.tinactory.core.gui.client.Renderables;
-import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,23 +33,27 @@ public class Technology implements ITechnology {
     private final Map<String, Integer> modifiers;
     private final long maxProgress;
     @Nullable
-    private final ItemStack displayItem;
+    private final ResourceLocation displayItem;
     @Nullable
-    private final Texture displayTexture;
+    private final ResourceLocation displayTexture;
+    private final IRenderDescriptor display;
     private final int rank;
 
     public Technology(List<ResourceLocation> dependIds, long maxProgress, Map<String, Integer> modifiers,
-        Optional<Item> displayItem, Optional<ResourceLocation> displayTexture, int rank) {
+        Optional<ResourceLocation> displayItem, Optional<ResourceLocation> displayTexture, int rank) {
         this.dependIds = dependIds;
         this.modifiers = modifiers;
         this.maxProgress = maxProgress;
-        this.displayItem = displayItem.map(ItemStack::new).orElse(null);
-        this.displayTexture = displayTexture.map($ -> new Texture($, 16, 16)).orElse(null);
+        this.displayItem = displayItem.orElse(null);
+        this.displayTexture = displayTexture.orElse(null);
+        this.display = this.displayItem != null ? new ItemIdRenderDescriptor(this.displayItem) :
+            this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
+            EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
     }
 
     @Override
-    public ResourceLocation getLoc() {
+    public ResourceLocation loc() {
         assert loc != null;
         return loc;
     }
@@ -81,14 +85,18 @@ public class Technology implements ITechnology {
     }
 
     @Override
-    public DistLazy<IRectRenderable> getDisplay() {
-        if (displayItem != null) {
-            return () -> () -> Renderables.item(displayItem);
-        } else if (displayTexture != null) {
-            return () -> () -> Renderables.texture(displayTexture);
-        } else {
-            return () -> Renderables::voidRenderable;
-        }
+    public IRenderDescriptor getDisplay() {
+        return display;
+    }
+
+    @Override
+    public Component getDescription() {
+        return I18n.tr(getDescriptionId(loc()));
+    }
+
+    @Override
+    public Component getDetails() {
+        return I18n.tr(getDetailsId(loc()));
     }
 
     /**
@@ -121,15 +129,23 @@ public class Technology implements ITechnology {
         return "Technology[" + loc + "]";
     }
 
+    public static String getDescriptionId(ResourceLocation loc) {
+        return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
+    }
+
+    public static String getDetailsId(ResourceLocation loc) {
+        return getDescriptionId(loc) + ".details";
+    }
+
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         ResourceLocation.CODEC.listOf().optionalFieldOf("depends", Collections.emptyList())
             .forGetter(tech -> tech.dependIds),
         Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
         Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
-        ForgeRegistries.ITEMS.getCodec().optionalFieldOf("display_item")
-            .forGetter(tech -> Optional.ofNullable(tech.displayItem).map(ItemStack::getItem)),
+        ResourceLocation.CODEC.optionalFieldOf("display_item")
+            .forGetter(tech -> Optional.ofNullable(tech.displayItem)),
         ResourceLocation.CODEC.optionalFieldOf("display_texture")
-            .forGetter(tech -> Optional.ofNullable(tech.displayTexture).map(Texture::loc)),
+            .forGetter(tech -> Optional.ofNullable(tech.displayTexture)),
         Codec.INT.fieldOf("rank").forGetter(tech -> tech.rank)
     ).apply(instance, Technology::new));
 }

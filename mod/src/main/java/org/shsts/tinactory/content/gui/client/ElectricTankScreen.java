@@ -10,19 +10,19 @@ import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.FluidSlot;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.sync.FluidSyncPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
+import org.shsts.tinactory.integration.gui.client.FluidSlot;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
+import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SYNC;
-import static org.shsts.tinactory.core.gui.LayoutMenu.FLUID_SYNC;
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
+import static org.shsts.tinactory.integration.gui.LayoutMenu.FLUID_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -73,8 +73,8 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         for (var slot : layout.slots) {
             var rectBg = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
             var rect = rectBg.offset(1, 1).enlarge(-2, -2);
-            layoutBg.addWidget(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
-            layoutPanel.addWidget(rect, new TankSlot(menu, slot.index()));
+            layoutBg.addChild(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
+            layoutPanel.addChild(rect, new TankSlot(menu, slot.index()));
         }
     }
 }

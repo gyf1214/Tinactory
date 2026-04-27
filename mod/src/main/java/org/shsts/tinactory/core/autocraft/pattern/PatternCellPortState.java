@@ -6,9 +6,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.logistics.IStackKey;
+import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 
 import java.util.HashMap;
 import java.util.List;

@@ -10,8 +10,8 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
-import org.shsts.tinactory.core.gui.InventoryMenu;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.integration.gui.InventoryMenu;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
+import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -2,12 +2,12 @@ package org.shsts.tinactory.datagen.content.chemistry
 
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.material.MaterialSet
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oilCracking
+import org.shsts.tinactory.integration.material.MaterialSet
 import kotlin.math.round
 
 object OilProcessing {

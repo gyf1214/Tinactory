@@ -10,10 +10,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.ButtonPanel;
-import org.shsts.tinactory.core.gui.client.MenuScreen;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_BORDER;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_BG;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -42,7 +42,7 @@ public class MachineSelectPanel extends ButtonPanel {
     public MachineSelectPanel(MenuScreen<?> screen) {
         super(screen, BUTTON_SIZE, BUTTON_SIZE, 1);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
-        addWidget(RectD.FULL, Rect.corners(-2, -2, 2, 2), bg);
+        addChild(RectD.FULL, Rect.corners(-2, -2, 2, 2), bg);
     }
 
     public Optional<UUID> getSelected() {

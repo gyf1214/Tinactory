@@ -14,7 +14,7 @@ import snownee.jade.addon.harvest.ToolHandler;
 
 import java.util.List;
 
-import static org.shsts.tinactory.core.tool.ToolItem.HIDE_BAR;
+import static org.shsts.tinactory.integration.tool.ToolItem.HIDE_BAR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

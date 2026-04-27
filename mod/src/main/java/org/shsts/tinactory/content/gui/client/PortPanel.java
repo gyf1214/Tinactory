@@ -11,16 +11,15 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.IWidgetConsumer;
-import org.shsts.tinactory.core.gui.client.Label;
-import org.shsts.tinactory.core.gui.client.Panel;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
-import org.shsts.tinactory.core.gui.client.SimpleButton;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
-import org.shsts.tinactory.core.gui.client.StretchImage;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.util.ClientUtil;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.SimpleButton;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.StretchImage;
+import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
@@ -33,11 +32,11 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.PORT_TEXT_COLOR;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.ProcessingMenu.portLabel;
 import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
-import static org.shsts.tinactory.core.gui.client.Widgets.BUTTON_PANEL_TEX;
+import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -64,7 +63,7 @@ public class PortPanel extends Panel {
         }
 
         @Override
-        protected boolean canHover() {
+        public boolean canHover() {
             return true;
         }
 
@@ -98,7 +97,7 @@ public class PortPanel extends Panel {
         this.xOffset = layout.getXOffset();
 
         var background = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
-        addWidget(RectD.FULL, Rect.ZERO, background);
+        addChild(RectD.FULL, Rect.ZERO, background);
 
         var i = 0;
         for (var port = 0; port < layout.portSlots.size(); port++) {
@@ -113,7 +112,7 @@ public class PortPanel extends Panel {
             label.color = 0xFFFFAA00;
 
             var y = (SLOT_SIZE + SPACING) * i;
-            addWidget(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
+            addChild(RectD.corners(0d, 0d, 1d, 0d), LABEL_RECT.offset(0, y), label);
             i++;
         }
     }
@@ -128,7 +127,7 @@ public class PortPanel extends Panel {
         }
     }
 
-    public static void addButton(MenuBase menu, IWidgetConsumer parent, PortPanel panel,
+    public static void addButton(MenuBase menu, Panel parent, PortPanel panel,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, SWITCH_BUTTON,
             I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {
@@ -141,7 +140,7 @@ public class PortPanel extends Panel {
         };
         var overlay = new StaticWidget(menu, GREGTECH_LOGO);
         var offset = new Rect(x, y, SLOT_SIZE, SLOT_SIZE);
-        parent.addWidget(anchor, offset, button);
-        parent.addWidget(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
+        parent.addChild(anchor, offset, button);
+        parent.addChild(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
     }
 }

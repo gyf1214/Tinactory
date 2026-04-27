@@ -5,13 +5,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.client.MenuWidget;
-import org.shsts.tinactory.core.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.MenuWidget;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.ArrayList;
@@ -27,14 +27,10 @@ public class GhostRecipe extends MenuWidget {
         super(menu);
     }
 
-    private void renderFluid(PoseStack poseStack, FluidStack stack, int x, int y) {
-        RenderUtil.renderGhostFluid(poseStack, stack, new Rect(x, y, 16, 16), getBlitOffset());
-    }
-
     private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {
-        RenderUtil.renderIngredient(ingredient,
-            stack -> RenderUtil.renderGhostItem(poseStack, stack, x, y),
-            stack -> renderFluid(poseStack, stack, x, y));
+        if (ingredient instanceof IProcessingDisplay display) {
+            RenderUtil.renderGhost(display.display(), poseStack, new Rect(x, y, 16, 16), getBlitOffset());
+        }
     }
 
     @Override

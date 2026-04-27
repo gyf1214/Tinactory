@@ -18,8 +18,8 @@ import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.core.gui.client.RenderUtil.renderBlockInWorld;
-import static org.shsts.tinactory.core.gui.client.RenderUtil.renderBlockModel;
+import static org.shsts.tinactory.integration.gui.client.RenderUtil.renderBlockInWorld;
+import static org.shsts.tinactory.integration.gui.client.RenderUtil.renderBlockModel;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

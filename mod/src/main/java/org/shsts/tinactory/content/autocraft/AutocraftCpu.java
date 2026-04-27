@@ -11,7 +11,6 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.integration.autocraft.AutocraftServiceBootstrap;
 import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;

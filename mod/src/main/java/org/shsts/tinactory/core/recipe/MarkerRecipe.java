@@ -8,13 +8,18 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -51,6 +56,22 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public Optional<Texture> displayTexture() {
         return Optional.ofNullable(displayTex);
+    }
+
+    @Override
+    public IRenderDescriptor display() {
+        if (displayTex != null) {
+            return new TextureRenderDescriptor(displayTex);
+        }
+        if (displayIngredient instanceof IProcessingDisplay display) {
+            return display.display();
+        }
+        return super.display();
+    }
+
+    @Override
+    public Optional<List<Component>> tooltip() {
+        return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc()))));
     }
 
     @Override

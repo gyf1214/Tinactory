@@ -6,8 +6,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
-import org.shsts.tinactory.core.gui.client.LayoutScreen;
-import org.shsts.tinactory.core.gui.client.StaticWidget;
+import org.shsts.tinactory.integration.gui.client.LayoutScreen;
+import org.shsts.tinactory.integration.gui.client.StaticWidget;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -16,7 +16,7 @@ public class WorkbenchScreen extends LayoutScreen<WorkbenchMenu> {
     public WorkbenchScreen(WorkbenchMenu menu, Component title) {
         super(menu, title);
         for (var image : layout.images) {
-            layoutBg.addWidget(image.rect(), new StaticWidget(menu, image.texture()));
+            layoutBg.addChild(image.rect(), new StaticWidget(menu, image.texture()));
         }
     }
 }

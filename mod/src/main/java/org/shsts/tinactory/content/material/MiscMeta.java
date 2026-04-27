@@ -41,10 +41,10 @@ import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.PowerBlock;
 import org.shsts.tinactory.content.network.MachineBlocks;
 import org.shsts.tinactory.content.tool.NuclearRod;
-import org.shsts.tinactory.core.builder.BlockEntityBuilder;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.LocHelper;
+import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -59,8 +59,8 @@ import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.material.MaterialMeta.parseColor;
-import static org.shsts.tinactory.core.util.ClientUtil.NUMBER_FORMAT;
-import static org.shsts.tinactory.core.util.ClientUtil.addTooltip;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

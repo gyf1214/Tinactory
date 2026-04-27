@@ -13,7 +13,7 @@ import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.core.common.CapabilityProvider;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
