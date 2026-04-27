@@ -7,11 +7,13 @@ import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.function.Supplier;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlastFurnace extends CoilMachine<BlastFurnaceRecipe> {
     public BlastFurnace(IRecipeType<BlastFurnaceRecipe.Builder> recipeType,
-        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

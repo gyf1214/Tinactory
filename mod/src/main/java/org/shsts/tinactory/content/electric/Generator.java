@@ -4,17 +4,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Generator extends ProcessingMachine<ProcessingRecipe> {
     public Generator(IRecipeType<ProcessingRecipe.Builder> recipeType,
-        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

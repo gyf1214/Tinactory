@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -87,7 +87,7 @@ class ProcessingRuntimeTest {
             .inputInfo(new ProcessingInfo(0, ingredient))
             .doneResult(result);
         var runtime = new ProcessingRuntime(List.of(processor), true, () -> Optional.of(machine),
-            false, () -> {}, (direction, object) -> reportedObjects.add(new Report(direction, object)),
+            () -> false, () -> {}, (direction, object) -> reportedObjects.add(new Report(direction, object)),
             TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
@@ -131,7 +131,7 @@ class ProcessingRuntimeTest {
         var machine = new TestMachine(new TestContainer()).targetRecipe(RECIPE_ID);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
         var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
-            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
 
@@ -145,7 +145,7 @@ class ProcessingRuntimeTest {
         var machine = new TestMachine(new TestContainer());
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
         var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
-            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
 
@@ -160,7 +160,8 @@ class ProcessingRuntimeTest {
         var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer());
         var runtime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
-            true, () -> Optional.of(machine), false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+            true, () -> Optional.of(machine), () -> false, updates::incrementAndGet,
+            TestProcessingObject.INFO_CODEC);
         runtime.setStopped(true);
 
         runtime.onPreWork();
@@ -175,7 +176,7 @@ class ProcessingRuntimeTest {
         var updates = new AtomicInteger();
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID).maxProgress(10).progressPerTick(3);
         var runtime = new ProcessingRuntime(List.of(processor), true, machineRef::get,
-            false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
 
         runtime.onPreWork();
         machineRef.set(Optional.empty());
@@ -185,7 +186,7 @@ class ProcessingRuntimeTest {
         assertEquals(1, updates.get());
 
         var emptyRuntime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
-            true, Optional::<IMachine>empty, false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+            true, Optional::<IMachine>empty, () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
         emptyRuntime.onPreWork();
         assertEquals(1, updates.get());
     }
@@ -257,7 +258,7 @@ class ProcessingRuntimeTest {
 
     private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
         return new ProcessingRuntime(List.of(processors), true, () -> Optional.of(machine),
-            false, () -> {}, TestProcessingObject.INFO_CODEC);
+            () -> false, () -> {}, TestProcessingObject.INFO_CODEC);
     }
 
     private static final class TestRecipeProcessor implements IRecipeProcessor<ResourceLocation> {

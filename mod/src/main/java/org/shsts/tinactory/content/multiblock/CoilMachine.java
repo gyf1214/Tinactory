@@ -10,13 +10,15 @@ import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.function.Supplier;
+
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class CoilMachine<R extends ProcessingRecipe> extends ProcessingMachine<R> {
     public CoilMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
-        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

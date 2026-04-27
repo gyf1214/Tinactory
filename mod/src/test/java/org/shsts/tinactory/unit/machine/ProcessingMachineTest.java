@@ -10,9 +10,9 @@ import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
-import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
+import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestStack;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -250,7 +250,7 @@ class ProcessingMachineTest {
         }
 
         private TestProcessingMachine(TestRecipeManager recipeManager) {
-            super(RECIPE_TYPE, recipeManager, MARKER_TYPE);
+            super(RECIPE_TYPE, () -> recipeManager, MARKER_TYPE);
         }
 
         private void addOutputInfoForTest(TestRecipe recipe, int parallel, Consumer<ProcessingInfo> info) {

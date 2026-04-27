@@ -3,9 +3,6 @@ package org.shsts.tinactory.integration.gui.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
@@ -67,17 +64,12 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
             int x = slot.x - 1 - MARGIN_X;
             int y = slot.y - 1 - MARGIN_TOP;
             var slotBg = new SlotBackground(slot);
-            rootPanel.addVanillaWidget(RectD.ZERO, new Rect(x, y, SLOT_SIZE, SLOT_SIZE), BG_Z, slotBg);
+            rootPanel.addChild(RectD.ZERO, new Rect(x, y, SLOT_SIZE, SLOT_SIZE), BG_Z, slotBg);
         }
     }
 
     public M menu() {
         return menu;
-    }
-
-    public <T extends GuiEventListener & Widget & NarratableEntry> void addWidgetToScreen(
-        T widget) {
-        super.addWidgetToScreen(widget);
     }
 
     public void addHoverable(IViewAdapter adapter) {

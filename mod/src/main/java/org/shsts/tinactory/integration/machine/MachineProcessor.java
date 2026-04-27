@@ -30,6 +30,7 @@ import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -58,13 +59,11 @@ public class MachineProcessor extends CapabilityProvider implements
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe) {
         this.blockEntity = blockEntity;
-        var world = blockEntity.getLevel();
-        assert world != null;
         this.runtime = new ProcessingRuntime(
             processorFactories.stream().map(factory -> factory.apply(blockEntity)).toList(),
             autoRecipe,
             this::machine,
-            world.isClientSide,
+            () -> Objects.requireNonNull(blockEntity.getLevel()).isClientSide,
             blockEntity::setChanged,
             this::reportProcessingObject,
             ProcessingHelper.INFO_CODEC);

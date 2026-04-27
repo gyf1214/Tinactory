@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
@@ -45,7 +46,10 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     private final List<IRecipeProcessor<?>> processors;
     private final boolean autoRecipe;
     private final Supplier<Optional<IMachine>> machineSupplier;
-    private final boolean isClientSide;
+    @Nullable
+    private BooleanSupplier sideSupplier;
+    @Nullable
+    private Boolean isClientSide = null;
     private final Runnable onUpdate;
     private final BiConsumer<PortDirection, IProcessingObject> onReportObject;
     private final Codec<ProcessingInfo> processingInfoCodec;
@@ -112,23 +116,32 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
-        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, boolean isClientSide,
+        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, BooleanSupplier sideSupplier,
         Runnable onUpdate, Codec<ProcessingInfo> processingInfoCodec) {
-        this(processors, autoRecipe, machineSupplier, isClientSide, onUpdate, (direction, object) -> {},
+        this(processors, autoRecipe, machineSupplier, sideSupplier, onUpdate, (direction, object) -> {},
             processingInfoCodec);
     }
 
     public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
-        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, boolean isClientSide,
+        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, BooleanSupplier sideSupplier,
         Runnable onUpdate, BiConsumer<PortDirection, IProcessingObject> onReportObject,
         Codec<ProcessingInfo> processingInfoCodec) {
         this.processors = List.copyOf(processors);
         this.autoRecipe = autoRecipe;
         this.machineSupplier = machineSupplier;
-        this.isClientSide = isClientSide;
+        this.sideSupplier = sideSupplier;
         this.onUpdate = onUpdate;
         this.onReportObject = onReportObject;
         this.processingInfoCodec = processingInfoCodec;
+    }
+
+    private boolean isClientSide() {
+        if (isClientSide == null) {
+            assert sideSupplier != null;
+            isClientSide = sideSupplier.getAsBoolean();
+            sideSupplier = null;
+        }
+        return isClientSide;
     }
 
     private Optional<IMachine> machine() {
@@ -179,7 +192,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         var machine = machine().orElseThrow();
         clearFilters(PortDirection.INPUT);
         for (var processor : processors) {
-            if (processor.allowTargetRecipe(isClientSide, loc, machine)) {
+            if (processor.allowTargetRecipe(isClientSide(), loc, machine)) {
                 processor.setTargetRecipe(loc, machine);
                 return;
             }

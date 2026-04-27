@@ -16,11 +16,14 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.machine.MachineProcessor;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
@@ -30,9 +33,13 @@ import static org.shsts.tinactory.Tinactory.CORE;
 public final class RecipeProcessors {
     private static final String ID = "machine/recipe_processor";
 
+    private static Supplier<IRecipeManager> recipeManager(BlockEntity be) {
+        return () -> CORE.recipeManager(Objects.requireNonNull(be.getLevel()));
+    }
+
     public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> processing(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
-        return be -> new ProcessingMachine<>(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
+        return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
     }
 
     public static Function<BlockEntity, IRecipeProcessor<SmeltingRecipe>> electricFurnace(
@@ -47,12 +54,12 @@ public final class RecipeProcessors {
 
     public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> generator(
         IRecipeType<ProcessingRecipe.Builder> recipeType) {
-        return be -> new Generator(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
+        return be -> new Generator(recipeType, recipeManager(be), MARKER);
     }
 
     public static Function<BlockEntity, IRecipeProcessor<OreAnalyzerRecipe>> oreAnalyzer(
         IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
-        return be -> new OreAnalyzer(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
+        return be -> new OreAnalyzer(recipeType, recipeManager(be), MARKER);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> machine(
@@ -62,7 +69,7 @@ public final class RecipeProcessors {
 
     public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> coil(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, int baseTemperature) {
-        return be -> new CoilMachine<>(recipeType, CORE.recipeManager(be.getLevel()), MARKER) {
+        return be -> new CoilMachine<>(recipeType, recipeManager(be), MARKER) {
             @Override
             protected int getRecipeTemperature(R recipe) {
                 return baseTemperature;
@@ -72,7 +79,7 @@ public final class RecipeProcessors {
 
     public static Function<BlockEntity, IRecipeProcessor<BlastFurnaceRecipe>> blastFurnace(
         IRecipeType<BlastFurnaceRecipe.Builder> recipeType) {
-        return be -> new BlastFurnace(recipeType, CORE.recipeManager(be.getLevel()), MARKER);
+        return be -> new BlastFurnace(recipeType, recipeManager(be), MARKER);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> multiblock(

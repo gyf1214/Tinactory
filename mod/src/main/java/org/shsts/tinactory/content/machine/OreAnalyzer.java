@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -24,7 +25,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
     public OreAnalyzer(IRecipeType<OreAnalyzerRecipe.Builder> recipeType,
-        IRecipeManager recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 
@@ -65,23 +66,23 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     @Override
     public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
-        var matches = recipeManager.getRecipesFor(recipeType, machine);
+        var matches = recipeManager().getRecipesFor(recipeType, machine);
         return newRecipe(matches, machine);
     }
 
     @Override
     public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine, ResourceLocation target) {
-        var marker = recipeManager.byLoc(markerType, target);
+        var marker = recipeManager().byLoc(markerType, target);
         if (marker.isPresent()) {
             var recipe = marker.get();
             setFilterRecipe(machine, recipe);
-            var matches = recipeManager.getRecipesFor(recipeType, machine)
+            var matches = recipeManager().getRecipesFor(recipeType, machine)
                 .stream().filter(recipe::matches)
                 .toList();
             return newRecipe(matches, machine);
         }
 
-        var processing = recipeManager.byLoc(recipeType, target);
+        var processing = recipeManager().byLoc(recipeType, target);
         if (processing.isPresent()) {
             var recipe = processing.get();
             setFilterRecipe(machine, recipe);
