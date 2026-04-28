@@ -1,8 +1,8 @@
 package org.shsts.tinactory.unit.logistics;
 
-import org.shsts.tinactory.unit.fixture.TestStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.unit.fixture.TestStack;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

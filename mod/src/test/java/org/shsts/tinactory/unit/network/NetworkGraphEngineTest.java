@@ -1,8 +1,8 @@
 package org.shsts.tinactory.unit.network;
 
-import org.junit.jupiter.api.Test;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 

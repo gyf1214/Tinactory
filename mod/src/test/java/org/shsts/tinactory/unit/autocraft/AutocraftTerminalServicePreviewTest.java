@@ -1,17 +1,17 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
-import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
 import java.util.Optional;

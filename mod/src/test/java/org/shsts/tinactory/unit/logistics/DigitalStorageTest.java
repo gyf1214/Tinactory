@@ -1,10 +1,10 @@
 package org.shsts.tinactory.unit.logistics;
 
-import org.shsts.tinactory.unit.fixture.TestStack;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.DigitalStorage;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
+import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.List;
 

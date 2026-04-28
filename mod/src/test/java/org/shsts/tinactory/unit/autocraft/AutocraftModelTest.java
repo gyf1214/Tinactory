@@ -1,14 +1,14 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
-import org.shsts.tinactory.unit.fixture.TestStackKey;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
 

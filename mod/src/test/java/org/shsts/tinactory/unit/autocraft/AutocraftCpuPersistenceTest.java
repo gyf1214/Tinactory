@@ -18,8 +18,8 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.unit.fixture.TestStackKey;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
+import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
 import java.util.List;
