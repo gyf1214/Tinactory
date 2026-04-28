@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 
@@ -47,6 +48,11 @@ public record TestStackKey(PortType type, String id, String nbt) implements ISta
             case NONE -> throw new IllegalArgumentException("Unsupported test key type: NONE");
         };
         return typeName + "|" + key.id() + "|" + key.nbt();
+    }
+
+    @Override
+    public IStackAdapter<?> adapter() {
+        return TestStack.ADAPTER;
     }
 
     @Override

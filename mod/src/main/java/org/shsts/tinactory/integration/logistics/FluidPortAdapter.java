@@ -127,6 +127,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         }
 
         @Override
+        public IStackAdapter<?> adapter() {
+            return StackHelper.FLUID_ADAPTER;
+        }
+
+        @Override
         public int compareTo(IStackKey other) {
             if (type() != other.type()) {
                 return Integer.compare(type().ordinal(), other.type().ordinal());

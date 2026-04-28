@@ -127,6 +127,11 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         }
 
         @Override
+        public IStackAdapter<?> adapter() {
+            return StackHelper.ITEM_ADAPTER;
+        }
+
+        @Override
         public int compareTo(IStackKey other) {
             if (type() != other.type()) {
                 return Integer.compare(type().ordinal(), other.type().ordinal());

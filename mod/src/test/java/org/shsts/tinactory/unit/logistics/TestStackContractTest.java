@@ -5,6 +5,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestStackContractTest {
@@ -15,6 +16,13 @@ class TestStackContractTest {
 
         assertEquals(PortType.ITEM, left.type());
         assertTrue(left.compareTo(right) < 0);
+    }
+
+    @Test
+    void keyShouldExposeAdapter() {
+        var key = TestStack.ADAPTER.keyOf(new TestStack("copper", 1));
+
+        assertSame(TestStack.ADAPTER, key.adapter());
     }
 
     @Test

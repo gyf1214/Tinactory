@@ -7,4 +7,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public interface IStackKey extends Comparable<IStackKey> {
     PortType type();
+
+    IStackAdapter<?> adapter();
 }
