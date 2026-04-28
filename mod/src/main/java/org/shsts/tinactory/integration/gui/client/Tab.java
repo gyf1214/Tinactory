@@ -71,10 +71,11 @@ public class Tab extends Panel {
             if (i + 1 < args.length) {
                 if (args[i + 1] instanceof ItemLike item) {
                     icon = new ItemStack(item);
+                    i++;
                 } else if (args[i + 1] instanceof IEntry<?> entry) {
                     icon = new ItemStack((ItemLike) entry.get());
+                    i++;
                 }
-                i++;
             }
 
             var button = new TabButton(menu, k, icon);

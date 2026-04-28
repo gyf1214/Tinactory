@@ -38,8 +38,6 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu> {
-    private static final int SLOT_COUNT = 6 * 9;
-
     private final List<ItemStack> items = new ArrayList<>();
     private final List<FluidStack> fluids = new ArrayList<>();
 
@@ -50,8 +48,9 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
 
         @Override
         protected int getItemCount() {
-            var size = items.size() + fluids.size();
-            return Math.max(1, (size + SLOT_COUNT) / SLOT_COUNT) * SLOT_COUNT;
+            var count = items.size() + fluids.size();
+            var slotCount = gridViewGroup.getSlotCount();
+            return Math.max(1, (count + slotCount) / slotCount) * slotCount;
         }
 
         @Override

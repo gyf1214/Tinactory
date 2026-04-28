@@ -18,8 +18,6 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
-import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
-import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
@@ -85,18 +83,11 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         }
     }
 
-    private void unregisterFromAutocraft() {
-        machine.network().ifPresent(network ->
-            network.getComponent(AUTOCRAFT_COMPONENT.get()).unregisterCpu(machine.uuid()));
-    }
-
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(BUILD_SCHEDULING.get(), builder ->
             builder.add(LOGISTICS_SCHEDULING.get(), (world, network) -> onTick()));
-        eventManager.subscribe(REMOVED_BY_CHUNK.get(), world -> unregisterFromAutocraft());
-        eventManager.subscribe(REMOVED_IN_WORLD.get(), world -> unregisterFromAutocraft());
     }
 
     @Override

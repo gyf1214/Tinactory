@@ -286,7 +286,7 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static void renderDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderDescriptor(PoseStack poseStack, IRenderDescriptor descriptor, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }
@@ -312,7 +312,7 @@ public final class RenderUtil {
         throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
-    public static void renderGhostDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderGhostDescriptor(PoseStack poseStack, IRenderDescriptor descriptor, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }

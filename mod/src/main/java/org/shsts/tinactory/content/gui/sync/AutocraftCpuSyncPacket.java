@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.gui.sync;
 
-import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -22,25 +21,11 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftCpuSyncPacket implements IPacket {
-    private final Codec<IStackKey> ingredientKeyCodec;
     private final List<CpuStatusEntry> entries = new ArrayList<>();
 
-    public AutocraftCpuSyncPacket() {
-        this(StackHelper.KEY_CODEC);
-    }
-
-    public AutocraftCpuSyncPacket(Codec<IStackKey> ingredientKeyCodec) {
-        this.ingredientKeyCodec = ingredientKeyCodec;
-    }
+    public AutocraftCpuSyncPacket() {}
 
     public AutocraftCpuSyncPacket(List<CpuStatusEntry> entries) {
-        this(StackHelper.KEY_CODEC, entries);
-    }
-
-    public AutocraftCpuSyncPacket(
-        Codec<IStackKey> ingredientKeyCodec,
-        List<CpuStatusEntry> entries) {
-        this.ingredientKeyCodec = ingredientKeyCodec;
         this.entries.addAll(entries);
     }
 
@@ -106,11 +91,11 @@ public class AutocraftCpuSyncPacket implements IPacket {
 
     private CompoundTag encodeIngredientKey(IStackKey key) {
         var tag = new CompoundTag();
-        tag.put("value", CodecHelper.encodeTag(ingredientKeyCodec, key));
+        tag.put("value", CodecHelper.encodeTag(StackHelper.KEY_CODEC, key));
         return tag;
     }
 
     private IStackKey decodeIngredientKey(CompoundTag tag) {
-        return CodecHelper.parseTag(ingredientKeyCodec, tag.get("value"));
+        return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
     }
 }

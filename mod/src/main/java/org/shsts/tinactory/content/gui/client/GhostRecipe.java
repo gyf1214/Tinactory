@@ -29,7 +29,7 @@ public class GhostRecipe extends MenuWidget {
 
     private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {
         if (ingredient instanceof IProcessingDisplay display) {
-            RenderUtil.renderGhostDescriptor(display.display(), poseStack, new Rect(x, y, 16, 16), getBlitOffset());
+            RenderUtil.renderGhostDescriptor(poseStack, display.display(), new Rect(x, y, 16, 16), getBlitOffset());
         }
     }
 
