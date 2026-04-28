@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.MathUtil;
 
 @OnlyIn(Dist.CLIENT)
@@ -15,10 +14,7 @@ public class GridViewGroup extends ViewGroup {
     private final int itemWidth;
     private final int itemHeight;
     private final int verticalSpacing;
-    private final int bottomReservedSpace;
-    private final RectD pageButtonAnchor;
-    private final Rect pageButtonOffset;
-    private final int pageButtonMargin;
+    private final Rect offset;
 
     private int columnCount = 1;
     private int rowCount = 1;
@@ -27,16 +23,11 @@ public class GridViewGroup extends ViewGroup {
     private int itemCount = 0;
     private int page = 0;
 
-    public GridViewGroup(int itemWidth, int itemHeight, int verticalSpacing, int bottomReservedSpace,
-        RectD pageButtonAnchor, Rect pageButtonOffset, int pageButtonMargin) {
-
+    public GridViewGroup(int itemWidth, int itemHeight, int verticalSpacing, Rect offset) {
         this.itemWidth = itemWidth;
         this.itemHeight = itemHeight;
         this.verticalSpacing = verticalSpacing;
-        this.bottomReservedSpace = bottomReservedSpace;
-        this.pageButtonAnchor = pageButtonAnchor;
-        this.pageButtonOffset = pageButtonOffset;
-        this.pageButtonMargin = pageButtonMargin;
+        this.offset = offset;
     }
 
     public int getColumnCount() {
@@ -67,18 +58,6 @@ public class GridViewGroup extends ViewGroup {
         return new Rect(x, y, itemWidth, itemHeight);
     }
 
-    public RectD getPageButtonAnchor() {
-        return pageButtonAnchor;
-    }
-
-    public Rect getLeftPageButtonOffset() {
-        return pageButtonOffset.offset(-pageButtonMargin - pageButtonOffset.width(), 0);
-    }
-
-    public Rect getRightPageButtonOffset() {
-        return pageButtonOffset.offset(pageButtonMargin, 0);
-    }
-
     public boolean isLeftPageEnabled() {
         return page != 0;
     }
@@ -106,9 +85,11 @@ public class GridViewGroup extends ViewGroup {
 
     @Override
     public void setRect(Rect rect) {
-        columnCount = Math.max(1, rect.width() / itemWidth);
-        rowCount = Math.max(1, (rect.height() + verticalSpacing - bottomReservedSpace) /
-            (itemHeight + verticalSpacing));
+        var width = rect.width() + offset.width();
+        var height = rect.height() + offset.height();
+
+        columnCount = Math.max(1, width / itemWidth);
+        rowCount = Math.max(1, (height + verticalSpacing) / (itemHeight + verticalSpacing));
         horizontalSpacing = columnCount > 1 ? (rect.width() - columnCount * itemWidth) / (columnCount - 1) : 0;
         buttonCount = rowCount * columnCount;
         setPage(page);

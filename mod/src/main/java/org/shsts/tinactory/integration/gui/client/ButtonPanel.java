@@ -22,10 +22,12 @@ import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ButtonPanel extends Panel {
+    private static final Rect PANEL_OFFSET = Rect.corners(0, 0, 0, -21);
     private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
     private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
     private static final int PAGE_MARGIN = 12;
-    private static final int BOTTOM_MARGIN = 21;
+    private static final Rect LEFT_PAGE_OFFSET = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0);
+    private static final Rect RIGHT_PAGE_OFFSET = PAGE_OFFSET.offset(PAGE_MARGIN, 0);
 
     protected final GridViewGroup gridViewGroup;
     protected int page = 0;
@@ -96,13 +98,13 @@ public abstract class ButtonPanel extends Panel {
     }
 
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen, createGridViewGroup(buttonWidth, buttonHeight, verticalSpacing));
+        super(screen, new GridViewGroup(buttonWidth, buttonHeight, verticalSpacing, PANEL_OFFSET));
         this.gridViewGroup = (GridViewGroup) viewGroup;
         this.leftPageButton = new PageButton(15, -1);
         this.rightPageButton = new PageButton(1, 1);
 
-        addChild(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getLeftPageButtonOffset(), leftPageButton);
-        addChild(gridViewGroup.getPageButtonAnchor(), gridViewGroup.getRightPageButtonOffset(), rightPageButton);
+        addChild(PAGE_ANCHOR, LEFT_PAGE_OFFSET, leftPageButton);
+        addChild(PAGE_ANCHOR, RIGHT_PAGE_OFFSET, rightPageButton);
     }
 
     @Override
@@ -177,10 +179,5 @@ public abstract class ButtonPanel extends Panel {
     @Override
     protected void doRefresh() {
         setPage(page);
-    }
-
-    private static GridViewGroup createGridViewGroup(int buttonWidth, int buttonHeight, int verticalSpacing) {
-        return new GridViewGroup(buttonWidth, buttonHeight, verticalSpacing, BOTTOM_MARGIN,
-            PAGE_ANCHOR, PAGE_OFFSET, PAGE_MARGIN);
     }
 }
