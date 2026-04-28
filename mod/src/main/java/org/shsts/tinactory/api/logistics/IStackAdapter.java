@@ -1,10 +1,9 @@
-package org.shsts.tinactory.core.logistics;
+package org.shsts.tinactory.api.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
-import org.shsts.tinactory.api.logistics.IStackKey;
 
 import java.util.List;
 import java.util.Optional;

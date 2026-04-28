@@ -12,9 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
+import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.core.logistics.IStackAdapter;
 import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 

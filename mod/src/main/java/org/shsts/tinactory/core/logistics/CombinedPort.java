@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
 import org.shsts.tinactory.api.logistics.IPortNotifier;
+import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
