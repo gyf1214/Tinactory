@@ -248,6 +248,12 @@ public final class RenderUtil {
         }
     }
 
+    public static void renderItem(PoseStack poseStack, ItemStack stack, int x, int y) {
+        var poseStack1 = applyToModelViewStack(poseStack);
+        renderItem(stack, x, y);
+        popModelViewStack(poseStack1);
+    }
+
     public static void renderItem(ItemStack stack, int x, int y) {
         ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
         RenderSystem.disableDepthTest();
@@ -280,7 +286,7 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static void render(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }
@@ -291,12 +297,12 @@ public final class RenderUtil {
         if (descriptor instanceof ItemIdRenderDescriptor itemId) {
             var item = ForgeRegistries.ITEMS.getValue(itemId.itemId());
             if (item != null) {
-                renderItem(new ItemStack(item), rect.x(), rect.y());
+                renderItem(poseStack, new ItemStack(item), rect.x(), rect.y());
             }
             return;
         }
         if (descriptor instanceof ItemRenderDescriptor item) {
-            renderItem(item.stack(), rect.x(), rect.y());
+            renderItem(poseStack, item.stack(), rect.x(), rect.y());
             return;
         }
         if (descriptor instanceof FluidRenderDescriptor fluid) {
@@ -306,7 +312,7 @@ public final class RenderUtil {
         throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
-    public static void renderGhost(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderGhostDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }
