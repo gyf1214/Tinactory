@@ -15,7 +15,8 @@ object RecoveryRegistry {
         val materialMap: Map<MaterialSet, MaterialSet>,
         val secondOutputRatio: Double,
         val workTicksPerIngot: Long,
-        val oxygenPerIngot: Double)
+        val oxygenPerIngot: Double,
+        val maxRecoveredMaterialAmount: Int)
 
     private lateinit var config: Config
     val targetSub: String
@@ -34,7 +35,9 @@ object RecoveryRegistry {
         materialMap: Map<MaterialSet, MaterialSet>,
         secondOutputRatio: Double,
         workTicksPerIngot: Long,
-        oxygenPerIngot: Double) {
+        oxygenPerIngot: Double,
+        maxRecoveredMaterialAmount: Int = 64) {
+        require(maxRecoveredMaterialAmount > 0)
         config = Config(
             targetSub,
             lossRate,
@@ -42,7 +45,8 @@ object RecoveryRegistry {
             materialMap.toMap(),
             secondOutputRatio,
             workTicksPerIngot,
-            oxygenPerIngot)
+            oxygenPerIngot,
+            maxRecoveredMaterialAmount)
         clearResolved()
     }
 
@@ -158,19 +162,23 @@ object RecoveryRegistry {
             return listOf()
         }
         val ret = mutableListOf<Pair<MaterialSet, Int>>()
-        val firstAmount = floor(top[0].second).toInt()
+        val firstAmount = capRecoveredAmount(top[0].second)
         if (firstAmount <= 0) {
             return listOf()
         }
         ret += top[0].first to firstAmount
-        if (top.size > 1 && top[1].second >= top[0].second * config.secondOutputRatio &&
+        if (top.size > 1 && top[1].second >= firstAmount * config.secondOutputRatio &&
             top[1].second > 0.0) {
-            val secondAmount = floor(top[1].second).toInt()
+            val secondAmount = capRecoveredAmount(top[1].second)
             if (secondAmount > 0) {
                 ret += top[1].first to secondAmount
             }
         }
         return ret
+    }
+
+    private fun capRecoveredAmount(amount: Double): Int {
+        return floor(amount).toInt().coerceAtMost(config.maxRecoveredMaterialAmount)
     }
 
     private fun isTopLevelTarget(loc: ResourceLocation): Boolean {

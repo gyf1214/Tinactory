@@ -26,7 +26,8 @@ object MaterialRecoveryRecipes {
                 getMaterial("iron") to getMaterial("wrought_iron")),
             secondOutputRatio = 0.25,
             workTicksPerIngot = 128L,
-            oxygenPerIngot = 0.1)
+            oxygenPerIngot = 0.1,
+            maxRecoveredMaterialAmount = 64)
         RecoveryRegistry.emitArcFurnaceRecipes()
     }
 }
