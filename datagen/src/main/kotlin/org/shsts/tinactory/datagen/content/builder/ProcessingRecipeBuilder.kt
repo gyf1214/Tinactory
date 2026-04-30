@@ -41,11 +41,18 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
 
     private fun defaultSub(name: String) = defaultSub(getMaterial(name))
 
+    protected open fun recordMaterialInput(mat: MaterialSet, sub: String, amount: Number) {}
+
+    protected open fun recordItemInput(item: ItemLike, amount: Int) {}
+
+    protected open fun recordItemOutput(item: ItemLike, amount: Int) {}
+
     fun input(tag: TagKey<Item>, amount: Int = 1, port: Int = defaultInputItem!!) {
         builder.input(port) { TagIngredient(tag, amount) }
     }
 
     fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {
+        recordItemInput(item, amount)
         builder.input(port) { ProcessingHelper.itemIngredient(ItemStack(item, amount)) }
     }
 
@@ -58,6 +65,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
             input(mat.fluid(sub).get(), mat.fluidAmount(sub, amount.toFloat()),
                 port ?: defaultInputFluid!!)
         } else {
+            recordMaterialInput(mat, sub, amount)
             input(mat.tag(sub), amount.toInt(), port ?: defaultInputItem!!)
         }
     }
@@ -67,6 +75,7 @@ open class ProcessingRecipeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(val b
     }
 
     open fun output(item: ItemLike, amount: Int = 1, port: Int = defaultOutputItem!!, rate: Double = 1.0) {
+        recordItemOutput(item, amount)
         builder.output(port) {
             ProcessingHelper.itemResult(rate, ItemStack(item, amount))
         }

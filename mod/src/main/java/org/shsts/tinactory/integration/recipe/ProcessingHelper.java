@@ -11,7 +11,11 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
+import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -34,6 +38,11 @@ public final class ProcessingHelper {
     public static final Codec<IProcessingResult> RESULT_CODEC;
     public static final Codec<ProcessingInfo> INFO_CODEC;
 
+    public static final ProcessingRecipe.Serializer<ProcessingRecipe, ProcessingRecipe.Builder> PROCESSING_SERIALIZER;
+    public static final AssemblyRecipe.Serializer<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLY_SERIALIZER;
+    public static final MarkerRecipe.Serializer MARKER_SERIALIZER;
+    public static final ResearchRecipe.Serializer RESEARCH_SERIALIZER;
+
     static {
         var ingredientCodecs = Map.of(
             ITEM_INGREDIENT_CODEC_NAME, itemIngredientCodec(),
@@ -47,6 +56,11 @@ public final class ProcessingHelper {
         RESULT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, resultCodecs::get);
 
         INFO_CODEC = ProcessingInfo.codec(INGREDIENT_CODEC, RESULT_CODEC);
+
+        PROCESSING_SERIALIZER = new ProcessingRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
+        ASSEMBLY_SERIALIZER = new AssemblyRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
+        MARKER_SERIALIZER = new MarkerRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC);
+        RESEARCH_SERIALIZER = new ResearchRecipe.Serializer(INGREDIENT_CODEC);
     }
 
     private ProcessingHelper() {}
