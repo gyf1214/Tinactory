@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllTags
@@ -8,6 +9,14 @@ import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.datagen.content.component.item
+import org.shsts.tinactory.datagen.content.recovery.RecoveryInput
+import org.shsts.tinactory.datagen.content.recovery.RecoveryItemInput
+import org.shsts.tinactory.datagen.content.recovery.RecoveryMaterialInput
+import org.shsts.tinactory.datagen.content.recovery.RecoveryOutput
+import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipe
+import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipeKey
+import org.shsts.tinactory.datagen.content.recovery.RecoveryRegistry
+import org.shsts.tinactory.integration.material.MaterialSet
 import kotlin.math.max
 
 class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
@@ -15,6 +24,8 @@ class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
     var componentVoltage: Voltage? = null
     private var components = 0
     var autoCable = false
+    private val recoveryInputs = mutableListOf<RecoveryInput>()
+    private val recoveryOutputs = mutableListOf<RecoveryOutput>()
 
     fun tech(vararg loc: ResourceLocation) {
         builder.requireTech(*loc)
@@ -55,9 +66,27 @@ class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
         }
     }
 
+    override fun recordMaterialInput(mat: MaterialSet, sub: String, amount: Number) {
+        recoveryInputs += RecoveryMaterialInput(mat, sub, amount.toDouble())
+    }
+
+    override fun recordItemInput(item: ItemLike, amount: Int) {
+        recoveryInputs += RecoveryItemInput(item, amount.toDouble())
+    }
+
+    override fun recordItemOutput(item: ItemLike, amount: Int) {
+        recoveryOutputs += RecoveryOutput(item, amount, voltage)
+    }
+
     override fun build() {
         if (autoCable) {
             component("cable", amount = max(2, components * 2))
+        }
+        if (recoveryInputs.isNotEmpty() && recoveryOutputs.size == 1) {
+            RecoveryRegistry.record(RecoveryRecipe(
+                RecoveryRecipeKey(builder.loc),
+                recoveryOutputs.single(),
+                recoveryInputs.toList()))
         }
         super.build()
     }

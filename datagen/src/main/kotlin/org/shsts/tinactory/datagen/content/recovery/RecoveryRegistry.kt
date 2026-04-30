@@ -1,0 +1,189 @@
+package org.shsts.tinactory.datagen.content.recovery
+
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.level.ItemLike
+import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
+import org.shsts.tinactory.integration.material.MaterialSet
+import kotlin.math.floor
+
+object RecoveryRegistry {
+    var targetSub = "ingot"
+        private set
+    private var lossRate = 0.9
+    private var secondOutputRatio = 0.25
+    private var secondOutputMinimum = 1.0
+    private val subFactors = mutableMapOf<String, Double>()
+    private val materialMap = mutableMapOf<MaterialSet, MaterialSet>()
+    private val recipesByItem = mutableMapOf<ResourceLocation, MutableList<RecoveryRecipe>>()
+    private val selectedRecipeByItem = mutableMapOf<ResourceLocation, RecoveryRecipe?>()
+    private val compositionByItem = mutableMapOf<ResourceLocation, RecoveryComposition>()
+    private val compositionByRecipe = mutableMapOf<RecoveryRecipeKey, RecoveryComposition>()
+    private val visitingItems = mutableSetOf<ResourceLocation>()
+    private val visitingRecipes = mutableSetOf<RecoveryRecipeKey>()
+
+    fun configure(
+        targetSub: String,
+        lossRate: Double,
+        subFactors: Map<String, Double>,
+        materialMap: Map<MaterialSet, MaterialSet>,
+        secondOutputRatio: Double,
+        secondOutputMinimum: Double) {
+        this.targetSub = targetSub
+        this.lossRate = lossRate
+        this.secondOutputRatio = secondOutputRatio
+        this.secondOutputMinimum = secondOutputMinimum
+        this.subFactors.clear()
+        this.subFactors.putAll(subFactors)
+        this.materialMap.clear()
+        this.materialMap.putAll(materialMap)
+        clearResolved()
+    }
+
+    fun record(recipe: RecoveryRecipe) {
+        val loc = itemLoc(recipe.output.item)
+        recipesByItem.getOrPut(loc) { mutableListOf() }.add(recipe)
+        clearResolved()
+    }
+
+    fun emitArcFurnaceRecipes() {
+        for (loc in recipesByItem.keys.sortedBy { it.toString() }) {
+            if (!isTopLevelTarget(loc)) {
+                continue
+            }
+            val composition = compositionOf(loc)
+            val outputs = recoveryOutputs(composition)
+            if (outputs.isEmpty()) {
+                continue
+            }
+            val recipe = selectedRecipeByItem[loc] ?: continue
+            arcFurnace {
+                recipe(ResourceLocation(loc.namespace, "recovery/${loc.namespace}/${loc.path}")) {
+                    voltage(recipe.output.voltage ?: Voltage.HV)
+                    workTicks(200)
+                    input(recipe.output.item)
+                    for ((material, amount) in outputs) {
+                        output(material, targetSub, amount, rate = lossRate)
+                    }
+                }
+            }
+        }
+    }
+
+    fun compositionOf(item: ItemLike): RecoveryComposition {
+        return compositionOf(itemLoc(item))
+    }
+
+    private fun compositionOf(loc: ResourceLocation): RecoveryComposition {
+        compositionByItem[loc]?.let { return it }
+        if (!visitingItems.add(loc)) {
+            println("Skipping cyclic recovery item input $loc")
+            return RecoveryComposition()
+        }
+        val selected = selectRecipe(loc, recipesByItem[loc].orEmpty())
+        selectedRecipeByItem[loc] = selected
+        val composition = selected?.let { compositionOf(it) } ?: RecoveryComposition()
+        compositionByItem[loc] = composition
+        visitingItems.remove(loc)
+        return composition
+    }
+
+    private fun compositionOf(recipe: RecoveryRecipe): RecoveryComposition {
+        compositionByRecipe[recipe.key]?.let { return it }
+        if (!visitingRecipes.add(recipe.key)) {
+            println("Skipping cyclic recovery recipe input ${recipe.key.loc}")
+            return RecoveryComposition()
+        }
+        var ret = RecoveryComposition()
+        for (input in recipe.inputs) {
+            val composition = when (input) {
+                is RecoveryMaterialInput -> convert(input)
+                    ?.let { RecoveryComposition(mapOf(it.first to it.second)) }
+                    ?: RecoveryComposition()
+                is RecoveryItemInput -> compositionOf(input.item).scale(input.amount)
+            }
+            ret = ret.plus(composition)
+        }
+        ret = ret.scale(1.0 / recipe.output.amount)
+        compositionByRecipe[recipe.key] = ret
+        visitingRecipes.remove(recipe.key)
+        return ret
+    }
+
+    private fun selectRecipe(loc: ResourceLocation, candidates: List<RecoveryRecipe>): RecoveryRecipe? {
+        val nonEmpty = candidates
+            .mapNotNull {
+                val composition = compositionOf(it)
+                if (composition.isEmpty()) null else it to composition
+            }
+        if (nonEmpty.isEmpty()) {
+            return null
+        }
+        val selected = nonEmpty.minWith(compareBy<Pair<RecoveryRecipe, RecoveryComposition>> {
+            it.second.topMaterials(1).first().second
+        }.thenBy {
+            it.first.key.loc.toString()
+        }).first
+        if (nonEmpty.size > 1) {
+            val discarded = nonEmpty.map { it.first }.filter { it != selected }
+            if (discarded.isNotEmpty()) {
+                println("Selected recovery recipe ${selected.key.loc} for $loc; discarded ${
+                    discarded.joinToString { it.key.loc.toString() }
+                }")
+            }
+        }
+        return selected
+    }
+
+    private fun convert(input: RecoveryMaterialInput): Pair<MaterialSet, Double>? {
+        val factor = subFactors[input.sub] ?: return null
+        val mapped = materialMap[input.material] ?: input.material
+        if (!mapped.hasItem(targetSub)) {
+            return null
+        }
+        return mapped to input.amount * factor
+    }
+
+    private fun recoveryOutputs(composition: RecoveryComposition): List<Pair<MaterialSet, Int>> {
+        val top = composition.topMaterials(2)
+        if (top.isEmpty()) {
+            return listOf()
+        }
+        val ret = mutableListOf<Pair<MaterialSet, Int>>()
+        val firstAmount = floor(top[0].second).toInt()
+        if (firstAmount <= 0) {
+            return listOf()
+        }
+        ret += top[0].first to firstAmount
+        if (top.size > 1 && top[1].second >= top[0].second * secondOutputRatio &&
+            top[1].second >= secondOutputMinimum) {
+            val secondAmount = floor(top[1].second).toInt()
+            if (secondAmount > 0) {
+                ret += top[1].first to secondAmount
+            }
+        }
+        return ret
+    }
+
+    private fun isTopLevelTarget(loc: ResourceLocation): Boolean {
+        if (loc.namespace != "tinactory") {
+            return false
+        }
+        return loc.path.startsWith("component/") ||
+            loc.path.startsWith("circuit/") ||
+            loc.path.startsWith("circuit_component/") ||
+            loc.path.startsWith("machine/")
+    }
+
+    private fun itemLoc(item: ItemLike): ResourceLocation {
+        return item.asItem().registryName!!
+    }
+
+    private fun clearResolved() {
+        selectedRecipeByItem.clear()
+        compositionByItem.clear()
+        compositionByRecipe.clear()
+        visitingItems.clear()
+        visitingRecipes.clear()
+    }
+}
