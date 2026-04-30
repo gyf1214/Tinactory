@@ -1,4 +1,5 @@
 {
+  "recipe": "display_input",
   "voltages": "hv-iv",
   "layout": {
     "slots": [
@@ -18,6 +19,12 @@
         "port": 2,
         "type": "item_output",
         "x": 72,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
         "y": 10
       }
     ],
