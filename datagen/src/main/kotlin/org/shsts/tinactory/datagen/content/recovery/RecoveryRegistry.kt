@@ -10,7 +10,7 @@ import kotlin.math.floor
 object RecoveryRegistry {
     private data class Config(
         val targetSub: String,
-        val lossRate: Double,
+        val recoverRate: Double,
         val subFactors: Map<String, Double>,
         val materialMap: Map<MaterialSet, MaterialSet>,
         val secondOutputRatio: Double,
@@ -30,7 +30,7 @@ object RecoveryRegistry {
 
     fun configure(
         targetSub: String,
-        lossRate: Double,
+        recoverRate: Double,
         subFactors: Map<String, Double>,
         materialMap: Map<MaterialSet, MaterialSet>,
         secondOutputRatio: Double,
@@ -40,7 +40,7 @@ object RecoveryRegistry {
         require(maxRecoveredMaterialAmount > 0)
         config = Config(
             targetSub,
-            lossRate,
+            recoverRate,
             subFactors.toMap(),
             materialMap.toMap(),
             secondOutputRatio,
@@ -69,13 +69,13 @@ object RecoveryRegistry {
             val recipe = selectedRecipeByItem[loc] ?: continue
             val totalOutputAmount = outputs.sumOf { it.second }
             arcFurnace {
-                recipe(ResourceLocation(loc.namespace, "recovery/${loc.namespace}/${loc.path}")) {
+                recipe(ResourceLocation(loc.namespace, "recovery/${loc.path}")) {
                     voltage(recipe.output.voltage ?: Voltage.HV)
                     workTicks(totalOutputAmount * config.workTicksPerIngot)
                     input(recipe.output.item)
                     input("oxygen", amount = totalOutputAmount * config.oxygenPerIngot)
                     for ((material, amount) in outputs) {
-                        output(material, targetSub, amount, rate = config.lossRate)
+                        output(material, targetSub, amount, rate = config.recoverRate)
                     }
                 }
             }
@@ -185,9 +185,8 @@ object RecoveryRegistry {
             return false
         }
         return loc.path.startsWith("component/") ||
-            loc.path.startsWith("circuit/") ||
-            loc.path.startsWith("circuit_component/") ||
-            loc.path.startsWith("machine/")
+            loc.path.startsWith("machine/") ||
+            loc.path.startsWith("network/")
     }
 
     private fun itemLoc(item: ItemLike): ResourceLocation {

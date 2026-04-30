@@ -6,7 +6,7 @@ object MaterialRecoveryRecipes {
     fun init() {
         RecoveryRegistry.configure(
             targetSub = "ingot",
-            lossRate = 0.9,
+            recoverRate = 0.7,
             subFactors = mapOf(
                 "ingot" to 1.0,
                 "dust" to 1.0,
