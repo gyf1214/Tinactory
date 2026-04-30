@@ -47,9 +47,7 @@ public final class AllRecipes {
 
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
             .recipeClass(MarkerRecipe.class)
-            .serializer(new MarkerRecipe.Serializer(
-                ProcessingHelper.INGREDIENT_CODEC,
-                ProcessingHelper.RESULT_CODEC))
+            .serializer(ProcessingHelper.MARKER_SERIALIZER)
             .register();
     }
 
