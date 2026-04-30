@@ -8,13 +8,18 @@ import org.shsts.tinactory.integration.material.MaterialSet
 import kotlin.math.floor
 
 object RecoveryRegistry {
-    var targetSub = "ingot"
-        private set
-    private var lossRate = 0.9
-    private var secondOutputRatio = 0.25
-    private var secondOutputMinimum = 1.0
-    private val subFactors = mutableMapOf<String, Double>()
-    private val materialMap = mutableMapOf<MaterialSet, MaterialSet>()
+    private data class Config(
+        val targetSub: String,
+        val lossRate: Double,
+        val subFactors: Map<String, Double>,
+        val materialMap: Map<MaterialSet, MaterialSet>,
+        val secondOutputRatio: Double,
+        val workTicksPerIngot: Long,
+        val oxygenPerIngot: Double)
+
+    private lateinit var config: Config
+    val targetSub: String
+        get() = config.targetSub
     private val recipesByItem = mutableMapOf<ResourceLocation, MutableList<RecoveryRecipe>>()
     private val selectedRecipeByItem = mutableMapOf<ResourceLocation, RecoveryRecipe?>()
     private val compositionByItem = mutableMapOf<ResourceLocation, RecoveryComposition>()
@@ -28,15 +33,16 @@ object RecoveryRegistry {
         subFactors: Map<String, Double>,
         materialMap: Map<MaterialSet, MaterialSet>,
         secondOutputRatio: Double,
-        secondOutputMinimum: Double) {
-        this.targetSub = targetSub
-        this.lossRate = lossRate
-        this.secondOutputRatio = secondOutputRatio
-        this.secondOutputMinimum = secondOutputMinimum
-        this.subFactors.clear()
-        this.subFactors.putAll(subFactors)
-        this.materialMap.clear()
-        this.materialMap.putAll(materialMap)
+        workTicksPerIngot: Long,
+        oxygenPerIngot: Double) {
+        config = Config(
+            targetSub,
+            lossRate,
+            subFactors.toMap(),
+            materialMap.toMap(),
+            secondOutputRatio,
+            workTicksPerIngot,
+            oxygenPerIngot)
         clearResolved()
     }
 
@@ -57,13 +63,15 @@ object RecoveryRegistry {
                 continue
             }
             val recipe = selectedRecipeByItem[loc] ?: continue
+            val totalOutputAmount = outputs.sumOf { it.second }
             arcFurnace {
                 recipe(ResourceLocation(loc.namespace, "recovery/${loc.namespace}/${loc.path}")) {
                     voltage(recipe.output.voltage ?: Voltage.HV)
-                    workTicks(200)
+                    workTicks(totalOutputAmount * config.workTicksPerIngot)
                     input(recipe.output.item)
+                    input("oxygen", amount = totalOutputAmount * config.oxygenPerIngot)
                     for ((material, amount) in outputs) {
-                        output(material, targetSub, amount, rate = lossRate)
+                        output(material, targetSub, amount, rate = config.lossRate)
                     }
                 }
             }
@@ -136,8 +144,8 @@ object RecoveryRegistry {
     }
 
     private fun convert(input: RecoveryMaterialInput): Pair<MaterialSet, Double>? {
-        val factor = subFactors[input.sub] ?: return null
-        val mapped = materialMap[input.material] ?: input.material
+        val factor = config.subFactors[input.sub] ?: return null
+        val mapped = config.materialMap[input.material] ?: input.material
         if (!mapped.hasItem(targetSub)) {
             return null
         }
@@ -155,8 +163,8 @@ object RecoveryRegistry {
             return listOf()
         }
         ret += top[0].first to firstAmount
-        if (top.size > 1 && top[1].second >= top[0].second * secondOutputRatio &&
-            top[1].second >= secondOutputMinimum) {
+        if (top.size > 1 && top[1].second >= top[0].second * config.secondOutputRatio &&
+            top[1].second > 0.0) {
             val secondAmount = floor(top[1].second).toInt()
             if (secondAmount > 0) {
                 ret += top[1].first to secondAmount

@@ -22,9 +22,11 @@ object MaterialRecoveryRecipes {
                 "rotor" to 4.0,
                 "pipe" to 1.0),
             materialMap = mapOf(
-                getMaterial("copper") to getMaterial("annealed_copper")),
+                getMaterial("copper") to getMaterial("annealed_copper"),
+                getMaterial("iron") to getMaterial("wrought_iron")),
             secondOutputRatio = 0.25,
-            secondOutputMinimum = 1.0)
+            workTicksPerIngot = 128L,
+            oxygenPerIngot = 0.1)
         RecoveryRegistry.emitArcFurnaceRecipes()
     }
 }
