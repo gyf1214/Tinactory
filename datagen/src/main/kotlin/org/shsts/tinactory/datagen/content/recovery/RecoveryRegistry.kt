@@ -167,8 +167,7 @@ object RecoveryRegistry {
             return listOf()
         }
         ret += top[0].first to firstAmount
-        if (top.size > 1 && top[1].second >= firstAmount * config.secondOutputRatio &&
-            top[1].second > 0.0) {
+        if (top.size > 1 && top[1].second >= firstAmount * config.secondOutputRatio) {
             val secondAmount = capRecoveredAmount(top[1].second)
             if (secondAmount > 0) {
                 ret += top[1].first to secondAmount
