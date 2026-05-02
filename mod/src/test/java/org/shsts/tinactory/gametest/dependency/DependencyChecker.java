@@ -68,6 +68,10 @@ public final class DependencyChecker implements IDependencyChecker {
     private static final ResourceLocation STICKY_RESIN = new ResourceLocation(TinactoryKeys.ID,
         "rubber_tree/sticky_resin");
     private static final ResourceLocation TOOL_CRAFTING = new ResourceLocation(TinactoryKeys.ID, "tool_crafting");
+    private static final List<ResourceLocation> GENERATOR_RECIPE_TYPES = List.of(
+        new ResourceLocation(TinactoryKeys.ID, "combustion_generator"),
+        new ResourceLocation(TinactoryKeys.ID, "gas_turbine"),
+        new ResourceLocation(TinactoryKeys.ID, "steam_turbine"));
     private static final ResourceLocation URANIUM_FUEL_ROD = new ResourceLocation(TinactoryKeys.ID,
         "component/uranium_fuel_rod");
     private static final ResourceLocation NUCLEAR_WASTE_ROD = new ResourceLocation(TinactoryKeys.ID,
@@ -88,10 +92,7 @@ public final class DependencyChecker implements IDependencyChecker {
     private final Map<String, NavigableMap<Double, Set<DependencyMethod>>> waitingByNumericNode = new HashMap<>();
     private final NavigableMap<Integer, Set<DependencyMethod>> waitingByVoltage = new TreeMap<>();
     private final Set<IDependencyNode> reachedExactNodes = new TreeSet<>();
-    private final Map<IDependencyNode, DependencyMethod> firstReachingMethods = new HashMap<>();
     private final Map<String, Double> maxNumericNodes = new HashMap<>();
-    private final Map<String, DependencyMethod> firstReachingNumericMethods = new HashMap<>();
-    private final Map<Voltage, DependencyMethod> firstReachingVoltageMethods = new HashMap<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
     private Voltage maxReachedVoltage = Voltage.PRIMITIVE;
 
@@ -124,6 +125,8 @@ public final class DependencyChecker implements IDependencyChecker {
 
     public static void runSelfCheck() {
         var checker = new DependencyChecker();
+        checker.runBridgeSelfCheck();
+        checker = new DependencyChecker();
         var seed = technology("seed");
         var exact = technology("exact");
         var numeric = technology("numeric");
@@ -161,7 +164,6 @@ public final class DependencyChecker implements IDependencyChecker {
         if (!reachedExactNodes.add(node)) {
             return false;
         }
-        firstReachingMethods.put(node, method);
         newlyReached.add(node);
         return true;
     }
@@ -188,7 +190,6 @@ public final class DependencyChecker implements IDependencyChecker {
             return false;
         }
         maxNumericNodes.put(key, value);
-        firstReachingNumericMethods.put(key, method);
         newlyReached.add(new NumericNode(key, value));
         return true;
     }
@@ -226,7 +227,6 @@ public final class DependencyChecker implements IDependencyChecker {
             return false;
         }
         maxReachedVoltage = voltage;
-        firstReachingVoltageMethods.put(voltage, method);
         newlyReached.add(new VoltageNode(voltage));
         return true;
     }
@@ -256,10 +256,7 @@ public final class DependencyChecker implements IDependencyChecker {
         waitingByNumericNode.clear();
         waitingByVoltage.clear();
         reachedExactNodes.clear();
-        firstReachingMethods.clear();
         maxNumericNodes.clear();
-        firstReachingNumericMethods.clear();
-        firstReachingVoltageMethods.clear();
         maxReachedVoltage = Voltage.PRIMITIVE;
     }
 
@@ -309,6 +306,39 @@ public final class DependencyChecker implements IDependencyChecker {
         }
     }
 
+    private void requireNotReached(IDependencyNode node) {
+        if (isReached(node)) {
+            throw new AssertionError("Expected dependency node to be blocked: " + node.displayId());
+        }
+    }
+
+    private void runBridgeSelfCheck() {
+        addVoltageBridgeMethods();
+        cableNode(Voltage.LV).ifPresent(cable -> {
+            solve(List.of(cable));
+            requireNotReached(new VoltageNode(Voltage.LV));
+        });
+        transformerNode(Voltage.LV).ifPresent(transformer -> {
+            solve(List.of(new VoltageNode(Voltage.ULV), transformer));
+            requireNotReached(new VoltageNode(Voltage.LV));
+        });
+
+        addMachineBridgeMethods();
+        if (AllBlockEntities.MACHINE_SETS.get("macerator") instanceof ProcessingSet processingSet) {
+            var voltage = Voltage.LV;
+            var machine = new MachineNode(processingSet.recipeType.loc(), voltage);
+            var requirements = new ArrayList<IDependencyNode>();
+            stackNode(new ItemStack(processingSet.block(voltage))).ifPresent(requirements::add);
+            solve(requirements);
+            requireNotReached(machine);
+        }
+
+        addMultiblockBridgeMethods();
+        var multiblock = new MultiblockNode(LARGE_CHEMICAL_REACTOR);
+        solve(List.of(multiblock, new VoltageNode(Voltage.LV)));
+        requireNotReached(new MachineNode(LARGE_CHEMICAL_REACTOR, Voltage.LV));
+    }
+
     private void extractRuntimeMethods(ServerLevel world) {
         extractProcessingRecipes(world);
         extractVanillaRecipes(world);
@@ -343,7 +373,6 @@ public final class DependencyChecker implements IDependencyChecker {
     private void addProcessingRecipeMethod(ResourceLocation recipeTypeId, ProcessingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(recipeTypeId, Voltage.fromValue(recipe.voltage)));
-        requirements.add(new VoltageNode(Voltage.fromValue(recipe.voltage)));
         recipe.inputs.stream()
             .map(ProcessingRecipe.Input::ingredient)
             .map(this::ingredientNode)
@@ -446,6 +475,7 @@ public final class DependencyChecker implements IDependencyChecker {
                 for (var voltage : processingSet.voltages) {
                     var requirements = new ArrayList<IDependencyNode>();
                     stackNode(new ItemStack(processingSet.block(voltage))).ifPresent(requirements::add);
+                    requirements.add(new VoltageNode(voltage));
                     var output = new MachineNode(processingSet.recipeType.loc(), voltage);
                     addMethodIfUseful("machine/" + output.id(), requirements, List.of(output), "machine bridge");
                 }
@@ -477,6 +507,7 @@ public final class DependencyChecker implements IDependencyChecker {
         for (var voltage : machineSet.voltages) {
             var requirements = new ArrayList<IDependencyNode>();
             stackNode(new ItemStack(machineSet.block(voltage))).ifPresent(requirements::add);
+            requirements.add(new VoltageNode(voltage));
             var output = new MachineNode(MINECRAFT_SMELTING, voltage);
             addMethodIfUseful("machine/" + output.id(), requirements, List.of(output), "electric furnace bridge");
         }
@@ -505,9 +536,10 @@ public final class DependencyChecker implements IDependencyChecker {
                 continue;
             }
             var output = new MachineNode(recipeTypeId, voltage);
-            addMethod(new DependencyMethod(
+            multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
                 "multiblock_machine/" + multiblock.id() + "/" + output.id(),
-                List.of(multiblock, new VoltageNode(voltage)), List.of(output), "multiblock machine bridge"));
+                List.of(multiblock, new VoltageNode(voltage), machineInterface), List.of(output),
+                "multiblock machine bridge")));
         }
     }
 
@@ -516,15 +548,20 @@ public final class DependencyChecker implements IDependencyChecker {
             if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
                 continue;
             }
-            cableNode(voltage).ifPresent(cable -> addMethod(new DependencyMethod(
-                "voltage/cable/" + voltage.id, List.of(cable), List.of(new VoltageNode(voltage)),
-                "voltage cable bridge")));
+            cableNode(voltage).ifPresent(cable -> {
+                for (var generator : GENERATOR_RECIPE_TYPES) {
+                    generatorNode(generator, voltage).ifPresent(generatorNode -> addMethod(new DependencyMethod(
+                        "voltage/generator/" + generator + "/" + voltage.id,
+                        List.of(cable, generatorNode), List.of(new VoltageNode(voltage)),
+                        "voltage generator bridge")));
+                }
+            });
             transformerNode(voltage).ifPresent(transformer -> {
                 if (voltage.rank > Voltage.ULV.rank) {
-                    addMethod(new DependencyMethod(
+                    cableNode(voltage).ifPresent(cable -> addMethod(new DependencyMethod(
                         "voltage/transformer/" + voltage.id,
-                        List.of(new VoltageNode(Voltage.fromRank(voltage.rank - 1)), transformer),
-                        List.of(new VoltageNode(voltage)), "voltage transformer bridge"));
+                        List.of(new VoltageNode(Voltage.fromRank(voltage.rank - 1)), transformer, cable),
+                        List.of(new VoltageNode(voltage)), "voltage transformer bridge")));
                 }
             });
         }
@@ -543,9 +580,9 @@ public final class DependencyChecker implements IDependencyChecker {
 
     private void addCleanroomBridgeMethods() {
         var cleanroom = new MultiblockNode(new ResourceLocation(TinactoryKeys.ID, "cleanroom"));
-        addMethod(new DependencyMethod(
-            "cleanroom/cleanness", List.of(cleanroom, new VoltageNode(Voltage.ULV)),
-            List.of(new NumericNode(CLEANROOM_CLEANNESS, 1d)), "cleanroom bridge"));
+        multiblockInterfaceNode(Voltage.ULV).ifPresent(machineInterface -> addMethod(new DependencyMethod(
+            "cleanroom/cleanness", List.of(cleanroom, new VoltageNode(Voltage.ULV), machineInterface),
+            List.of(new NumericNode(CLEANROOM_CLEANNESS, 1d)), "cleanroom bridge")));
     }
 
     private void addNuclearReactorBridgeMethods() {
@@ -762,6 +799,22 @@ public final class DependencyChecker implements IDependencyChecker {
 
     private Optional<StackNode> transformerNode(Voltage voltage) {
         return componentNode("transformer", voltage);
+    }
+
+    private Optional<StackNode> generatorNode(ResourceLocation recipeTypeId, Voltage voltage) {
+        var machineSet = AllBlockEntities.MACHINE_SETS.get(recipeTypeId.getPath());
+        if (machineSet == null || !machineSet.hasVoltage(voltage)) {
+            return Optional.empty();
+        }
+        return stackNode(new ItemStack(machineSet.block(voltage)));
+    }
+
+    private Optional<StackNode> multiblockInterfaceNode(Voltage voltage) {
+        var machineSet = AllBlockEntities.MACHINE_SETS.get("multiblock/interface");
+        if (machineSet == null || !machineSet.hasVoltage(voltage)) {
+            return Optional.empty();
+        }
+        return stackNode(new ItemStack(machineSet.block(voltage)));
     }
 
     private Optional<StackNode> componentNode(String name, Voltage voltage) {
