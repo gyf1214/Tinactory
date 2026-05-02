@@ -46,6 +46,10 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             property 'tinactory.dependencyChecker.reportFile',
                 layout.buildDirectory.file('reports/dependencyChecker/unreachable-targets.txt').get().asFile.absolutePath
+            property 'tinactory.dependencyChecker.traceBlockedMethods',
+                providers.gradleProperty('tinactory.dependencyChecker.traceBlockedMethods')
+                    .orElse(providers.systemProperty('tinactory.dependencyChecker.traceBlockedMethods'))
+                    .orElse('false').get()
             jvmArgs '-ea'
             args '--mixin.config', 'mixins.tinactory.test.json'
 

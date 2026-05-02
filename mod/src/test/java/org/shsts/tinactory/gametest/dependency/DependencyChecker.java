@@ -82,10 +82,14 @@ public final class DependencyChecker implements IDependencyChecker {
     private final Map<String, Double> maxNumericNodes = new HashMap<>();
     private final Map<String, DependencyMethod> firstReachingNumericMethods = new HashMap<>();
     private final Map<Voltage, DependencyMethod> firstReachingVoltageMethods = new HashMap<>();
+    private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
     private Voltage maxReachedVoltage = Voltage.PRIMITIVE;
 
     public void addMethod(DependencyMethod method) {
         methods.add(method);
+        for (var output : method.outputs()) {
+            methodsByOutput.computeIfAbsent(output, $ -> new TreeSet<>()).add(method);
+        }
     }
 
     public boolean isReached(IDependencyNode node) {
@@ -436,6 +440,7 @@ public final class DependencyChecker implements IDependencyChecker {
                 }
             }
         }
+        addVanillaFurnaceBridge();
         addElectricFurnaceBridge();
     }
 
@@ -444,6 +449,13 @@ public final class DependencyChecker implements IDependencyChecker {
         stackNode(new ItemStack(AllBlockEntities.WORKBENCH.get())).ifPresent(requirements::add);
         var output = new MachineNode(TOOL_CRAFTING, Voltage.PRIMITIVE);
         addMethodIfUseful("machine/" + output.id(), requirements, List.of(output), "workbench bridge");
+    }
+
+    private void addVanillaFurnaceBridge() {
+        var requirements = new ArrayList<IDependencyNode>();
+        stackNode(new ItemStack(Items.FURNACE)).ifPresent(requirements::add);
+        var output = new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE);
+        addMethodIfUseful("machine/" + output.id(), requirements, List.of(output), "vanilla furnace bridge");
     }
 
     private void addElectricFurnaceBridge() {
@@ -553,16 +565,11 @@ public final class DependencyChecker implements IDependencyChecker {
     private Collection<IDependencyNode> startNodes() {
         var ret = new ArrayList<IDependencyNode>();
         ret.add(new VoltageNode(Voltage.PRIMITIVE));
-        ret.add(new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
-        for (var item : List.of(
-            Items.AIR, Items.COBBLESTONE, Items.DIRT, Items.GRAVEL, Items.SAND, Items.CLAY_BALL,
-            Items.OAK_LOG, Items.STICK, Items.FLINT, Items.COAL, Items.CHARCOAL, Items.IRON_INGOT,
-            Items.COPPER_INGOT)) {
+        for (var item : List.of(Items.OAK_LOG, Items.WATER_BUCKET)) {
             stackNode(new ItemStack(item)).ifPresent(ret::add);
         }
         itemNode(STICKY_RESIN).ifPresent(ret::add);
         stackNode(new FluidStack(Fluids.WATER, 1000)).ifPresent(ret::add);
-        stackNode(new FluidStack(Fluids.LAVA, 1000)).ifPresent(ret::add);
         return ret;
     }
 
@@ -623,7 +630,18 @@ public final class DependencyChecker implements IDependencyChecker {
     }
 
     private Collection<String> formatMissingTarget(IDependencyNode target) {
-        return List.of("missing: " + target.displayId());
+        var lines = new ArrayList<String>();
+        lines.add("missing: " + target.displayId());
+        if (Boolean.getBoolean("tinactory.dependencyChecker.traceBlockedMethods")) {
+            for (var method : methodsByOutput.getOrDefault(target, Set.of())) {
+                lines.add("  blocked method: " + method.id() + " (" + method.source() + ")");
+                method.requirements().stream()
+                    .filter(requirement -> !requirement.isSatisfied(this))
+                    .map(requirement -> "    missing requirement: " + requirement.displayId())
+                    .forEach(lines::add);
+            }
+        }
+        return lines;
     }
 
     private Optional<IDependencyNode> ingredientNode(IProcessingIngredient ingredient) {
