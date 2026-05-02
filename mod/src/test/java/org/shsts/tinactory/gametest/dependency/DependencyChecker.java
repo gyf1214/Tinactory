@@ -15,6 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.AllMaterials;
 import org.shsts.tinactory.AllMultiblocks;
 import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.TinactoryKeys;
@@ -68,8 +69,10 @@ public final class DependencyChecker implements IDependencyChecker {
     private static final ResourceLocation TOOL_CRAFTING = new ResourceLocation(TinactoryKeys.ID, "tool_crafting");
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
-    // Current baseline: 400 stack targets and 40 LUV/ZPM machine targets remain unreachable.
-    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 440;
+    private static final String TEST_MATERIAL = "test";
+    private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
+    // Current baseline: 11 curated stack targets remain unreachable.
+    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 11;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Queue<DependencyMethod> readyMethods = new PriorityQueue<>();
@@ -577,32 +580,71 @@ public final class DependencyChecker implements IDependencyChecker {
 
     private Set<IDependencyNode> intendedTargets() {
         var ret = new TreeSet<IDependencyNode>();
-        for (var method : methods) {
-            method.outputs().stream()
-                .filter(output -> !(output instanceof TagNode))
-                .forEach(ret::add);
-        }
-        for (var machineSet : AllBlockEntities.MACHINE_SETS.values()) {
-            for (var voltage : machineSet.voltages) {
-                stackNode(new ItemStack(machineSet.block(voltage))).ifPresent(ret::add);
-            }
-        }
-        for (var multiblockSet : AllMultiblocks.MULTIBLOCK_SETS.values()) {
-            stackNode(new ItemStack(multiblockSet.block().get())).ifPresent(ret::add);
-        }
-        for (var componentSet : AllItems.COMPONENTS.values()) {
-            for (var entry : componentSet.values()) {
-                stackNode(new ItemStack(entry.get())).ifPresent(ret::add);
-            }
-        }
+        addMaterialTargets(ret);
+        addComponentTargets(ret);
+        addMachineTargets(ret);
+        addMultiblockTargets(ret);
+        ret.add(new VoltageNode(MAX_PROGRESS_VOLTAGE));
         TechManagers.server().allTechs().stream()
             .map(technology -> new TechnologyNode(technology.loc()))
             .forEach(ret::add);
         return ret;
     }
 
+    private void addMaterialTargets(Collection<IDependencyNode> targets) {
+        for (var material : AllMaterials.SET.values()) {
+            for (var sub : material.itemSubs()) {
+                if (!material.isAlias(sub)) {
+                    stackNode(new ItemStack(material.item(sub))).ifPresent(targets::add);
+                }
+            }
+        }
+    }
+
+    private void addComponentTargets(Collection<IDependencyNode> targets) {
+        for (var componentSet : AllItems.COMPONENTS.values()) {
+            for (var entry : componentSet.values()) {
+                stackNode(new ItemStack(entry.get())).ifPresent(targets::add);
+            }
+        }
+    }
+
+    private void addMachineTargets(Collection<IDependencyNode> targets) {
+        for (var machineSet : AllBlockEntities.MACHINE_SETS.values()) {
+            for (var entry : machineSet.entries()) {
+                stackNode(new ItemStack(entry.get())).ifPresent(targets::add);
+            }
+            if (machineSet instanceof ProcessingSet processingSet &&
+                processingSet.hasVoltage(MAX_PROGRESS_VOLTAGE)) {
+                targets.add(new MachineNode(processingSet.recipeType.loc(), MAX_PROGRESS_VOLTAGE));
+            }
+        }
+    }
+
+    private void addMultiblockTargets(Collection<IDependencyNode> targets) {
+        for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
+            var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
+            targets.add(new MultiblockNode(multiblockId));
+            stackNode(new ItemStack(entry.getValue().block().get())).ifPresent(targets::add);
+        }
+    }
+
     private Map<IDependencyNode, String> exemptTargets() {
-        return Map.of();
+        var ret = new HashMap<IDependencyNode, String>();
+        addMaterialExemptions(ret, TEST_MATERIAL, "test-only material set");
+        return ret;
+    }
+
+    private void addMaterialExemptions(Map<IDependencyNode, String> exemptions, String materialName, String reason) {
+        var material = AllMaterials.getMaterial(materialName);
+        if (material == null) {
+            return;
+        }
+        for (var sub : material.itemSubs()) {
+            if (!material.isAlias(sub)) {
+                stackNode(new ItemStack(material.item(sub))).ifPresent(node -> exemptions.put(node, reason));
+            }
+        }
     }
 
     private void writeReport(Set<IDependencyNode> targets, Map<IDependencyNode, String> exemptions) {
