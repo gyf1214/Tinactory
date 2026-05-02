@@ -68,6 +68,8 @@ public final class DependencyChecker implements IDependencyChecker {
     private static final ResourceLocation TOOL_CRAFTING = new ResourceLocation(TinactoryKeys.ID, "tool_crafting");
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
+    // Current baseline: 400 stack targets and 40 LUV/ZPM machine targets remain unreachable.
+    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 440;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Queue<DependencyMethod> readyMethods = new PriorityQueue<>();
@@ -623,9 +625,14 @@ public final class DependencyChecker implements IDependencyChecker {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to write dependency checker report " + path, e);
         }
-        if (!lines.isEmpty()) {
-            System.err.println("Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
-                " nodes unreachable: " + path);
+        if (missingTargets > 0) {
+            var message = "Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
+                " nodes unreachable: " + path;
+            System.err.println(message);
+            if (missingTargets > MAX_ALLOWED_UNREACHABLE_NODES) {
+                throw new IllegalStateException(message + " exceeds maximum allowed " +
+                    MAX_ALLOWED_UNREACHABLE_NODES);
+            }
         }
     }
 

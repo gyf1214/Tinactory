@@ -706,6 +706,15 @@ object Multiblocks {
                 input("stainless_steel", "rotor", 4)
                 tech(Technologies.AUTOCLAVE)
             }
+            multiblock("rocket_launch_site") {
+                solid("solid_steel")
+                circuit(4)
+                component("robot_arm", 4)
+                component("conveyor_module", 4)
+                component("cable", 4)
+                input(getItem("component/advanced_alloy"), 4)
+                tech(Technologies.ROCKET_SCIENCE)
+            }
 
             componentVoltage = Voltage.EV
             multiblock("lithography_machine") {
@@ -716,15 +725,6 @@ object Multiblocks {
                 component("cable", 4)
                 misc("lithography_lens/basic")
                 tech(Technologies.LITHOGRAPHY)
-            }
-            multiblock("rocket_launch_site") {
-                solid("solid_steel")
-                circuit(4)
-                component("robot_arm", 4)
-                component("conveyor_module", 4)
-                component("cable", 4)
-                input(getItem("component/advanced_alloy"), 4)
-                tech(Technologies.ROCKET_SCIENCE)
             }
             multiblock("multi_smelter") {
                 solid("heatproof")
