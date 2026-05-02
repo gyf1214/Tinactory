@@ -44,6 +44,8 @@ minecraft {
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'tinactory.dependencyChecker.reportFile',
+                layout.buildDirectory.file('reports/dependencyChecker/unreachable-targets.txt').get().asFile.absolutePath
             jvmArgs '-ea'
             args '--mixin.config', 'mixins.tinactory.test.json'
 

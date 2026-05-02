@@ -3,10 +3,12 @@ package org.shsts.tinactory.gametest.dependency;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
@@ -34,6 +36,8 @@ import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -123,6 +127,7 @@ public final class DependencyChecker implements IDependencyChecker {
         var checker = new DependencyChecker();
         checker.extractRuntimeMethods(world);
         checker.solve(checker.startNodes());
+        checker.writeReport(checker.intendedTargets(), checker.exemptTargets());
     }
 
     @Override
@@ -482,7 +487,100 @@ public final class DependencyChecker implements IDependencyChecker {
     }
 
     private Collection<IDependencyNode> startNodes() {
-        return List.of(new VoltageNode(Voltage.PRIMITIVE), new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
+        var ret = new ArrayList<IDependencyNode>();
+        ret.add(new VoltageNode(Voltage.PRIMITIVE));
+        ret.add(new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
+        for (var item : List.of(
+            Items.AIR, Items.COBBLESTONE, Items.DIRT, Items.GRAVEL, Items.SAND, Items.CLAY_BALL,
+            Items.OAK_LOG, Items.STICK, Items.FLINT, Items.COAL, Items.CHARCOAL, Items.IRON_INGOT,
+            Items.COPPER_INGOT)) {
+            stackNode(new ItemStack(item)).ifPresent(ret::add);
+        }
+        stackNode(new FluidStack(Fluids.WATER, 1000)).ifPresent(ret::add);
+        stackNode(new FluidStack(Fluids.LAVA, 1000)).ifPresent(ret::add);
+        return ret;
+    }
+
+    private Set<IDependencyNode> intendedTargets() {
+        var ret = new TreeSet<IDependencyNode>();
+        for (var method : methods) {
+            ret.addAll(method.outputs());
+        }
+        for (var machineSet : AllBlockEntities.MACHINE_SETS.values()) {
+            for (var voltage : machineSet.voltages) {
+                stackNode(new ItemStack(machineSet.block(voltage))).ifPresent(ret::add);
+            }
+        }
+        for (var multiblockSet : AllMultiblocks.MULTIBLOCK_SETS.values()) {
+            stackNode(new ItemStack(multiblockSet.block().get())).ifPresent(ret::add);
+        }
+        for (var componentSet : AllItems.COMPONENTS.values()) {
+            for (var entry : componentSet.values()) {
+                stackNode(new ItemStack(entry.get())).ifPresent(ret::add);
+            }
+        }
+        TechManagers.server().allTechs().stream()
+            .map(technology -> new TechnologyNode(technology.loc()))
+            .forEach(ret::add);
+        return ret;
+    }
+
+    private Map<IDependencyNode, String> exemptTargets() {
+        return Map.of();
+    }
+
+    private void writeReport(Set<IDependencyNode> targets, Map<IDependencyNode, String> exemptions) {
+        var reportFile = System.getProperty("tinactory.dependencyChecker.reportFile", "");
+        if (reportFile.isBlank()) {
+            return;
+        }
+        var lines = new ArrayList<String>();
+        for (var target : targets) {
+            if (!target.isSatisfied(this) && !exemptions.containsKey(target)) {
+                lines.addAll(formatMissingTarget(target));
+            }
+        }
+        var path = Path.of(reportFile);
+        try {
+            Files.createDirectories(path.getParent());
+            Files.write(path, lines);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to write dependency checker report " + path, e);
+        }
+        if (!lines.isEmpty()) {
+            System.err.println("Tinactory dependency checker found " + lines.size() +
+                " report lines for unreachable targets: " + path);
+        }
+    }
+
+    private Collection<String> formatMissingTarget(IDependencyNode target) {
+        var lines = new ArrayList<String>();
+        lines.add("missing " + target.displayId());
+        lines.add("  type: " + target.type());
+        lines.add("  id: " + target.id());
+        var blockedMethods = methods.stream()
+            .filter(method -> method.outputs().contains(target))
+            .sorted()
+            .limit(5)
+            .toList();
+        if (blockedMethods.isEmpty()) {
+            lines.add("  blocked method: none");
+        } else {
+            for (var method : blockedMethods) {
+                lines.add("  blocked method: " + method.id() + " (" + method.source() + ")");
+                lines.add("    first missing requirement: " + firstMissingRequirement(method)
+                    .map(IDependencyNode::displayId)
+                    .orElse("<none>"));
+            }
+        }
+        lines.add("");
+        return lines;
+    }
+
+    private Optional<IDependencyNode> firstMissingRequirement(DependencyMethod method) {
+        return method.requirements().stream()
+            .filter(requirement -> !requirement.isSatisfied(this))
+            .findFirst();
     }
 
     private Optional<IDependencyNode> ingredientNode(IProcessingIngredient ingredient) {
