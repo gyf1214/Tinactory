@@ -64,15 +64,20 @@ public final class DependencyChecker implements IDependencyChecker {
         TinactoryKeys.ID, "large_chemical_reactor");
     private static final ResourceLocation MINECRAFT_SMELTING = new ResourceLocation("minecraft", "smelting");
     private static final ResourceLocation MULTI_SMELTER = new ResourceLocation(TinactoryKeys.ID, "multi_smelter");
+    private static final ResourceLocation NUCLEAR_REACTOR = new ResourceLocation(TinactoryKeys.ID, "nuclear_reactor");
     private static final ResourceLocation STICKY_RESIN = new ResourceLocation(TinactoryKeys.ID,
         "rubber_tree/sticky_resin");
     private static final ResourceLocation TOOL_CRAFTING = new ResourceLocation(TinactoryKeys.ID, "tool_crafting");
+    private static final ResourceLocation URANIUM_FUEL_ROD = new ResourceLocation(TinactoryKeys.ID,
+        "component/uranium_fuel_rod");
+    private static final ResourceLocation NUCLEAR_WASTE_ROD = new ResourceLocation(TinactoryKeys.ID,
+        "component/nuclear_waste_rod");
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
-    // Current baseline: 11 curated stack targets remain unreachable.
-    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 11;
+    // Current baseline: 41 curated stack targets remain unreachable.
+    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 41;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Queue<DependencyMethod> readyMethods = new PriorityQueue<>();
@@ -313,6 +318,7 @@ public final class DependencyChecker implements IDependencyChecker {
         addVoltageBridgeMethods();
         addCoilBridgeMethods();
         addCleanroomBridgeMethods();
+        addNuclearReactorBridgeMethods();
         addTagBridgeMethods();
     }
 
@@ -542,6 +548,16 @@ public final class DependencyChecker implements IDependencyChecker {
             List.of(new NumericNode(CLEANROOM_CLEANNESS, 1d)), "cleanroom bridge"));
     }
 
+    private void addNuclearReactorBridgeMethods() {
+        var requirements = new ArrayList<IDependencyNode>();
+        itemNode(URANIUM_FUEL_ROD).ifPresent(requirements::add);
+        requirements.add(new MultiblockNode(NUCLEAR_REACTOR));
+        var outputs = new ArrayList<IDependencyNode>();
+        itemNode(NUCLEAR_WASTE_ROD).ifPresent(outputs::add);
+        addMethodIfUseful("nuclear_reactor/deplete/uranium_fuel_rod", requirements, outputs,
+            "nuclear reactor depletion bridge");
+    }
+
     private void addTagBridgeMethods() {
         var tagNodes = new TreeSet<TagNode>();
         for (var method : methods) {
@@ -573,6 +589,7 @@ public final class DependencyChecker implements IDependencyChecker {
         for (var item : List.of(Items.OAK_LOG, Items.WATER_BUCKET)) {
             stackNode(new ItemStack(item)).ifPresent(ret::add);
         }
+        stackNode(new ItemStack(AllItems.RUBBER_SAPLING.get())).ifPresent(ret::add);
         itemNode(STICKY_RESIN).ifPresent(ret::add);
         stackNode(new FluidStack(Fluids.WATER, 1000)).ifPresent(ret::add);
         return ret;
@@ -581,7 +598,7 @@ public final class DependencyChecker implements IDependencyChecker {
     private Set<IDependencyNode> intendedTargets() {
         var ret = new TreeSet<IDependencyNode>();
         addMaterialTargets(ret);
-        addComponentTargets(ret);
+        addTinactoryItemTargets(ret);
         addMachineTargets(ret);
         addMultiblockTargets(ret);
         ret.add(new VoltageNode(MAX_PROGRESS_VOLTAGE));
@@ -601,19 +618,17 @@ public final class DependencyChecker implements IDependencyChecker {
         }
     }
 
-    private void addComponentTargets(Collection<IDependencyNode> targets) {
-        for (var componentSet : AllItems.COMPONENTS.values()) {
-            for (var entry : componentSet.values()) {
-                stackNode(new ItemStack(entry.get())).ifPresent(targets::add);
+    private void addTinactoryItemTargets(Collection<IDependencyNode> targets) {
+        for (var item : ForgeRegistries.ITEMS) {
+            var key = ForgeRegistries.ITEMS.getKey(item);
+            if (key != null && key.getNamespace().equals(TinactoryKeys.ID)) {
+                stackNode(new ItemStack(item)).ifPresent(targets::add);
             }
         }
     }
 
     private void addMachineTargets(Collection<IDependencyNode> targets) {
         for (var machineSet : AllBlockEntities.MACHINE_SETS.values()) {
-            for (var entry : machineSet.entries()) {
-                stackNode(new ItemStack(entry.get())).ifPresent(targets::add);
-            }
             if (machineSet instanceof ProcessingSet processingSet &&
                 processingSet.hasVoltage(MAX_PROGRESS_VOLTAGE)) {
                 targets.add(new MachineNode(processingSet.recipeType.loc(), MAX_PROGRESS_VOLTAGE));
@@ -625,7 +640,6 @@ public final class DependencyChecker implements IDependencyChecker {
         for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
             var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
             targets.add(new MultiblockNode(multiblockId));
-            stackNode(new ItemStack(entry.getValue().block().get())).ifPresent(targets::add);
         }
     }
 
