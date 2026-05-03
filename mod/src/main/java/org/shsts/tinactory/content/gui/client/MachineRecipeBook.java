@@ -135,11 +135,11 @@ public class MachineRecipeBook extends Panel {
 
         @Override
         protected void doRefresh() {
-            var buttonCount = buttons.size();
-            if (buttonCount > 0) {
+            var slotCount = gridViewGroup.getSlotCount();
+            if (slotCount > 0) {
                 var currentIndex = findCurrentIndex();
                 if (currentIndex >= 0) {
-                    page = currentIndex / buttonCount;
+                    page = currentIndex / slotCount;
                 }
             }
             super.doRefresh();

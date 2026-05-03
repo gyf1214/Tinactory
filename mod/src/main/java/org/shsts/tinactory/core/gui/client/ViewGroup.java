@@ -29,6 +29,7 @@ public class ViewGroup implements IViewGroup {
     protected final List<ViewChild> children = new ArrayList<>();
     protected Rect rect = Rect.ZERO;
     protected boolean active = true;
+    protected boolean initialized = false;
 
     @Override
     public void addChild(RectD anchor, Rect offset, int zIndex, IViewNode child) {
@@ -52,6 +53,7 @@ public class ViewGroup implements IViewGroup {
         for (var child : children) {
             child.child().initView();
         }
+        initialized = true;
     }
 
     @Override

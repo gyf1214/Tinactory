@@ -12,7 +12,6 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.GridViewGroup;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +28,9 @@ public abstract class ButtonPanel extends Panel {
     private static final Rect LEFT_PAGE_OFFSET = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0);
     private static final Rect RIGHT_PAGE_OFFSET = PAGE_OFFSET.offset(PAGE_MARGIN, 0);
 
-    protected final GridViewGroup gridViewGroup;
+    protected final GridViewGroup<ItemButton> gridViewGroup;
     protected int page = 0;
 
-    protected final List<ItemButton> buttons = new ArrayList<>();
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
 
@@ -97,11 +95,13 @@ public abstract class ButtonPanel extends Panel {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen, new GridViewGroup(buttonWidth, buttonHeight, verticalSpacing, PANEL_OFFSET));
-        this.gridViewGroup = (GridViewGroup) viewGroup;
+        super(screen, new GridViewGroup<ItemButton>(buttonWidth, buttonHeight, verticalSpacing, PANEL_OFFSET));
+        this.gridViewGroup = (GridViewGroup<ItemButton>) viewGroup;
         this.leftPageButton = new PageButton(15, -1);
         this.rightPageButton = new PageButton(1, 1);
+        gridViewGroup.setSlotFactory(index -> new ItemButton());
 
         addChild(PAGE_ANCHOR, LEFT_PAGE_OFFSET, leftPageButton);
         addChild(PAGE_ANCHOR, RIGHT_PAGE_OFFSET, rightPageButton);
@@ -109,24 +109,6 @@ public abstract class ButtonPanel extends Panel {
 
     @Override
     public void setRect(Rect rect) {
-        gridViewGroup.setRect(rect);
-        var buttonCount = gridViewGroup.getButtonCount();
-
-        var curSize = buttons.size();
-        if (curSize < buttonCount) {
-            for (var i = curSize; i < buttonCount; i++) {
-                var button = new ItemButton();
-                buttons.add(button);
-                button.setActive(active);
-                addChild(gridViewGroup.getButtonRect(i), button);
-            }
-        } else {
-            for (var i = buttonCount; i < curSize; i++) {
-                var button = buttons.get(i);
-                removeChild(button);
-            }
-            buttons.subList(buttonCount, curSize).clear();
-        }
         super.setRect(rect);
         refresh();
     }
@@ -162,8 +144,8 @@ public abstract class ButtonPanel extends Panel {
         gridViewGroup.setPage(index);
         leftPageButton.setActive(gridViewGroup.isLeftPageEnabled());
         rightPageButton.setActive(gridViewGroup.isRightPageEnabled());
-        for (var i = 0; i < buttons.size(); i++) {
-            var button = buttons.get(i);
+        for (var i = 0; i < gridViewGroup.getSlotCount(); i++) {
+            var button = gridViewGroup.getSlot(i);
             var j = gridViewGroup.getVisibleIndex(i);
 
             if (j >= 0) {
