@@ -33,6 +33,7 @@ import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
+import org.shsts.tinactory.content.tool.NuclearRod;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -83,8 +84,6 @@ public final class DependencyChecker {
         modLoc("combustion_generator"),
         modLoc("gas_turbine"),
         modLoc("steam_turbine"));
-    private static final ResourceLocation URANIUM_FUEL_ROD = modLoc("component/uranium_fuel_rod");
-    private static final ResourceLocation NUCLEAR_WASTE_ROD = modLoc("component/nuclear_waste_rod");
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
@@ -483,13 +482,18 @@ public final class DependencyChecker {
     }
 
     private void addNuclearReactorBridgeMethods() {
-        var requirements = new ArrayList<IDependencyNode>();
-        itemNode(URANIUM_FUEL_ROD).ifPresent(requirements::add);
-        requirements.add(new MultiblockNode(NUCLEAR_REACTOR));
-        var outputs = new ArrayList<IDependencyNode>();
-        itemNode(NUCLEAR_WASTE_ROD).ifPresent(outputs::add);
-        addMethodIfUseful("nuclear_reactor/deplete/uranium_fuel_rod", requirements, outputs,
-            "nuclear reactor depletion bridge");
+        for (var item : ForgeRegistries.ITEMS) {
+            if (item instanceof NuclearRod nuclearRod) {
+                var requirements = new ArrayList<IDependencyNode>();
+                stackNode(new ItemStack(item)).ifPresent(requirements::add);
+                requirements.add(new MultiblockNode(NUCLEAR_REACTOR));
+                var outputs = new ArrayList<IDependencyNode>();
+                stackNode(nuclearRod.getDepleted()).ifPresent(outputs::add);
+                var itemId = ForgeRegistries.ITEMS.getKey(item);
+                addMethodIfUseful("nuclear_reactor/deplete/" + itemId, requirements, outputs,
+                    "nuclear reactor depletion bridge");
+            }
+        }
     }
 
     private void addTagBridgeMethods() {
