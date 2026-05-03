@@ -94,7 +94,7 @@ public final class DependencyChecker implements IDependencyChecker {
     private final Set<IDependencyNode> reachedExactNodes = new TreeSet<>();
     private final Map<String, Double> maxNumericNodes = new HashMap<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
-    private Voltage maxReachedVoltage = Voltage.PRIMITIVE;
+    private int maxReachedVoltageRank = -1;
 
     public void addMethod(DependencyMethod method) {
         methods.add(method);
@@ -125,6 +125,11 @@ public final class DependencyChecker implements IDependencyChecker {
 
     public static void runSelfCheck() {
         var checker = new DependencyChecker();
+        checker.solve(List.of());
+        checker.requireNotReached(new VoltageNode(Voltage.PRIMITIVE));
+        checker = new DependencyChecker();
+        checker.runIngredientSelfCheck();
+        checker = new DependencyChecker();
         checker.runBridgeSelfCheck();
         checker = new DependencyChecker();
         var seed = technology("seed");
@@ -217,16 +222,16 @@ public final class DependencyChecker implements IDependencyChecker {
     }
 
     @Override
-    public Voltage maxVoltage() {
-        return maxReachedVoltage;
+    public int maxVoltageRank() {
+        return maxReachedVoltageRank;
     }
 
     @Override
     public boolean reachVoltage(Voltage voltage, DependencyMethod method) {
-        if (maxReachedVoltage.rank >= voltage.rank) {
+        if (maxReachedVoltageRank >= voltage.rank) {
             return false;
         }
-        maxReachedVoltage = voltage;
+        maxReachedVoltageRank = voltage.rank;
         newlyReached.add(new VoltageNode(voltage));
         return true;
     }
@@ -257,7 +262,7 @@ public final class DependencyChecker implements IDependencyChecker {
         waitingByVoltage.clear();
         reachedExactNodes.clear();
         maxNumericNodes.clear();
-        maxReachedVoltage = Voltage.PRIMITIVE;
+        maxReachedVoltageRank = -1;
     }
 
     private void initializeMethods() {
@@ -310,6 +315,16 @@ public final class DependencyChecker implements IDependencyChecker {
         if (isReached(node)) {
             throw new AssertionError("Expected dependency node to be blocked: " + node.displayId());
         }
+    }
+
+    private void runIngredientSelfCheck() {
+        var recipeId = new ResourceLocation(TinactoryKeys.ID, "self_check/ingredient");
+        var output = technology("ingredient");
+        ingredientNode(Ingredient.of(Items.OAK_LOG, Items.BIRCH_LOG), recipeId, 0)
+            .ifPresent(ingredient -> addMethod(new DependencyMethod(
+                "self/ingredient", List.of(ingredient), List.of(output), "self check ingredient")));
+        solve(List.of(stackNode(new ItemStack(Items.BIRCH_LOG)).orElseThrow()));
+        requireReached(output);
     }
 
     private void runBridgeSelfCheck() {
@@ -373,11 +388,9 @@ public final class DependencyChecker implements IDependencyChecker {
     private void addProcessingRecipeMethod(ResourceLocation recipeTypeId, ProcessingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(recipeTypeId, Voltage.fromValue(recipe.voltage)));
-        recipe.inputs.stream()
-            .map(ProcessingRecipe.Input::ingredient)
-            .map(this::ingredientNode)
-            .flatMap(Optional::stream)
-            .forEach(requirements::add);
+        for (var i = 0; i < recipe.inputs.size(); i++) {
+            ingredientNode(recipe.inputs.get(i).ingredient(), recipe.loc(), i).ifPresent(requirements::add);
+        }
         addProcessingSubtypeRequirements(recipe, requirements);
         var outputs = new ArrayList<IDependencyNode>();
         if (recipe instanceof ResearchRecipe researchRecipe) {
@@ -431,7 +444,7 @@ public final class DependencyChecker implements IDependencyChecker {
 
     private void addSmeltingRecipeMethod(SmeltingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
-        ingredientNode(recipe.getIngredients().get(0), recipe.getId()).ifPresent(requirements::add);
+        ingredientNode(recipe.getIngredients().get(0), recipe.getId(), 0).ifPresent(requirements::add);
         requirements.add(new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
         var outputs = new ArrayList<IDependencyNode>();
         stackNode(recipe.getResultItem()).ifPresent(outputs::add);
@@ -440,9 +453,11 @@ public final class DependencyChecker implements IDependencyChecker {
 
     private void addCraftingRecipeMethod(CraftingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
-        for (var ingredient : recipe.getIngredients()) {
+        var ingredients = recipe.getIngredients();
+        for (var i = 0; i < ingredients.size(); i++) {
+            var ingredient = ingredients.get(i);
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.getId()).ifPresent(requirements::add);
+                ingredientNode(ingredient, recipe.getId(), i).ifPresent(requirements::add);
             }
         }
         var outputs = new ArrayList<IDependencyNode>();
@@ -453,15 +468,18 @@ public final class DependencyChecker implements IDependencyChecker {
     private void addToolRecipeMethod(ToolRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(TOOL_CRAFTING, Voltage.PRIMITIVE));
+        var inputIndex = 0;
         for (var ingredient : recipe.shapedRecipe.getIngredients()) {
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.loc()).ifPresent(requirements::add);
+                ingredientNode(ingredient, recipe.loc(), inputIndex).ifPresent(requirements::add);
             }
+            inputIndex++;
         }
         for (var ingredient : recipe.toolIngredients) {
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.loc()).ifPresent(requirements::add);
+                ingredientNode(ingredient, recipe.loc(), inputIndex).ifPresent(requirements::add);
             }
+            inputIndex++;
         }
         var outputs = new ArrayList<IDependencyNode>();
         stackNode(recipe.shapedRecipe.getResultItem()).ifPresent(outputs::add);
@@ -744,12 +762,13 @@ public final class DependencyChecker implements IDependencyChecker {
         return lines;
     }
 
-    private Optional<IDependencyNode> ingredientNode(IProcessingIngredient ingredient) {
+    private Optional<IDependencyNode> ingredientNode(IProcessingIngredient ingredient, ResourceLocation recipeId,
+        int inputIndex) {
         if (ingredient instanceof TagIngredient tagIngredient) {
             return Optional.of(new TagNode(PortType.ITEM, tagIngredient.tag().location()));
         }
         if (ingredient instanceof ItemsIngredient itemsIngredient) {
-            return ingredientNode(itemsIngredient.ingredient, null);
+            return ingredientNode(itemsIngredient.ingredient, recipeId, inputIndex);
         }
         return ProcessingHelper.asItemIngredient(ingredient)
             .flatMap(stackIngredient -> stackNode(stackIngredient.stack()))
@@ -770,7 +789,7 @@ public final class DependencyChecker implements IDependencyChecker {
                 .map(node -> node));
     }
 
-    private Optional<IDependencyNode> ingredientNode(Ingredient ingredient, ResourceLocation recipeId) {
+    private Optional<IDependencyNode> ingredientNode(Ingredient ingredient, ResourceLocation recipeId, int inputIndex) {
         var json = ingredient.toJson();
         if (json.isJsonObject()) {
             var object = json.getAsJsonObject();
@@ -785,12 +804,23 @@ public final class DependencyChecker implements IDependencyChecker {
             }
         }
         var items = ingredient.getItems();
-        if (items.length != 1) {
-            System.err.println("Tinactory dependency checker found non-tag ingredient with " + items.length +
-                " item alternatives" + (recipeId == null ? "" : " in recipe " + recipeId));
+        if (items.length == 0) {
+            return Optional.empty();
         }
-        return items.length == 0 ? Optional.empty() :
-            stackNode(items[0]).map(node -> (IDependencyNode) node);
+        if (items.length == 1) {
+            return stackNode(items[0]).map(node -> (IDependencyNode) node);
+        }
+        var node = new IngredientNode(recipeId, inputIndex);
+        addIngredientBridgeMethods(node, items);
+        return Optional.of(node);
+    }
+
+    private void addIngredientBridgeMethods(IngredientNode node, ItemStack[] candidates) {
+        for (var candidate : candidates) {
+            stackNode(candidate).ifPresent(candidateNode -> addMethodIfUseful(
+                "ingredient/" + node.id() + "/" + candidateNode.id(),
+                List.of(candidateNode), List.of(node), "ingredient bridge"));
+        }
     }
 
     private Optional<StackNode> cableNode(Voltage voltage) {

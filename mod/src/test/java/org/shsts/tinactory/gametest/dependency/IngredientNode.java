@@ -1,37 +1,37 @@
 package org.shsts.tinactory.gametest.dependency;
 
-import org.shsts.tinactory.core.electric.Voltage;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Set;
 
-record VoltageNode(Voltage voltage) implements IDependencyNode {
+record IngredientNode(ResourceLocation recipeId, int inputIndex) implements IDependencyNode {
     @Override
     public String type() {
-        return "voltage";
+        return "ingredient";
     }
 
     @Override
     public String id() {
-        return voltage.id;
+        return recipeId + "#" + inputIndex;
     }
 
     @Override
     public boolean isSatisfied(IDependencyChecker checker) {
-        return checker.maxVoltageRank() >= voltage.rank;
+        return checker.isExactReached(this);
     }
 
     @Override
     public boolean reach(IDependencyChecker checker, DependencyMethod method) {
-        return checker.reachVoltage(voltage, method);
+        return checker.reachExact(this, method);
     }
 
     @Override
     public void addWaiter(IDependencyChecker checker, DependencyMethod method) {
-        checker.addVoltageWaiter(this, method);
+        checker.addExactWaiter(this, method);
     }
 
     @Override
     public Set<DependencyMethod> releaseWaiters(IDependencyChecker checker) {
-        return checker.releaseVoltageWaiters(this);
+        return checker.releaseExactWaiters(this);
     }
 }

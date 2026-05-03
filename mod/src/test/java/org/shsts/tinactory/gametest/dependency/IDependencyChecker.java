@@ -21,7 +21,7 @@ interface IDependencyChecker {
 
     Set<DependencyMethod> releaseNumericWaiters(NumericNode node);
 
-    Voltage maxVoltage();
+    int maxVoltageRank();
 
     boolean reachVoltage(Voltage voltage, DependencyMethod method);
 
