@@ -24,6 +24,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.machine.ProcessingSet;
+import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
@@ -81,7 +82,7 @@ public final class DependencyChecker implements IDependencyChecker {
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
     // Current baseline: 41 curated stack targets remain unreachable.
-    private static final int MAX_ALLOWED_UNREACHABLE_NODES = 41;
+    private static final int ACCEPTED_UNREACHABLE_NODES = 41;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Queue<DependencyMethod> readyMethods = new PriorityQueue<>();
@@ -131,6 +132,10 @@ public final class DependencyChecker implements IDependencyChecker {
         checker.runIngredientSelfCheck();
         checker = new DependencyChecker();
         checker.runBridgeSelfCheck();
+        checker = new DependencyChecker();
+        checker.runTargetSelfCheck();
+        checker = new DependencyChecker();
+        checker.runReportSelfCheck();
         checker = new DependencyChecker();
         var seed = technology("seed");
         var exact = technology("exact");
@@ -352,6 +357,46 @@ public final class DependencyChecker implements IDependencyChecker {
         var multiblock = new MultiblockNode(LARGE_CHEMICAL_REACTOR);
         solve(List.of(multiblock, new VoltageNode(Voltage.LV)));
         requireNotReached(new MachineNode(LARGE_CHEMICAL_REACTOR, Voltage.LV));
+    }
+
+    private void runTargetSelfCheck() {
+        var targets = intendedTargets();
+        requireContainsTarget(targets, new MachineNode(MINECRAFT_SMELTING, MAX_PROGRESS_VOLTAGE));
+        for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
+            for (var type : entry.getValue().types()) {
+                requireContainsTarget(targets, new MachineNode(type.loc(), MAX_PROGRESS_VOLTAGE));
+            }
+        }
+    }
+
+    private void runReportSelfCheck() {
+        var oldReportFile = System.getProperty("tinactory.dependencyChecker.reportFile");
+        try {
+            System.setProperty("tinactory.dependencyChecker.reportFile", "dependency-checker-self-check.txt");
+            writeReport(Set.of(), Map.of());
+            expectThrows(() -> writeReport(Set.of(technology("missing")), Map.of()));
+        } finally {
+            if (oldReportFile == null) {
+                System.clearProperty("tinactory.dependencyChecker.reportFile");
+            } else {
+                System.setProperty("tinactory.dependencyChecker.reportFile", oldReportFile);
+            }
+        }
+    }
+
+    private void requireContainsTarget(Collection<IDependencyNode> targets, IDependencyNode target) {
+        if (!targets.contains(target)) {
+            throw new AssertionError("Expected dependency target: " + target.displayId());
+        }
+    }
+
+    private void expectThrows(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (IllegalStateException e) {
+            return;
+        }
+        throw new AssertionError("Expected dependency checker action to fail");
     }
 
     private void extractRuntimeMethods(ServerLevel world) {
@@ -597,10 +642,26 @@ public final class DependencyChecker implements IDependencyChecker {
     }
 
     private void addCleanroomBridgeMethods() {
-        var cleanroom = new MultiblockNode(new ResourceLocation(TinactoryKeys.ID, "cleanroom"));
-        multiblockInterfaceNode(Voltage.ULV).ifPresent(machineInterface -> addMethod(new DependencyMethod(
-            "cleanroom/cleanness", List.of(cleanroom, new VoltageNode(Voltage.ULV), machineInterface),
-            List.of(new NumericNode(CLEANROOM_CLEANNESS, 1d)), "cleanroom bridge")));
+        for (var entry : AllMultiblocks.CLEANROOM_PROPERTIES.entrySet()) {
+            var multiblock = new MultiblockNode(new ResourceLocation(TinactoryKeys.ID, entry.getKey()));
+            for (var voltage : Voltage.values()) {
+                if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
+                    continue;
+                }
+                var cleanness = maxCleanroomCleanness(entry.getValue(), voltage);
+                var output = new NumericNode(CLEANROOM_CLEANNESS, cleanness);
+                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
+                    "cleanroom/cleanness/" + multiblock.id() + "/" + voltage.id,
+                    List.of(multiblock, new VoltageNode(voltage), machineInterface),
+                    List.of(output), "cleanroom bridge")));
+            }
+        }
+    }
+
+    private static double maxCleanroomCleanness(Cleanroom.Properties properties, Voltage voltage) {
+        var clean = properties.baseClean() * Math.sqrt((double) voltage.value / (double) Voltage.ULV.value);
+        var decay = properties.baseDecay();
+        return (1d - decay) * clean / (clean + decay - clean * decay);
     }
 
     private void addNuclearReactorBridgeMethods() {
@@ -689,6 +750,12 @@ public final class DependencyChecker implements IDependencyChecker {
                 targets.add(new MachineNode(processingSet.recipeType.loc(), MAX_PROGRESS_VOLTAGE));
             }
         }
+        targets.add(new MachineNode(MINECRAFT_SMELTING, MAX_PROGRESS_VOLTAGE));
+        for (var set : AllMultiblocks.MULTIBLOCK_SETS.values()) {
+            for (var type : set.types()) {
+                targets.add(new MachineNode(type.loc(), MAX_PROGRESS_VOLTAGE));
+            }
+        }
     }
 
     private void addMultiblockTargets(Collection<IDependencyNode> targets) {
@@ -731,7 +798,10 @@ public final class DependencyChecker implements IDependencyChecker {
         }
         var path = Path.of(reportFile);
         try {
-            Files.createDirectories(path.getParent());
+            var parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
             Files.write(path, lines);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to write dependency checker report " + path, e);
@@ -740,9 +810,9 @@ public final class DependencyChecker implements IDependencyChecker {
             var message = "Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
                 " nodes unreachable: " + path;
             System.err.println(message);
-            if (missingTargets > MAX_ALLOWED_UNREACHABLE_NODES) {
-                throw new IllegalStateException(message + " exceeds maximum allowed " +
-                    MAX_ALLOWED_UNREACHABLE_NODES);
+            if (missingTargets != ACCEPTED_UNREACHABLE_NODES) {
+                throw new IllegalStateException(message + " differs from accepted baseline " +
+                    ACCEPTED_UNREACHABLE_NODES);
             }
         }
     }

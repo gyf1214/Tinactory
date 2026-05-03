@@ -39,6 +39,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllMultiblocks.CLEANROOM_PROPERTIES;
 import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.AllRegistries.BLOCKS;
@@ -289,6 +290,7 @@ public class MultiblockMeta extends MachineMeta {
                 GsonHelper.getAsDouble(jo, "baseClean"),
                 GsonHelper.getAsDouble(jo, "baseDecay"),
                 GsonHelper.getAsDouble(jo, "openDecay"));
+            CLEANROOM_PROPERTIES.put(id, properties);
 
             var jo1 = GsonHelper.getAsJsonObject(jo, "spec");
 
