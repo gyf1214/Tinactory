@@ -4,6 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -25,15 +26,18 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.machine.ProcessingSet;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
+import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
+import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
@@ -59,6 +63,8 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 public final class DependencyChecker {
+    private record LithographyLensBlock(StackNode node, Collection<Item> lens) {}
+
     private static final ResourceLocation BOILER = AllRecipes.BOILER.loc();
     private static final ResourceLocation LARGE_BOILER = modLoc("large_boiler");
     private static final ResourceLocation LARGE_CHEMICAL_REACTOR = modLoc("large_chemical_reactor");
@@ -88,6 +94,7 @@ public final class DependencyChecker {
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
+    private List<LithographyLensBlock> lithographyLensBlocks = null;
 
     public void addMethod(DependencyMethod method) {
         methods.add(method);
@@ -100,8 +107,9 @@ public final class DependencyChecker {
         var checker = new DependencyChecker();
         checker.extractRuntimeMethods(world);
         var solver = new DependencySolver(checker.methods);
-        solver.solve(checker.startNodes());
-        checker.writeReport(solver, checker.intendedTargets(), checker.exemptTargets());
+        var startNodes = checker.startNodes();
+        solver.solve(startNodes);
+        checker.writeReport(solver, startNodes, checker.intendedTargets(), checker.exemptTargets());
     }
 
     private void extractRuntimeMethods(ServerLevel world) {
@@ -140,10 +148,8 @@ public final class DependencyChecker {
     private void addProcessingRecipeMethod(ResourceLocation recipeTypeId, ProcessingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(recipeTypeId, Voltage.fromValue(recipe.voltage)));
-        for (var i = 0; i < recipe.inputs.size(); i++) {
-            ingredientNode(recipe.inputs.get(i).ingredient(), recipe.loc(), i).ifPresent(requirements::add);
-        }
-        addProcessingSubtypeRequirements(recipe, requirements);
+        addProcessingIngredients(recipe, requirements, false);
+        addProcessingSubtypeRequirements(recipe, requirements, true);
         var outputs = new ArrayList<IDependencyNode>();
         if (recipe instanceof ResearchRecipe researchRecipe) {
             outputs.add(new TechnologyNode(researchRecipe.target));
@@ -155,8 +161,47 @@ public final class DependencyChecker {
                 .forEach(outputs::add);
         }
         addMethodIfUseful(recipe.loc() + "#processing", requirements, outputs, "processing recipe " + recipe.loc());
+        if (recipe instanceof EngravingRecipe engravingRecipe) {
+            addLithographyRecipeMethods(recipeTypeId, engravingRecipe, outputs);
+        }
         if (recipe instanceof GeneratorRecipe generatorRecipe) {
             addGeneratorRecipeMethods(recipeTypeId, generatorRecipe);
+        }
+    }
+
+    private void addLithographyRecipeMethods(ResourceLocation recipeTypeId, EngravingRecipe recipe,
+        Collection<IDependencyNode> outputs) {
+        var lensInput = recipe.inputs.stream()
+            .filter(input -> input.port() == 1)
+            .findFirst();
+        if (lensInput.isEmpty()) {
+            return;
+        }
+        var voltage = Voltage.fromValue(recipe.voltage);
+        for (var entry : AllMultiblocks.LITHOGRAPHY_CLEANNESS_FACTORS.entrySet()) {
+            var multiblockSet = AllMultiblocks.MULTIBLOCK_SETS.get(entry.getKey());
+            if (multiblockSet == null || entry.getValue() <= 0d ||
+                multiblockSet.types().stream().noneMatch(type -> type.loc().equals(recipeTypeId))) {
+                continue;
+            }
+            var multiblock = new MultiblockNode(modLoc(entry.getKey()));
+            for (var lensBlock : lithographyLensBlocks()) {
+                if (!matchLens(lensBlock.lens(), lensInput.get().ingredient())) {
+                    continue;
+                }
+                var requirements = new ArrayList<IDependencyNode>();
+                requirements.add(multiblock);
+                requirements.add(new VoltageNode(voltage));
+                requirements.add(lensBlock.node());
+                if (recipe.minCleanness > 0d) {
+                    requirements.add(new NumericNode(CLEANROOM_CLEANNESS, recipe.minCleanness / entry.getValue()));
+                }
+                addProcessingIngredients(recipe, requirements, true);
+                addProcessingSubtypeRequirements(recipe, requirements, false);
+                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethodIfUseful(
+                    recipe.loc() + "#lithography/" + entry.getKey() + "/" + lensBlock.node().id(),
+                    with(requirements, machineInterface), outputs, "lithography recipe " + recipe.loc()));
+            }
         }
     }
 
@@ -187,7 +232,19 @@ public final class DependencyChecker {
             machineVoltage.rank >= recipeVoltage.rank;
     }
 
-    private void addProcessingSubtypeRequirements(ProcessingRecipe recipe, Collection<IDependencyNode> requirements) {
+    private void addProcessingIngredients(ProcessingRecipe recipe, Collection<IDependencyNode> requirements,
+        boolean skipLens) {
+        for (var i = 0; i < recipe.inputs.size(); i++) {
+            var input = recipe.inputs.get(i);
+            if (skipLens && input.port() == 1) {
+                continue;
+            }
+            ingredientNode(input.ingredient(), recipe.loc(), i).ifPresent(requirements::add);
+        }
+    }
+
+    private void addProcessingSubtypeRequirements(ProcessingRecipe recipe, Collection<IDependencyNode> requirements,
+        boolean includeClean) {
         if (recipe instanceof AssemblyRecipe assemblyRecipe) {
             assemblyRecipe.requiredTech.stream()
                 .map(TechnologyNode::new)
@@ -203,7 +260,7 @@ public final class DependencyChecker {
         if (recipe instanceof BlastFurnaceRecipe blastFurnaceRecipe && blastFurnaceRecipe.temperature > 0) {
             requirements.add(new NumericNode(COIL_TEMPERATURE, blastFurnaceRecipe.temperature));
         }
-        if (recipe instanceof CleanRecipe cleanRecipe && cleanRecipe.minCleanness > 0d) {
+        if (includeClean && recipe instanceof CleanRecipe cleanRecipe && cleanRecipe.minCleanness > 0d) {
             requirements.add(new NumericNode(CLEANROOM_CLEANNESS, cleanRecipe.minCleanness));
         }
         if (recipe instanceof ChemicalReactorRecipe chemicalReactorRecipe && chemicalReactorRecipe.requireMultiblock) {
@@ -450,6 +507,30 @@ public final class DependencyChecker {
         }
     }
 
+    private Collection<LithographyLensBlock> lithographyLensBlocks() {
+        if (lithographyLensBlocks == null) {
+            var ret = new ArrayList<LithographyLensBlock>();
+            for (var block : ForgeRegistries.BLOCKS) {
+                if (block instanceof LensBlock lensBlock) {
+                    stackNode(new ItemStack(block))
+                        .ifPresent(node -> ret.add(new LithographyLensBlock(node, lensBlock.getLens())));
+                }
+            }
+            lithographyLensBlocks = ret;
+        }
+        return lithographyLensBlocks;
+    }
+
+    private static boolean matchLens(Collection<Item> lens, IProcessingIngredient ingredient) {
+        if (ingredient instanceof ItemsIngredient items) {
+            return lens.stream().anyMatch($ -> items.ingredient.test(new ItemStack($)));
+        } else if (ingredient instanceof StackIngredient<?> item && item.type() == PortType.ITEM) {
+            return lens.stream().anyMatch($ -> ((ItemStack) item.stack()).is($));
+        } else {
+            return false;
+        }
+    }
+
     private void addItemTagBridgeMethods(TagNode tagNode) {
         var tag = TagKey.create(Registry.ITEM_REGISTRY, tagNode.tagId());
         for (var item : ForgeRegistries.ITEMS.tags().getTag(tag)) {
@@ -544,18 +625,27 @@ public final class DependencyChecker {
         }
     }
 
-    private void writeReport(IDependencySolver solver, Set<IDependencyNode> targets,
-        Map<IDependencyNode, String> exemptions) {
+    private void writeReport(IDependencySolver solver, Collection<IDependencyNode> startNodes,
+        Set<IDependencyNode> targets, Map<IDependencyNode, String> exemptions) {
         var reportFile = System.getProperty("tinactory.dependencyChecker.reportFile", "");
         if (reportFile.isBlank()) {
             return;
         }
         var lines = new ArrayList<String>();
+        var verbose = Boolean.getBoolean("tinactory.dependencyChecker.verbose");
+        if (verbose) {
+            lines.add("start nodes:");
+            startNodes.stream()
+                .map(node -> "  " + node.displayId())
+                .sorted()
+                .forEach(lines::add);
+            lines.add("");
+        }
         var missingTargets = 0;
         for (var target : targets) {
             if (!target.isSatisfied(solver) && !exemptions.containsKey(target)) {
                 missingTargets++;
-                lines.addAll(formatMissingTarget(solver, target));
+                lines.addAll(formatMissingTarget(solver, target, verbose));
             }
         }
         var path = Path.of(reportFile);
@@ -579,10 +669,10 @@ public final class DependencyChecker {
         }
     }
 
-    private Collection<String> formatMissingTarget(IDependencySolver solver, IDependencyNode target) {
+    private Collection<String> formatMissingTarget(IDependencySolver solver, IDependencyNode target, boolean verbose) {
         var lines = new ArrayList<String>();
         lines.add("missing: " + target.displayId());
-        if (Boolean.getBoolean("tinactory.dependencyChecker.traceBlockedMethods")) {
+        if (verbose) {
             for (var method : methodsByOutput.getOrDefault(target, Set.of())) {
                 lines.add("  blocked method: " + method.id() + " (" + method.source() + ")");
                 method.requirements().stream()

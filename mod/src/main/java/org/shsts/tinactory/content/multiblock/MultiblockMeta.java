@@ -40,6 +40,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllMultiblocks.CLEANROOM_PROPERTIES;
+import static org.shsts.tinactory.AllMultiblocks.LITHOGRAPHY_CLEANNESS_FACTORS;
 import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.AllRegistries.BLOCKS;
@@ -82,6 +83,7 @@ public class MultiblockMeta extends MachineMeta {
                 case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
                 case "engraving" -> {
                     var factor = GsonHelper.getAsDouble(jo, "cleannessFactor");
+                    LITHOGRAPHY_CLEANNESS_FACTORS.put(id, factor);
                     yield builder.child(Multiblock.builder((be, $) -> new Lithography(be, $, factor)));
                 }
                 case "distillation" -> {

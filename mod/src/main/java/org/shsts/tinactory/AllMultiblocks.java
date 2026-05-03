@@ -24,6 +24,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
     public static final Map<String, Cleanroom.Properties> CLEANROOM_PROPERTIES;
+    public static final Map<String, Double> LITHOGRAPHY_CLEANNESS_FACTORS;
 
     public static final Map<String, IEntry<Block>> SOLID_CASINGS;
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
@@ -33,6 +34,7 @@ public final class AllMultiblocks {
         COIL_BLOCKS = new HashMap<>();
         MULTIBLOCK_SETS = new HashMap<>();
         CLEANROOM_PROPERTIES = new HashMap<>();
+        LITHOGRAPHY_CLEANNESS_FACTORS = new HashMap<>();
 
         // misc
         REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)
