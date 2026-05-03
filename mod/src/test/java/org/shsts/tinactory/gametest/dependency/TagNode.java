@@ -17,22 +17,22 @@ record TagNode(PortType portType, ResourceLocation tagId) implements IDependency
     }
 
     @Override
-    public boolean isSatisfied(IDependencyChecker checker) {
+    public boolean isSatisfied(IDependencySolver checker) {
         return checker.isExactReached(this);
     }
 
     @Override
-    public boolean reach(IDependencyChecker checker, DependencyMethod method) {
+    public boolean reach(IDependencySolver checker, DependencyMethod method) {
         return checker.reachExact(this, method);
     }
 
     @Override
-    public void addWaiter(IDependencyChecker checker, DependencyMethod method) {
+    public void addWaiter(IDependencySolver checker, DependencyMethod method) {
         checker.addExactWaiter(this, method);
     }
 
     @Override
-    public Set<DependencyMethod> releaseWaiters(IDependencyChecker checker) {
+    public Set<DependencyMethod> releaseWaiters(IDependencySolver checker) {
         return checker.releaseExactWaiters(this);
     }
 }

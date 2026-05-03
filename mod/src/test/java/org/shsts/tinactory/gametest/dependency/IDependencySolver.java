@@ -4,7 +4,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.Set;
 
-interface IDependencyChecker {
+interface IDependencySolver {
     boolean isExactReached(IDependencyNode node);
 
     boolean reachExact(IDependencyNode node, DependencyMethod method);

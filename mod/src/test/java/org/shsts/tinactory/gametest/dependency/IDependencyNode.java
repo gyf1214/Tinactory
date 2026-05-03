@@ -7,13 +7,13 @@ interface IDependencyNode extends Comparable<IDependencyNode> {
 
     String id();
 
-    boolean isSatisfied(IDependencyChecker checker);
+    boolean isSatisfied(IDependencySolver checker);
 
-    boolean reach(IDependencyChecker checker, DependencyMethod method);
+    boolean reach(IDependencySolver checker, DependencyMethod method);
 
-    void addWaiter(IDependencyChecker checker, DependencyMethod method);
+    void addWaiter(IDependencySolver checker, DependencyMethod method);
 
-    Set<DependencyMethod> releaseWaiters(IDependencyChecker checker);
+    Set<DependencyMethod> releaseWaiters(IDependencySolver checker);
 
     @Override
     default int compareTo(IDependencyNode other) {

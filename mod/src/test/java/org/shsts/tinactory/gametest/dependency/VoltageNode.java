@@ -16,22 +16,22 @@ record VoltageNode(Voltage voltage) implements IDependencyNode {
     }
 
     @Override
-    public boolean isSatisfied(IDependencyChecker checker) {
+    public boolean isSatisfied(IDependencySolver checker) {
         return checker.maxVoltageRank() >= voltage.rank;
     }
 
     @Override
-    public boolean reach(IDependencyChecker checker, DependencyMethod method) {
+    public boolean reach(IDependencySolver checker, DependencyMethod method) {
         return checker.reachVoltage(voltage, method);
     }
 
     @Override
-    public void addWaiter(IDependencyChecker checker, DependencyMethod method) {
+    public void addWaiter(IDependencySolver checker, DependencyMethod method) {
         checker.addVoltageWaiter(this, method);
     }
 
     @Override
-    public Set<DependencyMethod> releaseWaiters(IDependencyChecker checker) {
+    public Set<DependencyMethod> releaseWaiters(IDependencySolver checker) {
         return checker.releaseVoltageWaiters(this);
     }
 }
