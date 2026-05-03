@@ -28,6 +28,7 @@ import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
+import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -146,6 +147,36 @@ public final class DependencyChecker {
                 .forEach(outputs::add);
         }
         addMethodIfUseful(recipe.loc() + "#processing", requirements, outputs, "processing recipe " + recipe.loc());
+        if (recipe instanceof GeneratorRecipe generatorRecipe) {
+            addGeneratorRecipeMethods(recipeTypeId, generatorRecipe);
+        }
+    }
+
+    private void addGeneratorRecipeMethods(ResourceLocation recipeTypeId, GeneratorRecipe recipe) {
+        var recipeVoltage = Voltage.fromValue(recipe.voltage);
+        for (var voltage : Voltage.values()) {
+            if (!canRunGeneratorRecipe(recipe, recipeVoltage, voltage)) {
+                continue;
+            }
+            var requirements = new ArrayList<IDependencyNode>();
+            requirements.add(new MachineNode(recipeTypeId, voltage));
+            for (var i = 0; i < recipe.inputs.size(); i++) {
+                ingredientNode(recipe.inputs.get(i).ingredient(), recipe.loc(), i).ifPresent(requirements::add);
+            }
+            var output = new GeneratorNode(voltage);
+            addMethodIfUseful(recipe.loc() + "#generator/" + voltage.id, requirements, List.of(output),
+                "generator recipe " + recipe.loc());
+        }
+    }
+
+    private static boolean canRunGeneratorRecipe(GeneratorRecipe recipe, Voltage recipeVoltage,
+        Voltage machineVoltage) {
+        if (machineVoltage == Voltage.PRIMITIVE || machineVoltage == Voltage.MAX) {
+            return false;
+        }
+        return recipe.exactVoltage() ?
+            machineVoltage == recipeVoltage :
+            machineVoltage.rank >= recipeVoltage.rank;
     }
 
     private void addProcessingSubtypeRequirements(ProcessingRecipe recipe, Collection<IDependencyNode> requirements) {
@@ -236,7 +267,9 @@ public final class DependencyChecker {
                 for (var voltage : processingSet.voltages) {
                     var requirements = new ArrayList<IDependencyNode>();
                     stackNode(new ItemStack(processingSet.block(voltage))).ifPresent(requirements::add);
-                    requirements.add(new VoltageNode(voltage));
+                    if (!isGeneratorRecipeType(processingSet.recipeType.loc())) {
+                        requirements.add(new VoltageNode(voltage));
+                    }
                     var output = new MachineNode(processingSet.recipeType.loc(), voltage);
                     addMethodIfUseful("machine/" + output.id(), requirements, List.of(output), "machine bridge");
                 }
@@ -297,9 +330,14 @@ public final class DependencyChecker {
                 continue;
             }
             var output = new MachineNode(recipeTypeId, voltage);
+            var requirements = new ArrayList<IDependencyNode>();
+            requirements.add(multiblock);
+            if (!isGeneratorRecipeType(recipeTypeId)) {
+                requirements.add(new VoltageNode(voltage));
+            }
             multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
                 "multiblock_machine/" + multiblock.id() + "/" + output.id(),
-                List.of(multiblock, new VoltageNode(voltage), machineInterface), List.of(output),
+                with(requirements, machineInterface), List.of(output),
                 "multiblock machine bridge")));
         }
     }
@@ -310,12 +348,10 @@ public final class DependencyChecker {
                 continue;
             }
             cableNode(voltage).ifPresent(cable -> {
-                for (var generator : GENERATOR_RECIPE_TYPES) {
-                    generatorNode(generator, voltage).ifPresent(generatorNode -> addMethod(new DependencyMethod(
-                        "voltage/generator/" + generator + "/" + voltage.id,
-                        List.of(cable, generatorNode), List.of(new VoltageNode(voltage)),
-                        "voltage generator bridge")));
-                }
+                addMethod(new DependencyMethod(
+                    "voltage/generator/" + voltage.id,
+                    List.of(cable, new GeneratorNode(voltage)), List.of(new VoltageNode(voltage)),
+                    "voltage generator bridge"));
             });
             transformerNode(voltage).ifPresent(transformer -> {
                 if (voltage.rank > Voltage.ULV.rank) {
@@ -600,14 +636,6 @@ public final class DependencyChecker {
         return componentNode("transformer", voltage);
     }
 
-    private Optional<StackNode> generatorNode(ResourceLocation recipeTypeId, Voltage voltage) {
-        var machineSet = AllBlockEntities.MACHINE_SETS.get(recipeTypeId.getPath());
-        if (machineSet == null || !machineSet.hasVoltage(voltage)) {
-            return Optional.empty();
-        }
-        return stackNode(new ItemStack(machineSet.block(voltage)));
-    }
-
     private Optional<StackNode> multiblockInterfaceNode(Voltage voltage) {
         var machineSet = AllBlockEntities.MACHINE_SETS.get("multiblock/interface");
         if (machineSet == null || !machineSet.hasVoltage(voltage)) {
@@ -622,6 +650,16 @@ public final class DependencyChecker {
             return Optional.empty();
         }
         return stackNode(new ItemStack(entries.get(voltage).get()));
+    }
+
+    private static boolean isGeneratorRecipeType(ResourceLocation recipeTypeId) {
+        return GENERATOR_RECIPE_TYPES.contains(recipeTypeId);
+    }
+
+    private static <T> List<T> with(Collection<T> values, T value) {
+        var ret = new ArrayList<>(values);
+        ret.add(value);
+        return ret;
     }
 
     private Optional<StackNode> itemNode(ResourceLocation loc) {

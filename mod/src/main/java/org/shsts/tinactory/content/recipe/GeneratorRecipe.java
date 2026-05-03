@@ -29,6 +29,10 @@ public class GeneratorRecipe extends DisplayInputRecipe {
         this.exactVoltage = builder.exactVoltage;
     }
 
+    public boolean exactVoltage() {
+        return exactVoltage;
+    }
+
     @Override
     public boolean matches(IMachine machine) {
         if (exactVoltage) {
