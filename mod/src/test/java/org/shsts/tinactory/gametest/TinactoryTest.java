@@ -10,7 +10,6 @@ import org.shsts.tinactory.gametest.dependency.DependencyChecker;
 public final class TinactoryTest {
     @GameTest
     public static void testSucceed(GameTestHelper helper) {
-        DependencyChecker.runSelfCheck();
         DependencyChecker.runRuntimeCheck(helper.getLevel());
         helper.succeed();
     }

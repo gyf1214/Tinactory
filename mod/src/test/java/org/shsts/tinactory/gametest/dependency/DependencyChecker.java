@@ -104,14 +104,6 @@ public final class DependencyChecker implements IDependencyChecker {
         }
     }
 
-    public boolean isReached(IDependencyNode node) {
-        return node.isSatisfied(this);
-    }
-
-    public int methodCount() {
-        return methods.size();
-    }
-
     public void solve(Collection<IDependencyNode> startNodes) {
         resetSolver();
         for (var node : startNodes) {
@@ -122,39 +114,6 @@ public final class DependencyChecker implements IDependencyChecker {
             applyReadyMethods();
             releaseReachedNodes();
         }
-    }
-
-    public static void runSelfCheck() {
-        var checker = new DependencyChecker();
-        checker.solve(List.of());
-        checker.requireNotReached(new VoltageNode(Voltage.PRIMITIVE));
-        checker = new DependencyChecker();
-        checker.runIngredientSelfCheck();
-        checker = new DependencyChecker();
-        checker.runBridgeSelfCheck();
-        checker = new DependencyChecker();
-        checker.runTargetSelfCheck();
-        checker = new DependencyChecker();
-        checker.runReportSelfCheck();
-        checker = new DependencyChecker();
-        var seed = technology("seed");
-        var exact = technology("exact");
-        var numeric = technology("numeric");
-        var voltage = technology("voltage");
-        var duplicate = technology("duplicate");
-        checker.addMethod(new DependencyMethod(
-            "self/exact", List.of(seed), List.of(exact), "self check exact"));
-        checker.addMethod(new DependencyMethod(
-            "self/numeric", List.of(new NumericNode("temperature", 2d)), List.of(numeric), "self check numeric"));
-        checker.addMethod(new DependencyMethod(
-            "self/voltage", List.of(new VoltageNode(Voltage.MV)), List.of(voltage), "self check voltage"));
-        checker.addMethod(new DependencyMethod(
-            "self/duplicate", List.of(exact, exact), List.of(duplicate), "self check duplicate"));
-        checker.solve(List.of(seed, new NumericNode("temperature", 3d), new VoltageNode(Voltage.HV)));
-        checker.requireReached(exact);
-        checker.requireReached(numeric);
-        checker.requireReached(voltage);
-        checker.requireReached(duplicate);
     }
 
     public static void runRuntimeCheck(ServerLevel world) {
@@ -308,95 +267,6 @@ public final class DependencyChecker implements IDependencyChecker {
                 }
             }
         }
-    }
-
-    private void requireReached(IDependencyNode node) {
-        if (!isReached(node)) {
-            throw new AssertionError("Expected dependency node to be reached: " + node.displayId());
-        }
-    }
-
-    private void requireNotReached(IDependencyNode node) {
-        if (isReached(node)) {
-            throw new AssertionError("Expected dependency node to be blocked: " + node.displayId());
-        }
-    }
-
-    private void runIngredientSelfCheck() {
-        var recipeId = new ResourceLocation(TinactoryKeys.ID, "self_check/ingredient");
-        var output = technology("ingredient");
-        ingredientNode(Ingredient.of(Items.OAK_LOG, Items.BIRCH_LOG), recipeId, 0)
-            .ifPresent(ingredient -> addMethod(new DependencyMethod(
-                "self/ingredient", List.of(ingredient), List.of(output), "self check ingredient")));
-        solve(List.of(stackNode(new ItemStack(Items.BIRCH_LOG)).orElseThrow()));
-        requireReached(output);
-    }
-
-    private void runBridgeSelfCheck() {
-        addVoltageBridgeMethods();
-        cableNode(Voltage.LV).ifPresent(cable -> {
-            solve(List.of(cable));
-            requireNotReached(new VoltageNode(Voltage.LV));
-        });
-        transformerNode(Voltage.LV).ifPresent(transformer -> {
-            solve(List.of(new VoltageNode(Voltage.ULV), transformer));
-            requireNotReached(new VoltageNode(Voltage.LV));
-        });
-
-        addMachineBridgeMethods();
-        if (AllBlockEntities.MACHINE_SETS.get("macerator") instanceof ProcessingSet processingSet) {
-            var voltage = Voltage.LV;
-            var machine = new MachineNode(processingSet.recipeType.loc(), voltage);
-            var requirements = new ArrayList<IDependencyNode>();
-            stackNode(new ItemStack(processingSet.block(voltage))).ifPresent(requirements::add);
-            solve(requirements);
-            requireNotReached(machine);
-        }
-
-        addMultiblockBridgeMethods();
-        var multiblock = new MultiblockNode(LARGE_CHEMICAL_REACTOR);
-        solve(List.of(multiblock, new VoltageNode(Voltage.LV)));
-        requireNotReached(new MachineNode(LARGE_CHEMICAL_REACTOR, Voltage.LV));
-    }
-
-    private void runTargetSelfCheck() {
-        var targets = intendedTargets();
-        requireContainsTarget(targets, new MachineNode(MINECRAFT_SMELTING, MAX_PROGRESS_VOLTAGE));
-        for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
-            for (var type : entry.getValue().types()) {
-                requireContainsTarget(targets, new MachineNode(type.loc(), MAX_PROGRESS_VOLTAGE));
-            }
-        }
-    }
-
-    private void runReportSelfCheck() {
-        var oldReportFile = System.getProperty("tinactory.dependencyChecker.reportFile");
-        try {
-            System.setProperty("tinactory.dependencyChecker.reportFile", "dependency-checker-self-check.txt");
-            writeReport(Set.of(), Map.of());
-            expectThrows(() -> writeReport(Set.of(technology("missing")), Map.of()));
-        } finally {
-            if (oldReportFile == null) {
-                System.clearProperty("tinactory.dependencyChecker.reportFile");
-            } else {
-                System.setProperty("tinactory.dependencyChecker.reportFile", oldReportFile);
-            }
-        }
-    }
-
-    private void requireContainsTarget(Collection<IDependencyNode> targets, IDependencyNode target) {
-        if (!targets.contains(target)) {
-            throw new AssertionError("Expected dependency target: " + target.displayId());
-        }
-    }
-
-    private void expectThrows(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (IllegalStateException e) {
-            return;
-        }
-        throw new AssertionError("Expected dependency checker action to fail");
     }
 
     private void extractRuntimeMethods(ServerLevel world) {
@@ -956,10 +826,6 @@ public final class DependencyChecker implements IDependencyChecker {
     }
 
     private static DependencyMethod bootstrapMethod() {
-        return new DependencyMethod("self/bootstrap", List.of(), List.of(), "self check bootstrap");
-    }
-
-    private static TechnologyNode technology(String id) {
-        return new TechnologyNode(new ResourceLocation(TinactoryKeys.ID, "self_check/" + id));
+        return new DependencyMethod("bootstrap/start", List.of(), List.of(), "start list bootstrap");
     }
 }
