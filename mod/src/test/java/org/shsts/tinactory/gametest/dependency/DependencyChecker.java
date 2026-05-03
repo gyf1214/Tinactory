@@ -55,24 +55,30 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 public final class DependencyChecker {
-    private static final ResourceLocation LARGE_CHEMICAL_REACTOR = new ResourceLocation(
-        TinactoryKeys.ID, "large_chemical_reactor");
-    private static final ResourceLocation MINECRAFT_SMELTING = new ResourceLocation("minecraft", "smelting");
-    private static final ResourceLocation MULTI_SMELTER = new ResourceLocation(TinactoryKeys.ID, "multi_smelter");
-    private static final ResourceLocation NUCLEAR_REACTOR = new ResourceLocation(TinactoryKeys.ID, "nuclear_reactor");
-    private static final ResourceLocation STICKY_RESIN = new ResourceLocation(TinactoryKeys.ID,
-        "rubber_tree/sticky_resin");
-    private static final ResourceLocation TOOL_CRAFTING = new ResourceLocation(TinactoryKeys.ID, "tool_crafting");
+    private static final ResourceLocation BOILER = AllRecipes.BOILER.loc();
+    private static final ResourceLocation LARGE_BOILER = modLoc("large_boiler");
+    private static final ResourceLocation LARGE_CHEMICAL_REACTOR = modLoc("large_chemical_reactor");
+    private static final ResourceLocation MINECRAFT_SMELTING = mcLoc("smelting");
+    private static final ResourceLocation MULTI_SMELTER = modLoc("multi_smelter");
+    private static final ResourceLocation NUCLEAR_REACTOR = modLoc("nuclear_reactor");
+    private static final ResourceLocation STICKY_RESIN = modLoc("rubber_tree/sticky_resin");
+    private static final ResourceLocation TOOL_CRAFTING = modLoc("tool_crafting");
+    private static final List<ResourceLocation> BOILER_BLOCKS = List.of(
+        modLoc("machine/boiler/low"),
+        modLoc("machine/boiler/high"));
+    private static final List<ResourceLocation> BOILER_MULTIBLOCKS = List.of(
+        LARGE_BOILER,
+        NUCLEAR_REACTOR);
     private static final List<ResourceLocation> GENERATOR_RECIPE_TYPES = List.of(
-        new ResourceLocation(TinactoryKeys.ID, "combustion_generator"),
-        new ResourceLocation(TinactoryKeys.ID, "gas_turbine"),
-        new ResourceLocation(TinactoryKeys.ID, "steam_turbine"));
-    private static final ResourceLocation URANIUM_FUEL_ROD = new ResourceLocation(TinactoryKeys.ID,
-        "component/uranium_fuel_rod");
-    private static final ResourceLocation NUCLEAR_WASTE_ROD = new ResourceLocation(TinactoryKeys.ID,
-        "component/nuclear_waste_rod");
+        modLoc("combustion_generator"),
+        modLoc("gas_turbine"),
+        modLoc("steam_turbine"));
+    private static final ResourceLocation URANIUM_FUEL_ROD = modLoc("component/uranium_fuel_rod");
+    private static final ResourceLocation NUCLEAR_WASTE_ROD = modLoc("component/nuclear_waste_rod");
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
@@ -104,6 +110,7 @@ public final class DependencyChecker {
         addMachineBridgeMethods();
         addWorkbenchBridgeMethod();
         addMultiblockBridgeMethods();
+        addBoilerBridgeMethods();
         addVoltageBridgeMethods();
         addCoilBridgeMethods();
         addCleanroomBridgeMethods();
@@ -122,6 +129,7 @@ public final class DependencyChecker {
         }
         for (var recipe : recipeManager.getAllRecipesFor(AllRecipes.BOILER)) {
             var requirements = new ArrayList<IDependencyNode>();
+            requirements.add(new MachineNode(BOILER, Voltage.PRIMITIVE));
             stackNode(recipe.input).ifPresent(requirements::add);
             var outputs = new ArrayList<IDependencyNode>();
             stackNode(recipe.output).ifPresent(outputs::add);
@@ -339,6 +347,25 @@ public final class DependencyChecker {
                 "multiblock_machine/" + multiblock.id() + "/" + output.id(),
                 with(requirements, machineInterface), List.of(output),
                 "multiblock machine bridge")));
+        }
+    }
+
+    private void addBoilerBridgeMethods() {
+        var output = new MachineNode(BOILER, Voltage.PRIMITIVE);
+        for (var block : BOILER_BLOCKS) {
+            itemNode(block).ifPresent(boiler -> addMethod(new DependencyMethod(
+                "boiler/" + block, List.of(boiler), List.of(output), "boiler bridge")));
+        }
+        for (var multiblockId : BOILER_MULTIBLOCKS) {
+            var multiblock = new MultiblockNode(multiblockId);
+            for (var voltage : Voltage.values()) {
+                if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
+                    continue;
+                }
+                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
+                    "boiler/" + multiblockId + "/" + voltage.id,
+                    List.of(multiblock, machineInterface), List.of(output), "multiblock boiler bridge")));
+            }
         }
     }
 
