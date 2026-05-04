@@ -40,6 +40,7 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.multiblock.BlockIngredient;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.recipe.TagIngredient;
@@ -377,6 +378,9 @@ public final class DependencyChecker {
             var set = entry.getValue();
             var requirements = new ArrayList<IDependencyNode>();
             stackNode(new ItemStack(set.block().get())).ifPresent(requirements::add);
+            for (var i = 0; i < set.structureIngredients().size(); i++) {
+                blockIngredientNode(set.structureIngredients().get(i), multiblockId, i).ifPresent(requirements::add);
+            }
             var multiblock = new MultiblockNode(multiblockId);
             addMethodIfUseful("multiblock/" + multiblock.id(), requirements, List.of(multiblock), "multiblock bridge");
             for (var type : set.types()) {
@@ -738,6 +742,23 @@ public final class DependencyChecker {
         }
         var node = new IngredientNode("recipe", recipeId, inputIndex);
         addIngredientBridgeMethods(node, List.of(items));
+        return Optional.of(node);
+    }
+
+    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient, ResourceLocation multiblockId,
+        int inputIndex) {
+        var candidates = ingredient.expand().stream()
+            .map(ItemStack::new)
+            .filter(stack -> !stack.isEmpty())
+            .toList();
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        }
+        if (candidates.size() == 1) {
+            return stackNode(candidates.get(0)).map(node -> (IDependencyNode) node);
+        }
+        var node = new IngredientNode("multiblock", multiblockId, inputIndex);
+        addIngredientBridgeMethods(node, candidates);
         return Optional.of(node);
     }
 
