@@ -56,7 +56,6 @@ class GridViewGroupTest {
         });
 
         group.setActive(false);
-        group.initView();
         group.setRect(new Rect(0, 0, 35, 18));
 
         assertEquals(6, group.getSlotCount());
@@ -64,7 +63,6 @@ class GridViewGroupTest {
         assertSame(created.get(2), group.getSlot(2));
         assertEquals(new Rect(24, 0, 10, 8), created.get(2).rect);
         assertEquals(new Rect(0, 10, 10, 8), created.get(3).rect);
-        assertTrue(created.stream().allMatch(node -> node.initialized));
         assertTrue(created.stream().noneMatch(node -> node.active));
 
         group.setRect(new Rect(0, 0, 10, 8));
@@ -77,13 +75,7 @@ class GridViewGroupTest {
 
     private static class RecordingNode implements IViewNode {
         private Rect rect = Rect.ZERO;
-        private boolean initialized = false;
         private boolean active = true;
-
-        @Override
-        public void initView() {
-            initialized = true;
-        }
 
         @Override
         public void setRect(Rect rect) {

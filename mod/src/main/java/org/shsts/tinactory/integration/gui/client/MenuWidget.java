@@ -33,9 +33,6 @@ public abstract class MenuWidget extends GuiComponent implements
     }
 
     @Override
-    public void initView() {}
-
-    @Override
     public void setRect(Rect rect) {
         this.rect = rect;
     }

@@ -21,9 +21,6 @@ public class VanillaWidgetAdapter<T extends GuiComponent & Widget & GuiEventList
     }
 
     @Override
-    public void initView() {}
-
-    @Override
     public void setRect(Rect rect) {
         if (widget instanceof AbstractWidget abstractWidget) {
             abstractWidget.x = rect.x();

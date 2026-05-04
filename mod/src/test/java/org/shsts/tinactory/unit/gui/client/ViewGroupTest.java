@@ -19,13 +19,10 @@ class ViewGroupTest {
         group.addChild(RectD.corners(0d, 0d, 1d, 1d), new Rect(1, 2, -3, -4), 10, later);
         group.addChild(RectD.corners(0.5d, 0d, 1d, 1d), new Rect(2, 3, -1, -2), -5, earlier);
 
-        group.initView();
         group.setRect(new Rect(10, 20, 40, 30));
         group.setActive(false);
 
-        assertEquals(1, earlier.initCount);
-        assertEquals(1, later.initCount);
-        assertTrue(earlier.initOrder < later.initOrder);
+        assertTrue(earlier.rectOrder < later.rectOrder);
         assertEquals(Rect.corners(32, 23, 51, 51), earlier.rect);
         assertEquals(Rect.corners(11, 22, 48, 48), later.rect);
         assertEquals(Boolean.FALSE, earlier.active);
@@ -33,22 +30,16 @@ class ViewGroupTest {
     }
 
     private static final class TestViewNode implements IViewNode {
-        private static int nextInitOrder = 0;
+        private static int nextRectOrder = 0;
 
-        private int initCount = 0;
-        private int initOrder = -1;
+        private int rectOrder = -1;
         private Rect rect = Rect.ZERO;
         private Boolean active = null;
 
         @Override
-        public void initView() {
-            initCount++;
-            initOrder = nextInitOrder++;
-        }
-
-        @Override
         public void setRect(Rect rect) {
             this.rect = rect;
+            rectOrder = nextRectOrder++;
         }
 
         @Override

@@ -106,7 +106,7 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
     }
 
     @Override
-    public void setRect(Rect rect) {
+    protected void updateDynamicChildren() {
         var width = rect.width() + offset.width();
         var height = rect.height() + offset.height();
 
@@ -116,7 +116,6 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
         slotCount = rowCount * columnCount;
         setPage(page);
         syncSlots();
-        super.setRect(rect);
     }
 
     private void syncSlots() {
@@ -126,9 +125,6 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
             }
             var slot = slotFactory.apply(slots.size());
             slots.add(slot);
-            if (initialized) {
-                slot.initView();
-            }
             slot.setActive(active);
         }
         while (slots.size() > slotCount) {

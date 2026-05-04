@@ -10,8 +10,6 @@ import org.shsts.tinactory.core.gui.Rect;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IViewNode {
-    void initView();
-
     void setRect(Rect rect);
 
     void setActive(boolean active);
