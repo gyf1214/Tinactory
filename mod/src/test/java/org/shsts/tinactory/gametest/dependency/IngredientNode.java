@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Set;
 
-record IngredientNode(ResourceLocation recipeId, int inputIndex) implements IDependencyNode {
+record IngredientNode(String kind, ResourceLocation owner, int inputIndex) implements IDependencyNode {
     @Override
     public String type() {
         return "ingredient";
@@ -12,7 +12,7 @@ record IngredientNode(ResourceLocation recipeId, int inputIndex) implements IDep
 
     @Override
     public String id() {
-        return recipeId + "#" + inputIndex;
+        return kind + "/" + owner + "#" + inputIndex;
     }
 
     @Override

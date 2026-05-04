@@ -736,12 +736,12 @@ public final class DependencyChecker {
         if (items.length == 1) {
             return stackNode(items[0]).map(node -> (IDependencyNode) node);
         }
-        var node = new IngredientNode(recipeId, inputIndex);
-        addIngredientBridgeMethods(node, items);
+        var node = new IngredientNode("recipe", recipeId, inputIndex);
+        addIngredientBridgeMethods(node, List.of(items));
         return Optional.of(node);
     }
 
-    private void addIngredientBridgeMethods(IngredientNode node, ItemStack[] candidates) {
+    private void addIngredientBridgeMethods(IngredientNode node, Collection<ItemStack> candidates) {
         for (var candidate : candidates) {
             stackNode(candidate).ifPresent(candidateNode -> addMethodIfUseful(
                 "ingredient/" + node.id() + "/" + candidateNode.id(),
