@@ -28,6 +28,8 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     protected final MenuScreen<?> screen;
     protected final ViewGroup viewGroup;
     protected boolean active = true;
+    protected boolean laidOut = false;
+    protected boolean refreshPending = false;
 
     public Panel(MenuScreen<?> screen) {
         this(screen, new ViewGroup());
@@ -46,9 +48,16 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     public void refresh() {
-        if (isActive()) {
-            doRefresh();
+        if (!laidOut) {
+            refreshPending = true;
+            return;
         }
+        if (!isActive()) {
+            refreshPending = true;
+            return;
+        }
+        refreshPending = false;
+        doRefresh();
     }
 
     protected void doRefresh() {}
@@ -57,8 +66,17 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
 
     @Override
     public void setRect(Rect rect) {
+        laidOut = false;
         this.rect = rect;
         viewGroup.setRect(rect);
+        laidOut = true;
+        postLayout();
+    }
+
+    protected void postLayout() {
+        if (refreshPending && isActive()) {
+            refresh();
+        }
     }
 
     public boolean isActive() {
@@ -69,7 +87,9 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     public void setActive(boolean value) {
         active = value;
         viewGroup.setActive(value);
-        refresh();
+        if (value && laidOut) {
+            refresh();
+        }
     }
 
     @Override

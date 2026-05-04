@@ -107,12 +107,6 @@ public abstract class ButtonPanel extends Panel {
         addChild(PAGE_ANCHOR, RIGHT_PAGE_OFFSET, rightPageButton);
     }
 
-    @Override
-    public void setRect(Rect rect) {
-        super.setRect(rect);
-        refresh();
-    }
-
     protected abstract int getItemCount();
 
     /**
@@ -156,6 +150,11 @@ public abstract class ButtonPanel extends Panel {
             }
         }
         page = gridViewGroup.getPage();
+    }
+
+    @Override
+    protected void postLayout() {
+        refresh();
     }
 
     @Override
