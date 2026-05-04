@@ -245,7 +245,7 @@ public class MultiblockMeta extends MachineMeta {
                     return $ -> $.check(ch, blockStateCheck(BlockState::isAir));
                 } else {
                     var block = BLOCKS.getEntry(new ResourceLocation(s));
-                    ingredientConsumer.accept(BlockIngredient.of(block.get()));
+                    ingredientConsumer.accept(BlockIngredient.of(block));
                     return $ -> $.check(ch, block(block, false));
                 }
             }
@@ -255,7 +255,7 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
-                    ingredientConsumer.accept(BlockIngredient.of(block.get()));
+                    ingredientConsumer.accept(BlockIngredient.of(block));
                     return $ -> $.check(ch, block(block, true));
                 }
                 case "tag" -> {
@@ -272,7 +272,7 @@ public class MultiblockMeta extends MachineMeta {
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(new BlockValue(block.get()), new TagValue(tag)));
+                    ingredientConsumer.accept(BlockIngredient.of(new BlockValue(block), new TagValue(tag)));
                     return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
                 }
             }
@@ -347,8 +347,8 @@ public class MultiblockMeta extends MachineMeta {
             var baseBlock = getBlock(jo1, "base");
             var ceilingBlock = getBlock(jo1, "ceiling");
             var wallTag = getBlockTag(jo1, "wall");
-            structureIngredients.add(BlockIngredient.of(baseBlock.get()));
-            structureIngredients.add(BlockIngredient.of(ceilingBlock.get()));
+            structureIngredients.add(BlockIngredient.of(baseBlock));
+            structureIngredients.add(BlockIngredient.of(ceilingBlock));
             structureIngredients.add(BlockIngredient.of(wallTag));
 
             var layout = parseLayout().buildLayout();

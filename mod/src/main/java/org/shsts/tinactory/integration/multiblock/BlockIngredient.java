@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,6 +20,10 @@ public record BlockIngredient(List<Value> values) {
     }
 
     public static BlockIngredient of(Block block) {
+        return new BlockIngredient(List.of(new BlockValue(() -> block)));
+    }
+
+    public static BlockIngredient of(Supplier<? extends Block> block) {
         return new BlockIngredient(List.of(new BlockValue(block)));
     }
 
@@ -46,10 +51,10 @@ public record BlockIngredient(List<Value> values) {
         void expand(Collection<Block> ret);
     }
 
-    public record BlockValue(Block block) implements Value {
+    public record BlockValue(Supplier<? extends Block> block) implements Value {
         @Override
         public void expand(Collection<Block> ret) {
-            ret.add(block);
+            ret.add(block.get());
         }
     }
 
