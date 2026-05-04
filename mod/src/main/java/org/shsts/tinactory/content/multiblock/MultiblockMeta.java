@@ -375,7 +375,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = buildBlock();
 
-            var set = new MultiblockSet(recipeTypes, block);
+            var set = new MultiblockSet(recipeTypes, block, List.of());
             MULTIBLOCK_SETS.put(id, set);
         }
     }
