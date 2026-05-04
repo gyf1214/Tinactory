@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.material.MiscMeta;
+import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
 import org.shsts.tinactory.content.multiblock.HalfBlock;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
@@ -22,6 +23,8 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @MethodsReturnNonnullByDefault
 public final class AllMultiblocks {
     public static final Map<String, MultiblockSet> MULTIBLOCK_SETS;
+    public static final Map<String, Cleanroom.Properties> CLEANROOM_PROPERTIES;
+    public static final Map<String, Double> LITHOGRAPHY_CLEANNESS_FACTORS;
 
     public static final Map<String, IEntry<Block>> SOLID_CASINGS;
     public static final Map<String, IEntry<CoilBlock>> COIL_BLOCKS;
@@ -30,6 +33,8 @@ public final class AllMultiblocks {
         SOLID_CASINGS = new HashMap<>();
         COIL_BLOCKS = new HashMap<>();
         MULTIBLOCK_SETS = new HashMap<>();
+        CLEANROOM_PROPERTIES = new HashMap<>();
+        LITHOGRAPHY_CLEANNESS_FACTORS = new HashMap<>();
 
         // misc
         REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)

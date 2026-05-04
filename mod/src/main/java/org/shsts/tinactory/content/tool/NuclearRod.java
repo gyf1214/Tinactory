@@ -97,7 +97,7 @@ public class NuclearRod extends Item implements INuclearItem {
         }
     }
 
-    private ItemStack getDepleted() {
+    public ItemStack getDepleted() {
         if (depletedItem == null) {
             depletedItem = ITEMS.getEntry(properties.depletedItem).get();
         }
