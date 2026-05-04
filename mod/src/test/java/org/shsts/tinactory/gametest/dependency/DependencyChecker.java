@@ -666,14 +666,14 @@ public final class DependencyChecker {
         } catch (Exception e) {
             throw new IllegalStateException("Failed to write dependency checker report " + path, e);
         }
+        var message = "Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
+            " nodes unreachable: " + path;
+        if (missingTargets != ACCEPTED_UNREACHABLE_NODES) {
+            throw new IllegalStateException(message + " differs from accepted baseline " +
+                ACCEPTED_UNREACHABLE_NODES);
+        }
         if (missingTargets > 0) {
-            var message = "Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
-                " nodes unreachable: " + path;
             System.err.println(message);
-            if (missingTargets != ACCEPTED_UNREACHABLE_NODES) {
-                throw new IllegalStateException(message + " differs from accepted baseline " +
-                    ACCEPTED_UNREACHABLE_NODES);
-            }
         }
     }
 
