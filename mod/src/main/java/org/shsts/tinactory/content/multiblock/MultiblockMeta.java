@@ -25,6 +25,9 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
+import org.shsts.tinactory.integration.multiblock.BlockIngredient;
+import org.shsts.tinactory.integration.multiblock.BlockIngredient.BlockValue;
+import org.shsts.tinactory.integration.multiblock.BlockIngredient.TagValue;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -33,8 +36,14 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -63,9 +72,21 @@ public class MultiblockMeta extends MachineMeta {
         return AllTags.block(loc);
     }
 
+    private static void collectMandatorySymbols(Collection<String> rows, Consumer<Character> consumer) {
+        for (var row : rows) {
+            for (var i = 0; i < row.length(); i++) {
+                var ch = row.charAt(i);
+                if (ch != MultiblockSpec.IGNORED_CHAR && ch != MultiblockSpec.CENTER_CHAR) {
+                    consumer.accept(ch);
+                }
+            }
+        }
+    }
+
     private static class Executor extends MachineMeta.Executor {
         private final List<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
+        private final Set<BlockIngredient> structureIngredients = new LinkedHashSet<>();
 
         public Executor(ResourceLocation loc, JsonObject jo) {
             super(loc, jo);
@@ -166,13 +187,18 @@ public class MultiblockMeta extends MachineMeta {
             };
         }
 
-        private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je) {
+        private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je,
+            Consumer<Character> mandatorySymbolConsumer) {
             if (je.isJsonArray()) {
                 var ja = je.getAsJsonArray();
+                var rows = new ArrayList<String>();
+                for (var je1 : ja) {
+                    rows.add(GsonHelper.convertToString(je1, "rows"));
+                }
+                collectMandatorySymbols(rows, mandatorySymbolConsumer);
                 return builder -> {
                     var layer = builder.layer();
-                    for (var je1 : ja) {
-                        var line = GsonHelper.convertToString(je1, "rows");
+                    for (var line : rows) {
                         layer.row(line);
                     }
                     return layer.build();
@@ -193,10 +219,16 @@ public class MultiblockMeta extends MachineMeta {
                     throw new JsonSyntaxException("Except field height to be either number or string");
                 }
                 var ja2 = GsonHelper.getAsJsonArray(jo1, "rows");
+                var rows = new ArrayList<String>();
+                for (var je2 : ja2) {
+                    rows.add(GsonHelper.convertToString(je2, "rows"));
+                }
+                if (minHeight > 0) {
+                    collectMandatorySymbols(rows, mandatorySymbolConsumer);
+                }
                 return builder -> {
                     var layer = builder.layer().height(minHeight, maxHeight);
-                    for (var je2 : ja2) {
-                        var line = GsonHelper.convertToString(je2, "rows");
+                    for (var line : rows) {
                         layer.row(line);
                     }
                     return layer.build();
@@ -205,13 +237,16 @@ public class MultiblockMeta extends MachineMeta {
             throw new JsonSyntaxException("Except field layers to be either JsonArray or JsonObject");
         }
 
-        private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseDefine(Character ch, JsonElement je) {
+        private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseDefine(Character ch, JsonElement je,
+            Consumer<BlockIngredient> ingredientConsumer) {
             if (je.isJsonPrimitive() && je.getAsJsonPrimitive().isString()) {
                 var s = je.getAsString();
                 if (s.equals("air")) {
                     return $ -> $.check(ch, blockStateCheck(BlockState::isAir));
                 } else {
-                    return $ -> $.check(ch, block(BLOCKS.getEntry(new ResourceLocation(s)), false));
+                    var block = BLOCKS.getEntry(new ResourceLocation(s));
+                    ingredientConsumer.accept(BlockIngredient.of(block.get()));
+                    return $ -> $.check(ch, block(block, false));
                 }
             }
 
@@ -220,20 +255,24 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
+                    ingredientConsumer.accept(BlockIngredient.of(block.get()));
                     return $ -> $.check(ch, block(block, true));
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
+                    ingredientConsumer.accept(BlockIngredient.of(tag));
                     return $ -> $.check(ch, blockStateCheck(blockState -> blockState.is(tag)));
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
+                    ingredientConsumer.accept(BlockIngredient.of(tag));
                     return $ -> $.check(ch, tagWithSameBlock(key, tag));
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
+                    ingredientConsumer.accept(BlockIngredient.of(new BlockValue(block.get()), new TagValue(tag)));
                     return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
                 }
             }
@@ -242,16 +281,26 @@ public class MultiblockMeta extends MachineMeta {
 
         private <P> Multiblock.Builder<P> buildSpec(Multiblock.Builder<P> builder) {
             var spec = builder.spec();
+            Set<Character> mandatorySymbols = new LinkedHashSet<>();
+            Map<Character, BlockIngredient> ingredientsBySymbol = new LinkedHashMap<>();
 
             var ja1 = GsonHelper.getAsJsonArray(jo, "layers");
             for (var je : ja1) {
-                spec.transform(parseLayer(je));
+                spec.transform(parseLayer(je, mandatorySymbols::add));
             }
 
             var jo2 = GsonHelper.getAsJsonObject(jo, "defines");
             for (var entry : jo2.entrySet()) {
                 var ch = entry.getKey().charAt(0);
-                spec.transform(parseDefine(ch, entry.getValue()));
+                spec.transform(parseDefine(ch, entry.getValue(),
+                    ingredient -> ingredientsBySymbol.put(ch, ingredient)));
+            }
+
+            for (var ch : mandatorySymbols) {
+                var ingredient = ingredientsBySymbol.get(ch);
+                if (ingredient != null) {
+                    structureIngredients.add(ingredient);
+                }
             }
 
             return spec.build();
@@ -295,6 +344,12 @@ public class MultiblockMeta extends MachineMeta {
             CLEANROOM_PROPERTIES.put(id, properties);
 
             var jo1 = GsonHelper.getAsJsonObject(jo, "spec");
+            var baseBlock = getBlock(jo1, "base");
+            var ceilingBlock = getBlock(jo1, "ceiling");
+            var wallTag = getBlockTag(jo1, "wall");
+            structureIngredients.add(BlockIngredient.of(baseBlock.get()));
+            structureIngredients.add(BlockIngredient.of(ceilingBlock.get()));
+            structureIngredients.add(BlockIngredient.of(wallTag));
 
             var layout = parseLayout().buildLayout();
 
@@ -304,9 +359,9 @@ public class MultiblockMeta extends MachineMeta {
                 .layout(layout)
                 .appearanceBlock(getBlock(jo, "appearance"))
                 .spec(Cleanroom::spec)
-                .baseBlock(getBlock(jo1, "base"))
-                .ceilingBlock(getBlock(jo1, "ceiling"))
-                .wallTag(getBlockTag(jo1, "wall"))
+                .baseBlock(baseBlock)
+                .ceilingBlock(ceilingBlock)
+                .wallTag(wallTag)
                 .connectorTag(getBlockTag(jo1, "connector"))
                 .doorTag(getBlockTag(jo1, "door"))
                 .maxSize(GsonHelper.getAsInt(jo1, "maxSize"))
@@ -375,7 +430,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = buildBlock();
 
-            var set = new MultiblockSet(recipeTypes, block, List.of());
+            var set = new MultiblockSet(recipeTypes, block, List.copyOf(structureIngredients));
             MULTIBLOCK_SETS.put(id, set);
         }
     }
