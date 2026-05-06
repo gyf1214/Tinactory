@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.service;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -20,7 +21,9 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    private AutocraftPreviewResult previewResult = AutocraftPreviewResult.empty();
+    private AutocraftPreview previewResult = AutocraftPreview.empty();
+    @Nullable
+    private List<CraftAmount> previewTargets;
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
@@ -63,27 +66,25 @@ public class AutocraftTerminalService {
         return service.get().cancel(job.get().jobId());
     }
 
-    public AutocraftPreviewResult preview(IStackKey target, long quantity) {
+    public AutocraftPreview preview(IStackKey target, long quantity) {
         if (quantity <= 0L) {
-            previewResult = AutocraftPreviewResult.empty();
+            clearPreview();
             return previewResult;
         }
         var targets = List.of(new CraftAmount(target, quantity));
         var snapshot = planner.plan(targets);
         if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
-            previewResult = AutocraftPreviewResult.failure(snapshot.error(), snapshot.summary());
+            previewTargets = null;
+            previewResult = AutocraftPreview.failure(snapshot.error(), snapshot.summary());
             return previewResult;
         }
-        previewResult = AutocraftPreviewResult.success(new AutocraftPreview(
-            targets,
-            snapshot.plan(),
-            snapshot.summary()));
+        previewTargets = targets;
+        previewResult = AutocraftPreview.success(snapshot.plan(), snapshot.summary());
         return previewResult;
     }
 
     public AutocraftExecuteResult execute(UUID cpuId) {
-        var preview = previewResult.preview();
-        if (preview == null) {
+        if (!previewResult.isSuccess() || previewTargets == null || previewResult.planSnapshot() == null) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
         }
         var service = cpuRuntime.findVisibleService(cpuId);
@@ -93,20 +94,27 @@ public class AutocraftTerminalService {
         if (service.get().isBusy()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
         }
-        previewResult = AutocraftPreviewResult.empty();
-        return AutocraftExecuteResult.success(service.get().submitPrepared(preview.targets(), preview.planSnapshot()));
+        var targets = previewTargets;
+        var plan = previewResult.planSnapshot();
+        clearPreview();
+        return AutocraftExecuteResult.success(service.get().submitPrepared(targets, plan));
     }
 
     public void cancelPreview() {
-        previewResult = AutocraftPreviewResult.empty();
+        clearPreview();
     }
 
     public Optional<AutocraftPreview> preview() {
-        return Optional.ofNullable(previewResult.preview());
+        return previewResult.isSuccess() ? Optional.of(previewResult) : Optional.empty();
     }
 
-    public AutocraftPreviewResult previewResult() {
+    public AutocraftPreview previewResult() {
         return previewResult;
+    }
+
+    private void clearPreview() {
+        previewResult = AutocraftPreview.empty();
+        previewTargets = null;
     }
 
     private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {

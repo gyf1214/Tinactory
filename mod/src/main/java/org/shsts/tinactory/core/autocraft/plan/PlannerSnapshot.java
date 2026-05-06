@@ -1,14 +1,19 @@
 package org.shsts.tinactory.core.autocraft.plan;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.PlanningState;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record PlannerSnapshot(PlanningState state, CraftPlan plan, PlanError error, PlanSummary summary) {
+public record PlannerSnapshot(
+    PlanningState state,
+    @Nullable CraftPlan plan,
+    @Nullable PlanError error,
+    PlanSummary summary) {
     public static PlannerSnapshot running() {
-        return new PlannerSnapshot(PlanningState.RUNNING, null, PlanError.none(), PlanSummary.empty());
+        return new PlannerSnapshot(PlanningState.RUNNING, null, null, PlanSummary.empty());
     }
 
     public static PlannerSnapshot completed(CraftPlan plan) {
@@ -16,7 +21,7 @@ public record PlannerSnapshot(PlanningState state, CraftPlan plan, PlanError err
     }
 
     public static PlannerSnapshot completed(CraftPlan plan, PlanSummary summary) {
-        return new PlannerSnapshot(PlanningState.COMPLETED, plan, PlanError.none(), summary);
+        return new PlannerSnapshot(PlanningState.COMPLETED, plan, null, summary);
     }
 
     public static PlannerSnapshot failed(PlanError error, PlanSummary summary) {

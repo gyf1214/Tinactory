@@ -14,10 +14,6 @@ public record PlanError(Code code, @Nullable IStackKey targetKey, List<IStackKey
         cyclePath = List.copyOf(cyclePath);
     }
 
-    public static PlanError none() {
-        return new PlanError(Code.NONE, null, List.of());
-    }
-
     public static PlanError missingPattern(IStackKey key) {
         return new PlanError(Code.MISSING_PATTERN, key, List.of());
     }
@@ -31,7 +27,6 @@ public record PlanError(Code code, @Nullable IStackKey targetKey, List<IStackKey
     }
 
     public enum Code {
-        NONE,
         MISSING_PATTERN,
         UNSATISFIED_BASE_RESOURCE,
         CYCLE_DETECTED

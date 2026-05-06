@@ -8,7 +8,6 @@ import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
-import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
@@ -36,7 +35,7 @@ class IncrementalPlannerTest {
 
         assertEquals(PlanningState.RUNNING, progress.state());
         assertNull(progress.plan());
-        assertEquals(PlanError.none(), progress.error());
+        assertNull(progress.error());
         assertEquals(PlanSummary.empty(), progress.summary());
     }
 

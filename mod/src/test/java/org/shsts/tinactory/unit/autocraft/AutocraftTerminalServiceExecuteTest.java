@@ -84,6 +84,9 @@ class AutocraftTerminalServiceExecuteTest {
 
         assertTrue(execute.isSuccess());
         assertTrue(service.previewResult().isEmpty());
+        assertEquals(
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
+            jobService.getJob().get().targets());
         assertEquals(1, previewPlanner.calls);
         assertDoesNotThrow(jobService::tick);
     }

@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.core.autocraft.service.AutocraftPreview;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalServicePreviewTest {
@@ -35,10 +37,19 @@ class AutocraftTerminalServicePreviewTest {
 
         assertTrue(result.isSuccess());
         assertEquals(0, result.planSnapshot().steps().size());
-        assertEquals(3L, result.targets().get(0).amount());
-        assertEquals(PlanError.none(), result.error());
+        assertNull(result.error());
         assertEquals(StaticPlanner.SUMMARY, result.summary());
         assertEquals(StaticPlanner.SUMMARY, service.preview().get().summary());
+    }
+
+    @Test
+    void emptyPreviewShouldHaveNoPlanOrErrorAndAnEmptySummary() {
+        var preview = AutocraftPreview.empty();
+
+        assertTrue(preview.isEmpty());
+        assertNull(preview.planSnapshot());
+        assertNull(preview.error());
+        assertEquals(PlanSummary.empty(), preview.summary());
     }
 
     @Test
