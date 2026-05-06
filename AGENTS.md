@@ -13,10 +13,10 @@
 
 ## Unit Test
 
-- Unit Test only applies to `mod/src/main`.
-- Do not add unit test to `datagen` or `mod/src/test`.
+- Unit Test only applies to `api.*` and `core.*` under `mod/src/main`.
+- Never add unit test for `datagen` or `mod/src/test` itself, including `check.*` and `gametest.*`.
 - Never bootstrap Minecraft in a unit test.
-- Prefer not to add unit tests for `integration.*` and `content.*`.
+- Do not add unit tests for `integration.*` and `content.*`.
 - When unit test does not apply, use constrained TDD with compile/verification coverage unless the user explicitly asks
   for different test coverage.
 
