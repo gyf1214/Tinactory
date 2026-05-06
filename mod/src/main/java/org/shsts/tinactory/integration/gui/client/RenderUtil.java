@@ -351,7 +351,7 @@ public final class RenderUtil {
 
     public static void renderText(PoseStack poseStack, Component text, int x, int y, int color, float scale) {
         poseStack.pushPose();
-        poseStack.translate((double) x, (double) y, 0d);
+        poseStack.translate(x, y, 0d);
         poseStack.scale(scale, scale, 1f);
         ClientUtil.getFont().draw(poseStack, text, 0f, 0f, color);
         poseStack.popPose();
@@ -364,7 +364,7 @@ public final class RenderUtil {
     public static void renderText(PoseStack poseStack, FormattedCharSequence text, int x, int y, int color,
         float scale) {
         poseStack.pushPose();
-        poseStack.translate((double) x, (double) y, 0d);
+        poseStack.translate(x, y, 0d);
         poseStack.scale(scale, scale, 1f);
         ClientUtil.getFont().draw(poseStack, text, 0f, 0f, color);
         poseStack.popPose();

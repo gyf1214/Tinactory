@@ -24,6 +24,9 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
+    public static final int BUTTON_WIDTH = 64;
+
+    private final Tab tab;
     private final AutocraftCpuStatusPanel cpuStatusPanel;
     private final AutocraftPreviewPanel previewPanel;
 
@@ -32,30 +35,33 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         var requestPanel = new AutocraftRequestPanel(this);
         this.cpuStatusPanel = new AutocraftCpuStatusPanel(this);
         this.previewPanel = new AutocraftPreviewPanel(this);
-        var tabs = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
+        this.tab = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tab);
         rootPanel.addGroup(requestPanel);
         rootPanel.addGroup(cpuStatusPanel);
-        rootPanel.addGroup(Rect.corners(0, 56, 0, -88), previewPanel);
-        this.contentHeight = 180;
+        rootPanel.addGroup(previewPanel);
+        this.contentHeight = 144;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, requestPanel::updateRequestables);
         menu.onSyncPacket(CPU_STATUS_SYNC, this::onCpuStatusSync);
         menu.onSyncPacket(PREVIEW_SYNC, this::onPreviewSync);
 
-        previewPanel.setActive(false);
+        tab.onSelect(i -> previewPanel.setActive(i < 0));
+        tab.select(0);
     }
 
     public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.autocraft." + key, args);
     }
 
-    public void requestPreview() {}
+    public void executePreview() {
+        tab.select(1);
+    }
 
-    public void executePreview() {}
-
-    public void cancelPreview() {}
+    public void cancelPreview() {
+        tab.select(0);
+    }
 
     public void cancelCpuJob() {}
 
@@ -64,6 +70,10 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     private void onPreviewSync(AutocraftPreviewSyncPacket packet) {
+        if (packet.state() == AutocraftPreviewSyncPacket.PreviewState.EMPTY) {
+            return;
+        }
         previewPanel.onPreviewSync(packet);
+        tab.select(-1);
     }
 }

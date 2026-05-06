@@ -22,7 +22,7 @@ import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
-import org.shsts.tinactory.integration.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
@@ -228,8 +228,7 @@ public class TechPanel extends Panel {
         this.selectedTechDetailsLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
         label3.verticalAlign = Label.Alignment.MIDDLE;
-        this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
-            null, this::startResearch);
+        this.startResearchButton = new VanillaButton(menu, tr("startResearchButton"), null, this::startResearch);
         var y = 0;
         var offset7 = Rect.corners(0, y - BUTTON_HEIGHT, 0, y);
         y -= BUTTON_HEIGHT + MARGIN_VERTICAL;

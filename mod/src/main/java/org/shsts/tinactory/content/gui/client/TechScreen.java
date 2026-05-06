@@ -23,6 +23,7 @@ import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.Tab;
+import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class TechScreen extends MenuScreen<TechMenu> {
         var welcomeLabel = new Label(menu, tr("welcome"));
         welcomeLabel.horizontalAlign = Label.Alignment.END;
         this.welcomeEdit = Widgets.editBox();
-        var welcomeButton = Widgets.simpleButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
+        var welcomeButton = new VanillaButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
         welcomePanel.addChild(welcomeLabel);
         welcomePanel.addVanillaWidget(RectD.ZERO, new Rect(0, -1, 64, EDIT_HEIGHT), 0, welcomeEdit);
         welcomePanel.addChild(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
