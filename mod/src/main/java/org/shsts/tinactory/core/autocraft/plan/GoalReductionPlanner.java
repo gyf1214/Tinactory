@@ -57,7 +57,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlannerSnapshot.completed(buildPlan(session));
+                    session.result = PlannerSnapshot.completed(buildPlan(session), session.ledger.summary());
                     return session.result;
                 }
                 var target = session.targets.get(session.nextTargetIndex);
@@ -70,7 +70,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             return session.result;
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlannerSnapshot.completed(buildPlan(session));
+            session.result = PlannerSnapshot.completed(buildPlan(session), session.ledger.summary());
             return session.result;
         }
         return PlannerSnapshot.running();
@@ -125,7 +125,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         }
         var available = inventory.amountOf(key);
         session.cachedAvailable.put(key, available);
-        session.ledger.add(key, available);
+        session.ledger.observeInventory(key, available);
     }
 
     private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
@@ -167,7 +167,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private void runApplyPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
         var pattern = frame.candidates.get(frame.candidateIndex);
         for (var output : pattern.outputs()) {
-            session.ledger.add(output.key(), output.amount() * frame.runs);
+            session.ledger.recordCraftedOutput(output.key(), output.amount() * frame.runs);
         }
         var fulfilled = session.ledger.consume(frame.key, frame.remaining);
         session.steps.add(new CraftStep(

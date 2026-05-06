@@ -6,16 +6,24 @@ import org.shsts.tinactory.core.autocraft.api.PlanningState;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record PlannerSnapshot(PlanningState state, CraftPlan plan, PlanError error) {
+public record PlannerSnapshot(PlanningState state, CraftPlan plan, PlanError error, PlanSummary summary) {
     public static PlannerSnapshot running() {
-        return new PlannerSnapshot(PlanningState.RUNNING, null, PlanError.none());
+        return new PlannerSnapshot(PlanningState.RUNNING, null, PlanError.none(), PlanSummary.empty());
     }
 
     public static PlannerSnapshot completed(CraftPlan plan) {
-        return new PlannerSnapshot(PlanningState.COMPLETED, plan, PlanError.none());
+        return completed(plan, PlanSummary.empty());
+    }
+
+    public static PlannerSnapshot completed(CraftPlan plan, PlanSummary summary) {
+        return new PlannerSnapshot(PlanningState.COMPLETED, plan, PlanError.none(), summary);
     }
 
     public static PlannerSnapshot failed(PlanError error) {
-        return new PlannerSnapshot(PlanningState.FAILED, null, error);
+        return failed(error, PlanSummary.empty());
+    }
+
+    public static PlannerSnapshot failed(PlanError error, PlanSummary summary) {
+        return new PlannerSnapshot(PlanningState.FAILED, null, error, summary);
     }
 }

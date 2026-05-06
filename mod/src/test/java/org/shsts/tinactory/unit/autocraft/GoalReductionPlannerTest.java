@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
@@ -303,8 +304,47 @@ class GoalReductionPlannerTest {
         assertEquals(1, inventory.readCount(ore));
     }
 
+    @Test
+    void plannerShouldSummarizeSuccessfulInventoryAndCraftingAmounts() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
+
+        var makePlate = pattern(
+            "tinactory:plate_from_ore",
+            List.of(new CraftAmount(ore, 1)),
+            List.of(new CraftAmount(plate, 2)));
+        var makeGear = pattern(
+            "tinactory:gear_from_plate",
+            List.of(new CraftAmount(plate, 1)),
+            List.of(new CraftAmount(gear, 1)));
+        var planner = planner(
+            repo(List.of(makePlate, makeGear)),
+            List.of(new CraftAmount(ore, 1), new CraftAmount(plate, 1)));
+
+        var snapshot = planner.plan(List.of(new CraftAmount(gear, 1), new CraftAmount(plate, 1)));
+
+        assertEquals(PlanningState.COMPLETED, snapshot.state());
+        var summary = snapshot.summary();
+        assertEquals(3, summary.entries().size());
+        assertSummaryEntry(summary, ore, 1, 1, 0);
+        assertSummaryEntry(summary, plate, 1, 1, 2);
+        assertSummaryEntry(summary, gear, 0, 0, 1);
+    }
+
     private static GoalReductionPlanner planner(IPatternRepository repo, List<CraftAmount> available) {
         return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
+    }
+
+    private static void assertSummaryEntry(
+        PlanSummary summary,
+        IStackKey key,
+        long existingAmount,
+        long consumedFromInventory,
+        long craftedAmount) {
+        assertEquals(
+            new PlanSummary.Entry(existingAmount, consumedFromInventory, craftedAmount),
+            summary.entries().get(key));
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
