@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -14,10 +13,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-
-import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -106,14 +102,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     private static CompoundTag serializeError(PlanError error) {
         var tag = new CompoundTag();
         tag.putString("code", error.code().name());
-        if (error.targetKey() != null) {
-            tag.put("targetKey", encodeIngredientKey(error.targetKey()));
-        }
-        var cyclePath = new ListTag();
-        for (var key : error.cyclePath()) {
-            cyclePath.add(encodeIngredientKey(key));
-        }
-        tag.put("cyclePath", cyclePath);
+        tag.put("targetKey", encodeIngredientKey(error.targetKey()));
         return tag;
     }
 
@@ -122,15 +111,9 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         if (tag == null) {
             return null;
         }
-        var cyclePathTag = tag.getList("cyclePath", TAG_COMPOUND);
-        var cyclePath = new ArrayList<IStackKey>(cyclePathTag.size());
-        for (var i = 0; i < cyclePathTag.size(); i++) {
-            cyclePath.add(decodeIngredientKey(cyclePathTag.getCompound(i)));
-        }
-        var targetKey = tag.contains("targetKey", TAG_COMPOUND) ?
-            decodeIngredientKey(tag.getCompound("targetKey")) :
-            null;
-        return new PlanError(PlanError.Code.valueOf(tag.getString("code")), targetKey, cyclePath);
+        return new PlanError(
+            PlanError.Code.valueOf(tag.getString("code")),
+            decodeIngredientKey(tag.getCompound("targetKey")));
     }
 
     private static CompoundTag encodeIngredientKey(IStackKey key) {

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class GoalReductionPlannerErrorTest {
     @Test
@@ -33,13 +32,12 @@ class GoalReductionPlannerErrorTest {
 
         assertEquals(PlanningState.FAILED, snapshot.state());
         assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
-        assertNotNull(snapshot.error().cyclePath());
-        assertEquals(a, snapshot.error().cyclePath().get(0));
+        assertEquals(a, snapshot.error().targetKey());
         assertSummaryEntry(snapshot.summary(), a, 0, 1, 1);
     }
 
     @Test
-    void plannerShouldDetectIndirectCycleWithPath() {
+    void plannerShouldReportIndirectCycleCauseKey() {
         var a = TestStackKey.item("tinactory:a", "");
         var b = TestStackKey.item("tinactory:b", "");
         var c = TestStackKey.item("tinactory:c", "");
@@ -53,7 +51,7 @@ class GoalReductionPlannerErrorTest {
 
         assertEquals(PlanningState.FAILED, snapshot.state());
         assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
-        assertEquals(List.of(a, b, c, a), snapshot.error().cyclePath());
+        assertEquals(a, snapshot.error().targetKey());
     }
 
     @Test

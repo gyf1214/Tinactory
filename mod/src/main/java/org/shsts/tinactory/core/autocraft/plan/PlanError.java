@@ -1,29 +1,22 @@
 package org.shsts.tinactory.core.autocraft.plan;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
 
-import java.util.List;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record PlanError(Code code, @Nullable IStackKey targetKey, List<IStackKey> cyclePath) {
-    public PlanError {
-        cyclePath = List.copyOf(cyclePath);
-    }
-
+public record PlanError(Code code, IStackKey targetKey) {
     public static PlanError missingPattern(IStackKey key) {
-        return new PlanError(Code.MISSING_PATTERN, key, List.of());
+        return new PlanError(Code.MISSING_PATTERN, key);
     }
 
     public static PlanError unsatisfiedBaseResource(IStackKey key) {
-        return new PlanError(Code.UNSATISFIED_BASE_RESOURCE, key, List.of());
+        return new PlanError(Code.UNSATISFIED_BASE_RESOURCE, key);
     }
 
-    public static PlanError cycleDetected(List<IStackKey> cyclePath) {
-        return new PlanError(Code.CYCLE_DETECTED, null, cyclePath);
+    public static PlanError cycleDetected(IStackKey key) {
+        return new PlanError(Code.CYCLE_DETECTED, key);
     }
 
     public enum Code {

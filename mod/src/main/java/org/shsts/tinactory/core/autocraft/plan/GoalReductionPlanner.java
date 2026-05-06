@@ -235,11 +235,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         var current = stack.get(stack.size() - 1);
         for (var i = 0; i < stack.size() - 1; i++) {
             if (stack.get(i).key.equals(current.key)) {
-                var cyclePath = new ArrayList<IStackKey>();
-                for (var j = i; j < stack.size(); j++) {
-                    cyclePath.add(stack.get(j).key);
-                }
-                return PlanError.cycleDetected(cyclePath);
+                return PlanError.cycleDetected(current.key);
             }
         }
         return null;
