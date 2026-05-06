@@ -42,7 +42,6 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     public void init(Rect rect) {
-        initPanel();
         setRect(rect);
         attach(screen);
     }
@@ -61,8 +60,6 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     protected void doRefresh() {}
-
-    protected void initPanel() {}
 
     @Override
     public void setRect(Rect rect) {
