@@ -25,10 +25,6 @@ public record AutocraftPreviewResult(
         return new AutocraftPreviewResult(preview, PlanError.none(), preview.summary());
     }
 
-    public static AutocraftPreviewResult failure(PlanError error) {
-        return failure(error, PlanSummary.empty());
-    }
-
     public static AutocraftPreviewResult failure(PlanError error, PlanSummary summary) {
         return new AutocraftPreviewResult(null, error, summary);
     }

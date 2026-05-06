@@ -97,12 +97,12 @@ public final class PlannerLedger {
         for (var item : summary.entrySet()) {
             var entry = item.getValue();
             if (entry.existingAmount() != 0L ||
-                    entry.consumedFromInventory() != 0L ||
-                    entry.craftedAmount() != 0L) {
+                entry.consumedFromInventory() != 0L ||
+                entry.craftedAmount() != 0L) {
                 entries.put(item.getKey(), entry);
             }
         }
-        return PlanSummary.copyOf(entries);
+        return new PlanSummary(entries);
     }
 
     private PlanSummary.Entry entryOf(IStackKey key) {

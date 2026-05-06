@@ -19,10 +19,6 @@ public record PlannerSnapshot(PlanningState state, CraftPlan plan, PlanError err
         return new PlannerSnapshot(PlanningState.COMPLETED, plan, PlanError.none(), summary);
     }
 
-    public static PlannerSnapshot failed(PlanError error) {
-        return failed(error, PlanSummary.empty());
-    }
-
     public static PlannerSnapshot failed(PlanError error, PlanSummary summary) {
         return new PlannerSnapshot(PlanningState.FAILED, null, error, summary);
     }
