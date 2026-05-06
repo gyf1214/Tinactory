@@ -100,10 +100,6 @@ public class AutocraftTerminalService {
         return AutocraftExecuteResult.success(service.get().submitPrepared(targets, plan));
     }
 
-    public void cancelPreview() {
-        clearPreview();
-    }
-
     public Optional<AutocraftPreview> preview() {
         return previewResult.isSuccess() ? Optional.of(previewResult) : Optional.empty();
     }

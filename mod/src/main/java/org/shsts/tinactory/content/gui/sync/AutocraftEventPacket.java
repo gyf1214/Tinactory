@@ -18,8 +18,7 @@ public class AutocraftEventPacket implements IPacket {
     public enum Action {
         PREVIEW,
         EXECUTE,
-        CANCEL,
-        CANCEL_CPU
+        CANCEL
     }
 
     private Action action;
@@ -51,12 +50,8 @@ public class AutocraftEventPacket implements IPacket {
         return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
     }
 
-    public static AutocraftEventPacket cancel() {
-        return new AutocraftEventPacket(Action.CANCEL, null, 0L, null);
-    }
-
-    public static AutocraftEventPacket cancelCpu(UUID cpuId) {
-        return new AutocraftEventPacket(Action.CANCEL_CPU, null, 0L, cpuId);
+    public static AutocraftEventPacket cancel(UUID cpuId) {
+        return new AutocraftEventPacket(Action.CANCEL, null, 0L, cpuId);
     }
 
     public Action action() {

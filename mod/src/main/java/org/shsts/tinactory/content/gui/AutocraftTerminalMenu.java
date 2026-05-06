@@ -23,9 +23,9 @@ import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvi
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftTerminalMenu extends MenuBase {
-    public static final String REQUESTABLES_SYNC = "autocraftTerminalRequestables";
-    public static final String CPU_STATUS_SYNC = "autocraftTerminalCpuStatuses";
-    public static final String PREVIEW_SYNC = "autocraftTerminalPreview";
+    public static final String REQUESTABLES_SYNC = "requestables";
+    public static final String CPU_STATUS_SYNC = "cpuStatus";
+    public static final String PREVIEW_SYNC = "preview";
 
     private final IMachine machine;
     @Nullable
@@ -71,25 +71,18 @@ public class AutocraftTerminalMenu extends MenuBase {
         if (service == null) {
             return;
         }
-        if (packet.action() == AutocraftEventPacket.Action.PREVIEW &&
-            packet.target() != null) {
+        if (packet.action() == AutocraftEventPacket.Action.PREVIEW && packet.target() != null) {
             service.preview(packet.target(), packet.quantity());
             previewScheduler.invokeUpdate();
             return;
         }
-        if (packet.action() == AutocraftEventPacket.Action.EXECUTE &&
-            packet.cpuId() != null) {
+        if (packet.action() == AutocraftEventPacket.Action.EXECUTE && packet.cpuId() != null) {
             if (service.execute(packet.cpuId()).isSuccess()) {
                 previewScheduler.invokeUpdate();
             }
             return;
         }
-        if (packet.action() == AutocraftEventPacket.Action.CANCEL) {
-            service.cancelPreview();
-            previewScheduler.invokeUpdate();
-            return;
-        }
-        if (packet.action() == AutocraftEventPacket.Action.CANCEL_CPU && packet.cpuId() != null) {
+        if (packet.action() == AutocraftEventPacket.Action.CANCEL && packet.cpuId() != null) {
             service.cancelCpu(packet.cpuId());
         }
     }
