@@ -103,6 +103,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         }
         var cycleError = detectCycle(session.searchStack);
         if (cycleError != null) {
+            session.ledger.recordUnsatisfiedInventoryDemand(frame.key, frame.remaining);
             popFailure(session, cycleError);
             return;
         }
@@ -111,10 +112,12 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             var error = frame.rootDemand ?
                 PlanError.missingPattern(frame.key) :
                 PlanError.unsatisfiedBaseResource(frame.key);
+            session.ledger.recordUnsatisfiedInventoryDemand(frame.key, frame.remaining);
             popFailure(session, error);
             return;
         }
         frame.firstError = null;
+        frame.errorSummary = null;
         frame.candidateIndex = 0;
         frame.stage = PlannerSession.Stage.SELECT_PATTERN;
     }
@@ -131,7 +134,8 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
         if (frame.candidateIndex >= frame.candidates.size()) {
             var error = frame.firstError == null ? PlanError.unsatisfiedBaseResource(frame.key) : frame.firstError;
-            popFailure(session, error);
+            var summary = frame.errorSummary == null ? session.ledger.summary() : frame.errorSummary;
+            popFailure(session, error, summary);
             return;
         }
         frame.ledgerSnapshot = session.ledger.copy();
@@ -140,6 +144,11 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         frame.runs = 1L;
         frame.inputIndex = 0;
         frame.childError = null;
+        frame.childErrorSummary = null;
+        var pattern = frame.candidates.get(frame.candidateIndex);
+        for (var output : pattern.outputs()) {
+            session.ledger.recordCraftedAmount(output.key(), output.amount() * frame.runs);
+        }
         frame.stage = PlannerSession.Stage.REDUCE_INPUTS;
     }
 
@@ -147,9 +156,13 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         if (frame.childError != null) {
             if (frame.firstError == null) {
                 frame.firstError = frame.childError;
+                frame.errorSummary = frame.childErrorSummary == null ?
+                    session.ledger.summary() :
+                    frame.childErrorSummary;
             }
             rollbackCandidate(session, frame);
             frame.childError = null;
+            frame.childErrorSummary = null;
             frame.candidateIndex++;
             frame.stage = PlannerSession.Stage.SELECT_PATTERN;
             return;
@@ -167,7 +180,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     private void runApplyPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
         var pattern = frame.candidates.get(frame.candidateIndex);
         for (var output : pattern.outputs()) {
-            session.ledger.recordCraftedOutput(output.key(), output.amount() * frame.runs);
+            session.ledger.addCraftedStock(output.key(), output.amount() * frame.runs);
         }
         var fulfilled = session.ledger.consume(frame.key, frame.remaining);
         session.steps.add(new CraftStep(
@@ -203,13 +216,18 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     private void popFailure(PlannerSession session, PlanError error) {
+        popFailure(session, error, session.ledger.summary());
+    }
+
+    private void popFailure(PlannerSession session, PlanError error, PlanSummary summary) {
         session.searchStack.remove(session.searchStack.size() - 1);
         if (session.searchStack.isEmpty()) {
-            session.result = PlannerSnapshot.failed(error);
+            session.result = PlannerSnapshot.failed(error, summary);
             return;
         }
         var parent = peekFrame(session);
         parent.childError = error;
+        parent.childErrorSummary = summary;
     }
 
     @Nullable

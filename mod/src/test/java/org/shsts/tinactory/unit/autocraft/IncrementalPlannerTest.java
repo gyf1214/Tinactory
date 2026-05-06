@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
@@ -36,6 +37,7 @@ class IncrementalPlannerTest {
         assertEquals(PlanningState.RUNNING, progress.state());
         assertNull(progress.plan());
         assertEquals(PlanError.none(), progress.error());
+        assertEquals(PlanSummary.empty(), progress.summary());
     }
 
     @Test
@@ -59,6 +61,7 @@ class IncrementalPlannerTest {
         var progress = runUntilTerminal(planner, session, 64);
 
         assertEquals(PlanningState.RUNNING, first.state());
+        assertEquals(PlanSummary.empty(), first.summary());
         assertEquals(PlanningState.COMPLETED, progress.state());
         assertNotNull(progress.plan());
         var plannedPlateIntermediate = progress.plan().steps().stream()
@@ -75,9 +78,9 @@ class IncrementalPlannerTest {
             .sum();
         assertEquals(1L, plannedPlateIntermediate);
         assertEquals(1L, plannedPlateFinal);
-        assertEquals(
-            planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1))).plan(),
-            progress.plan());
+        var sync = planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)));
+        assertEquals(sync.plan(), progress.plan());
+        assertEquals(sync.summary(), progress.summary());
     }
 
     @Test
@@ -91,6 +94,7 @@ class IncrementalPlannerTest {
 
         assertEquals(PlanningState.FAILED, progress.state());
         assertEquals(sync.error(), progress.error());
+        assertEquals(sync.summary(), progress.summary());
     }
 
     @Test
@@ -143,6 +147,7 @@ class IncrementalPlannerTest {
         var progress = runUntilTerminal(planner, session, 64);
 
         assertEquals(PlanningState.RUNNING, first.state());
+        assertEquals(PlanSummary.empty(), first.summary());
         assertEquals(PlanningState.COMPLETED, progress.state());
         assertNotNull(progress.plan());
         assertEquals(

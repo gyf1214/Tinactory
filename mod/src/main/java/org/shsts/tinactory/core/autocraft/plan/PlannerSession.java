@@ -51,7 +51,11 @@ public final class PlannerSession {
         @Nullable
         PlanError firstError;
         @Nullable
+        PlanSummary errorSummary;
+        @Nullable
         PlanError childError;
+        @Nullable
+        PlanSummary childErrorSummary;
         Stage stage;
 
         SearchFrame(IStackKey key, long demand, boolean rootDemand) {
@@ -67,7 +71,9 @@ public final class PlannerSession {
             this.stepCountSnapshot = 0;
             this.stepIdSnapshot = 1L;
             this.firstError = null;
+            this.errorSummary = null;
             this.childError = null;
+            this.childErrorSummary = null;
             this.stage = Stage.START;
         }
     }

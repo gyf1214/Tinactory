@@ -47,16 +47,22 @@ public final class PlannerLedger {
             entry.craftedAmount()));
     }
 
-    public void recordCraftedOutput(IStackKey key, long amount) {
+    public void recordCraftedAmount(IStackKey key, long amount) {
         if (amount <= 0L) {
             return;
         }
-        craftedStock.merge(key, amount, Long::sum);
         var entry = entryOf(key);
         summary.put(key, new PlanSummary.Entry(
             entry.existingAmount(),
             entry.consumedFromInventory(),
             entry.craftedAmount() + amount));
+    }
+
+    public void addCraftedStock(IStackKey key, long amount) {
+        if (amount <= 0L) {
+            return;
+        }
+        craftedStock.merge(key, amount, Long::sum);
     }
 
     public void recordUnsatisfiedInventoryDemand(IStackKey key, long amount) {
