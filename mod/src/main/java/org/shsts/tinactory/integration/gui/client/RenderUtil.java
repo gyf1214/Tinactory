@@ -193,6 +193,7 @@ public final class RenderUtil {
         var poseStack1 = RenderSystem.getModelViewStack();
         poseStack1.pushPose();
         poseStack1.mulPoseMatrix(poseStack.last().pose());
+        RenderSystem.applyModelViewMatrix();
         return poseStack1;
     }
 
@@ -278,7 +279,9 @@ public final class RenderUtil {
     }
 
     public static void renderGhostItem(PoseStack poseStack, ItemStack stack, int x, int y) {
+        var poseStack1 = applyToModelViewStack(poseStack);
         ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
+        popModelViewStack(poseStack1);
         RenderSystem.depthFunc(516);
         RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0xAA8B8B8B);
         RenderSystem.depthFunc(515);
