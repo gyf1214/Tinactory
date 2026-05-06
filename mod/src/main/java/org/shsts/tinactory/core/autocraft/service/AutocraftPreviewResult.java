@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 
 import java.util.List;
 
@@ -13,18 +14,23 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public record AutocraftPreviewResult(
     @Nullable AutocraftPreview preview,
-    PlanError error) {
+    PlanError error,
+    PlanSummary summary) {
 
     public static AutocraftPreviewResult empty() {
-        return new AutocraftPreviewResult(null, PlanError.none());
+        return new AutocraftPreviewResult(null, PlanError.none(), PlanSummary.empty());
     }
 
     public static AutocraftPreviewResult success(AutocraftPreview preview) {
-        return new AutocraftPreviewResult(preview, PlanError.none());
+        return new AutocraftPreviewResult(preview, PlanError.none(), preview.summary());
     }
 
     public static AutocraftPreviewResult failure(PlanError error) {
-        return new AutocraftPreviewResult(null, error);
+        return failure(error, PlanSummary.empty());
+    }
+
+    public static AutocraftPreviewResult failure(PlanError error, PlanSummary summary) {
+        return new AutocraftPreviewResult(null, error, summary);
     }
 
     public boolean isSuccess() {

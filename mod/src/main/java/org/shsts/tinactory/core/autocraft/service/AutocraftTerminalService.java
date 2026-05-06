@@ -71,10 +71,13 @@ public class AutocraftTerminalService {
         var targets = List.of(new CraftAmount(target, quantity));
         var snapshot = planner.plan(targets);
         if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
-            previewResult = AutocraftPreviewResult.failure(snapshot.error());
+            previewResult = AutocraftPreviewResult.failure(snapshot.error(), snapshot.summary());
             return previewResult;
         }
-        previewResult = AutocraftPreviewResult.success(new AutocraftPreview(targets, snapshot.plan()));
+        previewResult = AutocraftPreviewResult.success(new AutocraftPreview(
+            targets,
+            snapshot.plan(),
+            snapshot.summary()));
         return previewResult;
     }
 

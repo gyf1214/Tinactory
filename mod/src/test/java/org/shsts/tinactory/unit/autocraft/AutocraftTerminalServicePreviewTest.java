@@ -9,11 +9,13 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,13 +37,16 @@ class AutocraftTerminalServicePreviewTest {
         assertEquals(0, result.planSnapshot().steps().size());
         assertEquals(3L, result.targets().get(0).amount());
         assertEquals(PlanError.none(), result.error());
+        assertEquals(StaticPlanner.SUMMARY, result.summary());
+        assertEquals(StaticPlanner.SUMMARY, service.preview().get().summary());
     }
 
     @Test
     void previewShouldReturnStructuredPlanError() {
         var missing = TestStackKey.item("minecraft:iron_ingot", "");
+        var summary = new PlanSummary(Map.of(missing, new PlanSummary.Entry(0, 3, 0)));
         var service = new AutocraftTerminalService(
-            targets -> PlannerSnapshot.failed(PlanError.missingPattern(missing)),
+            targets -> PlannerSnapshot.failed(PlanError.missingPattern(missing), summary),
             new PatternRegistryCache(),
             new TestCpuRuntime());
 
@@ -50,12 +55,17 @@ class AutocraftTerminalServicePreviewTest {
         assertTrue(!result.isSuccess());
         assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
         assertEquals(missing, result.error().targetKey());
+        assertEquals(summary, result.summary());
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
+        private static final PlanSummary SUMMARY = new PlanSummary(Map.of(
+            TestStackKey.item("minecraft:iron_ingot", ""),
+            new PlanSummary.Entry(4, 3, 0)));
+
         @Override
         public PlannerSnapshot plan(List<CraftAmount> targets) {
-            return PlannerSnapshot.completed(new CraftPlan(List.of()));
+            return PlannerSnapshot.completed(new CraftPlan(List.of()), SUMMARY);
         }
     }
 
