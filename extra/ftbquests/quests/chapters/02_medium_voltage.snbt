@@ -2,7 +2,7 @@
 	id: "7F7BFA5025452CE4"
 	group: ""
 	order_index: 2
-	filename: "7F7BFA5025452CE4"
+	filename: "02_medium_voltage"
 	title: "化工与电子交织"
 	icon: "tinactory:material/sheet/polyethylene"
 	subtitle: ["从中压起步，建造蒸馏塔与真空冷冻机，迈向化工时代；在超净间中刻蚀CPU晶圆，完成第一块CPU电路板。"]

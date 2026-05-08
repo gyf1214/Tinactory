@@ -2,7 +2,7 @@
 	id: "021730EB05578B09"
 	group: "5D26E55DB14C5F98"
 	order_index: 2
-	filename: "021730EB05578B09"
+	filename: "logistics"
 	title: "物流"
 	icon: "tinactory:component/hv/conveyor_module"
 	default_quest_shape: ""

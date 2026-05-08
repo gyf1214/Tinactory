@@ -2,7 +2,7 @@
 	id: "18A01183DF6A59D0"
 	group: "5D26E55DB14C5F98"
 	order_index: 1
-	filename: "18A01183DF6A59D0"
+	filename: "power_generation"
 	title: "发电方式"
 	icon: "tinactory:chip/low_pic"
 	default_quest_shape: ""
