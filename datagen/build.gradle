@@ -52,3 +52,21 @@ compileKotlin {
         jvmTarget = "21"
     }
 }
+
+tasks.register('extractQuestLanguage', JavaExec) {
+    group = 'tinactory'
+    description = 'Extract FTB Quests chapter text into language metadata.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
+    workingDir = rootProject.projectDir
+    args 'extract'
+}
+
+tasks.register('checkQuestLanguage', JavaExec) {
+    group = 'verification'
+    description = 'Check FTB Quests chapter text language metadata synchronization.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
+    workingDir = rootProject.projectDir
+    args 'check'
+}
