@@ -41,6 +41,12 @@ dependencies {
 
     // extra resources
     compileOnly rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
+
+    // FTB Quests SNBT
+    compileOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
+    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
+    compileOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
+    runtimeOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
 }
 
 compileKotlin {

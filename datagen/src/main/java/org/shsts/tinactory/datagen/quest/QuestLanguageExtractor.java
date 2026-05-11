@@ -4,15 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import dev.ftb.mods.ftblibrary.snbt.SNBT;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.SnbtPrinterTagVisitor;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagParser;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -63,7 +61,7 @@ public final class QuestLanguageExtractor {
         extractor.run();
     }
 
-    private void run() throws IOException, CommandSyntaxException {
+    private void run() throws IOException {
         var chapters = listChapters();
         for (var chapterPath : chapters) {
             processChapter(chapterPath);
@@ -87,11 +85,11 @@ public final class QuestLanguageExtractor {
         }
     }
 
-    private void processChapter(Path path) throws IOException, CommandSyntaxException {
+    private void processChapter(Path path) throws IOException {
         var fileName = path.getFileName().toString();
         var chapter = fileName.substring(0, fileName.length() - ".snbt".length());
         var rootKey = "tinactory.quests." + chapter;
-        var tag = TagParser.parseTag(normalizeSnbt(Files.readString(path, StandardCharsets.UTF_8)));
+        var tag = readSnbt(path);
         processString(tag, "title", rootKey + ".title");
         processStringOrList(tag, "subtitle", rootKey + ".subtitle");
         if (tag.contains("quests", Tag.TAG_LIST)) {
@@ -101,7 +99,7 @@ public final class QuestLanguageExtractor {
             }
         }
         if (write) {
-            Files.writeString(path, prettySnbt(tag) + "\n", StandardCharsets.UTF_8);
+            writeSnbt(path, tag);
         }
     }
 
@@ -222,47 +220,18 @@ public final class QuestLanguageExtractor {
         }
     }
 
-    private static String normalizeSnbt(String snbt) {
-        snbt = snbt.replaceAll("list<[^>]+>\\[[0-9]+] ", "");
-        var lines = snbt.split("\\R", -1);
-        var ret = new StringBuilder();
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            ret.append(line);
-            if (needsComma(line, nextNonBlank(lines, i + 1))) {
-                ret.append(",");
-            }
-            if (i + 1 < lines.length) {
-                ret.append("\n");
-            }
+    private static CompoundTag readSnbt(Path path) throws IOException {
+        var tag = SNBT.read(path);
+        if (tag == null) {
+            throw new IOException("Failed to read FTB Quests SNBT: " + path);
         }
-        return ret.toString();
+        return tag;
     }
 
-    private static String nextNonBlank(String[] lines, int start) {
-        for (var i = start; i < lines.length; i++) {
-            var trimmed = lines[i].trim();
-            if (!trimmed.isEmpty()) {
-                return trimmed;
-            }
+    private static void writeSnbt(Path path, CompoundTag tag) throws IOException {
+        if (!SNBT.write(path, tag)) {
+            throw new IOException("Failed to write FTB Quests SNBT: " + path);
         }
-        return "";
-    }
-
-    private static boolean needsComma(String line, String next) {
-        var trimmed = line.trim();
-        if (trimmed.isEmpty() || next.isEmpty()) {
-            return false;
-        }
-        var last = trimmed.charAt(trimmed.length() - 1);
-        if (last == ',' || last == '{' || last == '[' || next.charAt(0) == '}' || next.charAt(0) == ']') {
-            return false;
-        }
-        return true;
-    }
-
-    private static String prettySnbt(Tag tag) {
-        return new SnbtPrinterTagVisitor().visit(tag);
     }
 
     private static void writeLanguage(String locale, JsonObject jo) throws IOException {
