@@ -11,10 +11,6 @@ minecraft {
             ideaModule rootProject.name + "." + project.name + ".main"
 
             mods {
-                tinactory {
-                    source project(':mod').sourceSets.main
-                }
-
                 tinactory_datagen {
                     source sourceSets.main
                 }
