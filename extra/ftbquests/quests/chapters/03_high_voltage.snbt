@@ -3,7 +3,7 @@
     default_quest_shape: "",
     filename: "03_high_voltage",
     group: "5D26E55DB14C5F98",
-    icon: "tinactory:component/mixed_metal_ingot",
+    icon: "tinactory:component/advanced_alloy",
     id: "16E428B6C103B73D",
     order_index: 0,
     quest_links: [],
@@ -14,8 +14,14 @@
                 "0540D3B8052B479D",
                 "0623B327BA00512F"
             ],
+            description: [
+                "{tinactory.quests.03_high_voltage.000.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.000.description.1}"
+            ],
             icon: "tinactory:component/hv/machine_hull",
             id: "21D9FC2113E23F69",
+            subtitle: "{tinactory.quests.03_high_voltage.000.subtitle}",
             tasks: [
                 {
                     id: "7B7657EE71111FFB",
@@ -28,16 +34,46 @@
                     type: "item"
                 }
             ],
+            title: "{tinactory.quests.03_high_voltage.000.title}",
             x: 0.0d,
             y: 0.0d
+        },
+        {
+            dependencies: [
+                "21D9FC2113E23F69"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.001.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.001.description.1}"
+            ],
+            icon: "tinactory:network/hv/transformer",
+            id: "8FCAD3D5BA236EFF",
+            subtitle: "{tinactory.quests.03_high_voltage.001.subtitle}",
+            tasks: [
+                {
+                    id: "819C1FE0D19BBE45",
+                    item: "tinactory:network/hv/transformer",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.001.title}",
+            x: 2.0d,
+            y: -1.5d
         },
         {
             dependencies: [
                 "21D9FC2113E23F69",
                 "16072DE55220A84E"
             ],
+            description: [
+                "{tinactory.quests.03_high_voltage.002.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.002.description.1}"
+            ],
+            icon: "tinactory:machine/hv/arc_furnace",
             id: "7F321A366176BDA1",
-            size: 2.0d,
+            subtitle: "{tinactory.quests.03_high_voltage.002.subtitle}",
             tasks: [
                 {
                     id: "643382A79DD56C25",
@@ -45,8 +81,400 @@
                     type: "item"
                 }
             ],
-            x: -4.0d,
+            title: "{tinactory.quests.03_high_voltage.002.title}",
+            x: -3.0d,
             y: 0.0d
+        },
+        {
+            dependencies: [
+                "21D9FC2113E23F69"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.003.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.003.description.1}"
+            ],
+            id: "983B183361BD47C3",
+            shape: "pentagon",
+            subtitle: "{tinactory.quests.03_high_voltage.003.subtitle}",
+            tasks: [
+                {
+                    id: "D98272110F8B7B64",
+                    title: "{tinactory.quests.03_high_voltage.003.title}",
+                    type: "checkmark"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.003.title}",
+            x: 0.0d,
+            y: 2.0d
+        },
+        {
+            dependencies: [
+                "983B183361BD47C3",
+                "7F321A366176BDA1"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.004.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.004.description.1}"
+            ],
+            icon: "tinactory:material/ingot/chrome",
+            id: "C3F313BE1445D18F",
+            subtitle: "{tinactory.quests.03_high_voltage.004.subtitle}",
+            tasks: [
+                {
+                    id: "E5FEA8997E767F42",
+                    item: "tinactory:material/ingot/chrome",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.004.title}",
+            x: -4.0d,
+            y: 2.5d
+        },
+        {
+            dependencies: [
+                "983B183361BD47C3"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.005.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.005.description.1}"
+            ],
+            icon: "tinactory:material/sheet/polytetrafluoro_ethylene",
+            id: "0C217200FF9702E5",
+            subtitle: "{tinactory.quests.03_high_voltage.005.subtitle}",
+            tasks: [
+                {
+                    id: "C211DAAD2817E519",
+                    item: "tinactory:material/sheet/polytetrafluoro_ethylene",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.005.title}",
+            x: 1.5d,
+            y: 4.0d
+        },
+        {
+            dependencies: [
+                "0C217200FF9702E5",
+                "C3F313BE1445D18F"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.006.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.006.description.1}"
+            ],
+            icon: "tinactory:multiblock/large_chemical_reactor",
+            id: "81253C8F9710CB0E",
+            subtitle: "{tinactory.quests.03_high_voltage.006.subtitle}",
+            tasks: [
+                {
+                    id: "9B0CAA2EF36765C7",
+                    item: "tinactory:multiblock/large_chemical_reactor",
+                    type: "item"
+                },
+                {
+                    id: "DE4E1E5C53511FFA",
+                    item: "tinactory:multiblock/solid/inert_ptfe",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.006.title}",
+            x: 1.5d,
+            y: 6.0d
+        },
+        {
+            dependencies: [
+                "81253C8F9710CB0E"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.007.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.007.description.1}"
+            ],
+            icon: "tinactory:material/ingot/titanium",
+            id: "DC091A76AA1D6BE4",
+            subtitle: "{tinactory.quests.03_high_voltage.007.subtitle}",
+            tasks: [
+                {
+                    id: "EA6EE55FFD9878D0",
+                    item: "tinactory:material/ingot/titanium",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.007.title}",
+            x: 4.0d,
+            y: 6.0d
+        },
+        {
+            dependencies: [
+                "21D9FC2113E23F69",
+                "983B183361BD47C3"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.008.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.008.description.1}"
+            ],
+            icon: "tinactory:circuit_component/resistor/smd",
+            id: "50DAEA8D4E5101D2",
+            subtitle: "{tinactory.quests.03_high_voltage.008.subtitle}",
+            tasks: [
+                {
+                    id: "E8A3958DAF0DABCC",
+                    item: "tinactory:circuit_component/resistor/smd",
+                    type: "item"
+                },
+                {
+                    id: "CB5F49C703F0564F",
+                    item: "tinactory:circuit_component/transistor/smd",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.008.title}",
+            x: 4.0d,
+            y: 1.5d
+        },
+        {
+            dependencies: [
+                "50DAEA8D4E5101D2",
+                "509698D71CF37F3F"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.009.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.009.description.1}"
+            ],
+            icon: "tinactory:chip/nano_cpu",
+            id: "26BE0999A791EA18",
+            subtitle: "{tinactory.quests.03_high_voltage.009.subtitle}",
+            tasks: [
+                {
+                    id: "BCBE6CD1809EEFD7",
+                    item: "tinactory:chip/nano_cpu",
+                    type: "item"
+                },
+                {
+                    id: "8C847168BB0B13A6",
+                    item: "tinactory:chip/nor",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.009.title}",
+            x: 5.5d,
+            y: 3.5d
+        },
+        {
+            dependencies: [
+                "26BE0999A791EA18"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.010.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.010.description.1}"
+            ],
+            icon: "tinactory:circuit/nano_assembly",
+            id: "674DEB575AFFDE92",
+            subtitle: "{tinactory.quests.03_high_voltage.010.subtitle}",
+            tasks: [
+                {
+                    id: "0199B889B3741E68",
+                    item: "tinactory:circuit/nano_assembly",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.010.title}",
+            x: 7.5d,
+            y: 3.5d
+        },
+        {
+            dependencies: [
+                "983B183361BD47C3",
+                "509698D71CF37F3F",
+                "674DEB575AFFDE92"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.011.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.011.description.1}"
+            ],
+            icon: "tinactory:material/gem/certus_quartz",
+            id: "DEE13B34D43B0740",
+            subtitle: "{tinactory.quests.03_high_voltage.011.subtitle}",
+            tasks: [
+                {
+                    id: "F0BE345AC2B680E9",
+                    item: "tinactory:material/gem/certus_quartz",
+                    type: "item"
+                },
+                {
+                    id: "2D2644977C7CFF14",
+                    item: "tinactory:material/gem/fluix",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.011.title}",
+            x: 4.0d,
+            y: -1.0d
+        },
+        {
+            dependencies: [
+                "983B183361BD47C3"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.012.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.012.description.1}"
+            ],
+            icon: "minecraft:tnt",
+            id: "88843692A73E63A5",
+            subtitle: "{tinactory.quests.03_high_voltage.012.subtitle}",
+            tasks: [
+                {
+                    id: "5EC23956E8642C97",
+                    item: "minecraft:tnt",
+                    type: "item"
+                },
+                {
+                    id: "66446D144089A27F",
+                    item: "tinactory:multiblock/implosion_compressor",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.012.title}",
+            x: -1.5d,
+            y: 5.0d
+        },
+        {
+            dependencies: [
+                "88843692A73E63A5",
+                "C3F313BE1445D18F"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.013.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.013.description.1}"
+            ],
+            icon: "tinactory:component/advanced_alloy",
+            id: "99D1042CB7FD92AE",
+            subtitle: "{tinactory.quests.03_high_voltage.013.subtitle}",
+            tasks: [
+                {
+                    id: "07CEE126AC4C5584",
+                    item: "tinactory:component/advanced_alloy",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.013.title}",
+            x: -1.5d,
+            y: 7.0d
+        },
+        {
+            dependencies: [
+                "99D1042CB7FD92AE",
+                "21D9FC2113E23F69"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.014.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.014.description.1}"
+            ],
+            icon: "tinactory:component/hv/research_equipment",
+            id: "3C8191E99249AD20",
+            subtitle: "{tinactory.quests.03_high_voltage.014.subtitle}",
+            tasks: [
+                {
+                    id: "C85273CD30136977",
+                    item: "tinactory:component/hv/research_equipment",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.014.title}",
+            x: -1.5d,
+            y: 9.0d
+        },
+        {
+            dependencies: [
+                "983B183361BD47C3"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.015.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.015.description.1}"
+            ],
+            icon: "tinactory:tool/fluid_cell/iron",
+            id: "F527C00835D29EFF",
+            subtitle: "{tinactory.quests.03_high_voltage.015.subtitle}",
+            tasks: [
+                {
+                    id: "1ED8C569D7FF0937",
+                    item: {
+                        Count: 1b,
+                        id: "tinactory:tool/fluid_cell/iron",
+                        tag: {
+                            Fluid: {
+                                Amount: 4000,
+                                FluidName: "tinactory:material/fluid/cetane_boosted_diesel"
+                            }
+                        }
+                    },
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.015.title}",
+            x: 1.5d,
+            y: 8.0d
+        },
+        {
+            dependencies: [
+                "99D1042CB7FD92AE",
+                "F527C00835D29EFF",
+                "674DEB575AFFDE92"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.016.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.016.description.1}"
+            ],
+            icon: "tinactory:multiblock/rocket_launch_site",
+            id: "F2F471F2F5F60833",
+            subtitle: "{tinactory.quests.03_high_voltage.016.subtitle}",
+            tasks: [
+                {
+                    id: "C1F5478BF257681E",
+                    item: "tinactory:multiblock/rocket_launch_site",
+                    type: "item"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.016.title}",
+            x: 1.5d,
+            y: 10.0d
+        },
+        {
+            dependencies: [
+                "F2F471F2F5F60833",
+                "3C8191E99249AD20",
+                "F527C00835D29EFF"
+            ],
+            description: [
+                "{tinactory.quests.03_high_voltage.017.description.0}",
+                "",
+                "{tinactory.quests.03_high_voltage.017.description.1}"
+            ],
+            id: "DC8BFF0B020D5FF1",
+            shape: "pentagon",
+            subtitle: "{tinactory.quests.03_high_voltage.017.subtitle}",
+            tasks: [
+                {
+                    id: "DD6068C2AEFF15A8",
+                    title: "{tinactory.quests.03_high_voltage.017.title}",
+                    type: "checkmark"
+                }
+            ],
+            title: "{tinactory.quests.03_high_voltage.017.title}",
+            x: 1.5d,
+            y: 12.0d
         }
     ],
     title: "{tinactory.quests.03_high_voltage.title}"
