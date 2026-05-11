@@ -54,10 +54,11 @@
             tasks: [
                 {
                     id: "4919C4842FF1F786",
-                    title: "{tinactory.quests.00_ultra_low_voltage.001.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.001.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.001.title}",
             x: -2.0d,
             y: 0.0d
         },
@@ -730,10 +731,11 @@
             tasks: [
                 {
                     id: "3ED71FF0218E2F8B",
-                    title: "{tinactory.quests.00_ultra_low_voltage.019.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.019.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.019.title}",
             x: 4.0d,
             y: 9.0d
         },
@@ -756,10 +758,11 @@
             tasks: [
                 {
                     id: "34D72055101DD93B",
-                    title: "{tinactory.quests.00_ultra_low_voltage.020.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.020.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.020.title}",
             x: -5.0d,
             y: 9.0d
         },
@@ -785,10 +788,11 @@
             tasks: [
                 {
                     id: "14ADA78EDD6D41C2",
-                    title: "{tinactory.quests.00_ultra_low_voltage.021.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.021.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.021.title}",
             x: 4.0d,
             y: 11.0d
         },
@@ -818,10 +822,11 @@
             tasks: [
                 {
                     id: "101389EE911902B9",
-                    title: "{tinactory.quests.00_ultra_low_voltage.022.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.022.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.022.title}",
             x: 4.0d,
             y: 13.0d
         },
@@ -844,10 +849,11 @@
             tasks: [
                 {
                     id: "25F798FEF2D03B2F",
-                    title: "{tinactory.quests.00_ultra_low_voltage.023.task.00.title}",
+                    title: "{tinactory.quests.00_ultra_low_voltage.023.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.00_ultra_low_voltage.023.title}",
             x: -3.0d,
             y: 3.5d
         },

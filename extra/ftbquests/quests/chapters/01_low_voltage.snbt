@@ -1272,10 +1272,11 @@
             tasks: [
                 {
                     id: "2E96AD94136DB828",
-                    title: "{tinactory.quests.01_low_voltage.046.task.00.title}",
+                    title: "{tinactory.quests.01_low_voltage.046.title}",
                     type: "checkmark"
                 }
             ],
+            title: "{tinactory.quests.01_low_voltage.046.title}",
             x: 10.0d,
             y: 8.0d
         }
