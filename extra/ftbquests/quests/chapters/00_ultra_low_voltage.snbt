@@ -1,14 +1,19 @@
 {
-	default_hide_dependency_lines: 0b
-	default_quest_shape: ""
-	filename: "00_ultra_low_voltage"
-	group: ""
-	icon: "minecraft:oak_sapling"
 	id: "4E10B8DB9F33643B"
+	group: ""
 	order_index: 0
-	quest_links: [ ]
+	filename: "00_ultra_low_voltage"
+	title: "{tinactory.quests.00_ultra_low_voltage.title}"
+	icon: "minecraft:oak_sapling"
+	subtitle: ["{tinactory.quests.00_ultra_low_voltage.subtitle.0}"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
 	quests: [
 		{
+			title: "{tinactory.quests.00_ultra_low_voltage.000.title}"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.000.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.000.description.0}"
 				"{tinactory.quests.00_ultra_low_voltage.000.description.1}"
@@ -17,19 +22,21 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.000.description.3}"
 			]
-			id: "1E3576759FC89A54"
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.000.subtitle}"
+			id: "1E3576759FC89A54"
 			tasks: [{
 				id: "53A27D5233E299A8"
-				item: "minecraft:oak_log"
 				type: "item"
+				item: "minecraft:oak_log"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.000.title}"
-			x: 0.0d
-			y: 0.0d
 		}
 		{
+			title: "{tinactory.quests.00_ultra_low_voltage.001.title}"
+			icon: "minecraft:creeper_head"
+			x: -2.0d
+			y: 0.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.001.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.001.description.0}"
 				""
@@ -45,47 +52,45 @@
 				"{tinactory.quests.00_ultra_low_voltage.001.description.6}"
 				"{tinactory.quests.00_ultra_low_voltage.001.description.7}"
 			]
-			icon: "minecraft:creeper_head"
 			id: "5CA02C19E0D43DB9"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.001.subtitle}"
 			tasks: [{
 				id: "4919C4842FF1F786"
-				title: "{tinactory.quests.00_ultra_low_voltage.001.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.001.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.001.title}"
-			x: -2.0d
-			y: 0.0d
 		}
 		{
-			dependencies: ["1E3576759FC89A54"]
+			title: "{tinactory.quests.00_ultra_low_voltage.002.title}"
+			icon: "minecraft:cobblestone"
+			x: 0.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.002.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.002.description.0}"
 				""
 				"{tinactory.quests.00_ultra_low_voltage.002.description.1}"
 			]
-			icon: "minecraft:cobblestone"
+			dependencies: ["1E3576759FC89A54"]
 			id: "11E5FCB1DF1477FD"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.002.subtitle}"
 			tasks: [
 				{
 					id: "0E15862A4CF7D517"
-					item: "tinactory:primitive/stone_generator"
 					type: "item"
+					item: "tinactory:primitive/stone_generator"
 				}
 				{
 					id: "69098CD79DB53833"
-					item: "minecraft:cobblestone"
 					type: "item"
+					item: "minecraft:cobblestone"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.002.title}"
-			x: 0.0d
-			y: 2.0d
 		}
 		{
-			dependencies: ["11E5FCB1DF1477FD"]
+			title: "{tinactory.quests.00_ultra_low_voltage.003.title}"
+			icon: "tinactory:material/raw/chalcopyrite"
+			x: -1.5d
+			y: 3.5d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.003.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.003.description.0}"
 				""
@@ -95,27 +100,27 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.003.description.3}"
 			]
-			icon: "tinactory:material/raw/chalcopyrite"
+			dependencies: ["11E5FCB1DF1477FD"]
 			id: "70A3BD39E2350A91"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.003.subtitle}"
 			tasks: [
 				{
 					id: "473E482E21997F8C"
-					item: "tinactory:primitive/ore_analyzer"
 					type: "item"
+					item: "tinactory:primitive/ore_analyzer"
 				}
 				{
 					id: "51D2A9E4E3F8041A"
-					item: "tinactory:primitive/ore_washer"
 					type: "item"
+					item: "tinactory:primitive/ore_washer"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.003.title}"
-			x: -1.5d
-			y: 3.5d
 		}
 		{
-			dependencies: ["11E5FCB1DF1477FD"]
+			title: "{tinactory.quests.00_ultra_low_voltage.004.title}"
+			icon: "tinactory:primitive/workbench"
+			x: 1.5d
+			y: 3.5d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.004.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.004.description.0}"
 				""
@@ -130,47 +135,44 @@
 				"{tinactory.quests.00_ultra_low_voltage.004.description.7}"
 				"{tinactory.quests.00_ultra_low_voltage.004.description.8}"
 			]
-			icon: "tinactory:primitive/workbench"
+			dependencies: ["11E5FCB1DF1477FD"]
 			id: "01653617B5B3450E"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.004.subtitle}"
 			tasks: [
 				{
 					id: "7B0E27B01D1CB7C4"
-					item: "tinactory:primitive/workbench"
 					type: "item"
+					item: "tinactory:primitive/workbench"
 				}
 				{
 					id: "7D1236B774D8D04A"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/hammer/stone"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "49C9B3755FBF5F8B"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/mortar/flint"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.004.title}"
-			x: 1.5d
-			y: 3.5d
 		}
 		{
-			dependencies: [
-				"70A3BD39E2350A91"
-				"01653617B5B3450E"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.005.title}"
+			icon: "minecraft:iron_ingot"
+			x: 0.0d
+			y: 5.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.005.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.005.description.0}"
 				""
@@ -181,28 +183,30 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.005.description.4}"
 			]
-			icon: "minecraft:iron_ingot"
-			id: "34D0991E0CCF5EEC"
+			dependencies: [
+				"70A3BD39E2350A91"
+				"01653617B5B3450E"
+			]
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.005.subtitle}"
+			id: "34D0991E0CCF5EEC"
 			tasks: [
 				{
 					id: "75033FD840BE757C"
-					item: "minecraft:iron_ingot"
 					type: "item"
+					item: "minecraft:iron_ingot"
 				}
 				{
 					id: "62EC3912A8455EE5"
-					item: "minecraft:copper_ingot"
 					type: "item"
+					item: "minecraft:copper_ingot"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.005.title}"
-			x: 0.0d
-			y: 5.0d
 		}
 		{
-			dependencies: ["34D0991E0CCF5EEC"]
+			title: "{tinactory.quests.00_ultra_low_voltage.006.title}"
+			x: 0.0d
+			y: 7.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.006.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.006.description.0}"
 				"{tinactory.quests.00_ultra_low_voltage.006.description.1}"
@@ -217,19 +221,26 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.006.description.9}"
 			]
+			dependencies: ["34D0991E0CCF5EEC"]
 			id: "1E5E7333A9D920E1"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.006.subtitle}"
 			tasks: [{
 				id: "5F139379566C7F48"
-				item: "tinactory:material/ingot/wrought_iron"
 				type: "item"
+				item: "tinactory:material/ingot/wrought_iron"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.006.title}"
-			x: 0.0d
-			y: 7.0d
 		}
 		{
-			dependencies: ["1E5E7333A9D920E1"]
+			title: "{tinactory.quests.00_ultra_low_voltage.007.title}"
+			icon: {
+				id: "tinactory:tool/file/wrought_iron"
+				Count: 1b
+				tag: {
+					Damage: 0
+				}
+			}
+			x: 2.0d
+			y: 7.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.007.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.007.description.0}"
 				""
@@ -238,100 +249,94 @@
 				"{tinactory.quests.00_ultra_low_voltage.007.description.2}"
 				"{tinactory.quests.00_ultra_low_voltage.007.description.3}"
 			]
-			icon: {
-				Count: 1b
-				id: "tinactory:tool/file/wrought_iron"
-				tag: {
-					Damage: 0
-				}
-			}
+			dependencies: ["1E5E7333A9D920E1"]
 			id: "312DEB1E14FF9588"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.007.subtitle}"
 			tasks: [
 				{
 					id: "6B9ABB6522F87014"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/file/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "52F16B3DAD9ECD3F"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/hammer/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "128A69EB13C648C0"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/mortar/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "028A57CB20BD7787"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/saw/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "438E65747A63A25D"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/screwdriver/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "70F6DC1A66FD0E07"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/wire_cutter/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 				{
 					id: "4D4FFAEBAE478796"
+					type: "item"
 					item: {
-						Count: 1b
 						id: "tinactory:tool/wrench/wrought_iron"
+						Count: 1b
 						tag: {
 							Damage: 0
 						}
 					}
-					type: "item"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.007.title}"
-			x: 2.0d
-			y: 7.0d
 		}
 		{
-			dependencies: ["1E5E7333A9D920E1"]
+			title: "{tinactory.quests.00_ultra_low_voltage.008.title}"
+			icon: "tinactory:component/ulv/machine_hull"
+			x: 0.0d
+			y: 9.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.008.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.008.description.0}"
 				""
@@ -341,33 +346,33 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.008.description.3}"
 			]
-			icon: "tinactory:component/ulv/machine_hull"
-			id: "0B73A7F9E0645551"
+			dependencies: ["1E5E7333A9D920E1"]
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.008.subtitle}"
+			id: "0B73A7F9E0645551"
 			tasks: [
 				{
 					id: "6E8B21C6AA52C1D7"
-					item: "tinactory:component/ulv/machine_hull"
 					type: "item"
+					item: "tinactory:component/ulv/machine_hull"
 				}
 				{
 					id: "28CFC6971BD56024"
-					item: "tinactory:network/ulv/cable"
 					type: "item"
+					item: "tinactory:network/ulv/cable"
 				}
 				{
 					id: "5FE9F4CB6CA9994E"
-					item: "tinactory:circuit/vacuum_tube"
 					type: "item"
+					item: "tinactory:circuit/vacuum_tube"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.008.title}"
-			x: 0.0d
-			y: 9.0d
 		}
 		{
-			dependencies: ["0B73A7F9E0645551"]
+			title: "{tinactory.quests.00_ultra_low_voltage.009.title}"
+			icon: "tinactory:machine/ulv/steam_turbine"
+			x: 2.0d
+			y: 9.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.009.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.009.description.0}"
 				""
@@ -379,27 +384,26 @@
 				"{tinactory.quests.00_ultra_low_voltage.009.description.5}"
 				""
 			]
-			icon: "tinactory:machine/ulv/steam_turbine"
+			dependencies: ["0B73A7F9E0645551"]
 			id: "16BF47CD29F96F57"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.009.subtitle}"
 			tasks: [
 				{
 					id: "2AF36D71FC53DEB3"
-					item: "tinactory:machine/boiler/low"
 					type: "item"
+					item: "tinactory:machine/boiler/low"
 				}
 				{
 					id: "6F8DA5F7379D5997"
-					item: "tinactory:machine/ulv/steam_turbine"
 					type: "item"
+					item: "tinactory:machine/ulv/steam_turbine"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.009.title}"
-			x: 2.0d
-			y: 9.0d
 		}
 		{
-			dependencies: ["0B73A7F9E0645551"]
+			title: "{tinactory.quests.00_ultra_low_voltage.010.title}"
+			x: 0.0d
+			y: 11.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.010.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.010.description.0}"
 				""
@@ -407,22 +411,20 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.010.description.2}"
 			]
+			dependencies: ["0B73A7F9E0645551"]
 			id: "6F6EE8943B6B06BC"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.010.subtitle}"
 			tasks: [{
 				id: "2165D6BBA2D46650"
-				item: "tinactory:machine/ulv/assembler"
 				type: "item"
+				item: "tinactory:machine/ulv/assembler"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.010.title}"
-			x: 0.0d
-			y: 11.0d
 		}
 		{
-			dependencies: [
-				"6F6EE8943B6B06BC"
-				"16BF47CD29F96F57"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.011.title}"
+			icon: "tinactory:component/ulv/research_equipment"
+			x: 2.0d
+			y: 11.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.011.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.011.description.0}"
 				""
@@ -434,28 +436,31 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.011.description.5}"
 			]
-			icon: "tinactory:component/ulv/research_equipment"
-			id: "1DF1F6516600868F"
+			dependencies: [
+				"6F6EE8943B6B06BC"
+				"16BF47CD29F96F57"
+			]
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.011.subtitle}"
+			id: "1DF1F6516600868F"
 			tasks: [
 				{
 					id: "56F55824D0761E28"
-					item: "tinactory:machine/ulv/research_bench"
 					type: "item"
+					item: "tinactory:machine/ulv/research_bench"
 				}
 				{
 					id: "22E255C03F85B2E4"
-					item: "tinactory:component/ulv/research_equipment"
 					type: "item"
+					item: "tinactory:component/ulv/research_equipment"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.011.title}"
-			x: 2.0d
-			y: 11.0d
 		}
 		{
-			dependencies: ["0B73A7F9E0645551"]
+			title: "{tinactory.quests.00_ultra_low_voltage.012.title}"
+			icon: "tinactory:material/crushed_purified/chalcopyrite"
+			x: -2.0d
+			y: 11.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.012.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.012.description.0}"
 				""
@@ -464,30 +469,26 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.012.description.3}"
 			]
-			icon: "tinactory:material/crushed_purified/chalcopyrite"
+			dependencies: ["0B73A7F9E0645551"]
 			id: "070F82ED30238005"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.012.subtitle}"
 			tasks: [
 				{
 					id: "3BE38EF75C2BC9B0"
-					item: "tinactory:machine/ulv/ore_analyzer"
 					type: "item"
+					item: "tinactory:machine/ulv/ore_analyzer"
 				}
 				{
 					id: "482622842F504ADD"
-					item: "tinactory:machine/ulv/ore_washer"
 					type: "item"
+					item: "tinactory:machine/ulv/ore_washer"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.012.title}"
-			x: -2.0d
-			y: 11.0d
 		}
 		{
-			dependencies: [
-				"070F82ED30238005"
-				"1DF1F6516600868F"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.013.title}"
+			x: 0.0d
+			y: 13.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.013.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.013.description.0}"
 				""
@@ -495,19 +496,22 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.013.description.2}"
 			]
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
 			id: "6EBA694D07E58E72"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.013.subtitle}"
 			tasks: [{
 				id: "65AF8B4B6ABA164C"
-				item: "tinactory:material/dust/nickel"
 				type: "item"
+				item: "tinactory:material/dust/nickel"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.013.title}"
-			x: 0.0d
-			y: 13.0d
 		}
 		{
-			dependencies: ["1DF1F6516600868F"]
+			title: "{tinactory.quests.00_ultra_low_voltage.014.title}"
+			x: 2.0d
+			y: 13.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.014.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.014.description.0}"
 				""
@@ -515,40 +519,38 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.014.description.2}"
 			]
+			dependencies: ["1DF1F6516600868F"]
 			id: "36F6E91079CD47B2"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.014.subtitle}"
 			tasks: [{
 				id: "51CF4D42AEBC55B6"
-				item: "tinactory:machine/ulv/alloy_smelter"
 				type: "item"
+				item: "tinactory:machine/ulv/alloy_smelter"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.014.title}"
-			x: 2.0d
-			y: 13.0d
 		}
 		{
-			dependencies: ["070F82ED30238005"]
+			title: "{tinactory.quests.00_ultra_low_voltage.015.title}"
+			x: -4.0d
+			y: 13.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.015.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.015.description.0}"
 				""
 				"{tinactory.quests.00_ultra_low_voltage.015.description.1}"
 			]
+			dependencies: ["070F82ED30238005"]
 			id: "5B60F443F822A96F"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.015.subtitle}"
 			tasks: [{
 				id: "20B43EE906163E08"
-				item: "tinactory:material/dust/sulfur"
 				type: "item"
+				item: "tinactory:material/dust/sulfur"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.015.title}"
-			x: -4.0d
-			y: 13.0d
 		}
 		{
-			dependencies: [
-				"7AE6BC52B1A42AE8"
-				"04F63737063FFA5E"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.016.title}"
+			icon: "tinactory:multiblock/blast_furnace"
+			x: 0.0d
+			y: 17.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.016.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.016.description.0}"
 				""
@@ -562,43 +564,43 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.016.description.7}"
 			]
-			icon: "tinactory:multiblock/blast_furnace"
-			id: "1E207E3075739472"
+			dependencies: [
+				"7AE6BC52B1A42AE8"
+				"04F63737063FFA5E"
+			]
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.016.subtitle}"
+			id: "1E207E3075739472"
 			tasks: [
 				{
 					id: "6B8FF60AFCD0E05D"
+					type: "item"
 					item: "tinactory:multiblock/blast_furnace"
-					type: "item"
 				}
 				{
-					count: 16L
 					id: "238075606372E15B"
-					item: "tinactory:multiblock/coil/cupronickel"
 					type: "item"
+					item: "tinactory:multiblock/coil/cupronickel"
+					count: 16L
 				}
 				{
-					count: 16L
 					id: "4E5DC538BE3D3E69"
-					item: "tinactory:multiblock/solid/heatproof"
 					type: "item"
+					item: "tinactory:multiblock/solid/heatproof"
+					count: 16L
 				}
 				{
 					id: "642EBCEBAE64CA52"
-					item: "tinactory:multiblock/ulv/interface"
 					type: "item"
+					item: "tinactory:multiblock/ulv/interface"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.016.title}"
-			x: 0.0d
-			y: 17.0d
 		}
 		{
-			dependencies: [
-				"6EBA694D07E58E72"
-				"36F6E91079CD47B2"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.017.title}"
+			icon: "tinactory:material/ingot/invar"
+			x: 0.0d
+			y: 15.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.017.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.017.description.0}"
 				""
@@ -606,27 +608,29 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.017.description.2}"
 			]
-			icon: "tinactory:material/ingot/invar"
+			dependencies: [
+				"6EBA694D07E58E72"
+				"36F6E91079CD47B2"
+			]
 			id: "7AE6BC52B1A42AE8"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.017.subtitle}"
 			tasks: [
 				{
 					id: "6D4E7912C5BC638E"
-					item: "tinactory:material/ingot/invar"
 					type: "item"
+					item: "tinactory:material/ingot/invar"
 				}
 				{
 					id: "50E169B96982299A"
-					item: "tinactory:material/ingot/cupronickel"
 					type: "item"
+					item: "tinactory:material/ingot/cupronickel"
 				}
 			]
-			title: "{tinactory.quests.00_ultra_low_voltage.017.title}"
-			x: 0.0d
-			y: 15.0d
 		}
 		{
-			dependencies: ["0B73A7F9E0645551"]
+			title: "{tinactory.quests.00_ultra_low_voltage.018.title}"
+			x: -3.0d
+			y: 9.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.018.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.018.description.0}"
 				""
@@ -646,20 +650,22 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.018.description.12}"
 			]
-			id: "35AFA1FBD784B4D2"
+			dependencies: ["0B73A7F9E0645551"]
 			size: 2.0d
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.018.subtitle}"
+			id: "35AFA1FBD784B4D2"
 			tasks: [{
 				id: "7B774713F00DB381"
-				item: "tinactory:logistics/ulv/logistic_worker"
 				type: "item"
+				item: "tinactory:logistics/ulv/logistic_worker"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.018.title}"
-			x: -3.0d
-			y: 9.0d
 		}
 		{
-			dependencies: ["16BF47CD29F96F57"]
+			title: "{tinactory.quests.00_ultra_low_voltage.019.title}"
+			icon: "tinactory:network/lv/cable"
+			x: 4.0d
+			y: 9.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.019.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.019.description.0}"
 				""
@@ -682,21 +688,21 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.019.description.13}"
 			]
-			icon: "tinactory:network/lv/cable"
+			dependencies: ["16BF47CD29F96F57"]
 			id: "61E3BD587521AAF2"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.019.subtitle}"
 			tasks: [{
 				id: "3ED71FF0218E2F8B"
-				title: "{tinactory.quests.00_ultra_low_voltage.019.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.019.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.019.title}"
-			x: 4.0d
-			y: 9.0d
 		}
 		{
-			dependencies: ["35AFA1FBD784B4D2"]
+			title: "{tinactory.quests.00_ultra_low_voltage.020.title}"
+			icon: "tinactory:component/lv/conveyor_module"
+			x: -5.0d
+			y: 9.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.020.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.020.description.0}"
 				""
@@ -705,21 +711,21 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.020.description.3}"
 			]
-			icon: "tinactory:component/lv/conveyor_module"
+			dependencies: ["35AFA1FBD784B4D2"]
 			id: "7AD47A6D95AD744E"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.020.subtitle}"
 			tasks: [{
 				id: "34D72055101DD93B"
-				title: "{tinactory.quests.00_ultra_low_voltage.020.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.020.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.020.title}"
-			x: -5.0d
-			y: 9.0d
 		}
 		{
-			dependencies: ["6F6EE8943B6B06BC"]
+			title: "{tinactory.quests.00_ultra_low_voltage.021.title}"
+			icon: "minecraft:book"
+			x: 4.0d
+			y: 11.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.021.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.021.description.0}"
 				""
@@ -731,21 +737,21 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.021.description.4}"
 			]
-			icon: "minecraft:book"
+			dependencies: ["6F6EE8943B6B06BC"]
 			id: "5557C2511290CA78"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.021.subtitle}"
 			tasks: [{
 				id: "14ADA78EDD6D41C2"
-				title: "{tinactory.quests.00_ultra_low_voltage.021.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.021.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.021.title}"
-			x: 4.0d
-			y: 11.0d
 		}
 		{
-			dependencies: ["1DF1F6516600868F"]
+			title: "{tinactory.quests.00_ultra_low_voltage.022.title}"
+			icon: "tinactory:machine/ulv/research_bench"
+			x: 4.0d
+			y: 13.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.022.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.022.description.0}"
 				""
@@ -761,21 +767,21 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.022.description.9}"
 			]
-			icon: "tinactory:machine/ulv/research_bench"
+			dependencies: ["1DF1F6516600868F"]
 			id: "361089D5DBD02A97"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.022.subtitle}"
 			tasks: [{
 				id: "101389EE911902B9"
-				title: "{tinactory.quests.00_ultra_low_voltage.022.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.022.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.022.title}"
-			x: 4.0d
-			y: 13.0d
 		}
 		{
-			dependencies: ["70A3BD39E2350A91"]
+			title: "{tinactory.quests.00_ultra_low_voltage.023.title}"
+			icon: "minecraft:water_bucket"
+			x: -3.0d
+			y: 3.5d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.023.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.023.description.0}"
 				""
@@ -784,24 +790,19 @@
 				"{tinactory.quests.00_ultra_low_voltage.023.description.2}"
 				"{tinactory.quests.00_ultra_low_voltage.023.description.3}"
 			]
-			icon: "minecraft:water_bucket"
+			dependencies: ["70A3BD39E2350A91"]
 			id: "5D3D592F154FE900"
-			shape: "pentagon"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.023.subtitle}"
 			tasks: [{
 				id: "25F798FEF2D03B2F"
-				title: "{tinactory.quests.00_ultra_low_voltage.023.title}"
 				type: "checkmark"
+				title: "{tinactory.quests.00_ultra_low_voltage.023.title}"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.023.title}"
-			x: -3.0d
-			y: 3.5d
 		}
 		{
-			dependencies: [
-				"070F82ED30238005"
-				"1DF1F6516600868F"
-			]
+			title: "{tinactory.quests.00_ultra_low_voltage.024.title}"
+			x: -2.0d
+			y: 15.0d
+			subtitle: "{tinactory.quests.00_ultra_low_voltage.024.subtitle}"
 			description: [
 				"{tinactory.quests.00_ultra_low_voltage.024.description.0}"
 				""
@@ -809,18 +810,17 @@
 				""
 				"{tinactory.quests.00_ultra_low_voltage.024.description.2}"
 			]
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
 			id: "04F63737063FFA5E"
-			subtitle: "{tinactory.quests.00_ultra_low_voltage.024.subtitle}"
 			tasks: [{
 				id: "2BE074EE34626987"
-				item: "tinactory:material/dust/tin"
 				type: "item"
+				item: "tinactory:material/dust/tin"
 			}]
-			title: "{tinactory.quests.00_ultra_low_voltage.024.title}"
-			x: -2.0d
-			y: 15.0d
 		}
 	]
-	subtitle: ["{tinactory.quests.00_ultra_low_voltage.subtitle.0}"]
-	title: "{tinactory.quests.00_ultra_low_voltage.title}"
+	quest_links: [ ]
 }

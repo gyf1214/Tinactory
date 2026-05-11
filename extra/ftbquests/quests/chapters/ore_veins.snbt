@@ -1,379 +1,379 @@
 {
-	default_hide_dependency_lines: 0b
-	default_quest_shape: ""
-	filename: "ore_veins"
-	group: ""
-	icon: "minecraft:raw_iron"
 	id: "3B5374D34DFEC6AF"
+	group: ""
 	order_index: 3
-	quest_links: [ ]
+	filename: "ore_veins"
+	title: "{tinactory.quests.ore_veins.title}"
+	icon: "minecraft:raw_iron"
+	subtitle: ["{tinactory.quests.ore_veins.subtitle.0}"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
 	quests: [
 		{
-			dependencies: [
-				"070F82ED30238005"
-				"1DF1F6516600868F"
-			]
+			title: "{tinactory.quests.ore_veins.000.title}"
+			icon: "tinactory:material/raw/limonite"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.ore_veins.000.subtitle}"
 			description: [
 				"{tinactory.quests.ore_veins.000.description.0}"
 				""
 				"{tinactory.quests.ore_veins.000.description.1}"
 			]
-			icon: "tinactory:material/raw/limonite"
-			id: "6CBAE7AF9D17A28D"
+			dependencies: [
+				"070F82ED30238005"
+				"1DF1F6516600868F"
+			]
 			size: 2.0d
-			subtitle: "{tinactory.quests.ore_veins.000.subtitle}"
+			id: "6CBAE7AF9D17A28D"
 			tasks: [
 				{
 					id: "24C335B04D01BAF9"
-					item: "tinactory:material/raw/limonite"
 					type: "item"
+					item: "tinactory:material/raw/limonite"
 				}
 				{
 					id: "3513D11929FD3F9E"
-					item: "tinactory:material/raw/banded_iron"
 					type: "item"
+					item: "tinactory:material/raw/banded_iron"
 				}
 				{
 					id: "65EB78F293BEB670"
-					item: "tinactory:material/raw/garnierite"
 					type: "item"
+					item: "tinactory:material/raw/garnierite"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.000.title}"
-			x: 0.0d
-			y: 0.0d
 		}
 		{
-			dependencies: ["6CBAE7AF9D17A28D"]
-			description: ["{tinactory.quests.ore_veins.001.description.0}"]
-			id: "38AD236D90FE95DD"
-			subtitle: "{tinactory.quests.ore_veins.001.subtitle}"
-			tasks: [
-				{
-					id: "5F7E8CC3336E56D5"
-					item: "tinactory:material/raw/tin"
-					type: "item"
-				}
-				{
-					id: "3DE6AEBA00EAFBAB"
-					item: "tinactory:material/raw/cassiterite"
-					type: "item"
-				}
-			]
 			title: "{tinactory.quests.ore_veins.001.title}"
 			x: 2.0d
 			y: 0.0d
+			subtitle: "{tinactory.quests.ore_veins.001.subtitle}"
+			description: ["{tinactory.quests.ore_veins.001.description.0}"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "38AD236D90FE95DD"
+			tasks: [
+				{
+					id: "5F7E8CC3336E56D5"
+					type: "item"
+					item: "tinactory:material/raw/tin"
+				}
+				{
+					id: "3DE6AEBA00EAFBAB"
+					type: "item"
+					item: "tinactory:material/raw/cassiterite"
+				}
+			]
 		}
 		{
-			dependencies: ["6CBAE7AF9D17A28D"]
-			description: ["{tinactory.quests.ore_veins.002.description.0}"]
+			title: "{tinactory.quests.ore_veins.002.title}"
 			icon: "tinactory:material/raw/redstone"
-			id: "45183BF83F5A72B0"
+			x: 0.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.ore_veins.002.subtitle}"
+			description: ["{tinactory.quests.ore_veins.002.description.0}"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "45183BF83F5A72B0"
 			tasks: [
 				{
 					id: "75511E24A6827A6E"
-					item: "tinactory:material/raw/redstone"
 					type: "item"
+					item: "tinactory:material/raw/redstone"
 				}
 				{
 					id: "36556D8D2AAF0FEF"
-					item: "tinactory:material/raw/ruby"
 					type: "item"
+					item: "tinactory:material/raw/ruby"
 				}
 				{
 					id: "45A36342CB243025"
-					item: "tinactory:material/raw/cinnabar"
 					type: "item"
+					item: "tinactory:material/raw/cinnabar"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.002.title}"
-			x: 0.0d
-			y: 2.0d
 		}
 		{
-			dependencies: ["6CBAE7AF9D17A28D"]
-			description: ["{tinactory.quests.ore_veins.003.description.0}"]
-			id: "2CF3758FBEB5EA41"
-			subtitle: "{tinactory.quests.ore_veins.003.subtitle}"
-			tasks: [{
-				id: "16854437B5D5BD30"
-				item: "tinactory:material/raw/coal"
-				type: "item"
-			}]
 			title: "{tinactory.quests.ore_veins.003.title}"
 			x: -2.0d
 			y: 0.0d
+			subtitle: "{tinactory.quests.ore_veins.003.subtitle}"
+			description: ["{tinactory.quests.ore_veins.003.description.0}"]
+			dependencies: ["6CBAE7AF9D17A28D"]
+			id: "2CF3758FBEB5EA41"
+			tasks: [{
+				id: "16854437B5D5BD30"
+				type: "item"
+				item: "tinactory:material/raw/coal"
+			}]
 		}
 		{
-			dependencies: [
-				"3C6F611AD202962D"
-				"0A1EE54892C444A8"
-				"079709D94E4A69A5"
-			]
+			title: "{tinactory.quests.ore_veins.004.title}"
+			icon: "tinactory:material/raw/magnetite"
+			x: 8.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.ore_veins.004.subtitle}"
 			description: [
 				"{tinactory.quests.ore_veins.004.description.0}"
 				""
 				"{tinactory.quests.ore_veins.004.description.1}"
 			]
-			icon: "tinactory:material/raw/magnetite"
-			id: "3CD314088812FBB4"
+			dependencies: [
+				"3C6F611AD202962D"
+				"0A1EE54892C444A8"
+				"079709D94E4A69A5"
+			]
 			size: 2.0d
-			subtitle: "{tinactory.quests.ore_veins.004.subtitle}"
+			id: "3CD314088812FBB4"
 			tasks: [
 				{
 					id: "18AAF579D5B448FE"
-					item: "tinactory:material/raw/magnetite"
 					type: "item"
+					item: "tinactory:material/raw/magnetite"
 				}
 				{
 					id: "71F46C460CD98051"
-					item: "minecraft:raw_gold"
 					type: "item"
+					item: "minecraft:raw_gold"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.004.title}"
-			x: 8.0d
-			y: 0.0d
 		}
 		{
-			dependencies: ["3CD314088812FBB4"]
-			description: ["{tinactory.quests.ore_veins.005.description.0}"]
+			title: "{tinactory.quests.ore_veins.005.title}"
 			icon: "tinactory:material/raw/graphite"
-			id: "7F86524AF19D5E4C"
+			x: 6.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.ore_veins.005.subtitle}"
+			description: ["{tinactory.quests.ore_veins.005.description.0}"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "7F86524AF19D5E4C"
 			tasks: [
 				{
 					id: "7FD4FDFAC01C7B6F"
-					item: "tinactory:material/raw/graphite"
 					type: "item"
+					item: "tinactory:material/raw/graphite"
 				}
 				{
 					id: "2848E6562DDF83D6"
-					item: "tinactory:material/raw/diamond"
 					type: "item"
+					item: "tinactory:material/raw/diamond"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.005.title}"
-			x: 6.0d
-			y: 0.0d
 		}
 		{
-			dependencies: ["3CD314088812FBB4"]
-			description: ["{tinactory.quests.ore_veins.006.description.0}"]
+			title: "{tinactory.quests.ore_veins.006.title}"
 			icon: "tinactory:material/raw/bauxite"
-			id: "681E37422C8CADA2"
+			x: 6.5d
+			y: 2.0d
 			subtitle: "{tinactory.quests.ore_veins.006.subtitle}"
+			description: ["{tinactory.quests.ore_veins.006.description.0}"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "681E37422C8CADA2"
 			tasks: [
 				{
 					id: "52106B157F631AE5"
-					item: "tinactory:material/raw/bauxite"
 					type: "item"
+					item: "tinactory:material/raw/bauxite"
 				}
 				{
 					id: "02D3278B3C2BA43B"
-					item: "tinactory:material/raw/ilmenite"
 					type: "item"
+					item: "tinactory:material/raw/ilmenite"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.006.title}"
-			x: 6.5d
-			y: 2.0d
 		}
 		{
-			dependencies: ["3CD314088812FBB4"]
-			description: ["{tinactory.quests.ore_veins.007.description.0}"]
+			title: "{tinactory.quests.ore_veins.007.title}"
 			icon: "tinactory:material/raw/galena"
-			id: "190125F22C1A5EE0"
+			x: 10.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.ore_veins.007.subtitle}"
+			description: ["{tinactory.quests.ore_veins.007.description.0}"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "190125F22C1A5EE0"
 			tasks: [
 				{
 					id: "02ACFA9EA5FF5624"
-					item: "tinactory:material/raw/galena"
 					type: "item"
+					item: "tinactory:material/raw/galena"
 				}
 				{
 					id: "12A3073920F4F5E4"
-					item: "tinactory:material/raw/sphalerite"
 					type: "item"
+					item: "tinactory:material/raw/sphalerite"
 				}
 				{
 					id: "78079F160BF5B442"
-					item: "tinactory:material/raw/silver"
 					type: "item"
+					item: "tinactory:material/raw/silver"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.007.title}"
-			x: 10.0d
-			y: 0.0d
 		}
 		{
-			dependencies: ["3CD314088812FBB4"]
-			description: ["{tinactory.quests.ore_veins.008.description.0}"]
+			title: "{tinactory.quests.ore_veins.008.title}"
 			icon: "tinactory:material/raw/emerald"
-			id: "2A3A2EF77EBB6998"
+			x: 8.0d
+			y: -2.0d
 			subtitle: "{tinactory.quests.ore_veins.008.subtitle}"
+			description: ["{tinactory.quests.ore_veins.008.description.0}"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "2A3A2EF77EBB6998"
 			tasks: [
 				{
 					id: "51B31F3D73ADA959"
-					item: "tinactory:material/raw/emerald"
 					type: "item"
+					item: "tinactory:material/raw/emerald"
 				}
 				{
 					id: "0E5A2F702F2E4F1B"
-					item: "tinactory:material/raw/sapphire"
 					type: "item"
+					item: "tinactory:material/raw/sapphire"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.008.title}"
-			x: 8.0d
-			y: -2.0d
 		}
 		{
-			dependencies: ["3CD314088812FBB4"]
-			description: ["{tinactory.quests.ore_veins.009.description.0}"]
+			title: "{tinactory.quests.ore_veins.009.title}"
 			icon: "tinactory:material/raw_fluid/natural_gas"
-			id: "29D02376CFF086C1"
+			x: 9.5d
+			y: 2.0d
 			subtitle: "{tinactory.quests.ore_veins.009.subtitle}"
+			description: ["{tinactory.quests.ore_veins.009.description.0}"]
+			dependencies: ["3CD314088812FBB4"]
+			id: "29D02376CFF086C1"
 			tasks: [
 				{
 					id: "7FDA06CAE94E5C58"
-					item: "tinactory:material/raw_fluid/natural_gas"
 					type: "item"
+					item: "tinactory:material/raw_fluid/natural_gas"
 				}
 				{
 					id: "3D19EA7A300F4B53"
-					item: "tinactory:material/raw_fluid/light_oil"
 					type: "item"
+					item: "tinactory:material/raw_fluid/light_oil"
 				}
 				{
 					id: "1B36F3CE0A998E8C"
-					item: "tinactory:material/raw_fluid/heavy_oil"
 					type: "item"
+					item: "tinactory:material/raw_fluid/heavy_oil"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.009.title}"
-			x: 9.5d
-			y: 2.0d
 		}
 		{
-			dependencies: ["21D9FC2113E23F69"]
+			title: "{tinactory.quests.ore_veins.010.title}"
+			icon: "minecraft:raw_gold"
+			x: 0.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.ore_veins.010.subtitle}"
 			description: [
 				"{tinactory.quests.ore_veins.010.description.0}"
 				""
 				"{tinactory.quests.ore_veins.010.description.1}"
 			]
-			icon: "minecraft:raw_gold"
-			id: "41CAE47DBA5E2C33"
+			dependencies: ["21D9FC2113E23F69"]
 			size: 2.0d
-			subtitle: "{tinactory.quests.ore_veins.010.subtitle}"
+			id: "41CAE47DBA5E2C33"
 			tasks: [
 				{
 					id: "6273F39868D3AEAC"
-					item: "minecraft:raw_gold"
 					type: "item"
+					item: "minecraft:raw_gold"
 				}
 				{
 					id: "17EFE3975AEA4672"
-					item: "tinactory:material/raw/topaz"
 					type: "item"
+					item: "tinactory:material/raw/topaz"
 				}
 				{
 					id: "450876595F2501F4"
-					item: "tinactory:material/raw/blue_topaz"
 					type: "item"
+					item: "tinactory:material/raw/blue_topaz"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.010.title}"
-			x: 0.0d
-			y: 8.0d
 		}
 		{
-			dependencies: ["41CAE47DBA5E2C33"]
-			description: ["{tinactory.quests.ore_veins.011.description.0}"]
+			title: "{tinactory.quests.ore_veins.011.title}"
 			icon: "tinactory:material/raw/nether_quartz"
-			id: "02DDF396D6BCCE5E"
+			x: -2.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.ore_veins.011.subtitle}"
+			description: ["{tinactory.quests.ore_veins.011.description.0}"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "02DDF396D6BCCE5E"
 			tasks: [
 				{
 					id: "5A3E7A47CB4C47E0"
-					item: "tinactory:material/raw/nether_quartz"
 					type: "item"
+					item: "tinactory:material/raw/nether_quartz"
 				}
 				{
 					id: "0C4E927E1DFB1ACF"
-					item: "tinactory:material/raw/certus_quartz"
 					type: "item"
+					item: "tinactory:material/raw/certus_quartz"
 				}
 				{
 					id: "4747BF4202BE8FCF"
-					item: "tinactory:material/raw/lapis"
 					type: "item"
+					item: "tinactory:material/raw/lapis"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.011.title}"
-			x: -2.0d
-			y: 8.0d
 		}
 		{
-			dependencies: ["41CAE47DBA5E2C33"]
-			description: ["{tinactory.quests.ore_veins.012.description.0}"]
+			title: "{tinactory.quests.ore_veins.012.title}"
 			icon: "tinactory:material/raw/tungstate"
-			id: "7363E5AC14AECA75"
+			x: 2.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.ore_veins.012.subtitle}"
+			description: ["{tinactory.quests.ore_veins.012.description.0}"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "7363E5AC14AECA75"
 			tasks: [
 				{
 					id: "761973CC6B103DC9"
-					item: "tinactory:material/raw/tungstate"
 					type: "item"
+					item: "tinactory:material/raw/tungstate"
 				}
 				{
 					id: "12269B518E613342"
-					item: "tinactory:material/raw/molybdate"
 					type: "item"
+					item: "tinactory:material/raw/molybdate"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.012.title}"
-			x: 2.0d
-			y: 8.0d
 		}
 		{
-			dependencies: ["41CAE47DBA5E2C33"]
-			description: ["{tinactory.quests.ore_veins.013.description.0}"]
+			title: "{tinactory.quests.ore_veins.013.title}"
 			icon: "tinactory:material/raw/pitchblende"
-			id: "642B670E0BD087C2"
+			x: 0.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.ore_veins.013.subtitle}"
+			description: ["{tinactory.quests.ore_veins.013.description.0}"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "642B670E0BD087C2"
 			tasks: [
 				{
 					id: "1EE4BA004E450308"
-					item: "tinactory:material/raw/pitchblende"
 					type: "item"
+					item: "tinactory:material/raw/pitchblende"
 				}
 				{
 					id: "367600507AABB5ED"
-					item: "tinactory:material/raw/thorium"
 					type: "item"
+					item: "tinactory:material/raw/thorium"
 				}
 			]
-			title: "{tinactory.quests.ore_veins.013.title}"
-			x: 0.0d
-			y: 10.0d
 		}
 		{
-			dependencies: ["41CAE47DBA5E2C33"]
-			description: ["{tinactory.quests.ore_veins.014.description.0}"]
-			id: "7B6DDB0F8DA8568C"
-			subtitle: "{tinactory.quests.ore_veins.014.subtitle}"
-			tasks: [{
-				id: "43CB0E545147ABCA"
-				item: "minecraft:magma_block"
-				type: "item"
-			}]
 			title: "{tinactory.quests.ore_veins.014.title}"
 			x: 0.0d
 			y: 6.0d
+			subtitle: "{tinactory.quests.ore_veins.014.subtitle}"
+			description: ["{tinactory.quests.ore_veins.014.description.0}"]
+			dependencies: ["41CAE47DBA5E2C33"]
+			id: "7B6DDB0F8DA8568C"
+			tasks: [{
+				id: "43CB0E545147ABCA"
+				type: "item"
+				item: "minecraft:magma_block"
+			}]
 		}
 	]
-	subtitle: ["{tinactory.quests.ore_veins.subtitle.0}"]
-	title: "{tinactory.quests.ore_veins.title}"
+	quest_links: [ ]
 }
