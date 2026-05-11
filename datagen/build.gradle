@@ -58,7 +58,11 @@ tasks.register('extractQuestLanguage', JavaExec) {
     description = 'Extract FTB Quests chapter text into language metadata.'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
-    workingDir = rootProject.projectDir
+    workingDir = rootProject.file('run/questLanguage')
+    systemProperty 'tinactory.projectRoot', rootProject.projectDir.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+    }
     args 'extract'
 }
 
@@ -67,6 +71,10 @@ tasks.register('checkQuestLanguage', JavaExec) {
     description = 'Check FTB Quests chapter text language metadata synchronization.'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
-    workingDir = rootProject.projectDir
+    workingDir = rootProject.file('run/questLanguage')
+    systemProperty 'tinactory.projectRoot', rootProject.projectDir.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+    }
     args 'check'
 }

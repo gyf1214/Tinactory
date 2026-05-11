@@ -9,6 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.SnbtPrinterTagVisitor;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
@@ -30,8 +31,11 @@ import java.util.regex.Pattern;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class QuestLanguageExtractor {
-    private static final Path CHAPTERS_PATH = Path.of("extra/ftbquests/quests/chapters");
-    private static final Path LANGUAGE_PATH = Path.of("datagen/src/main/resources/meta/tinactory/language");
+    private static final String PROJECT_ROOT_PROPERTY = "tinactory.projectRoot";
+    private static final Path PROJECT_ROOT = Path.of(System.getProperty(PROJECT_ROOT_PROPERTY, "."));
+    private static final Path CHAPTERS_PATH = PROJECT_ROOT.resolve("extra/ftbquests/quests/chapters");
+    private static final Path LANGUAGE_PATH =
+        PROJECT_ROOT.resolve("datagen/src/main/resources/meta/tinactory/language");
     private static final Pattern INTERPOLATION = Pattern.compile("\\{(tinactory[.]quests[.][^}]+)}");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
@@ -97,7 +101,7 @@ public final class QuestLanguageExtractor {
             }
         }
         if (write) {
-            Files.writeString(path, tag + "\n", StandardCharsets.UTF_8);
+            Files.writeString(path, prettySnbt(tag) + "\n", StandardCharsets.UTF_8);
         }
     }
 
@@ -255,6 +259,10 @@ public final class QuestLanguageExtractor {
             return false;
         }
         return true;
+    }
+
+    private static String prettySnbt(Tag tag) {
+        return new SnbtPrinterTagVisitor().visit(tag);
     }
 
     private static void writeLanguage(String locale, JsonObject jo) throws IOException {

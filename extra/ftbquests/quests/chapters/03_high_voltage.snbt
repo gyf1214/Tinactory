@@ -1,1 +1,53 @@
-{default_hide_dependency_lines:0b,default_quest_shape:"",filename:"03_high_voltage",group:"5D26E55DB14C5F98",icon:"tinactory:component/mixed_metal_ingot",id:"16E428B6C103B73D",order_index:0,quest_links:[],quests:[{dependencies:["2DF7B5D218636018","0540D3B8052B479D","0623B327BA00512F"],icon:"tinactory:component/hv/machine_hull",id:"21D9FC2113E23F69",tasks:[{id:"7B7657EE71111FFB",item:"tinactory:component/hv/machine_hull",type:"item"},{id:"4FA7E5F6C9E48EC3",item:"tinactory:network/hv/cable",type:"item"}],x:0.0d,y:0.0d},{dependencies:["21D9FC2113E23F69","16072DE55220A84E"],id:"7F321A366176BDA1",size:2.0d,tasks:[{id:"643382A79DD56C25",item:"tinactory:machine/hv/arc_furnace",type:"item"}],x:-4.0d,y:0.0d}],title:"{tinactory.quests.03_high_voltage.title}"}
+{
+    default_hide_dependency_lines: 0b,
+    default_quest_shape: "",
+    filename: "03_high_voltage",
+    group: "5D26E55DB14C5F98",
+    icon: "tinactory:component/mixed_metal_ingot",
+    id: "16E428B6C103B73D",
+    order_index: 0,
+    quest_links: [],
+    quests: [
+        {
+            dependencies: [
+                "2DF7B5D218636018",
+                "0540D3B8052B479D",
+                "0623B327BA00512F"
+            ],
+            icon: "tinactory:component/hv/machine_hull",
+            id: "21D9FC2113E23F69",
+            tasks: [
+                {
+                    id: "7B7657EE71111FFB",
+                    item: "tinactory:component/hv/machine_hull",
+                    type: "item"
+                },
+                {
+                    id: "4FA7E5F6C9E48EC3",
+                    item: "tinactory:network/hv/cable",
+                    type: "item"
+                }
+            ],
+            x: 0.0d,
+            y: 0.0d
+        },
+        {
+            dependencies: [
+                "21D9FC2113E23F69",
+                "16072DE55220A84E"
+            ],
+            id: "7F321A366176BDA1",
+            size: 2.0d,
+            tasks: [
+                {
+                    id: "643382A79DD56C25",
+                    item: "tinactory:machine/hv/arc_furnace",
+                    type: "item"
+                }
+            ],
+            x: -4.0d,
+            y: 0.0d
+        }
+    ],
+    title: "{tinactory.quests.03_high_voltage.title}"
+}
