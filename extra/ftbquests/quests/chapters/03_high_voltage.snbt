@@ -40,7 +40,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.001.title}"
-			icon: "tinactory:network/hv/transformer"
 			x: -2.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.001.subtitle}"
@@ -59,7 +58,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.002.title}"
-			icon: "tinactory:machine/hv/arc_furnace"
 			x: 0.0d
 			y: -4.0d
 			subtitle: "{tinactory.quests.03_high_voltage.002.subtitle}"
@@ -132,7 +130,7 @@
 					tag: {
 						Fluid: {
 							FluidName: "tinactory:material/liquid/nitric_acid"
-							Amount: 1000
+							Amount: 4000
 						}
 					}
 				}
@@ -140,7 +138,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.005.title}"
-			icon: "tinactory:material/dust/sodium_carbonate"
 			x: -6.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.03_high_voltage.005.subtitle}"
@@ -154,12 +151,11 @@
 			tasks: [{
 				id: "252DCBA3F375D8F9"
 				type: "item"
-				item: "tinactory:material/dust/potassium_chloride"
+				item: "tinactory:material/dust/sodium_carbonate"
 			}]
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.006.title}"
-			icon: "tinactory:material/dust/ammonium_chloride"
 			x: -6.0d
 			y: 0.0d
 			subtitle: "{tinactory.quests.03_high_voltage.006.subtitle}"
@@ -178,7 +174,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.007.title}"
-			icon: "tinactory:material/dust/potassium_nitrate"
 			x: -6.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.007.subtitle}"
@@ -200,7 +195,7 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.008.title}"
-			icon: "tinactory:misc/fertilizer"
+			icon: "minecraft:bone_meal"
 			x: -8.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.008.subtitle}"
@@ -248,7 +243,7 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.010.title}"
-			icon: "tinactory:material/ingot/chrome"
+			icon: "tinactory:material/ingot_hot/chrome"
 			x: -8.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.010.subtitle}"
@@ -293,7 +288,7 @@
 					tag: {
 						Fluid: {
 							FluidName: "tinactory:material/liquid/titanium_tetrachloride"
-							Amount: 1000
+							Amount: 4000
 						}
 					}
 				}
@@ -301,7 +296,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.012.title}"
-			icon: "tinactory:material/ingot_hot/titanium"
 			x: 0.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.03_high_voltage.012.subtitle}"
@@ -320,7 +314,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.013.title}"
-			icon: "tinactory:material/ingot/titanium"
 			x: 0.0d
 			y: 6.0d
 			subtitle: "{tinactory.quests.03_high_voltage.013.subtitle}"
@@ -366,7 +359,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.015.title}"
-			icon: "tinactory:machine/hv/laser_engraver"
 			x: 2.0d
 			y: -4.0d
 			subtitle: "{tinactory.quests.03_high_voltage.015.subtitle}"
@@ -388,7 +380,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.016.title}"
-			icon: "tinactory:circuit_board/advanced"
 			x: 6.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.016.subtitle}"
@@ -433,7 +424,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.018.title}"
-			icon: "tinactory:circuit/nano_processor"
 			x: 4.0d
 			y: 0.0d
 			subtitle: "{tinactory.quests.03_high_voltage.018.subtitle}"
@@ -458,7 +448,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.019.title}"
-			icon: "tinactory:circuit/nano_assembly"
 			x: 4.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.019.subtitle}"
@@ -477,7 +466,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.020.title}"
-			icon: "tinactory:circuit/workstation"
 			x: 8.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.020.subtitle}"
@@ -496,7 +484,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.021.title}"
-			icon: "tinactory:misc/gelled_toluene"
 			x: -4.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.03_high_voltage.021.subtitle}"
@@ -518,7 +505,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.022.title}"
-			icon: "minecraft:tnt"
 			x: -4.0d
 			y: 6.0d
 			subtitle: "{tinactory.quests.03_high_voltage.022.subtitle}"
@@ -537,7 +523,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.023.title}"
-			icon: "tinactory:multiblock/implosion_compressor"
 			x: -6.0d
 			y: 6.0d
 			subtitle: "{tinactory.quests.03_high_voltage.023.subtitle}"
@@ -557,7 +542,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.024.title}"
-			icon: "tinactory:component/mixed_metal_ingot"
 			x: -6.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.024.subtitle}"
@@ -576,7 +560,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.025.title}"
-			icon: "tinactory:component/advanced_alloy"
 			x: -4.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.025.subtitle}"
@@ -600,7 +583,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.026.title}"
-			icon: "tinactory:component/hv/research_equipment"
 			x: -2.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.026.subtitle}"
@@ -650,8 +632,25 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.03_high_voltage.028.title}"
+			x: 8.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.03_high_voltage.028.subtitle}"
+			description: [
+				"{tinactory.quests.03_high_voltage.028.description.0}"
+				""
+				"{tinactory.quests.03_high_voltage.028.description.1}"
+			]
+			dependencies: ["54D61C6A8BA84D5D"]
+			id: "4F2ADA90E07C2761"
+			tasks: [{
+				id: "187D858294439887"
+				type: "item"
+				item: "tinactory:machine/hv/circuit_assembler"
+			}]
+		}
+		{
 			title: "{tinactory.quests.03_high_voltage.029.title}"
-			icon: "tinactory:multiblock/misc/launch_site_base"
 			x: 0.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.029.subtitle}"
@@ -670,7 +669,6 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.030.title}"
-			icon: "tinactory:multiblock/rocket_launch_site"
 			x: 2.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.030.subtitle}"
@@ -709,17 +707,6 @@
 				id: "58A667C11AA55AF9"
 				type: "checkmark"
 				title: "{tinactory.quests.03_high_voltage.031.title}"
-			}]
-		}
-		{
-			x: 8.0d
-			y: 0.0d
-			dependencies: ["54D61C6A8BA84D5D"]
-			id: "4F2ADA90E07C2761"
-			tasks: [{
-				id: "187D858294439887"
-				type: "item"
-				item: "tinactory:machine/hv/circuit_assembler"
 			}]
 		}
 	]
