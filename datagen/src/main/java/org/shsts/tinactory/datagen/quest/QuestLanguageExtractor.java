@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.ftb.mods.ftblibrary.snbt.SNBT;
+import dev.ftb.mods.ftblibrary.snbt.SNBTCompoundTag;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
@@ -36,6 +37,25 @@ public final class QuestLanguageExtractor {
         PROJECT_ROOT.resolve("datagen/src/main/resources/meta/tinactory/language");
     private static final Pattern INTERPOLATION = Pattern.compile("\\{(tinactory[.]quests[.][^}]+)}");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final List<String> CHAPTER_ORDER = List.of("id", "group", "order_index", "filename", "title", "icon",
+        "tags", "disable_toast", "subtitle", "always_invisible", "default_quest_shape",
+        "default_hide_dependency_lines", "images", "default_min_width", "progression_mode",
+        "hide_quest_details_until_startable", "quests", "quest_links");
+    private static final List<String> QUEST_ORDER = List.of("title", "icon", "tags", "disable_toast", "x", "y",
+        "shape", "subtitle", "description", "guide_page", "hide_dependency_lines", "min_required_dependencies",
+        "dependencies", "hide", "dependency_requirement", "hide_text_until_complete", "size", "optional",
+        "min_width", "can_repeat", "invisible", "invisible_until_tasks", "ignore_reward_blocking",
+        "progression_mode", "hide_details_until_startable", "id", "tasks", "rewards");
+    private static final List<String> TASK_ORDER = List.of("id", "type", "title", "icon", "tags", "disable_toast",
+        "item", "count", "consume_items", "only_from_crafting", "match_nbt", "weak_nbt_match", "task_screen_only");
+    private static final List<String> REWARD_ORDER = List.of("id", "type", "title", "icon", "tags", "team_reward",
+        "auto", "exclude_from_claim_all", "ignore_reward_blocking", "item", "count", "random_bonus", "only_one");
+    private static final List<String> ITEM_STACK_ORDER = List.of("id", "Count", "tag");
+    private static final Set<String> BOOLEAN_FIELDS = Set.of("default_hide_dependency_lines", "always_invisible",
+        "hide_quest_details_until_startable", "disable_toast", "hide_dependency_lines", "hide",
+        "hide_text_until_complete", "optional", "can_repeat", "invisible", "ignore_reward_blocking",
+        "hide_details_until_startable", "consume_items", "only_from_crafting", "match_nbt", "weak_nbt_match",
+        "task_screen_only", "team_reward", "exclude_from_claim_all", "only_one");
 
     private final boolean write;
     private final JsonObject zhCn;
@@ -99,7 +119,7 @@ public final class QuestLanguageExtractor {
             }
         }
         if (write) {
-            writeSnbt(path, tag);
+            writeSnbt(path, orderChapter(tag));
         }
     }
 
@@ -231,6 +251,57 @@ public final class QuestLanguageExtractor {
     private static void writeSnbt(Path path, CompoundTag tag) throws IOException {
         if (!SNBT.write(path, tag)) {
             throw new IOException("Failed to write FTB Quests SNBT: " + path);
+        }
+    }
+
+    private static CompoundTag orderChapter(CompoundTag tag) {
+        return orderCompound(tag, CHAPTER_ORDER);
+    }
+
+    private static Tag orderTag(String key, Tag tag) {
+        if (tag instanceof CompoundTag compound) {
+            if (key.equals("quests")) {
+                return orderCompound(compound, QUEST_ORDER);
+            } else if (key.equals("tasks")) {
+                return orderCompound(compound, TASK_ORDER);
+            } else if (key.equals("rewards")) {
+                return orderCompound(compound, REWARD_ORDER);
+            } else if (compound.contains("id", Tag.TAG_STRING) && compound.contains("Count", Tag.TAG_BYTE)) {
+                return orderCompound(compound, ITEM_STACK_ORDER);
+            }
+            return orderCompound(compound, List.of());
+        } else if (tag instanceof ListTag list) {
+            var ordered = new ListTag();
+            for (var value : list) {
+                ordered.add(orderTag(key, value));
+            }
+            return ordered;
+        }
+        return tag;
+    }
+
+    private static CompoundTag orderCompound(CompoundTag tag, List<String> order) {
+        var ret = new SNBTCompoundTag();
+        for (var key : order) {
+            putOrdered(ret, tag, key);
+        }
+        for (var key : tag.getAllKeys()) {
+            if (!order.contains(key)) {
+                putOrdered(ret, tag, key);
+            }
+        }
+        return ret;
+    }
+
+    private static void putOrdered(CompoundTag ret, CompoundTag tag, String key) {
+        if (!tag.contains(key)) {
+            return;
+        }
+        var value = tag.get(key);
+        if (BOOLEAN_FIELDS.contains(key) && value.getId() == Tag.TAG_BYTE) {
+            ret.putBoolean(key, tag.getBoolean(key));
+        } else {
+            ret.put(key, orderTag(key, value));
         }
     }
 
