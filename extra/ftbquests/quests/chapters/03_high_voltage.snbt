@@ -567,6 +567,8 @@
 				"{tinactory.quests.03_high_voltage.025.description.0}"
 				""
 				"{tinactory.quests.03_high_voltage.025.description.1}"
+				""
+				"{tinactory.quests.03_high_voltage.025.description.2}"
 			]
 			dependencies: [
 				"46F8F26339555C62"
@@ -676,6 +678,8 @@
 				"{tinactory.quests.03_high_voltage.030.description.0}"
 				""
 				"{tinactory.quests.03_high_voltage.030.description.1}"
+				""
+				"{tinactory.quests.03_high_voltage.030.description.2}"
 			]
 			dependencies: ["742D07DE04DB82F6"]
 			size: 2.0d
@@ -696,6 +700,8 @@
 				"{tinactory.quests.03_high_voltage.031.description.0}"
 				""
 				"{tinactory.quests.03_high_voltage.031.description.1}"
+				""
+				"{tinactory.quests.03_high_voltage.031.description.2}"
 			]
 			dependencies: [
 				"2575F9DB22B75F1C"
