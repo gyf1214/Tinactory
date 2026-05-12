@@ -268,7 +268,7 @@
 				""
 				"{tinactory.quests.ore_veins.010.description.1}"
 			]
-			dependencies: ["21D9FC2113E23F69"]
+			dependencies: ["3A37204C020F5B2C"]
 			size: 2.0d
 			id: "41CAE47DBA5E2C33"
 			tasks: [
