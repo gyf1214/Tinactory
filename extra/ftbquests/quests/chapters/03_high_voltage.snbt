@@ -1,7 +1,7 @@
 {
 	id: "16E428B6C103B73D"
-	group: "5D26E55DB14C5F98"
-	order_index: 0
+	group: ""
+	order_index: 3
 	filename: "03_high_voltage"
 	title: "{tinactory.quests.03_high_voltage.title}"
 	icon: "tinactory:component/advanced_alloy"

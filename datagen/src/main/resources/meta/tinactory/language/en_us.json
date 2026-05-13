@@ -933,7 +933,7 @@
     "tinactory.quests.02_medium_voltage.041.subtitle": "Build an Oil Cracker for hydrocracking or steam cracking",
     "tinactory.quests.02_medium_voltage.041.description.0": "Cracking is the most complex step in refining. Build an Oil Cracker with HV Circuit Boards and HV components as its core, plus Clean Stainless Steel Machine Casings and Heating Coils for the shell. If you built a Distillation Tower, this is expensive but manageable.",
     "tinactory.quests.02_medium_voltage.041.description.1": "There are two cracking methods. Hydrocracking converts heavy fractions into lighter ones for flexible refining. Steam cracking produces more useful organics and feeds many organic materials. Pick the route your factory needs.",
-    "tinactory.quests.03_high_voltage.title": "The HV Era",
+    "tinactory.quests.03_high_voltage.title": "HV to Liftoff",
     "tinactory.quests.03_high_voltage.000.title": "The First HV Foundation",
     "tinactory.quests.03_high_voltage.000.subtitle": "Assemble HV Machine Hulls and cables",
     "tinactory.quests.03_high_voltage.000.description.0": "HV is not a faster MV, but a new layer of infrastructure. Stainless steel frames, Polyethylene insulation, and CPU-grade circuits start becoming the default machine cost.",
