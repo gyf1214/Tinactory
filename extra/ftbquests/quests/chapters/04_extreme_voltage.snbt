@@ -89,9 +89,7 @@
 			x: 0.0d
 			y: -4.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.003.subtitle}"
-			description: [
-				"{tinactory.quests.04_extreme_voltage.003.description.0}"
-			]
+			description: ["{tinactory.quests.04_extreme_voltage.003.description.0}"]
 			dependencies: [
 				"756F380B2118DD7F"
 				"74F77E09DA51F48F"
@@ -108,9 +106,7 @@
 			x: 2.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.004.subtitle}"
-			description: [
-				"{tinactory.quests.04_extreme_voltage.004.description.0}"
-			]
+			description: ["{tinactory.quests.04_extreme_voltage.004.description.0}"]
 			dependencies: ["756F380B2118DD7F"]
 			id: "7696374781756109"
 			tasks: [{
@@ -699,9 +695,7 @@
 			x: -2.0d
 			y: 16.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.021.subtitle}"
-			description: [
-				"{tinactory.quests.04_extreme_voltage.021.description.0}"
-			]
+			description: ["{tinactory.quests.04_extreme_voltage.021.description.0}"]
 			dependencies: ["07515AD71E8B26EF"]
 			id: "1839DA1403560DB3"
 			tasks: [{
@@ -725,9 +719,7 @@
 			x: -2.0d
 			y: 14.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.022.subtitle}"
-			description: [
-				"{tinactory.quests.04_extreme_voltage.022.description.0}"
-			]
+			description: ["{tinactory.quests.04_extreme_voltage.022.description.0}"]
 			dependencies: [
 				"4BC5CC00BBABBC80"
 				"52D537C7D3268C67"
@@ -754,9 +746,7 @@
 			x: 0.0d
 			y: 16.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.023.subtitle}"
-			description: [
-				"{tinactory.quests.04_extreme_voltage.023.description.0}"
-			]
+			description: ["{tinactory.quests.04_extreme_voltage.023.description.0}"]
 			dependencies: [
 				"1839DA1403560DB3"
 				"7F568D268CA544F6"

@@ -109,6 +109,9 @@ public final class QuestLanguageExtractor {
         var fileName = path.getFileName().toString();
         var chapter = fileName.substring(0, fileName.length() - ".snbt".length());
         var rootKey = "tinactory.quests." + chapter;
+        if (!write) {
+            checkDescriptionFormatting(path);
+        }
         var tag = readSnbt(path);
         processString(tag, "title", rootKey + ".title");
         processStringOrList(tag, "subtitle", rootKey + ".subtitle");
@@ -120,6 +123,30 @@ public final class QuestLanguageExtractor {
         }
         if (write) {
             writeSnbt(path, orderChapter(tag));
+        }
+    }
+
+    private void checkDescriptionFormatting(Path path) throws IOException {
+        var lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+        for (var i = 0; i < lines.size(); i++) {
+            if (!lines.get(i).trim().equals("description: [")) {
+                continue;
+            }
+            var elementCount = 0;
+            for (var j = i + 1; j < lines.size(); j++) {
+                var line = lines.get(j).trim();
+                if (line.equals("]")) {
+                    if (elementCount == 1) {
+                        var relativePath = PROJECT_ROOT.relativize(path);
+                        errors.add("Single-line description list must be normalized in " + relativePath + ":" +
+                            (i + 1));
+                    }
+                    break;
+                }
+                if (!line.isEmpty()) {
+                    elementCount++;
+                }
+            }
         }
     }
 
