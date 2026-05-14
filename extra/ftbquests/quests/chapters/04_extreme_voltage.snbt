@@ -206,7 +206,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.010.title}"
 			x: -2.0d
-			y: 6.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.010.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.010.description.0}"]
 			dependencies: ["378E7D2AD50D6C50"]
@@ -251,8 +251,17 @@
 		}
 		{
 			title: "{tinactory.quests.04_extreme_voltage.028.title}"
-			icon: "tinactory:material/liquid/phenol"
-			x: -4.0d
+			icon: {
+				id: "tinactory:tool/fluid_cell/iron"
+				Count: 1b
+				tag: {
+					Fluid: {
+						FluidName: "tinactory:material/liquid/phenol"
+						Amount: 4000
+					}
+				}
+			}
+			x: 2.0d
 			y: 10.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.028.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.028.description.0}"]
@@ -318,7 +327,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.030.title}"
 			icon: "tinactory:material/sheet/epoxy"
-			x: -2.0d
+			x: 0.0d
 			y: 12.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.030.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.030.description.0}"]
@@ -326,6 +335,7 @@
 				"2A41C0F4C70E1293"
 				"12D6316F28C15A03"
 			]
+			size: 2.0d
 			id: "0F38B05E2E11756A"
 			tasks: [
 				{
@@ -353,11 +363,14 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.031.title}"
 			icon: "tinactory:component/carbon_fiber"
-			x: 0.0d
-			y: 12.0d
+			x: 4.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.031.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.031.description.0}"]
-			dependencies: ["378E7D2AD50D6C50"]
+			dependencies: [
+				"56D30433BF43D996"
+				"46F8F26339555C62"
+			]
 			id: "3B40E5106A3F53F1"
 			tasks: [
 				{
@@ -375,7 +388,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.012.title}"
 			icon: "tinactory:component/carbon_plate"
-			x: 2.0d
+			x: 4.0d
 			y: 12.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.012.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.012.description.0}"]
@@ -527,7 +540,7 @@
 		}
 		{
 			title: "{tinactory.quests.04_extreme_voltage.021.title}"
-			x: -4.0d
+			x: -2.0d
 			y: 16.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.021.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.021.description.0}"]
@@ -552,7 +565,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.022.title}"
 			x: -2.0d
-			y: 16.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.022.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.022.description.0}"]
 			dependencies: [
@@ -625,7 +638,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.025.title}"
 			x: 8.0d
-			y: 10.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.025.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.025.description.0}"]
 			dependencies: ["54189E058A630417"]
@@ -639,7 +652,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.026.title}"
 			x: 8.0d
-			y: 14.0d
+			y: 16.0d
 			subtitle: "{tinactory.quests.04_extreme_voltage.026.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.026.description.0}"]
 			dependencies: ["54D61C6A8BA84D5D"]
@@ -659,7 +672,7 @@
 		{
 			title: "{tinactory.quests.04_extreme_voltage.027.title}"
 			x: 4.0d
-			y: 14.0d
+			y: 16.0d
 			shape: "pentagon"
 			subtitle: "{tinactory.quests.04_extreme_voltage.027.subtitle}"
 			description: ["{tinactory.quests.04_extreme_voltage.027.description.0}"]
