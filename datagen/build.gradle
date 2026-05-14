@@ -11,10 +11,6 @@ minecraft {
             ideaModule rootProject.name + "." + project.name + ".main"
 
             mods {
-                tinactory {
-                    source project(':mod').sourceSets.main
-                }
-
                 tinactory_datagen {
                     source sourceSets.main
                 }
@@ -45,10 +41,42 @@ dependencies {
 
     // extra resources
     compileOnly rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
+
+    // FTB Quests SNBT
+    compileOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
+    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
+    compileOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
+    runtimeOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
 }
 
 compileKotlin {
     kotlinOptions {
         jvmTarget = "21"
     }
+}
+
+tasks.register('extractQuestLanguage', JavaExec) {
+    group = 'tinactory'
+    description = 'Extract FTB Quests chapter text into language metadata.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
+    workingDir = rootProject.file('run/questLanguage')
+    systemProperty 'tinactory.projectRoot', rootProject.projectDir.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+    }
+    args 'extract'
+}
+
+tasks.register('checkQuestLanguage', JavaExec) {
+    group = 'verification'
+    description = 'Check FTB Quests chapter text language metadata synchronization.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.shsts.tinactory.datagen.quest.QuestLanguageExtractor'
+    workingDir = rootProject.file('run/questLanguage')
+    systemProperty 'tinactory.projectRoot', rootProject.projectDir.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+    }
+    args 'check'
 }

@@ -1,24 +1,24 @@
 {
 	id: "3B5374D34DFEC6AF"
 	group: ""
-	order_index: 3
-	filename: "3B5374D34DFEC6AF"
-	title: "寻迹深层之脉动"
+	order_index: 5
+	filename: "ore_veins"
+	title: "{tinactory.quests.ore_veins.title}"
 	icon: "minecraft:raw_iron"
-	subtitle: ["用科研解锁多种矿脉，让矿石分析仪从普通石头中读出大地的秘密"]
+	subtitle: ["{tinactory.quests.ore_veins.subtitle.0}"]
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
 		{
-			title: "褐铁矿脉"
+			title: "{tinactory.quests.ore_veins.000.title}"
 			icon: "tinactory:material/raw/limonite"
 			x: 0.0d
 			y: 0.0d
-			subtitle: "研究圆石矿脉科技，解锁褐铁矿脉"
+			subtitle: "{tinactory.quests.ore_veins.000.subtitle}"
 			description: [
-				"褐铁矿脉可以得到褐铁矿、带状铁矿和硅镁石。这也是研究圆石矿脉科技能解锁的第一个矿脉。"
+				"{tinactory.quests.ore_veins.000.description.0}"
 				""
-				"你需要超低压科研和矿石分析仪。"
+				"{tinactory.quests.ore_veins.000.description.1}"
 			]
 			dependencies: [
 				"070F82ED30238005"
@@ -45,11 +45,11 @@
 			]
 		}
 		{
-			title: "锡矿脉"
+			title: "{tinactory.quests.ore_veins.001.title}"
 			x: 2.0d
 			y: 0.0d
-			subtitle: "解锁锡矿脉"
-			description: ["锡矿脉可以得到锡和锡石。"]
+			subtitle: "{tinactory.quests.ore_veins.001.subtitle}"
+			description: ["{tinactory.quests.ore_veins.001.description.0}"]
 			dependencies: ["6CBAE7AF9D17A28D"]
 			id: "38AD236D90FE95DD"
 			tasks: [
@@ -66,12 +66,12 @@
 			]
 		}
 		{
-			title: "红石矿脉"
+			title: "{tinactory.quests.ore_veins.002.title}"
 			icon: "tinactory:material/raw/redstone"
 			x: 0.0d
 			y: 2.0d
-			subtitle: "解锁红石矿脉"
-			description: ["红石矿脉可以得到红石、红宝石和朱砂。"]
+			subtitle: "{tinactory.quests.ore_veins.002.subtitle}"
+			description: ["{tinactory.quests.ore_veins.002.description.0}"]
 			dependencies: ["6CBAE7AF9D17A28D"]
 			id: "45183BF83F5A72B0"
 			tasks: [
@@ -93,11 +93,11 @@
 			]
 		}
 		{
-			title: "煤矿脉"
+			title: "{tinactory.quests.ore_veins.003.title}"
 			x: -2.0d
 			y: 0.0d
-			subtitle: "解锁煤矿脉"
-			description: ["煤矿脉可以得到煤。"]
+			subtitle: "{tinactory.quests.ore_veins.003.subtitle}"
+			description: ["{tinactory.quests.ore_veins.003.description.0}"]
 			dependencies: ["6CBAE7AF9D17A28D"]
 			id: "2CF3758FBEB5EA41"
 			tasks: [{
@@ -107,15 +107,15 @@
 			}]
 		}
 		{
-			title: "磁铁矿脉"
+			title: "{tinactory.quests.ore_veins.004.title}"
 			icon: "tinactory:material/raw/magnetite"
 			x: 8.0d
 			y: 0.0d
-			subtitle: "研究深板岩矿脉科技，解锁磁铁矿脉"
+			subtitle: "{tinactory.quests.ore_veins.004.subtitle}"
 			description: [
-				"磁铁矿脉可以得到磁铁矿和金。这也是研究深板岩矿脉科技能解锁的第一个矿脉。"
+				"{tinactory.quests.ore_veins.004.description.0}"
 				""
-				"你需要低压科研和矿石分析仪。"
+				"{tinactory.quests.ore_veins.004.description.1}"
 			]
 			dependencies: [
 				"3C6F611AD202962D"
@@ -138,12 +138,12 @@
 			]
 		}
 		{
-			title: "石墨矿脉"
+			title: "{tinactory.quests.ore_veins.005.title}"
 			icon: "tinactory:material/raw/graphite"
 			x: 6.0d
 			y: 0.0d
-			subtitle: "解锁石墨矿脉"
-			description: ["石墨矿脉可以得到石墨和钻石。"]
+			subtitle: "{tinactory.quests.ore_veins.005.subtitle}"
+			description: ["{tinactory.quests.ore_veins.005.description.0}"]
 			dependencies: ["3CD314088812FBB4"]
 			id: "7F86524AF19D5E4C"
 			tasks: [
@@ -160,12 +160,12 @@
 			]
 		}
 		{
-			title: "铝土矿脉"
+			title: "{tinactory.quests.ore_veins.006.title}"
 			icon: "tinactory:material/raw/bauxite"
 			x: 6.5d
 			y: 2.0d
-			subtitle: "解锁铝土矿脉"
-			description: ["铝土矿脉可以得到铝土矿和钛铁矿。"]
+			subtitle: "{tinactory.quests.ore_veins.006.subtitle}"
+			description: ["{tinactory.quests.ore_veins.006.description.0}"]
 			dependencies: ["3CD314088812FBB4"]
 			id: "681E37422C8CADA2"
 			tasks: [
@@ -182,12 +182,12 @@
 			]
 		}
 		{
-			title: "硫矿脉"
+			title: "{tinactory.quests.ore_veins.007.title}"
 			icon: "tinactory:material/raw/galena"
 			x: 10.0d
 			y: 0.0d
-			subtitle: "解锁硫矿脉"
-			description: ["硫矿脉可以得到闪锌矿、方铅矿和银。"]
+			subtitle: "{tinactory.quests.ore_veins.007.subtitle}"
+			description: ["{tinactory.quests.ore_veins.007.description.0}"]
 			dependencies: ["3CD314088812FBB4"]
 			id: "190125F22C1A5EE0"
 			tasks: [
@@ -209,12 +209,12 @@
 			]
 		}
 		{
-			title: "宝石矿脉"
+			title: "{tinactory.quests.ore_veins.008.title}"
 			icon: "tinactory:material/raw/emerald"
 			x: 8.0d
 			y: -2.0d
-			subtitle: "解锁宝石矿脉"
-			description: ["宝石矿脉可以得到绿宝石和蓝宝石。"]
+			subtitle: "{tinactory.quests.ore_veins.008.subtitle}"
+			description: ["{tinactory.quests.ore_veins.008.description.0}"]
 			dependencies: ["3CD314088812FBB4"]
 			id: "2A3A2EF77EBB6998"
 			tasks: [
@@ -231,12 +231,12 @@
 			]
 		}
 		{
-			title: "石油矿脉"
+			title: "{tinactory.quests.ore_veins.009.title}"
 			icon: "tinactory:material/raw_fluid/natural_gas"
 			x: 9.5d
 			y: 2.0d
-			subtitle: "解锁石油矿脉"
-			description: ["石油矿脉可以得到天然气、轻原油和重原油。"]
+			subtitle: "{tinactory.quests.ore_veins.009.subtitle}"
+			description: ["{tinactory.quests.ore_veins.009.description.0}"]
 			dependencies: ["3CD314088812FBB4"]
 			id: "29D02376CFF086C1"
 			tasks: [
@@ -258,17 +258,17 @@
 			]
 		}
 		{
-			title: "金矿脉"
+			title: "{tinactory.quests.ore_veins.010.title}"
 			icon: "minecraft:raw_gold"
 			x: 0.0d
 			y: 8.0d
-			subtitle: "研究地狱岩矿脉科技，解锁金矿脉"
+			subtitle: "{tinactory.quests.ore_veins.010.subtitle}"
 			description: [
-				"金矿脉可以得到金矿、黄玉和蓝黄玉。这也是研究地狱岩矿脉科技能解锁的第一个矿脉。"
+				"{tinactory.quests.ore_veins.010.description.0}"
 				""
-				"你需要高压科研和矿石分析仪，同时需要先解锁一阶火箭。"
+				"{tinactory.quests.ore_veins.010.description.1}"
 			]
-			dependencies: ["21D9FC2113E23F69"]
+			dependencies: ["3A37204C020F5B2C"]
 			size: 2.0d
 			id: "41CAE47DBA5E2C33"
 			tasks: [
@@ -290,12 +290,12 @@
 			]
 		}
 		{
-			title: "石英矿脉"
+			title: "{tinactory.quests.ore_veins.011.title}"
 			icon: "tinactory:material/raw/nether_quartz"
 			x: -2.0d
 			y: 8.0d
-			subtitle: "解锁石英矿脉"
-			description: ["石英矿脉可以得到下界石英、塞特斯石英和青金石。"]
+			subtitle: "{tinactory.quests.ore_veins.011.subtitle}"
+			description: ["{tinactory.quests.ore_veins.011.description.0}"]
 			dependencies: ["41CAE47DBA5E2C33"]
 			id: "02DDF396D6BCCE5E"
 			tasks: [
@@ -317,12 +317,12 @@
 			]
 		}
 		{
-			title: "钨酸锂矿脉"
+			title: "{tinactory.quests.ore_veins.012.title}"
 			icon: "tinactory:material/raw/tungstate"
 			x: 2.0d
 			y: 8.0d
-			subtitle: "解锁钨酸锂矿脉"
-			description: ["钨酸锂矿脉可以得到钨酸锂矿和钼酸钙矿。"]
+			subtitle: "{tinactory.quests.ore_veins.012.subtitle}"
+			description: ["{tinactory.quests.ore_veins.012.description.0}"]
 			dependencies: ["41CAE47DBA5E2C33"]
 			id: "7363E5AC14AECA75"
 			tasks: [
@@ -339,12 +339,12 @@
 			]
 		}
 		{
-			title: "沥青铀矿脉"
+			title: "{tinactory.quests.ore_veins.013.title}"
 			icon: "tinactory:material/raw/pitchblende"
 			x: 0.0d
 			y: 10.0d
-			subtitle: "解锁沥青铀矿脉"
-			description: ["沥青铀矿脉可以得到沥青铀矿和钍。"]
+			subtitle: "{tinactory.quests.ore_veins.013.subtitle}"
+			description: ["{tinactory.quests.ore_veins.013.description.0}"]
 			dependencies: ["41CAE47DBA5E2C33"]
 			id: "642B670E0BD087C2"
 			tasks: [
@@ -361,11 +361,11 @@
 			]
 		}
 		{
-			title: "岩浆矿脉"
+			title: "{tinactory.quests.ore_veins.014.title}"
 			x: 0.0d
 			y: 6.0d
-			subtitle: "解锁岩浆矿脉"
-			description: ["岩浆矿脉可以得到岩浆块。"]
+			subtitle: "{tinactory.quests.ore_veins.014.subtitle}"
+			description: ["{tinactory.quests.ore_veins.014.description.0}"]
 			dependencies: ["41CAE47DBA5E2C33"]
 			id: "7B6DDB0F8DA8568C"
 			tasks: [{

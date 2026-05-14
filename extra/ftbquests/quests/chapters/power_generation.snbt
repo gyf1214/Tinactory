@@ -1,9 +1,9 @@
 {
 	id: "18A01183DF6A59D0"
 	group: "5D26E55DB14C5F98"
-	order_index: 1
-	filename: "18A01183DF6A59D0"
-	title: "发电方式"
+	order_index: 0
+	filename: "power_generation"
+	title: "{tinactory.quests.power_generation.title}"
 	icon: "tinactory:chip/low_pic"
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
@@ -45,7 +45,7 @@
 			}]
 		}
 		{
-			title: "LPG"
+			title: "{tinactory.quests.power_generation.003.title}"
 			x: 2.0d
 			y: 2.0d
 			dependencies: [
@@ -69,12 +69,13 @@
 			}]
 		}
 		{
-			title: "Rocket Fuel"
+			title: "{tinactory.quests.power_generation.004.title}"
 			x: 2.0d
 			y: 4.0d
 			dependencies: [
 				"7FC43799DC08AC4E"
-				"21D9FC2113E23F69"
+				"4BC5CC00BBABBC80"
+				"56D39B7C7922E621"
 			]
 			id: "7754C6016593C2B8"
 			tasks: [{
@@ -104,7 +105,7 @@
 			}]
 		}
 		{
-			title: "Diesel"
+			title: "{tinactory.quests.power_generation.006.title}"
 			x: 4.0d
 			y: 2.0d
 			dependencies: [
@@ -128,12 +129,13 @@
 			}]
 		}
 		{
-			title: "Boosted Diesel"
+			title: "{tinactory.quests.power_generation.007.title}"
 			x: 4.0d
 			y: 4.0d
 			dependencies: [
 				"7902ED312A19F27B"
-				"21D9FC2113E23F69"
+				"79DF7E4A2DFFCC09"
+				"50A4694A51414D54"
 			]
 			id: "5CD1BF9CBC8CB89F"
 			tasks: [{
@@ -158,7 +160,6 @@
 				"3B814E5A86CB22E7"
 				"363746D1E8189E50"
 				"1213D571D21C3386"
-				"21D9FC2113E23F69"
 			]
 			size: 2.0d
 			id: "4DB9BF0E510E3E9C"
@@ -171,10 +172,7 @@
 		{
 			x: 0.0d
 			y: 4.0d
-			dependencies: [
-				"7890894D11E55E47"
-				"21D9FC2113E23F69"
-			]
+			dependencies: ["7890894D11E55E47"]
 			size: 2.0d
 			id: "24366ACA10086991"
 			tasks: [{
@@ -189,7 +187,6 @@
 			dependencies: [
 				"3B814E5A86CB22E7"
 				"4BC5CC00BBABBC80"
-				"21D9FC2113E23F69"
 			]
 			id: "180A7F8DD9AD0580"
 			tasks: [{

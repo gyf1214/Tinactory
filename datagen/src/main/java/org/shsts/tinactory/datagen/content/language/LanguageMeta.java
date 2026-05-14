@@ -22,6 +22,9 @@ public class LanguageMeta extends MetaConsumer {
     }
 
     private void parse(JsonObject jo, String member, BiConsumer<String, String> cons) {
+        if (!jo.has(member)) {
+            return;
+        }
         var jo1 = GsonHelper.getAsJsonObject(jo, member);
         for (var entry : jo1.entrySet()) {
             cons.accept(entry.getKey(), GsonHelper.convertToString(entry.getValue(), member));
@@ -37,6 +40,7 @@ public class LanguageMeta extends MetaConsumer {
         parse(jo, "words", processor::word);
         parse(jo, "patterns", processor::pattern);
         parse(jo, "extras", processor::extra);
+        parse(jo, "quests", processor::extra);
 
         initDelayed(() -> DATA_GEN.addProvider((dataGen, event) ->
             new LanguageDataProvider(dataGen, event, locale, processor)));

@@ -1,9 +1,9 @@
 {
 	id: "021730EB05578B09"
 	group: "5D26E55DB14C5F98"
-	order_index: 2
-	filename: "021730EB05578B09"
-	title: "物流"
+	order_index: 1
+	filename: "logistics"
+	title: "{tinactory.quests.logistics.title}"
 	icon: "tinactory:component/hv/conveyor_module"
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
@@ -110,7 +110,7 @@
 		{
 			x: 1.0d
 			y: 6.0d
-			dependencies: ["21D9FC2113E23F69"]
+			dependencies: ["56D39B7C7922E621"]
 			size: 2.0d
 			id: "61C306A510164241"
 			tasks: [{
@@ -134,7 +134,7 @@
 		{
 			x: 1.0d
 			y: 8.0d
-			dependencies: ["21D9FC2113E23F69"]
+			dependencies: ["3A37204C020F5B2C"]
 			id: "4034E621C42EBF60"
 			tasks: [{
 				id: "018ABCD56E6CDF11"
@@ -159,7 +159,7 @@
 		{
 			x: -2.0d
 			y: 10.0d
-			dependencies: ["21D9FC2113E23F69"]
+			dependencies: ["3A37204C020F5B2C"]
 			id: "3EDE299FA6EF6A78"
 			tasks: [{
 				id: "54401F085EBBA288"
@@ -228,7 +228,7 @@
 		}
 		{
 			x: 4.0d
-			y: 18.5d
+			y: 18.0d
 			dependencies: ["41B2E83E7E86A9A6"]
 			id: "2669AE71AD768BC1"
 			tasks: [{

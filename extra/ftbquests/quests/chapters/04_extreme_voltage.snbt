@@ -1,0 +1,879 @@
+{
+	id: "1552B98C4F286D86"
+	group: ""
+	order_index: 4
+	filename: "04_extreme_voltage"
+	title: "{tinactory.quests.04_extreme_voltage.title}"
+	icon: "tinactory:component/iv/electric_pump"
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			title: "{tinactory.quests.04_extreme_voltage.000.title}"
+			icon: "minecraft:netherrack"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.000.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.000.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.000.description.1}"
+			]
+			dependencies: ["3A37204C020F5B2C"]
+			size: 2.0d
+			id: "46C15B5CA52BBB56"
+			tasks: [
+				{
+					id: "2CE813177769CA05"
+					type: "item"
+					item: "tinactory:machine/hv/stone_generator"
+				}
+				{
+					id: "60D997BBB82F3389"
+					type: "item"
+					item: "minecraft:netherrack"
+				}
+				{
+					id: "2F9C6F62A39B33D0"
+					type: "item"
+					item: "tinactory:machine/hv/ore_analyzer"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.001.title}"
+			icon: "tinactory:material/dust/certus_quartz"
+			x: 0.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.001.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.001.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.001.description.1}"
+			]
+			dependencies: ["46C15B5CA52BBB56"]
+			id: "756F380B2118DD7F"
+			tasks: [
+				{
+					id: "172DF6DABE273B6F"
+					type: "item"
+					item: "tinactory:material/dust/certus_quartz"
+				}
+				{
+					id: "23EC33FAEC6CF23C"
+					type: "item"
+					item: "tinactory:material/dust/nether_quartz"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.002.title}"
+			x: -2.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.002.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.002.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.002.description.1}"
+			]
+			dependencies: ["46C15B5CA52BBB56"]
+			id: "74F77E09DA51F48F"
+			tasks: [{
+				id: "6320DD50271FC37D"
+				type: "item"
+				item: "tinactory:multiblock/autoclave"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.003.title}"
+			x: 0.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.003.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.003.description.0}"
+			]
+			dependencies: [
+				"756F380B2118DD7F"
+				"74F77E09DA51F48F"
+			]
+			id: "77F50D58EF027BF0"
+			tasks: [{
+				id: "0A7B0E21C9053A7A"
+				type: "item"
+				item: "tinactory:material/seed/certus_quartz"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.004.title}"
+			x: 2.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.004.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.004.description.0}"
+			]
+			dependencies: ["756F380B2118DD7F"]
+			id: "7696374781756109"
+			tasks: [{
+				id: "5A1EA8BDBB2FB07D"
+				type: "item"
+				item: "tinactory:material/dust/fluix"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.005.title}"
+			x: 2.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.005.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.005.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.005.description.1}"
+			]
+			dependencies: [
+				"77F50D58EF027BF0"
+				"7696374781756109"
+			]
+			id: "662483EF1D1C66F5"
+			tasks: [{
+				id: "7E33A3A6D6A2E86C"
+				type: "item"
+				item: "tinactory:material/seed/fluix"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.006.title}"
+			icon: "tinactory:material/dust/topaz"
+			x: 0.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.006.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.006.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.006.description.1}"
+			]
+			dependencies: ["46C15B5CA52BBB56"]
+			id: "182DCD33318D27DF"
+			tasks: [
+				{
+					id: "2C8FEDE4222EF045"
+					type: "item"
+					item: "tinactory:material/dust/topaz"
+				}
+				{
+					id: "2582015F034C8B06"
+					type: "item"
+					item: "tinactory:material/dust/blue_topaz"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.032.title}"
+			icon: "minecraft:lava_bucket"
+			x: -2.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.032.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.032.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.032.description.1}"
+			]
+			dependencies: ["46C15B5CA52BBB56"]
+			id: "0F875BA74B75405A"
+			tasks: [
+				{
+					id: "EB9710E5205623C2"
+					type: "item"
+					item: "minecraft:magma_block"
+				}
+				{
+					id: "5A67F346104F8578"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "minecraft:lava"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.033.title}"
+			x: -2.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.033.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.033.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.033.description.1}"
+			]
+			dependencies: ["0F875BA74B75405A"]
+			id: "3E72DFCA89D79EAD"
+			tasks: [{
+				id: "E0B970B8FF23A6EE"
+				type: "item"
+				item: "minecraft:obsidian"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.007.title}"
+			x: 0.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.007.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.007.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.007.description.1}"
+			]
+			dependencies: ["182DCD33318D27DF"]
+			id: "3BD5E7B3FBD1C438"
+			tasks: [{
+				id: "7FD844865F9F60B5"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/gas/hydrogen_fluoride"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.008.title}"
+			icon: "tinactory:material/pipe/polytetrafluoro_ethylene"
+			x: 0.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.008.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.008.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.008.description.1}"
+			]
+			dependencies: ["3BD5E7B3FBD1C438"]
+			id: "0D522F211E92F89B"
+			tasks: [
+				{
+					id: "2710E57133302C4A"
+					type: "item"
+					item: "tinactory:material/sheet/polytetrafluoro_ethylene"
+				}
+				{
+					id: "0B97E98E9F578427"
+					type: "item"
+					item: "tinactory:material/pipe/polytetrafluoro_ethylene"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.009.title}"
+			x: 0.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.009.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.009.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.009.description.1}"
+				""
+				"{tinactory.quests.04_extreme_voltage.009.description.2}"
+			]
+			dependencies: ["0D522F211E92F89B"]
+			size: 2.0d
+			id: "378E7D2AD50D6C50"
+			tasks: [{
+				id: "4E5C8F682C2644E8"
+				type: "item"
+				item: "tinactory:multiblock/large_chemical_reactor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.010.title}"
+			x: -2.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.010.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.010.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.010.description.1}"
+			]
+			dependencies: ["378E7D2AD50D6C50"]
+			id: "7E351C201E3FE985"
+			tasks: [{
+				id: "684CE569A359D3AA"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/molten/raw_styrene_butadiene_rubber"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.011.title}"
+			icon: "tinactory:material/foil/silicone_rubber"
+			x: 2.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.011.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.011.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.011.description.1}"
+			]
+			dependencies: ["378E7D2AD50D6C50"]
+			id: "645CBB8D8FE85012"
+			tasks: [
+				{
+					id: "656FCCB57A385FA3"
+					type: "item"
+					item: "tinactory:material/dust/polydimethyl_siloxane"
+				}
+				{
+					id: "10AD6C96CFC4FDA8"
+					type: "item"
+					item: "tinactory:material/foil/silicone_rubber"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.028.title}"
+			icon: {
+				id: "tinactory:tool/fluid_cell/iron"
+				Count: 1b
+				tag: {
+					Fluid: {
+						FluidName: "tinactory:material/liquid/phenol"
+						Amount: 4000
+					}
+				}
+			}
+			x: 2.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.028.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.028.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.028.description.1}"
+			]
+			dependencies: ["378E7D2AD50D6C50"]
+			id: "2A41C0F4C70E1293"
+			tasks: [
+				{
+					id: "22A7083D709D239B"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "tinactory:material/liquid/phenol"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+				{
+					id: "6D06B8C0A5E75172"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "tinactory:material/liquid/acetone"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.029.title}"
+			x: -2.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.029.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.029.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.029.description.1}"
+			]
+			dependencies: ["378E7D2AD50D6C50"]
+			id: "12D6316F28C15A03"
+			tasks: [{
+				id: "4F85D22EC1D68B38"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/epichlorohydrin"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.030.title}"
+			icon: "tinactory:material/sheet/epoxy"
+			x: 0.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.030.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.030.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.030.description.1}"
+				""
+				"{tinactory.quests.04_extreme_voltage.030.description.2}"
+			]
+			dependencies: [
+				"2A41C0F4C70E1293"
+				"12D6316F28C15A03"
+			]
+			size: 2.0d
+			id: "0F38B05E2E11756A"
+			tasks: [
+				{
+					id: "13F7B5157711D67E"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "tinactory:material/molten/epoxy"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+				{
+					id: "0A6DB073CB709457"
+					type: "item"
+					item: "tinactory:material/sheet/epoxy"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.031.title}"
+			icon: "tinactory:component/carbon_fiber"
+			x: 4.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.031.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.031.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.031.description.1}"
+			]
+			dependencies: [
+				"56D30433BF43D996"
+				"46F8F26339555C62"
+			]
+			id: "3B40E5106A3F53F1"
+			tasks: [
+				{
+					id: "79284BE77C62ED10"
+					type: "item"
+					item: "tinactory:material/ingot/carbon"
+				}
+				{
+					id: "5A24C3F991184B24"
+					type: "item"
+					item: "tinactory:component/carbon_fiber"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.012.title}"
+			icon: "tinactory:component/carbon_plate"
+			x: 4.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.012.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.012.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.012.description.1}"
+				""
+				"{tinactory.quests.04_extreme_voltage.012.description.2}"
+			]
+			dependencies: [
+				"0F38B05E2E11756A"
+				"3B40E5106A3F53F1"
+			]
+			id: "1DA662F6D90438AB"
+			tasks: [
+				{
+					id: "22BDD789AF84E5CB"
+					type: "item"
+					item: "tinactory:component/carbon_mesh"
+				}
+				{
+					id: "5B301E3F45469D08"
+					type: "item"
+					item: "tinactory:component/carbon_plate"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.013.title}"
+			icon: "tinactory:component/ev/machine_hull"
+			x: 4.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.013.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.013.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.013.description.1}"
+			]
+			dependencies: ["645CBB8D8FE85012"]
+			id: "6885F61C806D96E5"
+			tasks: [
+				{
+					id: "602AAF86116609F2"
+					type: "item"
+					item: "tinactory:network/ev/cable"
+				}
+				{
+					id: "2BCEF5C59B954718"
+					type: "item"
+					item: "tinactory:component/ev/machine_hull"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.014.title}"
+			x: 6.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.014.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.014.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.014.description.1}"
+			]
+			dependencies: ["6885F61C806D96E5"]
+			id: "6D4396F046AC59FA"
+			tasks: [{
+				id: "09F50AB90C269FB0"
+				type: "item"
+				item: "tinactory:machine/ev/assembler"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.015.title}"
+			x: 2.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.015.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.015.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.015.description.1}"
+			]
+			dependencies: ["46C15B5CA52BBB56"]
+			id: "21E237DEB81D960E"
+			tasks: [{
+				id: "1E3DC9B5A75EBDF2"
+				type: "item"
+				item: "tinactory:material/dust/tungstate"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.016.title}"
+			x: 4.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.016.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.016.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.016.description.1}"
+			]
+			dependencies: ["21E237DEB81D960E"]
+			id: "4E8E2AA5D4AAF81E"
+			tasks: [{
+				id: "64AECF2298B7CD22"
+				type: "item"
+				item: "tinactory:material/dust/tungsten_trioxide"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.017.title}"
+			x: 6.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.017.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.017.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.017.description.1}"
+			]
+			dependencies: ["4E8E2AA5D4AAF81E"]
+			id: "330CE0C6D92F38F2"
+			tasks: [{
+				id: "40D6627359C944CA"
+				type: "item"
+				item: "tinactory:material/ingot/tungsten"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.018.title}"
+			x: 8.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.018.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.018.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.018.description.1}"
+			]
+			dependencies: ["330CE0C6D92F38F2"]
+			id: "09CB7C63AE45690A"
+			tasks: [{
+				id: "01122A97337F3568"
+				type: "item"
+				item: "tinactory:material/ingot/tungsten_steel"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.019.title}"
+			icon: "tinactory:material/dust/neodymium"
+			x: 4.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.019.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.019.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.019.description.1}"
+			]
+			dependencies: ["30CEEE3CBC4AA11A"]
+			id: "1EDE3A566356F600"
+			tasks: [
+				{
+					id: "6EB15AF9231FF9A6"
+					type: "item"
+					item: "tinactory:material/dust/cadmium"
+				}
+				{
+					id: "05D4588060EB1CD6"
+					type: "item"
+					item: "tinactory:material/dust/neodymium"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.020.title}"
+			x: 6.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.020.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.020.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.020.description.1}"
+			]
+			dependencies: ["1EDE3A566356F600"]
+			id: "6ECD29DDE2637A82"
+			tasks: [{
+				id: "21107D967F8EBB0C"
+				type: "item"
+				item: "tinactory:material/magnetic/neodymium"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.021.title}"
+			x: -2.0d
+			y: 16.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.021.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.021.description.0}"
+			]
+			dependencies: ["07515AD71E8B26EF"]
+			id: "1839DA1403560DB3"
+			tasks: [{
+				id: "40C01BE1DA394F53"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/fluid/lpg"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.022.title}"
+			x: -2.0d
+			y: 14.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.022.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.022.description.0}"
+			]
+			dependencies: [
+				"4BC5CC00BBABBC80"
+				"52D537C7D3268C67"
+			]
+			id: "7F568D268CA544F6"
+			tasks: [{
+				id: "016E65A3D7D38AF7"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/oxygen"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.023.title}"
+			x: 0.0d
+			y: 16.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.023.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.023.description.0}"
+			]
+			dependencies: [
+				"1839DA1403560DB3"
+				"7F568D268CA544F6"
+			]
+			id: "0B17D0A26F286ACA"
+			tasks: [{
+				id: "35A3FE06E5C9BE85"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/rocket_fuel"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.024.title}"
+			x: 8.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.024.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.024.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.024.description.1}"
+				""
+				"{tinactory.quests.04_extreme_voltage.024.description.2}"
+			]
+			dependencies: [
+				"09CB7C63AE45690A"
+				"6ECD29DDE2637A82"
+				"6D4396F046AC59FA"
+			]
+			size: 2.0d
+			id: "54189E058A630417"
+			tasks: [{
+				id: "400682BB41B108AA"
+				type: "item"
+				item: "tinactory:component/iv/electric_motor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.025.title}"
+			x: 8.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.025.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.025.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.025.description.1}"
+			]
+			dependencies: ["54189E058A630417"]
+			id: "0D7A901319FE3E62"
+			tasks: [{
+				id: "53AD07135F7BCC67"
+				type: "item"
+				item: "tinactory:component/iv/electric_pump"
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.026.title}"
+			x: 8.0d
+			y: 16.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.026.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.026.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.026.description.1}"
+			]
+			dependencies: ["54D61C6A8BA84D5D"]
+			id: "1D933C575C5519B5"
+			tasks: [{
+				id: "6B23623D91F637BA"
+				type: "item"
+				item: {
+					id: "itemfilters:tag"
+					Count: 1b
+					tag: {
+						value: "tinactory:circuit/iv"
+					}
+				}
+			}]
+		}
+		{
+			title: "{tinactory.quests.04_extreme_voltage.027.title}"
+			x: 4.0d
+			y: 16.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.04_extreme_voltage.027.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.027.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.027.description.1}"
+				""
+				"{tinactory.quests.04_extreme_voltage.027.description.2}"
+			]
+			dependencies: [
+				"1DA662F6D90438AB"
+				"0B17D0A26F286ACA"
+				"0D7A901319FE3E62"
+				"1D933C575C5519B5"
+				"1E73498504A1B6C4"
+				"2C0BDC359D181269"
+			]
+			size: 2.0d
+			id: "15A12C982E065F64"
+			tasks: [{
+				id: "433A0522B2F3010E"
+				type: "checkmark"
+				title: "{tinactory.quests.04_extreme_voltage.027.title}"
+			}]
+		}
+	]
+	quest_links: [ ]
+}
