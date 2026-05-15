@@ -50,7 +50,7 @@
     "item[.]tinactory[.]wafer[.](.*)": "$1 Wafer",
     "item[.]tinactory[.]chip[.](.*)": "$1 Chip",
     "item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)": "$2 ME $1",
-    "item[.]tinactory[.]logistics[.](.*_pattern_cell)[.](.*)": "$2 ME $1",
+    "item[.]tinactory[.]logistics[.]pattern_cell[.](.*)": "$1 ME Pattern Cell",
     "block[.]tinactory[.]material[.]ore[.](.*)": "$1 Ore",
     "block[.]tinactory[.]network[.](.*)[.](.*)": "$1 $2",
     "block[.]tinactory[.]machine[.](.*)[.](.*)": "$1 $2",
