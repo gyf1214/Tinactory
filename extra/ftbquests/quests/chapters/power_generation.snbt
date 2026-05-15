@@ -275,7 +275,7 @@
 				"{tinactory.quests.power_generation.011.description.1}"
 			]
 			x: 6.0d
-			y: 6.0d
+			y: 2.0d
 			dependencies: ["6D4396F046AC59FA"]
 			size: 2.0d
 			id: "6A56C38D3F934B21"

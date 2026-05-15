@@ -15,7 +15,7 @@
 				"{tinactory.quests.logistics.000.description.0}"
 				"{tinactory.quests.logistics.000.description.1}"
 			]
-			x: 0.0d
+			x: -2.0d
 			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4BE9B26C04647BD8"
@@ -32,7 +32,7 @@
 				"{tinactory.quests.logistics.001.description.0}"
 				"{tinactory.quests.logistics.001.description.1}"
 			]
-			x: 2.0d
+			x: 0.0d
 			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "7A00FA0C45702638"
@@ -49,7 +49,7 @@
 				"{tinactory.quests.logistics.002.description.0}"
 				"{tinactory.quests.logistics.002.description.1}"
 			]
-			x: 0.0d
+			x: -2.0d
 			y: 2.0d
 			dependencies: [
 				"4BE9B26C04647BD8"
@@ -69,7 +69,7 @@
 				"{tinactory.quests.logistics.003.description.0}"
 				"{tinactory.quests.logistics.003.description.1}"
 			]
-			x: 2.0d
+			x: 0.0d
 			y: 2.0d
 			dependencies: [
 				"7A00FA0C45702638"
@@ -110,9 +110,12 @@
 				"{tinactory.quests.logistics.005.description.0}"
 				"{tinactory.quests.logistics.005.description.1}"
 			]
-			x: 8.0d
+			x: 10.0d
 			y: 2.0d
-			dependencies: ["2463E4F002BC25EE"]
+			dependencies: [
+				"2463E4F002BC25EE"
+				"6885F61C806D96E5"
+			]
 			size: 2.0d
 			id: "2E0C38684C061101"
 			tasks: [{
@@ -128,7 +131,7 @@
 				"{tinactory.quests.logistics.006.description.0}"
 				"{tinactory.quests.logistics.006.description.1}"
 			]
-			x: 2.0d
+			x: 0.0d
 			y: 4.0d
 			dependencies: ["69A0DE7834E046EF"]
 			id: "1378262C4553AE71"
@@ -145,7 +148,7 @@
 				"{tinactory.quests.logistics.007.description.0}"
 				"{tinactory.quests.logistics.007.description.1}"
 			]
-			x: 0.0d
+			x: -2.0d
 			y: 4.0d
 			dependencies: ["7A85227BDB6CB5A2"]
 			id: "011CB57C780EE663"
@@ -162,8 +165,8 @@
 				"{tinactory.quests.logistics.008.description.0}"
 				"{tinactory.quests.logistics.008.description.1}"
 			]
-			x: 0.0d
-			y: 6.0d
+			x: -2.0d
+			y: 8.0d
 			dependencies: ["56D39B7C7922E621"]
 			size: 2.0d
 			id: "61C306A510164241"
@@ -180,8 +183,8 @@
 				"{tinactory.quests.logistics.009.description.0}"
 				"{tinactory.quests.logistics.009.description.1}"
 			]
-			x: 4.0d
-			y: 10.0d
+			x: 6.0d
+			y: 12.0d
 			dependencies: ["4034E621C42EBF60"]
 			size: 2.0d
 			id: "1E73498504A1B6C4"
@@ -198,9 +201,9 @@
 				"{tinactory.quests.logistics.010.description.0}"
 				"{tinactory.quests.logistics.010.description.1}"
 			]
-			x: 0.0d
+			x: 2.0d
 			y: 8.0d
-			dependencies: ["3A37204C020F5B2C"]
+			dependencies: ["756F380B2118DD7F"]
 			id: "4034E621C42EBF60"
 			tasks: [{
 				id: "018ABCD56E6CDF11"
@@ -215,8 +218,8 @@
 				"{tinactory.quests.logistics.011.description.0}"
 				"{tinactory.quests.logistics.011.description.1}"
 			]
-			x: 0.0d
-			y: 14.0d
+			x: 2.0d
+			y: 10.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
@@ -235,14 +238,14 @@
 				"{tinactory.quests.logistics.012.description.0}"
 				"{tinactory.quests.logistics.012.description.1}"
 			]
-			x: -2.0d
-			y: 10.0d
-			dependencies: ["3A37204C020F5B2C"]
+			x: 4.0d
+			y: 16.0d
+			dependencies: ["7696374781756109"]
 			id: "3EDE299FA6EF6A78"
 			tasks: [{
 				id: "54401F085EBBA288"
 				type: "item"
-				item: "tinactory:material/dust/fluix"
+				item: "tinactory:material/gem/fluix"
 			}]
 		}
 		{
@@ -256,7 +259,7 @@
 			x: -2.0d
 			y: 12.0d
 			dependencies: [
-				"3EDE299FA6EF6A78"
+				"7696374781756109"
 				"4034E621C42EBF60"
 			]
 			size: 2.0d
@@ -282,7 +285,7 @@
 				"{tinactory.quests.logistics.014.description.1}"
 			]
 			x: 2.0d
-			y: 14.0d
+			y: 12.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
@@ -301,8 +304,8 @@
 				"{tinactory.quests.logistics.015.description.0}"
 				"{tinactory.quests.logistics.015.description.1}"
 			]
-			x: 4.0d
-			y: 12.0d
+			x: 6.0d
+			y: 14.0d
 			dependencies: ["1E73498504A1B6C4"]
 			id: "340A59CCBC050E4A"
 			tasks: [{
@@ -318,9 +321,12 @@
 				"{tinactory.quests.logistics.016.description.0}"
 				"{tinactory.quests.logistics.016.description.1}"
 			]
-			x: 4.0d
-			y: 14.0d
-			dependencies: ["340A59CCBC050E4A"]
+			x: 6.0d
+			y: 16.0d
+			dependencies: [
+				"340A59CCBC050E4A"
+				"3EDE299FA6EF6A78"
+			]
 			id: "41B2E83E7E86A9A6"
 			tasks: [{
 				id: "6F81858A92A85A94"
@@ -335,8 +341,8 @@
 				"{tinactory.quests.logistics.017.description.0}"
 				"{tinactory.quests.logistics.017.description.1}"
 			]
-			x: 4.0d
-			y: 16.0d
+			x: 6.0d
+			y: 18.0d
 			dependencies: ["41B2E83E7E86A9A6"]
 			id: "2669AE71AD768BC1"
 			tasks: [{
@@ -369,7 +375,7 @@
 				"{tinactory.quests.logistics.019.description.0}"
 				"{tinactory.quests.logistics.019.description.1}"
 			]
-			x: 8.0d
+			x: 10.0d
 			y: 8.0d
 			dependencies: [
 				"4D7BE161FBFBB80C"
@@ -390,7 +396,7 @@
 				"{tinactory.quests.logistics.020.description.0}"
 				"{tinactory.quests.logistics.020.description.1}"
 			]
-			x: 8.0d
+			x: 10.0d
 			y: 6.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4D7BE161FBFBB80C"
@@ -407,7 +413,7 @@
 				"{tinactory.quests.logistics.021.description.0}"
 				"{tinactory.quests.logistics.021.description.1}"
 			]
-			x: 8.0d
+			x: 10.0d
 			y: 10.0d
 			dependencies: ["5EDD9D5E4EE9487D"]
 			id: "51A3CD15BE4A96D2"
@@ -424,11 +430,12 @@
 				"{tinactory.quests.logistics.022.description.0}"
 				"{tinactory.quests.logistics.022.description.1}"
 			]
-			x: 0.0d
-			y: 18.0d
+			x: 2.0d
+			y: 14.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
+				"6885F61C806D96E5"
 			]
 			size: 2.0d
 			id: "247F2D17E69312E2"

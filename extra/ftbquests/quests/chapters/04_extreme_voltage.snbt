@@ -541,7 +541,10 @@
 				""
 				"{tinactory.quests.04_extreme_voltage.013.description.1}"
 			]
-			dependencies: ["645CBB8D8FE85012"]
+			dependencies: [
+				"645CBB8D8FE85012"
+				"61B9D2ACAF1C5D38"
+			]
 			id: "6885F61C806D96E5"
 			tasks: [
 				{
