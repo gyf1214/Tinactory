@@ -13,6 +13,7 @@
 			subtitle: "{tinactory.quests.logistics.000.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.000.description.0}"
+				""
 				"{tinactory.quests.logistics.000.description.1}"
 			]
 			x: -2.0d
@@ -30,6 +31,7 @@
 			subtitle: "{tinactory.quests.logistics.001.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.001.description.0}"
+				""
 				"{tinactory.quests.logistics.001.description.1}"
 			]
 			x: 0.0d
@@ -47,6 +49,7 @@
 			subtitle: "{tinactory.quests.logistics.002.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.002.description.0}"
+				""
 				"{tinactory.quests.logistics.002.description.1}"
 			]
 			x: -2.0d
@@ -67,6 +70,7 @@
 			subtitle: "{tinactory.quests.logistics.003.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.003.description.0}"
+				""
 				"{tinactory.quests.logistics.003.description.1}"
 			]
 			x: 0.0d
@@ -87,6 +91,7 @@
 			subtitle: "{tinactory.quests.logistics.004.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.004.description.0}"
+				""
 				"{tinactory.quests.logistics.004.description.1}"
 			]
 			x: 6.0d
@@ -108,6 +113,7 @@
 			subtitle: "{tinactory.quests.logistics.005.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.005.description.0}"
+				""
 				"{tinactory.quests.logistics.005.description.1}"
 			]
 			x: 10.0d
@@ -129,6 +135,7 @@
 			subtitle: "{tinactory.quests.logistics.006.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.006.description.0}"
+				""
 				"{tinactory.quests.logistics.006.description.1}"
 			]
 			x: 0.0d
@@ -146,6 +153,7 @@
 			subtitle: "{tinactory.quests.logistics.007.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.007.description.0}"
+				""
 				"{tinactory.quests.logistics.007.description.1}"
 			]
 			x: -2.0d
@@ -163,6 +171,7 @@
 			subtitle: "{tinactory.quests.logistics.008.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.008.description.0}"
+				""
 				"{tinactory.quests.logistics.008.description.1}"
 			]
 			x: -2.0d
@@ -181,6 +190,7 @@
 			subtitle: "{tinactory.quests.logistics.009.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.009.description.0}"
+				""
 				"{tinactory.quests.logistics.009.description.1}"
 			]
 			x: 6.0d
@@ -199,6 +209,7 @@
 			subtitle: "{tinactory.quests.logistics.010.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.010.description.0}"
+				""
 				"{tinactory.quests.logistics.010.description.1}"
 			]
 			x: 2.0d
@@ -216,6 +227,7 @@
 			subtitle: "{tinactory.quests.logistics.011.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.011.description.0}"
+				""
 				"{tinactory.quests.logistics.011.description.1}"
 			]
 			x: 2.0d
@@ -236,6 +248,7 @@
 			subtitle: "{tinactory.quests.logistics.012.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.012.description.0}"
+				""
 				"{tinactory.quests.logistics.012.description.1}"
 			]
 			x: 4.0d
@@ -254,6 +267,7 @@
 			subtitle: "{tinactory.quests.logistics.013.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.013.description.0}"
+				""
 				"{tinactory.quests.logistics.013.description.1}"
 			]
 			x: -2.0d
@@ -282,6 +296,7 @@
 			subtitle: "{tinactory.quests.logistics.014.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.014.description.0}"
+				""
 				"{tinactory.quests.logistics.014.description.1}"
 			]
 			x: 2.0d
@@ -302,6 +317,7 @@
 			subtitle: "{tinactory.quests.logistics.015.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.015.description.0}"
+				""
 				"{tinactory.quests.logistics.015.description.1}"
 			]
 			x: 6.0d
@@ -319,6 +335,7 @@
 			subtitle: "{tinactory.quests.logistics.016.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.016.description.0}"
+				""
 				"{tinactory.quests.logistics.016.description.1}"
 			]
 			x: 6.0d
@@ -339,6 +356,7 @@
 			subtitle: "{tinactory.quests.logistics.017.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.017.description.0}"
+				""
 				"{tinactory.quests.logistics.017.description.1}"
 			]
 			x: 6.0d
@@ -356,6 +374,7 @@
 			subtitle: "{tinactory.quests.logistics.018.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.018.description.0}"
+				""
 				"{tinactory.quests.logistics.018.description.1}"
 			]
 			x: -2.0d
@@ -373,6 +392,7 @@
 			subtitle: "{tinactory.quests.logistics.019.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.019.description.0}"
+				""
 				"{tinactory.quests.logistics.019.description.1}"
 			]
 			x: 10.0d
@@ -394,6 +414,7 @@
 			subtitle: "{tinactory.quests.logistics.020.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.020.description.0}"
+				""
 				"{tinactory.quests.logistics.020.description.1}"
 			]
 			x: 10.0d
@@ -411,6 +432,7 @@
 			subtitle: "{tinactory.quests.logistics.021.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.021.description.0}"
+				""
 				"{tinactory.quests.logistics.021.description.1}"
 			]
 			x: 10.0d
@@ -428,6 +450,7 @@
 			subtitle: "{tinactory.quests.logistics.022.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.022.description.0}"
+				""
 				"{tinactory.quests.logistics.022.description.1}"
 			]
 			x: 2.0d

@@ -13,6 +13,7 @@
 			subtitle: "{tinactory.quests.power_generation.000.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.000.description.0}"
+				""
 				"{tinactory.quests.power_generation.000.description.1}"
 			]
 			x: 0.0d
@@ -30,6 +31,7 @@
 			subtitle: "{tinactory.quests.power_generation.001.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.001.description.0}"
+				""
 				"{tinactory.quests.power_generation.001.description.1}"
 			]
 			x: 0.0d
@@ -50,6 +52,7 @@
 			subtitle: "{tinactory.quests.power_generation.002.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.002.description.0}"
+				""
 				"{tinactory.quests.power_generation.002.description.1}"
 			]
 			x: 2.0d
@@ -67,6 +70,7 @@
 			subtitle: "{tinactory.quests.power_generation.003.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.003.description.0}"
+				""
 				"{tinactory.quests.power_generation.003.description.1}"
 			]
 			x: 2.0d
@@ -96,6 +100,7 @@
 			subtitle: "{tinactory.quests.power_generation.004.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.004.description.0}"
+				""
 				"{tinactory.quests.power_generation.004.description.1}"
 			]
 			x: 2.0d
@@ -126,6 +131,7 @@
 			subtitle: "{tinactory.quests.power_generation.005.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.005.description.0}"
+				""
 				"{tinactory.quests.power_generation.005.description.1}"
 			]
 			x: 4.0d
@@ -143,6 +149,7 @@
 			subtitle: "{tinactory.quests.power_generation.006.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.006.description.0}"
+				""
 				"{tinactory.quests.power_generation.006.description.1}"
 			]
 			x: 4.0d
@@ -172,6 +179,7 @@
 			subtitle: "{tinactory.quests.power_generation.007.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.007.description.0}"
+				""
 				"{tinactory.quests.power_generation.007.description.1}"
 			]
 			x: 4.0d
@@ -202,6 +210,7 @@
 			subtitle: "{tinactory.quests.power_generation.008.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.008.description.0}"
+				""
 				"{tinactory.quests.power_generation.008.description.1}"
 			]
 			x: 2.0d
@@ -225,6 +234,7 @@
 			subtitle: "{tinactory.quests.power_generation.009.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.009.description.0}"
+				""
 				"{tinactory.quests.power_generation.009.description.1}"
 			]
 			x: 0.0d
@@ -243,6 +253,7 @@
 			subtitle: "{tinactory.quests.power_generation.010.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.010.description.0}"
+				""
 				"{tinactory.quests.power_generation.010.description.1}"
 			]
 			x: -2.0d
@@ -272,6 +283,7 @@
 			subtitle: "{tinactory.quests.power_generation.011.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.011.description.0}"
+				""
 				"{tinactory.quests.power_generation.011.description.1}"
 			]
 			x: 6.0d
@@ -290,6 +302,7 @@
 			subtitle: "{tinactory.quests.power_generation.012.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.012.description.0}"
+				""
 				"{tinactory.quests.power_generation.012.description.1}"
 			]
 			x: -2.0d
