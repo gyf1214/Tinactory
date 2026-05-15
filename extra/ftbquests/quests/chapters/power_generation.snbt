@@ -160,6 +160,7 @@
 				"3B814E5A86CB22E7"
 				"363746D1E8189E50"
 				"1213D571D21C3386"
+				"56D39B7C7922E621"
 			]
 			size: 2.0d
 			id: "4DB9BF0E510E3E9C"
@@ -202,6 +203,34 @@
 						}
 					}
 				}
+			}]
+		}
+		{
+			x: 6.0d
+			y: 6.0d
+			dependencies: ["6D4396F046AC59FA"]
+			size: 2.0d
+			id: "6A56C38D3F934B21"
+			tasks: [{
+				id: "18E0A9A3E92A4C74"
+				type: "item"
+				item: "tinactory:multiblock/power_substation"
+			}]
+		}
+		{
+			x: -2.0d
+			y: 2.0d
+			dependencies: [
+				"180A7F8DD9AD0580"
+				"6D4396F046AC59FA"
+				"2C0BDC359D181269"
+			]
+			size: 2.0d
+			id: "6F4A7B2C1D039E58"
+			tasks: [{
+				id: "2D7C901B84F26A33"
+				type: "item"
+				item: "tinactory:multiblock/nuclear_reactor"
 			}]
 		}
 	]
