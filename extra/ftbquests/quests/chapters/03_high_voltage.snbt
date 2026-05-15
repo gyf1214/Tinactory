@@ -715,8 +715,12 @@
 			id: "3A37204C020F5B2C"
 			tasks: [{
 				id: "58A667C11AA55AF9"
-				type: "checkmark"
+				type: "custom"
 				title: "{tinactory.quests.03_high_voltage.031.title}"
+				tags: [
+					"tinactory_technology"
+					"tinactory_technology_tinactory_rocket_t1"
+				]
 			}]
 		}
 	]

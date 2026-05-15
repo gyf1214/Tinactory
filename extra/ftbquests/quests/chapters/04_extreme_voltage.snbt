@@ -860,8 +860,12 @@
 			id: "15A12C982E065F64"
 			tasks: [{
 				id: "433A0522B2F3010E"
-				type: "checkmark"
+				type: "custom"
 				title: "{tinactory.quests.04_extreme_voltage.027.title}"
+				tags: [
+					"tinactory_technology"
+					"tinactory_technology_tinactory_rocket_t2"
+				]
 			}]
 		}
 	]
