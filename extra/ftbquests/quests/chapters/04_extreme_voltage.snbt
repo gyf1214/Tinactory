@@ -177,7 +177,7 @@
 			id: "0F875BA74B75405A"
 			tasks: [
 				{
-					id: "EB9710E5205623C2"
+					id: "6B9710E5205623C2"
 					type: "item"
 					item: "minecraft:magma_block"
 				}
@@ -211,7 +211,7 @@
 			dependencies: ["0F875BA74B75405A"]
 			id: "3E72DFCA89D79EAD"
 			tasks: [{
-				id: "E0B970B8FF23A6EE"
+				id: "60B970B8FF23A6EE"
 				type: "item"
 				item: "minecraft:obsidian"
 			}]

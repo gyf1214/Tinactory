@@ -36,6 +36,7 @@ public final class QuestLanguageExtractor {
     private static final Path LANGUAGE_PATH =
         PROJECT_ROOT.resolve("datagen/src/main/resources/meta/tinactory/language");
     private static final Pattern INTERPOLATION = Pattern.compile("\\{(tinactory[.]quests[.][^}]+)}");
+    private static final Pattern QUEST_OBJECT_ID = Pattern.compile("[0-9A-F]{16}");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final List<String> CHAPTER_ORDER = List.of("id", "group", "order_index", "filename", "title", "icon",
         "tags", "disable_toast", "subtitle", "always_invisible", "default_quest_shape",
@@ -113,6 +114,9 @@ public final class QuestLanguageExtractor {
             checkDescriptionFormatting(path);
         }
         var tag = readSnbt(path);
+        if (!write) {
+            checkQuestObjectIds(path, tag);
+        }
         processString(tag, "title", rootKey + ".title");
         processStringOrList(tag, "subtitle", rootKey + ".subtitle");
         if (tag.contains("quests", Tag.TAG_LIST)) {
@@ -147,6 +151,35 @@ public final class QuestLanguageExtractor {
                     elementCount++;
                 }
             }
+        }
+    }
+
+    private void checkQuestObjectIds(Path path, Tag tag) {
+        checkQuestObjectIds(path, tag, "");
+    }
+
+    private void checkQuestObjectIds(Path path, Tag tag, String pathInFile) {
+        if (tag instanceof CompoundTag compound) {
+            for (var key : compound.getAllKeys()) {
+                var childPath = pathInFile + "." + key;
+                var value = compound.get(key);
+                if (key.equals("id") && compound.contains(key, Tag.TAG_STRING)) {
+                    checkQuestObjectId(path, childPath, compound.getString(key));
+                } else if (value != null) {
+                    checkQuestObjectIds(path, value, childPath);
+                }
+            }
+        } else if (tag instanceof ListTag list) {
+            for (var i = 0; i < list.size(); i++) {
+                checkQuestObjectIds(path, list.get(i), pathInFile + "[" + i + "]");
+            }
+        }
+    }
+
+    private void checkQuestObjectId(Path path, String pathInFile, String id) {
+        if (QUEST_OBJECT_ID.matcher(id).matches() && id.charAt(0) > '7') {
+            errors.add("Quest object id exceeds signed long range in " + PROJECT_ROOT.relativize(path) + pathInFile +
+                ": " + id);
         }
     }
 
