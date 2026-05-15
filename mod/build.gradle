@@ -77,6 +77,10 @@ dependencies {
     implementation fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
     // waila
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+    // FTB Quests
+    implementation fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
+    implementation fg.deobf("curse.maven:ftb-teams-forge-404468:4579981")
+    implementation fg.deobf("curse.maven:ftb-quests-forge-289412:6113498")
 
     // runtime dependencies
     // CTM
