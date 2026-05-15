@@ -1,7 +1,7 @@
 {
 	id: "18A01183DF6A59D0"
-	group: "5D26E55DB14C5F98"
-	order_index: 0
+	group: ""
+	order_index: 5
 	filename: "power_generation"
 	title: "{tinactory.quests.power_generation.title}"
 	icon: "tinactory:chip/low_pic"
