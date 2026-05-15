@@ -1,12 +1,14 @@
 package org.shsts.tinactory;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -15,6 +17,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.api.network.IChannel;
@@ -34,6 +37,8 @@ public class Tinactory {
     public static IChannel CHANNEL;
 
     private final IEventBus modEventBus;
+    @Nullable
+    private TechQuestIntegration techQuestIntegration = null;
 
     public Tinactory() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
@@ -68,6 +73,9 @@ public class Tinactory {
             AllMultiblocks.init();
 
             TechManagers.init();
+            if (ModList.get().isLoaded("ftbquests")) {
+                techQuestIntegration = new TechQuestIntegration();
+            }
             AllWorldGens.init();
 
             REGISTRATE.register(modEventBus);
