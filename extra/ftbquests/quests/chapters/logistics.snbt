@@ -9,6 +9,12 @@
 	default_hide_dependency_lines: false
 	quests: [
 		{
+			title: "{tinactory.quests.logistics.000.title}"
+			subtitle: "{tinactory.quests.logistics.000.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.000.description.0}"
+				"{tinactory.quests.logistics.000.description.1}"
+			]
 			x: 0.0d
 			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
@@ -20,6 +26,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.001.title}"
+			subtitle: "{tinactory.quests.logistics.001.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.001.description.0}"
+				"{tinactory.quests.logistics.001.description.1}"
+			]
 			x: 2.0d
 			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
@@ -31,6 +43,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.002.title}"
+			subtitle: "{tinactory.quests.logistics.002.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.002.description.0}"
+				"{tinactory.quests.logistics.002.description.1}"
+			]
 			x: 0.0d
 			y: 2.0d
 			dependencies: [
@@ -45,6 +63,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.003.title}"
+			subtitle: "{tinactory.quests.logistics.003.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.003.description.0}"
+				"{tinactory.quests.logistics.003.description.1}"
+			]
 			x: 2.0d
 			y: 2.0d
 			dependencies: [
@@ -59,6 +83,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.004.title}"
+			subtitle: "{tinactory.quests.logistics.004.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.004.description.0}"
+				"{tinactory.quests.logistics.004.description.1}"
+			]
 			x: 6.0d
 			y: 2.0d
 			dependencies: [
@@ -74,6 +104,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.005.title}"
+			subtitle: "{tinactory.quests.logistics.005.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.005.description.0}"
+				"{tinactory.quests.logistics.005.description.1}"
+			]
 			x: 8.0d
 			y: 2.0d
 			dependencies: ["2463E4F002BC25EE"]
@@ -86,6 +122,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.006.title}"
+			subtitle: "{tinactory.quests.logistics.006.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.006.description.0}"
+				"{tinactory.quests.logistics.006.description.1}"
+			]
 			x: 2.0d
 			y: 4.0d
 			dependencies: ["69A0DE7834E046EF"]
@@ -97,6 +139,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.007.title}"
+			subtitle: "{tinactory.quests.logistics.007.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.007.description.0}"
+				"{tinactory.quests.logistics.007.description.1}"
+			]
 			x: 0.0d
 			y: 4.0d
 			dependencies: ["7A85227BDB6CB5A2"]
@@ -108,6 +156,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.008.title}"
+			subtitle: "{tinactory.quests.logistics.008.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.008.description.0}"
+				"{tinactory.quests.logistics.008.description.1}"
+			]
 			x: 0.0d
 			y: 6.0d
 			dependencies: ["56D39B7C7922E621"]
@@ -120,6 +174,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.009.title}"
+			subtitle: "{tinactory.quests.logistics.009.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.009.description.0}"
+				"{tinactory.quests.logistics.009.description.1}"
+			]
 			x: 4.0d
 			y: 10.0d
 			dependencies: ["4034E621C42EBF60"]
@@ -132,6 +192,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.010.title}"
+			subtitle: "{tinactory.quests.logistics.010.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.010.description.0}"
+				"{tinactory.quests.logistics.010.description.1}"
+			]
 			x: 0.0d
 			y: 8.0d
 			dependencies: ["3A37204C020F5B2C"]
@@ -143,6 +209,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.011.title}"
+			subtitle: "{tinactory.quests.logistics.011.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.011.description.0}"
+				"{tinactory.quests.logistics.011.description.1}"
+			]
 			x: 0.0d
 			y: 14.0d
 			dependencies: [
@@ -157,6 +229,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.012.title}"
+			subtitle: "{tinactory.quests.logistics.012.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.012.description.0}"
+				"{tinactory.quests.logistics.012.description.1}"
+			]
 			x: -2.0d
 			y: 10.0d
 			dependencies: ["3A37204C020F5B2C"]
@@ -169,6 +247,12 @@
 		}
 		{
 			icon: "tinactory:component/annihilation_core"
+			title: "{tinactory.quests.logistics.013.title}"
+			subtitle: "{tinactory.quests.logistics.013.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.013.description.0}"
+				"{tinactory.quests.logistics.013.description.1}"
+			]
 			x: -2.0d
 			y: 12.0d
 			dependencies: [
@@ -191,6 +275,12 @@
 			]
 		}
 		{
+			title: "{tinactory.quests.logistics.014.title}"
+			subtitle: "{tinactory.quests.logistics.014.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.014.description.0}"
+				"{tinactory.quests.logistics.014.description.1}"
+			]
 			x: 2.0d
 			y: 14.0d
 			dependencies: [
@@ -205,6 +295,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.015.title}"
+			subtitle: "{tinactory.quests.logistics.015.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.015.description.0}"
+				"{tinactory.quests.logistics.015.description.1}"
+			]
 			x: 4.0d
 			y: 12.0d
 			dependencies: ["1E73498504A1B6C4"]
@@ -216,6 +312,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.016.title}"
+			subtitle: "{tinactory.quests.logistics.016.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.016.description.0}"
+				"{tinactory.quests.logistics.016.description.1}"
+			]
 			x: 4.0d
 			y: 14.0d
 			dependencies: ["340A59CCBC050E4A"]
@@ -227,6 +329,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.017.title}"
+			subtitle: "{tinactory.quests.logistics.017.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.017.description.0}"
+				"{tinactory.quests.logistics.017.description.1}"
+			]
 			x: 4.0d
 			y: 16.0d
 			dependencies: ["41B2E83E7E86A9A6"]
@@ -238,6 +346,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.018.title}"
+			subtitle: "{tinactory.quests.logistics.018.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.018.description.0}"
+				"{tinactory.quests.logistics.018.description.1}"
+			]
 			x: -2.0d
 			y: 14.0d
 			dependencies: ["1B073B0E13E0484E"]
@@ -249,6 +363,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.019.title}"
+			subtitle: "{tinactory.quests.logistics.019.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.019.description.0}"
+				"{tinactory.quests.logistics.019.description.1}"
+			]
 			x: 8.0d
 			y: 8.0d
 			dependencies: [
@@ -264,6 +384,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.020.title}"
+			subtitle: "{tinactory.quests.logistics.020.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.020.description.0}"
+				"{tinactory.quests.logistics.020.description.1}"
+			]
 			x: 8.0d
 			y: 6.0d
 			dependencies: ["1DF1F6516600868F"]
@@ -275,6 +401,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.021.title}"
+			subtitle: "{tinactory.quests.logistics.021.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.021.description.0}"
+				"{tinactory.quests.logistics.021.description.1}"
+			]
 			x: 8.0d
 			y: 10.0d
 			dependencies: ["5EDD9D5E4EE9487D"]
@@ -286,6 +418,12 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.022.title}"
+			subtitle: "{tinactory.quests.logistics.022.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.022.description.0}"
+				"{tinactory.quests.logistics.022.description.1}"
+			]
 			x: 0.0d
 			y: 18.0d
 			dependencies: [
