@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static org.shsts.tinactory.Tinactory.LOGGER;
 
@@ -36,11 +36,10 @@ public final class TechQuestIntegration {
     @Nullable
     private ServerQuestFile activeQuestFile = null;
     private final Map<ResourceLocation, List<TechnologyTaskBinding>> tasksByTechnology = new HashMap<>();
-    private final Consumer<ITeamProfile> techProgressListener = this::onTinactoryTechProgressChanged;
 
     public TechQuestIntegration() {
         CustomTaskEvent.EVENT.register(this::onCustomTask);
-        TechManagers.server().onProgressChange(techProgressListener);
+        TechManagers.server().onProgressChange(this::onTinactoryTechProgressChanged);
     }
 
     private static String technologyTag(ResourceLocation technology) {
@@ -124,7 +123,7 @@ public final class TechQuestIntegration {
             .stream()
             .flatMap(playerTeam -> playerTeam.getPlayers().stream())
             .map(playerName -> ServerUtil.getPlayerList().getPlayerByName(playerName))
-            .filter(player -> player != null)
+            .filter(Objects::nonNull)
             .findFirst();
     }
 

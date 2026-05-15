@@ -87,11 +87,7 @@ dependencies {
     // CTM
     runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
     // FTB Quests
-    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
-    runtimeOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
-    runtimeOnly fg.deobf("curse.maven:ftb-teams-forge-404468:4579981")
     runtimeOnly fg.deobf("curse.maven:item-filters-309674:4553322")
-    runtimeOnly fg.deobf("curse.maven:ftb-quests-forge-289412:6113498")
 
     testImplementation platform('org.junit:junit-bom:5.12.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
