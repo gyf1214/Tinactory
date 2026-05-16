@@ -187,8 +187,10 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
                     world.dimension().location(), multiblockInterfacePos);
                 return;
             }
-            MACHINE.tryGet(be1).ifPresent(machine ->
-                multiblockInterface = (MultiblockInterface) machine);
+            MACHINE.tryGet(be1).ifPresent(machine -> {
+                LOGGER.debug("{}: set multiblockInterface={}", this, machine);
+                multiblockInterface = (MultiblockInterface) machine;
+            });
         } else {
             multiblockInterface = null;
         }
@@ -258,6 +260,11 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
         if (firstTick) {
             updateMultiblockInterface();
         }
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + blockEntity + "]";
     }
 
     public static class Builder<P> extends SimpleBuilder<Function<BlockEntity, Multiblock>,
