@@ -690,6 +690,7 @@ object Multiblocks {
             multiblock("precision_cutting_machine", "stable_titanium", "metal_former")
             multiblock("extrusion_press", "robust_tungstensteel", "metal_former")
             multiblock("phase_exchange_chamber", "inert_ptfe", "large_chemical_reactor")
+            multiblock("electrochemical_processor", "stable_titanium", "large_chemical_reactor")
             getMultiblock("large_turbine").apply {
                 block(block) {
                     blockState { ctx ->
@@ -1057,6 +1058,20 @@ object Multiblocks {
                 input("tungsten_steel", "plate", 8)
                 input("soldering_alloy", amount = 6)
                 tech(Technologies.EXTRUSION_PRESS)
+            }
+            multiblock("electrochemical_processor") {
+                misc("electrode_casing")
+                misc("ptfe_pipe_casing")
+                circuit(4, Voltage.LUV)
+                machine("polarizer", voltage = Voltage.IV)
+                machine("electrolyzer", voltage = Voltage.IV)
+                component("electric_pump", 4)
+                component("electric_motor", 2)
+                component("cable", 16)
+                input("titanium", "plate", 8)
+                input("ptfe", "pipe", 4)
+                input("soldering_alloy", amount = 6)
+                tech(Technologies.ELECTROCHEMICAL_PROCESSING)
             }
         }
 

@@ -376,7 +376,7 @@ object Technologies {
 
             EXTRUSION_PRESS = tech("extrusion_press") {
                 maxProgress(200)
-                displayItem(getMachine("extruder").entry(Voltage.IV))
+                displayItem(getMultiblock("extrusion_press").block)
                 depends(METAL_FORMER)
             }
 
@@ -384,19 +384,19 @@ object Technologies {
 
             MINERAL_BENEFICIATION = tech("mineral_beneficiation") {
                 maxProgress(200)
-                displayItem(getMachine("ore_washer").entry(Voltage.IV))
+                displayItem(getMultiblock("ore_processing_unit").block)
                 depends(TUNGSTEN_STEEL, MULTI_SMELTER)
             }
 
             MATERIAL_CONDITIONING = tech("material_conditioning") {
                 maxProgress(220)
-                displayItem(getMachine("fluid_solidifier").entry(Voltage.IV))
+                displayItem(getMultiblock("phase_exchange_chamber").block)
                 depends(TUNGSTEN_STEEL, ADVANCED_CHEMISTRY)
             }
 
             ELECTROCHEMICAL_PROCESSING = tech("electrochemical_processing") {
                 maxProgress(260)
-                displayItem(getMachine("electrolyzer").entry(Voltage.IV))
+                displayItem(getMultiblock("electrochemical_processor").block)
                 depends(MATERIAL_CONDITIONING, ELECTROLYZING, LITHOGRAPHY)
             }
 
@@ -423,7 +423,7 @@ object Technologies {
 
             PROSPECTING_STATION = tech("prospecting_station") {
                 maxProgress(220)
-                displayItem(getMachine("ore_analyzer").entry(Voltage.IV))
+                displayItem(getMultiblock("prospecting_station").block)
                 depends(MINERAL_BENEFICIATION, ENDER_CHEMISTRY)
             }
 
