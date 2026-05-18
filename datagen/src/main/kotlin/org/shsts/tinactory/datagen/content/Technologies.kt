@@ -90,6 +90,11 @@ object Technologies {
     val NUCLEAR_PHYSICS: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
+    val EXTRUSION_PRESS: ResourceLocation
+    val MINERAL_BENEFICIATION: ResourceLocation
+    val PROSPECTING_STATION: ResourceLocation
+    val MATERIAL_CONDITIONING: ResourceLocation
+    val ELECTROCHEMICAL_PROCESSING: ResourceLocation
     val LARGE_BOILER: ResourceLocation
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
@@ -369,6 +374,34 @@ object Technologies {
                 displayItem(getMultiblock("metal_former").block)
             }
 
+            EXTRUSION_PRESS = tech("extrusion_press") {
+                maxProgress(200)
+                displayItem(getMachine("extruder").entry(Voltage.IV))
+                depends(METAL_FORMER)
+            }
+
+            base = null
+
+            MINERAL_BENEFICIATION = tech("mineral_beneficiation") {
+                maxProgress(200)
+                displayItem(getMachine("ore_washer").entry(Voltage.IV))
+                depends(TUNGSTEN_STEEL, MULTI_SMELTER)
+            }
+
+            MATERIAL_CONDITIONING = tech("material_conditioning") {
+                maxProgress(220)
+                displayItem(getMachine("fluid_solidifier").entry(Voltage.IV))
+                depends(TUNGSTEN_STEEL, ADVANCED_CHEMISTRY)
+            }
+
+            ELECTROCHEMICAL_PROCESSING = tech("electrochemical_processing") {
+                maxProgress(260)
+                displayItem(getMachine("electrolyzer").entry(Voltage.IV))
+                depends(MATERIAL_CONDITIONING, ELECTROLYZING, LITHOGRAPHY)
+            }
+
+            base = TUNGSTEN_STEEL
+
             LARGE_BOILER = tech("large_boiler") {
                 maxProgress(140)
                 displayItem(getMultiblock("large_boiler").block)
@@ -385,6 +418,16 @@ object Technologies {
                 maxProgress(160)
                 displayItem(Items.ENDER_EYE)
             }
+
+            base = null
+
+            PROSPECTING_STATION = tech("prospecting_station") {
+                maxProgress(220)
+                displayItem(getMachine("ore_analyzer").entry(Voltage.IV))
+                depends(MINERAL_BENEFICIATION, ENDER_CHEMISTRY)
+            }
+
+            base = TUNGSTEN_STEEL
 
             PLATINUM_GROUP_METAL = tech("platinum_group_metal") {
                 maxProgress(160)

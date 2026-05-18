@@ -166,6 +166,41 @@ object Multiblocks {
                     "casings/solid/machine_casing_robust_tungstensteel"))
             }
 
+            misc("ore_processing_chamber") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_filter"))
+            }
+
+            misc("precision_tooling_casing") {
+                blockState(cubeColumn("casings/gearbox/machine_casing_gearbox_titanium",
+                    "casings/solid/machine_casing_stable_titanium"))
+            }
+
+            misc("extrusion_die_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_pipe_4x"))
+            }
+
+            misc("phase_converter_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_inert_ptfe",
+                    "overlay/machine/overlay_fluid_hatch_input"))
+            }
+
+            misc("batch_rotor_casing") {
+                blockState(cubeColumn("casings/pipe/machine_casing_pipe_polytetrafluoroethylene",
+                    "casings/solid/machine_casing_clean_stainless_steel"))
+            }
+
+            misc("electrode_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_stable_titanium",
+                    "overlay/machine/overlay_energy_out"))
+            }
+
+            misc("geological_sensor_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_stable_titanium",
+                    "overlay/machine/overlay_screen"))
+            }
+
             misc("turbine_blade") {
                 blockState { ctx ->
                     turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
@@ -428,6 +463,114 @@ object Multiblocks {
                 input("tungsten_steel", "plate", 8)
                 input("soldering_alloy", amount = 4)
                 tech(Technologies.TUNGSTEN_STEEL)
+            }
+
+            misc("ore_processing_chamber") {
+                solid("robust_tungstensteel")
+                circuit(3)
+                machine("macerator", voltage = Voltage.IV)
+                machine("ore_washer", voltage = Voltage.IV)
+                machine("thermal_centrifuge", voltage = Voltage.IV)
+                component("electric_motor", 4)
+                component("electric_pump", 2)
+                component("conveyor_module", 2)
+                input(itemFilter, 4)
+                input("tungsten_steel", "plate", 6)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.MINERAL_BENEFICIATION)
+            }
+
+            misc("precision_tooling_casing") {
+                solid("stable_titanium")
+                circuit(2)
+                input(getItem("component/buzzsaw/basic"), 4)
+                component("electric_motor", 4)
+                component("electric_piston", 2)
+                component("robot_arm", 2)
+                component("conveyor_module", 2)
+                input("titanium", "plate", 6)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.METAL_FORMER)
+            }
+
+            misc("extrusion_die_casing") {
+                solid("robust_tungstensteel")
+                circuit(4)
+                machine("extruder", voltage = Voltage.IV)
+                component("electric_piston", 4)
+                input("stainless_steel", "pipe", 4)
+                input("kanthal", "wire", 16)
+                input("tungsten_steel", "plate", 8)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.EXTRUSION_PRESS)
+            }
+
+            misc("geological_sensor_casing") {
+                solid("stable_titanium")
+                circuit(4)
+                component("sensor", 2)
+                component("emitter")
+                input("glass", "primary", 4)
+                component("cable", 4)
+                input("titanium", "plate", 6)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.PROSPECTING_STATION)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.IV)
+                workTicks(320)
+            }
+
+            componentVoltage = Voltage.IV
+            misc("batch_rotor_casing") {
+                solid("clean_stainless_steel")
+                circuit(3)
+                machine("mixer", voltage = Voltage.IV)
+                machine("centrifuge", voltage = Voltage.IV)
+                component("electric_motor", 4)
+                component("electric_pump", 2)
+                input("titanium", "rotor", 4)
+                misc("ptfe_pipe_casing")
+                input(itemFilter, 4)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.MATERIAL_CONDITIONING)
+            }
+
+            misc("electrode_casing") {
+                solid("stable_titanium")
+                circuit(4, Voltage.LUV)
+                component("emitter")
+                component("sensor")
+                component("cable", 8)
+                misc("ptfe_pipe_casing")
+                input("platinum", "wire", 16)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.ELECTROCHEMICAL_PROCESSING)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.EV)
+                workTicks(320)
+            }
+
+            componentVoltage = Voltage.IV
+            misc("phase_converter_casing") {
+                solid("inert_ptfe")
+                circuit(3)
+                machine("extractor", voltage = Voltage.IV)
+                machine("fluid_solidifier", voltage = Voltage.IV)
+                component("electric_pump", 4)
+                misc("ptfe_pipe_casing")
+                input("glass", "primary", 4)
+                input("kanthal", "wire", 16)
+                input("ptfe", "sheet", 6)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.MATERIAL_CONDITIONING)
             }
         }
 
