@@ -101,6 +101,10 @@ object Multiblocks {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
             }
 
+            misc("assembler_machine_casing") {
+                blockState(solidBlock("casings/solid/machine_casing_solid_steel"))
+            }
+
             misc("autofarm_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
@@ -526,6 +530,7 @@ object Multiblocks {
                 tag(itemEntry("multiblock/multi_smelter"), ELECTRIC_FURNACE)
             }
             multiblock("metal_former", "frost_proof", "blast_furnace")
+            multiblock("assembly_line", "solid_steel", "assembler")
             getMultiblock("large_turbine").apply {
                 block(block) {
                     blockState { ctx ->

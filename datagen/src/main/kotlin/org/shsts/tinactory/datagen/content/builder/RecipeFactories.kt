@@ -84,6 +84,17 @@ object RecipeFactories {
         }.block()
     }
 
+    fun assemblyLine(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("assembly_line") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 0.5
+            voltage(Voltage.IV)
+            workTicks(400)
+        }.block()
+    }
+
     fun stoneGenerator(block: AssemblyRecipeFactory.() -> Unit) {
         assembly("stone_generator") {
             defaultOutputItem = 0
