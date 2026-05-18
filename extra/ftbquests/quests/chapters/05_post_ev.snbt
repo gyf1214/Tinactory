@@ -1,0 +1,330 @@
+{
+	id: "05A550E7057E0000"
+	group: ""
+	order_index: 8
+	filename: "05_post_ev"
+	title: "{tinactory.quests.05_post_ev.title}"
+	icon: "tinactory:multiblock/assembly_line"
+	subtitle: ["{tinactory.quests.05_post_ev.subtitle.0}"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			title: "{tinactory.quests.05_post_ev.000.title}"
+			icon: "tinactory:component/iv/machine_hull"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.05_post_ev.000.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.000.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.000.description.1}"
+			]
+			dependencies: [
+				"09CB7C63AE45690A"
+				"54189E058A630417"
+			]
+			id: "05A550E7057E0001"
+			tasks: [
+				{
+					id: "05A550E7057E0002"
+					type: "item"
+					item: "tinactory:component/iv/machine_hull"
+				}
+				{
+					id: "05A550E7057E0003"
+					type: "item"
+					item: "tinactory:component/iv/cable"
+				}
+				{
+					id: "05A550E7057E0004"
+					type: "item"
+					item: "tinactory:material/ingot/tungsten_steel"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.001.title}"
+			icon: "minecraft:end_stone"
+			x: 0.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.05_post_ev.001.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.001.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.001.description.1}"
+			]
+			dependencies: [
+				"15A12C982E065F64"
+				"46C15B5CA52BBB56"
+			]
+			id: "05A550E7057E0005"
+			tasks: [
+				{
+					id: "05A550E7057E0006"
+					type: "item"
+					item: "minecraft:end_stone"
+				}
+				{
+					id: "05A550E7057E0007"
+					type: "item"
+					item: "tinactory:machine/hv/ore_analyzer"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.002.title}"
+			icon: "tinactory:material/raw/ender_pearl"
+			x: 0.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.05_post_ev.002.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.002.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.002.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0005"
+				"0E15D0E25A9B4C10"
+			]
+			id: "05A550E7057E0008"
+			tasks: [
+				{
+					id: "05A550E7057E0009"
+					type: "item"
+					item: "tinactory:material/raw/ender_pearl"
+				}
+				{
+					id: "05A550E7057E000A"
+					type: "item"
+					item: "minecraft:ender_pearl"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.003.title}"
+			icon: "minecraft:blaze_rod"
+			x: -2.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.05_post_ev.003.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.003.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.003.description.1}"
+			]
+			dependencies: ["0F875BA74B75405A"]
+			id: "05A550E7057E000B"
+			tasks: [
+				{
+					id: "05A550E7057E000C"
+					type: "item"
+					item: "minecraft:blaze_rod"
+				}
+				{
+					id: "05A550E7057E000D"
+					type: "item"
+					item: "minecraft:blaze_powder"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.004.title}"
+			icon: "minecraft:ender_eye"
+			x: -2.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.05_post_ev.004.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.004.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.004.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0008"
+				"05A550E7057E000B"
+				"635C4C25FAC0CA40"
+			]
+			id: "05A550E7057E000E"
+			tasks: [
+				{
+					id: "05A550E7057E000F"
+					type: "item"
+					item: "minecraft:ender_eye"
+				}
+				{
+					id: "05A550E7057E0010"
+					type: "item"
+					item: "tinactory:material/dust/ender_eye"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.005.title}"
+			x: -4.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.05_post_ev.005.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.005.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.005.description.1}"
+			]
+			dependencies: ["05A550E7057E000E"]
+			id: "05A550E7057E0011"
+			tasks: [{
+				id: "05A550E7057E0012"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/gas/radon"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.006.title}"
+			x: -2.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.05_post_ev.006.subtitle}"
+			description: ["{tinactory.quests.05_post_ev.006.description.0}"]
+			dependencies: [
+				"05A550E7057E000E"
+				"05A550E7057E0011"
+			]
+			id: "05A550E7057E0013"
+			tasks: [{
+				id: "05A550E7057E0014"
+				type: "item"
+				item: "tinactory:component/quantum_eye"
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.007.title}"
+			icon: "tinactory:circuit/quantum_processor"
+			x: -2.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.05_post_ev.007.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.007.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.007.description.1}"
+			]
+			dependencies: ["05A550E7057E0013"]
+			id: "05A550E7057E0015"
+			tasks: [
+				{
+					id: "05A550E7057E0016"
+					type: "item"
+					item: "tinactory:circuit/quantum_processor"
+				}
+				{
+					id: "05A550E7057E0017"
+					type: "item"
+					item: "tinactory:circuit/quantum_assembly"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.008.title}"
+			icon: "tinactory:component/iv/sensor"
+			x: 2.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.05_post_ev.008.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.008.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.008.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0001"
+				"05A550E7057E000E"
+			]
+			id: "05A550E7057E0018"
+			tasks: [
+				{
+					id: "05A550E7057E0019"
+					type: "item"
+					item: "tinactory:component/iv/sensor"
+				}
+				{
+					id: "05A550E7057E001A"
+					type: "item"
+					item: "tinactory:component/iv/emitter"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.009.title}"
+			x: 2.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.05_post_ev.009.subtitle}"
+			description: ["{tinactory.quests.05_post_ev.009.description.0}"]
+			dependencies: ["05A550E7057E0001"]
+			id: "05A550E7057E001B"
+			tasks: [{
+				id: "05A550E7057E001C"
+				type: "item"
+				item: "tinactory:machine/iv/assembler"
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.010.title}"
+			x: 2.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.05_post_ev.010.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.010.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.010.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E001B"
+				"05A550E7057E0018"
+			]
+			id: "05A550E7057E001D"
+			tasks: [{
+				id: "05A550E7057E001E"
+				type: "item"
+				item: "tinactory:machine/iv/circuit_assembler"
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.011.title}"
+			icon: "tinactory:multiblock/assembly_line"
+			x: 4.0d
+			y: 6.0d
+			shape: "pentagon"
+			subtitle: "{tinactory.quests.05_post_ev.011.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.011.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.011.description.1}"
+				""
+				"{tinactory.quests.05_post_ev.011.description.2}"
+			]
+			dependencies: [
+				"05A550E7057E001D"
+				"05A550E7057E0008"
+			]
+			size: 2.0d
+			id: "05A550E7057E001F"
+			tasks: [
+				{
+					id: "05A550E7057E0020"
+					type: "item"
+					item: "tinactory:multiblock/assembly_line"
+				}
+				{
+					id: "05A550E7057E0021"
+					type: "item"
+					item: "tinactory:multiblock/misc/assembler_machine_casing"
+				}
+			]
+		}
+	]
+	quest_links: [ ]
+}
