@@ -651,7 +651,11 @@ object Materials {
             machineProcess(Voltage.MV)
             implosionPrimary()
         }
-        material("platinum_metallic", METALLIC)
+        material("platinum_metallic", METALLIC) {
+            oreProcess {
+                byProducts("platinum_metallic", "raw_platinum", "platinum_metallic")
+            }
+        }
         material("lava", DULL) {
             fluidOre(400, Items.NETHERRACK)
         }
@@ -701,6 +705,10 @@ object Materials {
             crystallize("lava", Voltage.HV, 1000, 0.0, 0.5)
         }
         material("ender_pearl", FINE) {
+            oreProcess {
+                siftPrimary = true
+                byProducts("platinum_metallic", "ender_pearl", "platinum_metallic")
+            }
             machineProcess(Voltage.HV)
             crystallize("argon", Voltage.EV, 400, 0.5, 1.0, amount = 0.1)
         }

@@ -45,6 +45,7 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -418,6 +419,15 @@ object Multiblocks {
                 input("titanium", "plate", 6)
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.LITHOGRAPHY)
+            }
+            misc("assembler_machine_casing", 2) {
+                solid("robust_tungstensteel")
+                component("robot_arm", 8)
+                component("conveyor_module", 4)
+                component("electric_motor", 4)
+                input("tungsten_steel", "plate", 8)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.TUNGSTEN_STEEL)
             }
         }
 
@@ -797,6 +807,29 @@ object Multiblocks {
                 component("cable", 8)
                 input(advancedAlloy, 12)
                 tech(Technologies.NUCLEAR_PHYSICS)
+            }
+
+            componentVoltage = Voltage.IV
+            multiblock("assembly_line") {
+                machine("assembler")
+                machine("circuit_assembler")
+                input(getBlock("multiblock/misc/assembler_machine_casing"), 4)
+                circuit(4, Voltage.LUV)
+                component("robot_arm", 4)
+                component("conveyor_module", 4)
+                component("cable", 16)
+                input("tungsten_steel", "plate", 16)
+                input("soldering_alloy", amount = 6)
+                tech(Technologies.TUNGSTEN_STEEL)
+            }
+        }
+
+        assemblyLine {
+            recipe("multiblock/assembly_line_smoke") {
+                input(getMultiblock("assembly_line").block.get())
+                input(getBlock("multiblock/misc/assembler_machine_casing"), 2)
+                input("soldering_alloy", amount = 1)
+                output(getBlock("multiblock/misc/assembler_machine_casing"))
             }
         }
     }
