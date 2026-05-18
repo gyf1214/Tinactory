@@ -1,0 +1,75 @@
+{
+  "recipes": {
+    "tinactory:extractor": {},
+    "tinactory:fluid_solidifier": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/inert_ptfe",
+  "layers": [
+    [
+      "BBBB",
+      "B$BB",
+      "BBBB"
+    ],
+    [
+      "CPCF",
+      "PAAF",
+      "CPCF"
+    ],
+    [
+      "CWCW",
+      "CPPC",
+      "CWCW"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "C": "tinactory:multiblock/solid/inert_ptfe",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "F": "tinactory:multiblock/misc/phase_converter_casing",
+    "W": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "A": "air"
+  }
+}

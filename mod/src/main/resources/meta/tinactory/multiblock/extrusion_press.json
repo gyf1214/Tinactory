@@ -1,0 +1,55 @@
+{
+  "recipe": "tinactory:extruder",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/robust_tungstensteel",
+  "layers": [
+    [
+      "BBBBB",
+      "BB$BB",
+      "BBBBB"
+    ],
+    [
+      "CCTDC",
+      "CTAAD",
+      "CCTDC"
+    ],
+    [
+      "CCDDC",
+      "CTAAT",
+      "CCDDC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/robust_tungstensteel"
+    },
+    "C": "tinactory:multiblock/solid/robust_tungstensteel",
+    "T": "tinactory:multiblock/misc/precision_tooling_casing",
+    "D": "tinactory:multiblock/misc/extrusion_die_casing",
+    "A": "air"
+  }
+}
