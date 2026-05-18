@@ -8,6 +8,7 @@ object Veins {
         stone()
         deepslate()
         netherrack()
+        endStone()
     }
 
     private fun stone() {
@@ -94,6 +95,16 @@ object Veins {
         vein("pitchblende", 0.2) {
             ore("pitchblende", 0.8)
             ore("thorium", 0.3)
+        }
+    }
+
+    private fun endStone() {
+        vein("ender", 0.2) {
+            variant(OreVariant.END_STONE)
+            baseOre = true
+            ore("platinum_metallic", 1.0)
+            ore("platinum_metallic", 0.3)
+            ore("ender_pearl", 0.1)
         }
     }
 

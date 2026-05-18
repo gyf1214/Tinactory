@@ -98,7 +98,7 @@ object MachineComponents {
             rotor = "titanium",
             magnetic = "neodymium",
             sensor = "platinum",
-            quartz = "ender_eye")
+            quartz = "ender_pearl")
     }
 
     private fun component(v: Voltage, main: String, motor: String,
