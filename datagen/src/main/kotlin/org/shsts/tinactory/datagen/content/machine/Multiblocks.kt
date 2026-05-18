@@ -684,6 +684,9 @@ object Multiblocks {
             }
             multiblock("metal_former", "frost_proof", "blast_furnace")
             multiblock("assembly_line", "solid_steel", "assembler")
+            multiblock("ore_processing_unit", "robust_tungstensteel", "multi_smelter")
+            multiblock("batching_vessel", "clean_stainless_steel", "large_chemical_reactor")
+            multiblock("prospecting_station", "stable_titanium", "lithography_machine")
             getMultiblock("large_turbine").apply {
                 block(block) {
                     blockState { ctx ->
@@ -951,6 +954,33 @@ object Multiblocks {
                 input(advancedAlloy, 12)
                 tech(Technologies.NUCLEAR_PHYSICS)
             }
+            multiblock("ore_processing_unit") {
+                misc("ore_processing_chamber")
+                circuit(4, Voltage.IV)
+                machine("macerator", voltage = Voltage.IV)
+                machine("ore_washer", voltage = Voltage.IV)
+                machine("thermal_centrifuge", voltage = Voltage.IV)
+                component("electric_motor", 4)
+                component("electric_pump", 4)
+                component("conveyor_module", 4)
+                component("cable", 8)
+                input("tungsten_steel", "plate", 8)
+                input("soldering_alloy", amount = 6)
+                tech(Technologies.MINERAL_BENEFICIATION)
+            }
+            multiblock("prospecting_station") {
+                misc("geological_sensor_casing")
+                circuit(4, Voltage.IV)
+                machine("ore_analyzer", voltage = Voltage.IV)
+                machine("stone_generator", voltage = Voltage.IV)
+                component("sensor", 2)
+                component("emitter")
+                component("cable", 8)
+                input("titanium", "plate", 8)
+                input("glass", "primary", 4)
+                input("soldering_alloy", amount = 6)
+                tech(Technologies.PROSPECTING_STATION)
+            }
 
             componentVoltage = Voltage.IV
             multiblock("assembly_line") {
@@ -964,6 +994,28 @@ object Multiblocks {
                 input("tungsten_steel", "plate", 16)
                 input("soldering_alloy", amount = 6)
                 tech(Technologies.TUNGSTEN_STEEL)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            componentVoltage = Voltage.IV
+            multiblock("batching_vessel") {
+                misc("batch_rotor_casing")
+                circuit(4)
+                machine("mixer", voltage = Voltage.IV)
+                machine("centrifuge", voltage = Voltage.IV)
+                component("electric_motor", 4)
+                component("electric_pump", 4)
+                component("cable", 8)
+                input("titanium", "rotor", 4)
+                input("stainless_steel", "plate", 8)
+                input("soldering_alloy", amount = 6)
+                tech(Technologies.MATERIAL_CONDITIONING)
             }
         }
 

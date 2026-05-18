@@ -1,0 +1,64 @@
+{
+  "recipes": {
+    "tinactory:ore_analyzer": {},
+    "tinactory:stone_generator": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "BBBBB",
+      "BB$BB",
+      "BBBBB"
+    ],
+    [
+      "CSASC",
+      "SAAPS",
+      "CCPCC"
+    ],
+    [
+      "CSGSC",
+      "CAWAC",
+      "CCCCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "S": "tinactory:multiblock/misc/geological_sensor_casing",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "G": "tinactory:multiblock/misc/grate_machine_casing",
+    "W": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "A": "air"
+  }
+}

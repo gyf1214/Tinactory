@@ -1,0 +1,83 @@
+{
+  "recipes": {
+    "tinactory:mixer": {},
+    "tinactory:centrifuge": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
+      "x": 54,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/clean_stainless_steel",
+  "layers": [
+    [
+      " BBB ",
+      "BBBBB",
+      "BBPBB",
+      "BBBBB",
+      " BBB "
+    ],
+    [
+      "CCCCC",
+      "CRARC",
+      "$PAPC",
+      "CRARC",
+      "CCCCC"
+    ],
+    [
+      " GGG ",
+      "GCCCG",
+      "GCPPG",
+      "GCCCG",
+      " GGG "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "C": "tinactory:multiblock/solid/clean_stainless_steel",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "R": "tinactory:multiblock/misc/batch_rotor_casing",
+    "G": "tinactory:multiblock/misc/grate_machine_casing",
+    "A": "air"
+  }
+}

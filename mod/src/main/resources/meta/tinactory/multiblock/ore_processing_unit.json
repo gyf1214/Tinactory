@@ -1,0 +1,89 @@
+{
+  "recipes": {
+    "tinactory:macerator": {},
+    "tinactory:ore_washer": {},
+    "tinactory:thermal_centrifuge": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 28
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_macerate",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/robust_tungstensteel",
+  "layers": [
+    [
+      "BBBBB",
+      "BB$BB",
+      "BBBBB"
+    ],
+    [
+      "COGOC",
+      "OAAPA",
+      "COGOC"
+    ],
+    [
+      "COPOC",
+      "OAAAO",
+      "COPOC"
+    ],
+    [
+      " COC ",
+      " CPP ",
+      " COC "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/robust_tungstensteel"
+    },
+    "C": "tinactory:multiblock/solid/robust_tungstensteel",
+    "O": "tinactory:multiblock/misc/ore_processing_chamber",
+    "G": "tinactory:multiblock/misc/grate_machine_casing",
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "A": "air"
+  }
+}
