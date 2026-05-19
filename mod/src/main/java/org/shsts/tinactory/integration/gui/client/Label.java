@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
@@ -8,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -35,6 +37,9 @@ public class Label extends MenuWidget {
     private int cacheWidth = 0;
     private int cacheHeight = 0;
     private final Font font = ClientUtil.getFont();
+    @Nullable
+    private Component multiline = null;
+    private float scale = 1f;
 
     public int color = RenderUtil.TEXT_COLOR;
     public Alignment horizontalAlign = Alignment.BEGIN;
@@ -52,19 +57,38 @@ public class Label extends MenuWidget {
 
     private void updateSize() {
         if (formattedLines.isEmpty()) {
-            cacheWidth = lines.stream()
+            var width = lines.stream()
                 .mapToInt(font::width)
                 .max().orElse(0);
-            cacheHeight = lines.size() * (FONT_HEIGHT + spacing) - spacing;
+            cacheWidth = scaledSize(width);
+            cacheHeight = scaledSize(lines.size() * (FONT_HEIGHT + spacing) - spacing);
         } else {
-            cacheWidth = formattedLines.stream()
+            var width = formattedLines.stream()
                 .mapToInt(font::width)
                 .max().orElse(0);
-            cacheHeight = formattedLines.size() * (FONT_HEIGHT + spacing) - spacing;
+            cacheWidth = scaledSize(width);
+            cacheHeight = scaledSize(formattedLines.size() * (FONT_HEIGHT + spacing) - spacing);
+        }
+    }
+
+    private int scaledSize(int value) {
+        return (int) Math.ceil((double) value * (double) scale);
+    }
+
+    private int scaledLineSpacing() {
+        return scaledSize(FONT_HEIGHT + spacing);
+    }
+
+    private void updateMultiline() {
+        if (multiline != null && rect != null) {
+            formattedLines.clear();
+            formattedLines.addAll(font.split(multiline, Math.max(1, (int) ((float) rect.width() / scale))));
+            updateSize();
         }
     }
 
     public void setLines(Component... values) {
+        multiline = null;
         formattedLines.clear();
         lines.clear();
         lines.addAll(Arrays.asList(values));
@@ -72,6 +96,7 @@ public class Label extends MenuWidget {
     }
 
     public void setLine(int index, Component value) {
+        multiline = null;
         formattedLines.clear();
         while (lines.size() <= index) {
             lines.add(TextComponent.EMPTY);
@@ -81,9 +106,25 @@ public class Label extends MenuWidget {
     }
 
     public void setMultiline(Component value) {
-        formattedLines.clear();
+        multiline = value;
         lines.clear();
-        formattedLines.addAll(font.split(value, rect.width()));
+        updateMultiline();
+    }
+
+    public Label setScale(float value) {
+        if (value <= 0f) {
+            throw new IllegalArgumentException("Label scale must be positive");
+        }
+        scale = value;
+        updateMultiline();
+        updateSize();
+        return this;
+    }
+
+    @Override
+    public void setRect(Rect rect) {
+        super.setRect(rect);
+        updateMultiline();
     }
 
     @Override
@@ -92,13 +133,13 @@ public class Label extends MenuWidget {
         int y = rect.inY(verticalAlign.value) - (int) (cacheHeight * verticalAlign.value);
         if (formattedLines.isEmpty()) {
             for (var line : lines) {
-                RenderUtil.renderText(poseStack, line, x, y, color);
-                y += FONT_HEIGHT + spacing;
+                RenderUtil.renderText(poseStack, line, x, y, color, scale);
+                y += scaledLineSpacing();
             }
         } else {
             for (var line : formattedLines) {
-                RenderUtil.renderText(poseStack, line, x, y, color);
-                y += FONT_HEIGHT + spacing;
+                RenderUtil.renderText(poseStack, line, x, y, color, scale);
+                y += scaledLineSpacing();
             }
         }
     }
