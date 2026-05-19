@@ -168,6 +168,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     private void onConnect(INetwork network) {
         registerPort(network);
+        registerPatternCells(network);
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
         signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
@@ -199,26 +200,31 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);
         if (machine != null) {
-            machine.network().ifPresent(network -> {
-                var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
-                patternRepository.removeCellPorts(machine.uuid());
-                var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
-                for (var i = 0; i < slots; i++) {
-                    var stack = storages.getStackInSlot(i);
-                    if (stack.isEmpty()) {
-                        continue;
-                    }
-                    var slotIndex = i;
-                    stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
-                        patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
-                }
-            });
+            machine.network().ifPresent(this::registerPatternCells);
         }
         onContainerChange();
     }
 
+    private void registerPatternCells(INetwork network) {
+        var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
+        patternRepository.removeCellPorts(machine.uuid());
+        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        for (var i = 0; i < storages.getSlots(); i++) {
+            var stack = storages.getStackInSlot(i);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            var slotIndex = i;
+            stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
+                patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
+        }
+    }
+
     private void onMachineConfig() {
-        machine.network().ifPresent(this::registerPort);
+        machine.network().ifPresent(network -> {
+            registerPort(network);
+            registerPatternCells(network);
+        });
     }
 
     private void onLoad() {
