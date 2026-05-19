@@ -124,6 +124,29 @@ class PatternRegistryCacheTest {
         assertTrue(repo.addCellPort(machine, 5, 0, new TestCellPort(List.of())));
     }
 
+    @Test
+    void revisionShouldChangeOnlyWhenContentsChange() {
+        var repo = new PatternRegistryCache();
+        var machine = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var initialRevision = repo.revision();
+        var pattern = pattern("tinactory:p1", "tinactory:iron_plate");
+
+        assertFalse(repo.removePattern(pattern.patternId()));
+        assertEquals(initialRevision, repo.revision());
+        assertTrue(repo.addCellPort(machine, 1, 0, new TestCellPort(List.of(pattern))));
+        var addedCellRevision = repo.revision();
+        assertTrue(addedCellRevision > initialRevision);
+
+        assertFalse(repo.addCellPort(machine, 1, 0, new TestCellPort(List.of())));
+        assertEquals(addedCellRevision, repo.revision());
+        assertTrue(repo.updatePattern(pattern("tinactory:p1", "tinactory:copper_plate")));
+        var updatedRevision = repo.revision();
+        assertTrue(updatedRevision > addedCellRevision);
+
+        assertEquals(1, repo.removeCellPorts(machine));
+        assertTrue(repo.revision() > updatedRevision);
+    }
+
     private static CraftPattern pattern(String patternId, String outputId) {
         return TestAutocraftHelper.pattern(
             patternId,

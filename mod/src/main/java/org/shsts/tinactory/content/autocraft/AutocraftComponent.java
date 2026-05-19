@@ -51,15 +51,6 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
     }
 
     @Override
-    public List<UUID> listAvailableCpus() {
-        return autocraftCpus.values().stream()
-            .filter(cpu -> !cpu.service().isBusy())
-            .map(AutocraftCpuState::cpuId)
-            .sorted()
-            .toList();
-    }
-
-    @Override
     public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
         var cpu = autocraftCpus.get(cpuId);
         if (cpu == null) {

@@ -39,14 +39,13 @@ public class AutocraftTerminalService {
         return patternRepository.listRequestables();
     }
 
-    public List<UUID> listAvailableCpus() {
-        return List.copyOf(cpuRuntime.listAvailableCpus());
+    public long requestablesRevision() {
+        return patternRepository.revision();
     }
 
     public List<CpuStatusEntry> listCpuStatuses() {
-        var available = cpuRuntime.listAvailableCpus();
         return cpuRuntime.listVisibleCpus().stream()
-            .map(cpuId -> toCpuStatus(cpuId, available))
+            .map(this::toCpuStatus)
             .toList();
     }
 
@@ -113,21 +112,22 @@ public class AutocraftTerminalService {
         previewTargets = null;
     }
 
-    private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {
+    private CpuStatusEntry toCpuStatus(UUID cpuId) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
             return CpuStatusEntry.idle(cpuId, false);
         }
 
         var current = service.get().getJob();
+        var available = !service.get().isBusy();
         if (current.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId, available.contains(cpuId));
+            return CpuStatusEntry.idle(cpuId, available);
         }
         var execution = current.get().execution();
         var state = execution.state();
         return new CpuStatusEntry(
             cpuId,
-            available.contains(cpuId),
+            available,
             current.get().targets(),
             state,
             state == JobState.IDLE ? null : execution.phase(),

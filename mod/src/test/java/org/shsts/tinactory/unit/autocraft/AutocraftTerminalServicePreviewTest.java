@@ -93,11 +93,6 @@ class AutocraftTerminalServicePreviewTest {
         }
 
         @Override
-        public List<UUID> listAvailableCpus() {
-            return List.of();
-        }
-
-        @Override
         public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
             return Optional.empty();
         }

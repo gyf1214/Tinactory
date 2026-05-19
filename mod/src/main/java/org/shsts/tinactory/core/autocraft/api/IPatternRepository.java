@@ -15,6 +15,10 @@ public interface IPatternRepository {
 
     List<IStackKey> listRequestables();
 
+    default long revision() {
+        return 0L;
+    }
+
     boolean containsPatternId(String patternId);
 
     boolean addPattern(CraftPattern pattern);

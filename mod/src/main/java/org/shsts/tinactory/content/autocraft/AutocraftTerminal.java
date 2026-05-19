@@ -18,7 +18,7 @@ public class AutocraftTerminal extends MEStorageAccess {
     public static final String ID = "autocraft/terminal";
 
     @Nullable
-    private AutocraftTerminalService service;
+    private AutocraftComponent autocraft;
 
     public AutocraftTerminal(BlockEntity blockEntity, double power) {
         super(blockEntity, power);
@@ -31,15 +31,17 @@ public class AutocraftTerminal extends MEStorageAccess {
     @Override
     protected void onConnect(INetwork network) {
         super.onConnect(network);
-        var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
-        service = AutocraftServiceBootstrap.createTerminalService(
-            autocraft,
-            combinedItem,
-            combinedFluid);
+        autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
     }
 
     @Nullable
-    public AutocraftTerminalService service() {
-        return service;
+    public AutocraftTerminalService createService() {
+        if (autocraft == null) {
+            return null;
+        }
+        return AutocraftServiceBootstrap.createTerminalService(
+            autocraft,
+            combinedItem,
+            combinedFluid);
     }
 }

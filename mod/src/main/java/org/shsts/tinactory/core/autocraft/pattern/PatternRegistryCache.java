@@ -29,6 +29,7 @@ public final class PatternRegistryCache implements IPatternRepository {
     private final Map<String, PatternEntry> byPatternId = new HashMap<>();
     private final Map<IStackKey, List<CraftPattern>> byOutput = new HashMap<>();
     private final Map<UUID, Integer> machinePriority = new HashMap<>();
+    private long revision;
 
     @Override
     public List<CraftPattern> findPatternsProducing(IStackKey key) {
@@ -41,6 +42,11 @@ public final class PatternRegistryCache implements IPatternRepository {
     }
 
     @Override
+    public long revision() {
+        return revision;
+    }
+
+    @Override
     public boolean containsPatternId(String patternId) {
         return byPatternId.containsKey(patternId);
     }
@@ -50,12 +56,8 @@ public final class PatternRegistryCache implements IPatternRepository {
         if (containsPatternId(pattern.patternId())) {
             return false;
         }
-        for (var key : orderedCells) {
-            var state = requireCellState(key);
-            if (!state.port().insert(pattern)) {
-                continue;
-            }
-            addPatternIndexes(key, state, pattern);
+        if (addPatternToCell(pattern)) {
+            revision++;
             return true;
         }
         return false;
@@ -72,6 +74,7 @@ public final class PatternRegistryCache implements IPatternRepository {
             throw invalidState("pattern %s exists in indexes but owner cell rejected remove", patternId);
         }
         removePatternIndexes(entry.owner(), state, entry.pattern());
+        revision++;
         return true;
     }
 
@@ -91,7 +94,8 @@ public final class PatternRegistryCache implements IPatternRepository {
         }
         removePatternIndexes(owner, state, existing.pattern());
 
-        if (addPattern(pattern)) {
+        if (addPatternToCell(pattern)) {
+            revision++;
             return true;
         }
 
@@ -128,6 +132,7 @@ public final class PatternRegistryCache implements IPatternRepository {
         for (var pattern : patterns) {
             addPatternIndexes(key, state, pattern);
         }
+        revision++;
         return true;
     }
 
@@ -151,16 +156,34 @@ public final class PatternRegistryCache implements IPatternRepository {
             orderedCells.remove(key);
         }
         machinePriority.remove(machineId);
+        revision++;
         return keys.size();
     }
 
     @Override
     public void clear() {
+        if (cellsByKey.isEmpty() && orderedCells.isEmpty() && byPatternId.isEmpty() && byOutput.isEmpty() &&
+            machinePriority.isEmpty()) {
+            return;
+        }
         cellsByKey.clear();
         orderedCells.clear();
         byPatternId.clear();
         byOutput.clear();
         machinePriority.clear();
+        revision++;
+    }
+
+    private boolean addPatternToCell(CraftPattern pattern) {
+        for (var key : orderedCells) {
+            var state = requireCellState(key);
+            if (!state.port().insert(pattern)) {
+                continue;
+            }
+            addPatternIndexes(key, state, pattern);
+            return true;
+        }
+        return false;
     }
 
     private void addPatternIndexes(CellKey owner, CellState state, CraftPattern pattern) {

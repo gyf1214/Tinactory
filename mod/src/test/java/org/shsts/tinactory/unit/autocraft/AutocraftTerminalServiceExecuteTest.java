@@ -53,7 +53,7 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(patterns),
-            new TestCpuRuntime(() -> List.of(), () -> List.of(), id -> Optional.empty()));
+            new TestCpuRuntime(() -> List.of(), id -> Optional.empty()));
 
         var requestables = service.listRequestables();
 
@@ -65,7 +65,6 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldUseStoredSnapshotAndNotInvokePlannerAgain() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
         var previewPlanner = new StaticPlanner(planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -76,7 +75,6 @@ class AutocraftTerminalServiceExecuteTest {
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
-                () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
 
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
@@ -94,7 +92,6 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldFailWhenCpuUnavailable() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
         var jobService = new AutocraftJobService(new TestExecutor()) {
             @Override
@@ -109,10 +106,8 @@ class AutocraftTerminalServiceExecuteTest {
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
-                () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        availableCpus.clear();
 
         var execute = service.execute(cpu);
 
@@ -149,7 +144,6 @@ class AutocraftTerminalServiceExecuteTest {
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.of(cpu),
-                () -> List.of(),
                 id -> id.equals(cpu) ? Optional.of(staticService(job)) : Optional.empty()));
 
         var statuses = service.listCpuStatuses();
@@ -268,7 +262,6 @@ class AutocraftTerminalServiceExecuteTest {
 
     private record TestCpuRuntime(
         Supplier<List<UUID>> visibleCpuSupplier,
-        Supplier<List<UUID>> availableCpuSupplier,
         Function<UUID, Optional<IAutocraftService>> serviceResolver) implements ICpuRuntime {
         @Override
         public void registerCpu(IMachine machine, IAutocraftService service) {}
@@ -279,11 +272,6 @@ class AutocraftTerminalServiceExecuteTest {
         @Override
         public List<UUID> listVisibleCpus() {
             return visibleCpuSupplier.get();
-        }
-
-        @Override
-        public List<UUID> listAvailableCpus() {
-            return availableCpuSupplier.get();
         }
 
         @Override

@@ -11,6 +11,7 @@ import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
+import org.shsts.tinactory.content.gui.sync.RevisionScheduler;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -30,16 +31,20 @@ public class AutocraftTerminalMenu extends MenuBase {
     private final IMachine machine;
     @Nullable
     private final AutocraftTerminalService service;
+    private final RevisionScheduler<AutocraftRequestablesSyncPacket> requestablesScheduler;
     private final ActiveScheduler<AutocraftPreviewSyncPacket> previewScheduler;
 
     public AutocraftTerminalMenu(Properties properties) {
         super(properties);
         this.machine = MACHINE.get(blockEntity());
         var terminal = getProvider(blockEntity(), AutocraftTerminal.ID, AutocraftTerminal.class);
-        this.service = world.isClientSide ? null : terminal.service();
+        this.service = world.isClientSide ? null : terminal.createService();
+        this.requestablesScheduler = new RevisionScheduler<>(
+            this::requestablesRevision,
+            this::requestablesPacket);
         this.previewScheduler = new ActiveScheduler<>(this::previewPacket);
 
-        addSyncSlot(REQUESTABLES_SYNC, this::requestablesPacket);
+        addSyncSlot(REQUESTABLES_SYNC, requestablesScheduler);
         addSyncSlot(CPU_STATUS_SYNC, this::cpuStatusPacket);
         addSyncSlot(PREVIEW_SYNC, previewScheduler);
         onEventPacket(AUTOCRAFT_TERMINAL_ACTION, this::onAction);
@@ -52,6 +57,10 @@ public class AutocraftTerminalMenu extends MenuBase {
 
     private AutocraftRequestablesSyncPacket requestablesPacket() {
         return new AutocraftRequestablesSyncPacket(service == null ? List.of() : service.listRequestables());
+    }
+
+    private long requestablesRevision() {
+        return service == null ? 0L : service.requestablesRevision();
     }
 
     private AutocraftCpuSyncPacket cpuStatusPacket() {

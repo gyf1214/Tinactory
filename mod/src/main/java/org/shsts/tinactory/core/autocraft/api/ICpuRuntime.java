@@ -17,7 +17,5 @@ public interface ICpuRuntime {
 
     List<UUID> listVisibleCpus();
 
-    List<UUID> listAvailableCpus();
-
     Optional<IAutocraftService> findVisibleService(UUID cpuId);
 }
