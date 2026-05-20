@@ -4,7 +4,8 @@
     "dust",
     "foil",
     "ingot",
-    "ingot_hot"
+    "ingot_hot",
+    "plate"
   ],
   "fluids": {},
   "aliases": {
