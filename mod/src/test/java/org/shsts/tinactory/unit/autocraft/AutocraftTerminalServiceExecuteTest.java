@@ -293,6 +293,11 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
+        public Optional<IMachine> findVisibleCpuMachine(UUID cpuId) {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
             return serviceResolver.apply(cpuId);
         }

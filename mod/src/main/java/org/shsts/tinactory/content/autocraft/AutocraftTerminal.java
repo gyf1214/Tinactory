@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
+import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -43,5 +44,10 @@ public class AutocraftTerminal extends MEStorageAccess {
             autocraft,
             combinedItem,
             combinedFluid);
+    }
+
+    @Nullable
+    public ICpuRuntime cpuRuntime() {
+        return autocraft;
     }
 }

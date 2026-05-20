@@ -51,6 +51,15 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
     }
 
     @Override
+    public Optional<IMachine> findVisibleCpuMachine(UUID cpuId) {
+        var cpu = autocraftCpus.get(cpuId);
+        if (cpu == null) {
+            return Optional.empty();
+        }
+        return Optional.of(cpu.machine());
+    }
+
+    @Override
     public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
         var cpu = autocraftCpus.get(cpuId);
         if (cpu == null) {
