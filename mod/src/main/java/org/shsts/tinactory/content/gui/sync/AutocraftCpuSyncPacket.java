@@ -5,7 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -37,20 +36,14 @@ public class AutocraftCpuSyncPacket implements IPacket {
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeCollection(entries, (buf1, entry) -> {
             buf1.writeUUID(entry.cpuId());
-            buf1.writeBoolean(entry.available());
+            buf1.writeEnum(entry.state());
             buf1.writeCollection(entry.targets(), (buf2, amount) -> {
                 buf2.writeNbt(encodeIngredientKey(amount.key()));
                 buf2.writeLong(amount.amount());
             });
-            buf1.writeEnum(entry.state());
-            buf1.writeBoolean(entry.phase() != null);
-            if (entry.phase() != null) {
-                buf1.writeEnum(entry.phase());
-            }
-            buf1.writeInt(entry.nextStepIndex());
-            buf1.writeInt(entry.stepCount());
+            buf1.writeInt(entry.completedSteps());
+            buf1.writeInt(entry.totalSteps());
             buf1.writeEnum(entry.error());
-            buf1.writeBoolean(entry.cancellable());
         });
     }
 
@@ -59,18 +52,15 @@ public class AutocraftCpuSyncPacket implements IPacket {
         entries.clear();
         entries.addAll(buf.readList(buf1 -> new CpuStatusEntry(
             buf1.readUUID(),
-            buf1.readBoolean(),
+            buf1.readEnum(JobState.class),
             buf1.readList(buf2 -> {
                 var key = decodeIngredientKey(buf2.readNbt());
                 var amount = buf2.readLong();
                 return new CraftAmount(key, amount);
             }),
-            buf1.readEnum(JobState.class),
-            buf1.readBoolean() ? buf1.readEnum(ExecutionPhase.class) : null,
             buf1.readInt(),
             buf1.readInt(),
-            buf1.readEnum(ExecutionError.class),
-            buf1.readBoolean())));
+            buf1.readEnum(ExecutionError.class))));
     }
 
     @Override

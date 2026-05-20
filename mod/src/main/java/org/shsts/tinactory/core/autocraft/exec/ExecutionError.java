@@ -7,6 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public enum ExecutionError {
     NONE,
+    OFFLINE,
     INPUT_UNAVAILABLE,
     MACHINE_UNAVAILABLE,
     MACHINE_REASSIGNMENT_BLOCKED,

@@ -115,25 +115,20 @@ public class AutocraftTerminalService {
     private CpuStatusEntry toCpuStatus(UUID cpuId) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId, false);
+            return CpuStatusEntry.offline(cpuId);
         }
 
         var current = service.get().getJob();
-        var available = !service.get().isBusy();
         if (current.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId, available);
+            return CpuStatusEntry.idle(cpuId);
         }
         var execution = current.get().execution();
-        var state = execution.state();
         return new CpuStatusEntry(
             cpuId,
-            available,
+            execution.state(),
             current.get().targets(),
-            state,
-            state == JobState.IDLE ? null : execution.phase(),
             execution.nextStepIndex(),
             execution.plan().steps().size(),
-            execution.error(),
-            state == JobState.RUNNING || state == JobState.BLOCKED);
+            execution.error());
     }
 }

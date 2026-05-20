@@ -549,6 +549,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
     private static String blockedMessage(ExecutionError error) {
         return switch (error) {
+            case OFFLINE -> "CPU service is offline";
             case INPUT_UNAVAILABLE -> "Input resources are unavailable";
             case MACHINE_UNAVAILABLE -> "Machine requirement is unavailable";
             case MACHINE_REASSIGNMENT_BLOCKED -> "Machine reassignment blocked by in-flight transfer";

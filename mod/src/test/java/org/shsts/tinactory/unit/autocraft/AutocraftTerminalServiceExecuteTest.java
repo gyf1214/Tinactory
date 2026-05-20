@@ -151,14 +151,32 @@ class AutocraftTerminalServiceExecuteTest {
         assertEquals(1, statuses.size());
         assertTrue(statuses.get(0) instanceof CpuStatusEntry);
         assertEquals(cpu, statuses.get(0).cpuId());
-        assertFalse(statuses.get(0).available());
         assertEquals(targets, statuses.get(0).targets());
         assertEquals(JobState.BLOCKED, statuses.get(0).state());
-        assertEquals(ExecutionPhase.FLUSHING, statuses.get(0).phase());
-        assertEquals(1, statuses.get(0).nextStepIndex());
-        assertEquals(1, statuses.get(0).stepCount());
+        assertEquals(1, statuses.get(0).completedSteps());
+        assertEquals(1, statuses.get(0).totalSteps());
         assertEquals(ExecutionError.FLUSH_BACKPRESSURE, statuses.get(0).error());
-        assertTrue(statuses.get(0).cancellable());
+    }
+
+    @Test
+    void listCpuStatusesShouldExposeOfflineEntryWhenVisibleServiceCannotBeResolved() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.empty()));
+
+        var statuses = service.listCpuStatuses();
+
+        assertEquals(1, statuses.size());
+        assertEquals(cpu, statuses.get(0).cpuId());
+        assertEquals(JobState.FAILED, statuses.get(0).state());
+        assertEquals(List.of(), statuses.get(0).targets());
+        assertEquals(0, statuses.get(0).completedSteps());
+        assertEquals(0, statuses.get(0).totalSteps());
+        assertEquals(ExecutionError.OFFLINE, statuses.get(0).error());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
