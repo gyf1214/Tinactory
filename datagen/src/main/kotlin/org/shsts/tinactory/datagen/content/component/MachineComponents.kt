@@ -1,12 +1,16 @@
 package org.shsts.tinactory.datagen.content.component
 
 import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
+import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import org.shsts.tinactory.integration.network.CableBlock
 
@@ -99,6 +103,18 @@ object MachineComponents {
             magnetic = "neodymium",
             sensor = "platinum",
             quartz = "ender_pearl")
+
+        advancedComponent(Voltage.LUV,
+            main = "hssg",
+            casing = "rhodium_plated_palladium",
+            insulation = "ptfe",
+            motorWire = "ruridit",
+            pipe = "niobium_titanium",
+            rotor = "hssg",
+            magnetic = "neodymium",
+            sensorCore = "ender_eye",
+            sensorBody = "ruridit",
+            sensorFoil = "palladium")
     }
 
     private fun component(v: Voltage, main: String, motor: String,
@@ -202,6 +218,102 @@ object MachineComponents {
         }
     }
 
+    private fun advancedComponent(v: Voltage, main: String, casing: String,
+        insulation: String, motorWire: String, pipe: String, rotor: String,
+        magnetic: String, sensorCore: String, sensorBody: String, sensorFoil: String) {
+        assemblyLine {
+            advancedComponent(v, "electric_motor") {
+                input(magnetic, "magnetic")
+                input(main, "stick", 4)
+                input(main, "ring", 2)
+                input(motorWire, "wire", 64)
+                component("cable", v, 2)
+                input("soldering_alloy")
+            }
+            advancedComponent(v, "electric_pump") {
+                component("electric_motor", v)
+                input(pipe, "pipe")
+                input(main, "plate", 2)
+                input(main, "screw", 8)
+                input(rotor, "rotor")
+                input("silicone_rubber", "ring", 4)
+                component("cable", v, 2)
+                input("soldering_alloy")
+            }
+            advancedComponent(v, "electric_piston") {
+                component("electric_motor", v)
+                input(main, "plate", 4)
+                input(main, "ring", 4)
+                input(main, "stick", 4)
+                input(main, "gear", 6)
+                component("cable", v, 2)
+                input("soldering_alloy")
+            }
+            advancedComponent(v, "conveyor_module") {
+                component("electric_motor", v, 2)
+                input(main, "plate", 2)
+                input(main, "ring", 4)
+                input(main, "screw", 4)
+                component("cable", v, 2)
+                input("silicone_rubber")
+                input("soldering_alloy")
+            }
+            advancedComponent(v, "robot_arm") {
+                component("electric_motor", v, 2)
+                component("electric_piston", v)
+                input(main, "stick", 8)
+                input(main, "gear", 7)
+                circuit(Voltage.LUV)
+                circuit(Voltage.IV, 2)
+                circuit(Voltage.EV, 4)
+                component("cable", v, 4)
+                input("soldering_alloy", amount = 4)
+            }
+            advancedComponent(v, "sensor") {
+                input(main, "stick", 3)
+                component("electric_motor", v)
+                input(sensorBody, "plate", 4)
+                input(sensorCore, "gem")
+                circuit(Voltage.LUV, 2)
+                input(sensorFoil, "foil", 96)
+                component("cable", v, 4)
+                input("soldering_alloy", amount = 2)
+            }
+            advancedComponent(v, "emitter") {
+                input(main, "stick", 3)
+                component("electric_motor", v)
+                input(sensorBody, "stick", 4)
+                input(sensorCore, "gem")
+                circuit(Voltage.LUV, 2)
+                input(sensorFoil, "foil", 96)
+                component("cable", v, 4)
+                input("soldering_alloy", amount = 2)
+            }
+            advancedComponent(v, "machine_hull") {
+                input(casing, "plate", 8)
+                component("cable", v, 2)
+                input(insulation, amount = 2)
+            }
+        }
+    }
+
+    private fun ProcessingRecipeFactory.advancedComponent(v: Voltage, name: String,
+        block: SimpleProcessingBuilder.() -> Unit) {
+        recipe("component/${v.id}/$name") {
+            output(getComponent(name).item(v))
+            voltage(Voltage.IV)
+            block()
+        }
+    }
+
+    private fun SimpleProcessingBuilder.component(name: String, voltage: Voltage, amount: Int = 1) {
+        input(getComponent(name).item(voltage), amount)
+    }
+
+    private fun SimpleProcessingBuilder.circuit(voltage: Voltage, amount: Int = 1) {
+        input(AllTags.circuit(voltage), amount)
+    }
+
     private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust") {
         val wires = v.rank - 1
         val plates = wires * wires
@@ -221,6 +333,7 @@ object MachineComponents {
                 tech(Technologies.NUCLEAR_PHYSICS)
             }
             superconductor(Voltage.EV, "niobium_titanium", "ptfe", "coolant")
+            superconductor(Voltage.IV, "vanadium_gallium", "niobium_titanium", "coolant")
         }
     }
 
