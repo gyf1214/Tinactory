@@ -298,6 +298,34 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.power_generation.013.title}"
+			subtitle: "{tinactory.quests.power_generation.013.subtitle}"
+			description: ["{tinactory.quests.power_generation.013.description.0}"]
+			x: -4.0d
+			y: 2.0d
+			dependencies: ["180A7F8DD9AD0580"]
+			id: "18A01183DF6A59D1"
+			tasks: [{
+				id: "18A01183DF6A59D2"
+				type: "item"
+				item: "tinactory:material/wire/ev_superconductor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.power_generation.014.title}"
+			subtitle: "{tinactory.quests.power_generation.014.subtitle}"
+			description: ["{tinactory.quests.power_generation.014.description.0}"]
+			x: -4.0d
+			y: 4.0d
+			dependencies: ["18A01183DF6A59D1"]
+			id: "18A01183DF6A59D3"
+			tasks: [{
+				id: "18A01183DF6A59D4"
+				type: "item"
+				item: "tinactory:component/ev/field_generator"
+			}]
+		}
+		{
 			title: "{tinactory.quests.power_generation.012.title}"
 			x: -2.0d
 			y: 2.0d
@@ -311,6 +339,7 @@
 				"180A7F8DD9AD0580"
 				"6D4396F046AC59FA"
 				"2C0BDC359D181269"
+				"18A01183DF6A59D3"
 			]
 			size: 2.0d
 			id: "6F4A7B2C1D039E58"
