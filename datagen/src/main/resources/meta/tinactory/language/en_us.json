@@ -19,7 +19,11 @@
     "pic": "PIC",
     "soc": "SoC",
     "ptfe": "PTFE",
-    "me": "ME"
+    "me": "ME",
+    "hssg": "HSS-G",
+    "ruridit": "Ruridit",
+    "rhodium_plated_palladium": "Rhodium Plated Palladium",
+    "vanadium_gallium": "Vanadium Gallium"
   },
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1 $2",

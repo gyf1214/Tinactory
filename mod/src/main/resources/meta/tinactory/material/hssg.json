@@ -1,10 +1,15 @@
 {
-  "color": "0xFFDC0C58",
+  "color": "0xFF999966",
   "items": [
     "dust",
+    "dust_tiny",
+    "gear",
     "ingot",
-    "ingot_hot",
-    "plate"
+    "plate",
+    "ring",
+    "rotor",
+    "screw",
+    "stick"
   ],
   "fluids": {},
   "aliases": {

@@ -351,6 +351,35 @@ object Materials {
                 component("titanium")
             }
         }
+        material("hssg", METALLIC) {
+            machineProcess(Voltage.EV, 2.0)
+            mix(Voltage.EV) {
+                component("tungsten_steel", 5)
+                component("chrome")
+                component("molybdenum", 2)
+                component("vanadium")
+            }
+            blast(Voltage.EV, 4200, 1280)
+        }
+        material("ruridit", BRIGHT) {
+            machineProcess(Voltage.EV, 2.0)
+            mix(Voltage.EV) {
+                component("ruthenium", 2)
+                component("iridium")
+            }
+            blast(Voltage.EV, 4500, 1280)
+        }
+        material("rhodium_plated_palladium", SHINY) {
+            machineProcess(Voltage.IV, 2.0)
+        }
+        material("vanadium_gallium", METALLIC) {
+            machineProcess(Voltage.EV, 1.5)
+            mix(Voltage.EV) {
+                component("vanadium", 3)
+                component("gallium")
+            }
+            blast(Voltage.EV, 4500, 1280)
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("chloroplatinate", DULL)

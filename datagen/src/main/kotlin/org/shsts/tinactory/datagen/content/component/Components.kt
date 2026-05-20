@@ -139,6 +139,10 @@ object Components {
                 model(basicItem("metaitems/quantumeye"))
             }
 
+            component("raw_rhodium_plated_palladium") {
+                model(basicItem(ResourceLocation("gregtech4", "items/iridium_alloy_ingot")))
+            }
+
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {

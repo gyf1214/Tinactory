@@ -23,9 +23,11 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.cubeTint
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
@@ -115,6 +117,26 @@ object MiscMaterials {
                 input("sodium")
                 input("potassium")
                 voltage(Voltage.HV)
+                workTicks(200)
+            }
+        }
+
+        blastFurnace {
+            recipe("material/rhodium_plated_palladium/ingot_hot_from_raw") {
+                input(getItem("component/raw_rhodium_plated_palladium"))
+                output("rhodium_plated_palladium", "ingot_hot")
+                voltage(Voltage.IV)
+                workTicks(1280)
+                extra {
+                    temperature(4500)
+                }
+            }
+        }
+
+        vacuumFreezer {
+            output("rhodium_plated_palladium", "ingot") {
+                input("rhodium_plated_palladium", "ingot_hot")
+                voltage(Voltage.EV)
                 workTicks(200)
             }
         }

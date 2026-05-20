@@ -111,6 +111,14 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.ENDER_CHEMISTRY)
             }
+            misc("raw_rhodium_plated_palladium", 4) {
+                input("rhodium", "plate")
+                input("palladium", "ingot", 3)
+                input("soldering_alloy")
+                voltage(Voltage.IV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.SOLDERING)
+            }
         }
 
         wiremill {
