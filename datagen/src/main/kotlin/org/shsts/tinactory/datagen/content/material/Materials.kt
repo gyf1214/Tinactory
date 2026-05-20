@@ -146,11 +146,15 @@ object Materials {
         material("niobium", METALLIC)
         material("palladium", SHINY) {
             machineProcess(Voltage.HV)
-            smelt()
+            blast(Voltage.HV, 3200, 960) {
+                component("nitrogen")
+            }
         }
         material("rhodium", BRIGHT) {
             machineProcess(Voltage.HV, 1.5)
-            smelt()
+            blast(Voltage.HV, 3600, 960) {
+                component("nitrogen")
+            }
         }
         material("ruthenium", BRIGHT)
         material("iridium", METALLIC) {
