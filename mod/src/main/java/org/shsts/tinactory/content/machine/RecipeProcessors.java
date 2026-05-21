@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilMachine;
+import org.shsts.tinactory.content.multiblock.FusionReactor;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -39,6 +40,12 @@ public final class RecipeProcessors {
 
     public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> processing(
         IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
+        return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
+    }
+
+    public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> fusion(
+        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType,
+        FusionReactor.Properties properties) {
         return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
     }
 
@@ -85,5 +92,12 @@ public final class RecipeProcessors {
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> multiblock(
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
         return $ -> $.capability(ID, be -> new MultiblockProcessor(be, processorFactories, autoRecipe));
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> fusionMultiblock(
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
+        boolean autoRecipe,
+        FusionReactor.Properties properties) {
+        return $ -> $.capability(ID, be -> new FusionReactor(be, processorFactories, autoRecipe, properties));
     }
 }

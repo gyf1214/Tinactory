@@ -95,11 +95,16 @@ public class MultiblockMeta extends MachineMeta {
         private <P> Multiblock.Builder<P> multiblock(IBlockEntityTypeBuilder<P> builder) {
             if (!processors.isEmpty()) {
                 var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
-                builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
+                if (machineType.equals("fusion_reactor")) {
+                    var properties = FusionReactor.Properties.fromJson(jo);
+                    builder.transform(RecipeProcessors.fusionMultiblock(processors, autoRecipe, properties));
+                } else {
+                    builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
+                }
             }
 
             return switch (machineType) {
-                case "default" -> builder.child(Multiblock.builder(Multiblock::new));
+                case "default", "fusion_reactor" -> builder.child(Multiblock.builder(Multiblock::new));
                 case "research" -> builder.child(Multiblock.builder(ResearchMultiblock::new));
                 case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
                 case "engraving" -> {
@@ -263,6 +268,19 @@ public class MultiblockMeta extends MachineMeta {
                     ingredientConsumer.accept(BlockIngredient.of(tag));
                     return $ -> $.check(ch, blockStateCheck(blockState -> blockState.is(tag)));
                 }
+                case "tag_or_interface" -> {
+                    var tag = getBlockTag(jo, "tag");
+                    ingredientConsumer.accept(BlockIngredient.of(tag));
+                    return $ -> $.check(ch, (ctx, pos) -> {
+                        var block = ctx.getBlock(pos);
+                        if (MultiblockSpec.checkInterface(ctx, pos)) {
+                            return;
+                        }
+                        if (block.isEmpty() || !block.get().is(tag)) {
+                            ctx.setFailed();
+                        }
+                    });
+                }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
@@ -317,6 +335,10 @@ public class MultiblockMeta extends MachineMeta {
                 parseRecipeType();
                 return switch (machineType) {
                     case "default", "engraving" -> RecipeProcessors.processing(recipeType());
+                    case "fusion_reactor" -> {
+                        var properties = FusionReactor.Properties.fromJson(jo);
+                        yield RecipeProcessors.fusion(recipeType(), properties);
+                    }
                     case "coil" -> {
                         var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
                         yield RecipeProcessors.coil(recipeType(), baseTemp);
