@@ -1,0 +1,102 @@
+{
+  "recipe": "default",
+  "machine": "fusion_reactor",
+  "startEnergyFactor": 8388608,
+  "chargeAmperage": 1,
+  "decayRate": 0.001,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_fusion",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/misc/fusion_casing",
+  "layers": [
+    [
+      "               ",
+      "      WWW      ",
+      "    WWAAAWW    ",
+      "   WAAAAAAAW   ",
+      "  WAAAAAAAAAW  ",
+      "  WAAAAAAAAAW  ",
+      " WAAAAAAAAAAAW ",
+      " WAAAAAAAAAAAW ",
+      " WAAAAAAAAAAAW ",
+      "  WAAAAAAAAAW  ",
+      "  WAAAAAAAAAW  ",
+      "   WAAAAAAAW   ",
+      "    WWAAAWW    ",
+      "      WWW      ",
+      "               "
+    ],
+    [
+      "      XXX      ",
+      "    XXKKKXX    ",
+      "   XKKWWWKKX   ",
+      "  XKWWAAAWWKX  ",
+      " XKWAAAAAAAWKX ",
+      " XKWAAAAAAAWKX ",
+      "XKWAAAAAAAAAWKX",
+      "XKWAAAAAAAAAWKX",
+      "XKWAAAAAAAAAWKX",
+      " XKWAAAAAAAWKX ",
+      " XKWAAAAAAAWKX ",
+      "  XKWWAAAWWKX  ",
+      "   XKKWWWKKX   ",
+      "    XXKKKXX    ",
+      "      X$X      "
+    ],
+    [
+      "               ",
+      "      WWW      ",
+      "    WWAAAWW    ",
+      "   WAAAAAAAW   ",
+      "  WAAAAAAAAAW  ",
+      "  WAAAAAAAAAW  ",
+      " WAAAAAAAAAAAW ",
+      " WAAAAAAAAAAAW ",
+      " WAAAAAAAAAAAW ",
+      "  WAAAAAAAAAW  ",
+      "  WAAAAAAAAAW  ",
+      "   WAAAAAAAW   ",
+      "    WWAAAWW    ",
+      "      WWW      ",
+      "               "
+    ]
+  ],
+  "defines": {
+    "W": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/fusion_shell"
+    },
+    "X": {
+      "type": "tag_or_interface",
+      "tag": "tinactory:multiblock/fusion_shell"
+    },
+    "K": "tinactory:multiblock/misc/superconducting_coil",
+    "A": "air"
+  }
+}

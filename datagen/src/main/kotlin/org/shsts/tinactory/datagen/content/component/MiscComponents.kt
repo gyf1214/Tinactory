@@ -117,7 +117,7 @@ object MiscComponents {
                 input("soldering_alloy")
                 voltage(Voltage.IV)
                 workTicks(COMPONENT_TICKS)
-                tech(Technologies.SOLDERING)
+                tech(Technologies.RHODIUM_PLATED_PALLADIUM)
             }
         }
 

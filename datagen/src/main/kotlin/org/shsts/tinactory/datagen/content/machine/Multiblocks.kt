@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraftforge.client.model.generators.ConfiguredModel
 import net.minecraftforge.common.Tags
 import org.shsts.tinactory.AllBlockEntities.getMachine
+import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS
 import org.shsts.tinactory.AllMultiblocks.getMultiblock
@@ -35,6 +36,7 @@ import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
@@ -48,6 +50,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
+import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
@@ -57,6 +60,8 @@ import org.shsts.tinactory.integration.network.PrimitiveBlock
 import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Multiblocks {
+    private val FUSION_SHELL = AllTags.block(modLoc("multiblock/fusion_shell"))
+
     fun init() {
         components()
         componentRecipes()
@@ -239,6 +244,21 @@ object Multiblocks {
             misc("nuclear_chamber") {
                 blockState(cubeColumn(ic2("blocks/generator/reactor/reactor_chamber_sides"),
                     ic2("blocks/generator/reactor/reactor_chamber_top")))
+            }
+
+            misc("fusion_casing") {
+                blockState(solidBlock("casings/fusion/machine_casing_fusion"))
+                tag(FUSION_SHELL)
+            }
+
+            misc("fusion_glass") {
+                blockState(solidBlock("casings/transparent/fusion_glass"))
+                tag(FUSION_SHELL)
+                tag(Tags.Blocks.GLASS)
+            }
+
+            misc("superconducting_coil") {
+                blockState(solidBlock("casings/fusion/machine_coil_superconductor"))
             }
         }
 
@@ -607,8 +627,19 @@ object Multiblocks {
         output(getItem("multiblock/misc/$name"), amount, block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
-        input(getItem("multiblock/misc/$name"))
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+        name: String, amount: Int = 1) {
+        input(getBlock("multiblock/misc/$name"), amount)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.component(
+        name: String, voltage: Voltage, amount: Int = 1) {
+        input(getComponent(name).item(voltage), amount)
+    }
+
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuit(
+        voltage: Voltage, amount: Int = 1) {
+        input(AllTags.circuit(voltage), amount)
     }
 
     private fun AssemblyRecipeFactory.solid(name: String,
@@ -717,6 +748,8 @@ object Multiblocks {
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
             multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"),
                 modLoc("blocks/multiblock/nuclear_reactor"))
+            multiblock("fusion_reactor", gregtech("blocks/casings/fusion/machine_casing_fusion"),
+                gregtech("blocks/multiblock/fusion_reactor"))
         }
     }
 
@@ -1034,6 +1067,32 @@ object Multiblocks {
             }
 
             componentVoltage = Voltage.IV
+            misc("fusion_casing") {
+                input("hssg", "stick", 2)
+                input("rhodium_plated_palladium", "plate", 3)
+                input("ruridit", "foil", 2)
+                input("soldering_alloy", amount = 2)
+                workTicks(200)
+                tech(Technologies.FUSION)
+            }
+            misc("fusion_glass") {
+                misc("hardened_glass", 2)
+                input("hssg", "stick", 2)
+                input("rhodium_plated_palladium", "plate", 3)
+                input("ruridit", "foil", 2)
+                input("soldering_alloy", amount = 2)
+                workTicks(200)
+                tech(Technologies.FUSION)
+            }
+            misc("superconducting_coil") {
+                input("iv_superconductor", "wire", 48)
+                input("ruridit", "foil", 48)
+                input("rhodium_plated_palladium", "plate", 2)
+                input("pe", amount = 2)
+                input("soldering_alloy", amount = 4)
+                workTicks(200)
+                tech(Technologies.FUSION)
+            }
             multiblock("batching_vessel") {
                 misc("batch_rotor_casing")
                 circuit(4)
@@ -1076,6 +1135,18 @@ object Multiblocks {
         }
 
         assemblyLine {
+            recipe("multiblock/fusion_reactor") {
+                output(getMultiblock("fusion_reactor").block.get())
+                input(getComponent("machine_hull").item(Voltage.LUV))
+                component("robot_arm", Voltage.LUV, 4)
+                component("electric_pump", Voltage.LUV, 4)
+                component("field_generator", Voltage.IV, 8)
+                circuit(Voltage.LUV, 8)
+                input("hssg", "stick", 8)
+                input("ruridit", "foil", 16)
+                input("soldering_alloy", amount = 16)
+                workTicks(2400)
+            }
             recipe("multiblock/assembly_line_smoke") {
                 input(getMultiblock("assembly_line").block.get())
                 input(getBlock("multiblock/misc/assembler_machine_casing"), 2)

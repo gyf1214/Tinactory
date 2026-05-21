@@ -23,7 +23,12 @@
     "hssg": "HSS-G",
     "ruridit": "Ruridit",
     "rhodium_plated_palladium": "Rhodium Plated Palladium",
-    "vanadium_gallium": "Vanadium Gallium"
+    "vanadium_gallium": "Vanadium Gallium",
+    "fusion_casing": "Fusion Casing",
+    "fusion_glass": "Fusion Glass",
+    "superconducting_coil": "Superconducting Coil",
+    "fusion_reactor": "Fusion Reactor",
+    "fusion": "Fusion"
   },
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1 $2",
@@ -340,6 +345,9 @@
     "tinactory.technology.material_conditioning.details": "Covers physical material handling processes such as mixing, centrifuging, extracting, and solidifying before LuV machine casings appear.",
     "tinactory.technology.electrochemical_processing.details": "Unlocks electrolyte and electrical-field processing that combines polarizing and electrolyzing for late Phase 2 material work.",
     "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
+    "tinactory.technology.rhodium_plated_palladium.details": "Unlocks the plated palladium precursor needed for LuV machine casings and fusion containment components.",
+    "tinactory.technology.fusion.details": "Unlocks fusion reactor construction, including dedicated shell blocks, superconducting coils, and the first reactor controller.",
+    "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",
     "generator.tinactory.void": "Void",
     "key.tinactory.open_tech": "Technology Screen",
     "config.waila.plugin_tinactory.hide_empty_tank": "Hide Empty Tank",

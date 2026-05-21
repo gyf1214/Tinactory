@@ -13,6 +13,7 @@ import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
@@ -99,6 +100,8 @@ object Technologies {
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
+    val RHODIUM_PLATED_PALLADIUM: ResourceLocation
+    val FUSION: ResourceLocation
 
     init {
         Factory().apply {
@@ -432,6 +435,20 @@ object Technologies {
             PLATINUM_GROUP_METAL = tech("platinum_group_metal") {
                 maxProgress(160)
                 displayMaterial("platinum_metallic", "dust")
+            }
+
+            voltage = Voltage.IV
+
+            RHODIUM_PLATED_PALLADIUM = tech("rhodium_plated_palladium") {
+                maxProgress(200)
+                displayItem(getItem("component/raw_rhodium_plated_palladium"))
+                depends(PLATINUM_GROUP_METAL)
+            }
+
+            FUSION = tech("fusion") {
+                maxProgress(400)
+                displayItem(getMultiblock("fusion_reactor").block)
+                depends(NUCLEAR_PHYSICS, RHODIUM_PLATED_PALLADIUM)
             }
         }
     }
