@@ -6,6 +6,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraftforge.client.model.generators.ConfiguredModel
 import net.minecraftforge.common.Tags
+import org.shsts.tinactory.Tinactory.REGISTRATE
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS
@@ -1153,6 +1154,19 @@ object Multiblocks {
                 input("soldering_alloy", amount = 1)
                 output(getBlock("multiblock/misc/assembler_machine_casing"))
             }
+        }
+
+        RecipeFactory(REGISTRATE.getRecipeType<ProcessingRecipe.Builder>("fusion_reactor"),
+            ::ProcessingRecipeBuilder) {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            amperage = 1.0
+        }.recipe("multiblock/fusion_reactor_smoke") {
+            input("water")
+            input("water", "gas")
+            output("water", "gas", 2)
+            voltage(Voltage.LUV)
+            workTicks(200)
         }
     }
 
