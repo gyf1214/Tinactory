@@ -726,6 +726,74 @@
 				item: "tinactory:component/luv/robot_arm"
 			}]
 		}
+		{
+			title: "{tinactory.quests.05_post_ev.031.title}"
+			x: 2.0d
+			y: 18.0d
+			subtitle: "{tinactory.quests.05_post_ev.031.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.031.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.031.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0043"
+				"05A550E7057E003B"
+				"05A550E7057E0036"
+			]
+			id: "05A550E7057E0051"
+			tasks: [{
+				id: "05A550E7057E0052"
+				type: "item"
+				item: "tinactory:multiblock/misc/fusion_casing"
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.032.title}"
+			x: 6.0d
+			y: 18.0d
+			subtitle: "{tinactory.quests.05_post_ev.032.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.032.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.032.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E003F"
+				"05A550E7057E003B"
+				"05A550E7057E0036"
+				"05A550E7057E0043"
+			]
+			id: "05A550E7057E0053"
+			tasks: [{
+				id: "05A550E7057E0054"
+				type: "item"
+				item: "tinactory:multiblock/misc/superconducting_coil"
+			}]
+		}
+		{
+			title: "{tinactory.quests.05_post_ev.033.title}"
+			x: 4.0d
+			y: 20.0d
+			subtitle: "{tinactory.quests.05_post_ev.033.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.033.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.033.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0051"
+				"05A550E7057E0053"
+				"05A550E7057E0041"
+				"05A550E7057E004F"
+			]
+			id: "05A550E7057E0055"
+			tasks: [{
+				id: "05A550E7057E0056"
+				type: "item"
+				item: "tinactory:multiblock/fusion_reactor"
+			}]
+		}
 	]
 	quest_links: [ ]
 }
