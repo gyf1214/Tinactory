@@ -70,6 +70,12 @@ public class MachineProcessor extends CapabilityProvider implements
         this.processorCap = LazyOptional.of(() -> runtime);
     }
 
+    public MachineProcessor(BlockEntity blockEntity, ProcessingRuntime runtime) {
+        this.blockEntity = blockEntity;
+        this.runtime = runtime;
+        this.processorCap = LazyOptional.of(() -> runtime);
+    }
+
     protected Optional<IMachine> machine() {
         return MACHINE.tryGet(blockEntity);
     }

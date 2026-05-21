@@ -98,6 +98,7 @@ public final class RecipeProcessors {
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe,
         FusionReactor.Properties properties) {
-        return $ -> $.capability(ID, be -> new FusionReactor(be, processorFactories, autoRecipe, properties));
+        return $ -> $.capability(ID, be -> new MultiblockProcessor(be,
+            new FusionReactor(be, processorFactories, autoRecipe, properties)));
     }
 }

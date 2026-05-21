@@ -1,31 +1,31 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
+import org.shsts.tinactory.integration.metrics.MetricsManager;
+import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -33,10 +33,10 @@ import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FusionReactor extends MultiblockProcessor {
+public class FusionReactor extends ProcessingRuntime {
     private static final double STARTUP_EPSILON = 1d;
     private final State state;
-    private final LazyOptional<IMachineProcessor> processorCap;
+    private final BlockEntity blockEntity;
 
     public FusionReactor(BlockEntity blockEntity,
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
@@ -47,22 +47,40 @@ public class FusionReactor extends MultiblockProcessor {
     private FusionReactor(BlockEntity blockEntity,
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe, State state) {
-        super(blockEntity, wrap(processorFactories, state), autoRecipe);
+        super(wrap(blockEntity, processorFactories, state), autoRecipe,
+            () -> machine(blockEntity),
+            () -> Objects.requireNonNull(blockEntity.getLevel()).isClientSide,
+            blockEntity::setChanged,
+            (direction, object) -> reportProcessingObject(blockEntity, direction, object),
+            ProcessingHelper.INFO_CODEC);
+        this.blockEntity = blockEntity;
         this.state = state;
         state.owner = this;
-        processorCap = LazyOptional.of(FusionProcessor::new);
     }
 
-    private static Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> wrap(
+    private static Collection<IRecipeProcessor<?>> wrap(BlockEntity blockEntity,
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories, State state) {
         return processorFactories.stream()
-            .<Function<BlockEntity, ? extends IRecipeProcessor<?>>>map(factory ->
-                be -> new StartupProcessor<>(factory.apply(be), state))
+            .<IRecipeProcessor<?>>map(factory -> new StartupProcessor<>(factory.apply(blockEntity), state))
             .toList();
     }
 
+    private static Optional<IMachine> machine(BlockEntity blockEntity) {
+        return Multiblock.get(blockEntity).getInterface().map($ -> $);
+    }
+
+    private static void reportProcessingObject(BlockEntity blockEntity, PortDirection direction,
+        IProcessingObject object) {
+        var action = switch (direction) {
+            case INPUT -> "consumed";
+            case OUTPUT -> "produced";
+            case NONE -> throw new IllegalArgumentException("unexpected processing direction: " + direction);
+        };
+        machine(blockEntity).ifPresent(machine -> MetricsManager.reportProcessingObject(action, machine, object));
+    }
+
     private Optional<Voltage> voltage() {
-        return machine()
+        return machine(blockEntity)
             .filter(MultiblockInterface.class::isInstance)
             .map(MultiblockInterface.class::cast)
             .map($ -> $.voltage);
@@ -84,16 +102,18 @@ public class FusionReactor extends MultiblockProcessor {
         blockEntity.setChanged();
     }
 
-    private void onPreWork() {
+    @Override
+    public void onPreWork() {
         state.beginPreWork();
         if (!state.isFull()) {
-            runtime.onContainerChange();
+            onContainerChange();
         }
-        runtime.onPreWork();
+        super.onPreWork();
         state.finishPreWork();
     }
 
-    private void onWorkTick(double partial) {
+    @Override
+    public void onWorkTick(double partial) {
         if (state.charging) {
             var before = state.startupEnergy;
             state.startupEnergy = Math.min(startupCapacity(), state.startupEnergy + chargeRate() * partial);
@@ -101,7 +121,7 @@ public class FusionReactor extends MultiblockProcessor {
                 setChanged();
             }
             if (state.isFull()) {
-                runtime.onContainerChange();
+                onContainerChange();
             }
         } else if (!state.running && !state.possible) {
             var before = state.startupEnergy;
@@ -113,22 +133,23 @@ public class FusionReactor extends MultiblockProcessor {
                 setChanged();
             }
         }
-        runtime.onWorkTick(partial);
-    }
-
-    private boolean isWorking(double partial) {
-        return state.charging || runtime.isWorking(partial);
+        super.onWorkTick(partial);
     }
 
     @Override
-    public ElectricMachineType getMachineType() {
-        return state.charging ? ElectricMachineType.CONSUMER : super.getMachineType();
+    public boolean isWorking(double partial) {
+        return state.charging || super.isWorking(partial);
     }
 
     @Override
-    public double getPowerCons() {
+    public ElectricMachineType machineType() {
+        return state.charging ? ElectricMachineType.CONSUMER : super.machineType();
+    }
+
+    @Override
+    public double powerCons() {
         if (!state.charging) {
-            return super.getPowerCons();
+            return super.powerCons();
         }
         return Math.min(chargeRate(), Math.max(0d, startupCapacity() - state.startupEnergy));
     }
@@ -144,14 +165,6 @@ public class FusionReactor extends MultiblockProcessor {
     public void deserializeNBT(CompoundTag tag) {
         super.deserializeNBT(tag);
         state.startupEnergy = tag.getDouble("startupEnergy");
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get()) {
-            return processorCap.cast();
-        }
-        return super.getCapability(cap, side);
     }
 
     public record Properties(long startEnergyFactor, double chargeAmperage, double decayRate) {
@@ -312,58 +325,6 @@ public class FusionReactor extends MultiblockProcessor {
         @Override
         public void deserializeNBT(CompoundTag tag) {
             delegate.deserializeNBT(tag);
-        }
-    }
-
-    private class FusionProcessor implements IMachineProcessor {
-        @Override
-        public Optional<IProcessingObject> getInfo(int port, int index) {
-            return runtime.getInfo(port, index);
-        }
-
-        @Override
-        public List<IProcessingObject> getAllInfo() {
-            return runtime.getAllInfo();
-        }
-
-        @Override
-        public long progressTicks() {
-            return runtime.progressTicks();
-        }
-
-        @Override
-        public long maxProgressTicks() {
-            return runtime.maxProgressTicks();
-        }
-
-        @Override
-        public double workSpeed() {
-            return runtime.workSpeed();
-        }
-
-        @Override
-        public boolean supportsRecipeType(ResourceLocation recipeTypeId) {
-            return runtime.supportsRecipeType(recipeTypeId);
-        }
-
-        @Override
-        public void onPreWork() {
-            FusionReactor.this.onPreWork();
-        }
-
-        @Override
-        public void onWorkTick(double partial) {
-            FusionReactor.this.onWorkTick(partial);
-        }
-
-        @Override
-        public double getProgress() {
-            return runtime.getProgress();
-        }
-
-        @Override
-        public boolean isWorking(double partial) {
-            return FusionReactor.this.isWorking(partial);
         }
     }
 }
