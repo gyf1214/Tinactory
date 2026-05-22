@@ -92,6 +92,10 @@ public final class PlannerLedger {
         return inventoryConsumed + consumeFrom(craftedStock, key, remaining);
     }
 
+    public long consumeCrafted(IStackKey key, long amount) {
+        return consumeFrom(craftedStock, key, amount);
+    }
+
     public PlanSummary summary() {
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
         for (var item : summary.entrySet()) {

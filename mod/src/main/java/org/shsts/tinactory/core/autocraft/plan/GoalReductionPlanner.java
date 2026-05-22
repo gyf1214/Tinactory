@@ -94,7 +94,10 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     private void runStartStage(PlanningSession session, SearchFrame frame) {
         loadAvailableAmount(session, frame.key);
-        frame.remaining = frame.demand - session.ledger.consume(frame.key, frame.demand);
+        var consumed = frame.rootDemand ?
+            session.ledger.consumeCrafted(frame.key, frame.demand) :
+            session.ledger.consume(frame.key, frame.demand);
+        frame.remaining = frame.demand - consumed;
         if (frame.remaining <= 0L) {
             popSuccess(session);
             return;
@@ -180,7 +183,9 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         for (var output : pattern.outputs()) {
             session.ledger.addCraftedStock(output.key(), output.amount() * frame.runs);
         }
-        var fulfilled = session.ledger.consume(frame.key, frame.remaining);
+        var fulfilled = frame.rootDemand ?
+            session.ledger.consumeCrafted(frame.key, frame.remaining) :
+            session.ledger.consume(frame.key, frame.remaining);
         session.steps.add(new CraftStep(
             "step-" + session.nextStepId++,
             pattern,

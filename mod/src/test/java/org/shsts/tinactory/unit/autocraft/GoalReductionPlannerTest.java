@@ -73,6 +73,26 @@ class GoalReductionPlannerTest {
     }
 
     @Test
+    void plannerShouldIgnoreExistingInventoryForDirectTargetDemand() {
+        var plank = TestStackKey.item("minecraft:oak_planks", "");
+        var chest = TestStackKey.item("minecraft:chest", "");
+        var makeChest = pattern(
+            "minecraft:chest_from_planks",
+            List.of(new CraftAmount(plank, 1)),
+            List.of(new CraftAmount(chest, 1)));
+        var planner = planner(
+            repo(List.of(makeChest)),
+            List.of(new CraftAmount(plank, 5), new CraftAmount(chest, 3)));
+
+        var snapshot = planner.plan(List.of(new CraftAmount(chest, 5)));
+
+        assertNotNull(snapshot.plan());
+        assertEquals(5, snapshot.plan().steps().size());
+        assertSummaryEntry(snapshot.summary(), plank, 5, 5, 0);
+        assertSummaryEntry(snapshot.summary(), chest, 3, 0, 5);
+    }
+
+    @Test
     void plannerShouldReuseByproductsFromEarlierSteps() {
         var crude = TestStackKey.fluid("tinactory:crude_oil", "");
         var plastic = TestStackKey.item("tinactory:plastic", "");
