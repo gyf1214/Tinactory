@@ -8,7 +8,6 @@ import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 
 import java.util.List;
@@ -71,14 +70,14 @@ public class AutocraftTerminalService {
             return previewResult;
         }
         var targets = List.of(new CraftAmount(target, quantity));
-        var snapshot = planner.plan(targets);
-        if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
+        var result = planner.plan(targets);
+        if (result.plan() == null) {
             previewTargets = null;
-            previewResult = AutocraftPreview.failure(snapshot.error(), snapshot.summary());
+            previewResult = AutocraftPreview.failure(result.error(), result.summary());
             return previewResult;
         }
         previewTargets = targets;
-        previewResult = AutocraftPreview.success(snapshot.plan(), snapshot.summary());
+        previewResult = AutocraftPreview.success(result.plan(), result.summary());
         return previewResult;
     }
 

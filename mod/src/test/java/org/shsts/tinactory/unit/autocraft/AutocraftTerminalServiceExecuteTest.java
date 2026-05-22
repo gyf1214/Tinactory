@@ -18,7 +18,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
@@ -300,9 +300,19 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public PlannerSnapshot plan(List<CraftAmount> targets) {
+        public PlanResult plan(List<CraftAmount> targets) {
             calls++;
-            return PlannerSnapshot.completed(plan);
+            return PlanResult.completed(plan);
+        }
+
+        @Override
+        public void start(List<CraftAmount> targets) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Optional<PlanResult> advance(int budget) {
+            throw new UnsupportedOperationException();
         }
     }
 

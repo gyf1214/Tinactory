@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class GoalReductionPlannerErrorTest {
     @Test
@@ -30,7 +30,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
         assertEquals(a, snapshot.error().targetKey());
         assertSummaryEntry(snapshot.summary(), a, 0, 1, 1);
@@ -49,7 +49,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(a, 1)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.CYCLE_DETECTED, snapshot.error().code());
         assertEquals(a, snapshot.error().targetKey());
     }
@@ -61,7 +61,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(missing, 1)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.MISSING_PATTERN, snapshot.error().code());
         assertEquals(missing, snapshot.error().targetKey());
         assertSummaryEntry(snapshot.summary(), missing, 0, 1, 0);
@@ -79,7 +79,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
         assertEquals(ingot, snapshot.error().targetKey());
         assertEquals(2, snapshot.summary().entries().size());
@@ -112,7 +112,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(gear, 2)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
         assertEquals(ore, snapshot.error().targetKey());
         assertEquals(4, snapshot.summary().entries().size());
@@ -141,7 +141,7 @@ class GoalReductionPlannerErrorTest {
 
         var snapshot = planner.plan(List.of(new CraftAmount(a, 1), new CraftAmount(d, 1)));
 
-        assertEquals(PlanningState.FAILED, snapshot.state());
+        assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
         assertEquals(e, snapshot.error().targetKey());
         assertEquals(4, snapshot.summary().entries().size());

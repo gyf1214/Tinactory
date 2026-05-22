@@ -4,10 +4,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.core.autocraft.api.IIncrementalCraftPlanner;
+import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 
@@ -16,12 +15,15 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
+public final class GoalReductionPlanner implements ICraftPlanner {
     private final IPatternRepository patterns;
     private final IInventoryView inventory;
+    @Nullable
+    private PlanningSession activeSession;
 
     public GoalReductionPlanner(IPatternRepository patterns, IInventoryView inventory) {
         this.patterns = patterns;
@@ -29,54 +31,50 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     @Override
-    public PlannerSnapshot plan(List<CraftAmount> targets) {
-        var session = startSession(targets);
-        while (true) {
-            var snapshot = resume(session, Integer.MAX_VALUE);
-            if (snapshot.state() != PlanningState.RUNNING) {
-                return snapshot;
-            }
+    public void start(List<CraftAmount> targets) {
+        activeSession = new PlanningSession(targets);
+    }
+
+    @Override
+    public Optional<PlanResult> advance(int stepBudget) {
+        if (activeSession == null) {
+            return Optional.empty();
         }
+        return resume(activeSession, stepBudget);
     }
 
-    @Override
-    public PlannerSession startSession(List<CraftAmount> targets) {
-        return new PlannerSession(targets);
-    }
-
-    @Override
-    public PlannerSnapshot resume(PlannerSession session, int stepBudget) {
+    private Optional<PlanResult> resume(PlanningSession session, int stepBudget) {
         if (session.result != null) {
-            return session.result;
+            return Optional.of(session.result);
         }
         if (stepBudget <= 0) {
-            return PlannerSnapshot.running();
+            return Optional.empty();
         }
 
         var budget = stepBudget;
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlannerSnapshot.completed(buildPlan(session), session.ledger.summary());
-                    return session.result;
+                    session.result = PlanResult.completed(buildPlan(session), session.ledger.summary());
+                    return Optional.of(session.result);
                 }
                 var target = session.targets.get(session.nextTargetIndex);
-                session.searchStack.add(new PlannerSession.SearchFrame(target.key(), target.amount(), true));
+                session.searchStack.add(new SearchFrame(target.key(), target.amount(), true));
             }
             processOneSearchStep(session);
             budget--;
         }
         if (session.result != null) {
-            return session.result;
+            return Optional.of(session.result);
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlannerSnapshot.completed(buildPlan(session), session.ledger.summary());
-            return session.result;
+            session.result = PlanResult.completed(buildPlan(session), session.ledger.summary());
+            return Optional.of(session.result);
         }
-        return PlannerSnapshot.running();
+        return Optional.empty();
     }
 
-    private void processOneSearchStep(PlannerSession session) {
+    private void processOneSearchStep(PlanningSession session) {
         var frame = peekFrame(session);
         switch (frame.stage) {
             case START:
@@ -94,7 +92,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         }
     }
 
-    private void runStartStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+    private void runStartStage(PlanningSession session, SearchFrame frame) {
         loadAvailableAmount(session, frame.key);
         frame.remaining = frame.demand - session.ledger.consume(frame.key, frame.demand);
         if (frame.remaining <= 0L) {
@@ -119,10 +117,10 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         frame.firstError = null;
         frame.errorSummary = null;
         frame.candidateIndex = 0;
-        frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+        frame.stage = Stage.SELECT_PATTERN;
     }
 
-    private void loadAvailableAmount(PlannerSession session, IStackKey key) {
+    private void loadAvailableAmount(PlanningSession session, IStackKey key) {
         if (session.cachedAvailable.containsKey(key)) {
             return;
         }
@@ -131,7 +129,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         session.ledger.observeInventory(key, available);
     }
 
-    private void runSelectPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+    private void runSelectPatternStage(PlanningSession session, SearchFrame frame) {
         if (frame.candidateIndex >= frame.candidates.size()) {
             var error = frame.firstError == null ? PlanError.unsatisfiedBaseResource(frame.key) : frame.firstError;
             var summary = frame.errorSummary == null ? session.ledger.summary() : frame.errorSummary;
@@ -149,10 +147,10 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         for (var output : pattern.outputs()) {
             session.ledger.recordCraftedAmount(output.key(), output.amount() * frame.runs);
         }
-        frame.stage = PlannerSession.Stage.REDUCE_INPUTS;
+        frame.stage = Stage.REDUCE_INPUTS;
     }
 
-    private void runReduceInputsStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+    private void runReduceInputsStage(PlanningSession session, SearchFrame frame) {
         if (frame.childError != null) {
             if (frame.firstError == null) {
                 frame.firstError = frame.childError;
@@ -164,20 +162,20 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             frame.childError = null;
             frame.childErrorSummary = null;
             frame.candidateIndex++;
-            frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+            frame.stage = Stage.SELECT_PATTERN;
             return;
         }
         var pattern = frame.candidates.get(frame.candidateIndex);
         if (frame.inputIndex >= pattern.inputs().size()) {
-            frame.stage = PlannerSession.Stage.APPLY_PATTERN;
+            frame.stage = Stage.APPLY_PATTERN;
             return;
         }
         var input = pattern.inputs().get(frame.inputIndex);
         frame.inputIndex++;
-        session.searchStack.add(new PlannerSession.SearchFrame(input.key(), input.amount() * frame.runs, false));
+        session.searchStack.add(new SearchFrame(input.key(), input.amount() * frame.runs, false));
     }
 
-    private void runApplyPatternStage(PlannerSession session, PlannerSession.SearchFrame frame) {
+    private void runApplyPatternStage(PlanningSession session, SearchFrame frame) {
         var pattern = frame.candidates.get(frame.candidateIndex);
         for (var output : pattern.outputs()) {
             session.ledger.addCraftedStock(output.key(), output.amount() * frame.runs);
@@ -193,10 +191,10 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             popSuccess(session);
             return;
         }
-        frame.stage = PlannerSession.Stage.SELECT_PATTERN;
+        frame.stage = Stage.SELECT_PATTERN;
     }
 
-    private void rollbackCandidate(PlannerSession session, PlannerSession.SearchFrame frame) {
+    private void rollbackCandidate(PlanningSession session, SearchFrame frame) {
         session.ledger.reset(frame.ledgerSnapshot);
         while (session.steps.size() > frame.stepCountSnapshot) {
             session.steps.remove(session.steps.size() - 1);
@@ -204,25 +202,25 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
         session.nextStepId = frame.stepIdSnapshot;
     }
 
-    private PlannerSession.SearchFrame peekFrame(PlannerSession session) {
+    private SearchFrame peekFrame(PlanningSession session) {
         return session.searchStack.get(session.searchStack.size() - 1);
     }
 
-    private void popSuccess(PlannerSession session) {
+    private void popSuccess(PlanningSession session) {
         session.searchStack.remove(session.searchStack.size() - 1);
         if (session.searchStack.isEmpty()) {
             session.nextTargetIndex++;
         }
     }
 
-    private void popFailure(PlannerSession session, PlanError error) {
+    private void popFailure(PlanningSession session, PlanError error) {
         popFailure(session, error, session.ledger.summary());
     }
 
-    private void popFailure(PlannerSession session, PlanError error, PlanSummary summary) {
+    private void popFailure(PlanningSession session, PlanError error, PlanSummary summary) {
         session.searchStack.remove(session.searchStack.size() - 1);
         if (session.searchStack.isEmpty()) {
-            session.result = PlannerSnapshot.failed(error, summary);
+            session.result = PlanResult.failed(error, summary);
             return;
         }
         var parent = peekFrame(session);
@@ -231,7 +229,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
     }
 
     @Nullable
-    private static PlanError detectCycle(List<PlannerSession.SearchFrame> stack) {
+    private static PlanError detectCycle(List<SearchFrame> stack) {
         var current = stack.get(stack.size() - 1);
         for (var i = 0; i < stack.size() - 1; i++) {
             if (stack.get(i).key.equals(current.key)) {
@@ -247,7 +245,7 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             .toList();
     }
 
-    private static CraftPlan buildPlan(PlannerSession session) {
+    private static CraftPlan buildPlan(PlanningSession session) {
         return new CraftPlan(classifyStepOutputRoles(session.steps, session.targets));
     }
 
@@ -322,5 +320,77 @@ public final class GoalReductionPlanner implements IIncrementalCraftPlanner {
             demandMap.put(key, demand - consumed);
         }
         return consumed;
+    }
+
+    private static final class PlanningSession {
+        final List<CraftAmount> targets;
+        final PlannerLedger ledger;
+        final Map<IStackKey, Long> cachedAvailable;
+        final List<CraftStep> steps;
+        final List<SearchFrame> searchStack;
+        int nextTargetIndex;
+        long nextStepId;
+        @Nullable
+        PlanResult result;
+
+        PlanningSession(List<CraftAmount> targets) {
+            this.targets = List.copyOf(targets);
+            this.ledger = new PlannerLedger();
+            this.cachedAvailable = new LinkedHashMap<>();
+            this.steps = new ArrayList<>();
+            this.searchStack = new ArrayList<>();
+            this.nextTargetIndex = 0;
+            this.nextStepId = 1L;
+            this.result = null;
+        }
+    }
+
+    private static final class SearchFrame {
+        final IStackKey key;
+        final long demand;
+        final boolean rootDemand;
+        long remaining;
+        List<CraftPattern> candidates;
+        int candidateIndex;
+        int inputIndex;
+        long runs;
+        PlannerLedger ledgerSnapshot;
+        int stepCountSnapshot;
+        long stepIdSnapshot;
+        @Nullable
+        PlanError firstError;
+        @Nullable
+        PlanSummary errorSummary;
+        @Nullable
+        PlanError childError;
+        @Nullable
+        PlanSummary childErrorSummary;
+        Stage stage;
+
+        SearchFrame(IStackKey key, long demand, boolean rootDemand) {
+            this.key = key;
+            this.demand = demand;
+            this.rootDemand = rootDemand;
+            this.remaining = 0L;
+            this.candidates = List.of();
+            this.candidateIndex = 0;
+            this.inputIndex = 0;
+            this.runs = 0L;
+            this.ledgerSnapshot = new PlannerLedger();
+            this.stepCountSnapshot = 0;
+            this.stepIdSnapshot = 1L;
+            this.firstError = null;
+            this.errorSummary = null;
+            this.childError = null;
+            this.childErrorSummary = null;
+            this.stage = Stage.START;
+        }
+    }
+
+    private enum Stage {
+        START,
+        SELECT_PATTERN,
+        REDUCE_INPUTS,
+        APPLY_PATTERN
     }
 }
