@@ -214,7 +214,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(plate));
         assertEquals(0L, inventory.amountOf(waste));
     }
@@ -293,7 +293,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
     }
 
     @Test
@@ -384,7 +384,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machineA));
         assertEquals(1L, inventory.amountOf(machineB));
         assertEquals(0L, inventory.amountOf(part));
@@ -434,7 +434,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualInserted(part));
@@ -492,7 +492,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualExtracted(part));

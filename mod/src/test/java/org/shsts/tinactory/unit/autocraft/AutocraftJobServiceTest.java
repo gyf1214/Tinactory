@@ -26,49 +26,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftJobServiceTest {
     @Test
-    void serviceShouldTransitionRunningDone() {
-        var executor = new TestExecutor(JobState.RUNNING, JobState.COMPLETED);
+    void serviceShouldClearJobWhenRunningDone() {
+        var executor = new TestExecutor(JobState.RUNNING, JobState.IDLE);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
-        var id = service.submitPrepared(List.of(target), testPlan());
+        service.submitPrepared(List.of(target), testPlan());
 
         assertEquals(JobState.RUNNING, service.getJob().orElseThrow().execution().state());
         service.tick();
-        assertEquals(JobState.COMPLETED, service.getJob().orElseThrow().execution().state());
-        assertEquals(id, service.getJob().orElseThrow().jobId());
+        assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldSubmitPreparedPlanWithoutPlannerDependency() {
-        var service = new AutocraftJobService(new TestExecutor(JobState.COMPLETED));
+        var service = new AutocraftJobService(new TestExecutor(JobState.IDLE));
 
-        var id = service.submitPrepared(
+        service.submitPrepared(
             List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)),
             testPlan());
 
-        assertEquals(id, service.getJob().orElseThrow().jobId());
-        assertEquals(JobState.COMPLETED, service.getJob().orElseThrow().execution().state());
+        assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldRemainBusyWhenExecutorBlockedRetriably() {
-        var executor = new TestExecutor(JobState.BLOCKED, JobState.BLOCKED, JobState.COMPLETED);
+        var executor = new TestExecutor(JobState.BLOCKED, JobState.BLOCKED, JobState.IDLE);
         executor.blockedReason = ExecutionError.FLUSH_BACKPRESSURE;
         var service = new AutocraftJobService(executor);
 
-        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
         service.tick();
         assertEquals(JobState.BLOCKED, service.getJob().orElseThrow().execution().state());
         assertTrue(service.isBusy());
         service.tick();
-        assertEquals(JobState.COMPLETED, service.getJob().orElseThrow().execution().state());
-        assertEquals(id, service.getJob().orElseThrow().jobId());
+        assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldExposeEmptyWhenNoCurrentJob() {
-        var service = new AutocraftJobService(new TestExecutor(JobState.COMPLETED));
+        var service = new AutocraftJobService(new TestExecutor(JobState.IDLE));
 
         assertTrue(service.getJob().isEmpty());
     }
@@ -84,24 +81,24 @@ class AutocraftJobServiceTest {
 
     @Test
     void serviceShouldCancelRunningJobBeforeFirstTick() {
-        var service = new AutocraftJobService(new TestExecutor(JobState.RUNNING, JobState.CANCELLED));
+        var service = new AutocraftJobService(new TestExecutor(JobState.RUNNING, JobState.IDLE));
         var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
         assertFalse(service.cancel(UUIDs.other()));
         assertTrue(service.cancel(id));
         service.tick();
-        assertEquals(JobState.CANCELLED, service.getJob().orElseThrow().execution().state());
+        assertTrue(service.getJob().isEmpty());
     }
 
     @Test
     void serviceShouldCancelRunningJob() {
-        var executor = new TestExecutor(JobState.RUNNING, JobState.CANCELLED);
+        var executor = new TestExecutor(JobState.RUNNING, JobState.IDLE);
         var service = new AutocraftJobService(executor);
         var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
         assertTrue(service.cancel(id));
         service.tick();
-        assertEquals(JobState.CANCELLED, service.getJob().orElseThrow().execution().state());
+        assertTrue(service.getJob().isEmpty());
         assertTrue(executor.cancelled);
         assertFalse(service.cancel(id));
     }
@@ -215,7 +212,7 @@ class AutocraftJobServiceTest {
             var error = errorFor(state);
             return new ExecutorSnapshot(
                 state,
-                state == JobState.CANCELLED ? ExecutionPhase.TERMINAL : ExecutionPhase.RUN_STEP,
+                state == JobState.IDLE ? ExecutionPhase.TERMINAL : ExecutionPhase.RUN_STEP,
                 error,
                 null,
                 plan,

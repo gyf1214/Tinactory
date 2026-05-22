@@ -217,8 +217,6 @@
     "tinactory.gui.autocraft.cpu.state.idle": "Idle",
     "tinactory.gui.autocraft.cpu.state.running": "Running",
     "tinactory.gui.autocraft.cpu.state.blocked": "Blocked",
-    "tinactory.gui.autocraft.cpu.state.completed": "Completed",
-    "tinactory.gui.autocraft.cpu.state.cancelled": "Cancelled",
     "tinactory.gui.autocraft.cpu.state.failed": "Failed",
     "tinactory.gui.autocraft.cpu.steps": "%s / %s",
     "tinactory.gui.autocraft.cpu.error.offline": "CPU service is offline",

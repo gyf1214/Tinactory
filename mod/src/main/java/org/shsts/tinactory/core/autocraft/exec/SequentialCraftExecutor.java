@@ -71,7 +71,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         this.plan = plan;
         nextStep = nextStepIndex;
         if (plan.steps().isEmpty() || nextStep >= plan.steps().size()) {
-            state = JobState.COMPLETED;
+            state = JobState.IDLE;
         } else {
             state = JobState.RUNNING;
         }
@@ -86,8 +86,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     @Override
     public void runCycle(long transmissionBandwidth) {
         if (phase == ExecutionPhase.TERMINAL ||
-            state == JobState.COMPLETED ||
-            state == JobState.CANCELLED ||
             state == JobState.FAILED) {
             return;
         }
@@ -96,7 +94,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         if (nextStep >= plan.steps().size()) {
-            beginFlushing(JobState.COMPLETED, null, null, true);
+            beginFlushing(JobState.IDLE, null, null, true);
             flushStepBuffer(transmissionBandwidth);
             return;
         }
@@ -137,7 +135,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 return;
             }
             if (nextStep >= plan.steps().size()) {
-                beginFlushing(JobState.COMPLETED, null, null, true);
+                beginFlushing(JobState.IDLE, null, null, true);
             }
         }
     }
@@ -148,7 +146,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         beginFlushing(
-            JobState.CANCELLED,
+            JobState.IDLE,
             ExecutionError.NONE,
             null,
             true);
@@ -400,7 +398,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         var done = pendingFlush.isEmpty() && (!flushStepBufferInPhase || stepBuffer.isEmpty());
         if (done) {
-            var terminalState = pendingTerminalState == null ? JobState.COMPLETED : pendingTerminalState;
+            var terminalState = pendingTerminalState == null ? JobState.IDLE : pendingTerminalState;
             state = terminalState;
             pendingTerminalState = null;
             if (terminalState == JobState.RUNNING) {

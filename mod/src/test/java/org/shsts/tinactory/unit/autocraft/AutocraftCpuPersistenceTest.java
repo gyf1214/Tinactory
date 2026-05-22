@@ -47,11 +47,10 @@ class AutocraftCpuPersistenceTest {
         assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().execution().state());
         assertEquals(jobId, restored.getJob().orElseThrow().jobId());
 
-        while (restored.getJob().orElseThrow().execution().state() == JobState.RUNNING ||
-            restored.getJob().orElseThrow().execution().state() == JobState.BLOCKED) {
+        while (restored.isBusy()) {
             restored.tick();
         }
-        assertEquals(JobState.COMPLETED, restored.getJob().orElseThrow().execution().state());
+        assertTrue(restored.getJob().isEmpty());
     }
 
     @Test

@@ -9,8 +9,6 @@ public enum JobState {
     IDLE,
     RUNNING,
     BLOCKED,
-    COMPLETED,
-    CANCELLED,
     FAILED;
 
     public final String id;

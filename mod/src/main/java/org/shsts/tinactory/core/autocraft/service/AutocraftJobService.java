@@ -67,7 +67,7 @@ public class AutocraftJobService implements IAutocraftService {
             return;
         }
         executor.restore(snapshot.execution());
-        currentJob = new AutocraftJobSnapshot(snapshot.jobId(), snapshot.targets(), executor.snapshot());
+        currentJob = activeJob(snapshot.jobId(), snapshot.targets(), executor.snapshot());
         pendingTicks = 0;
     }
 
@@ -86,7 +86,7 @@ public class AutocraftJobService implements IAutocraftService {
         }
         var id = UUID.randomUUID();
         executor.start(plan);
-        currentJob = new AutocraftJobSnapshot(id, targets, executor.snapshot());
+        currentJob = activeJob(id, targets, executor.snapshot());
         pendingTicks = 0;
         return id;
     }
@@ -102,7 +102,7 @@ public class AutocraftJobService implements IAutocraftService {
             return false;
         }
         executor.cancel();
-        currentJob = new AutocraftJobSnapshot(id, currentJob.targets(), executor.snapshot());
+        currentJob = activeJob(id, currentJob.targets(), executor.snapshot());
         return true;
     }
 
@@ -116,11 +116,16 @@ public class AutocraftJobService implements IAutocraftService {
         }
         pendingTicks = 0;
         executor.runCycle(transmissionBandwidth);
-        currentJob = new AutocraftJobSnapshot(currentJob.jobId(), currentJob.targets(), executor.snapshot());
+        currentJob = activeJob(currentJob.jobId(), currentJob.targets(), executor.snapshot());
         return true;
     }
 
     public record RunningSnapshot(UUID jobId, List<CraftAmount> targets, ExecutorSnapshot execution) {}
+
+    @Nullable
+    private static AutocraftJobSnapshot activeJob(UUID jobId, List<CraftAmount> targets, ExecutorSnapshot execution) {
+        return execution.state().busy() ? new AutocraftJobSnapshot(jobId, targets, execution) : null;
+    }
 
     private static CompoundTag serializeSnapshot(RunningSnapshot snapshot, PatternNbtCodec codec) {
         var tag = new CompoundTag();
@@ -210,10 +215,10 @@ public class AutocraftJobService implements IAutocraftService {
 
     private static ExecutorSnapshot deserializeRuntime(CompoundTag tag, PatternNbtCodec codec) {
         return new ExecutorSnapshot(
-            JobState.valueOf(tag.getString("state")),
+            deserializeJobState(tag.getString("state")),
             ExecutionPhase.valueOf(tag.getString("phase")),
             tag.contains("error", TAG_COMPOUND) ? deserializeError(tag.getCompound("error")) : ExecutionError.NONE,
-            tag.contains("pendingTerminalState") ? JobState.valueOf(tag.getString("pendingTerminalState")) : null,
+            tag.contains("pendingTerminalState") ? deserializeJobState(tag.getString("pendingTerminalState")) : null,
             deserializePlan(tag.getCompound("plan"), codec),
             tag.getInt("nextStepIndex"),
             deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND), codec),
@@ -223,6 +228,13 @@ public class AutocraftJobService implements IAutocraftService {
             deserializeKeyedAmounts(tag.getList("transmittedInputs", TAG_COMPOUND), codec),
             deserializeKeyedAmounts(tag.getList("transmittedRequiredOutputs", TAG_COMPOUND), codec),
             tag.hasUUID("leasedMachineId") ? tag.getUUID("leasedMachineId") : null);
+    }
+
+    private static JobState deserializeJobState(String name) {
+        if ("COMPLETED".equals(name) || "CANCELLED".equals(name)) {
+            return JobState.IDLE;
+        }
+        return JobState.valueOf(name);
     }
 
     private static CompoundTag serializeError(ExecutionError error) {

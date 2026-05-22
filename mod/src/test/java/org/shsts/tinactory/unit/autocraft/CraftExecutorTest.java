@@ -54,7 +54,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertTrue(inventory.insertCalls > 0);
         assertEquals(List.of("start:s1", "done:s1", "start:s2", "done:s2"), events.events);
@@ -93,7 +93,7 @@ class CraftExecutorTest {
         executor.cancel();
         executor.runCycle(64);
 
-        assertEquals(JobState.CANCELLED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(ExecutionError.NONE, executor.snapshot().error());
         assertEquals(0L, inventory.amountOf(plate));
     }
@@ -130,7 +130,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(1L, inventory.amountOf(waste));
