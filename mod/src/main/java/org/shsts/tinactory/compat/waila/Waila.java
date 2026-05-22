@@ -30,6 +30,7 @@ public class Waila implements IWailaPlugin {
     public static final ResourceLocation WORK_SPEED = modLoc("work_speed");
     public static final ResourceLocation ELECTRIC = modLoc("electric");
     public static final ResourceLocation MULTIBLOCK = modLoc("multiblock");
+    public static final ResourceLocation AUTOCRAFT_CPU = modLoc("autocraft_cpu");
 
     @Override
     public void register(IWailaCommonRegistration registration) {
@@ -44,11 +45,13 @@ public class Waila implements IWailaPlugin {
         registration.addConfig(WORK_SPEED, true);
         registration.addConfig(ELECTRIC, true);
         registration.addConfig(MULTIBLOCK, true);
+        registration.addConfig(AUTOCRAFT_CPU, true);
 
         registration.registerBlockDataProvider(ContainerProvider.INSTANCE, BlockEntity.class);
         registration.registerBlockDataProvider(MultiblockProvider.INSTANCE, BlockEntity.class);
         registration.registerBlockDataProvider(ProcessorProvider.INSTANCE, BlockEntity.class);
         registration.registerBlockDataProvider(ElectricProvider.INSTANCE, BlockEntity.class);
+        registration.registerBlockDataProvider(AutocraftCpuProvider.INSTANCE, BlockEntity.class);
     }
 
     @Override
@@ -60,6 +63,8 @@ public class Waila implements IWailaPlugin {
         registration.registerComponentProvider(ProcessorProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
         registration.registerComponentProvider(ElectricProvider.INSTANCE, TooltipPosition.BODY,
+            SmartEntityBlock.class);
+        registration.registerComponentProvider(AutocraftCpuProvider.INSTANCE, TooltipPosition.BODY,
             SmartEntityBlock.class);
     }
 

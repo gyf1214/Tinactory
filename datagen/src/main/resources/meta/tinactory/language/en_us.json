@@ -321,7 +321,8 @@
     "config.waila.plugin_tinactory.recipe": "Working Recipe",
     "config.waila.plugin_tinactory.work_speed": "Working Speed",
     "config.waila.plugin_tinactory.electric": "Electric",
-    "config.waila.plugin_tinactory.multiblock": "Multiblock"
+    "config.waila.plugin_tinactory.multiblock": "Multiblock",
+    "config.waila.plugin_tinactory.autocraft_cpu": "Autocraft CPU"
   },
   "quests": {
     "tinactory.quests.00_ultra_low_voltage.title": "Industry from Zero",

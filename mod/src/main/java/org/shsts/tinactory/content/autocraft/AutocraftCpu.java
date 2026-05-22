@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.logistics.MEStorageAccess;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -25,7 +26,7 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
-    private static final String ID = "autocraft/cpu";
+    public static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
     private final PatternNbtCodec snapshotCodec =
@@ -52,6 +53,25 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         long transmissionBandwidth,
         int executionIntervalTicks) {
         return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
+    }
+
+    public CpuStatusEntry status() {
+        var cpuId = machine.uuid();
+        if (service == null) {
+            return CpuStatusEntry.offline(cpuId);
+        }
+        var job = service.getJob();
+        if (job.isEmpty()) {
+            return CpuStatusEntry.idle(cpuId);
+        }
+        var current = job.get();
+        return new CpuStatusEntry(
+            cpuId,
+            current.state(),
+            current.targets(),
+            current.completedSteps(),
+            current.totalSteps(),
+            current.error());
     }
 
     @Override
