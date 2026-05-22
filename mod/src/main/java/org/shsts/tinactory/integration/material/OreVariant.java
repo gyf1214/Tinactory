@@ -15,6 +15,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.core.electric.Voltage;
 
+import java.util.Locale;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum OreVariant implements StringRepresentable {
@@ -55,12 +57,8 @@ public enum OreVariant implements StringRepresentable {
         this.material = material;
     }
 
-    public String getName() {
-        return name().toLowerCase();
-    }
-
     public static OreVariant fromName(String name) {
-        return valueOf(name.toUpperCase());
+        return valueOf(name.toUpperCase(Locale.ROOT));
     }
 
     public ResourceLocation getLoc() {
@@ -71,6 +69,6 @@ public enum OreVariant implements StringRepresentable {
 
     @Override
     public String getSerializedName() {
-        return getName();
+        return name().toLowerCase(Locale.ROOT);
     }
 }

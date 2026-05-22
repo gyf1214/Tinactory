@@ -1,6 +1,10 @@
 package org.shsts.tinactory.api.logistics;
 
-public enum PortDirection {
+import net.minecraft.util.StringRepresentable;
+
+import java.util.Locale;
+
+public enum PortDirection implements StringRepresentable {
     NONE, OUTPUT, INPUT;
 
     public PortDirection invert() {
@@ -9,5 +13,14 @@ public enum PortDirection {
             case INPUT -> OUTPUT;
             case OUTPUT -> INPUT;
         };
+    }
+
+    @Override
+    public String getSerializedName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static PortDirection fromName(String name) {
+        return valueOf(name.toUpperCase(Locale.ROOT));
     }
 }

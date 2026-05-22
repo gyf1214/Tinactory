@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @ParametersAreNonnullByDefault
@@ -24,7 +25,7 @@ public enum Voltage {
         this.rank = rank;
         this.value = rank == 0 ? 0 : 2L << (2L * rank);
         this.color = color;
-        this.id = name().toLowerCase();
+        this.id = name().toLowerCase(Locale.ROOT);
     }
 
     public static List<Voltage> between(Voltage from, Voltage to) {
@@ -52,10 +53,10 @@ public enum Voltage {
     }
 
     public static Voltage fromName(String id) {
-        return valueOf(id.toUpperCase());
+        return valueOf(id.toUpperCase(Locale.ROOT));
     }
 
     public String displayName() {
-        return id.toUpperCase();
+        return id.toUpperCase(Locale.ROOT);
     }
 }

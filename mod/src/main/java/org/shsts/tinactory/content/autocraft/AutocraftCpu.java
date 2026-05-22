@@ -9,9 +9,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
+import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -29,7 +29,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
     private final PatternNbtCodec snapshotCodec =
-        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, StackHelper.KEY_CODEC);
+        new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable

@@ -3,6 +3,8 @@ package org.shsts.tinactory.api.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
+import java.util.Locale;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum SlotType {
@@ -21,6 +23,6 @@ public enum SlotType {
     }
 
     public static SlotType fromName(String name) {
-        return valueOf(name.toUpperCase());
+        return valueOf(name.toUpperCase(Locale.ROOT));
     }
 }

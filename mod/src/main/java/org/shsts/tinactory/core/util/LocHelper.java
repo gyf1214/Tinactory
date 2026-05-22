@@ -6,6 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.api.TinactoryKeys;
 
+import java.util.Locale;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LocHelper {
@@ -63,7 +65,7 @@ public final class LocHelper {
         var names = str.split("_");
         var sb = new StringBuilder();
         for (var i = 0; i < names.length; i++) {
-            var name = names[i].toLowerCase();
+            var name = names[i].toLowerCase(Locale.ROOT);
             sb.append(i == 0 ? name : StringUtils.capitalize(name));
         }
         return sb.toString();

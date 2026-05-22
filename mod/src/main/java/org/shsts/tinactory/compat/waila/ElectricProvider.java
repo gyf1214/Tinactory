@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.electric.ElectricComponent;
@@ -35,7 +36,7 @@ public class ElectricProvider extends ProviderBase implements IServerDataProvide
     }
 
     private void addTr(CompoundTag tag, String key) {
-        var tagKey = "tinactoryElectric" + key.substring(0, 1).toUpperCase() + key.substring(1);
+        var tagKey = "tinactoryElectric" + StringUtils.capitalize(key);
         var id = "electric." + key;
         if (tag.contains(tagKey, Tag.TAG_DOUBLE)) {
             add(helper.text(tr(id, NUMBER_FORMAT.format(tag.getDouble(tagKey)))));

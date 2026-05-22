@@ -31,6 +31,7 @@ import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -395,6 +396,6 @@ public class MachineModel {
         if (voltage == Voltage.PRIMITIVE) {
             return PRIMITIVE_TEX;
         }
-        return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase());
+        return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase(Locale.ROOT));
     }
 }

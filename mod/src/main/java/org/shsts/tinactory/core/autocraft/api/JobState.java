@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.autocraft.api;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
+import java.util.Locale;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum JobState {
@@ -14,7 +16,7 @@ public enum JobState {
     public final String id;
 
     JobState() {
-        this.id = name().toLowerCase();
+        this.id = name().toLowerCase(Locale.ROOT);
     }
 
     public boolean busy() {
