@@ -323,17 +323,17 @@ public final class GoalReductionPlanner implements ICraftPlanner {
     }
 
     private static final class PlanningSession {
-        final List<CraftAmount> targets;
-        final PlannerLedger ledger;
-        final Map<IStackKey, Long> cachedAvailable;
-        final List<CraftStep> steps;
-        final List<SearchFrame> searchStack;
-        int nextTargetIndex;
-        long nextStepId;
+        private final List<CraftAmount> targets;
+        private final PlannerLedger ledger;
+        private final Map<IStackKey, Long> cachedAvailable;
+        private final List<CraftStep> steps;
+        private final List<SearchFrame> searchStack;
+        private int nextTargetIndex;
+        private long nextStepId;
         @Nullable
-        PlanResult result;
+        private PlanResult result;
 
-        PlanningSession(List<CraftAmount> targets) {
+        private PlanningSession(List<CraftAmount> targets) {
             this.targets = List.copyOf(targets);
             this.ledger = new PlannerLedger();
             this.cachedAvailable = new LinkedHashMap<>();
@@ -346,28 +346,28 @@ public final class GoalReductionPlanner implements ICraftPlanner {
     }
 
     private static final class SearchFrame {
-        final IStackKey key;
-        final long demand;
-        final boolean rootDemand;
-        long remaining;
-        List<CraftPattern> candidates;
-        int candidateIndex;
-        int inputIndex;
-        long runs;
-        PlannerLedger ledgerSnapshot;
-        int stepCountSnapshot;
-        long stepIdSnapshot;
+        private final IStackKey key;
+        private final long demand;
+        private final boolean rootDemand;
+        private long remaining;
+        private List<CraftPattern> candidates;
+        private int candidateIndex;
+        private int inputIndex;
+        private long runs;
+        private PlannerLedger ledgerSnapshot;
+        private int stepCountSnapshot;
+        private long stepIdSnapshot;
         @Nullable
-        PlanError firstError;
+        private PlanError firstError;
         @Nullable
-        PlanSummary errorSummary;
+        private PlanSummary errorSummary;
         @Nullable
-        PlanError childError;
+        private PlanError childError;
         @Nullable
-        PlanSummary childErrorSummary;
-        Stage stage;
+        private PlanSummary childErrorSummary;
+        private Stage stage;
 
-        SearchFrame(IStackKey key, long demand, boolean rootDemand) {
+        private SearchFrame(IStackKey key, long demand, boolean rootDemand) {
             this.key = key;
             this.demand = demand;
             this.rootDemand = rootDemand;
