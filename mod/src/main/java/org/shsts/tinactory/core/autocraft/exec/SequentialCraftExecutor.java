@@ -3,6 +3,8 @@ package org.shsts.tinactory.core.autocraft.exec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
@@ -12,13 +14,20 @@ import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.JobState;
+import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static net.minecraft.nbt.Tag.TAG_COMPOUND;
+import static net.minecraft.nbt.Tag.TAG_LIST;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -60,11 +69,15 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         initializeRun(plan, 0);
     }
 
-    @Override
     public void restore(ExecutorSnapshot snapshot) {
         ensureNotActive("restore");
         initializeRun(snapshot.plan(), snapshot.nextStepIndex());
         restoreSnapshot(snapshot);
+    }
+
+    @Override
+    public void restore(CompoundTag tag, PatternNbtCodec codec) {
+        restore(deserialize(tag, codec));
     }
 
     private void initializeRun(CraftPlan plan, int nextStepIndex) {
@@ -149,6 +162,35 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     }
 
     @Override
+    public boolean isBusy() {
+        return state.busy();
+    }
+
+    @Override
+    public JobState state() {
+        return state;
+    }
+
+    @Override
+    public ExecutionError error() {
+        return error;
+    }
+
+    @Override
+    public int completedSteps() {
+        return nextStep;
+    }
+
+    @Override
+    public int totalSteps() {
+        return plan.steps().size();
+    }
+
+    @Override
+    public CompoundTag serialize(PatternNbtCodec codec) {
+        return serialize(snapshot(), codec);
+    }
+
     public ExecutorSnapshot snapshot() {
         return new ExecutorSnapshot(
             state,
@@ -183,6 +225,138 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         transmittedInputs.putAll(snapshot.transmittedInputs());
         transmittedRequiredOutputs.putAll(snapshot.transmittedRequiredOutputs());
         leasedMachineId = snapshot.leasedMachineId();
+    }
+
+    private static CompoundTag serialize(ExecutorSnapshot snapshot, PatternNbtCodec codec) {
+        var tag = new CompoundTag();
+        tag.putString("state", snapshot.state().name());
+        tag.putString("phase", snapshot.phase().name());
+        tag.put("error", serializeError(snapshot.error()));
+        if (snapshot.stateAfterFlush() != null) {
+            tag.putString("stateAfterFlush", snapshot.stateAfterFlush().name());
+        }
+        tag.put("plan", serializePlan(snapshot.plan(), codec));
+        tag.putInt("nextStepIndex", snapshot.nextStepIndex());
+        tag.put("pendingFlush", serializeKeyedAmounts(snapshot.pendingFlush(), codec));
+        tag.putBoolean("flushStepBufferInPhase", snapshot.flushStepBufferInPhase());
+        tag.put("stepBuffer", serializeKeyedAmounts(snapshot.stepBuffer(), codec));
+        tag.put("stepProducedOutputs", serializeKeyedAmounts(snapshot.stepProducedOutputs(), codec));
+        tag.put("stepRequiredOutputs", serializeKeyedAmounts(snapshot.stepRequiredOutputs(), codec));
+        tag.put("stepRequiredInputs", serializeKeyedAmounts(snapshot.stepRequiredInputs(), codec));
+        tag.put("transmittedInputs", serializeKeyedAmounts(snapshot.transmittedInputs(), codec));
+        tag.put("transmittedRequiredOutputs", serializeKeyedAmounts(snapshot.transmittedRequiredOutputs(), codec));
+        if (snapshot.leasedMachineId() != null) {
+            tag.putUUID("leasedMachineId", snapshot.leasedMachineId());
+        }
+        return tag;
+    }
+
+    private static ExecutorSnapshot deserialize(CompoundTag tag, PatternNbtCodec codec) {
+        return new ExecutorSnapshot(
+            JobState.valueOf(tag.getString("state")),
+            ExecutionPhase.valueOf(tag.getString("phase")),
+            tag.contains("error", TAG_COMPOUND) ? deserializeError(tag.getCompound("error")) : ExecutionError.NONE,
+            deserializeStateAfterFlush(tag),
+            deserializePlan(tag.getCompound("plan"), codec),
+            tag.getInt("nextStepIndex"),
+            tag.contains("pendingFlush", TAG_LIST) ?
+                deserializeKeyedAmounts(tag.getList("pendingFlush", TAG_COMPOUND), codec) :
+                Map.of(),
+            tag.contains("flushStepBufferInPhase") ?
+                tag.getBoolean("flushStepBufferInPhase") :
+                shouldFlushStepBufferInPhase(tag),
+            deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND), codec),
+            deserializeKeyedAmounts(tag.getList("stepProducedOutputs", TAG_COMPOUND), codec),
+            deserializeKeyedAmounts(tag.getList("stepRequiredOutputs", TAG_COMPOUND), codec),
+            deserializeKeyedAmounts(tag.getList("stepRequiredInputs", TAG_COMPOUND), codec),
+            deserializeKeyedAmounts(tag.getList("transmittedInputs", TAG_COMPOUND), codec),
+            deserializeKeyedAmounts(tag.getList("transmittedRequiredOutputs", TAG_COMPOUND), codec),
+            tag.hasUUID("leasedMachineId") ? tag.getUUID("leasedMachineId") : null);
+    }
+
+    @Nullable
+    private static JobState deserializeStateAfterFlush(CompoundTag tag) {
+        return tag.contains("stateAfterFlush") ? JobState.valueOf(tag.getString("stateAfterFlush")) : null;
+    }
+
+    private static boolean shouldFlushStepBufferInPhase(CompoundTag tag) {
+        var stateAfterFlush = deserializeStateAfterFlush(tag);
+        return ExecutionPhase.valueOf(tag.getString("phase")) == ExecutionPhase.FLUSHING &&
+            stateAfterFlush == JobState.IDLE;
+    }
+
+    private static CompoundTag serializePlan(CraftPlan plan, PatternNbtCodec codec) {
+        var tag = new CompoundTag();
+        var steps = new ListTag();
+        for (var step : plan.steps()) {
+            var stepTag = new CompoundTag();
+            stepTag.putString("stepId", step.stepId());
+            stepTag.putLong("runs", step.runs());
+            stepTag.put("pattern", codec.encodePattern(step.pattern()));
+            stepTag.put("requiredIntermediateOutputs", serializeAmounts(step.requiredIntermediateOutputs(), codec));
+            stepTag.put("requiredFinalOutputs", serializeAmounts(step.requiredFinalOutputs(), codec));
+            steps.add(stepTag);
+        }
+        tag.put("steps", steps);
+        return tag;
+    }
+
+    private static CraftPlan deserializePlan(CompoundTag tag, PatternNbtCodec codec) {
+        var steps = tag.getList("steps", TAG_COMPOUND);
+        var out = new ArrayList<CraftStep>(steps.size());
+        for (var i = 0; i < steps.size(); i++) {
+            var stepTag = steps.getCompound(i);
+            out.add(new CraftStep(
+                stepTag.getString("stepId"),
+                codec.decodePattern(stepTag.getCompound("pattern")),
+                stepTag.getLong("runs"),
+                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND), codec),
+                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND), codec)));
+        }
+        return new CraftPlan(out);
+    }
+
+    private static ListTag serializeAmounts(List<CraftAmount> amounts, PatternNbtCodec codec) {
+        var out = new ListTag();
+        for (var amount : amounts) {
+            out.add(codec.encodeAmount(amount));
+        }
+        return out;
+    }
+
+    private static List<CraftAmount> deserializeAmounts(ListTag amounts, PatternNbtCodec codec) {
+        var out = new ArrayList<CraftAmount>(amounts.size());
+        for (var i = 0; i < amounts.size(); i++) {
+            out.add(codec.decodeAmount(amounts.getCompound(i)));
+        }
+        return out;
+    }
+
+    private static CompoundTag serializeError(ExecutionError error) {
+        var tag = new CompoundTag();
+        tag.putString("value", error.name());
+        return tag;
+    }
+
+    private static ExecutionError deserializeError(CompoundTag tag) {
+        return ExecutionError.valueOf(tag.getString("value"));
+    }
+
+    private static ListTag serializeKeyedAmounts(Map<IStackKey, Long> amounts, PatternNbtCodec codec) {
+        var out = new ListTag();
+        for (var entry : amounts.entrySet()) {
+            out.add(codec.encodeAmount(entry.getKey(), entry.getValue()));
+        }
+        return out;
+    }
+
+    private static Map<IStackKey, Long> deserializeKeyedAmounts(ListTag tags, PatternNbtCodec codec) {
+        var out = new LinkedHashMap<IStackKey, Long>();
+        for (var i = 0; i < tags.size(); i++) {
+            var amount = codec.decodeAmount(tags.getCompound(i));
+            out.put(amount.key(), amount.amount());
+        }
+        return out;
     }
 
     private void ensureNotActive(String action) {

@@ -15,9 +15,11 @@ import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
@@ -600,12 +602,13 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
         executor.runCycle(64);
         executor.runCycle(64);
-        var snapshot = executor.snapshot();
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var snapshot = executor.serialize(codec);
 
         inventory.rejectInsertKeys.clear();
         var restored = new SequentialCraftExecutor(inventory, new SequenceAllocator(List.of(
             new RouteLease(Map.of(), Map.of(gear, 1L), true))), IJobEvents.NO_OP);
-        restored.restore(snapshot);
+        restored.restore(snapshot, codec);
         restored.runCycle(64);
 
         assertEquals(JobState.RUNNING, restored.snapshot().state());

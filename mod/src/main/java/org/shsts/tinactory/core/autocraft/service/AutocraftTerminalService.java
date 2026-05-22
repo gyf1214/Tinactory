@@ -58,11 +58,11 @@ public class AutocraftTerminalService {
         if (job.isEmpty()) {
             return;
         }
-        var status = job.get().execution().state();
+        var status = job.get().state();
         if (status != JobState.RUNNING && status != JobState.BLOCKED) {
             return;
         }
-        service.get().cancel(job.get().jobId());
+        service.get().cancel();
     }
 
     public AutocraftPreview preview(IStackKey target, long quantity) {
@@ -96,7 +96,8 @@ public class AutocraftTerminalService {
         var targets = previewTargets;
         var plan = previewResult.planSnapshot();
         clearPreview();
-        return AutocraftExecuteResult.success(service.get().submitPrepared(targets, plan));
+        service.get().submitPrepared(targets, plan);
+        return AutocraftExecuteResult.success();
     }
 
     public Optional<AutocraftPreview> preview() {
@@ -122,13 +123,13 @@ public class AutocraftTerminalService {
         if (current.isEmpty()) {
             return CpuStatusEntry.idle(cpuId);
         }
-        var execution = current.get().execution();
+        var job = current.get();
         return new CpuStatusEntry(
             cpuId,
-            execution.state(),
-            current.get().targets(),
-            execution.nextStepIndex(),
-            execution.plan().steps().size(),
-            execution.error());
+            job.state(),
+            job.targets(),
+            job.completedSteps(),
+            job.totalSteps(),
+            job.error());
     }
 }

@@ -1,11 +1,11 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
@@ -13,9 +13,9 @@ import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
@@ -29,7 +29,6 @@ import org.shsts.tinactory.unit.fixture.TestStackKey;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -119,25 +118,12 @@ class AutocraftTerminalServiceExecuteTest {
     void listCpuStatusesShouldExposeStructuredJobFields() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var targets = List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3));
-        var execution = new ExecutorSnapshot(
+        var job = new AutocraftJobSnapshot(
+            targets,
             JobState.BLOCKED,
-            ExecutionPhase.FLUSHING,
-            ExecutionError.FLUSH_BACKPRESSURE,
-            null,
-            new CraftPlan(List.of(new CraftStep(
-                "s1",
-                pattern("tinactory:test", List.of(
-                    new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3))),
-                1L))),
             1,
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
-        var job = new AutocraftJobSnapshot(UUID.fromString("22222222-2222-2222-2222-222222222222"), targets, execution);
+            1,
+            ExecutionError.FLUSH_BACKPRESSURE);
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(List.of()),
@@ -256,7 +242,7 @@ class AutocraftTerminalServiceExecuteTest {
         return new IAutocraftService() {
             @Override
             public boolean isBusy() {
-                return job.execution().state() == JobState.RUNNING || job.execution().state() == JobState.BLOCKED;
+                return job.state() == JobState.RUNNING || job.state() == JobState.BLOCKED;
             }
 
             @Override
@@ -265,12 +251,12 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
-            public boolean cancel(UUID id) {
+            public boolean cancel() {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public UUID submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
                 throw new UnsupportedOperationException();
             }
         };
@@ -325,7 +311,7 @@ class AutocraftTerminalServiceExecuteTest {
         public void start(CraftPlan plan) {}
 
         @Override
-        public void restore(ExecutorSnapshot snapshot) {}
+        public void restore(CompoundTag tag, PatternNbtCodec codec) {}
 
         @Override
         public void runCycle(long transmissionBandwidth) {}
@@ -334,21 +320,33 @@ class AutocraftTerminalServiceExecuteTest {
         public void cancel() {}
 
         @Override
-        public ExecutorSnapshot snapshot() {
-            return new ExecutorSnapshot(
-                JobState.RUNNING,
-                ExecutionPhase.RUN_STEP,
-                ExecutionError.NONE,
-                null,
-                new CraftPlan(List.of()),
-                0,
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                null);
+        public boolean isBusy() {
+            return true;
+        }
+
+        @Override
+        public JobState state() {
+            return JobState.RUNNING;
+        }
+
+        @Override
+        public ExecutionError error() {
+            return ExecutionError.NONE;
+        }
+
+        @Override
+        public int completedSteps() {
+            return 0;
+        }
+
+        @Override
+        public int totalSteps() {
+            return 0;
+        }
+
+        @Override
+        public CompoundTag serialize(PatternNbtCodec codec) {
+            return new CompoundTag();
         }
     }
 }

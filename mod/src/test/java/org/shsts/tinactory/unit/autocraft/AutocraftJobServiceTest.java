@@ -1,23 +1,22 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +32,7 @@ class AutocraftJobServiceTest {
 
         service.submitPrepared(List.of(target), testPlan());
 
-        assertEquals(JobState.RUNNING, service.getJob().orElseThrow().execution().state());
+        assertEquals(JobState.RUNNING, service.getJob().orElseThrow().state());
         service.tick();
         assertTrue(service.getJob().isEmpty());
     }
@@ -57,7 +56,7 @@ class AutocraftJobServiceTest {
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
         service.tick();
-        assertEquals(JobState.BLOCKED, service.getJob().orElseThrow().execution().state());
+        assertEquals(JobState.BLOCKED, service.getJob().orElseThrow().state());
         assertTrue(service.isBusy());
         service.tick();
         assertTrue(service.getJob().isEmpty());
@@ -82,10 +81,9 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldCancelRunningJobBeforeFirstTick() {
         var service = new AutocraftJobService(new TestExecutor(JobState.RUNNING, JobState.IDLE));
-        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
-        assertFalse(service.cancel(UUIDs.other()));
-        assertTrue(service.cancel(id));
+        assertTrue(service.cancel());
         service.tick();
         assertTrue(service.getJob().isEmpty());
     }
@@ -94,58 +92,48 @@ class AutocraftJobServiceTest {
     void serviceShouldCancelRunningJob() {
         var executor = new TestExecutor(JobState.RUNNING, JobState.IDLE);
         var service = new AutocraftJobService(executor);
-        var id = service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
 
-        assertTrue(service.cancel(id));
+        assertTrue(service.cancel());
         service.tick();
         assertTrue(service.getJob().isEmpty());
         assertTrue(executor.cancelled);
-        assertFalse(service.cancel(id));
+        assertFalse(service.cancel());
     }
 
     @Test
-    void serviceShouldExposeRunningSnapshotFromExecutorInterface() {
+    void serviceShouldExposePublicJobSnapshotFromCheapExecutorFields() {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
-        var jobId = service.submitPrepared(List.of(target), testPlan());
-        var snapshot = service.snapshotRunning().orElseThrow();
+        service.submitPrepared(List.of(target), testPlan());
+        var snapshot = service.getJob().orElseThrow();
 
-        assertEquals(jobId, snapshot.jobId());
-        assertEquals(executor.snapshot(), snapshot.execution());
-        assertEquals(testPlan(), snapshot.execution().plan());
+        assertEquals(List.of(target), snapshot.targets());
+        assertEquals(JobState.RUNNING, snapshot.state());
+        assertEquals(0, snapshot.completedSteps());
+        assertEquals(1, snapshot.totalSteps());
+        assertEquals(ExecutionError.NONE, snapshot.error());
     }
 
     @Test
-    void serviceShouldRestoreRunningSnapshotThroughExecutorInterface() {
+    void serviceShouldRestoreRunningSnapshotThroughExecutorPersistence() {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
-        var snapshot = new ExecutorSnapshot(
-            JobState.RUNNING,
-            ExecutionPhase.RUN_STEP,
-            ExecutionError.NONE,
-            null,
-            testPlan(),
-            0,
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
-        service.restoreRunning(new AutocraftJobService.RunningSnapshot(
-            UUIDs.fixed(),
-            List.of(target),
-            snapshot));
+        service.submitPrepared(List.of(target), testPlan());
+        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var restoredExecutor = new TestExecutor(JobState.IDLE);
+        service = new AutocraftJobService(restoredExecutor);
+        service.restoreRunningSnapshot(persisted, codec);
 
-        assertTrue(executor.restoreCalled);
-        assertEquals(testPlan(), executor.snapshot().plan());
+        assertTrue(restoredExecutor.restoreCalled);
         assertTrue(service.isBusy());
-        assertEquals(JobState.RUNNING, service.getJob().orElseThrow().execution().state());
+        assertEquals(JobState.RUNNING, service.getJob().orElseThrow().state());
+        assertEquals(List.of(target), service.getJob().orElseThrow().targets());
     }
 
     private static CraftStep step() {
@@ -167,7 +155,6 @@ class AutocraftJobServiceTest {
         private boolean restoreCalled;
         private ExecutionError blockedReason;
         private CraftPlan currentPlan = new CraftPlan(List.of());
-        private ExecutorSnapshot snapshot = snapshotFor(JobState.IDLE, currentPlan, null);
 
         private TestExecutor(JobState... states) {
             this.states = List.of(states);
@@ -176,14 +163,11 @@ class AutocraftJobServiceTest {
         @Override
         public void start(CraftPlan plan) {
             currentPlan = plan;
-            snapshot = snapshotFor(state(), currentPlan, null);
         }
 
         @Override
-        public void restore(ExecutorSnapshot snapshot) {
+        public void restore(CompoundTag tag, PatternNbtCodec codec) {
             restoreCalled = true;
-            currentPlan = snapshot.plan();
-            this.snapshot = snapshot;
         }
 
         @Override
@@ -191,7 +175,6 @@ class AutocraftJobServiceTest {
             if (index + 1 < states.size()) {
                 index++;
             }
-            snapshot = snapshotFor(state(), currentPlan, snapshot.leasedMachineId());
         }
 
         @Override
@@ -200,47 +183,40 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public ExecutorSnapshot snapshot() {
-            return snapshot;
+        public boolean isBusy() {
+            return state().busy();
         }
 
-        private JobState state() {
-            return states.get(index);
+        @Override
+        public JobState state() {
+            return restoreCalled ? JobState.RUNNING : states.get(index);
         }
 
-        private ExecutorSnapshot snapshotFor(JobState state, CraftPlan plan, UUID leasedMachineId) {
-            var error = errorFor(state);
-            return new ExecutorSnapshot(
-                state,
-                state == JobState.IDLE ? ExecutionPhase.TERMINAL : ExecutionPhase.RUN_STEP,
-                error,
-                null,
-                plan,
-                0,
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                leasedMachineId);
+        @Override
+        public ExecutionError error() {
+            return errorFor(state());
         }
 
-        private ExecutionError errorFor(JobState state) {
-            if (state == JobState.BLOCKED) {
+        @Override
+        public int completedSteps() {
+            return 0;
+        }
+
+        @Override
+        public int totalSteps() {
+            return currentPlan.steps().size();
+        }
+
+        @Override
+        public CompoundTag serialize(PatternNbtCodec codec) {
+            return new CompoundTag();
+        }
+
+        private ExecutionError errorFor(JobState jobState) {
+            if (jobState == JobState.BLOCKED) {
                 return blockedReason == null ? ExecutionError.MACHINE_UNAVAILABLE : blockedReason;
             }
             return ExecutionError.NONE;
-        }
-    }
-
-    private static final class UUIDs {
-        private static UUID fixed() {
-            return UUID.fromString("11111111-1111-1111-1111-111111111111");
-        }
-
-        private static UUID other() {
-            return UUID.fromString("22222222-2222-2222-2222-222222222222");
         }
     }
 }
