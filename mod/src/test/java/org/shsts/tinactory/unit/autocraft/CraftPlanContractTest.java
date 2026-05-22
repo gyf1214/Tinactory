@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -118,5 +119,25 @@ class CraftPlanContractTest {
         assertEquals(1, encoded.getInt("slotIndex"));
         assertEquals(4, encoded.getInt("portIndex"));
         assertEquals("input", encoded.getString("direction"));
+    }
+
+    @Test
+    void machineConstraintCodecShouldPreserveTargetRecipeConstraint() {
+        var constraint = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var decoded = CodecHelper.parseTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+
+        assertEquals(constraint, decoded);
+    }
+
+    @Test
+    void machineConstraintCodecShouldEncodeStructuredTargetRecipeConstraintPayload() {
+        var encoded = (CompoundTag) CodecHelper.encodeTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit")));
+
+        assertEquals(TargetRecipeConstraint.TYPE_ID, encoded.getString("type"));
+        assertEquals("tinactory:assembler/circuit", encoded.getString("recipeId"));
     }
 }

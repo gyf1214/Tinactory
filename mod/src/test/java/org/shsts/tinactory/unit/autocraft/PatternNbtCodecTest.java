@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
@@ -83,6 +84,21 @@ class PatternNbtCodecTest {
                     new PortConstraint(PortDirection.INPUT, 1, null),
                     new PortConstraint(PortDirection.OUTPUT, 0, 5),
                     new PortConstraint(PortDirection.OUTPUT, 1, null))));
+
+        var decoded = codec.decodePattern(codec.encodePattern(pattern));
+
+        assertEquals(pattern, decoded);
+    }
+
+    @Test
+    void codecShouldRoundTripTargetRecipeConstraintWithCpuRegistry() {
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var targetRecipe = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var pattern = new CraftPattern(
+            "tinactory:target_recipe",
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
+            List.of(new CraftAmount(TestStackKey.item("tinactory:circuit", ""), 1)),
+            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of(targetRecipe)));
 
         var decoded = codec.decodePattern(codec.encodePattern(pattern));
 

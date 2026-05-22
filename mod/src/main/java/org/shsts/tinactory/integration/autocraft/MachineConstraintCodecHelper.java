@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,6 +20,7 @@ public final class MachineConstraintCodecHelper {
     private static Codec<? extends IMachineConstraint> codec(String typeId) {
         return switch (typeId) {
             case PortConstraint.TYPE_ID -> PortConstraint.CODEC;
+            case TargetRecipeConstraint.TYPE_ID -> TargetRecipeConstraint.CODEC;
             default -> throw new IllegalArgumentException("unknown machine constraint type id: " + typeId);
         };
     }

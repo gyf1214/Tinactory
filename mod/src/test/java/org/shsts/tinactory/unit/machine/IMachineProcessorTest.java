@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class IMachineProcessorTest {
     @Test
@@ -30,6 +31,13 @@ class IMachineProcessorTest {
         var processor = new TestProcessor(3, 8);
 
         assertEquals(0.375d, processor.getProgress());
+    }
+
+    @Test
+    void allowTargetRecipeShouldDefaultToFalse() {
+        var processor = new TestProcessor(0, 0);
+
+        assertFalse(processor.allowTargetRecipe(new ResourceLocation("tinactory", "recipe")));
     }
 
     private record TestProcessor(long progressTicks, long maxProgressTicks) implements IMachineProcessor {

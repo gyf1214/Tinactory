@@ -372,6 +372,20 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     @Override
+    public boolean allowTargetRecipe(ResourceLocation loc) {
+        var machine = machine();
+        if (machine.isEmpty()) {
+            return false;
+        }
+        for (var processor : processors) {
+            if (processor.allowTargetRecipe(false, loc, machine.get())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean isWorking(double partial) {
         return currentRecipe != null && workSpeed > 0;
     }
