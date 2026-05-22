@@ -45,6 +45,8 @@ import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
+import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -118,6 +120,11 @@ public class MiscMeta extends MetaConsumer {
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
             .register();
+    }
+
+    private SmartEntityBlock.Factory<MachineBlock> simpleElectric(double power) {
+        return MachineBlocks.simple(tooltip ->
+            addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power)));
     }
 
     private void solid(String name, String id, JsonObject jo) {
@@ -216,8 +223,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void meStorageInterface(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id, MachineBlocks.simple(tooltip ->
-                addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
+        BlockEntityBuilder.builder(id, simpleElectric(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_INTERFACE)
             .blockEntity()
@@ -271,11 +277,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void autocraftCpu(String id, JsonObject jo) {
         var config = parseAutocraftCpuConfig(jo);
-        BlockEntityBuilder.builder(id,
-                MachineBlocks.simple(tooltip -> {
-                    addTooltip(tooltip, "autocraftCpu");
-                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(config.power()));
-                }))
+        BlockEntityBuilder.builder(id, simpleElectric(config.power()))
             .transform(MachineSet::baseMachine)
             .blockEntity()
             .transform(AutocraftCpu.factory(
@@ -288,11 +290,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void autocraftTerminal(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
-        BlockEntityBuilder.builder(id,
-                MachineBlocks.simple(tooltip -> {
-                    addTooltip(tooltip, "autocraftTerminal");
-                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
-                }))
+        BlockEntityBuilder.builder(id, simpleElectric(power))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.AUTOCRAFT_TERMINAL)
             .blockEntity()
