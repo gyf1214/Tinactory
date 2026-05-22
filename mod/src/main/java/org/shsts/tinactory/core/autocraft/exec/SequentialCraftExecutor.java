@@ -94,7 +94,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         if (nextStep >= plan.steps().size()) {
-            beginFlushing(JobState.IDLE, null, null, true);
+            beginFlushing();
             flushStepBuffer(transmissionBandwidth);
             return;
         }
@@ -135,7 +135,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 return;
             }
             if (nextStep >= plan.steps().size()) {
-                beginFlushing(JobState.IDLE, null, null, true);
+                beginFlushing();
             }
         }
     }
@@ -145,11 +145,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         if (phase == ExecutionPhase.TERMINAL) {
             return;
         }
-        beginFlushing(
-            JobState.IDLE,
-            ExecutionError.NONE,
-            null,
-            true);
+        beginFlushing();
     }
 
     @Override
@@ -373,17 +369,13 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return scheduledRuns <= recoveredRuns;
     }
 
-    private void beginFlushing(
-        JobState terminalState,
-        @Nullable ExecutionError terminalError,
-        @Nullable ExecutionError flushBlockedReason,
-        boolean includeStepBuffer) {
+    private void beginFlushing() {
         releaseLease();
-        pendingTerminalState = terminalState;
+        pendingTerminalState = JobState.IDLE;
         phase = ExecutionPhase.FLUSHING;
-        error = terminalError == null ? ExecutionError.NONE : terminalError;
-        flushStepBufferInPhase = includeStepBuffer;
-        state = flushBlockedReason == null ? JobState.RUNNING : JobState.BLOCKED;
+        error = ExecutionError.NONE;
+        flushStepBufferInPhase = true;
+        state = JobState.RUNNING;
     }
 
     private void flushStepBuffer(long bandwidth) {
