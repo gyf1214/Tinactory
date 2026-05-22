@@ -37,6 +37,12 @@ public interface IStackAdapter<T> {
         return display(stackOf(key));
     }
 
+    Component name(T stack);
+
+    default Component name(IStackKey key) {
+        return name(stackOf(key));
+    }
+
     Optional<List<Component>> tooltip(T stack);
 
     default Optional<List<Component>> tooltip(IStackKey key) {

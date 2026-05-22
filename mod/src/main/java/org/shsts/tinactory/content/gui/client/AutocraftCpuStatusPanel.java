@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.VanillaButton;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +52,13 @@ public class AutocraftCpuStatusPanel extends Panel {
             var ret = new ArrayList<Component>();
             var entry = cpus.get(index);
             var status = entry.status();
-            var state = status.state();
             ret.add(entry.name());
-            ret.add(tr("cpu.state." + state.id).withStyle(ChatFormatting.GRAY));
-            if (state.busy()) {
+            ret.add(tr("cpu.state." + status.state().id).withStyle(ChatFormatting.GRAY));
+            if (!status.targets().isEmpty()) {
+                var target = status.targets().get(0);
+                ret.add(tr("cpu.target", target.key().name(), ClientUtil.getNumberString(target.amount())));
+            }
+            if (status.state().busy()) {
                 ret.add(tr("cpu.steps",
                     NUMBER_FORMAT.format(status.completedSteps()),
                     NUMBER_FORMAT.format(status.totalSteps())).withStyle(ChatFormatting.GRAY));

@@ -19,6 +19,10 @@ public interface IStackKey extends Comparable<IStackKey> {
         return adapter().display(this);
     }
 
+    default Component name() {
+        return adapter().name(this);
+    }
+
     default Optional<List<Component>> tooltip() {
         return adapter().tooltip(this);
     }

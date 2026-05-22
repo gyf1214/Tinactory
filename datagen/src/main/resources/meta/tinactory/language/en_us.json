@@ -218,6 +218,7 @@
     "tinactory.gui.autocraft.cpu.state.running": "Running",
     "tinactory.gui.autocraft.cpu.state.blocked": "Blocked",
     "tinactory.gui.autocraft.cpu.state.failed": "Failed",
+    "tinactory.gui.autocraft.cpu.target": "%s x%s",
     "tinactory.gui.autocraft.cpu.steps": "%s / %s",
     "tinactory.gui.autocraft.cpu.error.offline": "CPU service is offline",
     "tinactory.gui.autocraft.cpu.error.inputUnavailable": "Input resources are unavailable",

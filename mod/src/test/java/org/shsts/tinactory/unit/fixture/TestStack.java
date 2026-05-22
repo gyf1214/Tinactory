@@ -73,9 +73,14 @@ public record TestStack(PortType type, String id, String nbt, int amount) {
         }
 
         @Override
-        public Optional<List<Component>> tooltip(TestStack stack) {
+        public Component name(TestStack stack) {
             var label = stack.type() == PortType.FLUID ? "fluid" : "item";
-            return Optional.of(List.<Component>of(I18n.raw("%s %s x%d", label, stack.id(), stack.amount())));
+            return I18n.raw("%s %s x%d", label, stack.id(), stack.amount());
+        }
+
+        @Override
+        public Optional<List<Component>> tooltip(TestStack stack) {
+            return Optional.of(List.of(name(stack)));
         }
     };
 
