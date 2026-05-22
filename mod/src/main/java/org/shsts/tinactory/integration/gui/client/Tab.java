@@ -88,10 +88,13 @@ public class Tab extends Panel {
     }
 
     public void select(int tab) {
-        currentTab = tab;
         for (var i = 0; i < tabPanels.size(); i++) {
             tabPanels.get(i).setActive(i == tab);
         }
+        if (currentTab == tab) {
+            return;
+        }
+        currentTab = tab;
         if (onSelect != null) {
             onSelect.accept(tab);
         }

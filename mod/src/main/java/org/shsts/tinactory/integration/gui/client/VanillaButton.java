@@ -18,8 +18,8 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 public class VanillaButton extends Button {
     private final Texture texture;
     private final Font font;
-    private final int textWidth;
-    private final Component label;
+    private Component label;
+    private int textWidth;
     private final Runnable onPress;
 
     public boolean disabled = false;
@@ -31,6 +31,11 @@ public class VanillaButton extends Button {
         texture = Texture.VANILLA_WIDGETS;
         font = ClientUtil.getFont();
         textWidth = font.width(label);
+    }
+
+    public void setLabel(Component val) {
+        label = val;
+        textWidth = font.width(val);
     }
 
     @Override

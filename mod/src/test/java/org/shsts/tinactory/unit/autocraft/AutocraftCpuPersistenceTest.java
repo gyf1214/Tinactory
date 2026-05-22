@@ -120,7 +120,7 @@ class AutocraftCpuPersistenceTest {
     }
 
     private static SequentialCraftExecutor executor() {
-        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), new NoOpEvents());
+        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
     }
 
     private static final class NoOpInventory implements IInventoryView {
@@ -211,8 +211,5 @@ class AutocraftCpuPersistenceTest {
                 public void release() {}
             });
         }
-    }
-
-    private static final class NoOpEvents implements IJobEvents {
     }
 }

@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
@@ -102,11 +103,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         var step = plan.steps().get(nextStep);
         if (!ensureStepReady()) {
-            jobEvents.onStepBlocked(step, blockedMessage(error));
+            jobEvents.onStepBlocked(step, error);
             return;
         }
         if (!ensureLease(step)) {
-            jobEvents.onStepBlocked(step, blockedMessage(error));
+            jobEvents.onStepBlocked(step, error);
             return;
         }
 
@@ -119,10 +120,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         if (stepCompleted()) {
             releaseLease();
-            var completedStep = step;
-            var flushCandidates = extractFlushCandidates(completedStep);
+            var flushCandidates = extractFlushCandidates(step);
             clearStepProgressState();
-            jobEvents.onStepCompleted(completedStep);
+            jobEvents.onStepCompleted(step);
             nextStep++;
             error = ExecutionError.NONE;
             state = JobState.RUNNING;
@@ -533,9 +533,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             } else {
                 stepBuffer.remove(key);
             }
-            if (flush > 0L) {
-                flushCandidates.put(key, flush);
-            }
+            flushCandidates.put(key, flush);
         }
         return flushCandidates;
     }
@@ -545,16 +543,5 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return 0L;
         }
         return (numerator + denominator - 1L) / denominator;
-    }
-
-    private static String blockedMessage(ExecutionError error) {
-        return switch (error) {
-            case OFFLINE -> "CPU service is offline";
-            case INPUT_UNAVAILABLE -> "Input resources are unavailable";
-            case MACHINE_UNAVAILABLE -> "Machine requirement is unavailable";
-            case MACHINE_REASSIGNMENT_BLOCKED -> "Machine reassignment blocked by in-flight transfer";
-            case FLUSH_BACKPRESSURE -> "Flush blocked by storage backpressure";
-            case NONE -> "step blocked";
-        };
     }
 }

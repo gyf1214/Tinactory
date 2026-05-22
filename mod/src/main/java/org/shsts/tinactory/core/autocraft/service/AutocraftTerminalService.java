@@ -49,20 +49,20 @@ public class AutocraftTerminalService {
             .toList();
     }
 
-    public boolean cancelCpu(UUID cpuId) {
+    public void cancelCpu(UUID cpuId) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return false;
+            return;
         }
         var job = service.get().getJob();
         if (job.isEmpty()) {
-            return false;
+            return;
         }
         var status = job.get().execution().state();
         if (status != JobState.RUNNING && status != JobState.BLOCKED) {
-            return false;
+            return;
         }
-        return service.get().cancel(job.get().jobId());
+        service.get().cancel(job.get().jobId());
     }
 
     public AutocraftPreview preview(IStackKey target, long quantity) {

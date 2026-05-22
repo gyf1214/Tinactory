@@ -1,10 +1,12 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.gui.Rect;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.BUTTON_WIDTH;
 import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.tr;
@@ -41,11 +44,15 @@ public class AutocraftPreviewPanel extends Panel {
     private static final int BG_COLOR_ERROR = 0xFFDD9898;
 
     private final VanillaButton executeButton;
+    private final VanillaButton cpuButton;
     private final List<Map.Entry<IStackKey, PlanSummary.Entry>> summary = new ArrayList<>();
+    private final Component defaultCpuLabel;
+    @Nullable
+    private UUID selectedCpu = null;
 
     private class SummaryPanel extends ButtonPanel {
         public SummaryPanel() {
-            super(AutocraftPreviewPanel.this.screen, SUMMARY_WIDTH, SUMMARY_HEIGHT, 0);
+            super(AutocraftPreviewPanel.this.screen, SUMMARY_WIDTH, SUMMARY_HEIGHT, 1);
         }
 
         @Override
@@ -102,7 +109,15 @@ public class AutocraftPreviewPanel extends Panel {
 
     public AutocraftPreviewPanel(AutocraftTerminalScreen screen) {
         super(screen);
-        this.executeButton = new VanillaButton(menu, tr("execute"), null, screen::executePreview);
+        this.defaultCpuLabel = tr("defaultCpu");
+        this.cpuButton = new VanillaButton(menu, defaultCpuLabel, null, () -> screen.selectCpu(this::onSelectCpu));
+        this.executeButton = new VanillaButton(menu, tr("execute"), null, () -> {
+            if (selectedCpu == null) {
+                // TODO
+                return;
+            }
+            screen.executePreview(selectedCpu);
+        });
         executeButton.disabled = true;
         var cancelButton = new VanillaButton(menu, tr("cancel"), null, () -> {
             executeButton.disabled = true;
@@ -110,7 +125,10 @@ public class AutocraftPreviewPanel extends Panel {
             screen.cancelPreview();
         });
 
-        addGroup(Rect.corners(0, 0, 0, -BUTTON_HEIGHT - SPACING), new SummaryPanel());
+        addGroup(Rect.corners(0, 0, 0, -BUTTON_HEIGHT * 2 - SPACING * 2), new SummaryPanel());
+        addChild(RectD.corners(0d, 1d, 1d, 1d),
+            Rect.corners(0, -BUTTON_HEIGHT * 2 - SPACING, 0, -BUTTON_HEIGHT - SPACING),
+            cpuButton);
         addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0), executeButton);
         addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), cancelButton);
     }
@@ -121,5 +139,19 @@ public class AutocraftPreviewPanel extends Panel {
         packet.summary().entries().entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
             .forEach(summary::add);
+        selectedCpu = null;
+        cpuButton.setLabel(defaultCpuLabel);
+    }
+
+    private boolean onSelectCpu(@Nullable AutocraftCpuSyncPacket.CpuInfo cpu) {
+        if (cpu == null) {
+            return true;
+        }
+        if (!cpu.status().available()) {
+            return false;
+        }
+        selectedCpu = cpu.status().cpuId();
+        cpuButton.setLabel(cpu.name());
+        return true;
     }
 }

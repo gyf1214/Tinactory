@@ -3,17 +3,23 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.AutocraftTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Tab;
 
+import java.util.UUID;
+import java.util.function.Predicate;
+
+import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_STATUS_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.PREVIEW_SYNC;
 import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.REQUESTABLES_SYNC;
@@ -44,29 +50,40 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         this.contentHeight = 144;
 
         menu.onSyncPacket(REQUESTABLES_SYNC, requestPanel::updateRequestables);
-        menu.onSyncPacket(CPU_STATUS_SYNC, this::onCpuStatusSync);
+        menu.onSyncPacket(CPU_STATUS_SYNC, cpuStatusPanel::updateStatus);
         menu.onSyncPacket(PREVIEW_SYNC, this::onPreviewSync);
 
-        tab.onSelect(i -> previewPanel.setActive(i < 0));
+        tab.onSelect(this::onTabChange);
+        previewPanel.setActive(false);
         tab.select(0);
     }
 
-    public static Component tr(String key, Object... args) {
+    public static TranslatableComponent tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.autocraft." + key, args);
     }
 
-    public void executePreview() {
+    private void onTabChange(int i) {
+        previewPanel.setActive(i < 0);
+        cpuStatusPanel.onSelectCpu(null);
+    }
+
+    public void selectCpu(Predicate<AutocraftCpuSyncPacket.CpuInfo> cb) {
+        tab.select(1);
+        cpuStatusPanel.onSelectCpu(cpu -> {
+            if (cb.test(cpu)) {
+                tab.select(-1);
+            }
+        });
+    }
+
+    public void executePreview(UUID cpu) {
+        var packet = AutocraftEventPacket.execute(cpu);
+        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> packet);
         tab.select(1);
     }
 
     public void cancelPreview() {
         tab.select(0);
-    }
-
-    public void cancelCpuJob() {}
-
-    private void onCpuStatusSync(AutocraftCpuSyncPacket packet) {
-        cpuStatusPanel.onStatusSync(packet);
     }
 
     private void onPreviewSync(AutocraftPreviewSyncPacket packet) {

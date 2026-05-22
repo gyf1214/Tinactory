@@ -2,8 +2,8 @@ package org.shsts.tinactory.core.autocraft.service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 
 import java.util.List;
@@ -41,5 +41,9 @@ public record CpuStatusEntry(
             0,
             0,
             ExecutionError.OFFLINE);
+    }
+
+    public boolean available() {
+        return state == JobState.IDLE;
     }
 }

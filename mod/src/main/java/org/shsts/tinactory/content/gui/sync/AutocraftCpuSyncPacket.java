@@ -7,8 +7,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -66,7 +66,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
     }
 
     public List<CpuInfo> entries() {
-        return List.copyOf(entries);
+        return entries;
     }
 
     @Override

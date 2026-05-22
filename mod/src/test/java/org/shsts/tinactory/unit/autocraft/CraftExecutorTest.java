@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -10,7 +11,6 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -212,8 +212,8 @@ class CraftExecutorTest {
         }
 
         @Override
-        public void onStepBlocked(CraftStep step, String reason) {
-            events.add("blocked:" + step.stepId() + ":" + reason);
+        public void onStepBlocked(CraftStep step, ExecutionError reason) {
+            events.add("blocked:" + step.stepId() + ":" + reason.id);
         }
     }
 

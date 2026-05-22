@@ -6,11 +6,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
@@ -52,11 +52,7 @@ public class AutocraftJobService implements IAutocraftService {
 
     @Override
     public boolean isBusy() {
-        if (currentJob == null) {
-            return false;
-        }
-        var state = currentJob.execution().state();
-        return state == JobState.RUNNING || state == JobState.BLOCKED;
+        return currentJob != null && currentJob.execution().state().busy();
     }
 
     public Optional<RunningSnapshot> snapshotRunning() {

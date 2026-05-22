@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
@@ -12,7 +13,6 @@ import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -23,7 +23,6 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
-import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -149,7 +148,6 @@ class AutocraftTerminalServiceExecuteTest {
         var statuses = service.listCpuStatuses();
 
         assertEquals(1, statuses.size());
-        assertTrue(statuses.get(0) instanceof CpuStatusEntry);
         assertEquals(cpu, statuses.get(0).cpuId());
         assertEquals(targets, statuses.get(0).targets());
         assertEquals(JobState.BLOCKED, statuses.get(0).state());
@@ -181,7 +179,7 @@ class AutocraftTerminalServiceExecuteTest {
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
         return TestAutocraftHelper.pattern(id, List.of(
-            new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
+                new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             outputs, TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
     }
 

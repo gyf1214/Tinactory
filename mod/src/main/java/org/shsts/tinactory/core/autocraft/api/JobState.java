@@ -11,5 +11,15 @@ public enum JobState {
     BLOCKED,
     COMPLETED,
     CANCELLED,
-    FAILED
+    FAILED;
+
+    public final String id;
+
+    JobState() {
+        this.id = name().toLowerCase();
+    }
+
+    public boolean busy() {
+        return this == RUNNING || this == BLOCKED;
+    }
 }

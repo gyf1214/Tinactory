@@ -55,4 +55,17 @@ public final class LocHelper {
             return names[names.length + index];
         }
     }
+
+    /**
+     * Convert a CAPITAL_CASE to camelCase
+     */
+    public static String constantToId(String str) {
+        var names = str.split("_");
+        var sb = new StringBuilder();
+        for (var i = 0; i < names.length; i++) {
+            var name = names[i].toLowerCase();
+            sb.append(i == 0 ? name : StringUtils.capitalize(name));
+        }
+        return sb.toString();
+    }
 }
