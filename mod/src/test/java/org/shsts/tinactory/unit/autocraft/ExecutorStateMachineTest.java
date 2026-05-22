@@ -547,6 +547,72 @@ class ExecutorStateMachineTest {
         assertEquals(1, executor.snapshot().nextStepIndex());
     }
 
+    @Test
+    void restoreShouldResumeFinalFlushOfStepBuffer() {
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new MutableInventory(Map.of());
+        var executor = new SequentialCraftExecutor(inventory, step -> Optional.empty(), IJobEvents.NO_OP);
+        var snapshot = new ExecutorSnapshot(
+            JobState.BLOCKED,
+            ExecutionPhase.FLUSHING,
+            ExecutionError.FLUSH_BACKPRESSURE,
+            JobState.IDLE,
+            new CraftPlan(List.of()),
+            0,
+            Map.of(plate, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.restore(snapshot);
+        executor.runCycle(64);
+
+        assertEquals(JobState.IDLE, executor.snapshot().state());
+        assertEquals(1L, inventory.amountOf(plate));
+    }
+
+    @Test
+    void restoreShouldResumeStepBoundaryPendingFlush() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        var secondStep = new CraftStep(
+            "s2",
+            pattern("tinactory:gear", List.of(), List.of(new CraftAmount(gear, 1))),
+            1);
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true);
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        inventory.rejectInsertKeys.add(plate);
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            new SequenceAllocator(List.of(firstLease, new RouteLease(Map.of(), Map.of(gear, 1L), true))),
+            IJobEvents.NO_OP);
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+        executor.runCycle(64);
+        executor.runCycle(64);
+        var snapshot = executor.snapshot();
+
+        inventory.rejectInsertKeys.clear();
+        var restored = new SequentialCraftExecutor(inventory, new SequenceAllocator(List.of(
+            new RouteLease(Map.of(), Map.of(gear, 1L), true))), IJobEvents.NO_OP);
+        restored.restore(snapshot);
+        restored.runCycle(64);
+
+        assertEquals(JobState.RUNNING, restored.snapshot().state());
+        assertEquals(ExecutionPhase.RUN_STEP, restored.snapshot().phase());
+        assertEquals(1L, inventory.amountOf(plate));
+    }
+
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
         return TestAutocraftHelper.pattern(id, inputs, outputs);
     }

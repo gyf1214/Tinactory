@@ -32,7 +32,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private JobState state = JobState.IDLE;
     private ExecutionPhase phase = ExecutionPhase.TERMINAL;
     @Nullable
-    private JobState pendingTerminalState;
+    private JobState stateAfterFlush;
     private ExecutionError error = ExecutionError.NONE;
     @Nullable
     private IMachineLease lease;
@@ -77,7 +77,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
         phase = state == JobState.RUNNING ? ExecutionPhase.RUN_STEP : ExecutionPhase.TERMINAL;
         error = ExecutionError.NONE;
-        pendingTerminalState = null;
+        stateAfterFlush = null;
         releaseLease();
         clearStepState();
         flushStepBufferInPhase = false;
@@ -94,7 +94,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         if (nextStep >= plan.steps().size()) {
-            beginFlushing();
+            beginFinalFlushing();
             flushStepBuffer(transmissionBandwidth);
             return;
         }
@@ -128,14 +128,14 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (!flushStepBufferNow(flushCandidates)) {
                 pendingFlush.putAll(flushCandidates);
                 phase = ExecutionPhase.FLUSHING;
-                pendingTerminalState = JobState.RUNNING;
+                stateAfterFlush = JobState.RUNNING;
                 state = JobState.BLOCKED;
                 error = ExecutionError.FLUSH_BACKPRESSURE;
                 flushStepBufferInPhase = false;
                 return;
             }
             if (nextStep >= plan.steps().size()) {
-                beginFlushing();
+                beginFinalFlushing();
             }
         }
     }
@@ -145,7 +145,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         if (phase == ExecutionPhase.TERMINAL) {
             return;
         }
-        beginFlushing();
+        beginFinalFlushing();
     }
 
     @Override
@@ -154,9 +154,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             state,
             phase,
             error,
-            pendingTerminalState,
+            stateAfterFlush,
             plan,
             nextStep,
+            pendingFlush,
+            flushStepBufferInPhase,
             stepBuffer,
             stepProducedOutputs,
             stepRequiredOutputs,
@@ -170,8 +172,10 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         state = snapshot.state();
         phase = snapshot.phase();
         error = snapshot.error();
-        pendingTerminalState = snapshot.pendingTerminalState();
+        stateAfterFlush = snapshot.stateAfterFlush();
         nextStep = snapshot.nextStepIndex();
+        pendingFlush.putAll(snapshot.pendingFlush());
+        flushStepBufferInPhase = snapshot.flushStepBufferInPhase();
         stepBuffer.putAll(snapshot.stepBuffer());
         stepProducedOutputs.putAll(snapshot.stepProducedOutputs());
         stepRequiredOutputs.putAll(snapshot.stepRequiredOutputs());
@@ -369,9 +373,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return scheduledRuns <= recoveredRuns;
     }
 
-    private void beginFlushing() {
+    private void beginFinalFlushing() {
         releaseLease();
-        pendingTerminalState = JobState.IDLE;
+        stateAfterFlush = JobState.IDLE;
         phase = ExecutionPhase.FLUSHING;
         error = ExecutionError.NONE;
         flushStepBufferInPhase = true;
@@ -390,10 +394,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         var done = pendingFlush.isEmpty() && (!flushStepBufferInPhase || stepBuffer.isEmpty());
         if (done) {
-            var terminalState = pendingTerminalState == null ? JobState.IDLE : pendingTerminalState;
-            state = terminalState;
-            pendingTerminalState = null;
-            if (terminalState == JobState.RUNNING) {
+            state = stateAfterFlush == null ? JobState.IDLE : stateAfterFlush;
+            stateAfterFlush = null;
+            if (state == JobState.RUNNING) {
                 phase = ExecutionPhase.RUN_STEP;
                 if (error == ExecutionError.FLUSH_BACKPRESSURE) {
                     error = ExecutionError.NONE;

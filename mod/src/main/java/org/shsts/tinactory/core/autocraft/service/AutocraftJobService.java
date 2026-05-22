@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
+import static net.minecraft.nbt.Tag.TAG_LIST;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -196,11 +197,13 @@ public class AutocraftJobService implements IAutocraftService {
         tag.putString("state", snapshot.state().name());
         tag.putString("phase", snapshot.phase().name());
         tag.put("error", serializeError(snapshot.error()));
-        if (snapshot.pendingTerminalState() != null) {
-            tag.putString("pendingTerminalState", snapshot.pendingTerminalState().name());
+        if (snapshot.stateAfterFlush() != null) {
+            tag.putString("stateAfterFlush", snapshot.stateAfterFlush().name());
         }
         tag.put("plan", serializePlan(snapshot.plan(), codec));
         tag.putInt("nextStepIndex", snapshot.nextStepIndex());
+        tag.put("pendingFlush", serializeKeyedAmounts(snapshot.pendingFlush(), codec));
+        tag.putBoolean("flushStepBufferInPhase", snapshot.flushStepBufferInPhase());
         tag.put("stepBuffer", serializeKeyedAmounts(snapshot.stepBuffer(), codec));
         tag.put("stepProducedOutputs", serializeKeyedAmounts(snapshot.stepProducedOutputs(), codec));
         tag.put("stepRequiredOutputs", serializeKeyedAmounts(snapshot.stepRequiredOutputs(), codec));
@@ -215,12 +218,18 @@ public class AutocraftJobService implements IAutocraftService {
 
     private static ExecutorSnapshot deserializeRuntime(CompoundTag tag, PatternNbtCodec codec) {
         return new ExecutorSnapshot(
-            deserializeJobState(tag.getString("state")),
+            JobState.valueOf(tag.getString("state")),
             ExecutionPhase.valueOf(tag.getString("phase")),
             tag.contains("error", TAG_COMPOUND) ? deserializeError(tag.getCompound("error")) : ExecutionError.NONE,
-            tag.contains("pendingTerminalState") ? deserializeJobState(tag.getString("pendingTerminalState")) : null,
+            deserializeStateAfterFlush(tag),
             deserializePlan(tag.getCompound("plan"), codec),
             tag.getInt("nextStepIndex"),
+            tag.contains("pendingFlush", TAG_LIST) ?
+                deserializeKeyedAmounts(tag.getList("pendingFlush", TAG_COMPOUND), codec) :
+                Map.of(),
+            tag.contains("flushStepBufferInPhase") ?
+                tag.getBoolean("flushStepBufferInPhase") :
+                shouldFlushStepBufferInPhase(tag),
             deserializeKeyedAmounts(tag.getList("stepBuffer", TAG_COMPOUND), codec),
             deserializeKeyedAmounts(tag.getList("stepProducedOutputs", TAG_COMPOUND), codec),
             deserializeKeyedAmounts(tag.getList("stepRequiredOutputs", TAG_COMPOUND), codec),
@@ -230,11 +239,15 @@ public class AutocraftJobService implements IAutocraftService {
             tag.hasUUID("leasedMachineId") ? tag.getUUID("leasedMachineId") : null);
     }
 
-    private static JobState deserializeJobState(String name) {
-        if ("COMPLETED".equals(name) || "CANCELLED".equals(name)) {
-            return JobState.IDLE;
-        }
-        return JobState.valueOf(name);
+    @Nullable
+    private static JobState deserializeStateAfterFlush(CompoundTag tag) {
+        return tag.contains("stateAfterFlush") ? JobState.valueOf(tag.getString("stateAfterFlush")) : null;
+    }
+
+    private static boolean shouldFlushStepBufferInPhase(CompoundTag tag) {
+        var stateAfterFlush = deserializeStateAfterFlush(tag);
+        return ExecutionPhase.valueOf(tag.getString("phase")) == ExecutionPhase.FLUSHING &&
+            stateAfterFlush == JobState.IDLE;
     }
 
     private static CompoundTag serializeError(ExecutionError error) {
