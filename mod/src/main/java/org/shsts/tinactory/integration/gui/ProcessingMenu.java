@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -46,7 +47,7 @@ public class ProcessingMenu extends LayoutMenu {
     }
 
     public static Component portLabel(PortType type, int index) {
-        var key = "tinactory.gui.portName." + type.name().toLowerCase() + "Label";
+        var key = "tinactory.gui.portName." + type.name().toLowerCase(Locale.ROOT) + "Label";
         return tr(key, index);
     }
 

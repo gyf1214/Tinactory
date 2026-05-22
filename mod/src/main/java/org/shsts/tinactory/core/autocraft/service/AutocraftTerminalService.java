@@ -1,5 +1,6 @@
 package org.shsts.tinactory.core.autocraft.service;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -7,7 +8,6 @@ import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 
 import java.util.List;
@@ -20,7 +20,9 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    private AutocraftPreviewResult previewResult = AutocraftPreviewResult.empty();
+    private AutocraftPreview previewResult = AutocraftPreview.empty();
+    @Nullable
+    private List<CraftAmount> previewTargets;
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
@@ -36,51 +38,51 @@ public class AutocraftTerminalService {
         return patternRepository.listRequestables();
     }
 
-    public List<UUID> listAvailableCpus() {
-        return List.copyOf(cpuRuntime.listAvailableCpus());
+    public long requestablesRevision() {
+        return patternRepository.revision();
     }
 
     public List<CpuStatusEntry> listCpuStatuses() {
-        var available = cpuRuntime.listAvailableCpus();
         return cpuRuntime.listVisibleCpus().stream()
-            .map(cpuId -> toCpuStatus(cpuId, available))
+            .map(this::toCpuStatus)
             .toList();
     }
 
-    public boolean cancelCpu(UUID cpuId) {
+    public void cancelCpu(UUID cpuId) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return false;
+            return;
         }
         var job = service.get().getJob();
         if (job.isEmpty()) {
-            return false;
+            return;
         }
-        var status = job.get().execution().state();
+        var status = job.get().state();
         if (status != JobState.RUNNING && status != JobState.BLOCKED) {
-            return false;
+            return;
         }
-        return service.get().cancel(job.get().jobId());
+        service.get().cancel();
     }
 
-    public AutocraftPreviewResult preview(IStackKey target, long quantity) {
+    public AutocraftPreview preview(IStackKey target, long quantity) {
         if (quantity <= 0L) {
-            previewResult = AutocraftPreviewResult.empty();
+            clearPreview();
             return previewResult;
         }
         var targets = List.of(new CraftAmount(target, quantity));
-        var snapshot = planner.plan(targets);
-        if (snapshot.state() != PlanningState.COMPLETED || snapshot.plan() == null) {
-            previewResult = AutocraftPreviewResult.failure(snapshot.error());
+        var result = planner.plan(targets);
+        if (result.plan() == null) {
+            previewTargets = null;
+            previewResult = AutocraftPreview.failure(result.error(), result.summary());
             return previewResult;
         }
-        previewResult = AutocraftPreviewResult.success(new AutocraftPreview(targets, snapshot.plan()));
+        previewTargets = targets;
+        previewResult = AutocraftPreview.success(result.plan(), result.summary());
         return previewResult;
     }
 
     public AutocraftExecuteResult execute(UUID cpuId) {
-        var preview = previewResult.preview();
-        if (preview == null) {
+        if (!previewResult.isSuccess() || previewTargets == null || previewResult.planSnapshot() == null) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
         }
         var service = cpuRuntime.findVisibleService(cpuId);
@@ -90,43 +92,43 @@ public class AutocraftTerminalService {
         if (service.get().isBusy()) {
             return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
         }
-        previewResult = AutocraftPreviewResult.empty();
-        return AutocraftExecuteResult.success(service.get().submitPrepared(preview.targets(), preview.planSnapshot()));
-    }
-
-    public void cancelPreview() {
-        previewResult = AutocraftPreviewResult.empty();
+        var targets = previewTargets;
+        var plan = previewResult.planSnapshot();
+        clearPreview();
+        service.get().submitPrepared(targets, plan);
+        return AutocraftExecuteResult.success();
     }
 
     public Optional<AutocraftPreview> preview() {
-        return Optional.ofNullable(previewResult.preview());
+        return previewResult.isSuccess() ? Optional.of(previewResult) : Optional.empty();
     }
 
-    public AutocraftPreviewResult previewResult() {
+    public AutocraftPreview previewResult() {
         return previewResult;
     }
 
-    private CpuStatusEntry toCpuStatus(UUID cpuId, List<UUID> available) {
+    private void clearPreview() {
+        previewResult = AutocraftPreview.empty();
+        previewTargets = null;
+    }
+
+    private CpuStatusEntry toCpuStatus(UUID cpuId) {
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId, false);
+            return CpuStatusEntry.offline(cpuId);
         }
 
         var current = service.get().getJob();
         if (current.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId, available.contains(cpuId));
+            return CpuStatusEntry.idle(cpuId);
         }
-        var execution = current.get().execution();
-        var state = execution.state();
+        var job = current.get();
         return new CpuStatusEntry(
             cpuId,
-            available.contains(cpuId),
-            current.get().targets(),
-            state,
-            state == JobState.IDLE ? null : execution.phase(),
-            execution.nextStepIndex(),
-            execution.plan().steps().size(),
-            execution.error(),
-            state == JobState.RUNNING || state == JobState.BLOCKED);
+            job.state(),
+            job.targets(),
+            job.completedSteps(),
+            job.totalSteps(),
+            job.error());
     }
 }

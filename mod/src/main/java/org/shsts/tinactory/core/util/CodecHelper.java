@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
@@ -17,6 +18,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.StringRepresentable;
+import org.shsts.tinactory.api.logistics.PortDirection;
 
 import java.io.Reader;
 import java.util.List;
@@ -28,6 +31,8 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public final class CodecHelper {
     public static final Gson GSON = new Gson();
+    public static final Codec<PortDirection> PORT_DIRECTION_CODEC =
+        StringRepresentable.fromEnum(PortDirection::values, PortDirection::fromName);
 
     public static JsonObject jsonFromStr(String s) {
         return GSON.fromJson(s, JsonObject.class);

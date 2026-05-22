@@ -1,108 +1,115 @@
 package org.shsts.tinactory.content.gui.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
+import org.shsts.tinactory.content.gui.sync.AutocraftRequestablesSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.Optional;
 
+import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
+import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.BUTTON_WIDTH;
+import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
+import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftRequestPanel extends Panel {
-    private final Label title;
-    private final Label targetSummary;
-    private final Label cpuSummary;
-    private final EditBox quantityInput;
-    private final EditBox targetIndexInput;
-    private final EditBox cpuIndexInput;
+    private final List<IStackKey> requestables = new ArrayList<>();
+    private final EditBox quantityEdit;
+    private int selected = -1;
+
+    private class RequestablesPanel extends ButtonPanel {
+        public RequestablesPanel() {
+            super(AutocraftRequestPanel.this.screen, SLOT_SIZE, SLOT_SIZE, 0);
+        }
+
+        @Override
+        protected int getItemCount() {
+            var count = requestables.size();
+            var slotCount = gridViewGroup.getSlotCount();
+            return Math.max(1, (count + slotCount - 1) / slotCount) * slotCount;
+        }
+
+        @Override
+        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+            float partialTick, Rect rect, int index, boolean isHovering) {
+            if (index == selected) {
+                RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect, 22, 1);
+            } else {
+                RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect);
+            }
+            if (index >= requestables.size()) {
+                return;
+            }
+            var requestable = requestables.get(index);
+            var display = requestable.display();
+            var rect1 = rect.offset(1, 1).enlarge(-2, -2);
+            RenderUtil.renderDescriptor(poseStack, display, rect1, getBlitOffset());
+        }
+
+        @Override
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
+            if (index < requestables.size()) {
+                selected = index;
+            }
+        }
+
+        @Override
+        protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
+            return index < requestables.size() ? requestables.get(index).tooltip() : Optional.empty();
+        }
+    }
+
+    private final RequestablesPanel buttonPanel = new RequestablesPanel();
 
     public AutocraftRequestPanel(AutocraftTerminalScreen screen) {
         super(screen);
-        this.title = new Label(menu, new TextComponent("Autocraft Request"));
-        this.targetSummary = new Label(menu, new TextComponent("Target: not selected"));
-        this.cpuSummary = new Label(menu, new TextComponent("CPU: optional until execute"));
-        this.quantityInput = Widgets.editBox();
-        this.targetIndexInput = Widgets.editBox();
-        this.cpuIndexInput = Widgets.editBox();
-        quantityInput.setValue("1");
-        targetIndexInput.setValue("");
-        cpuIndexInput.setValue("");
-        var previewButton = Widgets.simpleButton(menu, new TextComponent("Preview"), null, screen::requestPreview);
+        this.quantityEdit = Widgets.editBox();
+        var previewButton = new VanillaButton(menu, tr("preview"), null, this::requestPreview);
 
-        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 4, -4, 12), title);
-        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(4, 18, -4, 12), targetSummary);
-        addVanillaWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 32, 48, EDIT_HEIGHT), 0, targetIndexInput);
-        addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(56, 36, -4, 12), cpuSummary);
-        addVanillaWidget(RectD.corners(0d, 0d, 0d, 0d), new Rect(4, 46, 48, EDIT_HEIGHT), 0, cpuIndexInput);
-        addVanillaWidget(RectD.corners(1d, 0d, 1d, 0d), new Rect(-124, 44, 48, EDIT_HEIGHT), 0, quantityInput);
-        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-72, 42, 68, 20), previewButton);
+        addGroup(Rect.corners(0, 0, 0, -EDIT_HEIGHT - SPACING), buttonPanel);
+        addVanillaWidget(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -EDIT_HEIGHT, 48, 0), 0, quantityEdit);
+        addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), previewButton);
     }
 
-    public OptionalLong quantity() {
+    public void updateRequestables(AutocraftRequestablesSyncPacket packet) {
+        requestables.clear();
+        requestables.addAll(packet.requestables());
+        buttonPanel.refresh();
+    }
+
+    private void requestPreview() {
+        if (selected < 0 || selected >= requestables.size()) {
+            return;
+        }
+        var quantity = 0;
         try {
-            var value = Long.parseLong(quantityInput.getValue());
-            return value > 0L ? OptionalLong.of(value) : OptionalLong.empty();
+            quantity = Integer.parseInt(quantityEdit.getValue());
         } catch (NumberFormatException ignored) {
-            return OptionalLong.empty();
         }
-    }
-
-    public OptionalInt targetIndex(int size) {
-        return parseIndex(targetIndexInput.getValue(), size);
-    }
-
-    public OptionalInt cpuIndex(int size) {
-        return parseIndex(cpuIndexInput.getValue(), size);
-    }
-
-    public void updateSelectionSummary(
-        List<IStackKey> requestables,
-        List<CpuStatusEntry> cpus) {
-        targetSummary.setLine(0, new TextComponent(formatTargetSummary(requestables)));
-        cpuSummary.setLine(0, new TextComponent(formatCpuSummary(cpus)));
-    }
-
-    public void setTitle(Component component) {
-        title.setLine(0, component);
-    }
-
-    private static OptionalInt parseIndex(String raw, int size) {
-        try {
-            var index = Integer.parseInt(raw);
-            return index >= 0 && index < size ? OptionalInt.of(index) : OptionalInt.empty();
-        } catch (NumberFormatException ignored) {
-            return OptionalInt.empty();
+        if (quantity < 0) {
+            return;
         }
-    }
-
-    private String formatTargetSummary(List<IStackKey> requestables) {
-        var index = targetIndex(requestables.size());
-        if (index.isEmpty()) {
-            return "Target index: select 0.." + Math.max(0, requestables.size() - 1);
-        }
-        var key = requestables.get(index.getAsInt());
-        return "Target[" + index.getAsInt() + "]: " + key;
-    }
-
-    private String formatCpuSummary(List<CpuStatusEntry> cpus) {
-        var index = cpuIndex(cpus.size());
-        if (index.isEmpty()) {
-            return "CPU index: optional for execute 0.." + Math.max(0, cpus.size() - 1);
-        }
-        var cpu = cpus.get(index.getAsInt());
-        return "CPU[" + index.getAsInt() + "]: " + cpu.cpuId() + " (" + cpu.state().name() + ")";
+        var packet = AutocraftEventPacket.preview(requestables.get(selected), quantity);
+        screen.menu().triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> packet);
     }
 }

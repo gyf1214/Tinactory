@@ -3,6 +3,8 @@ package org.shsts.tinactory.content.electric;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
+import java.util.Locale;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum CircuitLevel {
@@ -24,6 +26,6 @@ public enum CircuitLevel {
     }
 
     public static CircuitLevel fromName(String name) {
-        return valueOf(name.toUpperCase());
+        return valueOf(name.toUpperCase(Locale.ROOT));
     }
 }

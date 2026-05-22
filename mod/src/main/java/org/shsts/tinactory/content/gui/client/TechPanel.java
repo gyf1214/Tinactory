@@ -22,7 +22,7 @@ import org.shsts.tinactory.integration.gui.client.MenuWidget;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
-import org.shsts.tinactory.integration.gui.client.Widgets;
+import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
@@ -228,8 +228,7 @@ public class TechPanel extends Panel {
         this.selectedTechDetailsLabel = new Label(menu);
         var label3 = new Label(menu, tr("techRequirementsLabel"));
         label3.verticalAlign = Label.Alignment.MIDDLE;
-        this.startResearchButton = Widgets.simpleButton(menu, tr("startResearchButton"),
-            null, this::startResearch);
+        this.startResearchButton = new VanillaButton(menu, tr("startResearchButton"), null, this::startResearch);
         var y = 0;
         var offset7 = Rect.corners(0, y - BUTTON_HEIGHT, 0, y);
         y -= BUTTON_HEIGHT + MARGIN_VERTICAL;
@@ -270,7 +269,7 @@ public class TechPanel extends Panel {
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-        RenderUtil.renderDescriptor(technology.getDisplay(), poseStack, new Rect(x, y, 16, 16), z);
+        RenderUtil.renderDescriptor(poseStack, technology.getDisplay(), new Rect(x, y, 16, 16), z);
     }
 
     private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,

@@ -97,7 +97,7 @@ public class LogisticComponent extends NotifierComponent {
         return ports.values().stream().toList();
     }
 
-    public Collection<IPort<?>> getStoragePorts() {
+    public Collection<? extends IPort<?>> getStoragePorts() {
         return storagePorts.stream()
             .map(ports::get)
             .sorted(Comparator.comparing(PortInfo::priority).reversed())

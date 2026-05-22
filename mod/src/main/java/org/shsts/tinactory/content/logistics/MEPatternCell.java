@@ -15,8 +15,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
-import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
 import org.shsts.tinactory.integration.common.CapabilityItem;
 import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -71,7 +71,7 @@ public class MEPatternCell extends CapabilityItem {
             super(stack, ID);
             this.state = new PatternCellPortState(
                 bytesLimit,
-                MachineConstraintCodecHelper.CODEC,
+                MachineConstraintHelper.CODEC,
                 StackHelper.KEY_CODEC);
             this.patternCap = LazyOptional.of(() -> this);
         }

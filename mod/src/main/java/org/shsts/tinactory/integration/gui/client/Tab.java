@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +15,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
 
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
@@ -59,6 +61,8 @@ public class Tab extends Panel {
 
     private final List<Panel> tabPanels = new ArrayList<>();
     private int currentTab = 0;
+    @Nullable
+    private IntConsumer onSelect = null;
 
     public Tab(MenuScreen<?> screen, Object... args) {
         super(screen);
@@ -71,10 +75,11 @@ public class Tab extends Panel {
             if (i + 1 < args.length) {
                 if (args[i + 1] instanceof ItemLike item) {
                     icon = new ItemStack(item);
+                    i++;
                 } else if (args[i + 1] instanceof IEntry<?> entry) {
                     icon = new ItemStack((ItemLike) entry.get());
+                    i++;
                 }
-                i++;
             }
 
             var button = new TabButton(menu, k, icon);
@@ -83,10 +88,20 @@ public class Tab extends Panel {
     }
 
     public void select(int tab) {
-        currentTab = tab;
         for (var i = 0; i < tabPanels.size(); i++) {
             tabPanels.get(i).setActive(i == tab);
         }
+        if (currentTab == tab) {
+            return;
+        }
+        currentTab = tab;
+        if (onSelect != null) {
+            onSelect.accept(tab);
+        }
+    }
+
+    public void onSelect(IntConsumer cb) {
+        onSelect = cb;
     }
 
     @Override

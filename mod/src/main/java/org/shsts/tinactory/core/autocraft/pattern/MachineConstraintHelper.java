@@ -1,24 +1,24 @@
-package org.shsts.tinactory.integration.autocraft;
+package org.shsts.tinactory.core.autocraft.pattern;
 
 import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class MachineConstraintCodecHelper {
-    private MachineConstraintCodecHelper() {}
+public final class MachineConstraintHelper {
+    private MachineConstraintHelper() {}
 
     public static final Codec<IMachineConstraint> CODEC = Codec.STRING.dispatch(
         IMachineConstraint::typeId,
-        MachineConstraintCodecHelper::codec
+        MachineConstraintHelper::codec
     );
 
-    private static Codec<? extends IMachineConstraint> codec(String typeId) {
+    public static Codec<? extends IMachineConstraint> codec(String typeId) {
         return switch (typeId) {
             case PortConstraint.TYPE_ID -> PortConstraint.CODEC;
+            case TargetRecipeConstraint.TYPE_ID -> TargetRecipeConstraint.CODEC;
             default -> throw new IllegalArgumentException("unknown machine constraint type id: " + typeId);
         };
     }

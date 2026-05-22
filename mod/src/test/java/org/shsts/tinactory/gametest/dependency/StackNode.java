@@ -2,6 +2,7 @@ package org.shsts.tinactory.gametest.dependency;
 
 import org.shsts.tinactory.api.logistics.IStackKey;
 
+import java.util.Locale;
 import java.util.Set;
 
 record StackNode(IStackKey key) implements IDependencyNode {
@@ -12,7 +13,7 @@ record StackNode(IStackKey key) implements IDependencyNode {
 
     @Override
     public String id() {
-        return key.type().name().toLowerCase() + ":" + key;
+        return key.type().name().toLowerCase(Locale.ROOT) + ":" + key;
     }
 
     @Override

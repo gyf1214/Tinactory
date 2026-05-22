@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.core.electric.Voltage;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 @ParametersAreNonnullByDefault
@@ -33,7 +34,7 @@ public enum CircuitTier {
     }
 
     public static CircuitTier fromName(String name) {
-        return valueOf(name.toUpperCase());
+        return valueOf(name.toUpperCase(Locale.ROOT));
     }
 
     public static CircuitTier fromRank(int rank) {

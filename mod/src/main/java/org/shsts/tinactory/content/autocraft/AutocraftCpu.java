@@ -9,17 +9,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
+import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
-import org.shsts.tinactory.integration.autocraft.MachineConstraintCodecHelper;
+import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
-import static org.shsts.tinactory.AllEvents.REMOVED_BY_CHUNK;
-import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
@@ -27,11 +26,11 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
-    private static final String ID = "autocraft/cpu";
+    public static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
 
     private final PatternNbtCodec snapshotCodec =
-        new PatternNbtCodec(MachineConstraintCodecHelper.CODEC, StackHelper.KEY_CODEC);
+        new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
     @Nullable
@@ -54,6 +53,25 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         long transmissionBandwidth,
         int executionIntervalTicks) {
         return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
+    }
+
+    public CpuStatusEntry status() {
+        var cpuId = machine.uuid();
+        if (service == null) {
+            return CpuStatusEntry.offline(cpuId);
+        }
+        var job = service.getJob();
+        if (job.isEmpty()) {
+            return CpuStatusEntry.idle(cpuId);
+        }
+        var current = job.get();
+        return new CpuStatusEntry(
+            cpuId,
+            current.state(),
+            current.targets(),
+            current.completedSteps(),
+            current.totalSteps(),
+            current.error());
     }
 
     @Override
@@ -85,18 +103,11 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         }
     }
 
-    private void unregisterFromAutocraft() {
-        machine.network().ifPresent(network ->
-            network.getComponent(AUTOCRAFT_COMPONENT.get()).unregisterCpu(machine.uuid()));
-    }
-
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(BUILD_SCHEDULING.get(), builder ->
             builder.add(LOGISTICS_SCHEDULING.get(), (world, network) -> onTick()));
-        eventManager.subscribe(REMOVED_BY_CHUNK.get(), world -> unregisterFromAutocraft());
-        eventManager.subscribe(REMOVED_IN_WORLD.get(), world -> unregisterFromAutocraft());
     }
 
     @Override

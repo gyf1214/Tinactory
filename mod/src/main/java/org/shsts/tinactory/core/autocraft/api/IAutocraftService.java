@@ -8,7 +8,6 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -17,7 +16,7 @@ public interface IAutocraftService {
 
     Optional<AutocraftJobSnapshot> getJob();
 
-    boolean cancel(UUID id);
+    boolean cancel();
 
-    UUID submitPrepared(List<CraftAmount> targets, CraftPlan plan);
+    void submitPrepared(List<CraftAmount> targets, CraftPlan plan);
 }

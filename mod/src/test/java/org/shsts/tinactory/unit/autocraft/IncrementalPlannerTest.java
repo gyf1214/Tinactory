@@ -4,13 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
-import org.shsts.tinactory.core.autocraft.api.PlanningState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
-import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSession;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
@@ -22,20 +19,18 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class IncrementalPlannerTest {
     @Test
     void incrementalPlannerShouldReturnRunningWhenBudgetIsZero() {
         var planner = planner(repo(List.of()), List.of());
         var key = TestStackKey.item("tinactory:gear", "");
-        var session = planner.startSession(List.of(new CraftAmount(key, 1)));
+        planner.start(List.of(new CraftAmount(key, 1)));
 
-        var progress = planner.resume(session, 0);
+        var progress = planner.advance(0);
 
-        assertEquals(PlanningState.RUNNING, progress.state());
-        assertNull(progress.plan());
-        assertEquals(PlanError.none(), progress.error());
+        assertTrue(progress.isEmpty());
     }
 
     @Test
@@ -53,13 +48,12 @@ class IncrementalPlannerTest {
             List.of(new CraftAmount(gear, 1)));
         var available = List.of(new CraftAmount(ingot, 4));
         var planner = planner(repo(List.of(platePattern, gearPattern)), available);
-        var session = planner.startSession(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)));
+        planner.start(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)));
 
-        var first = planner.resume(session, 1);
-        var progress = runUntilTerminal(planner, session, 64);
+        var first = planner.advance(1);
+        var progress = runUntilTerminal(planner, 64);
 
-        assertEquals(PlanningState.RUNNING, first.state());
-        assertEquals(PlanningState.COMPLETED, progress.state());
+        assertTrue(first.isEmpty());
         assertNotNull(progress.plan());
         var plannedPlateIntermediate = progress.plan().steps().stream()
             .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
@@ -75,22 +69,22 @@ class IncrementalPlannerTest {
             .sum();
         assertEquals(1L, plannedPlateIntermediate);
         assertEquals(1L, plannedPlateFinal);
-        assertEquals(
-            planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1))).plan(),
-            progress.plan());
+        var sync = planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)));
+        assertEquals(sync.plan(), progress.plan());
+        assertEquals(sync.summary(), progress.summary());
     }
 
     @Test
     void incrementalPlannerShouldMatchSynchronousFailure() {
         var gear = TestStackKey.item("tinactory:gear", "");
         var planner = planner(repo(List.of()), List.of());
-        var session = planner.startSession(List.of(new CraftAmount(gear, 1)));
+        planner.start(List.of(new CraftAmount(gear, 1)));
 
-        var progress = planner.resume(session, 1);
+        var progress = planner.advance(1).orElseThrow();
         var sync = planner.plan(List.of(new CraftAmount(gear, 1)));
 
-        assertEquals(PlanningState.FAILED, progress.state());
         assertEquals(sync.error(), progress.error());
+        assertEquals(sync.summary(), progress.summary());
     }
 
     @Test
@@ -108,17 +102,18 @@ class IncrementalPlannerTest {
             List.of(new CraftAmount(gear, 1)));
         var targets = List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1));
         var available = List.of(new CraftAmount(ingot, 4));
-        var planner = planner(repo(List.of(platePattern, gearPattern)), available);
+        var firstPlanner = planner(repo(List.of(platePattern, gearPattern)), available);
+        var secondPlanner = planner(repo(List.of(platePattern, gearPattern)), available);
 
-        var firstSession = planner.startSession(targets);
-        var secondSession = planner.startSession(targets);
-        var firstRunA = planner.resume(firstSession, 1);
-        var firstRunB = planner.resume(firstSession, 1);
-        var secondRunA = planner.resume(secondSession, 1);
-        var secondRunB = planner.resume(secondSession, 1);
+        firstPlanner.start(targets);
+        secondPlanner.start(targets);
+        var firstRunA = firstPlanner.advance(1);
+        var firstRunB = firstPlanner.advance(1);
+        var secondRunA = secondPlanner.advance(1);
+        var secondRunB = secondPlanner.advance(1);
 
-        assertEquals(firstRunA.state(), secondRunA.state());
-        assertEquals(firstRunB.state(), secondRunB.state());
+        assertEquals(firstRunA.isPresent(), secondRunA.isPresent());
+        assertEquals(firstRunB.isPresent(), secondRunB.isPresent());
         assertEquals(firstRunB, secondRunB);
     }
 
@@ -137,13 +132,12 @@ class IncrementalPlannerTest {
             List.of(new CraftAmount(gear, 1)));
         var available = List.of(new CraftAmount(ingot, 2));
         var planner = planner(repo(List.of(platePattern, gearPattern)), available);
-        var session = planner.startSession(List.of(new CraftAmount(gear, 1)));
+        planner.start(List.of(new CraftAmount(gear, 1)));
 
-        var first = planner.resume(session, 1);
-        var progress = runUntilTerminal(planner, session, 64);
+        var first = planner.advance(1);
+        var progress = runUntilTerminal(planner, 64);
 
-        assertEquals(PlanningState.RUNNING, first.state());
-        assertEquals(PlanningState.COMPLETED, progress.state());
+        assertTrue(first.isEmpty());
         assertNotNull(progress.plan());
         assertEquals(
             planner.plan(List.of(new CraftAmount(gear, 1))),
@@ -154,15 +148,14 @@ class IncrementalPlannerTest {
         return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
     }
 
-    private static PlannerSnapshot runUntilTerminal(
-        GoalReductionPlanner planner,
-        PlannerSession session,
-        int maxSteps) {
-        var progress = PlannerSnapshot.running();
-        for (var i = 0; i < maxSteps && progress.state() == PlanningState.RUNNING; i++) {
-            progress = planner.resume(session, 1);
+    private static PlanResult runUntilTerminal(GoalReductionPlanner planner, int maxSteps) {
+        for (var i = 0; i < maxSteps; i++) {
+            var progress = planner.advance(1);
+            if (progress.isPresent()) {
+                return progress.get();
+            }
         }
-        return progress;
+        throw new AssertionError("Planner did not finish within budget");
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {

@@ -17,53 +17,37 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiPredicate;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LogisticsMachineAllocator implements IMachineAllocator {
-    private final Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts;
-    private final ToIntFunction<IMachine> voltageRankResolver;
-    private final BiPredicate<IMachine, ResourceLocation> recipeSupport;
+    private static final String TARGET_RECIPE_CONFIG_KEY = "targetRecipe";
+    private final LogisticComponent logistics;
 
-    public LogisticsMachineAllocator(Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts) {
-        this(
-            visiblePorts,
-            machine -> MachineBlock.getBlockVoltage(machine.blockEntity()).rank,
-            (machine, recipeTypeId) -> machine.processor()
-                .filter(IMachineProcessor.class::isInstance)
-                .map(IMachineProcessor.class::cast)
-                .map(processor -> processor.supportsRecipeType(recipeTypeId))
-                .orElse(false));
-    }
-
-    public LogisticsMachineAllocator(
-        Supplier<Collection<LogisticComponent.PortInfo>> visiblePorts,
-        ToIntFunction<IMachine> voltageRankResolver,
-        BiPredicate<IMachine, ResourceLocation> recipeSupport) {
-
-        this.visiblePorts = visiblePorts;
-        this.voltageRankResolver = voltageRankResolver;
-        this.recipeSupport = recipeSupport;
+    public LogisticsMachineAllocator(LogisticComponent logistics) {
+        this.logistics = logistics;
     }
 
     @Override
     public Optional<IMachineLease> allocate(CraftStep step) {
+        var targetRecipe = targetRecipeSelection(step);
+        if (!targetRecipe.valid()) {
+            return Optional.empty();
+        }
         var machines = groupMachinePorts();
         for (var entry : machines.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
             var ports = entry.getValue();
@@ -71,13 +55,22 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
                 continue;
             }
             var machine = ports.get(0).machine();
-            if (voltageRankResolver.applyAsInt(machine) < step.pattern().machineRequirement().voltageTier()) {
+            if (MachineBlock.getBlockVoltage(machine.blockEntity()).rank <
+                step.pattern().machineRequirement().voltageTier()) {
                 continue;
             }
-            if (!recipeSupport.test(machine, step.pattern().machineRequirement().recipeTypeId())) {
+            var processor = machine.processor()
+                .filter(IMachineProcessor.class::isInstance)
+                .map(IMachineProcessor.class::cast);
+            if (processor.filter($ -> $.supportsRecipeType(step.pattern().machineRequirement().recipeTypeId()))
+                .isEmpty()) {
                 continue;
             }
-            var lease = buildLease(machine, ports, step);
+            if (targetRecipe.recipeId().isPresent() &&
+                processor.filter($ -> $.allowTargetRecipe(targetRecipe.recipeId().get())).isEmpty()) {
+                continue;
+            }
+            var lease = buildLease(machine, ports, step, targetRecipe.recipeId());
             if (lease.isPresent()) {
                 return lease;
             }
@@ -87,7 +80,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
     private Map<UUID, List<LogisticComponent.PortInfo>> groupMachinePorts() {
         var grouped = new HashMap<UUID, List<LogisticComponent.PortInfo>>();
-        for (var info : visiblePorts.get()) {
+        for (var info : logistics.getAllPorts()) {
             grouped.computeIfAbsent(info.machine().uuid(), $ -> new ArrayList<>()).add(info);
         }
         for (var ports : grouped.values()) {
@@ -99,7 +92,8 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     private Optional<IMachineLease> buildLease(
         IMachine machine,
         List<LogisticComponent.PortInfo> ports,
-        CraftStep step) {
+        CraftStep step,
+        Optional<ResourceLocation> targetRecipe) {
         var inputRoutes = new ArrayList<IMachineRoute>();
         for (var i = 0; i < step.pattern().inputs().size(); i++) {
             var input = step.pattern().inputs().get(i);
@@ -120,7 +114,44 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             outputRoutes.add(route.get());
         }
 
-        return Optional.of(new Lease(machine.uuid(), inputRoutes, outputRoutes));
+        return Optional.of(createLease(machine, inputRoutes, outputRoutes, targetRecipe));
+    }
+
+    private static TargetRecipeSelection targetRecipeSelection(CraftStep step) {
+        var targetRecipe = Optional.<ResourceLocation>empty();
+        for (var constraint : step.pattern().machineRequirement().constraints()) {
+            if (!(constraint instanceof TargetRecipeConstraint targetRecipeConstraint)) {
+                continue;
+            }
+            if (targetRecipe.isPresent() && !targetRecipe.get().equals(targetRecipeConstraint.recipeId())) {
+                return new TargetRecipeSelection(false, Optional.empty());
+            }
+            targetRecipe = Optional.of(targetRecipeConstraint.recipeId());
+        }
+        return new TargetRecipeSelection(true, targetRecipe);
+    }
+
+    private static IMachineLease createLease(
+        IMachine machine,
+        List<IMachineRoute> inputRoutes,
+        List<IMachineRoute> outputRoutes,
+        Optional<ResourceLocation> targetRecipe) {
+        if (targetRecipe.isEmpty()) {
+            return new Lease(machine, inputRoutes, outputRoutes, false, Optional.empty());
+        }
+        var previousTargetRecipe = machine.config().getLoc(TARGET_RECIPE_CONFIG_KEY);
+        machine.setConfig(SetMachineConfigPacket.builder()
+            .set(TARGET_RECIPE_CONFIG_KEY, targetRecipe.get())
+            .get());
+        return new Lease(machine, inputRoutes, outputRoutes, true, previousTargetRecipe);
+    }
+
+    private static void restoreTargetRecipe(IMachine machine, Optional<ResourceLocation> previousTargetRecipe) {
+        var builder = SetMachineConfigPacket.builder();
+        previousTargetRecipe.ifPresentOrElse(
+            recipeId -> builder.set(TARGET_RECIPE_CONFIG_KEY, recipeId),
+            () -> builder.reset(TARGET_RECIPE_CONFIG_KEY));
+        machine.setConfig(builder.get());
     }
 
     private Optional<IMachineRoute> buildInputRoute(
@@ -236,21 +267,32 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             port.asFluid()));
     }
 
+    private record TargetRecipeSelection(boolean valid, Optional<ResourceLocation> recipeId) {}
+
     private static final class Lease implements IMachineLease {
-        private final UUID machineId;
+        private final IMachine machine;
         private final List<IMachineRoute> inputRoutes;
         private final List<IMachineRoute> outputRoutes;
+        private final boolean restoreTargetRecipe;
+        private final Optional<ResourceLocation> previousTargetRecipe;
         private boolean released;
 
-        private Lease(UUID machineId, List<IMachineRoute> inputRoutes, List<IMachineRoute> outputRoutes) {
-            this.machineId = machineId;
+        private Lease(
+            IMachine machine,
+            List<IMachineRoute> inputRoutes,
+            List<IMachineRoute> outputRoutes,
+            boolean restoreTargetRecipe,
+            Optional<ResourceLocation> previousTargetRecipe) {
+            this.machine = machine;
             this.inputRoutes = List.copyOf(inputRoutes);
             this.outputRoutes = List.copyOf(outputRoutes);
+            this.restoreTargetRecipe = restoreTargetRecipe;
+            this.previousTargetRecipe = previousTargetRecipe;
         }
 
         @Override
         public UUID machineId() {
-            return machineId;
+            return machine.uuid();
         }
 
         @Override
@@ -270,7 +312,13 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
         @Override
         public void release() {
+            if (released) {
+                return;
+            }
             released = true;
+            if (restoreTargetRecipe) {
+                restoreTargetRecipe(machine, previousTargetRecipe);
+            }
         }
     }
 }

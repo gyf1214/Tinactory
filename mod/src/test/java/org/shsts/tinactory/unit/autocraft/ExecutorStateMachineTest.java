@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.autocraft;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -10,14 +11,15 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
@@ -39,7 +41,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ore, 1L)),
             new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(
             new CraftStep(
@@ -62,7 +64,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ore, 1L)),
             step -> Optional.empty(),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(
             new CraftStep(
@@ -87,7 +89,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ore, 1L)),
             new SingleLeaseAllocator(new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true)),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
         var plan = new CraftPlan(List.of(
             new CraftStep(
                 "s1",
@@ -125,7 +127,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
@@ -162,7 +164,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
@@ -206,7 +208,7 @@ class ExecutorStateMachineTest {
             Map.of(ore, 1L),
             Map.of(plate, 1L),
             true));
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4);
@@ -214,7 +216,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(plate));
         assertEquals(0L, inventory.amountOf(waste));
     }
@@ -236,7 +238,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             inventory,
             $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4);
@@ -261,7 +263,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ingot, 2L)),
             allocator,
-            new NoOpEvents());
+            IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(1);
@@ -285,7 +287,7 @@ class ExecutorStateMachineTest {
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ingot, 3L)),
             $ -> Optional.of(lease),
-            new NoOpEvents());
+            IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4);
@@ -293,7 +295,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(4);
         executor.runCycle(4);
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
     }
 
     @Test
@@ -333,7 +335,7 @@ class ExecutorStateMachineTest {
             }
         };
         var inventory = new MutableInventory(Map.of(ore, 1L));
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
         executor.runCycle(64);
@@ -377,14 +379,14 @@ class ExecutorStateMachineTest {
         var thirdLease = new RouteLease(Map.of(part, 1L), Map.of(machineB, 1L), true);
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease, thirdLease));
         var inventory = new MutableInventory(Map.of(ore, 1L));
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(firstStep, secondStep, thirdStep)));
         for (int i = 0; i < 12; i++) {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machineA));
         assertEquals(1L, inventory.amountOf(machineB));
         assertEquals(0L, inventory.amountOf(part));
@@ -427,14 +429,14 @@ class ExecutorStateMachineTest {
         var thirdLease = new RouteLease(Map.of(part, 2L), Map.of(machine, 1L), true);
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease, thirdLease));
         var inventory = new MutableInventory(Map.of(ore, 1L, plate, 1L));
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(firstStep, secondStep, thirdStep)));
         for (int i = 0; i < 12; i++) {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualInserted(part));
@@ -467,7 +469,7 @@ class ExecutorStateMachineTest {
         var secondLease = new RouteLease(Map.of(part, 2L), Map.of(machine, 1L), true);
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
         var inventory = new MutableInventory(Map.of(ore, 1L));
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
@@ -492,7 +494,7 @@ class ExecutorStateMachineTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(0L, inventory.actualExtracted(part));
@@ -521,7 +523,7 @@ class ExecutorStateMachineTest {
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
         var inventory = new MutableInventory(Map.of(ore, 1L));
         inventory.rejectInsertKeys.add(carry);
-        var executor = new SequentialCraftExecutor(inventory, allocator, new NoOpEvents());
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
             ExecutionPhase.RUN_STEP,
@@ -545,6 +547,73 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.RUNNING, executor.snapshot().state());
         assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
         assertEquals(1, executor.snapshot().nextStepIndex());
+    }
+
+    @Test
+    void restoreShouldResumeFinalFlushOfStepBuffer() {
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new MutableInventory(Map.of());
+        var executor = new SequentialCraftExecutor(inventory, step -> Optional.empty(), IJobEvents.NO_OP);
+        var snapshot = new ExecutorSnapshot(
+            JobState.BLOCKED,
+            ExecutionPhase.FLUSHING,
+            ExecutionError.FLUSH_BACKPRESSURE,
+            JobState.IDLE,
+            new CraftPlan(List.of()),
+            0,
+            Map.of(plate, 1L),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            Map.of(),
+            null);
+
+        executor.restore(snapshot);
+        executor.runCycle(64);
+
+        assertEquals(JobState.IDLE, executor.snapshot().state());
+        assertEquals(1L, inventory.amountOf(plate));
+    }
+
+    @Test
+    void restoreShouldResumeStepBoundaryPendingFlush() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
+        var firstStep = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        var secondStep = new CraftStep(
+            "s2",
+            pattern("tinactory:gear", List.of(), List.of(new CraftAmount(gear, 1))),
+            1);
+        var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true);
+        var inventory = new MutableInventory(Map.of(ore, 1L));
+        inventory.rejectInsertKeys.add(plate);
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            new SequenceAllocator(List.of(firstLease, new RouteLease(Map.of(), Map.of(gear, 1L), true))),
+            IJobEvents.NO_OP);
+
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+        executor.runCycle(64);
+        executor.runCycle(64);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var snapshot = executor.serialize(codec);
+
+        inventory.rejectInsertKeys.clear();
+        var restored = new SequentialCraftExecutor(inventory, new SequenceAllocator(List.of(
+            new RouteLease(Map.of(), Map.of(gear, 1L), true))), IJobEvents.NO_OP);
+        restored.restore(snapshot, codec);
+        restored.runCycle(64);
+
+        assertEquals(JobState.RUNNING, restored.snapshot().state());
+        assertEquals(ExecutionPhase.RUN_STEP, restored.snapshot().phase());
+        assertEquals(1L, inventory.amountOf(plate));
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -608,8 +677,6 @@ class ExecutorStateMachineTest {
             return actualInserted.getOrDefault(key, 0L);
         }
     }
-
-    private record NoOpEvents() implements IJobEvents {}
 
     private static final class SingleLeaseAllocator implements IMachineAllocator {
         private final IMachineLease lease;

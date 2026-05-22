@@ -17,6 +17,8 @@ import org.shsts.tinactory.integration.material.MaterialSet;
 import org.shsts.tinactory.integration.material.OreVariant;
 import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 
+import java.util.Locale;
+
 import static org.shsts.tinactory.AllRegistries.FLUIDS;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
@@ -32,7 +34,7 @@ public class MaterialMeta extends MetaConsumer {
         if (!hex.startsWith("0x")) {
             throw new MetaLoadingException("Bad color code " + hex);
         }
-        return Integer.parseUnsignedInt(hex.substring(2).toLowerCase(), 16);
+        return Integer.parseUnsignedInt(hex.substring(2).toLowerCase(Locale.ROOT), 16);
     }
 
     public static int parseColor(JsonObject jo, String member) {

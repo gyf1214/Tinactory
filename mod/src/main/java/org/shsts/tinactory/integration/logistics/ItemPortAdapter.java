@@ -76,6 +76,11 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     }
 
     @Override
+    public Component name(ItemStack stack) {
+        return stack.getDisplayName();
+    }
+
+    @Override
     public Optional<List<Component>> tooltip(ItemStack stack) {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.itemTooltip(stack));
     }

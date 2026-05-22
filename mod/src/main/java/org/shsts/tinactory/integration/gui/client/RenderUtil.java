@@ -193,6 +193,7 @@ public final class RenderUtil {
         var poseStack1 = RenderSystem.getModelViewStack();
         poseStack1.pushPose();
         poseStack1.mulPoseMatrix(poseStack.last().pose());
+        RenderSystem.applyModelViewMatrix();
         return poseStack1;
     }
 
@@ -278,7 +279,9 @@ public final class RenderUtil {
     }
 
     public static void renderGhostItem(PoseStack poseStack, ItemStack stack, int x, int y) {
+        var poseStack1 = applyToModelViewStack(poseStack);
         ClientUtil.getItemRenderer().renderAndDecorateItem(stack, x, y);
+        popModelViewStack(poseStack1);
         RenderSystem.depthFunc(516);
         RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), 0xAA8B8B8B);
         RenderSystem.depthFunc(515);
@@ -286,7 +289,7 @@ public final class RenderUtil {
         RenderSystem.disableBlend();
     }
 
-    public static void renderDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderDescriptor(PoseStack poseStack, IRenderDescriptor descriptor, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }
@@ -312,7 +315,7 @@ public final class RenderUtil {
         throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
-    public static void renderGhostDescriptor(IRenderDescriptor descriptor, PoseStack poseStack, Rect rect, int z) {
+    public static void renderGhostDescriptor(PoseStack poseStack, IRenderDescriptor descriptor, Rect rect, int z) {
         if (descriptor instanceof EmptyRenderDescriptor) {
             return;
         }
@@ -346,11 +349,32 @@ public final class RenderUtil {
         ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
     }
 
+    public static void renderText(PoseStack poseStack, Component text, int x, int y, int color, float scale) {
+        poseStack.pushPose();
+        poseStack.translate(x, y, 0d);
+        poseStack.scale(scale, scale, 1f);
+        ClientUtil.getFont().draw(poseStack, text, 0f, 0f, color);
+        poseStack.popPose();
+    }
+
     public static void renderText(PoseStack poseStack, FormattedCharSequence text, int x, int y, int color) {
         ClientUtil.getFont().draw(poseStack, text, (float) x, (float) y, color);
     }
 
+    public static void renderText(PoseStack poseStack, FormattedCharSequence text, int x, int y, int color,
+        float scale) {
+        poseStack.pushPose();
+        poseStack.translate(x, y, 0d);
+        poseStack.scale(scale, scale, 1f);
+        ClientUtil.getFont().draw(poseStack, text, 0f, 0f, color);
+        poseStack.popPose();
+    }
+
     public static void renderText(PoseStack poseStack, Component text, int x, int y) {
         renderText(poseStack, text, x, y, TEXT_COLOR);
+    }
+
+    public static void renderText(PoseStack poseStack, Component text, int x, int y, float scale) {
+        renderText(poseStack, text, x, y, TEXT_COLOR, scale);
     }
 }

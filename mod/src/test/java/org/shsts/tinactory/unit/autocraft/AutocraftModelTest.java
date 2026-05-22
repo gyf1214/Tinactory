@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -81,5 +82,16 @@ class AutocraftModelTest {
 
         assertThrows(AssertionError.class, () -> assertEquals(input0, input1));
         assertThrows(AssertionError.class, () -> assertEquals(output0, output1));
+    }
+
+    @Test
+    void targetRecipeConstraintShouldValidateRecipeId() {
+        var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
+        var constraint = new TargetRecipeConstraint(recipeId);
+
+        assertEquals(recipeId, constraint.recipeId());
+        assertEquals("tinactory:target_recipe", constraint.typeId());
+        assertThrows(IllegalArgumentException.class,
+            () -> new TargetRecipeConstraint(new ResourceLocation("tinactory", "")));
     }
 }

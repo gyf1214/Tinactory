@@ -3,6 +3,7 @@ package org.shsts.tinactory.gametest.dependency;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.PortType;
 
+import java.util.Locale;
 import java.util.Set;
 
 record TagNode(PortType portType, ResourceLocation tagId) implements IDependencyNode {
@@ -13,7 +14,7 @@ record TagNode(PortType portType, ResourceLocation tagId) implements IDependency
 
     @Override
     public String id() {
-        return portType.name().toLowerCase() + ":" + tagId;
+        return portType.name().toLowerCase(Locale.ROOT) + ":" + tagId;
     }
 
     @Override

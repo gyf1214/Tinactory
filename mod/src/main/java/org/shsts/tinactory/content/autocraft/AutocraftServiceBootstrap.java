@@ -26,8 +26,8 @@ public final class AutocraftServiceBootstrap {
         int executionIntervalTicks) {
 
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
-        var allocator = new LogisticsMachineAllocator(logistics::getAllPorts);
-        var executor = new SequentialCraftExecutor(inventory, allocator, new SilentJobEvents());
+        var allocator = new LogisticsMachineAllocator(logistics);
+        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
         return new AutocraftJobService(
             executor,
             transmissionBandwidth,
@@ -46,8 +46,5 @@ public final class AutocraftServiceBootstrap {
             planner,
             repository,
             autocraft);
-    }
-
-    private static final class SilentJobEvents implements IJobEvents {
     }
 }

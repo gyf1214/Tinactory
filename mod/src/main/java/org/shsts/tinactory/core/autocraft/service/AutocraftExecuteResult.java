@@ -4,24 +4,22 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
-import java.util.UUID;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record AutocraftExecuteResult(
-    @Nullable UUID jobId,
+    boolean successful,
     @Nullable Code errorCode) {
 
-    public static AutocraftExecuteResult success(UUID jobId) {
-        return new AutocraftExecuteResult(jobId, null);
+    public static AutocraftExecuteResult success() {
+        return new AutocraftExecuteResult(true, null);
     }
 
     public static AutocraftExecuteResult failure(Code errorCode) {
-        return new AutocraftExecuteResult(null, errorCode);
+        return new AutocraftExecuteResult(false, errorCode);
     }
 
     public boolean isSuccess() {
-        return jobId != null;
+        return successful;
     }
 
     @ParametersAreNonnullByDefault

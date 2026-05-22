@@ -23,6 +23,10 @@ public interface IMachineProcessor extends IProcessor {
 
     boolean supportsRecipeType(ResourceLocation recipeTypeId);
 
+    default boolean allowTargetRecipe(ResourceLocation loc) {
+        return false;
+    }
+
     @Override
     default double getProgress() {
         var maxProgress = maxProgressTicks();

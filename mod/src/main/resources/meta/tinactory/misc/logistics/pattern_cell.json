@@ -1,6 +1,6 @@
 {
   "type": "me_pattern_cell",
-  "componentPrefix": "component/pattern_storage_component",
+  "componentPrefix": "component/pattern_component",
   "items": {
     "1m": {
       "bytes": 1048576

@@ -3,14 +3,13 @@ package org.shsts.tinactory.unit.autocraft;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -54,7 +53,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.state());
         assertEquals(1L, inventory.amountOf(gear));
         assertTrue(inventory.insertCalls > 0);
         assertEquals(List.of("start:s1", "done:s1", "start:s2", "done:s2"), events.events);
@@ -74,8 +73,8 @@ class CraftExecutorTest {
 
         executor.runCycle(64);
 
-        assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
+        assertEquals(JobState.BLOCKED, executor.state());
+        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.error());
     }
 
     @Test
@@ -93,8 +92,8 @@ class CraftExecutorTest {
         executor.cancel();
         executor.runCycle(64);
 
-        assertEquals(JobState.CANCELLED, executor.snapshot().state());
-        assertEquals(ExecutionError.NONE, executor.snapshot().error());
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(ExecutionError.NONE, executor.error());
         assertEquals(0L, inventory.amountOf(plate));
     }
 
@@ -130,7 +129,7 @@ class CraftExecutorTest {
             executor.runCycle(64);
         }
 
-        assertEquals(JobState.COMPLETED, executor.snapshot().state());
+        assertEquals(JobState.IDLE, executor.state());
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(1L, inventory.amountOf(waste));
@@ -138,7 +137,7 @@ class CraftExecutorTest {
     }
 
     @Test
-    void snapshotShouldExposeExecutionStateThroughSinglePayload() {
+    void executorShouldExposeCheapExecutionStatus() {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ingot, 2L));
@@ -150,12 +149,10 @@ class CraftExecutorTest {
 
         executor.start(new CraftPlan(List.of(step)));
 
-        var snapshot = executor.snapshot();
-
-        assertEquals(JobState.RUNNING, snapshot.state());
-        assertEquals(ExecutionPhase.RUN_STEP, snapshot.phase());
-        assertEquals(0, snapshot.nextStepIndex());
-        assertEquals(1, snapshot.plan().steps().size());
+        assertEquals(JobState.RUNNING, executor.state());
+        assertEquals(ExecutionError.NONE, executor.error());
+        assertEquals(0, executor.completedSteps());
+        assertEquals(1, executor.totalSteps());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -212,8 +209,8 @@ class CraftExecutorTest {
         }
 
         @Override
-        public void onStepBlocked(CraftStep step, String reason) {
-            events.add("blocked:" + step.stepId() + ":" + reason);
+        public void onStepBlocked(CraftStep step, ExecutionError reason) {
+            events.add("blocked:" + step.stepId() + ":" + reason.id);
         }
     }
 

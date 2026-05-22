@@ -1,0 +1,141 @@
+package org.shsts.tinactory.compat.waila;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import mcp.mobius.waila.api.BlockAccessor;
+import mcp.mobius.waila.api.IServerDataProvider;
+import mcp.mobius.waila.api.config.IPluginConfig;
+import mcp.mobius.waila.api.ui.IElement;
+import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec2;
+import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.content.autocraft.AutocraftCpu;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
+import org.shsts.tinactory.core.autocraft.api.JobState;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
+import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.util.ClientUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.shsts.tinactory.compat.waila.Waila.AUTOCRAFT_CPU;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetProvider;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class AutocraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+    public static final AutocraftCpuProvider INSTANCE = new AutocraftCpuProvider();
+
+    private static final String PREFIX = "tinactoryAutocraftCpu";
+    private static final String STATE_KEY = PREFIX + "State";
+    private static final String TARGET_KEY = PREFIX + "Target";
+    private static final String TARGET_AMOUNT_KEY = PREFIX + "TargetAmount";
+    private static final String COMPLETED_STEPS_KEY = PREFIX + "CompletedSteps";
+    private static final String TOTAL_STEPS_KEY = PREFIX + "TotalSteps";
+    private static final String ERROR_KEY = PREFIX + "Error";
+    private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
+    private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
+
+    public AutocraftCpuProvider() {
+        super(modLoc("autocraft_cpu"));
+    }
+
+    @Override
+    protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
+        if (!config.get(AUTOCRAFT_CPU) || !tag.contains(STATE_KEY, Tag.TAG_STRING)) {
+            return;
+        }
+        var state = parseEnum(JobState.class, tag.getString(STATE_KEY));
+        if (state.isEmpty()) {
+            return;
+        }
+        add(helper.text(guiTr("cpu.state." + state.get().id).withStyle(ChatFormatting.GRAY)));
+        if (tag.contains(TARGET_KEY, Tag.TAG_COMPOUND)) {
+            appendTargetLine(tag);
+        }
+        if (state.get().busy() && tag.contains(TOTAL_STEPS_KEY, Tag.TAG_INT)) {
+            var text = guiTr("cpu.steps",
+                NUMBER_FORMAT.format(tag.getInt(COMPLETED_STEPS_KEY)),
+                NUMBER_FORMAT.format(tag.getInt(TOTAL_STEPS_KEY))).withStyle(ChatFormatting.GRAY);
+            add(helper.text(text));
+        }
+        var error = parseEnum(ExecutionError.class, tag.getString(ERROR_KEY)).orElse(ExecutionError.NONE);
+        if (error != ExecutionError.NONE) {
+            add(helper.text(guiTr("cpu.error." + error.id).withStyle(ChatFormatting.GRAY)));
+        }
+    }
+
+    private void appendTargetLine(CompoundTag tag) {
+        var key = decodeKey(tag.getCompound(TARGET_KEY));
+        var amount = tag.getLong(TARGET_AMOUNT_KEY);
+        var line = new ArrayList<IElement>();
+        appendTargetIcon(line, key);
+        line.add(helper.text(guiTr("cpu.target", key.name(), ClientUtil.getNumberString(amount))));
+        add(line);
+    }
+
+    private void appendTargetIcon(List<IElement> line, IStackKey key) {
+        var display = key.display();
+        if (display instanceof ItemRenderDescriptor item) {
+            line.add(helper.item(StackHelper.copyWithCount(item.stack(), 1), 0.5f).size(ITEM_SIZE));
+            line.add(helper.spacer(1, 0));
+        } else if (display instanceof FluidRenderDescriptor fluid) {
+            line.add(helper.fluid(fluid.stack()).size(FLUID_SIZE));
+            line.add(helper.spacer(2, 0));
+        }
+    }
+
+    private static TranslatableComponent guiTr(String id, Object... args) {
+        return I18n.tr("tinactory.gui.autocraft." + id, args);
+    }
+
+    private static <T extends Enum<T>> Optional<T> parseEnum(Class<T> clazz, String value) {
+        try {
+            return Optional.of(Enum.valueOf(clazz, value));
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
+        BlockEntity blockEntity, boolean showDetails) {
+        var cpu = tryGetProvider(blockEntity, AutocraftCpu.ID, AutocraftCpu.class);
+        if (cpu.isEmpty()) {
+            return;
+        }
+        var status = cpu.get().status();
+        tag.putString(STATE_KEY, status.state().name());
+        if (!status.targets().isEmpty()) {
+            var target = status.targets().get(0);
+            tag.put(TARGET_KEY, encodeKey(target.key()));
+            tag.putLong(TARGET_AMOUNT_KEY, target.amount());
+        }
+        tag.putInt(COMPLETED_STEPS_KEY, status.completedSteps());
+        tag.putInt(TOTAL_STEPS_KEY, status.totalSteps());
+        tag.putString(ERROR_KEY, status.error().name());
+    }
+
+    private static CompoundTag encodeKey(IStackKey key) {
+        var tag = new CompoundTag();
+        tag.put("value", CodecHelper.encodeTag(StackHelper.KEY_CODEC, key));
+        return tag;
+    }
+
+    private static IStackKey decodeKey(CompoundTag tag) {
+        return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
+    }
+}

@@ -91,7 +91,7 @@ public class MachineRecipeBook extends Panel {
             if (recipe == null) {
                 RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect1);
             } else {
-                RenderUtil.renderDescriptor(recipe.display(), poseStack, rect1, z);
+                RenderUtil.renderDescriptor(poseStack, recipe.display(), rect1, z);
             }
         }
 
@@ -171,22 +171,9 @@ public class MachineRecipeBook extends Panel {
 
         addChild(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
         addChild(new Rect(layout.getXOffset(), 0, 0, 0), ghostRecipe);
-    }
 
-    @Override
-    protected void initPanel() {
         refreshRecipes();
-        ghostRecipe.clear();
-        var loc = getCurrentRecipeLoc();
-        if (loc != null) {
-            for (var recipe : recipes) {
-                if (loc.equals(recipe.loc())) {
-                    recipe.select(layout, ghostRecipe::addIngredient);
-                    break;
-                }
-            }
-        }
-        super.initPanel();
+        TechManagers.client().onProgressChange(onTechChange);
     }
 
     @Nullable
@@ -201,11 +188,20 @@ public class MachineRecipeBook extends Panel {
     private void refreshRecipes() {
         recipes.clear();
         var processor = MACHINE.tryGet(blockEntity).flatMap(IMachine::processor);
-        if (processor.isEmpty() || !(processor.get() instanceof IRecipeBookProcessor machineProcessor)) {
-            return;
+        if (processor.isPresent() && processor.get() instanceof IRecipeBookProcessor machineProcessor) {
+            var items = machineProcessor.recipeBookItems().getValue();
+            recipes.addAll(items);
         }
-        var items = machineProcessor.recipeBookItems().getValue();
-        recipes.addAll(items);
+        ghostRecipe.clear();
+        var loc = getCurrentRecipeLoc();
+        if (loc != null) {
+            for (var recipe : recipes) {
+                if (loc.equals(recipe.loc())) {
+                    recipe.select(layout, ghostRecipe::addIngredient);
+                    break;
+                }
+            }
+        }
     }
 
     public void setBookActive(boolean value) {

@@ -76,6 +76,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
     }
 
     @Override
+    public Component name(FluidStack stack) {
+        return stack.getDisplayName();
+    }
+
+    @Override
     public Optional<List<Component>> tooltip(FluidStack stack) {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.fluidTooltip(stack, false));
     }

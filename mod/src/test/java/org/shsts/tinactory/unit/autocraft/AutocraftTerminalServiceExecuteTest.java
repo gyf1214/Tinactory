@@ -1,10 +1,11 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
+import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
@@ -12,25 +13,22 @@ import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.ExecutionError;
-import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
-import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -53,7 +51,7 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(patterns),
-            new TestCpuRuntime(() -> List.of(), () -> List.of(), id -> Optional.empty()));
+            new TestCpuRuntime(() -> List.of(), id -> Optional.empty()));
 
         var requestables = service.listRequestables();
 
@@ -65,7 +63,6 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldUseStoredSnapshotAndNotInvokePlannerAgain() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
         var previewPlanner = new StaticPlanner(planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -76,7 +73,6 @@ class AutocraftTerminalServiceExecuteTest {
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
-                () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
 
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
@@ -84,6 +80,9 @@ class AutocraftTerminalServiceExecuteTest {
 
         assertTrue(execute.isSuccess());
         assertTrue(service.previewResult().isEmpty());
+        assertEquals(
+            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
+            jobService.getJob().get().targets());
         assertEquals(1, previewPlanner.calls);
         assertDoesNotThrow(jobService::tick);
     }
@@ -91,7 +90,6 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldFailWhenCpuUnavailable() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var availableCpus = new ArrayList<>(List.of(cpu));
         var visibleCpus = new ArrayList<>(List.of(cpu));
         var jobService = new AutocraftJobService(new TestExecutor()) {
             @Override
@@ -106,10 +104,8 @@ class AutocraftTerminalServiceExecuteTest {
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.copyOf(visibleCpus),
-                () -> List.copyOf(availableCpus),
                 id -> id.equals(cpu) ? Optional.of(jobService) : Optional.empty()));
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        availableCpus.clear();
 
         var execute = service.execute(cpu);
 
@@ -122,51 +118,54 @@ class AutocraftTerminalServiceExecuteTest {
     void listCpuStatusesShouldExposeStructuredJobFields() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var targets = List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3));
-        var execution = new ExecutorSnapshot(
+        var job = new AutocraftJobSnapshot(
+            targets,
             JobState.BLOCKED,
-            ExecutionPhase.FLUSHING,
-            ExecutionError.FLUSH_BACKPRESSURE,
-            null,
-            new CraftPlan(List.of(new CraftStep(
-                "s1",
-                pattern("tinactory:test", List.of(
-                    new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 3))),
-                1L))),
             1,
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
-        var job = new AutocraftJobSnapshot(UUID.fromString("22222222-2222-2222-2222-222222222222"), targets, execution);
+            1,
+            ExecutionError.FLUSH_BACKPRESSURE);
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.of(cpu),
-                () -> List.of(),
                 id -> id.equals(cpu) ? Optional.of(staticService(job)) : Optional.empty()));
 
         var statuses = service.listCpuStatuses();
 
         assertEquals(1, statuses.size());
-        assertTrue(statuses.get(0) instanceof CpuStatusEntry);
         assertEquals(cpu, statuses.get(0).cpuId());
-        assertFalse(statuses.get(0).available());
         assertEquals(targets, statuses.get(0).targets());
         assertEquals(JobState.BLOCKED, statuses.get(0).state());
-        assertEquals(ExecutionPhase.FLUSHING, statuses.get(0).phase());
-        assertEquals(1, statuses.get(0).nextStepIndex());
-        assertEquals(1, statuses.get(0).stepCount());
+        assertEquals(1, statuses.get(0).completedSteps());
+        assertEquals(1, statuses.get(0).totalSteps());
         assertEquals(ExecutionError.FLUSH_BACKPRESSURE, statuses.get(0).error());
-        assertTrue(statuses.get(0).cancellable());
+    }
+
+    @Test
+    void listCpuStatusesShouldExposeOfflineEntryWhenVisibleServiceCannotBeResolved() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.empty()));
+
+        var statuses = service.listCpuStatuses();
+
+        assertEquals(1, statuses.size());
+        assertEquals(cpu, statuses.get(0).cpuId());
+        assertEquals(JobState.FAILED, statuses.get(0).state());
+        assertEquals(List.of(), statuses.get(0).targets());
+        assertEquals(0, statuses.get(0).completedSteps());
+        assertEquals(0, statuses.get(0).totalSteps());
+        assertEquals(ExecutionError.OFFLINE, statuses.get(0).error());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
         return TestAutocraftHelper.pattern(id, List.of(
-            new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
+                new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             outputs, TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
     }
 
@@ -243,7 +242,7 @@ class AutocraftTerminalServiceExecuteTest {
         return new IAutocraftService() {
             @Override
             public boolean isBusy() {
-                return job.execution().state() == JobState.RUNNING || job.execution().state() == JobState.BLOCKED;
+                return job.state() == JobState.RUNNING || job.state() == JobState.BLOCKED;
             }
 
             @Override
@@ -252,12 +251,12 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
-            public boolean cancel(UUID id) {
+            public boolean cancel() {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public UUID submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
                 throw new UnsupportedOperationException();
             }
         };
@@ -265,7 +264,6 @@ class AutocraftTerminalServiceExecuteTest {
 
     private record TestCpuRuntime(
         Supplier<List<UUID>> visibleCpuSupplier,
-        Supplier<List<UUID>> availableCpuSupplier,
         Function<UUID, Optional<IAutocraftService>> serviceResolver) implements ICpuRuntime {
         @Override
         public void registerCpu(IMachine machine, IAutocraftService service) {}
@@ -279,8 +277,8 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public List<UUID> listAvailableCpus() {
-            return availableCpuSupplier.get();
+        public Optional<IMachine> findVisibleCpuMachine(UUID cpuId) {
+            return Optional.empty();
         }
 
         @Override
@@ -302,9 +300,19 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public PlannerSnapshot plan(List<CraftAmount> targets) {
+        public PlanResult plan(List<CraftAmount> targets) {
             calls++;
-            return PlannerSnapshot.completed(plan);
+            return PlanResult.completed(plan);
+        }
+
+        @Override
+        public void start(List<CraftAmount> targets) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Optional<PlanResult> advance(int budget) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -313,7 +321,7 @@ class AutocraftTerminalServiceExecuteTest {
         public void start(CraftPlan plan) {}
 
         @Override
-        public void restore(ExecutorSnapshot snapshot) {}
+        public void restore(CompoundTag tag, PatternNbtCodec codec) {}
 
         @Override
         public void runCycle(long transmissionBandwidth) {}
@@ -322,21 +330,33 @@ class AutocraftTerminalServiceExecuteTest {
         public void cancel() {}
 
         @Override
-        public ExecutorSnapshot snapshot() {
-            return new ExecutorSnapshot(
-                JobState.RUNNING,
-                ExecutionPhase.RUN_STEP,
-                ExecutionError.NONE,
-                null,
-                new CraftPlan(List.of()),
-                0,
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                null);
+        public boolean isBusy() {
+            return true;
+        }
+
+        @Override
+        public JobState state() {
+            return JobState.RUNNING;
+        }
+
+        @Override
+        public ExecutionError error() {
+            return ExecutionError.NONE;
+        }
+
+        @Override
+        public int completedSteps() {
+            return 0;
+        }
+
+        @Override
+        public int totalSteps() {
+            return 0;
+        }
+
+        @Override
+        public CompoundTag serialize(PatternNbtCodec codec) {
+            return new CompoundTag();
         }
     }
 }

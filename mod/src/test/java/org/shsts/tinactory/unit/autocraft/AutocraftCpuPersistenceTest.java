@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,22 +37,22 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldResumeFromRunningSnapshot() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         var first = new AutocraftJobService(executor());
-        var jobId = first.submitPrepared(List.of(target), plan);
+        first.submitPrepared(List.of(target), plan);
         first.tick();
-        var snapshot = first.snapshotRunning().orElseThrow();
+        var snapshot = first.serializeRunningSnapshot(codec).orElseThrow();
 
         var restored = new AutocraftJobService(executor());
-        restored.restoreRunning(snapshot);
-        assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().execution().state());
-        assertEquals(jobId, restored.getJob().orElseThrow().jobId());
+        restored.restoreRunningSnapshot(snapshot, codec);
+        assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().state());
+        assertEquals(List.of(target), restored.getJob().orElseThrow().targets());
 
-        while (restored.getJob().orElseThrow().execution().state() == JobState.RUNNING ||
-            restored.getJob().orElseThrow().execution().state() == JobState.BLOCKED) {
+        while (restored.isBusy()) {
             restored.tick();
         }
-        assertEquals(JobState.COMPLETED, restored.getJob().orElseThrow().execution().state());
+        assertTrue(restored.getJob().isEmpty());
     }
 
     @Test
@@ -92,11 +93,13 @@ class AutocraftCpuPersistenceTest {
         var restored = new AutocraftJobService(executor());
         restored.restoreRunningSnapshot(serialized, codec);
 
-        var restoredStep = restored.snapshotRunning().orElseThrow().execution().plan().steps().get(0);
-        assertEquals(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            restoredStep.requiredIntermediateOutputs());
-        assertEquals(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            restoredStep.requiredFinalOutputs());
+        var restoredSerialized = restored.serializeRunningSnapshot(codec).orElseThrow();
+        var restoredStep = restoredSerialized.getCompound("execution")
+            .getCompound("plan")
+            .getList("steps", TAG_COMPOUND)
+            .getCompound(0);
+        assertEquals(1, restoredStep.getList("requiredIntermediateOutputs", TAG_COMPOUND).size());
+        assertEquals(1, restoredStep.getList("requiredFinalOutputs", TAG_COMPOUND).size());
     }
 
     @Test
@@ -120,7 +123,7 @@ class AutocraftCpuPersistenceTest {
     }
 
     private static SequentialCraftExecutor executor() {
-        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), new NoOpEvents());
+        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
     }
 
     private static final class NoOpInventory implements IInventoryView {
@@ -211,8 +214,5 @@ class AutocraftCpuPersistenceTest {
                 public void release() {}
             });
         }
-    }
-
-    private static final class NoOpEvents implements IJobEvents {
     }
 }

@@ -9,15 +9,19 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
-import org.shsts.tinactory.core.autocraft.plan.PlannerSnapshot;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
+import org.shsts.tinactory.core.autocraft.service.AutocraftPreview;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftTerminalServicePreviewTest {
@@ -33,15 +37,27 @@ class AutocraftTerminalServicePreviewTest {
 
         assertTrue(result.isSuccess());
         assertEquals(0, result.planSnapshot().steps().size());
-        assertEquals(3L, result.targets().get(0).amount());
-        assertEquals(PlanError.none(), result.error());
+        assertNull(result.error());
+        assertEquals(StaticPlanner.SUMMARY, result.summary());
+        assertEquals(StaticPlanner.SUMMARY, service.preview().get().summary());
+    }
+
+    @Test
+    void emptyPreviewShouldHaveNoPlanOrErrorAndAnEmptySummary() {
+        var preview = AutocraftPreview.empty();
+
+        assertTrue(preview.isEmpty());
+        assertNull(preview.planSnapshot());
+        assertNull(preview.error());
+        assertEquals(PlanSummary.empty(), preview.summary());
     }
 
     @Test
     void previewShouldReturnStructuredPlanError() {
         var missing = TestStackKey.item("minecraft:iron_ingot", "");
+        var summary = new PlanSummary(Map.of(missing, new PlanSummary.Entry(0, 3, 0)));
         var service = new AutocraftTerminalService(
-            targets -> PlannerSnapshot.failed(PlanError.missingPattern(missing)),
+            new StaticPlanner(PlanResult.failed(PlanError.missingPattern(missing), summary)),
             new PatternRegistryCache(),
             new TestCpuRuntime());
 
@@ -50,12 +66,36 @@ class AutocraftTerminalServicePreviewTest {
         assertTrue(!result.isSuccess());
         assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
         assertEquals(missing, result.error().targetKey());
+        assertEquals(summary, result.summary());
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
+        private static final PlanSummary SUMMARY = new PlanSummary(Map.of(
+            TestStackKey.item("minecraft:iron_ingot", ""),
+            new PlanSummary.Entry(4, 3, 0)));
+        private final PlanResult result;
+
+        private StaticPlanner() {
+            this(PlanResult.completed(new CraftPlan(List.of()), SUMMARY));
+        }
+
+        private StaticPlanner(PlanResult result) {
+            this.result = result;
+        }
+
         @Override
-        public PlannerSnapshot plan(List<CraftAmount> targets) {
-            return PlannerSnapshot.completed(new CraftPlan(List.of()));
+        public PlanResult plan(List<CraftAmount> targets) {
+            return result;
+        }
+
+        @Override
+        public void start(List<CraftAmount> targets) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Optional<PlanResult> advance(int budget) {
+            throw new UnsupportedOperationException();
         }
     }
 
@@ -72,8 +112,8 @@ class AutocraftTerminalServicePreviewTest {
         }
 
         @Override
-        public List<UUID> listAvailableCpus() {
-            return List.of();
+        public Optional<IMachine> findVisibleCpuMachine(UUID cpuId) {
+            return Optional.empty();
         }
 
         @Override

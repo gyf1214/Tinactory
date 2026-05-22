@@ -27,7 +27,25 @@ public interface IStackAdapter<T> {
 
     T stackOf(IStackKey key, long amount);
 
+    default T stackOf(IStackKey key) {
+        return stackOf(key, 1);
+    }
+
     IRenderDescriptor display(T stack);
 
+    default IRenderDescriptor display(IStackKey key) {
+        return display(stackOf(key));
+    }
+
+    Component name(T stack);
+
+    default Component name(IStackKey key) {
+        return name(stackOf(key));
+    }
+
     Optional<List<Component>> tooltip(T stack);
+
+    default Optional<List<Component>> tooltip(IStackKey key) {
+        return tooltip(stackOf(key));
+    }
 }

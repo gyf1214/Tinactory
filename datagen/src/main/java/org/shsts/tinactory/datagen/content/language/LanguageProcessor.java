@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.content.language;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.data.LanguageProvider;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public class LanguageProcessor {
         if (!isEnglish) {
             return MISSING_WORD;
         }
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+        return StringUtils.capitalize(str);
     }
 
     private String normalize(Matcher matcher, int group) {

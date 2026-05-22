@@ -246,6 +246,14 @@ class ProcessingRuntimeTest {
     }
 
     @Test
+    void shouldDelegateTargetRecipeAcceptanceToRecipeProcessors() {
+        var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
+
+        assertTrue(runtime.allowTargetRecipe(RECIPE_ID));
+        assertFalse(runtime.allowTargetRecipe(new ResourceLocation("tinactory", "other_recipe")));
+    }
+
+    @Test
     void shouldTreatEmptySerializationTagAsIdleState() {
         var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
 
