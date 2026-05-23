@@ -15,7 +15,6 @@ import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -32,7 +31,6 @@ public final class AllRecipes {
     public static final IRecipeType<BoilerRecipe.Builder> BOILER;
     // Recipes only used to mark input for recipe book purpose
     public static final IRecipeType<MarkerRecipe.Builder> MARKER;
-    public static final IRecipeType<ProcessingRecipe.Builder> ASSEMBLY_LINE;
 
     public static final Map<String, RecipeTypeInfo> PROCESSING_TYPES = new HashMap<>();
 
@@ -52,10 +50,6 @@ public final class AllRecipes {
             .serializer(ProcessingHelper.MARKER_SERIALIZER)
             .register();
 
-        ASSEMBLY_LINE = REGISTRATE.recipeType("assembly_line", ProcessingRecipe.Builder::new)
-            .recipeClass(ProcessingRecipe.class)
-            .serializer(ProcessingHelper.PROCESSING_SERIALIZER)
-            .register();
     }
 
     public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {

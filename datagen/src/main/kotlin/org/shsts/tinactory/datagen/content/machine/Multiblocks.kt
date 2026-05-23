@@ -1057,7 +1057,7 @@ object Multiblocks {
                 component("cable", 16)
                 input("tungsten_steel", "plate", 16)
                 input("soldering_alloy", amount = 6)
-                tech(Technologies.TUNGSTEN_STEEL)
+                tech(Technologies.ASSEMBLY_LINE)
             }
         }
 
@@ -1147,6 +1147,7 @@ object Multiblocks {
                 input("ruridit", "foil", 16)
                 input("soldering_alloy", amount = 16)
                 workTicks(2400)
+                tech(Technologies.FUSION)
             }
             recipe("multiblock/assembly_line_smoke") {
                 input(getMultiblock("assembly_line").block.get())

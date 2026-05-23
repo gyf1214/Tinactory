@@ -811,6 +811,8 @@
     "tinactory.technology.electrochemical_processing.details": "解锁电解液和电场处理能力，将极化与电解流程整合到二阶段后期材料加工中。",
     "tinactory.technology.nuclear_physics": "核物理学",
     "tinactory.technology.nuclear_physics.details": "探索原子核之间的相互作用，释放物质核心蕴藏的巨大能量。这些知识将为核能、先进反应堆和毁灭性武器的研发铺平道路。",
+    "tinactory.technology.assembly_line": "装配线",
+    "tinactory.technology.assembly_line.details": "解锁 LuV 规模部件和 IV 后期工业组装所需的专用装配线。",
     "tinactory.technology.rhodium_plated_palladium": "镀铑钯",
     "tinactory.technology.rhodium_plated_palladium.details": "解锁 LuV 机器外壳和聚变约束部件所需的镀层钯前体。",
     "tinactory.technology.fusion": "聚变",

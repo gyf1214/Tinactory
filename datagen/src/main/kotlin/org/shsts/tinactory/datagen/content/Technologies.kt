@@ -100,6 +100,7 @@ object Technologies {
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
+    val ASSEMBLY_LINE: ResourceLocation
     val RHODIUM_PLATED_PALLADIUM: ResourceLocation
     val FUSION: ResourceLocation
 
@@ -438,6 +439,11 @@ object Technologies {
             }
 
             voltage = Voltage.IV
+
+            ASSEMBLY_LINE = tech("assembly_line") {
+                maxProgress(220)
+                displayItem(getMultiblock("assembly_line").block)
+            }
 
             RHODIUM_PLATED_PALLADIUM = tech("rhodium_plated_palladium") {
                 maxProgress(200)

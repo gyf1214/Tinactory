@@ -2,7 +2,7 @@
   "recipes": {
     "tinactory:assembler": {},
     "tinactory:circuit_assembler": {},
-    "tinactory:assembly_line": {}
+    "assembly": {}
   },
   "autoRecipe": false,
   "layout": {

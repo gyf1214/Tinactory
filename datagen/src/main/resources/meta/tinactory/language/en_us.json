@@ -345,6 +345,8 @@
     "tinactory.technology.material_conditioning.details": "Covers physical material handling processes such as mixing, centrifuging, extracting, and solidifying before LuV machine casings appear.",
     "tinactory.technology.electrochemical_processing.details": "Unlocks electrolyte and electrical-field processing that combines polarizing and electrolyzing for late Phase 2 material work.",
     "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
+    "tinactory.technology.assembly_line": "Assembly Line",
+    "tinactory.technology.assembly_line.details": "Unlocks the dedicated construction line needed for LuV-scale components and late IV industrial assembly.",
     "tinactory.technology.rhodium_plated_palladium.details": "Unlocks the plated palladium precursor needed for LuV machine casings and fusion containment components.",
     "tinactory.technology.fusion.details": "Unlocks fusion reactor construction, including dedicated shell blocks, superconducting coils, and the first reactor controller.",
     "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",

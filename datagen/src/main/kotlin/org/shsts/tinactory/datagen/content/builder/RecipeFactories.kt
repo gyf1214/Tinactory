@@ -84,8 +84,8 @@ object RecipeFactories {
         }.block()
     }
 
-    fun assemblyLine(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("assembly_line") {
+    fun assemblyLine(block: AssemblyRecipeFactory.() -> Unit) {
+        assembly("assembly_line") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
