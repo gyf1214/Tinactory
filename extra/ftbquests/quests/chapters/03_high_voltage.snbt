@@ -698,7 +698,6 @@
 			title: "{tinactory.quests.03_high_voltage.031.title}"
 			x: 5.0d
 			y: 8.0d
-			shape: "pentagon"
 			subtitle: "{tinactory.quests.03_high_voltage.031.subtitle}"
 			description: [
 				"{tinactory.quests.03_high_voltage.031.description.0}"

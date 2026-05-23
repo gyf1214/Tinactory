@@ -842,7 +842,6 @@
 			title: "{tinactory.quests.04_extreme_voltage.027.title}"
 			x: 4.0d
 			y: 16.0d
-			shape: "pentagon"
 			subtitle: "{tinactory.quests.04_extreme_voltage.027.subtitle}"
 			description: [
 				"{tinactory.quests.04_extreme_voltage.027.description.0}"

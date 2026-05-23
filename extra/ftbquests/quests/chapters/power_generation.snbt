@@ -1,7 +1,7 @@
 {
 	id: "18A01183DF6A59D0"
 	group: ""
-	order_index: 5
+	order_index: 8
 	filename: "power_generation"
 	title: "{tinactory.quests.power_generation.title}"
 	icon: "tinactory:chip/low_pic"
@@ -299,10 +299,10 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.013.title}"
-			subtitle: "{tinactory.quests.power_generation.013.subtitle}"
-			description: ["{tinactory.quests.power_generation.013.description.0}"]
 			x: -4.0d
 			y: 2.0d
+			subtitle: "{tinactory.quests.power_generation.013.subtitle}"
+			description: ["{tinactory.quests.power_generation.013.description.0}"]
 			dependencies: ["180A7F8DD9AD0580"]
 			id: "18A01183DF6A59D1"
 			tasks: [{
@@ -313,10 +313,10 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.014.title}"
-			subtitle: "{tinactory.quests.power_generation.014.subtitle}"
-			description: ["{tinactory.quests.power_generation.014.description.0}"]
 			x: -4.0d
 			y: 4.0d
+			subtitle: "{tinactory.quests.power_generation.014.subtitle}"
+			description: ["{tinactory.quests.power_generation.014.description.0}"]
 			dependencies: ["18A01183DF6A59D1"]
 			id: "18A01183DF6A59D3"
 			tasks: [{

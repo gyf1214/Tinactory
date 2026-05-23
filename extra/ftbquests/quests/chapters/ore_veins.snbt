@@ -1,7 +1,7 @@
 {
 	id: "3B5374D34DFEC6AF"
 	group: ""
-	order_index: 7
+	order_index: 6
 	filename: "ore_veins"
 	title: "{tinactory.quests.ore_veins.title}"
 	icon: "minecraft:raw_iron"
@@ -377,8 +377,8 @@
 		{
 			title: "{tinactory.quests.ore_veins.015.title}"
 			icon: "tinactory:material/raw/ender_pearl"
-			x: 0.0d
-			y: 12.0d
+			x: 8.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.ore_veins.015.subtitle}"
 			description: [
 				"{tinactory.quests.ore_veins.015.description.0}"
@@ -389,6 +389,7 @@
 				"15A12C982E065F64"
 				"46C15B5CA52BBB56"
 			]
+			size: 2.0d
 			id: "0E15D0E25A9B4C10"
 			tasks: [
 				{

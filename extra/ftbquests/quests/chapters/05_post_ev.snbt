@@ -1,7 +1,7 @@
 {
 	id: "05A550E7057E0000"
 	group: ""
-	order_index: 8
+	order_index: 5
 	filename: "05_post_ev"
 	title: "{tinactory.quests.05_post_ev.title}"
 	icon: "tinactory:component/luv/machine_hull"
@@ -13,7 +13,7 @@
 			title: "{tinactory.quests.05_post_ev.000.title}"
 			icon: "tinactory:component/iv/machine_hull"
 			x: 0.0d
-			y: 0.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.05_post_ev.000.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.000.description.0}"
@@ -22,8 +22,9 @@
 			]
 			dependencies: [
 				"09CB7C63AE45690A"
-				"54189E058A630417"
+				"6D4396F046AC59FA"
 			]
+			size: 2.0d
 			id: "05A550E7057E0001"
 			tasks: [
 				{
@@ -32,14 +33,9 @@
 					item: "tinactory:component/iv/machine_hull"
 				}
 				{
-					id: "05A550E7057E0003"
+					id: "267070A180715499"
 					type: "item"
-					item: "tinactory:component/iv/cable"
-				}
-				{
-					id: "05A550E7057E0004"
-					type: "item"
-					item: "tinactory:material/ingot/tungsten_steel"
+					item: "tinactory:network/iv/cable"
 				}
 			]
 		}
@@ -47,7 +43,7 @@
 			title: "{tinactory.quests.05_post_ev.001.title}"
 			icon: "minecraft:end_stone"
 			x: 0.0d
-			y: 4.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.05_post_ev.001.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.001.description.0}"
@@ -58,6 +54,7 @@
 				"15A12C982E065F64"
 				"46C15B5CA52BBB56"
 			]
+			size: 2.0d
 			id: "05A550E7057E0005"
 			tasks: [
 				{
@@ -76,7 +73,7 @@
 			title: "{tinactory.quests.05_post_ev.002.title}"
 			icon: "tinactory:material/raw/ender_pearl"
 			x: 0.0d
-			y: 6.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.002.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.002.description.0}"
@@ -104,8 +101,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.003.title}"
 			icon: "minecraft:blaze_rod"
-			x: -2.0d
-			y: 6.0d
+			x: 2.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.05_post_ev.003.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.003.description.0}"
@@ -130,8 +127,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.004.title}"
 			icon: "minecraft:ender_eye"
-			x: -2.0d
-			y: 8.0d
+			x: 2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.004.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.004.description.0}"
@@ -159,8 +156,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.005.title}"
-			x: -4.0d
-			y: 8.0d
+			x: 4.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.005.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.005.description.0}"
@@ -187,14 +184,11 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.006.title}"
-			x: -2.0d
-			y: 10.0d
+			x: 6.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.006.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.006.description.0}"]
-			dependencies: [
-				"05A550E7057E000E"
-				"05A550E7057E0011"
-			]
+			dependencies: ["05A550E7057E0011"]
 			id: "05A550E7057E0013"
 			tasks: [{
 				id: "05A550E7057E0014"
@@ -205,8 +199,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.007.title}"
 			icon: "tinactory:circuit/quantum_processor"
-			x: -2.0d
-			y: 12.0d
+			x: 8.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.007.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.007.description.0}"
@@ -215,24 +209,17 @@
 			]
 			dependencies: ["05A550E7057E0013"]
 			id: "05A550E7057E0015"
-			tasks: [
-				{
-					id: "05A550E7057E0016"
-					type: "item"
-					item: "tinactory:circuit/quantum_processor"
-				}
-				{
-					id: "05A550E7057E0017"
-					type: "item"
-					item: "tinactory:circuit/quantum_assembly"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0016"
+				type: "item"
+				item: "tinactory:circuit/quantum_processor"
+			}]
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.008.title}"
 			icon: "tinactory:component/iv/sensor"
 			x: 2.0d
-			y: 6.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.05_post_ev.008.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.008.description.0}"
@@ -260,7 +247,7 @@
 		{
 			title: "{tinactory.quests.05_post_ev.009.title}"
 			x: 2.0d
-			y: 2.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.05_post_ev.009.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.009.description.0}"]
 			dependencies: ["05A550E7057E0001"]
@@ -273,8 +260,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.010.title}"
-			x: 2.0d
-			y: 4.0d
+			x: 4.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.05_post_ev.010.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.010.description.0}"
@@ -295,9 +282,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.011.title}"
 			icon: "tinactory:multiblock/assembly_line"
-			x: 4.0d
+			x: 8.0d
 			y: 6.0d
-			shape: "pentagon"
 			subtitle: "{tinactory.quests.05_post_ev.011.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.011.description.0}"
@@ -306,10 +292,7 @@
 				""
 				"{tinactory.quests.05_post_ev.011.description.2}"
 			]
-			dependencies: [
-				"05A550E7057E001D"
-				"05A550E7057E0008"
-			]
+			dependencies: ["05A550E7057E001D"]
 			size: 2.0d
 			id: "05A550E7057E001F"
 			tasks: [
@@ -327,8 +310,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.012.title}"
-			x: 0.0d
-			y: 8.0d
+			x: -2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.012.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.012.description.0}"]
 			dependencies: ["05A550E7057E0008"]
@@ -341,8 +324,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.013.title}"
-			x: -6.0d
-			y: 4.0d
+			x: -4.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.05_post_ev.013.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.013.description.0}"]
 			dependencies: ["50A4694A51414D54"]
@@ -366,7 +349,7 @@
 		{
 			title: "{tinactory.quests.05_post_ev.014.title}"
 			x: -4.0d
-			y: 6.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.014.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.014.description.0}"
@@ -397,7 +380,7 @@
 		{
 			title: "{tinactory.quests.05_post_ev.015.title}"
 			x: -4.0d
-			y: 8.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.05_post_ev.015.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.015.description.0}"]
 			dependencies: ["05A550E7057E0026"]
@@ -412,7 +395,7 @@
 			title: "{tinactory.quests.05_post_ev.016.title}"
 			icon: "tinactory:material/dust/raw_rhodium"
 			x: -6.0d
-			y: 8.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.016.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.016.description.0}"
@@ -438,7 +421,7 @@
 			title: "{tinactory.quests.05_post_ev.017.title}"
 			icon: "tinactory:material/dust/rhodium"
 			x: -6.0d
-			y: 10.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.05_post_ev.017.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.017.description.0}"]
 			dependencies: ["05A550E7057E002A"]
@@ -460,7 +443,7 @@
 			title: "{tinactory.quests.05_post_ev.018.title}"
 			icon: "tinactory:material/dust/raw_iridium"
 			x: -8.0d
-			y: 10.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.05_post_ev.018.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.018.description.0}"]
 			dependencies: ["05A550E7057E002A"]
@@ -492,7 +475,7 @@
 			title: "{tinactory.quests.05_post_ev.019.title}"
 			icon: "tinactory:material/dust/iridium"
 			x: -8.0d
-			y: 12.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.05_post_ev.019.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.019.description.0}"]
 			dependencies: ["05A550E7057E0030"]
@@ -512,8 +495,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.020.title}"
-			x: -6.0d
-			y: 12.0d
+			x: -8.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.05_post_ev.020.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.020.description.0}"]
 			dependencies: [
@@ -531,7 +514,7 @@
 			title: "{tinactory.quests.05_post_ev.021.title}"
 			icon: "tinactory:component/raw_rhodium_plated_palladium"
 			x: -4.0d
-			y: 10.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.05_post_ev.021.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.021.description.0}"
@@ -558,11 +541,11 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.022.title}"
-			x: 6.0d
-			y: 8.0d
+			x: -8.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.022.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.022.description.0}"]
-			dependencies: ["05A550E7057E001F"]
+			dependencies: ["330CE0C6D92F38F2"]
 			id: "05A550E7057E003B"
 			tasks: [{
 				id: "05A550E7057E003C"
@@ -572,11 +555,11 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.023.title}"
-			x: 8.0d
-			y: 6.0d
+			x: 4.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.023.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.023.description.0}"]
-			dependencies: ["05A550E7057E001F"]
+			dependencies: ["330CE0C6D92F38F2"]
 			id: "05A550E7057E003D"
 			tasks: [{
 				id: "05A550E7057E003E"
@@ -586,11 +569,14 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.024.title}"
-			x: 8.0d
-			y: 8.0d
+			x: 2.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.024.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.024.description.0}"]
-			dependencies: ["05A550E7057E003D"]
+			dependencies: [
+				"05A550E7057E003D"
+				"05A550E7057E001B"
+			]
 			id: "05A550E7057E003F"
 			tasks: [{
 				id: "05A550E7057E0040"
@@ -600,8 +586,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.025.title}"
-			x: 8.0d
-			y: 10.0d
+			x: 4.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.05_post_ev.025.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.025.description.0}"]
 			dependencies: ["05A550E7057E003F"]
@@ -615,7 +601,7 @@
 		{
 			title: "{tinactory.quests.05_post_ev.026.title}"
 			icon: "tinactory:component/luv/machine_hull"
-			x: 4.0d
+			x: -4.0d
 			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.026.subtitle}"
 			description: [
@@ -624,9 +610,12 @@
 				"{tinactory.quests.05_post_ev.026.description.1}"
 			]
 			dependencies: [
-				"05A550E7057E001F"
+				"05A550E7057E001B"
 				"05A550E7057E0038"
+				"05A550E7057E0036"
+				"05A550E7057E003B"
 			]
+			size: 2.0d
 			id: "05A550E7057E0043"
 			tasks: [
 				{
@@ -643,15 +632,11 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.027.title}"
-			x: 4.0d
-			y: 12.0d
+			x: 8.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.027.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.027.description.0}"]
-			dependencies: [
-				"05A550E7057E003B"
-				"05A550E7057E0036"
-				"05A550E7057E0043"
-			]
+			dependencies: ["05A550E7057E001F"]
 			id: "05A550E7057E0046"
 			tasks: [{
 				id: "05A550E7057E0047"
@@ -662,8 +647,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.028.title}"
 			icon: "tinactory:component/luv/electric_pump"
-			x: 4.0d
-			y: 14.0d
+			x: 8.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.05_post_ev.028.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.028.description.0}"]
 			dependencies: ["05A550E7057E0046"]
@@ -689,15 +674,11 @@
 		{
 			title: "{tinactory.quests.05_post_ev.029.title}"
 			icon: "tinactory:component/luv/sensor"
-			x: 6.0d
-			y: 14.0d
+			x: 10.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.05_post_ev.029.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.029.description.0}"]
-			dependencies: [
-				"05A550E7057E0046"
-				"05A550E7057E0028"
-				"05A550E7057E0036"
-			]
+			dependencies: ["05A550E7057E0046"]
 			id: "05A550E7057E004C"
 			tasks: [
 				{
@@ -714,8 +695,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.030.title}"
-			x: 4.0d
-			y: 16.0d
+			x: 8.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.05_post_ev.030.subtitle}"
 			description: ["{tinactory.quests.05_post_ev.030.description.0}"]
 			dependencies: ["05A550E7057E0048"]
@@ -728,19 +709,15 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.031.title}"
-			x: 2.0d
-			y: 18.0d
+			x: -4.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.05_post_ev.031.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.031.description.0}"
 				""
 				"{tinactory.quests.05_post_ev.031.description.1}"
 			]
-			dependencies: [
-				"05A550E7057E0043"
-				"05A550E7057E003B"
-				"05A550E7057E0036"
-			]
+			dependencies: ["05A550E7057E0043"]
 			id: "05A550E7057E0051"
 			tasks: [{
 				id: "05A550E7057E0052"
@@ -750,8 +727,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.032.title}"
-			x: 6.0d
-			y: 18.0d
+			x: 0.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.05_post_ev.032.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.032.description.0}"
@@ -760,8 +737,6 @@
 			]
 			dependencies: [
 				"05A550E7057E003F"
-				"05A550E7057E003B"
-				"05A550E7057E0036"
 				"05A550E7057E0043"
 			]
 			id: "05A550E7057E0053"
@@ -773,8 +748,8 @@
 		}
 		{
 			title: "{tinactory.quests.05_post_ev.033.title}"
-			x: 4.0d
-			y: 20.0d
+			x: 2.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.05_post_ev.033.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.033.description.0}"
@@ -787,6 +762,7 @@
 				"05A550E7057E0041"
 				"05A550E7057E004F"
 			]
+			size: 2.0d
 			id: "05A550E7057E0055"
 			tasks: [{
 				id: "05A550E7057E0056"
