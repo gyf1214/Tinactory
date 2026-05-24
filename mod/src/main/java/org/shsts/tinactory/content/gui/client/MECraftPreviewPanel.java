@@ -6,8 +6,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.BUTTON_WIDTH;
-import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.tr;
+import static org.shsts.tinactory.content.gui.client.MECraftTerminalScreen.BUTTON_WIDTH;
+import static org.shsts.tinactory.content.gui.client.MECraftTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -32,7 +32,7 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftPreviewPanel extends Panel {
+public class MECraftPreviewPanel extends Panel {
     private static final int SUMMARY_COLUMNS = 2;
     private static final int SUMMARY_HEIGHT = SLOT_SIZE + SPACING * 2;
     private static final int SUMMARY_WIDTH = (SLOT_SIZE * 9 - 1) / SUMMARY_COLUMNS;
@@ -52,7 +52,7 @@ public class AutocraftPreviewPanel extends Panel {
 
     private class SummaryPanel extends ButtonPanel {
         public SummaryPanel() {
-            super(AutocraftPreviewPanel.this.screen, SUMMARY_WIDTH, SUMMARY_HEIGHT, 1);
+            super(MECraftPreviewPanel.this.screen, SUMMARY_WIDTH, SUMMARY_HEIGHT, 1);
         }
 
         @Override
@@ -107,7 +107,7 @@ public class AutocraftPreviewPanel extends Panel {
         }
     }
 
-    public AutocraftPreviewPanel(AutocraftTerminalScreen screen) {
+    public MECraftPreviewPanel(MECraftTerminalScreen screen) {
         super(screen);
         this.defaultCpuLabel = tr("defaultCpu");
         this.cpuButton = new VanillaButton(menu, defaultCpuLabel, null, () -> screen.selectCpu(this::onSelectCpu));
@@ -133,8 +133,8 @@ public class AutocraftPreviewPanel extends Panel {
         addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), cancelButton);
     }
 
-    public void onPreviewSync(AutocraftPreviewSyncPacket packet) {
-        executeButton.disabled = packet.state() != AutocraftPreviewSyncPacket.PreviewState.PREVIEW_READY;
+    public void onPreviewSync(MECraftPreviewSyncPacket packet) {
+        executeButton.disabled = packet.state() != MECraftPreviewSyncPacket.PreviewState.PREVIEW_READY;
         summary.clear();
         packet.summary().entries().entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
@@ -143,7 +143,7 @@ public class AutocraftPreviewPanel extends Panel {
         cpuButton.setLabel(defaultCpuLabel);
     }
 
-    private boolean onSelectCpu(@Nullable AutocraftCpuSyncPacket.CpuInfo cpu) {
+    private boolean onSelectCpu(@Nullable MECraftCpuSyncPacket.CpuInfo cpu) {
         if (cpu == null) {
             return true;
         }

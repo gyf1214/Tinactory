@@ -5,8 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -19,21 +19,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
-import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.BUTTON_WIDTH;
-import static org.shsts.tinactory.content.gui.client.AutocraftTerminalScreen.tr;
+import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
+import static org.shsts.tinactory.content.gui.client.MECraftTerminalScreen.BUTTON_WIDTH;
+import static org.shsts.tinactory.content.gui.client.MECraftTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpuStatusPanel extends Panel {
+public class MECraftCpuStatusPanel extends Panel {
     private class CpuPanel extends MachineSelectPanel {
-        private final List<AutocraftCpuSyncPacket.CpuInfo> cpus = new ArrayList<>();
+        private final List<MECraftCpuSyncPacket.CpuInfo> cpus = new ArrayList<>();
 
         public CpuPanel() {
-            super(AutocraftCpuStatusPanel.this.screen);
+            super(MECraftCpuStatusPanel.this.screen);
         }
 
         @Override
@@ -42,7 +42,7 @@ public class AutocraftCpuStatusPanel extends Panel {
             cpus.clear();
         }
 
-        public void add(AutocraftCpuSyncPacket.CpuInfo info) {
+        public void add(MECraftCpuSyncPacket.CpuInfo info) {
             add(info.status().cpuId(), info.name(), info.icon());
             cpus.add(info);
         }
@@ -86,9 +86,9 @@ public class AutocraftCpuStatusPanel extends Panel {
     private final VanillaButton cancelButton;
 
     @Nullable
-    private Consumer<AutocraftCpuSyncPacket.CpuInfo> onSelectCpu = null;
+    private Consumer<MECraftCpuSyncPacket.CpuInfo> onSelectCpu = null;
 
-    public AutocraftCpuStatusPanel(AutocraftTerminalScreen screen) {
+    public MECraftCpuStatusPanel(MECraftTerminalScreen screen) {
         super(screen);
         this.cpuPanel = new CpuPanel();
         this.cancelLabel = tr("cancel");
@@ -99,12 +99,12 @@ public class AutocraftCpuStatusPanel extends Panel {
         addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), cancelButton);
     }
 
-    public void updateStatus(AutocraftCpuSyncPacket packet) {
+    public void updateStatus(MECraftCpuSyncPacket packet) {
         cpuPanel.clearList();
         packet.entries().forEach(cpuPanel::add);
     }
 
-    public void onSelectCpu(@Nullable Consumer<AutocraftCpuSyncPacket.CpuInfo> val) {
+    public void onSelectCpu(@Nullable Consumer<MECraftCpuSyncPacket.CpuInfo> val) {
         onSelectCpu = val;
         cpuPanel.clearSelect();
         cancelButton.setLabel(val == null ? cancelLabel : cancelJobLabel);
@@ -114,8 +114,8 @@ public class AutocraftCpuStatusPanel extends Panel {
         if (onSelectCpu != null) {
             onSelectCpu.accept(null);
         } else if (cpuPanel.getSelected().isPresent()) {
-            var packet = AutocraftEventPacket.cancel(cpuPanel.getSelected().get());
-            menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> packet);
+            var packet = MECraftEventPacket.cancel(cpuPanel.getSelected().get());
+            menu.triggerEvent(ME_CRAFT_ACTION, () -> packet);
         }
     }
 }

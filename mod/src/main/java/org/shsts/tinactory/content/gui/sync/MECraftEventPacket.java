@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftEventPacket implements IPacket {
+public class MECraftEventPacket implements IPacket {
     public enum Action {
         PREVIEW,
         EXECUTE,
@@ -28,9 +28,9 @@ public class AutocraftEventPacket implements IPacket {
     @Nullable
     private UUID cpuId;
 
-    public AutocraftEventPacket() {}
+    public MECraftEventPacket() {}
 
-    private AutocraftEventPacket(
+    private MECraftEventPacket(
         Action action,
         @Nullable IStackKey target,
         long quantity,
@@ -42,16 +42,16 @@ public class AutocraftEventPacket implements IPacket {
         this.cpuId = cpuId;
     }
 
-    public static AutocraftEventPacket preview(IStackKey target, long quantity) {
-        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, null);
+    public static MECraftEventPacket preview(IStackKey target, long quantity) {
+        return new MECraftEventPacket(Action.PREVIEW, target, quantity, null);
     }
 
-    public static AutocraftEventPacket execute(UUID cpuId) {
-        return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
+    public static MECraftEventPacket execute(UUID cpuId) {
+        return new MECraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
     }
 
-    public static AutocraftEventPacket cancel(UUID cpuId) {
-        return new AutocraftEventPacket(Action.CANCEL, null, 0L, cpuId);
+    public static MECraftEventPacket cancel(UUID cpuId) {
+        return new MECraftEventPacket(Action.CANCEL, null, 0L, cpuId);
     }
 
     public Action action() {

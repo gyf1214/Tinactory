@@ -1,5 +1,5 @@
 {
-  "type": "autocraft_cpu",
+  "type": "me_craft_cpu",
   "power": 32,
   "transmissionBandwidth": 64,
   "executionIntervalTicks": 1

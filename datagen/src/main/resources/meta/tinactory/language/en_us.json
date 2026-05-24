@@ -203,7 +203,6 @@
     "tinactory.gui.signal.amount": "Amount",
     "tinactory.gui.signalController.readSignal": "Read Signal",
     "tinactory.gui.signalController.writeSignal": "Write Signal",
-    "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",
     "tinactory.gui.autocraft.preview": "Preview",
     "tinactory.gui.autocraft.cancel": "Cancel",
     "tinactory.gui.autocraft.cancelJob": "Cancel Job",
@@ -320,7 +319,7 @@
     "config.waila.plugin_tinactory.work_speed": "Working Speed",
     "config.waila.plugin_tinactory.electric": "Electric",
     "config.waila.plugin_tinactory.multiblock": "Multiblock",
-    "config.waila.plugin_tinactory.autocraft_cpu": "Autocraft CPU"
+    "config.waila.plugin_tinactory.me_craft_cpu": "ME Craft CPU"
   },
   "quests": {
     "tinactory.quests.00_ultra_low_voltage.title": "Industry from Zero",

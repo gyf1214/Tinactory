@@ -25,9 +25,9 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
+public class MECraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
     public static final String ID = "autocraft/cpu";
-    private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
+    private static final String SNAPSHOT_KEY = "snapshot";
 
     private final PatternNbtCodec snapshotCodec =
         new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
@@ -38,21 +38,16 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     @Nullable
     private CompoundTag pendingSnapshot;
 
-    public AutocraftCpu(
-        BlockEntity blockEntity,
-        double power,
-        long transmissionBandwidth,
-        int executionIntervalTicks) {
-        super(blockEntity, power);
-        this.transmissionBandwidth = transmissionBandwidth;
-        this.executionIntervalTicks = executionIntervalTicks;
+    public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks) {}
+
+    public MECraftCpu(BlockEntity blockEntity, Properties properties) {
+        super(blockEntity, properties.power);
+        this.transmissionBandwidth = properties.transmissionBandwidth;
+        this.executionIntervalTicks = properties.executionIntervalTicks;
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        double power,
-        long transmissionBandwidth,
-        int executionIntervalTicks) {
-        return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.capability(ID, be -> new MECraftCpu(be, properties));
     }
 
     public CpuStatusEntry status() {
@@ -113,9 +108,10 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var snapshot = service == null ? pendingSnapshot : service.serializeRunningSnapshot(snapshotCodec).orElse(null);
+        var snapshot = service == null ? pendingSnapshot :
+            service.serializeRunningSnapshot(snapshotCodec).orElse(null);
         if (snapshot != null) {
-            tag.put(SNAPSHOT_KEY, snapshot.copy());
+            tag.put(SNAPSHOT_KEY, snapshot);
         }
         return tag;
     }

@@ -17,15 +17,15 @@ import java.util.LinkedHashMap;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftPreviewSyncPacket implements IPacket {
+public class MECraftPreviewSyncPacket implements IPacket {
     private PreviewState state = PreviewState.EMPTY;
     @Nullable
     private PlanError error;
     private PlanSummary summary = PlanSummary.empty();
 
-    public AutocraftPreviewSyncPacket() {}
+    public MECraftPreviewSyncPacket() {}
 
-    private AutocraftPreviewSyncPacket(
+    private MECraftPreviewSyncPacket(
         PreviewState state,
         @Nullable PlanError error,
         PlanSummary summary) {
@@ -34,7 +34,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         this.summary = summary;
     }
 
-    public static AutocraftPreviewSyncPacket of(AutocraftPreview preview) {
+    public static MECraftPreviewSyncPacket of(AutocraftPreview preview) {
         if (preview.isSuccess()) {
             return ready(preview.summary());
         }
@@ -44,16 +44,16 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return empty();
     }
 
-    public static AutocraftPreviewSyncPacket empty() {
-        return new AutocraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty());
+    public static MECraftPreviewSyncPacket empty() {
+        return new MECraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty());
     }
 
-    public static AutocraftPreviewSyncPacket ready(PlanSummary summary) {
-        return new AutocraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary);
+    public static MECraftPreviewSyncPacket ready(PlanSummary summary) {
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary);
     }
 
-    public static AutocraftPreviewSyncPacket failed(PlanError error, PlanSummary summary) {
-        return new AutocraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary);
+    public static MECraftPreviewSyncPacket failed(PlanError error, PlanSummary summary) {
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary);
     }
 
     public PreviewState state() {

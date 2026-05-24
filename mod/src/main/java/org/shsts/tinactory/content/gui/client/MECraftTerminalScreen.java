@@ -7,10 +7,10 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.AutocraftTerminalMenu;
-import org.shsts.tinactory.content.gui.sync.AutocraftCpuSyncPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftEventPacket;
-import org.shsts.tinactory.content.gui.sync.AutocraftPreviewSyncPacket;
+import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
+import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
+import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
@@ -19,28 +19,28 @@ import org.shsts.tinactory.integration.gui.client.Tab;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static org.shsts.tinactory.AllMenus.AUTOCRAFT_TERMINAL_ACTION;
-import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.CPU_STATUS_SYNC;
-import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.PREVIEW_SYNC;
-import static org.shsts.tinactory.content.gui.AutocraftTerminalMenu.REQUESTABLES_SYNC;
+import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
+import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.CPU_STATUS_SYNC;
+import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.PREVIEW_SYNC;
+import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.REQUEST_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
+public class MECraftTerminalScreen extends MenuScreen<MECraftTerminalMenu> {
     public static final int BUTTON_WIDTH = 64;
 
     private final Tab tab;
-    private final AutocraftCpuStatusPanel cpuStatusPanel;
-    private final AutocraftPreviewPanel previewPanel;
+    private final MECraftCpuStatusPanel cpuStatusPanel;
+    private final MECraftPreviewPanel previewPanel;
 
-    public AutocraftTerminalScreen(AutocraftTerminalMenu menu, Component title) {
+    public MECraftTerminalScreen(MECraftTerminalMenu menu, Component title) {
         super(menu, title);
-        var requestPanel = new AutocraftRequestPanel(this);
-        this.cpuStatusPanel = new AutocraftCpuStatusPanel(this);
-        this.previewPanel = new AutocraftPreviewPanel(this);
+        var requestPanel = new MECraftRequestPanel(this);
+        this.cpuStatusPanel = new MECraftCpuStatusPanel(this);
+        this.previewPanel = new MECraftPreviewPanel(this);
         this.tab = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
         rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tab);
@@ -49,7 +49,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         rootPanel.addGroup(previewPanel);
         this.contentHeight = 144;
 
-        menu.onSyncPacket(REQUESTABLES_SYNC, requestPanel::updateRequestables);
+        menu.onSyncPacket(REQUEST_SYNC, requestPanel::updateRequestables);
         menu.onSyncPacket(CPU_STATUS_SYNC, cpuStatusPanel::updateStatus);
         menu.onSyncPacket(PREVIEW_SYNC, this::onPreviewSync);
 
@@ -67,7 +67,7 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         cpuStatusPanel.onSelectCpu(null);
     }
 
-    public void selectCpu(Predicate<AutocraftCpuSyncPacket.CpuInfo> cb) {
+    public void selectCpu(Predicate<MECraftCpuSyncPacket.CpuInfo> cb) {
         tab.select(1);
         cpuStatusPanel.onSelectCpu(cpu -> {
             if (cb.test(cpu)) {
@@ -77,8 +77,8 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
     }
 
     public void executePreview(UUID cpu) {
-        var packet = AutocraftEventPacket.execute(cpu);
-        menu.triggerEvent(AUTOCRAFT_TERMINAL_ACTION, () -> packet);
+        var packet = MECraftEventPacket.execute(cpu);
+        menu.triggerEvent(ME_CRAFT_ACTION, () -> packet);
         tab.select(1);
     }
 
@@ -86,8 +86,8 @@ public class AutocraftTerminalScreen extends MenuScreen<AutocraftTerminalMenu> {
         tab.select(0);
     }
 
-    private void onPreviewSync(AutocraftPreviewSyncPacket packet) {
-        if (packet.state() == AutocraftPreviewSyncPacket.PreviewState.EMPTY) {
+    private void onPreviewSync(MECraftPreviewSyncPacket packet) {
+        if (packet.state() == MECraftPreviewSyncPacket.PreviewState.EMPTY) {
             return;
         }
         previewPanel.onPreviewSync(packet);

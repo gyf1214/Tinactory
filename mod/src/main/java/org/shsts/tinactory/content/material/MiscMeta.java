@@ -19,8 +19,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
-import org.shsts.tinactory.content.autocraft.AutocraftCpu;
-import org.shsts.tinactory.content.autocraft.AutocraftTerminal;
+import org.shsts.tinactory.content.autocraft.MECraftCpu;
+import org.shsts.tinactory.content.autocraft.MECraftTerminal;
 import org.shsts.tinactory.content.logistics.MEDrive;
 import org.shsts.tinactory.content.logistics.MEPatternCell;
 import org.shsts.tinactory.content.logistics.MEPatternCellSet;
@@ -77,45 +77,13 @@ public class MiscMeta extends MetaConsumer {
         super("Misc");
     }
 
-    public record AutocraftCpuConfig(double power, long transmissionBandwidth, int executionIntervalTicks) {
-    }
-
-    public static AutocraftCpuConfig parseAutocraftCpuConfig(JsonObject jo) {
-        var power = GsonHelper.getAsDouble(jo, "power");
-        var transmissionBandwidth = requiredPositiveLong(jo, "transmissionBandwidth");
-        var executionIntervalTicks = requiredPositiveInt(jo, "executionIntervalTicks");
-        return new AutocraftCpuConfig(power, transmissionBandwidth, executionIntervalTicks);
-    }
-
-    private static long requiredPositiveLong(JsonObject jo, String field) {
-        if (!jo.has(field)) {
-            throw new IllegalArgumentException("missing required field: " + field);
-        }
-        var value = GsonHelper.getAsLong(jo, field);
-        if (value <= 0L) {
-            throw new IllegalArgumentException(field + " must be positive");
-        }
-        return value;
-    }
-
-    private static int requiredPositiveInt(JsonObject jo, String field) {
-        if (!jo.has(field)) {
-            throw new IllegalArgumentException("missing required field: " + field);
-        }
-        var value = GsonHelper.getAsInt(jo, field);
-        if (value <= 0) {
-            throw new IllegalArgumentException(field + " must be positive");
-        }
-        return value;
-    }
-
-    private static MaterialColor parseMaterialColor(JsonObject jo, String field) {
+    private static MaterialColor parseMaterialColor(JsonObject jo) {
         // TODO: use string instead of integer
-        return MaterialColor.byId(GsonHelper.getAsInt(jo, field));
+        return MaterialColor.byId(GsonHelper.getAsInt(jo, "materialColor"));
     }
 
     private IEntry<Block> casing(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         return REGISTRATE.block(id, Block::new)
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -133,7 +101,7 @@ public class MiscMeta extends MetaConsumer {
 
     private void coil(String name, String id, JsonObject jo) {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -157,7 +125,7 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void lens(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         var ja = GsonHelper.getAsJsonArray(jo, "materials");
         var lens = new ArrayList<Supplier<? extends Item>>();
         for (var je : ja) {
@@ -176,7 +144,7 @@ public class MiscMeta extends MetaConsumer {
     private void power(String name, String id, JsonObject jo) {
         var voltage = Voltage.fromName(GsonHelper.getAsString(jo, "voltage", name));
         var capacity = GsonHelper.getAsLong(jo, "capacity");
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -184,7 +152,7 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void fixed(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         REGISTRATE.block(id, FixedBlock::new)
             .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
@@ -192,7 +160,7 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void coalBlock(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo, "materialColor");
+        var materialColor = parseMaterialColor(jo);
         var tint = parseColor(jo, "tint");
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
@@ -275,26 +243,26 @@ public class MiscMeta extends MetaConsumer {
         PATTERN_CELLS.add(new MEPatternCellSet(component, pattern));
     }
 
-    private void autocraftCpu(String id, JsonObject jo) {
-        var config = parseAutocraftCpuConfig(jo);
+    private void meCraftCpu(String id, JsonObject jo) {
+        var config = new MECraftCpu.Properties(
+            GsonHelper.getAsDouble(jo, "power"),
+            GsonHelper.getAsLong(jo, "transmissionBandwidth"),
+            GsonHelper.getAsInt(jo, "executionIntervalTicks"));
         BlockEntityBuilder.builder(id, simpleElectric(config.power()))
             .transform(MachineSet::baseMachine)
             .blockEntity()
-            .transform(AutocraftCpu.factory(
-                config.power(),
-                config.transmissionBandwidth(),
-                config.executionIntervalTicks()))
+            .transform(MECraftCpu.factory(config))
             .end()
             .build();
     }
 
-    private void autocraftTerminal(String id, JsonObject jo) {
+    private void meCraftTerminal(String id, JsonObject jo) {
         var power = GsonHelper.getAsDouble(jo, "power");
         BlockEntityBuilder.builder(id, simpleElectric(power))
             .transform(MachineSet::baseMachine)
-            .menu(AllMenus.AUTOCRAFT_TERMINAL)
+            .menu(AllMenus.ME_CRAFT_TERMINAL)
             .blockEntity()
-            .transform(AutocraftTerminal.factory(power))
+            .transform(MECraftTerminal.factory(power))
             .end()
             .build();
     }
@@ -354,8 +322,8 @@ public class MiscMeta extends MetaConsumer {
             case "me_pattern_cell" -> mePatternCell(name, id, jo);
             case "me_signal_controller" -> meSignalController(id, jo);
             case "me_storage_detector" -> meStorageDetector(id, jo);
-            case "autocraft_cpu" -> autocraftCpu(id, jo);
-            case "autocraft_terminal" -> autocraftTerminal(id, jo);
+            case "me_craft_cpu" -> meCraftCpu(id, jo);
+            case "me_craft_terminal" -> meCraftTerminal(id, jo);
             case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }

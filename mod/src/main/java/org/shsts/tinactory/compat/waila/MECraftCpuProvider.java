@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec2;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.content.autocraft.AutocraftCpu;
+import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -29,17 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.compat.waila.Waila.AUTOCRAFT_CPU;
+import static org.shsts.tinactory.compat.waila.Waila.ME_CRAFT_CPU;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetProvider;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
-    public static final AutocraftCpuProvider INSTANCE = new AutocraftCpuProvider();
+public class MECraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+    public static final MECraftCpuProvider INSTANCE = new MECraftCpuProvider();
 
-    private static final String PREFIX = "tinactoryAutocraftCpu";
+    private static final String PREFIX = "tinactoryMECraftCpu";
     private static final String STATE_KEY = PREFIX + "State";
     private static final String TARGET_KEY = PREFIX + "Target";
     private static final String TARGET_AMOUNT_KEY = PREFIX + "TargetAmount";
@@ -49,13 +49,13 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
     private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
     private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
 
-    public AutocraftCpuProvider() {
-        super(modLoc("autocraft_cpu"));
+    public MECraftCpuProvider() {
+        super(modLoc("me_craft_cpu"));
     }
 
     @Override
     protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
-        if (!config.get(AUTOCRAFT_CPU) || !tag.contains(STATE_KEY, Tag.TAG_STRING)) {
+        if (!config.get(ME_CRAFT_CPU) || !tag.contains(STATE_KEY, Tag.TAG_STRING)) {
             return;
         }
         var state = parseEnum(JobState.class, tag.getString(STATE_KEY));
@@ -113,7 +113,7 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
     @Override
     public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
         BlockEntity blockEntity, boolean showDetails) {
-        var cpu = tryGetProvider(blockEntity, AutocraftCpu.ID, AutocraftCpu.class);
+        var cpu = tryGetProvider(blockEntity, MECraftCpu.ID, MECraftCpu.class);
         if (cpu.isEmpty()) {
             return;
         }

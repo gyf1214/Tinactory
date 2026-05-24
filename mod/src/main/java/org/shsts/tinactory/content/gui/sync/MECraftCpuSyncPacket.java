@@ -21,7 +21,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpuSyncPacket implements IPacket {
+public class MECraftCpuSyncPacket implements IPacket {
     public record CpuInfo(CpuStatusEntry status, Component name, ItemStack icon) {
         private static void serialize(FriendlyByteBuf buf, CpuInfo info) {
             serializeStatus(buf, info.status);
@@ -59,9 +59,9 @@ public class AutocraftCpuSyncPacket implements IPacket {
 
     private final List<CpuInfo> entries = new ArrayList<>();
 
-    public AutocraftCpuSyncPacket() {}
+    public MECraftCpuSyncPacket() {}
 
-    public AutocraftCpuSyncPacket(List<CpuInfo> entries) {
+    public MECraftCpuSyncPacket(List<CpuInfo> entries) {
         this.entries.addAll(entries);
     }
 
@@ -85,7 +85,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AutocraftCpuSyncPacket other)) {
+        if (!(obj instanceof MECraftCpuSyncPacket other)) {
             return false;
         }
         return entries.equals(other.entries);

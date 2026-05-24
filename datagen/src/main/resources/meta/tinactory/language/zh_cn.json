@@ -33,7 +33,7 @@
     "controller": "控制器",
     "detector": "探测器",
     "digital": "数字",
-    "autocraft": "自动合成",
+    "craft": "合成",
     "terminal": "终端",
     "alloy_smelter": "合金炉",
     "arc_furnace": "电弧炉",
@@ -550,7 +550,6 @@
     "tinactory.tooltip.powerBlock": "容量：%s EU",
     "tinactory.tooltip.batteryBox": "电池槽：%s",
     "tinactory.tooltip.meDrive": "存储槽：%s",
-    "tinactory.tooltip.autocraftTerminal": "自动合成终端",
     "tinactory.tooltip.electricChest": "容量：%s x %s",
     "tinactory.tooltip.electricTank": "容量：%s mB x %s",
     "tinactory.tooltip.logisticWorker.1": "最大任务数量：%s",
@@ -598,7 +597,6 @@
     "tinactory.gui.signal.amount": "数量",
     "tinactory.gui.signalController.readSignal": "读信号",
     "tinactory.gui.signalController.writeSignal": "写信号",
-    "tinactory.gui.autocraftTerminal.title": "自动合成终端",
     "tinactory.gui.autocraft.preview": "预览",
     "tinactory.gui.autocraft.cancel": "取消",
     "tinactory.gui.autocraft.cancelJob": "取消任务",
@@ -761,9 +759,9 @@
     "config.waila.plugin_tinactory.progress": "工作进度",
     "config.waila.plugin_tinactory.recipe": "工作配方",
     "config.waila.plugin_tinactory.work_speed": "工作速度",
-    "config.waila.plugin_tinactory.electric": "用电情况",
+    "config.waila.plugin_tinactory.electric": "用电",
     "config.waila.plugin_tinactory.multiblock": "多方块",
-    "config.waila.plugin_tinactory.autocraft_cpu": "自动合成 CPU"
+    "config.waila.plugin_tinactory.me_craft_cpu": "ME合成CPU"
   },
   "quests": {
     "tinactory.quests.00_ultra_low_voltage.title": "从零开始的工业梦",
