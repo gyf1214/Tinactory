@@ -527,7 +527,7 @@ object CircuitComponents {
                     tech(Technologies.INTEGRATED_CIRCUIT)
                 }
                 output(board) {
-                    input(lastBoard, 2)
+                    input(lastBoard)
                     input("red_alloy", "wire_fine", 8)
                     input("soldering_alloy")
                 }
@@ -571,7 +571,7 @@ object CircuitComponents {
         circuitTier(CircuitTier.NANO) {
             assembler {
                 output(board) {
-                    input(lastBoard, 3)
+                    input(lastBoard)
                     input("silver", "wire_fine", 8)
                     input("soldering_alloy", amount = 1.5)
                     voltage(Voltage.MV)
@@ -600,13 +600,13 @@ object CircuitComponents {
                 }
                 output(board) {
                     input("epoxy", "sheet")
-                    input("annealed_copper", "foil", 8)
+                    input("electrum", "foil", 8)
                     input("sulfuric_acid", "dilute", 0.5)
                     workTicks(320)
                 }
                 output(circuitBoard) {
                     input(board)
-                    input("annealed_copper", "foil", 16)
+                    input("platinum", "foil", 16)
                     input("iron_chloride", amount = 0.75)
                     workTicks(480)
                 }
@@ -618,7 +618,7 @@ object CircuitComponents {
                 defaults {
                 }
                 output(board) {
-                    input(lastBoard, 4)
+                    input(lastBoard)
                     input("platinum", "wire_fine", 16)
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.EV)
@@ -630,7 +630,7 @@ object CircuitComponents {
             chemicalReactor {
                 output(circuitBoard) {
                     input(board)
-                    input("platinum", "foil", 16)
+                    input("ruridit", "foil", 16)
                     input("iron_chloride")
                     voltage(Voltage.EV)
                     workTicks(480)
