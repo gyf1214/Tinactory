@@ -694,6 +694,24 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.04_extreme_voltage.034.title}"
+			x: 6.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.034.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.034.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.034.description.1}"
+			]
+			dependencies: ["108DE34B8777351F"]
+			id: "55C4BF2F153D12A2"
+			tasks: [{
+				id: "7CB678EE1B4A9878"
+				type: "item"
+				item: "tinactory:material/wire/annealed_copper"
+			}]
+		}
+		{
 			title: "{tinactory.quests.04_extreme_voltage.021.title}"
 			x: -2.0d
 			y: 16.0d
@@ -786,6 +804,7 @@
 			dependencies: [
 				"09CB7C63AE45690A"
 				"6ECD29DDE2637A82"
+				"55C4BF2F153D12A2"
 				"6D4396F046AC59FA"
 			]
 			size: 2.0d
