@@ -38,6 +38,7 @@ object Components {
     private const val RESEARCH_TEX = "metaitems/glass_vial/"
     private const val GRINDER_TEX = "metaitems/component.grinder"
     const val COMPONENT_TICKS = 100L
+    const val ADVANCED_COMPONENT_TICKS = 400L
 
     fun init() {
         components()

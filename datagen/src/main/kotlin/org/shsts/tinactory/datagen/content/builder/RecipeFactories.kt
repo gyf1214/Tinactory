@@ -7,9 +7,9 @@ import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
+import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
-import org.shsts.tinactory.core.recipe.MarkerRecipe
 
 typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
@@ -89,9 +89,7 @@ object RecipeFactories {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
-            amperage = 0.5
-            voltage(Voltage.IV)
-            workTicks(400)
+            amperage = 0.75
         }.block()
     }
 

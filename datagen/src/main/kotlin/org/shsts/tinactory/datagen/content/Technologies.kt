@@ -13,9 +13,9 @@ import org.shsts.tinactory.content.electric.Circuits
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
-import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.provider.TechProvider
@@ -362,7 +362,7 @@ object Technologies {
 
             voltage = Voltage.EV
 
-            NUCLEAR_PHYSICS = child("nuclear_physics") {
+            NUCLEAR_PHYSICS = tech("nuclear_physics") {
                 maxProgress(120)
                 displayItem(getComponent("field_generator").item(Voltage.EV))
             }
@@ -373,7 +373,7 @@ object Technologies {
                 depends(HYDROMETALLURGY)
             }
 
-            METAL_FORMER = tech("metal_former") {
+            METAL_FORMER = child("metal_former") {
                 maxProgress(140)
                 displayItem(getMultiblock("metal_former").block)
             }
@@ -381,27 +381,25 @@ object Technologies {
             EXTRUSION_PRESS = tech("extrusion_press") {
                 maxProgress(200)
                 displayItem(getMultiblock("extrusion_press").block)
-                depends(METAL_FORMER)
             }
 
-            base = null
+            base = TUNGSTEN_STEEL
 
             MINERAL_BENEFICIATION = tech("mineral_beneficiation") {
                 maxProgress(200)
                 displayItem(getMultiblock("ore_processing_unit").block)
-                depends(TUNGSTEN_STEEL, MULTI_SMELTER)
+                depends(MULTI_SMELTER)
             }
 
-            MATERIAL_CONDITIONING = tech("material_conditioning") {
+            MATERIAL_CONDITIONING = child("material_conditioning") {
                 maxProgress(220)
                 displayItem(getMultiblock("phase_exchange_chamber").block)
-                depends(TUNGSTEN_STEEL, ADVANCED_CHEMISTRY)
             }
 
             ELECTROCHEMICAL_PROCESSING = tech("electrochemical_processing") {
                 maxProgress(260)
                 displayItem(getMultiblock("electrochemical_processor").block)
-                depends(MATERIAL_CONDITIONING, ELECTROLYZING, LITHOGRAPHY)
+                depends(ELECTROLYZING, LITHOGRAPHY)
             }
 
             base = TUNGSTEN_STEEL
@@ -418,20 +416,16 @@ object Technologies {
                 noResearch()
             }
 
-            ENDER_CHEMISTRY = tech("ender_chemistry") {
+            ENDER_CHEMISTRY = child("ender_chemistry") {
                 maxProgress(160)
                 displayItem(Items.ENDER_EYE)
             }
 
-            base = null
-
             PROSPECTING_STATION = tech("prospecting_station") {
                 maxProgress(220)
                 displayItem(getMultiblock("prospecting_station").block)
-                depends(MINERAL_BENEFICIATION, ENDER_CHEMISTRY)
+                depends(MINERAL_BENEFICIATION)
             }
-
-            base = TUNGSTEN_STEEL
 
             PLATINUM_GROUP_METAL = tech("platinum_group_metal") {
                 maxProgress(160)
@@ -445,16 +439,17 @@ object Technologies {
                 displayItem(getMultiblock("assembly_line").block)
             }
 
-            RHODIUM_PLATED_PALLADIUM = tech("rhodium_plated_palladium") {
+            base = PLATINUM_GROUP_METAL
+
+            RHODIUM_PLATED_PALLADIUM = child("rhodium_plated_palladium") {
                 maxProgress(200)
                 displayItem(getItem("component/raw_rhodium_plated_palladium"))
-                depends(PLATINUM_GROUP_METAL)
             }
 
             FUSION = tech("fusion") {
                 maxProgress(400)
                 displayItem(getMultiblock("fusion_reactor").block)
-                depends(NUCLEAR_PHYSICS, RHODIUM_PLATED_PALLADIUM)
+                depends(NUCLEAR_PHYSICS)
             }
         }
     }

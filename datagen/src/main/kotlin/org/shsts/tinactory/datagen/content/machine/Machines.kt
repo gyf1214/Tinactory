@@ -28,6 +28,7 @@ object Machines {
     private const val SCREEN_GLASS = "overlay/machine/overlay_screen_glass"
     private const val BOILER_TEX = "generators/boiler/coal"
     const val MACHINE_TICKS = 200L
+    const val ADVANCED_MACHINE_TICKS = 800L
 
     fun init() {
         processings()

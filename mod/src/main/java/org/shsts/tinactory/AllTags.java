@@ -45,6 +45,7 @@ public final class AllTags {
     public static final TagKey<Block> LITHOGRAPHY_LENS = modBlock("multiblock/lithography_lens");
     public static final TagKey<Block> POWER_BLOCK = modBlock("multiblock/power");
     public static final TagKey<Block> GLASS_CASING = modBlock("multiblock/glass_casing");
+    public static final TagKey<Block> FUSION_SHELL = modBlock("multiblock/fusion_shell");
 
     public static final TagKey<Item> STORAGE_CELL = modItem("storage_cell");
     public static final TagKey<Item> ITEM_STORAGE_CELL = extend(STORAGE_CELL, "item");
