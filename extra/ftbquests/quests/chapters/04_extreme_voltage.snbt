@@ -864,7 +864,7 @@
 				id: "433A0522B2F3010E"
 				type: "custom"
 				title: "{tinactory.quests.04_extreme_voltage.027.title}"
-				icon: "tinactory:component/carbon_plate"
+				icon: "minecraft:end_portal_frame"
 				tags: [
 					"tinactory_technology"
 					"tinactory_technology_tinactory_rocket_t2"

@@ -337,7 +337,7 @@ object Technologies {
 
             ROCKET_T1 = tech("rocket_t1") {
                 maxProgress(250)
-                displayItem(Items.FIREWORK_ROCKET)
+                displayItem(Items.CRYING_OBSIDIAN)
                 noResearch()
             }
 
@@ -411,7 +411,7 @@ object Technologies {
 
             ROCKET_T2 = child("rocket_t2") {
                 maxProgress(350)
-                displayItem(Items.FIREWORK_ROCKET)
+                displayItem(Items.END_PORTAL_FRAME)
                 depends(ROCKET_T1, DIGITAL_STORAGE, CARBON_FIBER)
                 noResearch()
             }

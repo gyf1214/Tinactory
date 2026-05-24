@@ -58,6 +58,11 @@
 			id: "05A550E7057E0005"
 			tasks: [
 				{
+					id: "553022B11F686A46"
+					type: "item"
+					item: "tinactory:machine/ev/stone_generator"
+				}
+				{
 					id: "05A550E7057E0006"
 					type: "item"
 					item: "minecraft:end_stone"
@@ -65,7 +70,7 @@
 				{
 					id: "05A550E7057E0007"
 					type: "item"
-					item: "tinactory:machine/hv/ore_analyzer"
+					item: "tinactory:machine/ev/ore_analyzer"
 				}
 			]
 		}

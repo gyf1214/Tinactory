@@ -716,7 +716,7 @@
 				id: "58A667C11AA55AF9"
 				type: "custom"
 				title: "{tinactory.quests.03_high_voltage.031.title}"
-				icon: "tinactory:multiblock/rocket_launch_site"
+				icon: "minecraft:crying_obsidian"
 				tags: [
 					"tinactory_technology"
 					"tinactory_technology_tinactory_rocket_t1"

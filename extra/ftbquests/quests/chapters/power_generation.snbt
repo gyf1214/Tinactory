@@ -300,7 +300,7 @@
 		{
 			title: "{tinactory.quests.power_generation.013.title}"
 			x: -4.0d
-			y: 2.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.013.subtitle}"
 			description: ["{tinactory.quests.power_generation.013.description.0}"]
 			dependencies: ["180A7F8DD9AD0580"]
@@ -314,7 +314,7 @@
 		{
 			title: "{tinactory.quests.power_generation.014.title}"
 			x: -4.0d
-			y: 4.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.014.subtitle}"
 			description: ["{tinactory.quests.power_generation.014.description.0}"]
 			dependencies: ["18A01183DF6A59D1"]
