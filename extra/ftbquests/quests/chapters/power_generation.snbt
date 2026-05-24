@@ -49,7 +49,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.002.title}"
-			x: 2.0d
+			x: 4.0d
 			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.002.subtitle}"
 			description: [
@@ -67,7 +67,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.003.title}"
-			x: 2.0d
+			x: 4.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.003.subtitle}"
 			description: [
@@ -97,7 +97,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.004.title}"
-			x: 2.0d
+			x: 4.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.004.subtitle}"
 			description: [
@@ -128,7 +128,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.005.title}"
-			x: 4.0d
+			x: 8.0d
 			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.005.subtitle}"
 			description: [
@@ -146,7 +146,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.006.title}"
-			x: 4.0d
+			x: 8.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.006.subtitle}"
 			description: [
@@ -176,7 +176,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.007.title}"
-			x: 4.0d
+			x: 8.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.007.subtitle}"
 			description: [
@@ -207,8 +207,8 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.008.title}"
-			x: 2.0d
-			y: -2.0d
+			x: 4.0d
+			y: -4.0d
 			subtitle: "{tinactory.quests.power_generation.008.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.008.description.0}"
@@ -280,8 +280,8 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.011.title}"
-			x: 6.0d
-			y: 2.0d
+			x: 12.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.011.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.011.description.0}"
@@ -327,8 +327,8 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.012.title}"
-			x: -2.0d
-			y: 2.0d
+			x: -4.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.012.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.012.description.0}"
@@ -336,7 +336,6 @@
 				"{tinactory.quests.power_generation.012.description.1}"
 			]
 			dependencies: [
-				"180A7F8DD9AD0580"
 				"6D4396F046AC59FA"
 				"2C0BDC359D181269"
 				"18A01183DF6A59D3"

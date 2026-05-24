@@ -470,7 +470,7 @@
 		{
 			title: "{tinactory.quests.03_high_voltage.020.title}"
 			x: 8.0d
-			y: -2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.03_high_voltage.020.subtitle}"
 			description: [
 				"{tinactory.quests.03_high_voltage.020.description.0}"
@@ -606,7 +606,7 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.027.title}"
-			x: 5.0d
+			x: 6.0d
 			y: 6.0d
 			subtitle: "{tinactory.quests.03_high_voltage.027.subtitle}"
 			description: [
@@ -675,7 +675,7 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.030.title}"
-			x: 2.0d
+			x: 4.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.030.subtitle}"
 			description: [
@@ -696,7 +696,7 @@
 		}
 		{
 			title: "{tinactory.quests.03_high_voltage.031.title}"
-			x: 5.0d
+			x: 8.0d
 			y: 8.0d
 			subtitle: "{tinactory.quests.03_high_voltage.031.subtitle}"
 			description: [
@@ -709,6 +709,7 @@
 			dependencies: [
 				"2575F9DB22B75F1C"
 				"25F9A6F2B9895E3D"
+				"54D61C6A8BA84D5D"
 			]
 			size: 2.0d
 			id: "3A37204C020F5B2C"
