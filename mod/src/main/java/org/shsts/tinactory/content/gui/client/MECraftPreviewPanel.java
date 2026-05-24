@@ -138,8 +138,8 @@ public class MECraftPreviewPanel extends Panel {
         addChild(RectD.corners(0d, 1d, 1d, 1d),
             Rect.corners(0, -BUTTON_HEIGHT * 2 - SPACING, 0, -BUTTON_HEIGHT - SPACING),
             cpuButton);
-        addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0), executeButton);
-        addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), cancelButton);
+        addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), executeButton);
+        addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0), cancelButton);
     }
 
     public void onPreviewSync(MECraftPreviewSyncPacket packet) {

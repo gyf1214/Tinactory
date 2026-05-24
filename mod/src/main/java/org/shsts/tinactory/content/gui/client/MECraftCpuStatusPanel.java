@@ -99,7 +99,7 @@ public class MECraftCpuStatusPanel extends Panel {
         this.cancelButton = new VanillaButton(menu, cancelLabel, null, this::cancel);
 
         addGroup(Rect.corners(2, 2, -2, -BUTTON_HEIGHT - SPACING - 2), cpuPanel);
-        addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), cancelButton);
+        addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0), cancelButton);
     }
 
     public void updateStatus(MECraftCpuSyncPacket packet) {
