@@ -20,6 +20,7 @@ import org.shsts.tinactory.integration.util.ClientUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -31,6 +32,8 @@ public class MEPatternBrowserPanel extends Panel {
     private static final int MAX_DISPLAY_INGREDIENT = 3;
 
     private final List<CraftPattern> patterns = new ArrayList<>();
+    private final Consumer<CraftPattern> onSelectPattern;
+    private final Runnable onCreatePattern;
 
     private class PatternButtonPanel extends ButtonPanel {
         public PatternButtonPanel() {
@@ -41,7 +44,7 @@ public class MEPatternBrowserPanel extends Panel {
         protected int getItemCount() {
             var count = patterns.size();
             var slotCount = gridViewGroup.getSlotCount();
-            return Math.max(1, (count + slotCount - 1) / slotCount) * slotCount;
+            return Math.max(1, count / slotCount + 1) * slotCount;
         }
 
         @Override
@@ -63,7 +66,13 @@ public class MEPatternBrowserPanel extends Panel {
         }
 
         @Override
-        protected void onSelect(int index, double mouseX, double mouseY, int button) {}
+        protected void onSelect(int index, double mouseX, double mouseY, int button) {
+            if (index < patterns.size()) {
+                onSelectPattern.accept(patterns.get(index));
+            } else {
+                onCreatePattern.run();
+            }
+        }
 
         @Override
         protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
@@ -74,8 +83,11 @@ public class MEPatternBrowserPanel extends Panel {
 
     private final PatternButtonPanel buttonPanel;
 
-    public MEPatternBrowserPanel(MEPatternTerminalScreen screen) {
+    public MEPatternBrowserPanel(MEPatternTerminalScreen screen,
+        Consumer<CraftPattern> onSelectPattern, Runnable onCreatePattern) {
         super(screen);
+        this.onSelectPattern = onSelectPattern;
+        this.onCreatePattern = onCreatePattern;
         this.buttonPanel = new PatternButtonPanel();
         addGroup(buttonPanel);
     }

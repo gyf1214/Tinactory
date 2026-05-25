@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
@@ -19,6 +20,10 @@ import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
 
 @ParametersAreNonnullByDefault
@@ -26,6 +31,10 @@ import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvi
 public class MEPatternTerminalMenu extends MenuBase {
     public static final String PATTERN_SYNC = "mePattern";
     public static final String PATTERN_RESULT_SYNC = "mePatternResult";
+    public static final int INVENTORY_WIDTH = SLOT_SIZE * 9;
+    public static final int INVENTORY_MARGIN = 7;
+    public static final int INVENTORY_Y = 151;
+    public static final int INVENTORY_BAR_Y = INVENTORY_Y + SLOT_SIZE * 3 + SPACING;
 
     private final IMachine machine;
     @Nullable
@@ -34,6 +43,18 @@ public class MEPatternTerminalMenu extends MenuBase {
     private MEPatternResultSyncPacket.ResultCode lastResult = MEPatternResultSyncPacket.ResultCode.SUCCESS;
     @Nullable
     private String lastResultPatternId;
+    private boolean editorActive = false;
+
+    private class EditorInventorySlot extends Slot {
+        public EditorInventorySlot(int slot, int x, int y) {
+            super(inventory, slot, x, y);
+        }
+
+        @Override
+        public boolean isActive() {
+            return editorActive;
+        }
+    }
 
     public MEPatternTerminalMenu(Properties properties) {
         super(properties);
@@ -45,11 +66,31 @@ public class MEPatternTerminalMenu extends MenuBase {
         addSyncSlot(PATTERN_SYNC, new RevisionScheduler<>(this::patternRevision, this::patternPacket));
         addSyncSlot(PATTERN_RESULT_SYNC, resultScheduler);
         onEventPacket(ME_PATTERN_ACTION, this::onAction);
+        addEditorInventorySlots();
     }
 
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player) && machine.canPlayerInteract(player);
+    }
+
+    public void setEditorActive(boolean value) {
+        editorActive = value;
+    }
+
+    private void addEditorInventorySlots() {
+        for (var j = 0; j < 9; j++) {
+            var x = MARGIN_X + INVENTORY_MARGIN + j * SLOT_SIZE;
+            var y = MARGIN_TOP + INVENTORY_BAR_Y;
+            addSlot(new EditorInventorySlot(j, x + 1, y + 1));
+        }
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 9; j++) {
+                var x = MARGIN_X + INVENTORY_MARGIN + j * SLOT_SIZE;
+                var y = MARGIN_TOP + INVENTORY_Y + i * SLOT_SIZE;
+                addSlot(new EditorInventorySlot(9 + i * 9 + j, x + 1, y + 1));
+            }
+        }
     }
 
     private long patternRevision() {
