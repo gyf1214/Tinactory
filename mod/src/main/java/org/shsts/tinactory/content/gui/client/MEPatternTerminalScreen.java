@@ -8,13 +8,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 
 import static org.shsts.tinactory.content.gui.MEPatternTerminalMenu.PATTERN_SYNC;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -26,7 +23,7 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
         super(menu, title);
         this.browserPanel = new MEPatternBrowserPanel(this);
 
-        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), browserPanel);
+        rootPanel.addGroup(browserPanel);
         this.contentHeight = 144;
 
         menu.onSyncPacket(PATTERN_SYNC, this::onPatternSync);
