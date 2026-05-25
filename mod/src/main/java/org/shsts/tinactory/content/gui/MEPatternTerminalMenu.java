@@ -12,6 +12,7 @@ import org.shsts.tinactory.content.gui.sync.MEPatternResultSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RevisionScheduler;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
+import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
@@ -31,6 +32,8 @@ public class MEPatternTerminalMenu extends MenuBase {
     private final IPatternRepository repository;
     private final ActiveScheduler<MEPatternResultSyncPacket> resultScheduler;
     private MEPatternResultSyncPacket.ResultCode lastResult = MEPatternResultSyncPacket.ResultCode.SUCCESS;
+    @Nullable
+    private String lastResultPatternId;
 
     public MEPatternTerminalMenu(Properties properties) {
         super(properties);
@@ -58,11 +61,67 @@ public class MEPatternTerminalMenu extends MenuBase {
     }
 
     private MEPatternResultSyncPacket resultPacket() {
-        return new MEPatternResultSyncPacket(lastResult);
+        return new MEPatternResultSyncPacket(lastResult, lastResultPatternId);
     }
 
     private void onAction(MEPatternEventPacket packet) {
-        lastResult = MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+        publishResult(handleAction(packet), packet.patternId());
+    }
+
+    private MEPatternResultSyncPacket.ResultCode handleAction(MEPatternEventPacket packet) {
+        if (repository == null || packet.patternId().isBlank()) {
+            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+        }
+        return switch (packet.action()) {
+            case CREATE -> createPattern(packet.patternId(), packet.pattern());
+            case UPDATE -> updatePattern(packet.patternId(), packet.pattern());
+            case DELETE -> deletePattern(packet.patternId(), packet.pattern());
+        };
+    }
+
+    private MEPatternResultSyncPacket.ResultCode createPattern(String patternId, @Nullable CraftPattern pattern) {
+        if (!hasValidPayload(pattern) || !patternId.equals(pattern.patternId())) {
+            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+        }
+        if (repository.containsPatternId(patternId)) {
+            return MEPatternResultSyncPacket.ResultCode.DUPLICATE_PATTERN_ID;
+        }
+        return repository.addPattern(pattern) ?
+            MEPatternResultSyncPacket.ResultCode.SUCCESS :
+            MEPatternResultSyncPacket.ResultCode.NO_CAPACITY;
+    }
+
+    private MEPatternResultSyncPacket.ResultCode updatePattern(String patternId, @Nullable CraftPattern pattern) {
+        if (!hasValidPayload(pattern)) {
+            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+        }
+        if (!repository.containsPatternId(patternId)) {
+            return MEPatternResultSyncPacket.ResultCode.PATTERN_NOT_FOUND;
+        }
+        if (!patternId.equals(pattern.patternId())) {
+            return MEPatternResultSyncPacket.ResultCode.STALE_PATTERN;
+        }
+        return repository.updatePattern(pattern) ?
+            MEPatternResultSyncPacket.ResultCode.SUCCESS :
+            MEPatternResultSyncPacket.ResultCode.NO_CAPACITY;
+    }
+
+    private MEPatternResultSyncPacket.ResultCode deletePattern(String patternId, @Nullable CraftPattern pattern) {
+        if (pattern != null) {
+            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+        }
+        return repository.removePattern(patternId) ?
+            MEPatternResultSyncPacket.ResultCode.SUCCESS :
+            MEPatternResultSyncPacket.ResultCode.PATTERN_NOT_FOUND;
+    }
+
+    private boolean hasValidPayload(@Nullable CraftPattern pattern) {
+        return pattern != null && !pattern.outputs().isEmpty();
+    }
+
+    private void publishResult(MEPatternResultSyncPacket.ResultCode result, String patternId) {
+        lastResult = result;
+        lastResultPatternId = patternId.isBlank() ? null : patternId;
         resultScheduler.invokeUpdate();
     }
 }
