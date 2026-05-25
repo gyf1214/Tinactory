@@ -8,7 +8,9 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -132,6 +134,26 @@ class CraftPlanContractTest {
     }
 
     @Test
+    void machineConstraintCodecShouldPreserveRecipeTypeConstraint() {
+        var constraint = new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler"));
+        var decoded = CodecHelper.parseTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+
+        assertEquals(constraint, decoded);
+    }
+
+    @Test
+    void machineConstraintCodecShouldPreserveVoltageConstraint() {
+        var constraint = new VoltageConstraint(3);
+        var decoded = CodecHelper.parseTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+
+        assertEquals(constraint, decoded);
+    }
+
+    @Test
     void machineConstraintCodecShouldEncodeStructuredTargetRecipeConstraintPayload() {
         var encoded = (CompoundTag) CodecHelper.encodeTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
@@ -139,5 +161,20 @@ class CraftPlanContractTest {
 
         assertEquals(TargetRecipeConstraint.TYPE_ID, encoded.getString("type"));
         assertEquals("tinactory:assembler/circuit", encoded.getString("recipeId"));
+    }
+
+    @Test
+    void machineConstraintCodecShouldEncodeStructuredRecipeTypeAndVoltagePayloads() {
+        var recipeType = (CompoundTag) CodecHelper.encodeTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler")));
+        var voltage = (CompoundTag) CodecHelper.encodeTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            new VoltageConstraint(3));
+
+        assertEquals(RecipeTypeConstraint.TYPE_ID, recipeType.getString("type"));
+        assertEquals("tinactory:assembler", recipeType.getString("recipeTypeId"));
+        assertEquals(VoltageConstraint.TYPE_ID, voltage.getString("type"));
+        assertEquals(3, voltage.getInt("voltageTier"));
     }
 }

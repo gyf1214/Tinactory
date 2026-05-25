@@ -1,6 +1,7 @@
 package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -14,8 +15,10 @@ import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
+import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
@@ -39,11 +42,12 @@ public final class TestMachine implements IMachine {
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
     private Optional<TestTeamProfile> owner = Optional.empty();
+    private Optional<TestProcessor> processor = Optional.empty();
     private boolean multiblock = false;
     private int parallel = 1;
 
     public TestMachine(IContainer container) {
-        this.container = Optional.of(container);
+        this.container = Optional.ofNullable(container);
     }
 
     public TestMachine withoutContainer() {
@@ -64,6 +68,15 @@ public final class TestMachine implements IMachine {
     public TestMachine targetRecipe(ResourceLocation loc) {
         config.stringValue("targetRecipe", loc.toString());
         return this;
+    }
+
+    public TestMachine supportsRecipeType(ResourceLocation loc) {
+        processor = Optional.of(new TestProcessor(Set.of(loc)));
+        return this;
+    }
+
+    public Optional<String> targetRecipe() {
+        return config.getString("targetRecipe");
     }
 
     public TestTeamProfile team() {
@@ -109,7 +122,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public void setConfig(ISetMachineConfigPacket packet, boolean invokeUpdate) {
-        throw new UnsupportedOperationException();
+        config.apply(packet);
     }
 
     @Override
@@ -134,7 +147,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public Optional<IProcessor> processor() {
-        return Optional.empty();
+        return processor.map(value -> value);
     }
 
     @Override
@@ -195,7 +208,16 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void apply(ISetMachineConfigPacket packet) {
-            throw new UnsupportedOperationException();
+            for (var key : packet.getResets()) {
+                booleans.remove(key);
+                strings.remove(key);
+            }
+            packet.getSets().getAllKeys().forEach(key -> {
+                var tag = packet.getSets().get(key);
+                if (tag instanceof StringTag stringTag) {
+                    strings.put(key, stringTag.getAsString());
+                }
+            });
         }
 
         @Override
@@ -230,6 +252,56 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void deserializeNBT(CompoundTag nbt) {
+        }
+    }
+
+    private record TestProcessor(Set<ResourceLocation> recipeTypes) implements IMachineProcessor {
+        @Override
+        public Optional<IProcessingObject> getInfo(int port, int index) {
+            return Optional.empty();
+        }
+
+        @Override
+        public List<IProcessingObject> getAllInfo() {
+            return List.of();
+        }
+
+        @Override
+        public long progressTicks() {
+            return 0;
+        }
+
+        @Override
+        public long maxProgressTicks() {
+            return 0;
+        }
+
+        @Override
+        public double workSpeed() {
+            return 0;
+        }
+
+        @Override
+        public boolean supportsRecipeType(ResourceLocation recipeTypeId) {
+            return recipeTypes.contains(recipeTypeId);
+        }
+
+        @Override
+        public boolean allowTargetRecipe(ResourceLocation loc) {
+            return true;
+        }
+
+        @Override
+        public void onPreWork() {
+        }
+
+        @Override
+        public void onWorkTick(double partial) {
+        }
+
+        @Override
+        public boolean isWorking(double partial) {
+            return false;
         }
     }
 

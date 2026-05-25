@@ -18,7 +18,9 @@ public final class MachineConstraintHelper {
     public static Codec<? extends IMachineConstraint> codec(String typeId) {
         return switch (typeId) {
             case PortConstraint.TYPE_ID -> PortConstraint.CODEC;
+            case RecipeTypeConstraint.TYPE_ID -> RecipeTypeConstraint.CODEC;
             case TargetRecipeConstraint.TYPE_ID -> TargetRecipeConstraint.CODEC;
+            case VoltageConstraint.TYPE_ID -> VoltageConstraint.CODEC;
             default -> throw new IllegalArgumentException("unknown machine constraint type id: " + typeId);
         };
     }

@@ -3,18 +3,26 @@ package org.shsts.tinactory.unit.autocraft;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
+import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutocraftModelTest {
     @Test
@@ -85,6 +93,54 @@ class AutocraftModelTest {
     }
 
     @Test
+    void machineConstraintDefaultsShouldAcceptMachinesAndRoutesWithoutLeaseSideEffects() {
+        IMachineConstraint constraint = new TestMachineConstraint("payload");
+        var machine = new TestMachine(null);
+        var key = TestStackKey.item("tinactory:ingot", "");
+
+        assertTrue(constraint.matches(machine, Voltage.LV));
+        assertTrue(constraint.matchesRoute(PortDirection.INPUT, 0, key, 2, 1, PortType.ITEM));
+        assertTrue(constraint.configureLease(machine).isEmpty());
+    }
+
+    @Test
+    void recipeTypeConstraintShouldMatchSupportedMachineProcessorTypes() {
+        var assembler = new ResourceLocation("tinactory", "assembler");
+        var mixer = new ResourceLocation("tinactory", "mixer");
+        var constraint = new RecipeTypeConstraint(assembler);
+        var machine = new TestMachine(null).supportsRecipeType(assembler);
+
+        assertEquals(assembler, constraint.recipeTypeId());
+        assertEquals("tinactory:recipe_type", constraint.typeId());
+        assertTrue(constraint.matches(machine, Voltage.LV));
+        assertFalse(new RecipeTypeConstraint(mixer).matches(machine, Voltage.LV));
+        assertFalse(constraint.matches(new TestMachine(null), Voltage.LV));
+    }
+
+    @Test
+    void voltageConstraintShouldMatchMinimumMachineVoltage() {
+        var constraint = new VoltageConstraint(Voltage.MV.rank);
+
+        assertEquals(Voltage.MV.rank, constraint.voltageTier());
+        assertEquals("tinactory:voltage", constraint.typeId());
+        assertTrue(constraint.matches(new TestMachine(null), Voltage.HV));
+        assertTrue(constraint.matches(new TestMachine(null), Voltage.MV));
+        assertFalse(constraint.matches(new TestMachine(null), Voltage.LV));
+        assertThrows(IllegalArgumentException.class, () -> new VoltageConstraint(-1));
+    }
+
+    @Test
+    void portConstraintShouldMatchOnlyTheBoundRoute() {
+        var constraint = new PortConstraint(PortDirection.INPUT, 0, 2);
+        var key = TestStackKey.item("tinactory:ingot", "");
+
+        assertTrue(constraint.matchesRoute(PortDirection.INPUT, 0, key, 4, 2, PortType.ITEM));
+        assertFalse(constraint.matchesRoute(PortDirection.INPUT, 0, key, 4, 3, PortType.ITEM));
+        assertTrue(constraint.matchesRoute(PortDirection.INPUT, 1, key, 4, 3, PortType.ITEM));
+        assertTrue(constraint.matchesRoute(PortDirection.OUTPUT, 0, key, 4, 3, PortType.ITEM));
+    }
+
+    @Test
     void targetRecipeConstraintShouldValidateRecipeId() {
         var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
         var constraint = new TargetRecipeConstraint(recipeId);
@@ -93,5 +149,22 @@ class AutocraftModelTest {
         assertEquals("tinactory:target_recipe", constraint.typeId());
         assertThrows(IllegalArgumentException.class,
             () -> new TargetRecipeConstraint(new ResourceLocation("tinactory", "")));
+    }
+
+    @Test
+    void targetRecipeConstraintShouldMatchAndRestoreMachineConfig() {
+        var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
+        var previous = new ResourceLocation("tinactory", "assembler/previous");
+        var constraint = new TargetRecipeConstraint(recipeId);
+        var machine = new TestMachine(null).supportsRecipeType(new ResourceLocation("tinactory", "assembler"))
+            .targetRecipe(previous);
+
+        assertTrue(constraint.matches(machine, Voltage.LV));
+        var restore = constraint.configureLease(machine).orElseThrow();
+        assertEquals(recipeId.toString(), machine.targetRecipe().orElseThrow());
+
+        restore.run();
+
+        assertEquals(previous.toString(), machine.targetRecipe().orElseThrow());
     }
 }

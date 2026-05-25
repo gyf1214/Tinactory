@@ -5,6 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -35,5 +37,11 @@ public record PortConstraint(PortDirection direction, int index, int port)
     @Override
     public String typeId() {
         return TYPE_ID;
+    }
+
+    @Override
+    public boolean matchesRoute(PortDirection dir, int index, IStackKey key, long amount, int port,
+        PortType portType) {
+        return this.direction != dir || this.index != index || this.port == port;
     }
 }
