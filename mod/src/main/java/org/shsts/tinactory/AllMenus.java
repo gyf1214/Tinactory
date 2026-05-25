@@ -21,6 +21,7 @@ import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MECraftTerminalScreen;
 import org.shsts.tinactory.content.gui.client.MEDriveScreen;
+import org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen;
 import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageDetectorScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
@@ -186,6 +187,7 @@ public final class AllMenus {
 
         ME_PATTERN_TERMINAL = REGISTRATE.menu("logistics/me_pattern_terminal", MEPatternTerminalMenu::new)
             .title(ProcessingMenu::getTitle)
+            .screen(() -> () -> MEPatternTerminalScreen::new)
             .register();
 
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
