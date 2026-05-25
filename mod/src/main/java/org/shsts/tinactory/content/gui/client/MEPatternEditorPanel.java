@@ -38,7 +38,6 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternEditorPanel extends Panel {
-    private static final String DEFAULT_RECIPE_TYPE = "tinactory:assembler";
     private static final int BUTTON_WIDTH = 48;
     private static final int BODY_Y = 46;
 
@@ -90,8 +89,8 @@ public class MEPatternEditorPanel extends Panel {
         patternIdLabel.setLines(TextComponent.EMPTY);
         inputRows.clear();
         outputRows.clear();
-        recipeTypeEdit.setValue(DEFAULT_RECIPE_TYPE);
-        voltageTierEdit.setValue("0");
+        recipeTypeEdit.setValue("");
+        voltageTierEdit.setValue("");
         feedbackLabel.setLines(TextComponent.EMPTY);
         refreshRows();
     }
@@ -106,8 +105,8 @@ public class MEPatternEditorPanel extends Panel {
         inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
         outputRows.addAll(fromAmounts(pattern.outputs(), pattern.constraints(), PortDirection.OUTPUT));
         recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString)
-            .orElse(DEFAULT_RECIPE_TYPE));
-        voltageTierEdit.setValue(Integer.toString(voltageConstraintTier(pattern.constraints()).orElse(0)));
+            .orElse(""));
+        voltageTierEdit.setValue(voltageConstraintTier(pattern.constraints()).map(Object::toString).orElse(""));
         feedbackLabel.setLines(TextComponent.EMPTY);
         refreshRows();
     }
@@ -144,8 +143,7 @@ public class MEPatternEditorPanel extends Panel {
 
     private Optional<CraftPattern> toPattern() {
         var patternId = patternIdEdit.getValue();
-        var recipeType = ResourceLocation.tryParse(recipeTypeEdit.getValue());
-        if (patternId.isBlank() || recipeType == null) {
+        if (patternId.isBlank()) {
             return Optional.empty();
         }
         var outputs = toAmounts(outputRows);
@@ -153,8 +151,16 @@ public class MEPatternEditorPanel extends Panel {
             return Optional.empty();
         }
         var constraints = constraints();
-        constraints.add(new RecipeTypeConstraint(recipeType));
-        constraints.add(new VoltageConstraint(parseInteger(voltageTierEdit.getValue(), 0)));
+        var recipeType = parseRecipeType();
+        if (recipeType.isEmpty() && !recipeTypeEdit.getValue().isBlank()) {
+            return Optional.empty();
+        }
+        var voltageTier = parseVoltageTier();
+        if (voltageTier.isEmpty() && !voltageTierEdit.getValue().isBlank()) {
+            return Optional.empty();
+        }
+        recipeType.ifPresent(value -> constraints.add(new RecipeTypeConstraint(value)));
+        voltageTier.ifPresent(value -> constraints.add(new VoltageConstraint(value)));
         return Optional.of(new CraftPattern(patternId, toAmounts(inputRows), outputs, constraints));
     }
 
@@ -208,11 +214,28 @@ public class MEPatternEditorPanel extends Panel {
         outputPanel.resetPage();
     }
 
-    private static int parseInteger(String value, int defaultValue) {
+    private Optional<ResourceLocation> parseRecipeType() {
+        var value = recipeTypeEdit.getValue();
+        if (value.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(ResourceLocation.tryParse(value));
+    }
+
+    private Optional<Integer> parseVoltageTier() {
+        var value = voltageTierEdit.getValue();
+        if (value.isBlank()) {
+            return Optional.empty();
+        }
+        var tier = parseInteger(value);
+        return tier >= 0 ? Optional.of(tier) : Optional.empty();
+    }
+
+    private static int parseInteger(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException ignored) {
-            return defaultValue;
+            return -1;
         }
     }
 
