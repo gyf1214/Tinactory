@@ -21,6 +21,7 @@ import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.content.autocraft.MECraftTerminal;
+import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
 import org.shsts.tinactory.content.logistics.MEDrive;
 import org.shsts.tinactory.content.logistics.MEPatternCell;
 import org.shsts.tinactory.content.logistics.MEPatternCellSet;
@@ -267,6 +268,17 @@ public class MiscMeta extends MetaConsumer {
             .build();
     }
 
+    private void mePatternTerminal(String id, JsonObject jo) {
+        var power = GsonHelper.getAsDouble(jo, "power");
+        BlockEntityBuilder.builder(id, simpleElectric(power))
+            .transform(MachineSet::baseMachine)
+            .menu(AllMenus.ME_PATTERN_TERMINAL)
+            .blockEntity()
+            .transform(MEPatternTerminal.factory(power))
+            .end()
+            .build();
+    }
+
     private void boiler(String id, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "layout");
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
@@ -324,6 +336,7 @@ public class MiscMeta extends MetaConsumer {
             case "me_storage_detector" -> meStorageDetector(id, jo);
             case "me_craft_cpu" -> meCraftCpu(id, jo);
             case "me_craft_terminal" -> meCraftTerminal(id, jo);
+            case "me_pattern_terminal" -> mePatternTerminal(id, jo);
             case "boiler" -> boiler(id, jo);
             default -> throw new UnsupportedTypeException("type", type);
         }

@@ -140,6 +140,13 @@ object Machines {
                     ioTex(ME_BUS)
                 }
             }
+            block("logistics/me_pattern_terminal") {
+                machineModel {
+                    casing(Voltage.HV)
+                    overlay("overlay/machine/overlay_screen")
+                    ioTex(ME_BUS)
+                }
+            }
         }
     }
 

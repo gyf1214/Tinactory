@@ -253,6 +253,15 @@ object MiscMachines {
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)
             }
+            output(getItem("logistics/me_pattern_terminal")) {
+                circuit(4)
+                input(getItem("component/annihilation_core"))
+                input(getItem("component/formation_core"))
+                input("certus_quartz", "gem", 4)
+                input("fluix", "dust", 4)
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.DIGITAL_STORAGE)
+            }
         }
     }
 
