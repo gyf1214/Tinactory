@@ -42,6 +42,14 @@ public final class PatternRegistryCache implements IPatternRepository {
     }
 
     @Override
+    public List<CraftPattern> listPatterns() {
+        return byPatternId.values().stream()
+            .map(PatternEntry::pattern)
+            .sorted(Comparator.comparing(CraftPattern::patternId))
+            .toList();
+    }
+
+    @Override
     public long revision() {
         return revision;
     }

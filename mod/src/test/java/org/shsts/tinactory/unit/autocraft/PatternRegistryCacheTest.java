@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PatternRegistryCacheTest {
@@ -44,6 +45,29 @@ class PatternRegistryCacheTest {
 
         assertEquals(List.of("tinactory:p1", "tinactory:p2"),
             repo.findPatternsProducing(out).stream().map(CraftPattern::patternId).toList());
+    }
+
+    @Test
+    void listPatternsShouldReturnPatternIdSortedImmutableSnapshot() {
+        var repo = new PatternRegistryCache();
+        var machineA = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var machineB = UUID.fromString("22222222-2222-2222-2222-222222222222");
+
+        assertTrue(repo.addCellPort(machineA, 1, 0, new TestCellPort(List.of(
+            pattern("tinactory:p3", "tinactory:iron_plate"),
+            pattern("tinactory:p1", "tinactory:copper_plate")))));
+        assertTrue(repo.addCellPort(machineB, 1, 0, new TestCellPort(List.of(
+            pattern("tinactory:p2", "tinactory:gold_plate")))));
+
+        var snapshot = repo.listPatterns();
+
+        assertEquals(List.of("tinactory:p1", "tinactory:p2", "tinactory:p3"),
+            snapshot.stream().map(CraftPattern::patternId).toList());
+        assertThrows(UnsupportedOperationException.class,
+            () -> snapshot.add(pattern("tinactory:p5", "tinactory:diamond_plate")));
+        assertTrue(repo.addPattern(pattern("tinactory:p4", "tinactory:steel_plate")));
+        assertEquals(List.of("tinactory:p1", "tinactory:p2", "tinactory:p3"),
+            snapshot.stream().map(CraftPattern::patternId).toList());
     }
 
     @Test

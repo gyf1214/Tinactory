@@ -15,6 +15,8 @@ public interface IPatternRepository {
 
     List<IStackKey> listRequestables();
 
+    List<CraftPattern> listPatterns();
+
     default long revision() {
         return 0L;
     }

@@ -196,6 +196,11 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
+            public List<CraftPattern> listPatterns() {
+                return patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList();
+            }
+
+            @Override
             public boolean containsPatternId(String patternId) {
                 return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
             }
