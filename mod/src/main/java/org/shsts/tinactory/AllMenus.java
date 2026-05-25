@@ -7,6 +7,7 @@ import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
+import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
@@ -35,6 +36,9 @@ import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftRequestSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
+import org.shsts.tinactory.content.gui.sync.MEPatternResultSyncPacket;
+import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
@@ -64,6 +68,7 @@ public final class AllMenus {
     public static final IMenuEvent<RenameEventPacket> RENAME;
     public static final IMenuEvent<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
     public static final IMenuEvent<MECraftEventPacket> ME_CRAFT_ACTION;
+    public static final IMenuEvent<MEPatternEventPacket> ME_PATTERN_ACTION;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType TECH_MENU;
@@ -76,6 +81,7 @@ public final class AllMenus {
     public static final IMenuType ME_SIGNAL_CONTROLLER;
     public static final IMenuType ME_STORAGE_DETECTOR;
     public static final IMenuType ME_CRAFT_TERMINAL;
+    public static final IMenuType ME_PATTERN_TERMINAL;
     public static final IMenuType PRIMITIVE_MACHINE;
     public static final IMenuType PROCESSING_MACHINE;
     public static final IMenuType BOILER;
@@ -102,7 +108,11 @@ public final class AllMenus {
             .registerMenuSyncPacket(MECraftCpuSyncPacket.class,
                 MECraftCpuSyncPacket::new)
             .registerMenuSyncPacket(MECraftPreviewSyncPacket.class,
-                MECraftPreviewSyncPacket::new);
+                MECraftPreviewSyncPacket::new)
+            .registerMenuSyncPacket(MEPatternSyncPacket.class,
+                MEPatternSyncPacket::new)
+            .registerMenuSyncPacket(MEPatternResultSyncPacket.class,
+                MEPatternResultSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
@@ -114,6 +124,8 @@ public final class AllMenus {
             MEStorageInterfaceEventPacket::new);
         ME_CRAFT_ACTION = CHANNEL.registerMenuEventPacket(MECraftEventPacket.class,
             MECraftEventPacket::new);
+        ME_PATTERN_ACTION = CHANNEL.registerMenuEventPacket(MEPatternEventPacket.class,
+            MEPatternEventPacket::new);
 
         CHANNEL.registerPacket(OpenTechPacket.class, () -> OpenTechPacket.INSTANCE, TechMenu::onOpenGui);
 
@@ -170,6 +182,10 @@ public final class AllMenus {
         ME_CRAFT_TERMINAL = REGISTRATE.menu("logistics/me_craft_terminal", MECraftTerminalMenu::new)
             .title(ProcessingMenu::getTitle)
             .screen(() -> () -> MECraftTerminalScreen::new)
+            .register();
+
+        ME_PATTERN_TERMINAL = REGISTRATE.menu("logistics/me_pattern_terminal", MEPatternTerminalMenu::new)
+            .title(ProcessingMenu::getTitle)
             .register();
 
         PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
