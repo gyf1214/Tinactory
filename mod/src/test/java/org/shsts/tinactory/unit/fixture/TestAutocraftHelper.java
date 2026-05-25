@@ -13,7 +13,9 @@ public final class TestAutocraftHelper {
     private TestAutocraftHelper() {}
 
     public static List<IMachineConstraint> constraints(String recipeTypeId, int voltageTier) {
-        return List.of(new RecipeTypeConstraint(new ResourceLocation(recipeTypeId)), new VoltageConstraint(voltageTier));
+        return List.of(
+            new RecipeTypeConstraint(new ResourceLocation(recipeTypeId)),
+            new VoltageConstraint(voltageTier));
     }
 
     public static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
