@@ -15,8 +15,6 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
-import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
-import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.logistics.CraftPortChannel;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -157,12 +155,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     private static List<IMachineConstraint> effectiveConstraints(CraftStep step) {
-        var requirement = step.pattern().machineRequirement();
-        var constraints = new ArrayList<IMachineConstraint>(requirement.constraints().size() + 2);
-        constraints.addAll(requirement.constraints());
-        constraints.add(new RecipeTypeConstraint(requirement.recipeTypeId()));
-        constraints.add(new VoltageConstraint(requirement.voltageTier()));
-        return List.copyOf(constraints);
+        return step.pattern().constraints();
     }
 
     private static boolean matchesConstraints(

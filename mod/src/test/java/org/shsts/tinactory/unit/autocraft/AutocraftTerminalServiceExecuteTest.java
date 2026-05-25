@@ -166,7 +166,7 @@ class AutocraftTerminalServiceExecuteTest {
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
         return TestAutocraftHelper.pattern(id, List.of(
                 new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
-            outputs, TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
+            outputs, TestAutocraftHelper.constraints("tinactory:mixer", 0));
     }
 
     private static IPatternRepository repo(List<CraftPattern> patterns) {
@@ -239,7 +239,7 @@ class AutocraftTerminalServiceExecuteTest {
         var pattern = TestAutocraftHelper.pattern("tinactory:test",
             List.of(input),
             List.of(output),
-            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
+            TestAutocraftHelper.constraints("tinactory:mixer", 0));
         return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)));
     }
 

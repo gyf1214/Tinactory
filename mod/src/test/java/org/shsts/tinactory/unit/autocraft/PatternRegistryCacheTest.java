@@ -176,7 +176,7 @@ class PatternRegistryCacheTest {
             patternId,
             List.of(new CraftAmount(TestStackKey.item("tinactory:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item(outputId, ""), 1)),
-            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
+            TestAutocraftHelper.constraints("tinactory:mixer", 0));
     }
 
     private static final class TestCellPort implements IPatternCellPort {

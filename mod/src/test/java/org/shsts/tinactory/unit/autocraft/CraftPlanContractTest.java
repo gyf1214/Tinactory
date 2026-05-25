@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -31,7 +30,7 @@ class CraftPlanContractTest {
             "tinactory:gear",
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var step = new CraftStep("step-1", pattern, 3);
         var plan = new CraftPlan(List.of(step));
 
@@ -45,7 +44,7 @@ class CraftPlanContractTest {
             "tinactory:gear",
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var intermediate = List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2));
         var finals = List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1));
 
@@ -61,7 +60,7 @@ class CraftPlanContractTest {
             "tinactory:gear",
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var intermediate = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2)));
         var finals = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)));
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);

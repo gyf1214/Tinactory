@@ -7,7 +7,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -40,30 +39,27 @@ class AutocraftModelTest {
         var ore = new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1);
         var plate = new CraftAmount(TestStackKey.item("tinactory:plate", ""), 2);
         var slag = new CraftAmount(TestStackKey.item("tinactory:slag", ""), 1);
-        var requirement = new MachineRequirement(new ResourceLocation("tinactory", "crusher"), 2,
-            List.of(new TestMachineConstraint("tooling")));
+        List<IMachineConstraint> constraints = List.of(new TestMachineConstraint("tooling"));
 
-        var pattern = new CraftPattern("tinactory:ore_to_plate", List.of(ore), List.of(plate, slag), requirement);
+        var pattern = new CraftPattern("tinactory:ore_to_plate", List.of(ore), List.of(plate, slag), constraints);
 
         assertEquals(List.of(ore), pattern.inputs());
         assertEquals(List.of(plate, slag), pattern.outputs());
-        assertEquals(new ResourceLocation("tinactory", "crusher"), pattern.machineRequirement().recipeTypeId());
-        assertEquals(2, pattern.machineRequirement().voltageTier());
-        assertEquals(new TestMachineConstraint("tooling"), pattern.machineRequirement().constraints().get(0));
+        assertEquals(new TestMachineConstraint("tooling"), pattern.constraints().get(0));
     }
 
     @Test
     void modelValuesShouldBeImmutable() {
-        var requirement = new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1,
-            List.of(new TestMachineConstraint("frame")));
         var pattern = new CraftPattern(
             "tinactory:part",
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:part", ""), 1)),
-            requirement);
+            List.of(new TestMachineConstraint("frame")));
 
         assertThrows(UnsupportedOperationException.class, () -> pattern.inputs().add(
             new CraftAmount(TestStackKey.item("tinactory:other", ""), 1)));
+        assertThrows(UnsupportedOperationException.class,
+            () -> pattern.constraints().add(new TestMachineConstraint("other")));
         assertThrows(IllegalArgumentException.class,
             () -> new CraftAmount(TestStackKey.item("tinactory:invalid", ""), 0));
     }
@@ -121,7 +117,7 @@ class AutocraftModelTest {
     void voltageConstraintShouldMatchMinimumMachineVoltage() {
         var constraint = new VoltageConstraint(Voltage.MV.rank);
 
-        assertEquals(Voltage.MV.rank, constraint.voltageTier());
+        assertEquals(Voltage.MV.rank, constraint.tier());
         assertEquals("tinactory:voltage", constraint.typeId());
         assertTrue(constraint.matches(new TestMachine(null), Voltage.HV));
         assertTrue(constraint.matches(new TestMachine(null), Voltage.MV));

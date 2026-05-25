@@ -10,14 +10,14 @@ import org.shsts.tinactory.core.electric.Voltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record VoltageConstraint(int voltageTier) implements IMachineConstraint {
+public record VoltageConstraint(int tier) implements IMachineConstraint {
     public static final String TYPE_ID = "tinactory:voltage";
     public static final Codec<VoltageConstraint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.INT.fieldOf("voltageTier").forGetter(VoltageConstraint::voltageTier)
+        Codec.INT.fieldOf("voltageTier").forGetter(VoltageConstraint::tier)
     ).apply(instance, VoltageConstraint::new));
 
     public VoltageConstraint {
-        if (voltageTier < 0) {
+        if (tier < 0) {
             throw new IllegalArgumentException("voltageTier must be non-negative");
         }
     }
@@ -29,6 +29,6 @@ public record VoltageConstraint(int voltageTier) implements IMachineConstraint {
 
     @Override
     public boolean matches(IMachine machine, Voltage voltage) {
-        return voltage.rank >= voltageTier;
+        return voltage.rank >= tier;
     }
 }

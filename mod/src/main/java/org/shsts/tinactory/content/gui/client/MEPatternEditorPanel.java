@@ -13,8 +13,9 @@ import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.Label;
@@ -102,12 +103,11 @@ public class MEPatternEditorPanel extends Panel {
         patternIdLabel.setLines(new TextComponent(pattern.patternId()));
         inputRows.clear();
         outputRows.clear();
-        inputRows.addAll(fromAmounts(pattern.inputs(), pattern.machineRequirement().constraints(),
-            PortDirection.INPUT));
-        outputRows.addAll(fromAmounts(pattern.outputs(), pattern.machineRequirement().constraints(),
-            PortDirection.OUTPUT));
-        recipeTypeEdit.setValue(pattern.machineRequirement().recipeTypeId().toString());
-        voltageTierEdit.setValue(Integer.toString(pattern.machineRequirement().voltageTier()));
+        inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
+        outputRows.addAll(fromAmounts(pattern.outputs(), pattern.constraints(), PortDirection.OUTPUT));
+        recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString)
+            .orElse(DEFAULT_RECIPE_TYPE));
+        voltageTierEdit.setValue(Integer.toString(voltageConstraintTier(pattern.constraints()).orElse(0)));
         feedbackLabel.setLines(TextComponent.EMPTY);
         refreshRows();
     }
@@ -152,9 +152,10 @@ public class MEPatternEditorPanel extends Panel {
         if (outputs.isEmpty()) {
             return Optional.empty();
         }
-        var requirement = new MachineRequirement(recipeType, parseInteger(voltageTierEdit.getValue(), 0),
-            constraints());
-        return Optional.of(new CraftPattern(patternId, toAmounts(inputRows), outputs, requirement));
+        var constraints = constraints();
+        constraints.add(new RecipeTypeConstraint(recipeType));
+        constraints.add(new VoltageConstraint(parseInteger(voltageTierEdit.getValue(), 0)));
+        return Optional.of(new CraftPattern(patternId, toAmounts(inputRows), outputs, constraints));
     }
 
     private List<IMachineConstraint> constraints() {
@@ -213,5 +214,21 @@ public class MEPatternEditorPanel extends Panel {
         } catch (NumberFormatException ignored) {
             return defaultValue;
         }
+    }
+
+    private static Optional<ResourceLocation> recipeType(List<IMachineConstraint> constraints) {
+        return constraints.stream()
+            .filter(RecipeTypeConstraint.class::isInstance)
+            .map(RecipeTypeConstraint.class::cast)
+            .map(RecipeTypeConstraint::recipeTypeId)
+            .findFirst();
+    }
+
+    private static Optional<Integer> voltageConstraintTier(List<IMachineConstraint> constraints) {
+        return constraints.stream()
+            .filter(VoltageConstraint.class::isInstance)
+            .map(VoltageConstraint.class::cast)
+            .map(VoltageConstraint::tier)
+            .findFirst();
     }
 }

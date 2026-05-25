@@ -52,6 +52,6 @@ class PatternCellIntegrationTest {
             id,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
-            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
+            TestAutocraftHelper.constraints("tinactory:mixer", 0));
     }
 }
