@@ -64,13 +64,13 @@ class AutocraftModelTest {
     void portConstraintShouldValidateDirectionAndIndices() {
         var constraint = new PortConstraint(PortDirection.INPUT, 0, 2);
         assertEquals(PortDirection.INPUT, constraint.direction());
-        assertEquals(0, constraint.slotIndex());
-        assertEquals(2, constraint.portIndex());
+        assertEquals(0, constraint.index());
+        assertEquals(2, constraint.port());
         assertEquals("tinactory:port", constraint.typeId());
 
         assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.INPUT, -1, 0));
         assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.INPUT, 0, -1));
-        assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.NONE, 0, null));
+        assertThrows(IllegalArgumentException.class, () -> new PortConstraint(PortDirection.NONE, 0, 0));
     }
 
     @Test

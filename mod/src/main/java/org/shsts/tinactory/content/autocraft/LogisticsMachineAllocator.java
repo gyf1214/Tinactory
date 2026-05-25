@@ -199,7 +199,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             .filter(PortConstraint.class::isInstance)
             .map(PortConstraint.class::cast)
             .filter(constraint -> constraint.direction() == PortDirection.INPUT)
-            .filter(constraint -> constraint.slotIndex() == slotIndex)
+            .filter(constraint -> constraint.index() == slotIndex)
             .toList();
     }
 
@@ -208,19 +208,14 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             .filter(PortConstraint.class::isInstance)
             .map(PortConstraint.class::cast)
             .filter(constraint -> constraint.direction() == PortDirection.OUTPUT)
-            .filter(constraint -> constraint.slotIndex() == slotIndex)
+            .filter(constraint -> constraint.index() == slotIndex)
             .toList();
     }
 
     private static boolean matchesConstraints(
         LogisticComponent.PortInfo info,
         List<PortConstraint> constraints) {
-        for (var constraint : constraints) {
-            if (constraint.portIndex() != null && constraint.portIndex() != info.portIndex()) {
-                return false;
-            }
-        }
-        return true;
+        return constraints.stream().allMatch($ -> $.port() == info.portIndex());
     }
 
     private static Optional<IMachineRoute> buildItemInputRoute(IPort<?> port, IStackKey key) {

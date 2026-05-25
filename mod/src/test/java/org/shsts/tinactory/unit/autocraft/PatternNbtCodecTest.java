@@ -81,9 +81,9 @@ class PatternNbtCodecTest {
                 1,
                 List.of(
                     new PortConstraint(PortDirection.INPUT, 0, 2),
-                    new PortConstraint(PortDirection.INPUT, 1, null),
+                    new PortConstraint(PortDirection.INPUT, 1, 3),
                     new PortConstraint(PortDirection.OUTPUT, 0, 5),
-                    new PortConstraint(PortDirection.OUTPUT, 1, null))));
+                    new PortConstraint(PortDirection.OUTPUT, 1, 1))));
 
         var decoded = codec.decodePattern(codec.encodePattern(pattern));
 

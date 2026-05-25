@@ -116,8 +116,8 @@ class CraftPlanContractTest {
             new PortConstraint(PortDirection.INPUT, 1, 4));
 
         assertEquals(PortConstraint.TYPE_ID, encoded.getString("type"));
-        assertEquals(1, encoded.getInt("slotIndex"));
-        assertEquals(4, encoded.getInt("portIndex"));
+        assertEquals(1, encoded.getInt("index"));
+        assertEquals(4, encoded.getInt("port"));
         assertEquals("input", encoded.getString("direction"));
     }
 
