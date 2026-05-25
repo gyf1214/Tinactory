@@ -141,6 +141,18 @@ class AutocraftModelTest {
     }
 
     @Test
+    void portConstraintShouldNotBlockDifferentKeysAmountsOrPortTypesOnOtherSlots() {
+        var constraint = new PortConstraint(PortDirection.OUTPUT, 1, 2);
+
+        assertTrue(constraint.matchesRoute(PortDirection.OUTPUT, 0,
+            TestStackKey.item("tinactory:gear", ""), 1, 5, PortType.ITEM));
+        assertTrue(constraint.matchesRoute(PortDirection.INPUT, 1,
+            TestStackKey.item("tinactory:gear", ""), 1, 5, PortType.ITEM));
+        assertTrue(constraint.matchesRoute(PortDirection.OUTPUT, 1,
+            TestStackKey.fluid("tinactory:steam", ""), 1000, 2, PortType.FLUID));
+    }
+
+    @Test
     void targetRecipeConstraintShouldValidateRecipeId() {
         var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
         var constraint = new TargetRecipeConstraint(recipeId);
@@ -166,5 +178,21 @@ class AutocraftModelTest {
         restore.run();
 
         assertEquals(previous.toString(), machine.targetRecipe().orElseThrow());
+    }
+
+    @Test
+    void targetRecipeConstraintRestoreCallbacksShouldNestCleanlyWhenGuardedByLeaseRelease() {
+        var firstRecipe = new ResourceLocation("tinactory", "assembler/first");
+        var secondRecipe = new ResourceLocation("tinactory", "assembler/second");
+        var machine = new TestMachine(null).supportsRecipeType(new ResourceLocation("tinactory", "assembler"));
+        var firstRestore = new TargetRecipeConstraint(firstRecipe).configureLease(machine).orElseThrow();
+        var secondRestore = new TargetRecipeConstraint(secondRecipe).configureLease(machine).orElseThrow();
+
+        assertEquals(secondRecipe.toString(), machine.targetRecipe().orElseThrow());
+
+        secondRestore.run();
+        firstRestore.run();
+
+        assertTrue(machine.targetRecipe().isEmpty());
     }
 }
