@@ -6,6 +6,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
 
 import java.util.List;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -14,5 +15,5 @@ public interface IPatternCellPort extends IBytesProvider {
 
     boolean insert(CraftPattern pattern);
 
-    boolean remove(String patternId);
+    boolean remove(UUID patternUuid);
 }

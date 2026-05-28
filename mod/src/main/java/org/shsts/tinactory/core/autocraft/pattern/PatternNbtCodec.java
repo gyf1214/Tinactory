@@ -30,7 +30,7 @@ public final class PatternNbtCodec {
 
     public CompoundTag encodePattern(CraftPattern pattern) {
         var tag = new CompoundTag();
-        tag.putString("patternId", pattern.patternId());
+        tag.putUUID("patternUuid", pattern.patternUuid());
         tag.put("inputs", encodeAmounts(pattern.inputs()));
         tag.put("outputs", encodeAmounts(pattern.outputs()));
         tag.put("constraints", encodeConstraints(pattern.constraints()));
@@ -38,8 +38,11 @@ public final class PatternNbtCodec {
     }
 
     public CraftPattern decodePattern(CompoundTag tag) {
+        if (!tag.hasUUID("patternUuid")) {
+            throw new IllegalArgumentException("patternUuid is required");
+        }
         return new CraftPattern(
-            tag.getString("patternId"),
+            tag.getUUID("patternUuid"),
             decodeAmounts(tag.getList("inputs", TAG_COMPOUND)),
             decodeAmounts(tag.getList("outputs", TAG_COMPOUND)),
             decodeConstraints(tag.getList("constraints", TAG_COMPOUND)));

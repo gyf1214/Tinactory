@@ -18,17 +18,22 @@ import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PatternNbtCodecTest {
+    private static final UUID TEST_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private static final UUID SLOT_UUID = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    private static final UUID TARGET_UUID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+
     @Test
     void codecShouldRoundTripPattern() {
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
-            "tinactory:test",
+            TEST_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
             List.of(new CraftAmount(TestStackKey.fluid("minecraft:water", ""), 250)),
             List.of(
@@ -42,6 +47,8 @@ class PatternNbtCodecTest {
         assertFalse(tag.contains("machineRequirement"));
         assertFalse(tag.contains("recipeTypeId"));
         assertFalse(tag.contains("voltageTier"));
+        assertFalse(tag.contains("patternId"));
+        assertEquals(TEST_UUID, tag.getUUID("patternUuid"));
         assertEquals(3, tag.getList("constraints", Tag.TAG_COMPOUND).size());
         assertEquals(pattern, decoded);
     }
@@ -50,7 +57,7 @@ class PatternNbtCodecTest {
     void codecShouldRejectUnknownConstraintType() {
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
-        tag.putString("patternId", "tinactory:bad");
+        tag.putUUID("patternUuid", TEST_UUID);
         tag.put("inputs", new ListTag());
         var outputs = new ListTag();
         var out = new CompoundTag();
@@ -71,10 +78,29 @@ class PatternNbtCodecTest {
     }
 
     @Test
+    void codecShouldRejectOldPatternIdNbt() {
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var tag = new CompoundTag();
+        tag.putString("patternId", "tinactory:bad");
+        tag.put("inputs", new ListTag());
+        var outputs = new ListTag();
+        var out = new CompoundTag();
+        out.put("key", CodecHelper.encodeTag(
+            TestStackKey.CODEC,
+            TestStackKey.item("minecraft:iron_ingot", "")));
+        out.putLong("amount", 1);
+        outputs.add(out);
+        tag.put("outputs", outputs);
+        tag.put("constraints", new ListTag());
+
+        assertThrows(IllegalArgumentException.class, () -> codec.decodePattern(tag));
+    }
+
+    @Test
     void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
-            "tinactory:slot_constraints",
+            SLOT_UUID,
             List.of(
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
@@ -97,7 +123,7 @@ class PatternNbtCodecTest {
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var targetRecipe = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
         var pattern = new CraftPattern(
-            "tinactory:target_recipe",
+            TARGET_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:circuit", ""), 1)),
             List.of(targetRecipe));

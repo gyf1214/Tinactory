@@ -23,10 +23,13 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public final class PatternRegistryCache implements IPatternRepository {
     private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Comparator<CraftPattern> DISPLAY_ORDER = Comparator
+        .comparing((CraftPattern pattern) -> pattern.outputs().get(0).key())
+        .thenComparing(CraftPattern::patternUuid);
 
     private final Map<CellKey, CellState> cellsByKey = new HashMap<>();
     private final NavigableSet<CellKey> orderedCells = new TreeSet<>();
-    private final Map<String, PatternEntry> byPatternId = new HashMap<>();
+    private final Map<UUID, PatternEntry> byPatternUuid = new HashMap<>();
     private final Map<IStackKey, List<CraftPattern>> byOutput = new HashMap<>();
     private final Map<UUID, Integer> machinePriority = new HashMap<>();
     private long revision;
@@ -43,9 +46,9 @@ public final class PatternRegistryCache implements IPatternRepository {
 
     @Override
     public List<CraftPattern> listPatterns() {
-        return byPatternId.values().stream()
+        return byPatternUuid.values().stream()
             .map(PatternEntry::pattern)
-            .sorted(Comparator.comparing(CraftPattern::patternId))
+            .sorted(DISPLAY_ORDER)
             .toList();
     }
 
@@ -55,13 +58,13 @@ public final class PatternRegistryCache implements IPatternRepository {
     }
 
     @Override
-    public boolean containsPatternId(String patternId) {
-        return byPatternId.containsKey(patternId);
+    public boolean containsPatternUuid(UUID patternUuid) {
+        return byPatternUuid.containsKey(patternUuid);
     }
 
     @Override
     public boolean addPattern(CraftPattern pattern) {
-        if (containsPatternId(pattern.patternId())) {
+        if (containsPatternUuid(pattern.patternUuid())) {
             return false;
         }
         if (addPatternToCell(pattern)) {
@@ -72,14 +75,14 @@ public final class PatternRegistryCache implements IPatternRepository {
     }
 
     @Override
-    public boolean removePattern(String patternId) {
-        var entry = byPatternId.get(patternId);
+    public boolean removePattern(UUID patternUuid) {
+        var entry = byPatternUuid.get(patternUuid);
         if (entry == null) {
             return false;
         }
         var state = requireCellState(entry.owner());
-        if (!state.port().remove(patternId)) {
-            throw invalidState("pattern %s exists in indexes but owner cell rejected remove", patternId);
+        if (!state.port().remove(patternUuid)) {
+            throw invalidState("pattern %s exists in indexes but owner cell rejected remove", patternUuid);
         }
         removePatternIndexes(entry.owner(), state, entry.pattern());
         revision++;
@@ -88,17 +91,17 @@ public final class PatternRegistryCache implements IPatternRepository {
 
     @Override
     public boolean updatePattern(CraftPattern pattern) {
-        var existing = byPatternId.get(pattern.patternId());
+        var existing = byPatternUuid.get(pattern.patternUuid());
         if (existing == null) {
             return addPattern(pattern);
         }
 
         var owner = existing.owner();
         var state = requireCellState(owner);
-        if (!state.port().remove(existing.pattern().patternId())) {
+        if (!state.port().remove(existing.pattern().patternUuid())) {
             throw invalidState(
                 "pattern %s exists in indexes but owner cell rejected remove",
-                existing.pattern().patternId());
+                existing.pattern().patternUuid());
         }
         removePatternIndexes(owner, state, existing.pattern());
 
@@ -108,7 +111,7 @@ public final class PatternRegistryCache implements IPatternRepository {
         }
 
         if (!state.port().insert(existing.pattern())) {
-            throw invalidState("rollback failed for pattern %s", existing.pattern().patternId());
+            throw invalidState("rollback failed for pattern %s", existing.pattern().patternUuid());
         }
         addPatternIndexes(owner, state, existing.pattern());
         return false;
@@ -127,7 +130,7 @@ public final class PatternRegistryCache implements IPatternRepository {
 
         var patterns = List.copyOf(port.patterns());
         for (var pattern : patterns) {
-            if (containsPatternId(pattern.patternId())) {
+            if (containsPatternUuid(pattern.patternUuid())) {
                 return false;
             }
         }
@@ -153,10 +156,10 @@ public final class PatternRegistryCache implements IPatternRepository {
 
         for (var key : keys) {
             var state = requireCellState(key);
-            for (var patternId : List.copyOf(state.patternIdsInCell())) {
-                var entry = byPatternId.get(patternId);
+            for (var patternUuid : List.copyOf(state.patternUuidsInCell())) {
+                var entry = byPatternUuid.get(patternUuid);
                 if (entry == null || !entry.owner().equals(key)) {
-                    throw invalidState("pattern %s missing or mismatched during cell removal", patternId);
+                    throw invalidState("pattern %s missing or mismatched during cell removal", patternUuid);
                 }
                 removePatternIndexes(key, state, entry.pattern());
             }
@@ -170,13 +173,13 @@ public final class PatternRegistryCache implements IPatternRepository {
 
     @Override
     public void clear() {
-        if (cellsByKey.isEmpty() && orderedCells.isEmpty() && byPatternId.isEmpty() && byOutput.isEmpty() &&
+        if (cellsByKey.isEmpty() && orderedCells.isEmpty() && byPatternUuid.isEmpty() && byOutput.isEmpty() &&
             machinePriority.isEmpty()) {
             return;
         }
         cellsByKey.clear();
         orderedCells.clear();
-        byPatternId.clear();
+        byPatternUuid.clear();
         byOutput.clear();
         machinePriority.clear();
         revision++;
@@ -195,27 +198,27 @@ public final class PatternRegistryCache implements IPatternRepository {
     }
 
     private void addPatternIndexes(CellKey owner, CellState state, CraftPattern pattern) {
-        var existing = byPatternId.putIfAbsent(pattern.patternId(), new PatternEntry(pattern, owner));
+        var existing = byPatternUuid.putIfAbsent(pattern.patternUuid(), new PatternEntry(pattern, owner));
         if (existing != null) {
-            throw invalidState("duplicate pattern id %s in index", pattern.patternId());
+            throw invalidState("duplicate pattern uuid %s in index", pattern.patternUuid());
         }
-        if (!state.patternIdsInCell().add(pattern.patternId())) {
-            throw invalidState("duplicate pattern id %s in cell membership", pattern.patternId());
+        if (!state.patternUuidsInCell().add(pattern.patternUuid())) {
+            throw invalidState("duplicate pattern uuid %s in cell membership", pattern.patternUuid());
         }
         for (var output : pattern.outputs()) {
             var list = byOutput.computeIfAbsent(output.key(), $ -> new ArrayList<>());
             list.add(pattern);
-            list.sort(Comparator.comparing(CraftPattern::patternId));
+            list.sort(DISPLAY_ORDER);
         }
     }
 
     private void removePatternIndexes(CellKey owner, CellState state, CraftPattern pattern) {
-        var removed = byPatternId.remove(pattern.patternId());
+        var removed = byPatternUuid.remove(pattern.patternUuid());
         if (removed == null || !removed.owner().equals(owner)) {
-            throw invalidState("pattern %s index owner mismatch during remove", pattern.patternId());
+            throw invalidState("pattern %s index owner mismatch during remove", pattern.patternUuid());
         }
-        if (!state.patternIdsInCell().remove(pattern.patternId())) {
-            throw invalidState("pattern %s missing from cell membership during remove", pattern.patternId());
+        if (!state.patternUuidsInCell().remove(pattern.patternUuid())) {
+            throw invalidState("pattern %s missing from cell membership during remove", pattern.patternUuid());
         }
         for (var output : pattern.outputs()) {
             var list = byOutput.get(output.key());
@@ -223,11 +226,11 @@ public final class PatternRegistryCache implements IPatternRepository {
                 throw invalidState(
                     "output key %s missing while removing pattern %s",
                     output.key(),
-                    pattern.patternId());
+                    pattern.patternUuid());
             }
-            var removedPattern = list.removeIf(existing -> existing.patternId().equals(pattern.patternId()));
+            var removedPattern = list.removeIf(existing -> existing.patternUuid().equals(pattern.patternUuid()));
             if (!removedPattern) {
-                throw invalidState("pattern %s missing from output key %s", pattern.patternId(), output.key());
+                throw invalidState("pattern %s missing from output key %s", pattern.patternUuid(), output.key());
             }
             if (list.isEmpty()) {
                 byOutput.remove(output.key());
@@ -264,7 +267,7 @@ public final class PatternRegistryCache implements IPatternRepository {
         }
     }
 
-    private record CellState(IPatternCellPort port, Set<String> patternIdsInCell) {}
+    private record CellState(IPatternCellPort port, Set<UUID> patternUuidsInCell) {}
 
     private record PatternEntry(CraftPattern pattern, CellKey owner) {}
 }

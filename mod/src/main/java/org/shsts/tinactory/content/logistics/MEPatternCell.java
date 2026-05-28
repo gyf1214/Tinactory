@@ -22,6 +22,7 @@ import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
@@ -101,8 +102,8 @@ public class MEPatternCell extends CapabilityItem {
         }
 
         @Override
-        public boolean remove(String patternId) {
-            if (!state.remove(patternId)) {
+        public boolean remove(UUID patternUuid) {
+            if (!state.remove(patternUuid)) {
                 return false;
             }
             syncTag();

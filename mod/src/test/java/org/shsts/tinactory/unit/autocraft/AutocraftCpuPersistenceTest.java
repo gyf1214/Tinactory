@@ -75,7 +75,7 @@ class AutocraftCpuPersistenceTest {
         var step = new CraftStep(
             "s1",
             new CraftPattern(
-                "tinactory:s1",
+                TestAutocraftHelper.uuid("tinactory:s1"),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 2)),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2)),
                 TestAutocraftHelper.constraints("tinactory:mixer", 0)),
@@ -115,7 +115,7 @@ class AutocraftCpuPersistenceTest {
 
     private static CraftStep step(String id) {
         return new CraftStep(id, new CraftPattern(
-            "tinactory:" + id,
+            TestAutocraftHelper.uuid("tinactory:" + id),
             List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);

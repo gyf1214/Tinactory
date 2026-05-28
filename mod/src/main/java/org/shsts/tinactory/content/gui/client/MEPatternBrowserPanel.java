@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
@@ -100,7 +99,6 @@ public class MEPatternBrowserPanel extends Panel {
 
     private static List<Component> patternTooltip(CraftPattern pattern) {
         var ret = new ArrayList<Component>();
-        ret.add(new TextComponent(pattern.patternId()));
         ret.add(tr("input", ingredientsTooltip(pattern.inputs())).withStyle(ChatFormatting.GRAY));
         ret.add(tr("output", ingredientsTooltip(pattern.outputs())).withStyle(ChatFormatting.GRAY));
         return ret;

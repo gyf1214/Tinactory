@@ -10,6 +10,8 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
+import java.util.UUID;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternEventPacket implements IPacket {
@@ -18,36 +20,38 @@ public class MEPatternEventPacket implements IPacket {
         StackHelper.KEY_CODEC);
 
     private Action action = Action.CREATE;
-    private String patternId = "";
+    @Nullable
+    private UUID patternUuid;
     @Nullable
     private CraftPattern pattern;
 
     public MEPatternEventPacket() {}
 
-    private MEPatternEventPacket(Action action, String patternId, @Nullable CraftPattern pattern) {
+    private MEPatternEventPacket(Action action, @Nullable UUID patternUuid, @Nullable CraftPattern pattern) {
         this.action = action;
-        this.patternId = patternId;
+        this.patternUuid = patternUuid;
         this.pattern = pattern;
     }
 
     public static MEPatternEventPacket create(CraftPattern pattern) {
-        return new MEPatternEventPacket(Action.CREATE, pattern.patternId(), pattern);
+        return new MEPatternEventPacket(Action.CREATE, null, pattern);
     }
 
-    public static MEPatternEventPacket update(String patternId, CraftPattern pattern) {
-        return new MEPatternEventPacket(Action.UPDATE, patternId, pattern);
+    public static MEPatternEventPacket update(UUID patternUuid, CraftPattern pattern) {
+        return new MEPatternEventPacket(Action.UPDATE, patternUuid, pattern);
     }
 
-    public static MEPatternEventPacket delete(String patternId) {
-        return new MEPatternEventPacket(Action.DELETE, patternId, null);
+    public static MEPatternEventPacket delete(UUID patternUuid) {
+        return new MEPatternEventPacket(Action.DELETE, patternUuid, null);
     }
 
     public Action action() {
         return action;
     }
 
-    public String patternId() {
-        return patternId;
+    @Nullable
+    public UUID patternUuid() {
+        return patternUuid;
     }
 
     @Nullable
@@ -58,7 +62,10 @@ public class MEPatternEventPacket implements IPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(action);
-        buf.writeUtf(patternId);
+        buf.writeBoolean(patternUuid != null);
+        if (patternUuid != null) {
+            buf.writeUUID(patternUuid);
+        }
         buf.writeBoolean(pattern != null);
         if (pattern != null) {
             buf.writeNbt(CODEC.encodePattern(pattern));
@@ -68,7 +75,7 @@ public class MEPatternEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        patternId = buf.readUtf();
+        patternUuid = buf.readBoolean() ? buf.readUUID() : null;
         pattern = buf.readBoolean() ? CODEC.decodePattern(buf.readNbt()) : null;
     }
 

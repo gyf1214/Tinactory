@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
@@ -41,7 +42,11 @@ class AutocraftModelTest {
         var slag = new CraftAmount(TestStackKey.item("tinactory:slag", ""), 1);
         List<IMachineConstraint> constraints = List.of(new TestMachineConstraint("tooling"));
 
-        var pattern = new CraftPattern("tinactory:ore_to_plate", List.of(ore), List.of(plate, slag), constraints);
+        var pattern = new CraftPattern(
+            TestAutocraftHelper.uuid("tinactory:ore_to_plate"),
+            List.of(ore),
+            List.of(plate, slag),
+            constraints);
 
         assertEquals(List.of(ore), pattern.inputs());
         assertEquals(List.of(plate, slag), pattern.outputs());
@@ -51,7 +56,7 @@ class AutocraftModelTest {
     @Test
     void modelValuesShouldBeImmutable() {
         var pattern = new CraftPattern(
-            "tinactory:part",
+            TestAutocraftHelper.uuid("tinactory:part"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:part", ""), 1)),
             List.of(new TestMachineConstraint("frame")));

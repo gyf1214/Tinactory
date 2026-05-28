@@ -114,12 +114,11 @@ class GoalReductionPlannerErrorTest {
 
         assertNotNull(snapshot.error());
         assertEquals(PlanError.Code.UNSATISFIED_BASE_RESOURCE, snapshot.error().code());
-        assertEquals(ore, snapshot.error().targetKey());
-        assertEquals(4, snapshot.summary().entries().size());
-        assertSummaryEntry(snapshot.summary(), dust, 1, 1, 0);
+        assertEquals(dust, snapshot.error().targetKey());
+        assertEquals(3, snapshot.summary().entries().size());
         assertSummaryEntry(snapshot.summary(), ingot, 0, 0, 2);
         assertSummaryEntry(snapshot.summary(), gear, 0, 0, 2);
-        assertSummaryEntry(snapshot.summary(), ore, 0, 1, 0);
+        assertSummaryEntry(snapshot.summary(), dust, 1, 2, 0);
     }
 
     @Test
@@ -171,7 +170,7 @@ class GoalReductionPlannerErrorTest {
             @Override
             public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
-                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList()) {
                     for (var output : pattern.outputs()) {
                         if (output.key().equals(key)) {
                             out.add(pattern);
@@ -194,12 +193,12 @@ class GoalReductionPlannerErrorTest {
 
             @Override
             public List<CraftPattern> listPatterns() {
-                return patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList();
+                return patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList();
             }
 
             @Override
-            public boolean containsPatternId(String patternId) {
-                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            public boolean containsPatternUuid(UUID patternUuid) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternUuid().equals(patternUuid));
             }
 
             @Override
@@ -208,7 +207,7 @@ class GoalReductionPlannerErrorTest {
             }
 
             @Override
-            public boolean removePattern(String patternId) {
+            public boolean removePattern(UUID patternUuid) {
                 throw new UnsupportedOperationException();
             }
 

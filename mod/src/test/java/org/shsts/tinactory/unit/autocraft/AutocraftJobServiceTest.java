@@ -137,7 +137,7 @@ class AutocraftJobServiceTest {
 
     private static CraftStep step() {
         return new CraftStep("s1", new CraftPattern(
-            "tinactory:test",
+            TestAutocraftHelper.uuid("tinactory:test"),
             List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);

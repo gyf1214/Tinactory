@@ -14,6 +14,7 @@ import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -27,7 +28,7 @@ class CraftPlanContractTest {
     @Test
     void craftPlanShouldBeImmutableStepList() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());
@@ -41,7 +42,7 @@ class CraftPlanContractTest {
     @Test
     void craftStepShouldSplitRequiredOutputsByRole() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());
@@ -57,7 +58,7 @@ class CraftPlanContractTest {
     @Test
     void craftStepShouldDefensivelyCopyRoleOutputs() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());

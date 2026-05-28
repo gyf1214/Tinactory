@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
@@ -43,7 +44,6 @@ public class MEPatternTerminalMenu extends MenuBase {
 
     public enum Result {
         SUCCESS,
-        DUPLICATE_PATTERN_ID,
         PATTERN_NOT_FOUND,
         NO_CAPACITY,
         INVALID_PATTERN;
@@ -128,50 +128,47 @@ public class MEPatternTerminalMenu extends MenuBase {
     }
 
     private Result handleAction(MEPatternEventPacket packet) {
-        if (repository == null || packet.patternId().isBlank()) {
+        if (repository == null) {
             return Result.INVALID_PATTERN;
         }
         return switch (packet.action()) {
-            case CREATE -> createPattern(packet.patternId(), packet.pattern());
-            case UPDATE -> updatePattern(packet.patternId(), packet.pattern());
-            case DELETE -> deletePattern(packet.patternId(), packet.pattern());
+            case CREATE -> createPattern(packet.patternUuid(), packet.pattern());
+            case UPDATE -> updatePattern(packet.patternUuid(), packet.pattern());
+            case DELETE -> deletePattern(packet.patternUuid(), packet.pattern());
         };
     }
 
-    private Result createPattern(String patternId, @Nullable CraftPattern pattern) {
-        if (repository == null || !hasValidPayload(patternId, pattern)) {
+    private Result createPattern(@Nullable UUID patternUuid, @Nullable CraftPattern pattern) {
+        if (repository == null || patternUuid != null || !hasValidPayload(pattern)) {
             return Result.INVALID_PATTERN;
         }
-        if (repository.containsPatternId(patternId)) {
-            return Result.DUPLICATE_PATTERN_ID;
-        }
-        return repository.addPattern(pattern) ?
+        return repository.addPattern(pattern.withUuid(UUID.randomUUID())) ?
             Result.SUCCESS :
             Result.NO_CAPACITY;
     }
 
-    private Result updatePattern(String patternId, @Nullable CraftPattern pattern) {
-        if (repository == null || !hasValidPayload(patternId, pattern)) {
+    private Result updatePattern(@Nullable UUID patternUuid, @Nullable CraftPattern pattern) {
+        if (repository == null || patternUuid == null || !hasValidPayload(pattern)) {
             return Result.INVALID_PATTERN;
         }
-        if (!repository.containsPatternId(patternId)) {
+        if (!repository.containsPatternUuid(patternUuid)) {
             return Result.PATTERN_NOT_FOUND;
         }
-        return repository.updatePattern(pattern) ?
+        return repository.updatePattern(pattern.withUuid(patternUuid)) ?
             Result.SUCCESS :
             Result.NO_CAPACITY;
     }
 
-    private Result deletePattern(String patternId, @Nullable CraftPattern pattern) {
-        if (repository == null || pattern != null) {
+    private Result deletePattern(@Nullable UUID patternUuid, @Nullable CraftPattern pattern) {
+        if (repository == null || patternUuid == null || pattern != null) {
             return Result.INVALID_PATTERN;
         }
-        return repository.removePattern(patternId) ?
+        return repository.removePattern(patternUuid) ?
             Result.SUCCESS :
             Result.PATTERN_NOT_FOUND;
     }
 
-    private static boolean hasValidPayload(String patternId, @Nullable CraftPattern pattern) {
-        return pattern != null && !pattern.outputs().isEmpty() && patternId.equals(pattern.patternId());
+    private static boolean hasValidPayload(@Nullable CraftPattern pattern) {
+        return pattern != null && !pattern.outputs().isEmpty();
     }
 }

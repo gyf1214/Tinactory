@@ -27,6 +27,7 @@ import org.shsts.tinactory.integration.gui.client.Widgets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
 import static org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen.tr;
@@ -40,13 +41,12 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 @MethodsReturnNonnullByDefault
 public class MEPatternEditorPanel extends Panel {
     private static final int BUTTON_WIDTH = 48;
+    private static final UUID DRAFT_UUID = new UUID(0L, 0L);
     private static final int LABEL_LEFT = 64;
     private static final Rect LABEL_OFFSET = new Rect(0, 0, LABEL_LEFT, EDIT_HEIGHT);
     private static final RectD EDIT_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
     private static final Rect EDIT_OFFSET = Rect.corners(LABEL_LEFT, 0, 0, EDIT_HEIGHT);
 
-    private final EditBox patternIdEdit;
-    private final Label patternIdLabel;
     private final VanillaButton deleteButton;
     private final EditBox recipeTypeEdit;
     private final EditBox voltageTierEdit;
@@ -57,12 +57,10 @@ public class MEPatternEditorPanel extends Panel {
     private final List<MEPatternIngredientDraft> inputRows = new ArrayList<>();
     private final List<MEPatternIngredientDraft> outputRows = new ArrayList<>();
     @Nullable
-    private String patternId;
+    private UUID originalUuid;
 
     public MEPatternEditorPanel(MEPatternTerminalScreen screen, Runnable onCancel) {
         super(screen);
-        this.patternIdEdit = Widgets.editBox();
-        this.patternIdLabel = new Label(menu);
         this.recipeTypeEdit = Widgets.editBox();
         this.voltageTierEdit = Widgets.editBox();
         this.feedbackLabel = new Label(menu);
@@ -83,12 +81,6 @@ public class MEPatternEditorPanel extends Panel {
 
         this.tab = new Tab(screen, inputPanel, Items.HOPPER, outputPanel, Items.CHEST, machinePanel, Items.COMPARATOR);
 
-        var idLabel = new Label(menu, tr("id"));
-        idLabel.verticalAlign = Label.Alignment.MIDDLE;
-        addChild(LABEL_OFFSET, idLabel);
-        addVanillaWidget(EDIT_ANCHOR, EDIT_OFFSET, 0, patternIdEdit);
-        addChild(EDIT_ANCHOR, EDIT_OFFSET, patternIdLabel);
-
         addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0),
             new VanillaButton(menu, tr("save"), null, this::save));
         addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0),
@@ -100,7 +92,7 @@ public class MEPatternEditorPanel extends Panel {
         addChild(RectD.corners(0d, 1d, 1d, 1d), new Rect(0, -BUTTON_HEIGHT - SPACING - FONT_HEIGHT, 0, FONT_HEIGHT),
             feedbackLabel);
 
-        var panelOffset = Rect.corners(0, EDIT_HEIGHT + SPACING, 0, -BUTTON_HEIGHT - FONT_HEIGHT - SPACING * 2);
+        var panelOffset = Rect.corners(0, 0, 0, -BUTTON_HEIGHT - FONT_HEIGHT - SPACING * 2);
         addGroup(panelOffset, inputPanel);
         addGroup(panelOffset, outputPanel);
         addGroup(panelOffset, machinePanel);
@@ -109,21 +101,14 @@ public class MEPatternEditorPanel extends Panel {
 
     public void create() {
         reset();
-        patternId = null;
-        patternIdEdit.active = true;
-        patternIdEdit.visible = true;
-        patternIdLabel.setActive(false);
+        originalUuid = null;
         deleteButton.setActive(false);
         postReset();
     }
 
     public void edit(CraftPattern pattern) {
         reset();
-        patternId = pattern.patternId();
-        patternIdEdit.active = false;
-        patternIdEdit.visible = false;
-        patternIdLabel.setLines(new TextComponent(pattern.patternId()));
-        patternIdLabel.setActive(true);
+        originalUuid = pattern.patternUuid();
         inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
         outputRows.addAll(fromAmounts(pattern.outputs(), pattern.constraints(), PortDirection.OUTPUT));
         recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString).orElse(""));
@@ -137,8 +122,6 @@ public class MEPatternEditorPanel extends Panel {
     }
 
     private void reset() {
-        patternIdEdit.setValue("");
-        patternIdLabel.setLines(TextComponent.EMPTY);
         inputRows.clear();
         outputRows.clear();
         recipeTypeEdit.setValue("");
@@ -154,25 +137,23 @@ public class MEPatternEditorPanel extends Panel {
 
     private void save() {
         toPattern().ifPresentOrElse(pattern -> {
-            if (patternId == null) {
+            if (originalUuid == null) {
                 menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.create(pattern));
             } else {
-                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.update(patternId, pattern));
+                var target = originalUuid;
+                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.update(target, pattern));
             }
         }, () -> feedbackLabel.setLines(tr("invalid")));
     }
 
     private void delete() {
-        if (patternId != null) {
-            menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.delete(patternId));
+        if (originalUuid != null) {
+            var target = originalUuid;
+            menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.delete(target));
         }
     }
 
     private Optional<CraftPattern> toPattern() {
-        var patternId = patternIdEdit.getValue();
-        if (patternId.isBlank()) {
-            return Optional.empty();
-        }
         var outputs = toAmounts(outputRows);
         if (outputs.isEmpty()) {
             return Optional.empty();
@@ -188,7 +169,7 @@ public class MEPatternEditorPanel extends Panel {
         }
         recipeType.ifPresent(value -> constraints.add(new RecipeTypeConstraint(value)));
         voltageTier.ifPresent(value -> constraints.add(new VoltageConstraint(value)));
-        return Optional.of(new CraftPattern(patternId, toAmounts(inputRows), outputs, constraints));
+        return Optional.of(new CraftPattern(DRAFT_UUID, toAmounts(inputRows), outputs, constraints));
     }
 
     private List<IMachineConstraint> constraints() {

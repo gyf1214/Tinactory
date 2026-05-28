@@ -86,7 +86,7 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
             var index = draftIndex(row.index);
 
             if (button == 1 && index < drafts.size() && carried.isEmpty()) {
-                remove(index);
+                removeDraft(index);
                 return;
             }
             if (carried.isEmpty()) {
@@ -135,7 +135,7 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
 
         private Optional<MEPatternIngredientDraft> draft() {
             var draftIndex = draftIndex(index);
-            return draftIndex < drafts.size() ? Optional.of(drafts.get(index)) : Optional.empty();
+            return draftIndex < drafts.size() ? Optional.of(drafts.get(draftIndex)) : Optional.empty();
         }
 
         public MEPatternIngredientDraft createDraft(IStackKey key) {
@@ -169,11 +169,11 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
 
     @Override
     protected int getItemCount() {
-        return drafts.size();
+        return drafts.size() + 1;
     }
 
-    private void remove(int rowIndex) {
-        drafts.remove(draftIndex(rowIndex));
+    private void removeDraft(int draftIndex) {
+        drafts.remove(draftIndex);
         refresh();
     }
 

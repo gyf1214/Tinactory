@@ -21,11 +21,11 @@ public interface IPatternRepository {
         return 0L;
     }
 
-    boolean containsPatternId(String patternId);
+    boolean containsPatternUuid(UUID patternUuid);
 
     boolean addPattern(CraftPattern pattern);
 
-    boolean removePattern(String patternId);
+    boolean removePattern(UUID patternUuid);
 
     boolean updatePattern(CraftPattern pattern);
 
