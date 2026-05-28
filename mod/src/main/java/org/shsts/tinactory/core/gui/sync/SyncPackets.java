@@ -97,4 +97,14 @@ public final class SyncPackets {
     public static LongPacket longPacket(long data) {
         return new LongPacket(data);
     }
+
+    public enum UnitPacket implements IPacket {
+        INSTANCE;
+
+        @Override
+        public void serializeToBuf(FriendlyByteBuf buf) {}
+
+        @Override
+        public void deserializeFromBuf(FriendlyByteBuf buf) {}
+    }
 }

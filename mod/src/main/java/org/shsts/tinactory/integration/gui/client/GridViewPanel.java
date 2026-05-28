@@ -22,7 +22,7 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
     private static final int PAGE_WIDTH = 12;
     private static final int PAGE_HEIGHT = 18;
     private static final int PAGE_MARGIN = 12;
-    private static final Rect PAGE_PANEL_OFFSET = Rect.corners(0, 0, 0, -PAGE_HEIGHT - SPACING);
+    public static final Rect PAGE_PANEL_OFFSET = Rect.corners(0, 0, 0, -PAGE_HEIGHT - SPACING);
     private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
     private static final Rect PAGE_OFFSET = Rect.corners(0, -PAGE_HEIGHT, PAGE_WIDTH, 0);
     private static final Rect PAGE_OFFSET_LEFT = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_WIDTH, 0);
@@ -55,7 +55,7 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
     private final PageButton leftPageButton;
     private final PageButton rightPageButton;
 
-    protected GridViewPanel(MenuScreen<?> screen, GridViewGroup<T> gridViewGroup) {
+    private GridViewPanel(MenuScreen<?> screen, GridViewGroup<T> gridViewGroup) {
         super(screen, gridViewGroup);
         this.gridViewGroup = gridViewGroup;
         this.leftPageButton = new PageButton(15, -1);
@@ -67,8 +67,13 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
         addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
     }
 
+    protected GridViewPanel(MenuScreen<?> screen, int itemWidth, int itemHeight,
+        int verticalSpacing, Rect offset) {
+        this(screen, new GridViewGroup<>(itemWidth, itemHeight, verticalSpacing, offset));
+    }
+
     protected GridViewPanel(MenuScreen<?> screen, int itemWidth, int itemHeight, int verticalSpacing) {
-        this(screen, new GridViewGroup<>(itemWidth, itemHeight, verticalSpacing, PAGE_PANEL_OFFSET));
+        this(screen, itemWidth, itemHeight, verticalSpacing, PAGE_PANEL_OFFSET);
     }
 
     protected abstract T createSlot(int index);

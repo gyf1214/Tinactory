@@ -96,6 +96,7 @@ public final class AllMenus {
         CHANNEL
             .registerMenuSyncPacket(SyncPackets.DoublePacket.class, SyncPackets.DoublePacket::new)
             .registerMenuSyncPacket(SyncPackets.LongPacket.class, SyncPackets.LongPacket::new)
+            .registerMenuSyncPacket(SyncPackets.UnitPacket.class, () -> SyncPackets.UnitPacket.INSTANCE)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
             .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
             .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,

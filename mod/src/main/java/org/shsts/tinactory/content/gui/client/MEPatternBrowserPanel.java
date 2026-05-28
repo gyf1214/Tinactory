@@ -41,9 +41,7 @@ public class MEPatternBrowserPanel extends Panel {
 
         @Override
         protected int getItemCount() {
-            var count = patterns.size();
-            var slotCount = gridViewGroup.getSlotCount();
-            return Math.max(1, count / slotCount + 1) * slotCount;
+            return patterns.size() + 1;
         }
 
         @Override

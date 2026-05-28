@@ -1,30 +1,29 @@
 package org.shsts.tinactory.content.gui.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.GridViewPanel;
+import org.shsts.tinactory.integration.gui.client.Label;
+import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.Widgets;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
@@ -32,7 +31,10 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientPanel.Row> {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Rect ROWS_OFFSET = PAGE_PANEL_OFFSET
+        .offset(0, FONT_HEIGHT + SPACING)
+        .enlarge(0, -FONT_HEIGHT - SPACING);
+    private static final int PORT_COLUMN_WIDTH = 48;
 
     private final List<MEPatternIngredientDraft> drafts;
 
@@ -92,11 +94,18 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
             if (carried.isEmpty()) {
                 return;
             }
-            stackKeyFromItem(carried).ifPresent(key -> {
+            MEPatternIngredientDraft.fromItem(carried).ifPresent(draft -> {
                 if (index >= drafts.size()) {
-                    drafts.add(row.createDraft(key));
+                    if (button != 0) {
+                        draft.setAmount(parseLong(row.amountEdit.getValue()));
+                    }
+                    draft.setPort(parseInteger(row.portEdit.getValue()));
+                    drafts.add(draft);
                 } else {
-                    drafts.get(index).setKey(key);
+                    drafts.get(index).setKey(draft.key());
+                    if (button == 0) {
+                        drafts.get(index).setAmount(draft.amount());
+                    }
                 }
                 refresh();
             });
@@ -115,34 +124,23 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
             this.amountEdit = Widgets.editBox();
             this.portEdit = Widgets.editBox();
 
-            addChild(RectD.corners(0d, 0.5d, 0d, 0.5d), new Rect(0, -SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE), keyButton);
-            addVanillaWidget(RectD.corners(0d, 0.5d, 0.5d, 0.5d),
-                Rect.corners(SLOT_SIZE + SPACING, -EDIT_HEIGHT / 2, SLOT_SIZE / 2, EDIT_HEIGHT / 2),
+            addChild(RectD.corners(0d, 0.5d, 0d, 0.5d),
+                Rect.corners(0, -SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE / 2),
+                keyButton);
+            addVanillaWidget(RectD.corners(0d, 0.5d, 1d, 0.5d),
+                Rect.corners(SLOT_SIZE + SPACING, -EDIT_HEIGHT / 2, -PORT_COLUMN_WIDTH - SPACING, EDIT_HEIGHT / 2),
                 0, amountEdit);
-            addVanillaWidget(RectD.corners(0.5d, 0.5d, 1d, 0.5d),
-                Rect.corners(SLOT_SIZE / 2 + SPACING, -EDIT_HEIGHT / 2, 0, EDIT_HEIGHT / 2),
+            addVanillaWidget(RectD.corners(1d, 0.5d, 1d, 0.5d),
+                Rect.corners(-PORT_COLUMN_WIDTH, -EDIT_HEIGHT / 2, 0, EDIT_HEIGHT / 2),
                 0, portEdit);
 
             amountEdit.setResponder(value -> draft().ifPresent($ -> $.setAmount(parseLong(value))));
             portEdit.setResponder(value -> draft().ifPresent($ -> $.setPort(parseInteger(value))));
         }
 
-        @Override
-        public void setRect(Rect rect) {
-            super.setRect(rect);
-            LOGGER.debug("set rect {}", rect);
-        }
-
         private Optional<MEPatternIngredientDraft> draft() {
             var draftIndex = draftIndex(index);
             return draftIndex < drafts.size() ? Optional.of(drafts.get(draftIndex)) : Optional.empty();
-        }
-
-        public MEPatternIngredientDraft createDraft(IStackKey key) {
-            var ret = new MEPatternIngredientDraft(key);
-            ret.setAmount(parseLong(amountEdit.getValue()));
-            ret.setPort(parseInteger(portEdit.getValue()));
-            return ret;
         }
 
         @Override
@@ -157,9 +155,30 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
         }
     }
 
-    public MEPatternIngredientPanel(MEPatternTerminalScreen screen, List<MEPatternIngredientDraft> drafts) {
-        super(screen, 0, SLOT_SIZE, SPACING);
+    private MEPatternIngredientPanel(MenuScreen<?> screen, List<MEPatternIngredientDraft> drafts,
+        String label) {
+        super(screen, 0, SLOT_SIZE, SPACING, ROWS_OFFSET);
         this.drafts = drafts;
+
+        var keyLabel = new Label(menu, tr(label));
+        var amountLabel = new Label(menu, tr("amount"));
+        var portLabel = new Label(menu, tr("port"));
+        portLabel.horizontalAlign = amountLabel.horizontalAlign = Label.Alignment.MIDDLE;
+        addChild(keyLabel);
+        addChild(RectD.corners(0d, 0d, 1d, 0d),
+            Rect.corners(SLOT_SIZE + SPACING, 0, -PORT_COLUMN_WIDTH - SPACING, 0),
+            amountLabel);
+        addChild(RectD.corners(1d, 0d, 1d, 0d),
+            Rect.corners(-PORT_COLUMN_WIDTH, 0, 0, 0),
+            portLabel);
+    }
+
+    public static MEPatternIngredientPanel input(MenuScreen<?> screen, List<MEPatternIngredientDraft> drafts) {
+        return new MEPatternIngredientPanel(screen, drafts, "editor.input");
+    }
+
+    public static MEPatternIngredientPanel output(MenuScreen<?> screen, List<MEPatternIngredientDraft> drafts) {
+        return new MEPatternIngredientPanel(screen, drafts, "editor.output");
     }
 
     @Override
@@ -179,16 +198,6 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
 
     public void resetPage() {
         setPage(0);
-    }
-
-    private static Optional<IStackKey> stackKeyFromItem(ItemStack stack) {
-        var fluid = StackHelper.getFluidHandlerFromItem(stack)
-            .map(handler -> handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE))
-            .filter(drained -> !drained.isEmpty());
-        if (fluid.isPresent()) {
-            return Optional.of(StackHelper.FLUID_ADAPTER.keyOf(fluid.get()));
-        }
-        return stack.isEmpty() ? Optional.empty() : Optional.of(StackHelper.ITEM_ADAPTER.keyOf(stack));
     }
 
     private static long parseLong(String value) {

@@ -4,9 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
@@ -32,7 +31,6 @@ import java.util.UUID;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
 import static org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
@@ -46,11 +44,11 @@ public class MEPatternEditorPanel extends Panel {
     private static final Rect LABEL_OFFSET = new Rect(0, 0, LABEL_LEFT, EDIT_HEIGHT);
     private static final RectD EDIT_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
     private static final Rect EDIT_OFFSET = Rect.corners(LABEL_LEFT, 0, 0, EDIT_HEIGHT);
+    private static final Rect PANEL_OFFSET = Rect.corners(0, 0, 0, -BUTTON_HEIGHT - SPACING);
 
     private final VanillaButton deleteButton;
     private final EditBox recipeTypeEdit;
     private final EditBox voltageTierEdit;
-    private final Label feedbackLabel;
     private final Tab tab;
     private final MEPatternIngredientPanel inputPanel;
     private final MEPatternIngredientPanel outputPanel;
@@ -63,10 +61,9 @@ public class MEPatternEditorPanel extends Panel {
         super(screen);
         this.recipeTypeEdit = Widgets.editBox();
         this.voltageTierEdit = Widgets.editBox();
-        this.feedbackLabel = new Label(menu);
         this.deleteButton = new VanillaButton(menu, tr("delete"), null, this::delete);
-        this.inputPanel = new MEPatternIngredientPanel(screen, inputRows);
-        this.outputPanel = new MEPatternIngredientPanel(screen, outputRows);
+        this.inputPanel = MEPatternIngredientPanel.input(screen, inputRows);
+        this.outputPanel = MEPatternIngredientPanel.output(screen, outputRows);
 
         var machinePanel = new Panel(screen);
         var recipeTypeLabel = new Label(menu, tr("recipeType"));
@@ -88,22 +85,19 @@ public class MEPatternEditorPanel extends Panel {
         addChild(RectD.corners(0.5d, 1d, 0.5d, 1d),
             Rect.corners(-BUTTON_WIDTH / 2, -BUTTON_HEIGHT, BUTTON_WIDTH / 2, 0),
             deleteButton);
-        feedbackLabel.horizontalAlign = Label.Alignment.MIDDLE;
-        addChild(RectD.corners(0d, 1d, 1d, 1d), new Rect(0, -BUTTON_HEIGHT - SPACING - FONT_HEIGHT, 0, FONT_HEIGHT),
-            feedbackLabel);
 
-        var panelOffset = Rect.corners(0, 0, 0, -BUTTON_HEIGHT - FONT_HEIGHT - SPACING * 2);
-        addGroup(panelOffset, inputPanel);
-        addGroup(panelOffset, outputPanel);
-        addGroup(panelOffset, machinePanel);
+        addGroup(PANEL_OFFSET, inputPanel);
+        addGroup(PANEL_OFFSET, outputPanel);
+        addGroup(PANEL_OFFSET, machinePanel);
         addGroup(TAB_OFFSET, tab);
     }
 
-    public void create() {
+    public void create(ItemStack stack) {
         reset();
         originalUuid = null;
+        MEPatternIngredientDraft.fromItem(stack).ifPresent(outputRows::add);
         deleteButton.setActive(false);
-        postReset();
+        postReset(1);
     }
 
     public void edit(CraftPattern pattern) {
@@ -114,11 +108,7 @@ public class MEPatternEditorPanel extends Panel {
         recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString).orElse(""));
         voltageTierEdit.setValue(voltageConstraintTier(pattern.constraints()).map(Object::toString).orElse(""));
         deleteButton.setActive(true);
-        postReset();
-    }
-
-    public void showFeedback(Component message) {
-        feedbackLabel.setLines(message);
+        postReset(0);
     }
 
     private void reset() {
@@ -126,24 +116,23 @@ public class MEPatternEditorPanel extends Panel {
         outputRows.clear();
         recipeTypeEdit.setValue("");
         voltageTierEdit.setValue("");
-        feedbackLabel.setLines(TextComponent.EMPTY);
     }
 
-    private void postReset() {
+    private void postReset(int index) {
         inputPanel.resetPage();
         outputPanel.resetPage();
-        tab.select(0);
+        tab.select(index);
     }
 
     private void save() {
-        toPattern().ifPresentOrElse(pattern -> {
+        toPattern().ifPresent(pattern -> {
             if (originalUuid == null) {
                 menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.create(pattern));
             } else {
                 var target = originalUuid;
                 menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.update(target, pattern));
             }
-        }, () -> feedbackLabel.setLines(tr("invalid")));
+        });
     }
 
     private void delete() {

@@ -78,8 +78,8 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
     public Rect getSlotRect(int index) {
         var column = index % columnCount;
         var row = index / columnCount;
-        var x = column * (slotWidth + horizontalSpacing);
-        var y = row * (slotHeight + verticalSpacing);
+        var x = column * (slotWidth + horizontalSpacing) + offset.x();
+        var y = row * (slotHeight + verticalSpacing) + offset.y();
         return new Rect(x, y, slotWidth, slotHeight);
     }
 

@@ -3,27 +3,51 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import java.util.Optional;
+
+import static org.shsts.tinactory.integration.logistics.StackHelper.FLUID_ADAPTER;
+import static org.shsts.tinactory.integration.logistics.StackHelper.ITEM_ADAPTER;
+
+@OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MEPatternIngredientDraft {
     private IStackKey key;
-    private long amount = 1L;
+    private long amount;
     @Nullable
-    private Integer port;
+    private Integer port = null;
 
-    public MEPatternIngredientDraft(IStackKey key) {
+    public MEPatternIngredientDraft(IStackKey key, long amount) {
         this.key = key;
+        this.amount = amount;
     }
 
     public static MEPatternIngredientDraft from(CraftAmount amount) {
-        var ret = new MEPatternIngredientDraft(amount.key());
-        ret.amount = amount.amount();
-        return ret;
+        return new MEPatternIngredientDraft(amount.key(), amount.amount());
+    }
+
+    public static <T> MEPatternIngredientDraft from(IStackAdapter<T> adapter, T stack) {
+        return new MEPatternIngredientDraft(adapter.keyOf(stack), adapter.amount(stack));
+    }
+
+    public static Optional<MEPatternIngredientDraft> fromItem(ItemStack stack) {
+        var fluid = StackHelper.getFluidHandlerFromItem(stack)
+            .map(handler -> handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE))
+            .filter(drained -> !drained.isEmpty());
+
+        return fluid.map($ -> from(FLUID_ADAPTER, $))
+            .or(() -> stack.isEmpty() ? Optional.empty() : Optional.of(from(ITEM_ADAPTER, stack)));
     }
 
     public IStackKey key() {

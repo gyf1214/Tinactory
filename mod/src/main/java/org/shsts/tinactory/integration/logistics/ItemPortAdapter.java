@@ -77,7 +77,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
     @Override
     public Component name(ItemStack stack) {
-        return stack.getDisplayName();
+        return stack.getHoverName();
     }
 
     @Override

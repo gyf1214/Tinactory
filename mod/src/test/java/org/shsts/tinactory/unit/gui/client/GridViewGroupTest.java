@@ -16,7 +16,8 @@ class GridViewGroupTest {
     @Test
     void shouldCalculateGrid() {
         var group = new GridViewGroup<>(10, 8, 2,
-            Rect.corners(0, 0, 0, -21), index -> new RecordingNode());
+            new Rect(1, 2, 0, -21),
+            index -> new RecordingNode());
 
         group.setRect(new Rect(0, 0, 35, 31));
 
@@ -24,9 +25,9 @@ class GridViewGroupTest {
         assertEquals(1, group.getRowCount());
         assertEquals(2, group.getHorizontalSpacing());
         assertEquals(3, group.getSlotCount());
-        assertEquals(new Rect(0, 0, 10, 8), group.getSlotRect(0));
-        assertEquals(new Rect(12, 0, 10, 8), group.getSlotRect(1));
-        assertEquals(new Rect(24, 0, 10, 8), group.getSlotRect(2));
+        assertEquals(new Rect(1, 2, 10, 8), group.getSlotRect(0));
+        assertEquals(new Rect(13, 2, 10, 8), group.getSlotRect(1));
+        assertEquals(new Rect(25, 2, 10, 8), group.getSlotRect(2));
     }
 
     @Test
