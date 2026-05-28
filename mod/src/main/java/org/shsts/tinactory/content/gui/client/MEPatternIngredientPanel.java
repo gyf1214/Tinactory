@@ -12,10 +12,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.GridViewGroup;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.gui.client.Button;
-import org.shsts.tinactory.integration.gui.client.PageButton;
+import org.shsts.tinactory.integration.gui.client.GridViewPanel;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.Widgets;
@@ -30,21 +28,13 @@ import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
-import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_ANCHOR;
-import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_LEFT;
-import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_RIGHT;
-import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_PANEL_OFFSET;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEPatternIngredientPanel extends Panel {
+public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientPanel.Row> {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final GridViewGroup<Row> gridViewGroup;
     private final List<MEPatternIngredientDraft> drafts;
-    private final PageButton leftPageButton;
-    private final PageButton rightPageButton;
-    private int page = 0;
 
     private int draftIndex(int rowIndex) {
         return page * gridViewGroup.getRowCount() + rowIndex;
@@ -113,7 +103,7 @@ public class MEPatternIngredientPanel extends Panel {
         }
     }
 
-    private class Row extends Panel {
+    protected class Row extends Panel {
         private final int index;
         private final EditBox amountEdit;
         private final EditBox portEdit;
@@ -167,22 +157,19 @@ public class MEPatternIngredientPanel extends Panel {
         }
     }
 
-    private MEPatternIngredientPanel(MEPatternTerminalScreen screen, GridViewGroup<Row> gridViewGroup,
-        List<MEPatternIngredientDraft> drafts) {
-        super(screen, gridViewGroup);
-        this.gridViewGroup = gridViewGroup;
+    public MEPatternIngredientPanel(MEPatternTerminalScreen screen, List<MEPatternIngredientDraft> drafts) {
+        super(screen, 0, SLOT_SIZE, SPACING);
         this.drafts = drafts;
-        this.leftPageButton = PageButton.previousPage(menu, this::changePage);
-        this.rightPageButton = PageButton.nextPage(menu, this::changePage);
-
-        gridViewGroup.setSlotFactory(Row::new);
-
-        addChild(PAGE_ANCHOR, PAGE_OFFSET_LEFT, leftPageButton);
-        addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
     }
 
-    public MEPatternIngredientPanel(MEPatternTerminalScreen screen, List<MEPatternIngredientDraft> drafts) {
-        this(screen, new GridViewGroup<>(0, SLOT_SIZE, SPACING, PAGE_PANEL_OFFSET), drafts);
+    @Override
+    protected Row createSlot(int index) {
+        return new Row(index);
+    }
+
+    @Override
+    protected int getItemCount() {
+        return drafts.size();
     }
 
     private void remove(int rowIndex) {
@@ -190,31 +177,8 @@ public class MEPatternIngredientPanel extends Panel {
         refresh();
     }
 
-    private void setPage(int val) {
-        var itemCount = drafts.size();
-        var slotCount = gridViewGroup.getSlotCount();
-        var maxPage = Math.max(1, (itemCount + slotCount - 1) / slotCount);
-        page = MathUtil.clamp(val, 0, maxPage - 1);
-        leftPageButton.setActive(page != 0);
-        rightPageButton.setActive(page != maxPage - 1);
-    }
-
-    private void changePage(int change) {
-        setPage(page + change);
-    }
-
     public void resetPage() {
         setPage(0);
-    }
-
-    @Override
-    protected void doRefresh() {
-        changePage(0);
-    }
-
-    @Override
-    protected void postLayout() {
-        refresh();
     }
 
     private static Optional<IStackKey> stackKeyFromItem(ItemStack stack) {
