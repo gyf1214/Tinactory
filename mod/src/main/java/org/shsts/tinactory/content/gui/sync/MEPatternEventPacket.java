@@ -66,17 +66,15 @@ public class MEPatternEventPacket implements IPacket {
         if (patternUuid != null) {
             buf.writeUUID(patternUuid);
         }
-        buf.writeBoolean(pattern != null);
-        if (pattern != null) {
-            buf.writeNbt(CODEC.encodePattern(pattern));
-        }
+        buf.writeNbt(pattern == null ? null : CODEC.encodePattern(pattern));
     }
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
         patternUuid = buf.readBoolean() ? buf.readUUID() : null;
-        pattern = buf.readBoolean() ? CODEC.decodePattern(buf.readNbt()) : null;
+        var patternTag = buf.readNbt();
+        pattern = patternTag == null ? null : CODEC.decodePattern(patternTag);
     }
 
     public enum Action {

@@ -39,7 +39,8 @@ public class MECraftRequestSyncPacket implements IPacket {
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         requestables.clear();
         requestables.addAll(
-            buf.readList(buf1 -> CodecHelper.parseTag(StackHelper.KEY_CODEC, buf1.readNbt())));
+            buf.readList(buf1 -> CodecHelper.parseTag(StackHelper.KEY_CODEC,
+                CodecHelper.readRequiredNbt(buf1, "requestable key"))));
     }
 
     @Override

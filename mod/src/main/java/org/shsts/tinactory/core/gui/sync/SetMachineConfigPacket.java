@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
 
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
-        sets = buf.readNbt();
+        sets = CodecHelper.readRequiredNbt(buf, "machine config sets");
         resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
     }
 

@@ -6,6 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -39,6 +40,7 @@ public class MEPatternSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         patterns.clear();
-        patterns.addAll(buf.readList(buf1 -> CODEC.decodePattern(buf1.readNbt())));
+        patterns.addAll(buf.readList(buf1 ->
+            CODEC.decodePattern(CodecHelper.readRequiredNbt(buf1, "pattern"))));
     }
 }

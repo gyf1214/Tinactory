@@ -113,7 +113,7 @@ public class MECraftCpuSyncPacket implements IPacket {
             buf.readUUID(),
             buf.readEnum(JobState.class),
             buf.readList(buf1 -> {
-                var key = decodeIngredientKey(buf1.readNbt());
+                var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "craft target key"));
                 var amount = buf1.readLong();
                 return new CraftAmount(key, amount);
             }),

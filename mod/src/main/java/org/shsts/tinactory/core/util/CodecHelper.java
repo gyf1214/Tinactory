@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.GsonHelper;
@@ -60,6 +61,14 @@ public final class CodecHelper {
 
     public static <P> Tag encodeTag(Encoder<P> encoder, P sth) {
         return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+    }
+
+    public static CompoundTag readRequiredNbt(FriendlyByteBuf buf, String name) {
+        var tag = buf.readNbt();
+        if (tag == null) {
+            throw new IllegalArgumentException("Missing " + name + " payload");
+        }
+        return tag;
     }
 
     public static CompoundTag encodeBlockPos(BlockPos pos) {

@@ -72,10 +72,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(state);
-        buf.writeBoolean(error != null);
-        if (error != null) {
-            buf.writeNbt(serializeError(error));
-        }
+        buf.writeNbt(error == null ? null : serializeError(error));
         buf.writeCollection(summary.entries().entrySet(), (buf1, entry) -> {
             buf1.writeNbt(encodeIngredientKey(entry.getKey()));
             buf1.writeLong(entry.getValue().existingAmount());
@@ -87,10 +84,10 @@ public class MECraftPreviewSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         state = buf.readEnum(PreviewState.class);
-        error = buf.readBoolean() ? deserializeError(buf.readNbt()) : null;
+        error = deserializeError(buf.readNbt());
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
         for (var entry : buf.readList(buf1 -> {
-            var key = decodeIngredientKey(buf1.readNbt());
+            var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "summary key"));
             var summaryEntry = new PlanSummary.Entry(buf1.readLong(), buf1.readLong(), buf1.readLong());
             return new SummaryEntry(key, summaryEntry);
         })) {
@@ -122,10 +119,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
         return tag;
     }
 
-    private static IStackKey decodeIngredientKey(@Nullable CompoundTag tag) {
-        if (tag == null) {
-            throw new IllegalArgumentException("Missing ingredient key payload");
-        }
+    private static IStackKey decodeIngredientKey(CompoundTag tag) {
         return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
     }
 

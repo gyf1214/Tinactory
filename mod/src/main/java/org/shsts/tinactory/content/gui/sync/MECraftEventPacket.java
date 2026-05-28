@@ -75,10 +75,8 @@ public class MECraftEventPacket implements IPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(action);
-        buf.writeBoolean(target != null);
-        if (target != null) {
-            buf.writeNbt((CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
-        }
+        buf.writeNbt(target == null ? null :
+            (CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
         buf.writeLong(quantity);
         buf.writeBoolean(cpuId != null);
         if (cpuId != null) {
@@ -89,9 +87,8 @@ public class MECraftEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        target = buf.readBoolean() ?
-            CodecHelper.parseTag(StackHelper.KEY_CODEC, buf.readNbt()) :
-            null;
+        var targetTag = buf.readNbt();
+        target = targetTag == null ? null : CodecHelper.parseTag(StackHelper.KEY_CODEC, targetTag);
         quantity = buf.readLong();
         cpuId = buf.readBoolean() ? buf.readUUID() : null;
     }
