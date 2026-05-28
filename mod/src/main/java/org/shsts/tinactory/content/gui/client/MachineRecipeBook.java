@@ -238,9 +238,9 @@ public class MachineRecipeBook extends Panel {
 
     public static Optional<IRecipeBookItem> getHoveredRecipe(IViewAdapter widget) {
         if (!(widget instanceof ButtonPanel.ItemButton button) ||
-            !(button.getParent() instanceof RecipeButtonPanel buttonPanel)) {
+            !(button.parent() instanceof RecipeButtonPanel buttonPanel)) {
             return Optional.empty();
         }
-        return Optional.ofNullable(buttonPanel.getRecipe(button.getIndex()));
+        return Optional.ofNullable(buttonPanel.getRecipe(button.itemIndex()));
     }
 }

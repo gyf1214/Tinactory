@@ -53,7 +53,7 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
                 RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y());
             }
 
-            if (isHovering(mouseX, mouseY)) {
+            if (isHovered(mouseX, mouseY)) {
                 RenderUtil.renderSlotHover(poseStack, rect);
             }
         }

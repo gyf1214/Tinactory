@@ -38,7 +38,6 @@ import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftRequestSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEPatternResultSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
@@ -96,6 +95,7 @@ public final class AllMenus {
     static {
         CHANNEL
             .registerMenuSyncPacket(SyncPackets.DoublePacket.class, SyncPackets.DoublePacket::new)
+            .registerMenuSyncPacket(SyncPackets.LongPacket.class, SyncPackets.LongPacket::new)
             .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
             .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
             .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
@@ -111,9 +111,7 @@ public final class AllMenus {
             .registerMenuSyncPacket(MECraftPreviewSyncPacket.class,
                 MECraftPreviewSyncPacket::new)
             .registerMenuSyncPacket(MEPatternSyncPacket.class,
-                MEPatternSyncPacket::new)
-            .registerMenuSyncPacket(MEPatternResultSyncPacket.class,
-                MEPatternResultSyncPacket::new);
+                MEPatternSyncPacket::new);
 
         FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
         ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);

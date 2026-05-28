@@ -8,26 +8,22 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.GridViewGroup;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_ANCHOR;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_LEFT;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_RIGHT;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_PANEL_OFFSET;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class ButtonPanel extends Panel {
-    private static final Rect PANEL_OFFSET = Rect.corners(0, 0, 0, -21);
-    private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
-    private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
-    private static final int PAGE_MARGIN = 12;
-    private static final Rect LEFT_PAGE_OFFSET = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0);
-    private static final Rect RIGHT_PAGE_OFFSET = PAGE_OFFSET.offset(PAGE_MARGIN, 0);
-
     protected final GridViewGroup<ItemButton> gridViewGroup;
     protected int page = 0;
 
@@ -35,76 +31,58 @@ public abstract class ButtonPanel extends Panel {
     private final PageButton rightPageButton;
 
     public class ItemButton extends Button {
-        private int index = 0;
+        private final int slotIndex;
 
-        public ItemButton() {
+        public ItemButton(int slotIndex) {
             super(ButtonPanel.this.menu);
+            this.slotIndex = slotIndex;
         }
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return buttonTooltip(index, mouseX - rect.x(), mouseY - rect.y());
+            return buttonTooltip(itemIndex(), mouseX - rect.x(), mouseY - rect.y());
         }
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             renderButton(poseStack, mouseX - rect.x(), mouseY - rect.y(), partialTick,
-                rect, index, isHovering(mouseX, mouseY));
+                rect, itemIndex(), isHovered(mouseX, mouseY));
         }
 
         @Override
         protected boolean canClick(int button, double mouseX, double mouseY) {
-            return canClickButton(index, mouseX - rect.x(), mouseY - rect.y(), button);
+            return canClickButton(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             playButtonSound();
-            onSelect(index, mouseX - rect.x(), mouseY - rect.y(), button);
+            onSelect(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
-        public int getIndex() {
-            return index;
+        public int itemIndex() {
+            return page * gridViewGroup.getSlotCount() + slotIndex;
         }
 
-        public ButtonPanel getParent() {
+        public ButtonPanel parent() {
             return ButtonPanel.this;
         }
     }
 
-    private class PageButton extends SimpleButton {
-        private static final int TEX_Y = 208;
+    private ButtonPanel(MenuScreen<?> screen, GridViewGroup<ItemButton> viewGroup) {
+        super(screen, viewGroup);
+        this.gridViewGroup = viewGroup;
+        this.leftPageButton = PageButton.previousPage(menu, this::changePage);
+        this.rightPageButton = PageButton.nextPage(menu, this::changePage);
 
-        private final int pageChange;
+        gridViewGroup.setSlotFactory(ItemButton::new);
 
-        public PageButton(int texX, int pageChange) {
-            super(ButtonPanel.this.menu, RECIPE_BOOK_BG, null, texX, TEX_Y,
-                texX, TEX_Y + PAGE_OFFSET.height());
-            this.pageChange = pageChange;
-        }
-
-        @Override
-        protected void playDownSound() {
-            ClientUtil.playSound(SoundEvents.BOOK_PAGE_TURN);
-        }
-
-        @Override
-        public void onMouseClicked(double mouseX, double mouseY, int button) {
-            super.onMouseClicked(mouseX, mouseY, button);
-            setPage(page + pageChange);
-        }
+        addChild(PAGE_ANCHOR, PAGE_OFFSET_LEFT, leftPageButton);
+        addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
     }
 
-    @SuppressWarnings("unchecked")
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen, new GridViewGroup<ItemButton>(buttonWidth, buttonHeight, verticalSpacing, PANEL_OFFSET));
-        this.gridViewGroup = (GridViewGroup<ItemButton>) viewGroup;
-        this.leftPageButton = new PageButton(15, -1);
-        this.rightPageButton = new PageButton(1, 1);
-        gridViewGroup.setSlotFactory(index -> new ItemButton());
-
-        addChild(PAGE_ANCHOR, LEFT_PAGE_OFFSET, leftPageButton);
-        addChild(PAGE_ANCHOR, RIGHT_PAGE_OFFSET, rightPageButton);
+        this(screen, new GridViewGroup<>(buttonWidth, buttonHeight, verticalSpacing, PAGE_PANEL_OFFSET));
     }
 
     protected abstract int getItemCount();
@@ -133,23 +111,22 @@ public abstract class ButtonPanel extends Panel {
      */
     protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
 
-    protected void setPage(int index) {
-        gridViewGroup.setItemCount(getItemCount());
-        gridViewGroup.setPage(index);
-        leftPageButton.setActive(gridViewGroup.isLeftPageEnabled());
-        rightPageButton.setActive(gridViewGroup.isRightPageEnabled());
+    protected void setPage(int val) {
+        var itemCount = getItemCount();
+        var slotCount = gridViewGroup.getSlotCount();
+        var maxPage = Math.max(1, (itemCount + slotCount - 1) / slotCount);
+        page = MathUtil.clamp(val, 0, maxPage - 1);
+        leftPageButton.setActive(page != 0);
+        rightPageButton.setActive(page != maxPage - 1);
         for (var i = 0; i < gridViewGroup.getSlotCount(); i++) {
             var button = gridViewGroup.getSlot(i);
-            var j = gridViewGroup.getVisibleIndex(i);
-
-            if (j >= 0) {
-                button.index = j;
-                button.setActive(true);
-            } else {
-                button.setActive(false);
-            }
+            var itemIndex = page * slotCount + button.slotIndex;
+            button.setActive(itemIndex >= 0 && itemIndex < itemCount);
         }
-        page = gridViewGroup.getPage();
+    }
+
+    private void changePage(int change) {
+        setPage(page + change);
     }
 
     @Override
@@ -159,6 +136,6 @@ public abstract class ButtonPanel extends Panel {
 
     @Override
     protected void doRefresh() {
-        setPage(page);
+        changePage(0);
     }
 }

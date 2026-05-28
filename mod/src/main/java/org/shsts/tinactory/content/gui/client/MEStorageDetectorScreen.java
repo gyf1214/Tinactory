@@ -64,7 +64,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
                 RenderUtil.renderFluid(poseStack, targetFluid, rect1, z);
             }
 
-            if (isHovering(mouseX, mouseY)) {
+            if (isHovered(mouseX, mouseY)) {
                 RenderUtil.renderSlotHover(poseStack, rect1);
             }
         }

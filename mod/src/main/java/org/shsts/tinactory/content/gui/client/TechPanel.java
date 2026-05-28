@@ -349,7 +349,7 @@ public class TechPanel extends Panel {
         return component instanceof TechButton ||
             component instanceof RequiredTechButtons ||
             (component instanceof ButtonPanel.ItemButton itemButton &&
-                itemButton.getParent() instanceof TechButtonPanel);
+                itemButton.parent() instanceof TechButtonPanel);
     }
 
     public static Optional<ITechnology> getHoveredTech(IViewAdapter component, double mouseX) {
@@ -358,8 +358,8 @@ public class TechPanel extends Panel {
         } else if (component instanceof RequiredTechButtons buttons) {
             return buttons.getSelectedTech(mouseX);
         } else if (component instanceof ButtonPanel.ItemButton itemButton &&
-            itemButton.getParent() instanceof TechButtonPanel buttonPanel) {
-            return Optional.of(buttonPanel.getTech(itemButton.getIndex()));
+            itemButton.parent() instanceof TechButtonPanel buttonPanel) {
+            return Optional.of(buttonPanel.getTech(itemButton.itemIndex()));
         }
         return Optional.empty();
     }

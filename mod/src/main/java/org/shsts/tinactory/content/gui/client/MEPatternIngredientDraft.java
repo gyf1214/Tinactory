@@ -11,20 +11,21 @@ import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MEPatternIngredientDraft {
-    @Nullable
     private IStackKey key;
     private long amount = 1L;
     @Nullable
     private Integer port;
 
+    public MEPatternIngredientDraft(IStackKey key) {
+        this.key = key;
+    }
+
     public static MEPatternIngredientDraft from(CraftAmount amount) {
-        var ret = new MEPatternIngredientDraft();
-        ret.key = amount.key();
+        var ret = new MEPatternIngredientDraft(amount.key());
         ret.amount = amount.amount();
         return ret;
     }
 
-    @Nullable
     public IStackKey key() {
         return key;
     }

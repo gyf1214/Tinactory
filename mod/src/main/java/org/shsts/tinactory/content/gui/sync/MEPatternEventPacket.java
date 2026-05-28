@@ -30,15 +30,15 @@ public class MEPatternEventPacket implements IPacket {
         this.pattern = pattern;
     }
 
-    public static MEPatternEventPacket createPattern(CraftPattern pattern) {
+    public static MEPatternEventPacket create(CraftPattern pattern) {
         return new MEPatternEventPacket(Action.CREATE, pattern.patternId(), pattern);
     }
 
-    public static MEPatternEventPacket updatePattern(String patternId, CraftPattern pattern) {
+    public static MEPatternEventPacket update(String patternId, CraftPattern pattern) {
         return new MEPatternEventPacket(Action.UPDATE, patternId, pattern);
     }
 
-    public static MEPatternEventPacket deletePattern(String patternId) {
+    public static MEPatternEventPacket delete(String patternId) {
         return new MEPatternEventPacket(Action.DELETE, patternId, null);
     }
 

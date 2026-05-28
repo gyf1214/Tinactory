@@ -1,0 +1,249 @@
+package org.shsts.tinactory.content.gui.client;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.client.GridViewGroup;
+import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.gui.client.Button;
+import org.shsts.tinactory.integration.gui.client.PageButton;
+import org.shsts.tinactory.integration.gui.client.Panel;
+import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.Widgets;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.slf4j.Logger;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_ANCHOR;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_LEFT;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_OFFSET_RIGHT;
+import static org.shsts.tinactory.integration.gui.client.PageButton.PAGE_PANEL_OFFSET;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class MEPatternIngredientPanel extends Panel {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    private final GridViewGroup<Row> gridViewGroup;
+    private final List<MEPatternIngredientDraft> drafts;
+    private final PageButton leftPageButton;
+    private final PageButton rightPageButton;
+    private int page = 0;
+
+    private int draftIndex(int rowIndex) {
+        return page * gridViewGroup.getRowCount() + rowIndex;
+    }
+
+    private class KeyButton extends Button {
+        private final Row row;
+
+        public KeyButton(MenuBase menu, Row row) {
+            super(menu);
+            this.row = row;
+        }
+
+        private Optional<MEPatternIngredientDraft> draft() {
+            var index = draftIndex(row.index);
+            return index >= drafts.size() ? Optional.empty() : Optional.of(drafts.get(index));
+        }
+
+        private Optional<IStackKey> key() {
+            return draft().map(MEPatternIngredientDraft::key);
+        }
+
+        @Override
+        protected boolean canClick(int button, double mouseX, double mouseY) {
+            return button == 0 || button == 1;
+        }
+
+        @Override
+        public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
+            return key().flatMap(IStackKey::tooltip);
+        }
+
+        @Override
+        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect);
+            var rect1 = rect.offset(1, 1).enlarge(-2, -2);
+            key().ifPresent(key -> RenderUtil.renderDescriptor(
+                poseStack, key.display(), rect1, getBlitOffset()));
+            if (isHovered(mouseX, mouseY)) {
+                RenderUtil.renderSlotHover(poseStack, rect1);
+            }
+        }
+
+        @Override
+        public void onMouseClicked(double mouseX, double mouseY, int button) {
+            super.onMouseClicked(mouseX, mouseY, button);
+
+            var carried = menu.getCarried();
+            var index = draftIndex(row.index);
+
+            if (button == 1 && index < drafts.size() && carried.isEmpty()) {
+                remove(index);
+                return;
+            }
+            if (carried.isEmpty()) {
+                return;
+            }
+            stackKeyFromItem(carried).ifPresent(key -> {
+                if (index >= drafts.size()) {
+                    drafts.add(row.createDraft(key));
+                } else {
+                    drafts.get(index).setKey(key);
+                }
+                refresh();
+            });
+        }
+    }
+
+    private class Row extends Panel {
+        private final int index;
+        private final EditBox amountEdit;
+        private final EditBox portEdit;
+
+        public Row(int index) {
+            super(MEPatternIngredientPanel.this.screen);
+            this.index = index;
+            var keyButton = new KeyButton(menu, this);
+            this.amountEdit = Widgets.editBox();
+            this.portEdit = Widgets.editBox();
+
+            addChild(RectD.corners(0d, 0.5d, 0d, 0.5d), new Rect(0, -SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE), keyButton);
+            addVanillaWidget(RectD.corners(0d, 0.5d, 0.5d, 0.5d),
+                Rect.corners(SLOT_SIZE + SPACING, -EDIT_HEIGHT / 2, SLOT_SIZE / 2, EDIT_HEIGHT / 2),
+                0, amountEdit);
+            addVanillaWidget(RectD.corners(0.5d, 0.5d, 1d, 0.5d),
+                Rect.corners(SLOT_SIZE / 2 + SPACING, -EDIT_HEIGHT / 2, 0, EDIT_HEIGHT / 2),
+                0, portEdit);
+
+            amountEdit.setResponder(value -> draft().ifPresent($ -> $.setAmount(parseLong(value))));
+            portEdit.setResponder(value -> draft().ifPresent($ -> $.setPort(parseInteger(value))));
+        }
+
+        @Override
+        public void setRect(Rect rect) {
+            super.setRect(rect);
+            LOGGER.debug("set rect {}", rect);
+        }
+
+        private Optional<MEPatternIngredientDraft> draft() {
+            var draftIndex = draftIndex(index);
+            return draftIndex < drafts.size() ? Optional.of(drafts.get(index)) : Optional.empty();
+        }
+
+        public MEPatternIngredientDraft createDraft(IStackKey key) {
+            var ret = new MEPatternIngredientDraft(key);
+            ret.setAmount(parseLong(amountEdit.getValue()));
+            ret.setPort(parseInteger(portEdit.getValue()));
+            return ret;
+        }
+
+        @Override
+        protected void doRefresh() {
+            var draft = draft();
+            var amount = draft.map($ -> Long.toString($.amount())).orElse("");
+            var port = draft.flatMap($ -> Optional.ofNullable($.port()))
+                .map($ -> Integer.toString($))
+                .orElse("");
+            amountEdit.setValue(amount);
+            portEdit.setValue(port);
+        }
+    }
+
+    private MEPatternIngredientPanel(MEPatternTerminalScreen screen, GridViewGroup<Row> gridViewGroup,
+        List<MEPatternIngredientDraft> drafts) {
+        super(screen, gridViewGroup);
+        this.gridViewGroup = gridViewGroup;
+        this.drafts = drafts;
+        this.leftPageButton = PageButton.previousPage(menu, this::changePage);
+        this.rightPageButton = PageButton.nextPage(menu, this::changePage);
+
+        gridViewGroup.setSlotFactory(Row::new);
+
+        addChild(PAGE_ANCHOR, PAGE_OFFSET_LEFT, leftPageButton);
+        addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
+    }
+
+    public MEPatternIngredientPanel(MEPatternTerminalScreen screen, List<MEPatternIngredientDraft> drafts) {
+        this(screen, new GridViewGroup<>(0, SLOT_SIZE, SPACING, PAGE_PANEL_OFFSET), drafts);
+    }
+
+    private void remove(int rowIndex) {
+        drafts.remove(draftIndex(rowIndex));
+        refresh();
+    }
+
+    private void setPage(int val) {
+        var itemCount = drafts.size();
+        var slotCount = gridViewGroup.getSlotCount();
+        var maxPage = Math.max(1, (itemCount + slotCount - 1) / slotCount);
+        page = MathUtil.clamp(val, 0, maxPage - 1);
+        leftPageButton.setActive(page != 0);
+        rightPageButton.setActive(page != maxPage - 1);
+    }
+
+    private void changePage(int change) {
+        setPage(page + change);
+    }
+
+    public void resetPage() {
+        setPage(0);
+    }
+
+    @Override
+    protected void doRefresh() {
+        changePage(0);
+    }
+
+    @Override
+    protected void postLayout() {
+        refresh();
+    }
+
+    private static Optional<IStackKey> stackKeyFromItem(ItemStack stack) {
+        var fluid = StackHelper.getFluidHandlerFromItem(stack)
+            .map(handler -> handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE))
+            .filter(drained -> !drained.isEmpty());
+        if (fluid.isPresent()) {
+            return Optional.of(StackHelper.FLUID_ADAPTER.keyOf(fluid.get()));
+        }
+        return stack.isEmpty() ? Optional.empty() : Optional.of(StackHelper.ITEM_ADAPTER.keyOf(stack));
+    }
+
+    private static long parseLong(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+            return 1L;
+        }
+    }
+
+    @Nullable
+    private static Integer parseInteger(String value) {
+        if (value.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+}

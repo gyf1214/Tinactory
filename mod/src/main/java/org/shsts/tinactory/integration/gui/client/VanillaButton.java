@@ -40,7 +40,8 @@ public class VanillaButton extends Button {
 
     @Override
     public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var y = disabled ? 66 - BUTTON_HEIGHT : (isHovering(mouseX, mouseY) ? 66 + BUTTON_HEIGHT : 66);
+        int y;
+        y = disabled ? 66 - BUTTON_HEIGHT : (isHovered(mouseX, mouseY) ? 66 + BUTTON_HEIGHT : 66);
         var w = rect.width() / 2;
         var rect1 = new Rect(rect.x(), rect.y(), w, rect.height());
         RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1, 0, y);

@@ -56,13 +56,9 @@ public abstract class MenuWidget extends GuiComponent implements
         return false;
     }
 
-    public boolean isHovering(double mouseX, double mouseY) {
-        return active && canHover() && rect.in(mouseX, mouseY);
-    }
-
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return isHovering(mouseX, mouseY);
+        return active && canHover() && rect.in(mouseX, mouseY);
     }
 
     public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {

@@ -9,11 +9,12 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEPatternResultSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.content.gui.sync.RevisionScheduler;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.gui.sync.SyncPackets;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
@@ -31,18 +32,30 @@ import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvi
 public class MEPatternTerminalMenu extends MenuBase {
     public static final String PATTERN_SYNC = "mePattern";
     public static final String PATTERN_RESULT_SYNC = "mePatternResult";
-    public static final int INVENTORY_WIDTH = SLOT_SIZE * 9;
-    public static final int INVENTORY_MARGIN = 7;
-    public static final int INVENTORY_Y = 151;
+    public static final int PANEL_HEIGHT = 148;
+    private static final int INVENTORY_Y = PANEL_HEIGHT + SPACING;
     public static final int INVENTORY_BAR_Y = INVENTORY_Y + SLOT_SIZE * 3 + SPACING;
 
     private final IMachine machine;
     @Nullable
     private final IPatternRepository repository;
-    private final ActiveScheduler<MEPatternResultSyncPacket> resultScheduler;
-    private MEPatternResultSyncPacket.ResultCode lastResult = MEPatternResultSyncPacket.ResultCode.SUCCESS;
-    @Nullable
-    private String lastResultPatternId;
+    private final ActiveScheduler<SyncPackets.LongPacket> resultScheduler;
+
+    public enum Result {
+        SUCCESS,
+        DUPLICATE_PATTERN_ID,
+        PATTERN_NOT_FOUND,
+        NO_CAPACITY,
+        INVALID_PATTERN;
+
+        public final String id;
+
+        Result() {
+            this.id = LocHelper.constantToId(name());
+        }
+    }
+
+    private Result lastResult = Result.SUCCESS;
     private boolean editorActive = false;
 
     private class EditorInventorySlot extends Slot {
@@ -69,6 +82,10 @@ public class MEPatternTerminalMenu extends MenuBase {
         addEditorInventorySlots();
     }
 
+    public static Result resultOf(long val) {
+        return Result.values()[(int) val];
+    }
+
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player) && machine.canPlayerInteract(player);
@@ -80,13 +97,13 @@ public class MEPatternTerminalMenu extends MenuBase {
 
     private void addEditorInventorySlots() {
         for (var j = 0; j < 9; j++) {
-            var x = MARGIN_X + INVENTORY_MARGIN + j * SLOT_SIZE;
+            var x = MARGIN_X + j * SLOT_SIZE;
             var y = MARGIN_TOP + INVENTORY_BAR_Y;
             addSlot(new EditorInventorySlot(j, x + 1, y + 1));
         }
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 9; j++) {
-                var x = MARGIN_X + INVENTORY_MARGIN + j * SLOT_SIZE;
+                var x = MARGIN_X + j * SLOT_SIZE;
                 var y = MARGIN_TOP + INVENTORY_Y + i * SLOT_SIZE;
                 addSlot(new EditorInventorySlot(9 + i * 9 + j, x + 1, y + 1));
             }
@@ -101,17 +118,18 @@ public class MEPatternTerminalMenu extends MenuBase {
         return new MEPatternSyncPacket(repository == null ? List.of() : repository.listPatterns());
     }
 
-    private MEPatternResultSyncPacket resultPacket() {
-        return new MEPatternResultSyncPacket(lastResult, lastResultPatternId);
+    private SyncPackets.LongPacket resultPacket() {
+        return new SyncPackets.LongPacket(lastResult.ordinal());
     }
 
     private void onAction(MEPatternEventPacket packet) {
-        publishResult(handleAction(packet), packet.patternId());
+        lastResult = handleAction(packet);
+        resultScheduler.invokeUpdate();
     }
 
-    private MEPatternResultSyncPacket.ResultCode handleAction(MEPatternEventPacket packet) {
+    private Result handleAction(MEPatternEventPacket packet) {
         if (repository == null || packet.patternId().isBlank()) {
-            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+            return Result.INVALID_PATTERN;
         }
         return switch (packet.action()) {
             case CREATE -> createPattern(packet.patternId(), packet.pattern());
@@ -120,49 +138,40 @@ public class MEPatternTerminalMenu extends MenuBase {
         };
     }
 
-    private MEPatternResultSyncPacket.ResultCode createPattern(String patternId, @Nullable CraftPattern pattern) {
-        if (!hasValidPayload(pattern) || !patternId.equals(pattern.patternId())) {
-            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+    private Result createPattern(String patternId, @Nullable CraftPattern pattern) {
+        if (repository == null || !hasValidPayload(patternId, pattern)) {
+            return Result.INVALID_PATTERN;
         }
         if (repository.containsPatternId(patternId)) {
-            return MEPatternResultSyncPacket.ResultCode.DUPLICATE_PATTERN_ID;
+            return Result.DUPLICATE_PATTERN_ID;
         }
         return repository.addPattern(pattern) ?
-            MEPatternResultSyncPacket.ResultCode.SUCCESS :
-            MEPatternResultSyncPacket.ResultCode.NO_CAPACITY;
+            Result.SUCCESS :
+            Result.NO_CAPACITY;
     }
 
-    private MEPatternResultSyncPacket.ResultCode updatePattern(String patternId, @Nullable CraftPattern pattern) {
-        if (!hasValidPayload(pattern)) {
-            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+    private Result updatePattern(String patternId, @Nullable CraftPattern pattern) {
+        if (repository == null || !hasValidPayload(patternId, pattern)) {
+            return Result.INVALID_PATTERN;
         }
         if (!repository.containsPatternId(patternId)) {
-            return MEPatternResultSyncPacket.ResultCode.PATTERN_NOT_FOUND;
-        }
-        if (!patternId.equals(pattern.patternId())) {
-            return MEPatternResultSyncPacket.ResultCode.STALE_PATTERN;
+            return Result.PATTERN_NOT_FOUND;
         }
         return repository.updatePattern(pattern) ?
-            MEPatternResultSyncPacket.ResultCode.SUCCESS :
-            MEPatternResultSyncPacket.ResultCode.NO_CAPACITY;
+            Result.SUCCESS :
+            Result.NO_CAPACITY;
     }
 
-    private MEPatternResultSyncPacket.ResultCode deletePattern(String patternId, @Nullable CraftPattern pattern) {
-        if (pattern != null) {
-            return MEPatternResultSyncPacket.ResultCode.INVALID_PATTERN;
+    private Result deletePattern(String patternId, @Nullable CraftPattern pattern) {
+        if (repository == null || pattern != null) {
+            return Result.INVALID_PATTERN;
         }
         return repository.removePattern(patternId) ?
-            MEPatternResultSyncPacket.ResultCode.SUCCESS :
-            MEPatternResultSyncPacket.ResultCode.PATTERN_NOT_FOUND;
+            Result.SUCCESS :
+            Result.PATTERN_NOT_FOUND;
     }
 
-    private boolean hasValidPayload(@Nullable CraftPattern pattern) {
-        return pattern != null && !pattern.outputs().isEmpty();
-    }
-
-    private void publishResult(MEPatternResultSyncPacket.ResultCode result, String patternId) {
-        lastResult = result;
-        lastResultPatternId = patternId.isBlank() ? null : patternId;
-        resultScheduler.invokeUpdate();
+    private static boolean hasValidPayload(String patternId, @Nullable CraftPattern pattern) {
+        return pattern != null && !pattern.outputs().isEmpty() && patternId.equals(pattern.patternId());
     }
 }

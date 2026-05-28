@@ -7,21 +7,23 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
-import org.shsts.tinactory.content.gui.sync.MEPatternResultSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 
+import static org.shsts.tinactory.content.gui.MEPatternTerminalMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEPatternTerminalMenu.PATTERN_RESULT_SYNC;
 import static org.shsts.tinactory.content.gui.MEPatternTerminalMenu.PATTERN_SYNC;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
-    public static final int BUTTON_WIDTH = 48;
-
     private final MEPatternBrowserPanel browserPanel;
     private final MEPatternEditorPanel editorPanel;
 
@@ -31,10 +33,11 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
         this.editorPanel = new MEPatternEditorPanel(this, this::showBrowser);
 
         rootPanel.addGroup(browserPanel);
-        rootPanel.addGroup(editorPanel);
+        rootPanel.addChild(RectD.corners(0d, 0d, 1d, 0d), new Rect(0, 0, 0, PANEL_HEIGHT), editorPanel);
+        this.contentHeight = MEPatternTerminalMenu.INVENTORY_BAR_Y + SLOT_SIZE;
+
         editorPanel.setActive(false);
         menu.setEditorActive(false);
-        this.contentHeight = MEPatternTerminalMenu.INVENTORY_BAR_Y + 18;
 
         menu.onSyncPacket(PATTERN_SYNC, this::onPatternSync);
         menu.onSyncPacket(PATTERN_RESULT_SYNC, this::onPatternResultSync);
@@ -55,35 +58,25 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
     }
 
     private void showCreate() {
-        editorPanel.create();
         browserPanel.setActive(false);
         editorPanel.setActive(true);
+        editorPanel.create();
         menu.setEditorActive(true);
     }
 
     private void showEditor(CraftPattern pattern) {
-        editorPanel.edit(pattern);
         browserPanel.setActive(false);
         editorPanel.setActive(true);
+        editorPanel.edit(pattern);
         menu.setEditorActive(true);
     }
 
-    private void onPatternResultSync(MEPatternResultSyncPacket packet) {
-        if (packet.result() == MEPatternResultSyncPacket.ResultCode.SUCCESS) {
+    private void onPatternResultSync(SyncPackets.LongPacket packet) {
+        var result = MEPatternTerminalMenu.resultOf(packet.getData());
+        if (result == MEPatternTerminalMenu.Result.SUCCESS) {
             showBrowser();
         } else {
-            editorPanel.showFeedback(resultMessage(packet.result()));
+            editorPanel.showFeedback(tr("result." + result.id));
         }
-    }
-
-    private static Component resultMessage(MEPatternResultSyncPacket.ResultCode result) {
-        return switch (result) {
-            case SUCCESS -> tr("result.success");
-            case DUPLICATE_PATTERN_ID -> tr("result.duplicatePatternId");
-            case PATTERN_NOT_FOUND -> tr("result.patternNotFound");
-            case NO_CAPACITY -> tr("result.noCapacity");
-            case INVALID_PATTERN -> tr("result.invalidPattern");
-            case STALE_PATTERN -> tr("result.stalePattern");
-        };
     }
 }

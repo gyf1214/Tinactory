@@ -79,7 +79,7 @@ public class FluidSlot extends MenuWidget {
 
     protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
         RenderUtil.renderFluidWithDecoration(poseStack, getFluidStack(), rect, getBlitOffset());
-        if (isHovering(mouseX, mouseY)) {
+        if (isHovered(mouseX, mouseY)) {
             RenderUtil.renderSlotHover(poseStack, rect);
         }
     }

@@ -70,7 +70,7 @@ public class PortPanel extends Panel {
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             super.doRender(poseStack, mouseX, mouseY, partialTick);
-            if (isHovering(mouseX, mouseY)) {
+            if (isHovered(mouseX, mouseY)) {
                 renderHoverOverlay(poseStack, slots);
             }
         }

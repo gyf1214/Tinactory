@@ -11,7 +11,6 @@ import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
-import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Tab;
@@ -23,8 +22,7 @@ import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
 import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.CPU_STATUS_SYNC;
 import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.PREVIEW_SYNC;
 import static org.shsts.tinactory.content.gui.MECraftTerminalMenu.REQUEST_SYNC;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -43,7 +41,7 @@ public class MECraftTerminalScreen extends MenuScreen<MECraftTerminalMenu> {
         this.previewPanel = new MECraftPreviewPanel(this);
         this.tab = new Tab(this, requestPanel, Items.WRITABLE_BOOK, cpuStatusPanel, Items.COMPARATOR);
 
-        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tab);
+        rootPanel.addGroup(TAB_OFFSET, tab);
         rootPanel.addGroup(requestPanel);
         rootPanel.addGroup(cpuStatusPanel);
         rootPanel.addGroup(previewPanel);

@@ -33,26 +33,31 @@ import static org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen.tr;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternEditorPanel extends Panel {
     private static final int BUTTON_WIDTH = 48;
-    private static final int BODY_Y = 46;
+    private static final int LABEL_LEFT = 64;
+    private static final Rect LABEL_OFFSET = new Rect(0, 0, LABEL_LEFT, EDIT_HEIGHT);
+    private static final RectD EDIT_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
+    private static final Rect EDIT_OFFSET = Rect.corners(LABEL_LEFT, 0, 0, EDIT_HEIGHT);
 
     private final EditBox patternIdEdit;
     private final Label patternIdLabel;
+    private final VanillaButton deleteButton;
     private final EditBox recipeTypeEdit;
     private final EditBox voltageTierEdit;
     private final Label feedbackLabel;
-    private final MEPatternIngredientRowPanel inputPanel;
-    private final MEPatternIngredientRowPanel outputPanel;
+    private final Tab tab;
+    private final MEPatternIngredientPanel inputPanel;
+    private final MEPatternIngredientPanel outputPanel;
     private final List<MEPatternIngredientDraft> inputRows = new ArrayList<>();
     private final List<MEPatternIngredientDraft> outputRows = new ArrayList<>();
-    private boolean createMode = true;
     @Nullable
-    private String originalPatternId;
+    private String patternId;
 
     public MEPatternEditorPanel(MEPatternTerminalScreen screen, Runnable onCancel) {
         super(screen);
@@ -61,30 +66,77 @@ public class MEPatternEditorPanel extends Panel {
         this.recipeTypeEdit = Widgets.editBox();
         this.voltageTierEdit = Widgets.editBox();
         this.feedbackLabel = new Label(menu);
-        this.inputPanel = new MEPatternIngredientRowPanel(screen, inputRows);
-        this.outputPanel = new MEPatternIngredientRowPanel(screen, outputRows);
-        var machinePanel = machinePanel();
-        var tab = new Tab(screen, inputPanel, Items.HOPPER, outputPanel, Items.CHEST, machinePanel, Items.COMPARATOR);
+        this.deleteButton = new VanillaButton(menu, tr("delete"), null, this::delete);
+        this.inputPanel = new MEPatternIngredientPanel(screen, inputRows);
+        this.outputPanel = new MEPatternIngredientPanel(screen, outputRows);
 
-        addChild(new Rect(0, 0, 64, FONT_HEIGHT), new Label(menu, tr("id")));
-        addVanillaWidget(RectD.ZERO, new Rect(70, -2, 104, EDIT_HEIGHT), 0, patternIdEdit);
-        addChild(new Rect(70, 0, 104, FONT_HEIGHT), patternIdLabel);
-        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-BUTTON_WIDTH * 3 - SPACING * 2, 0,
-            BUTTON_WIDTH, BUTTON_HEIGHT), new VanillaButton(menu, tr("save"), null, this::save));
-        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-BUTTON_WIDTH * 2 - SPACING, 0,
-            BUTTON_WIDTH, BUTTON_HEIGHT), new VanillaButton(menu, tr("cancel"), null, onCancel));
-        addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT),
-            new VanillaButton(menu, tr("delete"), null, this::delete));
-        addChild(new Rect(0, 24, 170, FONT_HEIGHT), feedbackLabel);
-        addGroup(new Rect(0, BODY_Y, 0, 0), inputPanel);
-        addGroup(new Rect(0, BODY_Y, 0, 0), outputPanel);
-        addGroup(new Rect(0, BODY_Y, 0, 0), machinePanel);
-        addGroup(new Rect(0, BODY_Y, 0, 0), tab);
+        var machinePanel = new Panel(screen);
+        var recipeTypeLabel = new Label(menu, tr("recipeType"));
+        recipeTypeLabel.verticalAlign = Label.Alignment.MIDDLE;
+        machinePanel.addChild(LABEL_OFFSET, recipeTypeLabel);
+        machinePanel.addVanillaWidget(EDIT_ANCHOR, EDIT_OFFSET, 0, recipeTypeEdit);
+        var voltageLabel = new Label(menu, tr("voltageTier"));
+        voltageLabel.verticalAlign = Label.Alignment.MIDDLE;
+        var lineOffset = EDIT_HEIGHT + SPACING;
+        machinePanel.addChild(LABEL_OFFSET.offset(0, lineOffset), voltageLabel);
+        machinePanel.addVanillaWidget(EDIT_ANCHOR, EDIT_OFFSET.offset(0, lineOffset), 0, voltageTierEdit);
+
+        this.tab = new Tab(screen, inputPanel, Items.HOPPER, outputPanel, Items.CHEST, machinePanel, Items.COMPARATOR);
+
+        var idLabel = new Label(menu, tr("id"));
+        idLabel.verticalAlign = Label.Alignment.MIDDLE;
+        addChild(LABEL_OFFSET, idLabel);
+        addVanillaWidget(EDIT_ANCHOR, EDIT_OFFSET, 0, patternIdEdit);
+        addChild(EDIT_ANCHOR, EDIT_OFFSET, patternIdLabel);
+
+        addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0),
+            new VanillaButton(menu, tr("save"), null, this::save));
+        addChild(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -BUTTON_HEIGHT, BUTTON_WIDTH, 0),
+            new VanillaButton(menu, tr("cancel"), null, onCancel));
+        addChild(RectD.corners(0.5d, 1d, 0.5d, 1d),
+            Rect.corners(-BUTTON_WIDTH / 2, -BUTTON_HEIGHT, BUTTON_WIDTH / 2, 0),
+            deleteButton);
+        feedbackLabel.horizontalAlign = Label.Alignment.MIDDLE;
+        addChild(RectD.corners(0d, 1d, 1d, 1d), new Rect(0, -BUTTON_HEIGHT - SPACING - FONT_HEIGHT, 0, FONT_HEIGHT),
+            feedbackLabel);
+
+        var panelOffset = Rect.corners(0, EDIT_HEIGHT + SPACING, 0, -BUTTON_HEIGHT - FONT_HEIGHT - SPACING * 2);
+        addGroup(panelOffset, inputPanel);
+        addGroup(panelOffset, outputPanel);
+        addGroup(panelOffset, machinePanel);
+        addGroup(TAB_OFFSET, tab);
     }
 
     public void create() {
-        createMode = true;
-        originalPatternId = null;
+        reset();
+        patternId = null;
+        patternIdEdit.active = true;
+        patternIdEdit.visible = true;
+        patternIdLabel.setActive(false);
+        deleteButton.setActive(false);
+        postReset();
+    }
+
+    public void edit(CraftPattern pattern) {
+        reset();
+        patternId = pattern.patternId();
+        patternIdEdit.active = false;
+        patternIdEdit.visible = false;
+        patternIdLabel.setLines(new TextComponent(pattern.patternId()));
+        patternIdLabel.setActive(true);
+        inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
+        outputRows.addAll(fromAmounts(pattern.outputs(), pattern.constraints(), PortDirection.OUTPUT));
+        recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString).orElse(""));
+        voltageTierEdit.setValue(voltageConstraintTier(pattern.constraints()).map(Object::toString).orElse(""));
+        deleteButton.setActive(true);
+        postReset();
+    }
+
+    public void showFeedback(Component message) {
+        feedbackLabel.setLines(message);
+    }
+
+    private void reset() {
         patternIdEdit.setValue("");
         patternIdLabel.setLines(TextComponent.EMPTY);
         inputRows.clear();
@@ -92,52 +144,27 @@ public class MEPatternEditorPanel extends Panel {
         recipeTypeEdit.setValue("");
         voltageTierEdit.setValue("");
         feedbackLabel.setLines(TextComponent.EMPTY);
-        refreshRows();
     }
 
-    public void edit(CraftPattern pattern) {
-        createMode = false;
-        originalPatternId = pattern.patternId();
-        patternIdEdit.setValue(pattern.patternId());
-        patternIdLabel.setLines(new TextComponent(pattern.patternId()));
-        inputRows.clear();
-        outputRows.clear();
-        inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
-        outputRows.addAll(fromAmounts(pattern.outputs(), pattern.constraints(), PortDirection.OUTPUT));
-        recipeTypeEdit.setValue(recipeType(pattern.constraints()).map(ResourceLocation::toString)
-            .orElse(""));
-        voltageTierEdit.setValue(voltageConstraintTier(pattern.constraints()).map(Object::toString).orElse(""));
-        feedbackLabel.setLines(TextComponent.EMPTY);
-        refreshRows();
-    }
-
-    public void showFeedback(Component message) {
-        feedbackLabel.setLines(message);
-    }
-
-    private Panel machinePanel() {
-        var ret = new Panel(screen);
-        ret.addChild(new Rect(0, 0, 72, FONT_HEIGHT), new Label(menu, tr("recipeType")));
-        ret.addVanillaWidget(RectD.ZERO, new Rect(82, -2, 132, EDIT_HEIGHT), 0, recipeTypeEdit);
-        ret.addChild(new Rect(0, 24, 72, FONT_HEIGHT), new Label(menu, tr("voltageTier")));
-        ret.addVanillaWidget(RectD.ZERO, new Rect(82, 22, 48, EDIT_HEIGHT), 0, voltageTierEdit);
-        return ret;
+    private void postReset() {
+        inputPanel.resetPage();
+        outputPanel.resetPage();
+        tab.select(0);
     }
 
     private void save() {
         toPattern().ifPresentOrElse(pattern -> {
-            if (createMode) {
-                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.createPattern(pattern));
-            } else if (originalPatternId != null) {
-                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.updatePattern(originalPatternId,
-                    pattern));
+            if (patternId == null) {
+                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.create(pattern));
+            } else {
+                menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.update(patternId, pattern));
             }
         }, () -> feedbackLabel.setLines(tr("invalid")));
     }
 
     private void delete() {
-        if (!createMode && originalPatternId != null) {
-            menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.deletePattern(originalPatternId));
+        if (patternId != null) {
+            menu.triggerEvent(ME_PATTERN_ACTION, () -> MEPatternEventPacket.delete(patternId));
         }
     }
 
@@ -205,13 +232,6 @@ public class MEPatternEditorPanel extends Panel {
             }
         }
         return ret;
-    }
-
-    private void refreshRows() {
-        inputPanel.ensureTrailingEmpty();
-        outputPanel.ensureTrailingEmpty();
-        inputPanel.resetPage();
-        outputPanel.resetPage();
     }
 
     private Optional<ResourceLocation> parseRecipeType() {
