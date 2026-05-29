@@ -29,8 +29,13 @@ public final class MEPatternIngredientDraft {
     private Integer port = null;
 
     public MEPatternIngredientDraft(IStackKey key, long amount) {
+        this(key, amount, null);
+    }
+
+    private MEPatternIngredientDraft(@Nullable IStackKey key, long amount, @Nullable Integer port) {
         this.key = key;
-        this.amount = amount;
+        this.amount = Math.max(1L, amount);
+        this.port = port;
     }
 
     public static MEPatternIngredientDraft from(CraftAmount amount) {
@@ -48,6 +53,10 @@ public final class MEPatternIngredientDraft {
 
         return fluid.map($ -> from(FLUID_ADAPTER, $))
             .or(() -> stack.isEmpty() ? Optional.empty() : Optional.of(from(ITEM_ADAPTER, stack)));
+    }
+
+    public MEPatternIngredientDraft copy() {
+        return new MEPatternIngredientDraft(key, amount, port);
     }
 
     public IStackKey key() {

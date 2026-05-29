@@ -62,6 +62,16 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
         editorPanel.create(menu.getCarried());
     }
 
+    public boolean canImportRecipeDraft() {
+        return !editorPanel.isActive();
+    }
+
+    public void createFromDraft(MEPatternDraft draft) {
+        browserPanel.setActive(false);
+        editorPanel.setActive(true);
+        editorPanel.createFromDraft(draft);
+    }
+
     private void showEditor(CraftPattern pattern) {
         browserPanel.setActive(false);
         editorPanel.setActive(true);

@@ -233,6 +233,7 @@
     "tinactory.gui.pattern.amount": "Amount",
     "tinactory.gui.pattern.port": "Port",
     "tinactory.gui.pattern.recipeType": "Recipe Type",
+    "tinactory.gui.pattern.targetRecipe": "Target Recipe",
     "tinactory.gui.pattern.voltageTier": "Voltage",
     "tinactory.gui.pattern.save": "Save",
     "tinactory.gui.pattern.cancel": "Cancel",
