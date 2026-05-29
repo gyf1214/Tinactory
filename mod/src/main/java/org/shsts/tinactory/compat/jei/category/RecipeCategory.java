@@ -88,6 +88,14 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     protected void drawExtra(R recipe, ICategoryDrawHelper helper,
         IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {}
 
+    public RecipeType<R> jeiRecipeType() {
+        return type;
+    }
+
+    public ResourceLocation recipeTypeId() {
+        return recipeType.loc();
+    }
+
     private IDrawable createBackground(IGuiHelper guiHelper) {
         var builder = ComposeDrawable.builder();
         buildBackground(builder, guiHelper, xOffset);

@@ -29,6 +29,8 @@ import org.shsts.tinactory.compat.jei.category.RecipeCategory;
 import org.shsts.tinactory.compat.jei.category.ResearchCategory;
 import org.shsts.tinactory.compat.jei.category.ToolCategory;
 import org.shsts.tinactory.compat.jei.gui.FluidScreenHandler;
+import org.shsts.tinactory.compat.jei.gui.MEPatternDraftBuilder;
+import org.shsts.tinactory.compat.jei.gui.MEPatternTransferHandler;
 import org.shsts.tinactory.compat.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
@@ -47,6 +49,7 @@ import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -166,6 +169,21 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        // TODO
+        for (var category : categories) {
+            if (category instanceof ProcessingCategory<?> processingCategory) {
+                addProcessingTransferHandler(registration, processingCategory);
+            }
+        }
+        registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
+            RecipeTypes.SMELTING.getRecipeClass(), MEPatternDraftBuilder::fromSmelting,
+            registration.getTransferHelper()), RecipeTypes.SMELTING);
+    }
+
+    private static <R extends ProcessingRecipe> void addProcessingTransferHandler(
+        IRecipeTransferRegistration registration, ProcessingCategory<R> category) {
+        registration.addRecipeTransferHandler(new MEPatternTransferHandler<R>(
+            category.jeiRecipeType().getRecipeClass(),
+            recipe -> MEPatternDraftBuilder.fromProcessing(recipe, category.recipeTypeId()),
+            registration.getTransferHelper()), category.jeiRecipeType());
     }
 }

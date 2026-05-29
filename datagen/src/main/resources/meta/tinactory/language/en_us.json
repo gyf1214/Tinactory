@@ -246,6 +246,8 @@
     "tinactory.jei.processing.temperature": "Temperature: %s K",
     "tinactory.jei.processing.cleanness": "Cleanness: %s - %s",
     "tinactory.jei.processing.requireLargeChemicalReactor": "Require Large Chemical Reactor",
+    "tinactory.jei.pattern.unsupportedRecipe": "This recipe cannot be imported as a pattern",
+    "tinactory.jei.pattern.activeDraft": "Close the current pattern draft before importing a recipe",
     "tinactory.jei.rate": "Chance: %s",
     "tinactory.jei.not_consumed": "Does not get consumed in the process",
     "tinactory.recipe.marker.centrifuge.material.dust_pure": "Centrifuge Pure Dusts",
