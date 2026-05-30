@@ -4,8 +4,11 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
+import org.shsts.tinactory.content.gui.client.MEPatternDraft;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
@@ -33,6 +36,8 @@ public class MEPatternTerminalMenu extends InventoryMenu {
     @Nullable
     private final IPatternRepository repository;
     private final ActiveScheduler<SyncPackets.UnitPacket> resultScheduler;
+    @Nullable
+    private IRecipeDraftImporter recipeDraftImporter;
 
     public MEPatternTerminalMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
@@ -49,6 +54,16 @@ public class MEPatternTerminalMenu extends InventoryMenu {
     @Override
     public boolean stillValid(Player player) {
         return super.stillValid(player) && machine.canPlayerInteract(player);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void setRecipeDraftImporter(@Nullable IRecipeDraftImporter importer) {
+        recipeDraftImporter = importer;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public boolean importRecipeDraft(MEPatternDraft draft, boolean doImport) {
+        return recipeDraftImporter != null && recipeDraftImporter.importRecipeDraft(draft, doImport);
     }
 
     private long patternRevision() {
@@ -102,5 +117,11 @@ public class MEPatternTerminalMenu extends InventoryMenu {
 
     private static boolean hasValidPayload(@Nullable CraftPattern pattern) {
         return pattern != null && !pattern.outputs().isEmpty();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @FunctionalInterface
+    public interface IRecipeDraftImporter {
+        boolean importRecipeDraft(MEPatternDraft draft, boolean doImport);
     }
 }

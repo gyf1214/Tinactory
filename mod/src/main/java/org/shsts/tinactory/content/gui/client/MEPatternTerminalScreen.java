@@ -41,6 +41,7 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
 
         menu.onSyncPacket(PATTERN_SYNC, this::onPatternSync);
         menu.onSyncPacket(PATTERN_RESULT_SYNC, $ -> showBrowser());
+        menu.setRecipeDraftImporter(this::importRecipeDraft);
     }
 
     public static TranslatableComponent tr(String key, Object... args) {
@@ -70,6 +71,16 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
         browserPanel.setActive(false);
         editorPanel.setActive(true);
         editorPanel.createFromDraft(draft);
+    }
+
+    private boolean importRecipeDraft(MEPatternDraft draft, boolean doImport) {
+        if (!canImportRecipeDraft()) {
+            return false;
+        }
+        if (doImport) {
+            createFromDraft(draft);
+        }
+        return true;
     }
 
     private void showEditor(CraftPattern pattern) {

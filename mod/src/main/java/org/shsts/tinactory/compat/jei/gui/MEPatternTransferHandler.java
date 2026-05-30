@@ -7,14 +7,12 @@ import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.client.MEPatternDraft;
-import org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -55,15 +53,8 @@ public final class MEPatternTransferHandler<R> implements IRecipeTransferHandler
         if (draft.isEmpty()) {
             return error("unsupportedRecipe");
         }
-        var screen = Minecraft.getInstance().screen;
-        if (!(screen instanceof MEPatternTerminalScreen patternScreen)) {
+        if (!container.importRecipeDraft(draft.get(), doTransfer)) {
             return helper.createInternalError();
-        }
-        if (!patternScreen.canImportRecipeDraft()) {
-            return error("activeDraft");
-        }
-        if (doTransfer) {
-            patternScreen.createFromDraft(draft.get());
         }
         return null;
     }
