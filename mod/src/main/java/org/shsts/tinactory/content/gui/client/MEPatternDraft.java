@@ -41,12 +41,6 @@ public final class MEPatternDraft {
         return new MEPatternDraft();
     }
 
-    public static MEPatternDraft copyOf(MEPatternDraft draft) {
-        var ret = empty();
-        ret.copyFrom(draft);
-        return ret;
-    }
-
     public static MEPatternDraft fromPattern(CraftPattern pattern) {
         var ret = empty();
         ret.inputRows.addAll(fromAmounts(pattern.inputs(), pattern.constraints(), PortDirection.INPUT));
@@ -57,15 +51,14 @@ public final class MEPatternDraft {
         return ret;
     }
 
+    /**
+     * This function performs a shallow copy. The parameter should not be used.
+     */
     public void copyFrom(MEPatternDraft draft) {
         inputRows.clear();
         outputRows.clear();
-        inputRows.addAll(draft.inputRows.stream()
-            .map(MEPatternIngredientDraft::copy)
-            .toList());
-        outputRows.addAll(draft.outputRows.stream()
-            .map(MEPatternIngredientDraft::copy)
-            .toList());
+        inputRows.addAll(draft.inputRows);
+        outputRows.addAll(draft.outputRows);
         recipeTypeId = draft.recipeTypeId;
         targetRecipeId = draft.targetRecipeId;
         voltageTier = draft.voltageTier;

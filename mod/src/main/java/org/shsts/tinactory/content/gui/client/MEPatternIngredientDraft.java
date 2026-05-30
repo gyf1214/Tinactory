@@ -26,13 +26,13 @@ public final class MEPatternIngredientDraft {
     private IStackKey key;
     private long amount;
     @Nullable
-    private Integer port = null;
+    private Integer port;
 
     public MEPatternIngredientDraft(IStackKey key, long amount) {
         this(key, amount, null);
     }
 
-    private MEPatternIngredientDraft(@Nullable IStackKey key, long amount, @Nullable Integer port) {
+    private MEPatternIngredientDraft(IStackKey key, long amount, @Nullable Integer port) {
         this.key = key;
         this.amount = Math.max(1L, amount);
         this.port = port;

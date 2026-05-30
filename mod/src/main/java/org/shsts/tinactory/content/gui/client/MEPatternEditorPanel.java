@@ -100,7 +100,7 @@ public class MEPatternEditorPanel extends Panel {
     public void createFromDraft(MEPatternDraft value) {
         reset();
         originalUuid = null;
-        draft.copyFrom(MEPatternDraft.copyOf(value));
+        draft.copyFrom(value);
         syncEditBoxesFromDraft();
         deleteButton.setActive(false);
         postReset(draft.inputRows().isEmpty() ? 1 : 0);
