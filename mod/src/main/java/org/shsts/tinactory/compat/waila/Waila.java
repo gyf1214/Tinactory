@@ -6,11 +6,19 @@ import mcp.mobius.waila.api.IWailaCommonRegistration;
 import mcp.mobius.waila.api.IWailaPlugin;
 import mcp.mobius.waila.api.TooltipPosition;
 import mcp.mobius.waila.api.WailaPlugin;
+import mcp.mobius.waila.api.ui.IElement;
+import mcp.mobius.waila.api.ui.IElementHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec2;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.integration.common.SmartEntityBlock;
+import org.shsts.tinactory.integration.logistics.StackHelper;
+
+import java.util.List;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -70,5 +78,20 @@ public class Waila implements IWailaPlugin {
 
     static {
         ToolHandlers.init();
+    }
+
+    private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
+    private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
+    private static final Vec2 ITEM_OFFSET = new Vec2(0f, -1f);
+
+    public static void addItemIcon(List<IElement> line, IElementHelper helper, ItemStack stack) {
+        var stack1 = StackHelper.copyWithCount(stack, 1);
+        line.add(helper.item(stack1, 0.5f).size(ITEM_SIZE).translate(ITEM_OFFSET));
+    }
+
+    public static void addFluidIcon(List<IElement> line, IElementHelper helper, FluidStack stack) {
+        line.add(helper.spacer(1, 0));
+        line.add(helper.fluid(stack).size(FLUID_SIZE));
+        line.add(helper.spacer(1, 0));
     }
 }

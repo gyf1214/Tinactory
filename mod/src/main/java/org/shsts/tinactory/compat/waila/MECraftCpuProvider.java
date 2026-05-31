@@ -13,7 +13,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec2;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
@@ -48,8 +47,6 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
     private static final String ERROR_KEY = PREFIX + "Error";
     private static final String MEMORY_LIMIT_KEY = PREFIX + "MemoryLimit";
     private static final String MEMORY_USAGE_KEY = PREFIX + "MemoryUsage";
-    private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
-    private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
 
     public MECraftCpuProvider() {
         super(modLoc("me_craft_cpu"));
@@ -91,18 +88,16 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         var amount = tag.getLong(TARGET_AMOUNT_KEY);
         var line = new ArrayList<IElement>();
         appendTargetIcon(line, key);
-        line.add(helper.text(guiTr("cpu.target", key.name(), ClientUtil.getNumberString(amount))));
+        line.add(helper.text(guiTr("cpu.target", "", ClientUtil.getNumberString(amount))));
         add(line);
     }
 
     private void appendTargetIcon(List<IElement> line, IStackKey key) {
         var display = key.display();
         if (display instanceof ItemRenderDescriptor item) {
-            line.add(helper.item(StackHelper.copyWithCount(item.stack(), 1), 0.5f).size(ITEM_SIZE));
-            line.add(helper.spacer(1, 0));
+            Waila.addItemIcon(line, helper, item.stack());
         } else if (display instanceof FluidRenderDescriptor fluid) {
-            line.add(helper.fluid(fluid.stack()).size(FLUID_SIZE));
-            line.add(helper.spacer(2, 0));
+            Waila.addFluidIcon(line, helper, fluid.stack());
         }
     }
 
