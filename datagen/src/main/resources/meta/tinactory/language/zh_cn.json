@@ -605,6 +605,8 @@
     "tinactory.gui.autocraft.summary.crafted": "制作: %s",
     "tinactory.gui.autocraft.summary.consumed": "消耗: %s",
     "tinactory.gui.autocraft.defaultCpu": "选择 CPU",
+    "tinactory.gui.autocraft.memoryRequired": "内存：%s",
+    "tinactory.gui.autocraft.memory": "内存：%s / %s",
     "tinactory.gui.autocraft.cpu.state.idle": "空闲",
     "tinactory.gui.autocraft.cpu.state.running": "运行中",
     "tinactory.gui.autocraft.cpu.state.blocked": "阻塞",

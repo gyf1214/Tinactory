@@ -211,6 +211,8 @@
     "tinactory.gui.autocraft.summary.crafted": "Crafting: %s",
     "tinactory.gui.autocraft.summary.consumed": "Consuming: %s",
     "tinactory.gui.autocraft.defaultCpu": "Select CPU",
+    "tinactory.gui.autocraft.memoryRequired": "Memory: %s",
+    "tinactory.gui.autocraft.memory": "Memory: %s / %s",
     "tinactory.gui.autocraft.cpu.state.idle": "Idle",
     "tinactory.gui.autocraft.cpu.state.running": "Running",
     "tinactory.gui.autocraft.cpu.state.blocked": "Blocked",

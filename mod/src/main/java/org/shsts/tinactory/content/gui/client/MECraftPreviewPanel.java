@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.VanillaButton;
@@ -45,8 +46,11 @@ public class MECraftPreviewPanel extends Panel {
 
     private final VanillaButton executeButton;
     private final VanillaButton cpuButton;
+    private final Label memoryLabel;
     private final List<Map.Entry<IStackKey, PlanSummary.Entry>> summary = new ArrayList<>();
     private final Component defaultCpuLabel;
+    private boolean previewReady = false;
+    private long previewMemoryUsage = 0L;
     @Nullable
     private UUID selectedCpu = null;
 
@@ -110,6 +114,7 @@ public class MECraftPreviewPanel extends Panel {
     public MECraftPreviewPanel(MECraftTerminalScreen screen) {
         super(screen);
         this.defaultCpuLabel = tr("defaultCpu");
+        this.memoryLabel = new Label(menu, tr("memoryRequired", ClientUtil.getBytesString(0L)));
         this.cpuButton = new VanillaButton(menu, defaultCpuLabel, null, () -> screen.selectCpu(this::onSelectCpu));
         this.executeButton = new VanillaButton(menu, tr("execute"), null, () -> {
             if (selectedCpu == null) {
@@ -118,14 +123,20 @@ public class MECraftPreviewPanel extends Panel {
             }
             screen.executePreview(selectedCpu);
         });
-        executeButton.disabled = true;
+        refreshExecuteDisabled();
         var cancelButton = new VanillaButton(menu, tr("cancel"), null, () -> {
-            executeButton.disabled = true;
+            previewReady = false;
+            previewMemoryUsage = 0L;
             summary.clear();
+            refreshMemoryLabel();
+            refreshExecuteDisabled();
             screen.cancelPreview();
         });
 
-        addGroup(Rect.corners(0, 0, 0, -BUTTON_HEIGHT * 2 - SPACING * 2), new SummaryPanel());
+        addGroup(Rect.corners(0, 0, 0, -BUTTON_HEIGHT * 2 - SPACING * 3 - FONT_HEIGHT), new SummaryPanel());
+        addChild(RectD.corners(0d, 1d, 1d, 1d),
+            Rect.corners(0, -BUTTON_HEIGHT * 2 - SPACING * 2 - FONT_HEIGHT, 0, -BUTTON_HEIGHT * 2 - SPACING * 2),
+            memoryLabel);
         addChild(RectD.corners(0d, 1d, 1d, 1d),
             Rect.corners(0, -BUTTON_HEIGHT * 2 - SPACING, 0, -BUTTON_HEIGHT - SPACING),
             cpuButton);
@@ -134,24 +145,39 @@ public class MECraftPreviewPanel extends Panel {
     }
 
     public void onPreviewSync(MECraftPreviewSyncPacket packet) {
-        executeButton.disabled = packet.state() != MECraftPreviewSyncPacket.PreviewState.PREVIEW_READY;
+        previewReady = packet.state() == MECraftPreviewSyncPacket.PreviewState.PREVIEW_READY;
+        previewMemoryUsage = previewReady ? packet.memoryUsage() : 0L;
         summary.clear();
         packet.summary().entries().entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
             .forEach(summary::add);
         selectedCpu = null;
         cpuButton.setLabel(defaultCpuLabel);
+        refreshMemoryLabel();
+        refreshExecuteDisabled();
     }
 
     private boolean onSelectCpu(@Nullable MECraftCpuSyncPacket.CpuInfo cpu) {
         if (cpu == null) {
+            selectedCpu = null;
+            cpuButton.setLabel(defaultCpuLabel);
+            refreshExecuteDisabled();
             return true;
         }
-        if (!cpu.status().available()) {
+        if (!cpu.status().available() || cpu.status().memoryLimit() < previewMemoryUsage) {
             return false;
         }
         selectedCpu = cpu.status().cpuId();
         cpuButton.setLabel(cpu.name());
+        refreshExecuteDisabled();
         return true;
+    }
+
+    private void refreshMemoryLabel() {
+        memoryLabel.setLine(0, tr("memoryRequired", ClientUtil.getBytesString(previewMemoryUsage)));
+    }
+
+    private void refreshExecuteDisabled() {
+        executeButton.disabled = !previewReady || selectedCpu == null;
     }
 }

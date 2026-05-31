@@ -46,6 +46,8 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
     private static final String COMPLETED_STEPS_KEY = PREFIX + "CompletedSteps";
     private static final String TOTAL_STEPS_KEY = PREFIX + "TotalSteps";
     private static final String ERROR_KEY = PREFIX + "Error";
+    private static final String MEMORY_LIMIT_KEY = PREFIX + "MemoryLimit";
+    private static final String MEMORY_USAGE_KEY = PREFIX + "MemoryUsage";
     private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
     private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
 
@@ -70,6 +72,12 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
             var text = guiTr("cpu.steps",
                 NUMBER_FORMAT.format(tag.getInt(COMPLETED_STEPS_KEY)),
                 NUMBER_FORMAT.format(tag.getInt(TOTAL_STEPS_KEY))).withStyle(ChatFormatting.GRAY);
+            add(helper.text(text));
+        }
+        if (tag.contains(MEMORY_LIMIT_KEY, Tag.TAG_LONG)) {
+            var text = guiTr("memory",
+                ClientUtil.getBytesString(tag.getLong(MEMORY_USAGE_KEY)),
+                ClientUtil.getBytesString(tag.getLong(MEMORY_LIMIT_KEY))).withStyle(ChatFormatting.GRAY);
             add(helper.text(text));
         }
         var error = parseEnum(ExecutionError.class, tag.getString(ERROR_KEY)).orElse(ExecutionError.NONE);
@@ -127,6 +135,8 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         tag.putInt(COMPLETED_STEPS_KEY, status.completedSteps());
         tag.putInt(TOTAL_STEPS_KEY, status.totalSteps());
         tag.putString(ERROR_KEY, status.error().name());
+        tag.putLong(MEMORY_LIMIT_KEY, status.memoryLimit());
+        tag.putLong(MEMORY_USAGE_KEY, status.memoryUsage());
     }
 
     private static CompoundTag encodeKey(IStackKey key) {

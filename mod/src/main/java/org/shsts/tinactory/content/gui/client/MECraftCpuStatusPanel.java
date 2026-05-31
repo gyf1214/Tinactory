@@ -63,6 +63,9 @@ public class MECraftCpuStatusPanel extends Panel {
                     NUMBER_FORMAT.format(status.completedSteps()),
                     NUMBER_FORMAT.format(status.totalSteps())).withStyle(ChatFormatting.GRAY));
             }
+            ret.add(tr("memory",
+                ClientUtil.getBytesString(status.memoryUsage()),
+                ClientUtil.getBytesString(status.memoryLimit())).withStyle(ChatFormatting.GRAY));
             if (status.error() != ExecutionError.NONE) {
                 ret.add(tr("cpu.error." + status.error().id).withStyle(ChatFormatting.GRAY));
             }
