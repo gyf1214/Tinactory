@@ -81,22 +81,22 @@ public class AutocraftTerminalService {
         return previewResult;
     }
 
-    public AutocraftExecuteResult execute(UUID cpuId) {
+    public boolean execute(UUID cpuId) {
         if (!previewResult.isSuccess() || previewTargets == null || previewResult.planSnapshot() == null) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.PLAN_NOT_FOUND);
+            return false;
         }
         var service = cpuRuntime.findVisibleService(cpuId);
         if (service.isEmpty()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_OFFLINE);
+            return false;
         }
         if (service.get().isBusy()) {
-            return AutocraftExecuteResult.failure(AutocraftExecuteResult.Code.CPU_BUSY);
+            return false;
         }
         var targets = previewTargets;
         var plan = previewResult.planSnapshot();
         clearPreview();
         service.get().submitPrepared(targets, plan);
-        return AutocraftExecuteResult.success();
+        return true;
     }
 
     public Optional<AutocraftPreview> preview() {

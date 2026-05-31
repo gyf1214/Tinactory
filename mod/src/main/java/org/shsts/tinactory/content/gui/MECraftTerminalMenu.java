@@ -101,7 +101,7 @@ public class MECraftTerminalMenu extends MenuBase {
             return;
         }
         if (packet.action() == MECraftEventPacket.Action.EXECUTE && packet.cpuId() != null) {
-            if (service.execute(packet.cpuId()).isSuccess()) {
+            if (service.execute(packet.cpuId())) {
                 previewScheduler.invokeUpdate();
             }
             return;

@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
-import org.shsts.tinactory.core.autocraft.service.AutocraftExecuteResult;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
@@ -78,7 +77,7 @@ class AutocraftTerminalServiceExecuteTest {
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
         var execute = service.execute(cpu);
 
-        assertTrue(execute.isSuccess());
+        assertTrue(execute);
         assertTrue(service.previewResult().isEmpty());
         assertEquals(
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
@@ -109,9 +108,44 @@ class AutocraftTerminalServiceExecuteTest {
 
         var execute = service.execute(cpu);
 
-        assertFalse(execute.isSuccess());
-        assertEquals(AutocraftExecuteResult.Code.CPU_BUSY, execute.errorCode());
+        assertFalse(execute);
         assertTrue(service.previewResult().isSuccess());
+    }
+
+    @Test
+    void executeShouldFailWhenCpuOffline() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(planRequiring(
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.empty()));
+        service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
+
+        var execute = service.execute(cpu);
+
+        assertFalse(execute);
+        assertTrue(service.previewResult().isSuccess());
+    }
+
+    @Test
+    void executeShouldFailWhenPreviewMissing() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var jobService = new AutocraftJobService(new TestExecutor());
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.of(jobService)));
+
+        var execute = service.execute(cpu);
+
+        assertFalse(execute);
+        assertTrue(jobService.getJob().isEmpty());
     }
 
     @Test
