@@ -17,20 +17,39 @@ public record CpuStatusEntry(
     List<CraftAmount> targets,
     int completedSteps,
     int totalSteps,
-    ExecutionError error) {
+    ExecutionError error,
+    long memoryLimit,
+    long memoryUsage) {
 
     public CpuStatusEntry {
         targets = List.copyOf(targets);
     }
 
-    public static CpuStatusEntry idle(UUID cpuId) {
+    public CpuStatusEntry(
+        UUID cpuId,
+        JobState state,
+        List<CraftAmount> targets,
+        int completedSteps,
+        int totalSteps,
+        ExecutionError error) {
+
+        this(cpuId, state, targets, completedSteps, totalSteps, error, 0L, 0L);
+    }
+
+    public static CpuStatusEntry idle(UUID cpuId, long memoryLimit) {
         return new CpuStatusEntry(
             cpuId,
             JobState.IDLE,
             List.of(),
             0,
             0,
-            ExecutionError.NONE);
+            ExecutionError.NONE,
+            memoryLimit,
+            0L);
+    }
+
+    public static CpuStatusEntry idle(UUID cpuId) {
+        return idle(cpuId, 0L);
     }
 
     public static CpuStatusEntry offline(UUID cpuId) {
@@ -40,7 +59,9 @@ public record CpuStatusEntry(
             List.of(),
             0,
             0,
-            ExecutionError.OFFLINE);
+            ExecutionError.OFFLINE,
+            0L,
+            0L);
     }
 
     public boolean available() {

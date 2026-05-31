@@ -23,6 +23,7 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
@@ -84,6 +85,30 @@ class AutocraftTerminalServiceExecuteTest {
             jobService.getJob().get().targets());
         assertEquals(1, previewPlanner.calls);
         assertDoesNotThrow(jobService::tick);
+    }
+
+    @Test
+    void executeShouldFailWhenPreviewMemoryExceedsCpuLimit() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 40L);
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(planRequiring(
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.of(jobService)),
+            50L,
+            0L,
+            0L);
+        service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
+
+        var execute = service.execute(cpu);
+
+        assertFalse(execute);
+        assertTrue(jobService.getJob().isEmpty());
+        assertTrue(service.previewResult().isSuccess());
     }
 
     @Test
@@ -157,7 +182,8 @@ class AutocraftTerminalServiceExecuteTest {
             JobState.BLOCKED,
             1,
             1,
-            ExecutionError.FLUSH_BACKPRESSURE);
+            ExecutionError.FLUSH_BACKPRESSURE,
+            256L);
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(List.of()),
@@ -174,6 +200,42 @@ class AutocraftTerminalServiceExecuteTest {
         assertEquals(1, statuses.get(0).completedSteps());
         assertEquals(1, statuses.get(0).totalSteps());
         assertEquals(ExecutionError.FLUSH_BACKPRESSURE, statuses.get(0).error());
+        assertEquals(1024L, statuses.get(0).memoryLimit());
+        assertEquals(256L, statuses.get(0).memoryUsage());
+    }
+
+    @Test
+    void jobSnapshotShouldPersistAndRestoreMemoryUsage() {
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var service = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        service.submitPrepared(List.of(target), planRequiring(
+            new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+            target), 256L);
+
+        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var restored = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        restored.restoreRunningSnapshot(persisted, codec);
+
+        assertEquals(256L, persisted.getLong("memoryUsage"));
+        assertEquals(256L, restored.getJob().orElseThrow().memoryUsage());
+    }
+
+    @Test
+    void oldJobSnapshotShouldRestoreZeroMemoryUsage() {
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var service = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        service.submitPrepared(List.of(target), planRequiring(
+            new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+            target), 256L);
+        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        persisted.remove("memoryUsage");
+
+        var restored = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        restored.restoreRunningSnapshot(persisted, codec);
+
+        assertEquals(0L, restored.getJob().orElseThrow().memoryUsage());
     }
 
     @Test
@@ -285,6 +347,11 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
+            public long memoryLimit() {
+                return 1024L;
+            }
+
+            @Override
             public Optional<AutocraftJobSnapshot> getJob() {
                 return Optional.of(job);
             }
@@ -295,7 +362,7 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
-            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage) {
                 throw new UnsupportedOperationException();
             }
         };
@@ -356,11 +423,17 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     private static final class TestExecutor implements ICraftExecutor {
-        @Override
-        public void start(CraftPlan plan) {}
+        private boolean active;
 
         @Override
-        public void restore(CompoundTag tag, PatternNbtCodec codec) {}
+        public void start(CraftPlan plan) {
+            active = true;
+        }
+
+        @Override
+        public void restore(CompoundTag tag, PatternNbtCodec codec) {
+            active = true;
+        }
 
         @Override
         public void runCycle(long transmissionBandwidth) {}
@@ -370,12 +443,12 @@ class AutocraftTerminalServiceExecuteTest {
 
         @Override
         public boolean isBusy() {
-            return true;
+            return active;
         }
 
         @Override
         public JobState state() {
-            return JobState.RUNNING;
+            return active ? JobState.RUNNING : JobState.IDLE;
         }
 
         @Override

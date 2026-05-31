@@ -15,9 +15,20 @@ public record AutocraftJobSnapshot(
     JobState state,
     int completedSteps,
     int totalSteps,
-    ExecutionError error) {
+    ExecutionError error,
+    long memoryUsage) {
 
     public AutocraftJobSnapshot {
         targets = List.copyOf(targets);
+    }
+
+    public AutocraftJobSnapshot(
+        List<CraftAmount> targets,
+        JobState state,
+        int completedSteps,
+        int totalSteps,
+        ExecutionError error) {
+
+        this(targets, state, completedSteps, totalSteps, error, 0L);
     }
 }
