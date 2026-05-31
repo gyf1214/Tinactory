@@ -2,5 +2,6 @@
   "type": "me_craft_cpu",
   "power": 32,
   "transmissionBandwidth": 64,
-  "executionIntervalTicks": 1
+  "executionIntervalTicks": 1,
+  "memoryLimit": 65536
 }

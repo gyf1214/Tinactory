@@ -33,17 +33,19 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
+    private final long memoryLimit;
     @Nullable
     private AutocraftJobService service;
     @Nullable
     private CompoundTag pendingSnapshot;
 
-    public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks) {}
+    public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks, long memoryLimit) {}
 
     public MECraftCpu(BlockEntity blockEntity, Properties properties) {
         super(blockEntity, properties.power);
         this.transmissionBandwidth = properties.transmissionBandwidth;
         this.executionIntervalTicks = properties.executionIntervalTicks;
+        this.memoryLimit = properties.memoryLimit;
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
@@ -66,7 +68,9 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             current.targets(),
             current.completedSteps(),
             current.totalSteps(),
-            current.error());
+            current.error(),
+            service.memoryLimit(),
+            current.memoryUsage());
     }
 
     @Override
@@ -80,7 +84,8 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             combinedItem,
             combinedFluid,
             transmissionBandwidth,
-            executionIntervalTicks);
+            executionIntervalTicks,
+            memoryLimit);
         if (pendingSnapshot != null) {
             service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
             pendingSnapshot = null;

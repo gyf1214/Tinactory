@@ -106,6 +106,8 @@ public class MECraftCpuSyncPacket implements IPacket {
         buf.writeInt(entry.completedSteps());
         buf.writeInt(entry.totalSteps());
         buf.writeEnum(entry.error());
+        buf.writeLong(entry.memoryLimit());
+        buf.writeLong(entry.memoryUsage());
     }
 
     private static CpuStatusEntry deserializeStatus(FriendlyByteBuf buf) {
@@ -119,7 +121,9 @@ public class MECraftCpuSyncPacket implements IPacket {
             }),
             buf.readInt(),
             buf.readInt(),
-            buf.readEnum(ExecutionError.class));
+            buf.readEnum(ExecutionError.class),
+            buf.readLong(),
+            buf.readLong());
     }
 
     private static CompoundTag encodeIngredientKey(IStackKey key) {

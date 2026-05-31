@@ -248,7 +248,8 @@ public class MiscMeta extends MetaConsumer {
         var config = new MECraftCpu.Properties(
             GsonHelper.getAsDouble(jo, "power"),
             GsonHelper.getAsLong(jo, "transmissionBandwidth"),
-            GsonHelper.getAsInt(jo, "executionIntervalTicks"));
+            GsonHelper.getAsInt(jo, "executionIntervalTicks"),
+            GsonHelper.getAsLong(jo, "memoryLimit"));
         BlockEntityBuilder.builder(id, simpleElectric(config.power()))
             .transform(MachineSet::baseMachine)
             .blockEntity()

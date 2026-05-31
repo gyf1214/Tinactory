@@ -22,21 +22,24 @@ public class MECraftPreviewSyncPacket implements IPacket {
     @Nullable
     private PlanError error;
     private PlanSummary summary = PlanSummary.empty();
+    private long memoryUsage;
 
     public MECraftPreviewSyncPacket() {}
 
     private MECraftPreviewSyncPacket(
         PreviewState state,
         @Nullable PlanError error,
-        PlanSummary summary) {
+        PlanSummary summary,
+        long memoryUsage) {
         this.state = state;
         this.error = error;
         this.summary = summary;
+        this.memoryUsage = memoryUsage;
     }
 
     public static MECraftPreviewSyncPacket of(AutocraftPreview preview) {
         if (preview.isSuccess()) {
-            return ready(preview.summary());
+            return ready(preview.summary(), preview.memoryUsage());
         }
         if (preview.error() != null) {
             return failed(preview.error(), preview.summary());
@@ -45,15 +48,19 @@ public class MECraftPreviewSyncPacket implements IPacket {
     }
 
     public static MECraftPreviewSyncPacket empty() {
-        return new MECraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty());
+        return new MECraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty(), 0L);
     }
 
     public static MECraftPreviewSyncPacket ready(PlanSummary summary) {
-        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary);
+        return ready(summary, 0L);
+    }
+
+    public static MECraftPreviewSyncPacket ready(PlanSummary summary, long memoryUsage) {
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary, memoryUsage);
     }
 
     public static MECraftPreviewSyncPacket failed(PlanError error, PlanSummary summary) {
-        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary);
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary, 0L);
     }
 
     public PreviewState state() {
@@ -69,9 +76,14 @@ public class MECraftPreviewSyncPacket implements IPacket {
         return summary;
     }
 
+    public long memoryUsage() {
+        return memoryUsage;
+    }
+
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(state);
+        buf.writeLong(memoryUsage);
         buf.writeNbt(error == null ? null : serializeError(error));
         buf.writeCollection(summary.entries().entrySet(), (buf1, entry) -> {
             buf1.writeNbt(encodeIngredientKey(entry.getKey()));
@@ -84,6 +96,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         state = buf.readEnum(PreviewState.class);
+        memoryUsage = buf.readLong();
         error = deserializeError(buf.readNbt());
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
         for (var entry : buf.readList(buf1 -> {
