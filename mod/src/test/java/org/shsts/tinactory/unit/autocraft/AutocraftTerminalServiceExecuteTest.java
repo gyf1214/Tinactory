@@ -88,6 +88,28 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     @Test
+    void executeShouldSubmitPreparedPreviewMemoryUsage() {
+        var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(planRequiring(
+                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
+            repo(List.of()),
+            new TestCpuRuntime(
+                () -> List.of(cpu),
+                id -> Optional.of(jobService)),
+            50L,
+            10L,
+            5L);
+        var preview = service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
+
+        assertEquals(60L, preview.memoryUsage());
+        assertTrue(service.execute(cpu));
+        assertEquals(60L, jobService.getJob().orElseThrow().memoryUsage());
+    }
+
+    @Test
     void executeShouldFailWhenPreviewMemoryExceedsCpuLimit() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 40L);

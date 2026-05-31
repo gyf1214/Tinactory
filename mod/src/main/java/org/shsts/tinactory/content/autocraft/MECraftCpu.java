@@ -59,7 +59,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         }
         var job = service.getJob();
         if (job.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId);
+            return CpuStatusEntry.idle(cpuId, service.memoryLimit());
         }
         var current = job.get();
         return new CpuStatusEntry(
@@ -79,6 +79,10 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
+        var snapshot = pendingSnapshot;
+        if (service != null) {
+            snapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(snapshot);
+        }
         service = AutocraftServiceBootstrap.create(
             logistics,
             combinedItem,
@@ -86,8 +90,8 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             transmissionBandwidth,
             executionIntervalTicks,
             memoryLimit);
-        if (pendingSnapshot != null) {
-            service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
+        if (snapshot != null) {
+            service.restoreRunningSnapshot(snapshot, snapshotCodec);
             pendingSnapshot = null;
         }
         autocraft.registerCpu(machine, service);

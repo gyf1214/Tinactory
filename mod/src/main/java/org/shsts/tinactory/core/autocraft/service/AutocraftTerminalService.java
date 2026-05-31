@@ -119,8 +119,9 @@ public class AutocraftTerminalService {
         }
         var targets = previewTargets;
         var plan = previewResult.planSnapshot();
+        var memoryUsage = previewResult.memoryUsage();
         clearPreview();
-        service.get().submitPrepared(targets, plan, previewResult.memoryUsage());
+        service.get().submitPrepared(targets, plan, memoryUsage);
         return true;
     }
 
