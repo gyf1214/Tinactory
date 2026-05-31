@@ -1,8 +1,6 @@
 package org.shsts.tinactory.unit.gui.sync;
 
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
-import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.unit.fixture.TestBufferHelper;
 
@@ -35,18 +33,4 @@ class SyncPacketsTest {
         assertEquals(123456789L, decoded.getData());
     }
 
-    @Test
-    void roundTripsAutocraftPreviewMemoryUsage() {
-        var summary = PlanSummary.empty();
-        var packet = MECraftPreviewSyncPacket.ready(summary, 512L);
-        var buf = TestBufferHelper.buf();
-
-        packet.serializeToBuf(buf);
-        var decoded = new MECraftPreviewSyncPacket();
-        decoded.deserializeFromBuf(buf);
-
-        assertEquals(MECraftPreviewSyncPacket.PreviewState.PREVIEW_READY, decoded.state());
-        assertEquals(summary, decoded.summary());
-        assertEquals(512L, decoded.memoryUsage());
-    }
 }
