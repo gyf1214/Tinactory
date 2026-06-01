@@ -468,6 +468,169 @@
 				item: "tinactory:multiblock/ev/digital_interface"
 			}]
 		}
+		{
+			title: "{tinactory.quests.logistics.023.title}"
+			subtitle: "{tinactory.quests.logistics.023.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.023.description.0}"
+				""
+				"{tinactory.quests.logistics.023.description.1}"
+			]
+			x: 10.0d
+			y: 14.0d
+			dependencies: [
+				"3EDE299FA6EF6A78"
+				"0F38B05E2E11756A"
+			]
+			id: "65D0B60510463343"
+			tasks: [{
+				id: "56244F730AB9A22A"
+				type: "item"
+				item: "tinactory:component/silicon_print"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.024.title}"
+			subtitle: "{tinactory.quests.logistics.024.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.024.description.0}"
+				""
+				"{tinactory.quests.logistics.024.description.1}"
+			]
+			x: 12.0d
+			y: 14.0d
+			dependencies: [
+				"65D0B60510463343"
+				"4FF5F28B05D7D3BD"
+			]
+			id: "7B958900C6A6AC26"
+			tasks: [{
+				id: "2D058F1038369B69"
+				type: "item"
+				item: "tinactory:component/logic_processor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.025.title}"
+			subtitle: "{tinactory.quests.logistics.025.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.025.description.0}"
+				""
+				"{tinactory.quests.logistics.025.description.1}"
+			]
+			x: 14.0d
+			y: 16.0d
+			dependencies: [
+				"7B958900C6A6AC26"
+				"0DFE5BEF57423538"
+			]
+			id: "022A8ABF3D58C41"
+			tasks: [{
+				id: "409D3611E7A4662"
+				type: "item"
+				item: "tinactory:component/calculation_processor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.026.title}"
+			subtitle: "{tinactory.quests.logistics.026.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.026.description.0}"
+				""
+				"{tinactory.quests.logistics.026.description.1}"
+			]
+			x: 8.0d
+			y: 16.0d
+			dependencies: [
+				"65D0B60510463343"
+				"1E73498504A1B6C4"
+				"61B9D2ACAF1C5D38"
+			]
+			id: "7617169E5734A74B"
+			tasks: [{
+				id: "1C716FC7E9EE5689"
+				type: "item"
+				item: "tinactory:logistics/pattern_cell/1m"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.027.title}"
+			subtitle: "{tinactory.quests.logistics.027.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.027.description.0}"
+				""
+				"{tinactory.quests.logistics.027.description.1}"
+			]
+			x: 10.0d
+			y: 18.0d
+			dependencies: [
+				"7B958900C6A6AC26"
+				"7617169E5734A74B"
+				"76896CF4A26C08CD"
+				"1B073B0E13E0484E"
+			]
+			size: 2.0d
+			id: "2DBD0C0A32F12F52"
+			tasks: [
+				{
+					id: "011B9EEA0AAE6440"
+					type: "item"
+					item: "tinactory:logistics/me_pattern_terminal"
+				}
+				{
+					id: "361556F57161B6C"
+					type: "item"
+					item: "tinactory:logistics/me_craft_terminal"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.logistics.028.title}"
+			subtitle: "{tinactory.quests.logistics.028.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.028.description.0}"
+				""
+				"{tinactory.quests.logistics.028.description.1}"
+			]
+			x: 12.0d
+			y: 20.0d
+			dependencies: [
+				"2DBD0C0A32F12F52"
+				"7B958900C6A6AC26"
+				"7617169E5734A74B"
+			]
+			size: 2.0d
+			id: "2FC118547396205"
+			tasks: [{
+				id: "27740CD7531F1DA"
+				type: "item"
+				item: "tinactory:logistics/me_craft_cpu/basic"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.029.title}"
+			subtitle: "{tinactory.quests.logistics.029.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.029.description.0}"
+				""
+				"{tinactory.quests.logistics.029.description.1}"
+			]
+			x: 14.0d
+			y: 22.0d
+			dependencies: [
+				"2FC118547396205"
+				"022A8ABF3D58C41"
+				"340A59CCBC050E4A"
+				"15A12C982E065F64"
+			]
+			size: 2.0d
+			id: "0046CC5063E9B6AD"
+			tasks: [{
+				id: "39FE594EC92F6C1B"
+				type: "item"
+				item: "tinactory:logistics/me_craft_cpu/advanced"
+			}]
+		}
 	]
 	quest_links: [ ]
 }
