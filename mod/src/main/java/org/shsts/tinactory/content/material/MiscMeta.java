@@ -24,7 +24,6 @@ import org.shsts.tinactory.content.autocraft.MECraftTerminal;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
 import org.shsts.tinactory.content.logistics.MEDrive;
 import org.shsts.tinactory.content.logistics.MEPatternCell;
-import org.shsts.tinactory.content.logistics.MEPatternCellSet;
 import org.shsts.tinactory.content.logistics.MESignalController;
 import org.shsts.tinactory.content.logistics.MEStorageCell;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
@@ -55,7 +54,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.AllItems.PATTERN_CELLS;
 import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
@@ -229,19 +227,10 @@ public class MiscMeta extends MetaConsumer {
             MEStorageCell.itemCell(bytes)).register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
             MEStorageCell.fluidCell(bytes)).register();
+        var pattern = REGISTRATE.item(prefix + "pattern_" + parent + "/" + name,
+            MEPatternCell.factory(bytes)).register();
 
-        STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid));
-    }
-
-    private void mePatternCell(String name, String id, JsonObject jo) {
-        var parent = LocHelper.name(id, -2);
-        var prefix = id.substring(0, id.length() - parent.length() - name.length() - 1);
-        var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
-        var bytes = GsonHelper.getAsInt(jo, "bytes");
-
-        var component = REGISTRATE.item(componentPrefix + "/" + name).register();
-        var pattern = REGISTRATE.item(prefix + parent + "/" + name, MEPatternCell.factory(bytes)).register();
-        PATTERN_CELLS.add(new MEPatternCellSet(component, pattern));
+        STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid, pattern));
     }
 
     private void meCraftCpu(String id, JsonObject jo) {
@@ -332,7 +321,6 @@ public class MiscMeta extends MetaConsumer {
             case "me_storage_interface" -> meStorageInterface(id, jo);
             case "me_drive" -> meDrive(id, jo);
             case "me_storage_cell" -> meStorageCell(name, id, jo);
-            case "me_pattern_cell" -> mePatternCell(name, id, jo);
             case "me_signal_controller" -> meSignalController(id, jo);
             case "me_storage_detector" -> meStorageDetector(id, jo);
             case "me_craft_cpu" -> meCraftCpu(id, jo);

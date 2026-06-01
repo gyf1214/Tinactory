@@ -7,4 +7,5 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record MEStorageCellSet(IEntry<Item> component, IEntry<MEStorageCell> item, IEntry<MEStorageCell> fluid) {}
+public record MEStorageCellSet(IEntry<Item> component, IEntry<MEStorageCell> item, IEntry<MEStorageCell> fluid,
+    IEntry<MEPatternCell> pattern) {}
