@@ -254,13 +254,51 @@ object MiscMachines {
                 tech(Technologies.DIGITAL_STORAGE)
             }
             output(getItem("logistics/me_pattern_terminal")) {
-                circuit(4)
+                input(getItem("component/logic_processor"))
                 input(getItem("component/annihilation_core"))
                 input(getItem("component/formation_core"))
                 input("certus_quartz", "gem", 4)
                 input("fluix", "dust", 4)
                 input("stainless_steel", "plate", 4)
-                tech(Technologies.DIGITAL_STORAGE)
+                input("epoxy", "sheet", 2)
+                tech(Technologies.AUTOCRAFTING)
+            }
+            output(getItem("logistics/me_craft_terminal")) {
+                input(getItem("logistics/me_pattern_terminal"))
+                input(getItem("component/logic_processor"))
+                input(getItem("component/annihilation_core"))
+                input(getItem("component/formation_core"))
+                input("fluix", "gem", 2)
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
+            }
+            output(getBlock("logistics/me_craft_cpu/basic")) {
+                input(getItem("component/logic_processor"))
+                input(getItem("component/storage_component/1m"))
+                input(getItem("component/formation_core"))
+                input(getItem("component/annihilation_core"))
+                component("sensor")
+                input("titanium", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
+            }
+        }
+        assembler {
+            componentVoltage = Voltage.IV
+            defaults {
+                component("machine_hull")
+                autoCable = true
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS)
+            }
+            output(getBlock("logistics/me_craft_cpu/advanced")) {
+                input(getBlock("logistics/me_craft_cpu/basic"))
+                input(getItem("component/calculation_processor"))
+                input(getItem("component/storage_component/4m"))
+                input(getItem("component/formation_core"))
+                input(getItem("component/annihilation_core"))
+                component("sensor")
+                input("tungsten_steel", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
             }
         }
     }

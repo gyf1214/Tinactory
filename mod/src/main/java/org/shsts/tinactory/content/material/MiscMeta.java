@@ -227,7 +227,7 @@ public class MiscMeta extends MetaConsumer {
             MEStorageCell.itemCell(bytes)).register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
             MEStorageCell.fluidCell(bytes)).register();
-        var pattern = REGISTRATE.item(prefix + "pattern_" + parent + "/" + name,
+        var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
             MEPatternCell.factory(bytes)).register();
 
         STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid, pattern));

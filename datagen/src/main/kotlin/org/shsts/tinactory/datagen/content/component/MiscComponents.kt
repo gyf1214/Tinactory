@@ -296,6 +296,13 @@ object MiscComponents {
                 input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
+            misc("silicon_print") {
+                input("silicon", "ingot")
+                input("annealed_copper", "foil", 4)
+                input("fluix", "gem")
+                input("epoxy", amount = 1)
+                tech(Technologies.ADVANCED_POLYMER)
+            }
 
             for (entry in STORAGE_CELLS) {
                 val component = entry.component.get()
@@ -313,12 +320,37 @@ object MiscComponents {
                     input("stainless_steel", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
+                output(entry.pattern.get()) {
+                    input(component)
+                    misc("silicon_print")
+                    input("epoxy", "sheet")
+                    input("titanium", "plate", 3)
+                    input("soldering_alloy", amount = 2)
+                    tech(Technologies.AUTOCRAFTING)
+                }
             }
         }
 
         circuitAssembler {
             defaults {
                 workTicks(200)
+            }
+            misc("logic_processor") {
+                misc("silicon_print")
+                input(CHIP.item("cpu"))
+                input(CHIP.item("ram"), 2)
+                input("red_alloy", "wire_fine", 8)
+                input("soldering_alloy", amount = 1)
+                voltage(Voltage.HV)
+            }
+            misc("calculation_processor") {
+                misc("silicon_print")
+                misc("logic_processor", 2)
+                input(CHIP.item("nano_cpu"))
+                input(CHIP.item("nor"), 2)
+                input("electrum", "wire_fine", 8)
+                input("soldering_alloy", amount = 1.5)
+                voltage(Voltage.IV)
             }
             storageComponent(0) {
                 input(CHIP.item("ram"), 4)

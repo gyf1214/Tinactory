@@ -111,6 +111,18 @@ object Components {
                 model(basicItem(ae2("items/material_formation_core")))
             }
 
+            component("silicon_print") {
+                model(basicItem(ae2("items/material_silicon_print")))
+            }
+
+            component("logic_processor") {
+                model(basicItem(ae2("items/material_logic_processor")))
+            }
+
+            component("calculation_processor") {
+                model(basicItem(ae2("items/material_calculation_processor")))
+            }
+
             component("carbon_fiber") {
                 model(basicItem("metaitems/carbon.fibres"))
             }
