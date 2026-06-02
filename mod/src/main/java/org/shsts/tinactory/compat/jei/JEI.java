@@ -29,7 +29,6 @@ import org.shsts.tinactory.compat.jei.category.RecipeCategory;
 import org.shsts.tinactory.compat.jei.category.ResearchCategory;
 import org.shsts.tinactory.compat.jei.category.ToolCategory;
 import org.shsts.tinactory.compat.jei.gui.FluidScreenHandler;
-import org.shsts.tinactory.compat.jei.gui.MEPatternDraftBuilder;
 import org.shsts.tinactory.compat.jei.gui.MEPatternTransferHandler;
 import org.shsts.tinactory.compat.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
@@ -175,15 +174,15 @@ public class JEI implements IModPlugin {
             }
         }
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
-            RecipeTypes.SMELTING.getRecipeClass(), MEPatternDraftBuilder::fromSmelting,
+            RecipeTypes.SMELTING.getRecipeClass(), MEPatternTransferHandler::fromSmelting,
             registration.getTransferHelper()), RecipeTypes.SMELTING);
     }
 
     private static <R extends ProcessingRecipe> void addProcessingTransferHandler(
         IRecipeTransferRegistration registration, ProcessingCategory<R> category) {
-        registration.addRecipeTransferHandler(new MEPatternTransferHandler<R>(
+        registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
             category.jeiRecipeType().getRecipeClass(),
-            recipe -> MEPatternDraftBuilder.fromProcessing(recipe, category.recipeTypeId()),
+            recipe -> MEPatternTransferHandler.fromProcessing(recipe, category.recipeTypeId()),
             registration.getTransferHelper()), category.jeiRecipeType());
     }
 }

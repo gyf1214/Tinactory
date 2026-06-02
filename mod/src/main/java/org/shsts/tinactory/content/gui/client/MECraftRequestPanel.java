@@ -86,8 +86,10 @@ public class MECraftRequestPanel extends Panel {
         this.quantityEdit = Widgets.editBox();
         var previewButton = new VanillaButton(menu, tr("preview"), null, this::requestPreview);
 
-        addGroup(Rect.corners(0, 0, 0, -EDIT_HEIGHT - SPACING), buttonPanel);
-        addVanillaWidget(RectD.corners(0d, 1d, 0d, 1d), Rect.corners(0, -EDIT_HEIGHT, 48, 0), 0, quantityEdit);
+        addGroup(Rect.corners(0, 0, 0, -BUTTON_HEIGHT - SPACING), buttonPanel);
+        addVanillaWidget(RectD.corners(0d, 1d, 0d, 1d),
+            Rect.corners(0, -EDIT_HEIGHT - SPACING, 48, -SPACING),
+            0, quantityEdit);
         addChild(RectD.corners(1d, 1d, 1d, 1d), Rect.corners(-BUTTON_WIDTH, -BUTTON_HEIGHT, 0, 0), previewButton);
     }
 

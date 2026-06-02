@@ -16,7 +16,7 @@ public class VanillaWidgetAdapter<T extends GuiComponent & Widget & GuiEventList
     implements IViewAdapter {
     private final T widget;
 
-    VanillaWidgetAdapter(T widget) {
+    public VanillaWidgetAdapter(T widget) {
         this.widget = widget;
     }
 

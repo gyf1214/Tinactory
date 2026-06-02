@@ -241,6 +241,7 @@
     "tinactory.gui.pattern.recipeType": "Recipe Type",
     "tinactory.gui.pattern.targetRecipe": "Target Recipe",
     "tinactory.gui.pattern.voltageTier": "Voltage",
+    "tinactory.gui.pattern.ignoreVoltage": "Ignore",
     "tinactory.gui.pattern.save": "Save",
     "tinactory.gui.pattern.cancel": "Cancel",
     "tinactory.gui.pattern.delete": "Delete",

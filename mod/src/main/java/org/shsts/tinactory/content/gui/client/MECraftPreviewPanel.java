@@ -117,11 +117,9 @@ public class MECraftPreviewPanel extends Panel {
         this.memoryLabel = new Label(menu, tr("memoryRequired", ClientUtil.getBytesString(0L)));
         this.cpuButton = new VanillaButton(menu, defaultCpuLabel, null, () -> screen.selectCpu(this::onSelectCpu));
         this.executeButton = new VanillaButton(menu, tr("execute"), null, () -> {
-            if (selectedCpu == null) {
-                // TODO
-                return;
+            if (selectedCpu != null) {
+                screen.executePreview(selectedCpu);
             }
-            screen.executePreview(selectedCpu);
         });
         refreshExecuteDisabled();
         var cancelButton = new VanillaButton(menu, tr("cancel"), null, () -> {

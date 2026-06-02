@@ -630,6 +630,7 @@
     "tinactory.gui.pattern.recipeType": "配方类型",
     "tinactory.gui.pattern.targetRecipe": "目标配方",
     "tinactory.gui.pattern.voltageTier": "电压",
+    "tinactory.gui.pattern.ignoreVoltage": "忽略",
     "tinactory.gui.pattern.save": "保存",
     "tinactory.gui.pattern.cancel": "取消",
     "tinactory.gui.pattern.delete": "删除",

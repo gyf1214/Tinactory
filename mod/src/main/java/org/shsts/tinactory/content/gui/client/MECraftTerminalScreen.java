@@ -29,6 +29,7 @@ import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
 @MethodsReturnNonnullByDefault
 public class MECraftTerminalScreen extends MenuScreen<MECraftTerminalMenu> {
     public static final int BUTTON_WIDTH = 64;
+    private static final int HEIGHT = 153;
 
     private final Tab tab;
     private final MECraftCpuStatusPanel cpuStatusPanel;
@@ -45,7 +46,7 @@ public class MECraftTerminalScreen extends MenuScreen<MECraftTerminalMenu> {
         rootPanel.addGroup(requestPanel);
         rootPanel.addGroup(cpuStatusPanel);
         rootPanel.addGroup(previewPanel);
-        this.contentHeight = 144;
+        this.contentHeight = HEIGHT;
 
         menu.onSyncPacket(REQUEST_SYNC, requestPanel::updateRequestables);
         menu.onSyncPacket(CPU_STATUS_SYNC, cpuStatusPanel::updateStatus);

@@ -37,7 +37,7 @@ public class MEPatternTerminalMenu extends InventoryMenu {
     private final IPatternRepository repository;
     private final ActiveScheduler<SyncPackets.UnitPacket> resultScheduler;
     @Nullable
-    private IRecipeDraftImporter recipeDraftImporter;
+    private IRecipeDraftImporter recipeDraftImporter = null;
 
     public MEPatternTerminalMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
@@ -56,12 +56,10 @@ public class MEPatternTerminalMenu extends InventoryMenu {
         return super.stillValid(player) && machine.canPlayerInteract(player);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void setRecipeDraftImporter(@Nullable IRecipeDraftImporter importer) {
         recipeDraftImporter = importer;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public boolean importRecipeDraft(MEPatternDraft draft, boolean doImport) {
         return recipeDraftImporter != null && recipeDraftImporter.importRecipeDraft(draft, doImport);
     }
