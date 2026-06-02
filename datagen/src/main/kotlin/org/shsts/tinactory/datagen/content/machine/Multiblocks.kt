@@ -36,7 +36,6 @@ import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
-import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
@@ -642,7 +641,7 @@ object Multiblocks {
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
         name: String, amount: Int = 1) {
-        input(getBlock("multiblock/misc/$name"), amount)
+        input(getItem("multiblock/misc/$name"), amount)
     }
 
     private fun AssemblyRecipeFactory.solid(name: String,
@@ -1052,7 +1051,7 @@ object Multiblocks {
             multiblock("assembly_line") {
                 machine("assembler")
                 machine("circuit_assembler")
-                input(getBlock("multiblock/misc/assembler_machine_casing"), 4)
+                misc("assembler_machine_casing", 4)
                 circuit(4, Voltage.LUV)
                 component("robot_arm", 4)
                 component("conveyor_module", 4)
