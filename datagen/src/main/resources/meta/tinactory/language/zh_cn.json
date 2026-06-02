@@ -642,8 +642,6 @@
     "tinactory.jei.processing.temperature": "温度：%s K",
     "tinactory.jei.processing.cleanness": "清洁度：%s - %s",
     "tinactory.jei.processing.requireLargeChemicalReactor": "需要大型化学反应器",
-    "tinactory.jei.pattern.unsupportedRecipe": "此配方无法作为样板导入",
-    "tinactory.jei.pattern.activeDraft": "请先关闭当前样板草稿，再导入配方",
     "tinactory.jei.rate": "概率：%s",
     "tinactory.jei.not_consumed": "过程中不消耗",
     "tinactory.recipe.marker.centrifuge.material.dust_pure": "离心洁净粉",

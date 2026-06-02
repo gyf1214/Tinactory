@@ -7,7 +7,6 @@ import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +27,6 @@ import org.shsts.tinactory.integration.util.ClientUtil;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.integration.logistics.StackHelper.FLUID_ADAPTER;
 import static org.shsts.tinactory.integration.logistics.StackHelper.ITEM_ADAPTER;
@@ -66,17 +64,12 @@ public final class MEPatternTransferHandler<R> implements IRecipeTransferHandler
         IRecipeSlotsView recipeSlotsView, Player player, boolean maxTransfer, boolean doTransfer) {
         var draft = converter.apply(recipe);
         if (draft.isEmpty()) {
-            return error("unsupportedRecipe");
+            return helper.createInternalError();
         }
         if (!container.importRecipeDraft(draft.get(), doTransfer)) {
             return helper.createInternalError();
         }
         return null;
-    }
-
-    private IRecipeTransferError error(String key) {
-        Component message = tr("tinactory.jei.pattern." + key);
-        return helper.createUserErrorWithTooltip(message);
     }
 
     public static Optional<MEPatternDraft> fromProcessing(ProcessingRecipe recipe, ResourceLocation recipeTypeId) {
