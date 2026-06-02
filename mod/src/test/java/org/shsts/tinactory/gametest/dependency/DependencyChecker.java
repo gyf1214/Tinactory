@@ -89,8 +89,8 @@ public final class DependencyChecker {
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
-    // Current baseline: 31 curated stack targets remain unreachable.
-    private static final int ACCEPTED_UNREACHABLE_NODES = 31;
+    // Current baseline: 25 curated stack targets remain unreachable.
+    private static final int ACCEPTED_UNREACHABLE_NODES = 25;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
