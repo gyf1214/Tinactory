@@ -15,12 +15,12 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftRequestablesSyncPacket implements IPacket {
+public class MECraftRequestSyncPacket implements IPacket {
     private final List<IStackKey> requestables = new ArrayList<>();
 
-    public AutocraftRequestablesSyncPacket() {}
+    public MECraftRequestSyncPacket() {}
 
-    public AutocraftRequestablesSyncPacket(List<IStackKey> requestables) {
+    public MECraftRequestSyncPacket(List<IStackKey> requestables) {
         this.requestables.addAll(requestables);
     }
 
@@ -39,7 +39,8 @@ public class AutocraftRequestablesSyncPacket implements IPacket {
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         requestables.clear();
         requestables.addAll(
-            buf.readList(buf1 -> CodecHelper.parseTag(StackHelper.KEY_CODEC, buf1.readNbt())));
+            buf.readList(buf1 -> CodecHelper.parseTag(StackHelper.KEY_CODEC,
+                CodecHelper.readRequiredNbt(buf1, "requestable key"))));
     }
 
     @Override
@@ -47,7 +48,7 @@ public class AutocraftRequestablesSyncPacket implements IPacket {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AutocraftRequestablesSyncPacket other)) {
+        if (!(obj instanceof MECraftRequestSyncPacket other)) {
             return false;
         }
         return requestables.equals(other.requestables);

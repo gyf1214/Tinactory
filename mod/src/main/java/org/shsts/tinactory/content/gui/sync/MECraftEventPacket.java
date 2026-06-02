@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftEventPacket implements IPacket {
+public class MECraftEventPacket implements IPacket {
     public enum Action {
         PREVIEW,
         EXECUTE,
@@ -28,9 +28,9 @@ public class AutocraftEventPacket implements IPacket {
     @Nullable
     private UUID cpuId;
 
-    public AutocraftEventPacket() {}
+    public MECraftEventPacket() {}
 
-    private AutocraftEventPacket(
+    private MECraftEventPacket(
         Action action,
         @Nullable IStackKey target,
         long quantity,
@@ -42,16 +42,16 @@ public class AutocraftEventPacket implements IPacket {
         this.cpuId = cpuId;
     }
 
-    public static AutocraftEventPacket preview(IStackKey target, long quantity) {
-        return new AutocraftEventPacket(Action.PREVIEW, target, quantity, null);
+    public static MECraftEventPacket preview(IStackKey target, long quantity) {
+        return new MECraftEventPacket(Action.PREVIEW, target, quantity, null);
     }
 
-    public static AutocraftEventPacket execute(UUID cpuId) {
-        return new AutocraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
+    public static MECraftEventPacket execute(UUID cpuId) {
+        return new MECraftEventPacket(Action.EXECUTE, null, 0L, cpuId);
     }
 
-    public static AutocraftEventPacket cancel(UUID cpuId) {
-        return new AutocraftEventPacket(Action.CANCEL, null, 0L, cpuId);
+    public static MECraftEventPacket cancel(UUID cpuId) {
+        return new MECraftEventPacket(Action.CANCEL, null, 0L, cpuId);
     }
 
     public Action action() {
@@ -75,10 +75,8 @@ public class AutocraftEventPacket implements IPacket {
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(action);
-        buf.writeBoolean(target != null);
-        if (target != null) {
-            buf.writeNbt((CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
-        }
+        buf.writeNbt(target == null ? null :
+            (CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
         buf.writeLong(quantity);
         buf.writeBoolean(cpuId != null);
         if (cpuId != null) {
@@ -89,9 +87,8 @@ public class AutocraftEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        target = buf.readBoolean() ?
-            CodecHelper.parseTag(StackHelper.KEY_CODEC, buf.readNbt()) :
-            null;
+        var targetTag = buf.readNbt();
+        target = targetTag == null ? null : CodecHelper.parseTag(StackHelper.KEY_CODEC, targetTag);
         quantity = buf.readLong();
         cpuId = buf.readBoolean() ? buf.readUUID() : null;
     }

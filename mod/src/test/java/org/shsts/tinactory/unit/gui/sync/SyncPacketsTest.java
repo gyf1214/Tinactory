@@ -32,4 +32,5 @@ class SyncPacketsTest {
         assertEquals(packet, decoded);
         assertEquals(123456789L, decoded.getData());
     }
+
 }

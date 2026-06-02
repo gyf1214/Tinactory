@@ -15,15 +15,17 @@ public interface IPatternRepository {
 
     List<IStackKey> listRequestables();
 
+    List<CraftPattern> listPatterns();
+
     default long revision() {
         return 0L;
     }
 
-    boolean containsPatternId(String patternId);
+    boolean containsPatternUuid(UUID patternUuid);
 
     boolean addPattern(CraftPattern pattern);
 
-    boolean removePattern(String patternId);
+    boolean removePattern(UUID patternUuid);
 
     boolean updatePattern(CraftPattern pattern);
 

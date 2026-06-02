@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntConsumer;
 
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
+import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 
 @OnlyIn(Dist.CLIENT)
@@ -30,6 +32,7 @@ public class Tab extends Panel {
     private static final int ICON_X_OFFSET = (BUTTON_WIDTH - 16) / 2;
     private static final int ICON_Y_OFFSET = ICON_X_OFFSET + 2;
     public static final int BUTTON_OFFSET = BUTTON_HEIGHT - 4;
+    public static final Rect TAB_OFFSET = new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0);
 
     private class TabButton extends Button {
         private final int index;

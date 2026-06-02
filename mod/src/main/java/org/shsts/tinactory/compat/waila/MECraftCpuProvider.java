@@ -13,9 +13,8 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec2;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.content.autocraft.AutocraftCpu;
+import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -29,33 +28,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.compat.waila.Waila.AUTOCRAFT_CPU;
+import static org.shsts.tinactory.compat.waila.Waila.ME_CRAFT_CPU;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetProvider;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
-    public static final AutocraftCpuProvider INSTANCE = new AutocraftCpuProvider();
+public class MECraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+    public static final MECraftCpuProvider INSTANCE = new MECraftCpuProvider();
 
-    private static final String PREFIX = "tinactoryAutocraftCpu";
+    private static final String PREFIX = "tinactoryMECraftCpu";
     private static final String STATE_KEY = PREFIX + "State";
     private static final String TARGET_KEY = PREFIX + "Target";
     private static final String TARGET_AMOUNT_KEY = PREFIX + "TargetAmount";
     private static final String COMPLETED_STEPS_KEY = PREFIX + "CompletedSteps";
     private static final String TOTAL_STEPS_KEY = PREFIX + "TotalSteps";
     private static final String ERROR_KEY = PREFIX + "Error";
-    private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
-    private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
+    private static final String MEMORY_LIMIT_KEY = PREFIX + "MemoryLimit";
+    private static final String MEMORY_USAGE_KEY = PREFIX + "MemoryUsage";
 
-    public AutocraftCpuProvider() {
-        super(modLoc("autocraft_cpu"));
+    public MECraftCpuProvider() {
+        super(modLoc("me_craft_cpu"));
     }
 
     @Override
     protected void doAppendTooltip(CompoundTag tag, BlockAccessor accessor, IPluginConfig config) {
-        if (!config.get(AUTOCRAFT_CPU) || !tag.contains(STATE_KEY, Tag.TAG_STRING)) {
+        if (!config.get(ME_CRAFT_CPU) || !tag.contains(STATE_KEY, Tag.TAG_STRING)) {
             return;
         }
         var state = parseEnum(JobState.class, tag.getString(STATE_KEY));
@@ -72,6 +71,12 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
                 NUMBER_FORMAT.format(tag.getInt(TOTAL_STEPS_KEY))).withStyle(ChatFormatting.GRAY);
             add(helper.text(text));
         }
+        if (tag.contains(MEMORY_LIMIT_KEY, Tag.TAG_LONG)) {
+            var text = guiTr("memory",
+                ClientUtil.getBytesString(tag.getLong(MEMORY_USAGE_KEY)),
+                ClientUtil.getBytesString(tag.getLong(MEMORY_LIMIT_KEY))).withStyle(ChatFormatting.GRAY);
+            add(helper.text(text));
+        }
         var error = parseEnum(ExecutionError.class, tag.getString(ERROR_KEY)).orElse(ExecutionError.NONE);
         if (error != ExecutionError.NONE) {
             add(helper.text(guiTr("cpu.error." + error.id).withStyle(ChatFormatting.GRAY)));
@@ -83,18 +88,16 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
         var amount = tag.getLong(TARGET_AMOUNT_KEY);
         var line = new ArrayList<IElement>();
         appendTargetIcon(line, key);
-        line.add(helper.text(guiTr("cpu.target", key.name(), ClientUtil.getNumberString(amount))));
+        line.add(helper.text(guiTr("cpu.target", "", ClientUtil.getNumberString(amount))));
         add(line);
     }
 
     private void appendTargetIcon(List<IElement> line, IStackKey key) {
         var display = key.display();
         if (display instanceof ItemRenderDescriptor item) {
-            line.add(helper.item(StackHelper.copyWithCount(item.stack(), 1), 0.5f).size(ITEM_SIZE));
-            line.add(helper.spacer(1, 0));
+            Waila.addItemIcon(line, helper, item.stack());
         } else if (display instanceof FluidRenderDescriptor fluid) {
-            line.add(helper.fluid(fluid.stack()).size(FLUID_SIZE));
-            line.add(helper.spacer(2, 0));
+            Waila.addFluidIcon(line, helper, fluid.stack());
         }
     }
 
@@ -113,7 +116,7 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
     @Override
     public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
         BlockEntity blockEntity, boolean showDetails) {
-        var cpu = tryGetProvider(blockEntity, AutocraftCpu.ID, AutocraftCpu.class);
+        var cpu = tryGetProvider(blockEntity, MECraftCpu.ID, MECraftCpu.class);
         if (cpu.isEmpty()) {
             return;
         }
@@ -127,6 +130,8 @@ public class AutocraftCpuProvider extends ProviderBase implements IServerDataPro
         tag.putInt(COMPLETED_STEPS_KEY, status.completedSteps());
         tag.putInt(TOTAL_STEPS_KEY, status.totalSteps());
         tag.putString(ERROR_KEY, status.error().name());
+        tag.putLong(MEMORY_LIMIT_KEY, status.memoryLimit());
+        tag.putLong(MEMORY_USAGE_KEY, status.memoryUsage());
     }
 
     private static CompoundTag encodeKey(IStackKey key) {

@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
@@ -23,7 +24,8 @@ public final class AutocraftServiceBootstrap {
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
         long transmissionBandwidth,
-        int executionIntervalTicks) {
+        int executionIntervalTicks,
+        long memoryLimit) {
 
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var allocator = new LogisticsMachineAllocator(logistics);
@@ -31,7 +33,8 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftJobService(
             executor,
             transmissionBandwidth,
-            executionIntervalTicks);
+            executionIntervalTicks,
+            memoryLimit);
     }
 
     public static AutocraftTerminalService createTerminalService(
@@ -45,6 +48,9 @@ public final class AutocraftServiceBootstrap {
         return new AutocraftTerminalService(
             planner,
             repository,
-            autocraft);
+            autocraft,
+            TinactoryConfig.CONFIG.autocraftPlanBaseMemory.get(),
+            TinactoryConfig.CONFIG.autocraftPlanStepMemory.get(),
+            TinactoryConfig.CONFIG.autocraftPlanIngredientMemory.get());
     }
 }

@@ -21,7 +21,7 @@ import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpuSyncPacket implements IPacket {
+public class MECraftCpuSyncPacket implements IPacket {
     public record CpuInfo(CpuStatusEntry status, Component name, ItemStack icon) {
         private static void serialize(FriendlyByteBuf buf, CpuInfo info) {
             serializeStatus(buf, info.status);
@@ -59,9 +59,9 @@ public class AutocraftCpuSyncPacket implements IPacket {
 
     private final List<CpuInfo> entries = new ArrayList<>();
 
-    public AutocraftCpuSyncPacket() {}
+    public MECraftCpuSyncPacket() {}
 
-    public AutocraftCpuSyncPacket(List<CpuInfo> entries) {
+    public MECraftCpuSyncPacket(List<CpuInfo> entries) {
         this.entries.addAll(entries);
     }
 
@@ -85,7 +85,7 @@ public class AutocraftCpuSyncPacket implements IPacket {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof AutocraftCpuSyncPacket other)) {
+        if (!(obj instanceof MECraftCpuSyncPacket other)) {
             return false;
         }
         return entries.equals(other.entries);
@@ -106,6 +106,8 @@ public class AutocraftCpuSyncPacket implements IPacket {
         buf.writeInt(entry.completedSteps());
         buf.writeInt(entry.totalSteps());
         buf.writeEnum(entry.error());
+        buf.writeLong(entry.memoryLimit());
+        buf.writeLong(entry.memoryUsage());
     }
 
     private static CpuStatusEntry deserializeStatus(FriendlyByteBuf buf) {
@@ -113,13 +115,15 @@ public class AutocraftCpuSyncPacket implements IPacket {
             buf.readUUID(),
             buf.readEnum(JobState.class),
             buf.readList(buf1 -> {
-                var key = decodeIngredientKey(buf1.readNbt());
+                var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "craft target key"));
                 var amount = buf1.readLong();
                 return new CraftAmount(key, amount);
             }),
             buf.readInt(),
             buf.readInt(),
-            buf.readEnum(ExecutionError.class));
+            buf.readEnum(ExecutionError.class),
+            buf.readLong(),
+            buf.readLong());
     }
 
     private static CompoundTag encodeIngredientKey(IStackKey key) {

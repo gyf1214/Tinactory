@@ -13,6 +13,7 @@ import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -22,7 +23,7 @@ public final class PatternCellPortState implements IPatternCellPort {
 
     private final int bytesLimit;
     private final PatternNbtCodec codec;
-    private final Map<String, CraftPattern> patterns = new HashMap<>();
+    private final Map<UUID, CraftPattern> patterns = new HashMap<>();
 
     public PatternCellPortState(
         int bytesLimit,
@@ -53,19 +54,19 @@ public final class PatternCellPortState implements IPatternCellPort {
 
     @Override
     public boolean insert(CraftPattern pattern) {
-        if (patterns.containsKey(pattern.patternId())) {
+        if (patterns.containsKey(pattern.patternUuid())) {
             return true;
         }
         if ((patterns.size() + 1) * BYTES_PER_PATTERN > bytesLimit) {
             return false;
         }
-        patterns.put(pattern.patternId(), pattern);
+        patterns.put(pattern.patternUuid(), pattern);
         return true;
     }
 
     @Override
-    public boolean remove(String patternId) {
-        return patterns.remove(patternId) != null;
+    public boolean remove(UUID patternUuid) {
+        return patterns.remove(patternUuid) != null;
     }
 
     public CompoundTag serialize() {
@@ -83,7 +84,7 @@ public final class PatternCellPortState implements IPatternCellPort {
         var list = tag.getList(PATTERNS_KEY, Tag.TAG_COMPOUND);
         for (var tag1 : list) {
             var pattern = codec.decodePattern((CompoundTag) tag1);
-            patterns.put(pattern.patternId(), pattern);
+            patterns.put(pattern.patternUuid(), pattern);
         }
     }
 }

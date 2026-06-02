@@ -78,6 +78,7 @@ object Technologies {
     val DIGITAL_STORAGE: ResourceLocation
     val LITHOGRAPHY: ResourceLocation
     val ADVANCED_POLYMER: ResourceLocation
+    val AUTOCRAFTING: ResourceLocation
     val CARBON_FIBER: ResourceLocation
     val ROCKET_SCIENCE: ResourceLocation
     val ROCKET_T1: ResourceLocation
@@ -303,6 +304,12 @@ object Technologies {
             ADVANCED_POLYMER = child("advanced_polymer") {
                 maxProgress(160)
                 displayMaterial("epoxy", "sheet")
+            }
+
+            AUTOCRAFTING = tech("autocrafting") {
+                maxProgress(200)
+                displayItem("logistics/me_craft_cpu/basic")
+                depends(DIGITAL_STORAGE, ADVANCED_POLYMER)
             }
 
             CARBON_FIBER = tech("carbon_fiber") {

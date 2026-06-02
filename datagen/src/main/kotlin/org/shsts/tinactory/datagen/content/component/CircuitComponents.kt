@@ -641,6 +641,45 @@ object CircuitComponents {
         }
     }
 
+    private fun SimpleProcessingBuilder.circuit(name: String, amount: Int = 1) {
+        input(getCircuit(name).item, amount)
+    }
+
+    fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
+        input(CHIP.item(name), amount)
+    }
+
+    private fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
+        block: SimpleProcessingBuilder.() -> Unit) {
+        val circuit = getCircuit(name)
+        output(circuit.item, amount) {
+            if (circuit.level().voltageOffset < 2) {
+                input(circuit.circuitBoard)
+            }
+            block()
+            val voltage = circuit.tier().baseVoltage
+            val voltage1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
+            val level = 1 + max(0, circuit.level().voltageOffset)
+            val solder = (1 shl (level - 1)) / 2.0
+            input("soldering_alloy", amount = solder)
+            voltage(voltage1)
+            workTicks(200L * level)
+        }
+    }
+
+    private fun ProcessingRecipeFactory.soc(name: String, amount: Int = 1,
+        block: SimpleProcessingBuilder.() -> Unit) {
+        val circuit = getCircuit(name)
+        output(circuit.item, amount, suffix = "_from_soc") {
+            input(circuit.circuitBoard)
+            block()
+            val voltage = Voltage.fromRank(circuit.tier().baseVoltage.rank + 2)
+            input("soldering_alloy", amount = 0.5)
+            voltage(voltage)
+            workTicks(100L)
+        }
+    }
+
     private class CircuitTierFactory(val tier: CircuitTier) {
         val componentTier = tier.componentTier
 
@@ -652,45 +691,6 @@ object CircuitComponents {
 
         fun SimpleProcessingBuilder.component(name: String, amount: Int = 1) {
             input(getCircuitComponent(name).tag(componentTier), amount)
-        }
-
-        fun SimpleProcessingBuilder.circuit(name: String, amount: Int = 1) {
-            input(getCircuit(name).item, amount)
-        }
-
-        fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
-            input(CHIP.item(name), amount)
-        }
-
-        fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
-            block: SimpleProcessingBuilder.() -> Unit) {
-            val circuit = getCircuit(name)
-            output(circuit.item, amount) {
-                if (circuit.level().voltageOffset < 2) {
-                    input(circuit.circuitBoard)
-                }
-                block()
-                val voltage = circuit.tier().baseVoltage
-                val voltage1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
-                val level = 1 + max(0, circuit.level().voltageOffset)
-                val solder = (1 shl (level - 1)) / 2.0
-                input("soldering_alloy", amount = solder)
-                voltage(voltage1)
-                workTicks(200L * level)
-            }
-        }
-
-        fun ProcessingRecipeFactory.soc(name: String, amount: Int = 1,
-            block: SimpleProcessingBuilder.() -> Unit) {
-            val circuit = getCircuit(name)
-            output(circuit.item, amount, suffix = "_from_soc") {
-                input(circuit.circuitBoard)
-                block()
-                val voltage = Voltage.fromRank(circuit.tier().baseVoltage.rank + 2)
-                input("soldering_alloy", amount = 0.5)
-                voltage(voltage)
-                workTicks(100L)
-            }
         }
     }
 

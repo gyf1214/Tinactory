@@ -12,18 +12,19 @@ import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 public record AutocraftPreview(
     @Nullable CraftPlan planSnapshot,
     @Nullable PlanError error,
-    PlanSummary summary) {
+    PlanSummary summary,
+    long memoryUsage) {
 
     public static AutocraftPreview empty() {
-        return new AutocraftPreview(null, null, PlanSummary.empty());
+        return new AutocraftPreview(null, null, PlanSummary.empty(), 0L);
     }
 
-    public static AutocraftPreview success(CraftPlan planSnapshot, PlanSummary summary) {
-        return new AutocraftPreview(planSnapshot, null, summary);
+    public static AutocraftPreview success(CraftPlan planSnapshot, PlanSummary summary, long memoryUsage) {
+        return new AutocraftPreview(planSnapshot, null, summary, memoryUsage);
     }
 
     public static AutocraftPreview failure(PlanError error, PlanSummary summary) {
-        return new AutocraftPreview(null, error, summary);
+        return new AutocraftPreview(null, error, summary, 0L);
     }
 
     public boolean isSuccess() {

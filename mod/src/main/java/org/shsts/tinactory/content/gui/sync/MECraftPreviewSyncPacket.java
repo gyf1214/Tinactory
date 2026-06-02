@@ -17,26 +17,29 @@ import java.util.LinkedHashMap;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftPreviewSyncPacket implements IPacket {
+public class MECraftPreviewSyncPacket implements IPacket {
     private PreviewState state = PreviewState.EMPTY;
     @Nullable
     private PlanError error;
     private PlanSummary summary = PlanSummary.empty();
+    private long memoryUsage;
 
-    public AutocraftPreviewSyncPacket() {}
+    public MECraftPreviewSyncPacket() {}
 
-    private AutocraftPreviewSyncPacket(
+    private MECraftPreviewSyncPacket(
         PreviewState state,
         @Nullable PlanError error,
-        PlanSummary summary) {
+        PlanSummary summary,
+        long memoryUsage) {
         this.state = state;
         this.error = error;
         this.summary = summary;
+        this.memoryUsage = memoryUsage;
     }
 
-    public static AutocraftPreviewSyncPacket of(AutocraftPreview preview) {
+    public static MECraftPreviewSyncPacket of(AutocraftPreview preview) {
         if (preview.isSuccess()) {
-            return ready(preview.summary());
+            return ready(preview.summary(), preview.memoryUsage());
         }
         if (preview.error() != null) {
             return failed(preview.error(), preview.summary());
@@ -44,16 +47,20 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return empty();
     }
 
-    public static AutocraftPreviewSyncPacket empty() {
-        return new AutocraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty());
+    public static MECraftPreviewSyncPacket empty() {
+        return new MECraftPreviewSyncPacket(PreviewState.EMPTY, null, PlanSummary.empty(), 0L);
     }
 
-    public static AutocraftPreviewSyncPacket ready(PlanSummary summary) {
-        return new AutocraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary);
+    public static MECraftPreviewSyncPacket ready(PlanSummary summary) {
+        return ready(summary, 0L);
     }
 
-    public static AutocraftPreviewSyncPacket failed(PlanError error, PlanSummary summary) {
-        return new AutocraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary);
+    public static MECraftPreviewSyncPacket ready(PlanSummary summary, long memoryUsage) {
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_READY, null, summary, memoryUsage);
+    }
+
+    public static MECraftPreviewSyncPacket failed(PlanError error, PlanSummary summary) {
+        return new MECraftPreviewSyncPacket(PreviewState.PREVIEW_FAILED, error, summary, 0L);
     }
 
     public PreviewState state() {
@@ -69,13 +76,15 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return summary;
     }
 
+    public long memoryUsage() {
+        return memoryUsage;
+    }
+
     @Override
     public void serializeToBuf(FriendlyByteBuf buf) {
         buf.writeEnum(state);
-        buf.writeBoolean(error != null);
-        if (error != null) {
-            buf.writeNbt(serializeError(error));
-        }
+        buf.writeLong(memoryUsage);
+        buf.writeNbt(error == null ? null : serializeError(error));
         buf.writeCollection(summary.entries().entrySet(), (buf1, entry) -> {
             buf1.writeNbt(encodeIngredientKey(entry.getKey()));
             buf1.writeLong(entry.getValue().existingAmount());
@@ -87,10 +96,11 @@ public class AutocraftPreviewSyncPacket implements IPacket {
     @Override
     public void deserializeFromBuf(FriendlyByteBuf buf) {
         state = buf.readEnum(PreviewState.class);
-        error = buf.readBoolean() ? deserializeError(buf.readNbt()) : null;
+        memoryUsage = buf.readLong();
+        error = deserializeError(buf.readNbt());
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
         for (var entry : buf.readList(buf1 -> {
-            var key = decodeIngredientKey(buf1.readNbt());
+            var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "summary key"));
             var summaryEntry = new PlanSummary.Entry(buf1.readLong(), buf1.readLong(), buf1.readLong());
             return new SummaryEntry(key, summaryEntry);
         })) {
@@ -122,10 +132,7 @@ public class AutocraftPreviewSyncPacket implements IPacket {
         return tag;
     }
 
-    private static IStackKey decodeIngredientKey(@Nullable CompoundTag tag) {
-        if (tag == null) {
-            throw new IllegalArgumentException("Missing ingredient key payload");
-        }
+    private static IStackKey decodeIngredientKey(CompoundTag tag) {
         return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
     }
 

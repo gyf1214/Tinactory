@@ -10,7 +10,6 @@ import org.shsts.tinactory.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.content.electric.CircuitTier
-import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
@@ -32,6 +31,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
+import org.shsts.tinactory.datagen.content.component.CircuitComponents.chip
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object MiscComponents {
@@ -153,12 +153,12 @@ object MiscComponents {
         nuclear()
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.misc(
+    fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.misc(
         id: String, amount: Int = 1, block: RB.() -> Unit) {
         output(getItem("component/$id"), amount, block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
         id: String, amount: Int = 1) {
         input(getItem("component/$id"), amount)
     }
@@ -296,6 +296,13 @@ object MiscComponents {
                 input("annealed_copper", "wire_fine", 8)
                 input("pvc")
             }
+            misc("silicon_print") {
+                input("silicon", "ingot")
+                input("annealed_copper", "foil", 4)
+                input("fluix", "gem")
+                input("epoxy", amount = 1)
+                tech(Technologies.ADVANCED_POLYMER)
+            }
 
             for (entry in STORAGE_CELLS) {
                 val component = entry.component.get()
@@ -313,6 +320,14 @@ object MiscComponents {
                     input("stainless_steel", "plate", 3)
                     input("soldering_alloy", amount = 3)
                 }
+                output(entry.pattern.get()) {
+                    input(component)
+                    misc("silicon_print")
+                    input("epoxy", "sheet")
+                    input("titanium", "plate", 3)
+                    input("soldering_alloy", amount = 2)
+                    tech(Technologies.AUTOCRAFTING)
+                }
             }
         }
 
@@ -320,26 +335,43 @@ object MiscComponents {
             defaults {
                 workTicks(200)
             }
+            misc("logic_processor") {
+                misc("silicon_print")
+                chip("cpu")
+                chip("ram", 4)
+                input("electrum", "wire_fine", 8)
+                input("soldering_alloy", amount = 2)
+                voltage(Voltage.HV)
+            }
+            misc("calculation_processor") {
+                misc("silicon_print")
+                misc("logic_processor", 2)
+                chip("nano_cpu")
+                chip("nor", 8)
+                input("platinum", "wire_fine", 8)
+                input("soldering_alloy", amount = 3)
+                voltage(Voltage.EV)
+            }
             storageComponent(0) {
-                input(CHIP.item("ram"), 4)
+                chip("ram", 4)
                 input("certus_quartz", "gem", 4)
                 input("annealed_copper", "wire_fine", 16)
                 voltage(Voltage.HV)
             }
             storageComponent(1) {
-                input(CHIP.item("nor"), 4)
+                chip("nor", 4)
                 input("certus_quartz", "gem", 4)
                 input("platinum", "wire_fine", 16)
                 voltage(Voltage.HV)
             }
             storageComponent(2) {
-                input(CHIP.item("nand"), 4)
+                chip("nand", 4)
                 input("fluix", "gem", 4)
                 input("niobium_titanium", "wire_fine", 16)
                 voltage(Voltage.EV)
             }
             storageComponent(3) {
-                input(CHIP.item("nand"), 16)
+                chip("nand", 16)
                 input("fluix", "gem", 4)
                 // TODO
                 input("platinum", "wire_fine", 16)

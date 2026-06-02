@@ -25,34 +25,31 @@ import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
+public class MECraftCpu extends MEStorageAccess implements INBTSerializable<CompoundTag> {
     public static final String ID = "autocraft/cpu";
-    private static final String SNAPSHOT_KEY = "autocraftRunningSnapshot";
+    private static final String SNAPSHOT_KEY = "snapshot";
 
     private final PatternNbtCodec snapshotCodec =
         new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
+    private final long memoryLimit;
     @Nullable
     private AutocraftJobService service;
     @Nullable
     private CompoundTag pendingSnapshot;
 
-    public AutocraftCpu(
-        BlockEntity blockEntity,
-        double power,
-        long transmissionBandwidth,
-        int executionIntervalTicks) {
-        super(blockEntity, power);
-        this.transmissionBandwidth = transmissionBandwidth;
-        this.executionIntervalTicks = executionIntervalTicks;
+    public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks, long memoryLimit) {}
+
+    public MECraftCpu(BlockEntity blockEntity, Properties properties) {
+        super(blockEntity, properties.power);
+        this.transmissionBandwidth = properties.transmissionBandwidth;
+        this.executionIntervalTicks = properties.executionIntervalTicks;
+        this.memoryLimit = properties.memoryLimit;
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        double power,
-        long transmissionBandwidth,
-        int executionIntervalTicks) {
-        return $ -> $.capability(ID, be -> new AutocraftCpu(be, power, transmissionBandwidth, executionIntervalTicks));
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.capability(ID, be -> new MECraftCpu(be, properties));
     }
 
     public CpuStatusEntry status() {
@@ -62,7 +59,7 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
         }
         var job = service.getJob();
         if (job.isEmpty()) {
-            return CpuStatusEntry.idle(cpuId);
+            return CpuStatusEntry.idle(cpuId, service.memoryLimit());
         }
         var current = job.get();
         return new CpuStatusEntry(
@@ -71,7 +68,9 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
             current.targets(),
             current.completedSteps(),
             current.totalSteps(),
-            current.error());
+            current.error(),
+            service.memoryLimit(),
+            current.memoryUsage());
     }
 
     @Override
@@ -80,14 +79,19 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
+        var snapshot = pendingSnapshot;
+        if (service != null) {
+            snapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(snapshot);
+        }
         service = AutocraftServiceBootstrap.create(
             logistics,
             combinedItem,
             combinedFluid,
             transmissionBandwidth,
-            executionIntervalTicks);
-        if (pendingSnapshot != null) {
-            service.restoreRunningSnapshot(pendingSnapshot, snapshotCodec);
+            executionIntervalTicks,
+            memoryLimit);
+        if (snapshot != null) {
+            service.restoreRunningSnapshot(snapshot, snapshotCodec);
             pendingSnapshot = null;
         }
         autocraft.registerCpu(machine, service);
@@ -113,9 +117,10 @@ public class AutocraftCpu extends MEStorageAccess implements INBTSerializable<Co
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
-        var snapshot = service == null ? pendingSnapshot : service.serializeRunningSnapshot(snapshotCodec).orElse(null);
+        var snapshot = service == null ? pendingSnapshot :
+            service.serializeRunningSnapshot(snapshotCodec).orElse(null);
         if (snapshot != null) {
-            tag.put(SNAPSHOT_KEY, snapshot.copy());
+            tag.put(SNAPSHOT_KEY, snapshot);
         }
         return tag;
     }

@@ -6,13 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
+import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -26,10 +28,10 @@ class CraftPlanContractTest {
     @Test
     void craftPlanShouldBeImmutableStepList() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var step = new CraftStep("step-1", pattern, 3);
         var plan = new CraftPlan(List.of(step));
 
@@ -40,10 +42,10 @@ class CraftPlanContractTest {
     @Test
     void craftStepShouldSplitRequiredOutputsByRole() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var intermediate = List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2));
         var finals = List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1));
 
@@ -56,10 +58,10 @@ class CraftPlanContractTest {
     @Test
     void craftStepShouldDefensivelyCopyRoleOutputs() {
         var pattern = new CraftPattern(
-            "tinactory:gear",
+            TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "assembler"), 1, List.of()));
+            List.of());
         var intermediate = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2)));
         var finals = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)));
         var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
@@ -116,14 +118,34 @@ class CraftPlanContractTest {
             new PortConstraint(PortDirection.INPUT, 1, 4));
 
         assertEquals(PortConstraint.TYPE_ID, encoded.getString("type"));
-        assertEquals(1, encoded.getInt("slotIndex"));
-        assertEquals(4, encoded.getInt("portIndex"));
+        assertEquals(1, encoded.getInt("index"));
+        assertEquals(4, encoded.getInt("port"));
         assertEquals("input", encoded.getString("direction"));
     }
 
     @Test
     void machineConstraintCodecShouldPreserveTargetRecipeConstraint() {
         var constraint = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var decoded = CodecHelper.parseTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+
+        assertEquals(constraint, decoded);
+    }
+
+    @Test
+    void machineConstraintCodecShouldPreserveRecipeTypeConstraint() {
+        var constraint = new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler"));
+        var decoded = CodecHelper.parseTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+
+        assertEquals(constraint, decoded);
+    }
+
+    @Test
+    void machineConstraintCodecShouldPreserveVoltageConstraint() {
+        var constraint = new VoltageConstraint(3);
         var decoded = CodecHelper.parseTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
@@ -139,5 +161,20 @@ class CraftPlanContractTest {
 
         assertEquals(TargetRecipeConstraint.TYPE_ID, encoded.getString("type"));
         assertEquals("tinactory:assembler/circuit", encoded.getString("recipeId"));
+    }
+
+    @Test
+    void machineConstraintCodecShouldEncodeStructuredRecipeTypeAndVoltagePayloads() {
+        var recipeType = (CompoundTag) CodecHelper.encodeTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler")));
+        var voltage = (CompoundTag) CodecHelper.encodeTag(
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
+            new VoltageConstraint(3));
+
+        assertEquals(RecipeTypeConstraint.TYPE_ID, recipeType.getString("type"));
+        assertEquals("tinactory:assembler", recipeType.getString("recipeTypeId"));
+        assertEquals(VoltageConstraint.TYPE_ID, voltage.getString("type"));
+        assertEquals(3, voltage.getInt("voltageTier"));
     }
 }

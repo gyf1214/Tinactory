@@ -21,8 +21,8 @@ import java.util.UUID;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftComponent extends NetworkComponent implements ICpuRuntime {
-    private final Map<UUID, AutocraftCpuState> autocraftCpus = new HashMap<>();
-    private final PatternRegistryCache patternRepository = new PatternRegistryCache();
+    private final Map<UUID, CpuState> cpus = new HashMap<>();
+    private final PatternRegistryCache patterns = new PatternRegistryCache();
 
     public AutocraftComponent(ComponentType<AutocraftComponent> type, INetwork network) {
         super(type, network);
@@ -30,29 +30,25 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
 
     @Override
     public void registerCpu(IMachine machine, IAutocraftService service) {
-        autocraftCpus.put(machine.uuid(), new AutocraftCpuState(machine, service));
+        cpus.put(machine.uuid(), new CpuState(machine, service));
     }
 
     @Override
     public void unregisterCpu(UUID cpuId) {
-        autocraftCpus.remove(cpuId);
-    }
-
-    public boolean isCpuRegistered(UUID cpuId) {
-        return autocraftCpus.containsKey(cpuId);
+        cpus.remove(cpuId);
     }
 
     @Override
     public List<UUID> listVisibleCpus() {
-        return autocraftCpus.values().stream()
-            .map(AutocraftCpuState::cpuId)
+        return cpus.values().stream()
+            .map(CpuState::cpuId)
             .sorted()
             .toList();
     }
 
     @Override
     public Optional<IMachine> findVisibleCpuMachine(UUID cpuId) {
-        var cpu = autocraftCpus.get(cpuId);
+        var cpu = cpus.get(cpuId);
         if (cpu == null) {
             return Optional.empty();
         }
@@ -61,7 +57,7 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
 
     @Override
     public Optional<IAutocraftService> findVisibleService(UUID cpuId) {
-        var cpu = autocraftCpus.get(cpuId);
+        var cpu = cpus.get(cpuId);
         if (cpu == null) {
             return Optional.empty();
         }
@@ -69,19 +65,19 @@ public class AutocraftComponent extends NetworkComponent implements ICpuRuntime 
     }
 
     public IPatternRepository patternRepository() {
-        return patternRepository;
+        return patterns;
     }
 
     @Override
     public void onDisconnect() {
-        autocraftCpus.clear();
-        patternRepository.clear();
+        cpus.clear();
+        patterns.clear();
     }
 
     @Override
     public void buildSchedulings(ISchedulingRegister builder) {}
 
-    private record AutocraftCpuState(IMachine machine, IAutocraftService service) {
+    private record CpuState(IMachine machine, IAutocraftService service) {
         private UUID cpuId() {
             return machine.uuid();
         }

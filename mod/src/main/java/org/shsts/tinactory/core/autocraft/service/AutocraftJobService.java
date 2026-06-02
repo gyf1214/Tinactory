@@ -25,14 +25,26 @@ public class AutocraftJobService implements IAutocraftService {
     private final ICraftExecutor executor;
     private final long transmissionBandwidth;
     private final int executionIntervalTicks;
+    private final long memoryLimit;
 
     private List<CraftAmount> currentTargets = List.of();
+    private long currentMemoryUsage;
     private int pendingTicks;
 
-    public AutocraftJobService(ICraftExecutor executor, long transmissionBandwidth, int executionIntervalTicks) {
+    public AutocraftJobService(
+        ICraftExecutor executor,
+        long transmissionBandwidth,
+        int executionIntervalTicks,
+        long memoryLimit) {
+
         this.executor = executor;
         this.transmissionBandwidth = transmissionBandwidth;
         this.executionIntervalTicks = Math.max(1, executionIntervalTicks);
+        this.memoryLimit = Math.max(0L, memoryLimit);
+    }
+
+    public AutocraftJobService(ICraftExecutor executor, long transmissionBandwidth, int executionIntervalTicks) {
+        this(executor, transmissionBandwidth, executionIntervalTicks, Long.MAX_VALUE);
     }
 
     public AutocraftJobService(ICraftExecutor executor) {
@@ -44,6 +56,11 @@ public class AutocraftJobService implements IAutocraftService {
         return !currentTargets.isEmpty() && executor.isBusy();
     }
 
+    @Override
+    public long memoryLimit() {
+        return memoryLimit;
+    }
+
     public Optional<CompoundTag> serializeRunningSnapshot(PatternNbtCodec codec) {
         if (!isBusy()) {
             return Optional.empty();
@@ -51,6 +68,7 @@ public class AutocraftJobService implements IAutocraftService {
         var tag = new CompoundTag();
         tag.put("targets", serializeAmounts(currentTargets, codec));
         tag.put("execution", executor.serialize(codec));
+        tag.putLong("memoryUsage", currentMemoryUsage);
         return Optional.of(tag);
     }
 
@@ -64,16 +82,18 @@ public class AutocraftJobService implements IAutocraftService {
         }
         executor.restore(tag.getCompound("execution"), codec);
         currentTargets = executor.isBusy() ? List.copyOf(targets) : List.of();
+        currentMemoryUsage = executor.isBusy() ? tag.getLong("memoryUsage") : 0L;
         pendingTicks = 0;
     }
 
     @Override
-    public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+    public void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage) {
         if (isBusy()) {
             throw new IllegalStateException("autocraft CPU is busy");
         }
         executor.start(plan);
         currentTargets = executor.isBusy() ? List.copyOf(targets) : List.of();
+        currentMemoryUsage = executor.isBusy() ? Math.max(0L, memoryUsage) : 0L;
         pendingTicks = 0;
     }
 
@@ -87,7 +107,8 @@ public class AutocraftJobService implements IAutocraftService {
             executor.state(),
             executor.completedSteps(),
             executor.totalSteps(),
-            executor.error()));
+            executor.error(),
+            currentMemoryUsage));
     }
 
     @Override
@@ -111,6 +132,7 @@ public class AutocraftJobService implements IAutocraftService {
         executor.runCycle(transmissionBandwidth);
         if (!executor.isBusy()) {
             currentTargets = List.of();
+            currentMemoryUsage = 0L;
         }
         return true;
     }

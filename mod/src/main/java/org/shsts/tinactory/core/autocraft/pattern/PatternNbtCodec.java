@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -31,19 +30,22 @@ public final class PatternNbtCodec {
 
     public CompoundTag encodePattern(CraftPattern pattern) {
         var tag = new CompoundTag();
-        tag.putString("patternId", pattern.patternId());
+        tag.putUUID("patternUuid", pattern.patternUuid());
         tag.put("inputs", encodeAmounts(pattern.inputs()));
         tag.put("outputs", encodeAmounts(pattern.outputs()));
-        tag.put("machineRequirement", encodeMachineRequirement(pattern.machineRequirement()));
+        tag.put("constraints", encodeConstraints(pattern.constraints()));
         return tag;
     }
 
     public CraftPattern decodePattern(CompoundTag tag) {
+        if (!tag.hasUUID("patternUuid")) {
+            throw new IllegalArgumentException("patternUuid is required");
+        }
         return new CraftPattern(
-            tag.getString("patternId"),
+            tag.getUUID("patternUuid"),
             decodeAmounts(tag.getList("inputs", TAG_COMPOUND)),
             decodeAmounts(tag.getList("outputs", TAG_COMPOUND)),
-            decodeMachineRequirement(tag.getCompound("machineRequirement")));
+            decodeConstraints(tag.getList("constraints", TAG_COMPOUND)));
     }
 
     private ListTag encodeAmounts(Iterable<CraftAmount> amounts) {
@@ -78,28 +80,19 @@ public final class PatternNbtCodec {
         return ret;
     }
 
-    private CompoundTag encodeMachineRequirement(MachineRequirement requirement) {
-        var tag = new CompoundTag();
-        tag.putString("recipeTypeId", requirement.recipeTypeId().toString());
-        tag.putInt("voltageTier", requirement.voltageTier());
-
+    private ListTag encodeConstraints(Iterable<IMachineConstraint> constraints) {
         var constraintsTag = new ListTag();
-        for (var constraint : requirement.constraints()) {
+        for (var constraint : constraints) {
             constraintsTag.add(CodecHelper.encodeTag(constraintCodec, constraint));
         }
-        tag.put("constraints", constraintsTag);
-        return tag;
+        return constraintsTag;
     }
 
-    private MachineRequirement decodeMachineRequirement(CompoundTag tag) {
-        var constraintsTag = tag.getList("constraints", TAG_COMPOUND);
-        var constraintsOut = new ArrayList<IMachineConstraint>(constraintsTag.size());
-        for (var i = 0; i < constraintsTag.size(); i++) {
-            constraintsOut.add(CodecHelper.parseTag(constraintCodec, constraintsTag.get(i)));
+    private ArrayList<IMachineConstraint> decodeConstraints(ListTag list) {
+        var ret = new ArrayList<IMachineConstraint>(list.size());
+        for (var i = 0; i < list.size(); i++) {
+            ret.add(CodecHelper.parseTag(constraintCodec, list.get(i)));
         }
-        return new MachineRequirement(
-            new ResourceLocation(tag.getString("recipeTypeId")),
-            tag.getInt("voltageTier"),
-            constraintsOut);
+        return ret;
     }
 }

@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
@@ -26,7 +25,6 @@ import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -60,23 +58,17 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
     private static final int CLEANNESS_COLOR = 0xFF00D412;
     private static final int POWER_COLOR = 0xFFD4CD00;
     private static final NumberFormat PROGRESS_FORMAT = new DecimalFormat("0.0");
-    private static final Vec2 ITEM_SIZE = new Vec2(10f, 10f);
-    private static final Vec2 FLUID_SIZE = new Vec2(8f, 8f);
-    private static final Vec2 ITEM_OFFSET = new Vec2(0f, -1f);
 
     public ProcessorProvider() {
         super(modLoc("processor"));
     }
 
     private void itemElement(List<IElement> line, ItemStack stack) {
-        var stack1 = StackHelper.copyWithCount(stack, 1);
-        line.add(helper.item(stack1, 0.5f).size(ITEM_SIZE).translate(ITEM_OFFSET));
+        Waila.addItemIcon(line, helper, stack);
     }
 
     private void fluidElement(List<IElement> line, FluidStack stack) {
-        line.add(helper.spacer(1, 0));
-        line.add(helper.fluid(stack).size(FLUID_SIZE));
-        line.add(helper.spacer(1, 0));
+        Waila.addFluidIcon(line, helper, stack);
     }
 
     public static void appendElement(List<IElement> line, IProcessingObject object,

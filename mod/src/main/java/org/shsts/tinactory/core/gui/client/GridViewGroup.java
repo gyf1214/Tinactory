@@ -6,9 +6,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.IntFunction;
 
@@ -26,14 +26,17 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
 
     private int columnCount = 1;
     private int rowCount = 1;
+    private int slotWidth;
+    private int slotHeight;
     private int horizontalSpacing = 0;
     private int slotCount = 1;
-    private int itemCount = 0;
-    private int page = 0;
 
+    /**
+     * width/height = 0 means expand to entire rect (i.e. row/height = 1).
+     */
     public GridViewGroup(int itemWidth, int itemHeight, int verticalSpacing, Rect offset) {
-        this.itemWidth = itemWidth;
-        this.itemHeight = itemHeight;
+        this.slotWidth = this.itemWidth = itemWidth;
+        this.slotHeight = this.itemHeight = itemHeight;
         this.verticalSpacing = verticalSpacing;
         this.offset = offset;
     }
@@ -64,8 +67,8 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
         return slotCount;
     }
 
-    public int getPage() {
-        return page;
+    public Collection<T> slots() {
+        return slots;
     }
 
     public T getSlot(int index) {
@@ -75,34 +78,9 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
     public Rect getSlotRect(int index) {
         var column = index % columnCount;
         var row = index / columnCount;
-        var x = column * (itemWidth + horizontalSpacing);
-        var y = row * (itemHeight + verticalSpacing);
-        return new Rect(x, y, itemWidth, itemHeight);
-    }
-
-    public boolean isLeftPageEnabled() {
-        return page != 0;
-    }
-
-    public boolean isRightPageEnabled() {
-        return page != getMaxPage() - 1;
-    }
-
-    public int getVisibleIndex(int index) {
-        if (index < 0 || index >= slotCount) {
-            return -1;
-        }
-        var visibleIndex = index + page * slotCount;
-        return visibleIndex < itemCount ? visibleIndex : -1;
-    }
-
-    public void setItemCount(int itemCount) {
-        this.itemCount = Math.max(0, itemCount);
-        setPage(page);
-    }
-
-    public void setPage(int page) {
-        this.page = MathUtil.clamp(page, 0, getMaxPage() - 1);
+        var x = column * (slotWidth + horizontalSpacing) + offset.x();
+        var y = row * (slotHeight + verticalSpacing) + offset.y();
+        return new Rect(x, y, slotWidth, slotHeight);
     }
 
     @Override
@@ -110,11 +88,12 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
         var width = rect.width() + offset.width();
         var height = rect.height() + offset.height();
 
-        columnCount = Math.max(1, width / itemWidth);
-        rowCount = Math.max(1, (height + verticalSpacing) / (itemHeight + verticalSpacing));
-        horizontalSpacing = columnCount > 1 ? (rect.width() - columnCount * itemWidth) / (columnCount - 1) : 0;
+        columnCount = itemWidth <= 0 ? 1 : Math.max(1, width / itemWidth);
+        rowCount = itemHeight <= 0 ? 1 : Math.max(1, (height + verticalSpacing) / (itemHeight + verticalSpacing));
+        horizontalSpacing = columnCount > 1 ? (width - columnCount * itemWidth) / (columnCount - 1) : 0;
         slotCount = rowCount * columnCount;
-        setPage(page);
+        slotWidth = itemWidth <= 0 ? width : itemWidth;
+        slotHeight = itemHeight <= 0 ? height : itemHeight;
         syncSlots();
     }
 
@@ -136,9 +115,5 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
             removeChild(slot);
             addChild(getSlotRect(i), slot);
         }
-    }
-
-    private int getMaxPage() {
-        return slotCount > 0 ? Math.max(1, (itemCount + slotCount - 1) / slotCount) : 1;
     }
 }

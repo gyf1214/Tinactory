@@ -39,10 +39,9 @@ import static org.shsts.tinactory.content.gui.TechMenu.RENAME_BASE_Y;
 import static org.shsts.tinactory.content.gui.TechMenu.WIDTH;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
-import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
+import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
@@ -54,7 +53,7 @@ public class TechScreen extends MenuScreen<TechMenu> {
 
     private final Panel welcomePanel;
     private final EditBox welcomeEdit;
-    private final Tab tabs;
+    private final Tab tab;
     private final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
 
@@ -101,14 +100,14 @@ public class TechScreen extends MenuScreen<TechMenu> {
             new StaticWidget(menu, CRAFTING_ARROW));
         menu.onRefreshName(renameEdit::setValue);
 
-        this.tabs = new Tab(this,
+        this.tab = new Tab(this,
             techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
         rootPanel.addChild(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
         rootPanel.addGroup(techPanel);
         rootPanel.addGroup(renamePanel);
-        rootPanel.addGroup(new Rect(-MARGIN_X, -MARGIN_TOP, 0, 0), tabs);
+        rootPanel.addGroup(TAB_OFFSET, tab);
 
         TechManagers.client().onProgressChange(onTechChange);
 
@@ -139,11 +138,11 @@ public class TechScreen extends MenuScreen<TechMenu> {
         LOGGER.trace("refresh team {}", localTeam);
         if (localTeam.isPresent()) {
             welcomePanel.setActive(false);
-            tabs.setActive(true);
+            tab.setActive(true);
             techPanel.refreshTech(localTeam.get());
         } else {
             welcomePanel.setActive(true);
-            tabs.setActive(false);
+            tab.setActive(false);
         }
     }
 

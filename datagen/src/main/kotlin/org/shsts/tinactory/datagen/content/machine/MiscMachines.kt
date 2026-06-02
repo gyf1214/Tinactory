@@ -14,14 +14,17 @@ import org.shsts.tinactory.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.AllTags.circuit
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.VanillaRecipeFactory
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
+import org.shsts.tinactory.datagen.content.component.MiscComponents.misc
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
@@ -202,6 +205,12 @@ object MiscMachines {
         ulv(getComponent(name).item(Voltage.ULV), base)
     }
 
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>,
+        RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.logistics(
+        id: String, amount: Int = 1, block: RB.() -> Unit) {
+        output(getItem("logistics/$id"), amount, block = block)
+    }
+
     private fun ae() {
         assembler {
             componentVoltage = Voltage.LV
@@ -212,7 +221,7 @@ object MiscMachines {
                 workTicks(MACHINE_TICKS)
             }
 
-            output(getItem("logistics/me_signal_controller")) {
+            logistics("me_signal_controller") {
                 circuit(2)
                 component("sensor")
                 component("emitter")
@@ -220,7 +229,7 @@ object MiscMachines {
                 input("iron", "plate", 4)
                 tech(Technologies.INTEGRATED_CIRCUIT)
             }
-            output(getItem("logistics/me_storage_detector")) {
+            logistics("me_storage_detector") {
                 circuit(2)
                 component("sensor", 2)
                 input(Items.CHEST)
@@ -238,20 +247,57 @@ object MiscMachines {
                 workTicks(MACHINE_TICKS)
             }
 
-            output(getItem("logistics/me_storage_interface")) {
+            logistics("me_storage_interface") {
                 circuit(4)
                 component("conveyor_module", 2)
                 component("electric_pump", 2)
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
-            output(getItem("logistics/me_drive")) {
+            logistics("me_drive") {
                 circuit(4)
                 input(Items.CHEST)
                 input("certus_quartz", "gem", 4)
                 input("fluix", "dust", 4)
                 input("stainless_steel", "plate", 4)
                 tech(Technologies.DIGITAL_STORAGE)
+            }
+            logistics("me_pattern_terminal") {
+                circuit(3)
+                misc("silicon_print")
+                input("stainless_steel", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
+            }
+            logistics("me_craft_terminal") {
+                circuit(3)
+                misc("logic_processor")
+                input("titanium", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
+            }
+            logistics("me_craft_cpu/basic") {
+                circuit(2)
+                misc("logic_processor", 2)
+                component("sensor", 2)
+                misc("storage_component/1m", 2)
+                input("titanium", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
+            }
+        }
+        assembler {
+            componentVoltage = Voltage.IV
+            defaults {
+                component("machine_hull")
+                autoCable = true
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS)
+            }
+            logistics("me_craft_cpu/advanced") {
+                circuit(2)
+                misc("calculation_processor", 2)
+                component("sensor", 2)
+                misc("storage_component/4m", 2)
+                input("tungsten_steel", "plate", 4)
+                tech(Technologies.AUTOCRAFTING)
             }
         }
     }
@@ -476,7 +522,7 @@ object MiscMachines {
 
     private fun misc() {
         toolCrafting {
-            result(getBlock("machine/boiler/low")) {
+            result(getItem("machine/boiler/low")) {
                 pattern("PPP")
                 pattern("PWP")
                 pattern("VFV")
@@ -490,7 +536,7 @@ object MiscMachines {
 
         assembler {
             componentVoltage = Voltage.ULV
-            output(getBlock("machine/boiler/low")) {
+            output(getItem("machine/boiler/low")) {
                 component("machine_hull")
                 circuit(2)
                 input(Items.FURNACE)
@@ -501,7 +547,7 @@ object MiscMachines {
             }
 
             componentVoltage = Voltage.MV
-            output(getBlock("machine/boiler/high")) {
+            output(getItem("machine/boiler/high")) {
                 component("machine_hull")
                 input(Items.FURNACE)
                 input("brass", "pipe", 2)

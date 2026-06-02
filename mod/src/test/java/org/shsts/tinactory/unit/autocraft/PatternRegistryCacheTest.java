@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,11 +18,12 @@ import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PatternRegistryCacheTest {
     @Test
-    void addCellPortShouldRejectDuplicatePatternIdsAcrossCells() {
+    void addCellPortShouldRejectDuplicatePatternUuidsAcrossCells() {
         var repo = new PatternRegistryCache();
         var machineA = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var machineB = UUID.fromString("22222222-2222-2222-2222-222222222222");
@@ -33,7 +35,7 @@ class PatternRegistryCacheTest {
     }
 
     @Test
-    void findPatternsProducingShouldReturnPatternIdSortedList() {
+    void findPatternsProducingShouldReturnUuidSortedList() {
         var repo = new PatternRegistryCache();
         var machine = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var out = TestStackKey.item("tinactory:iron_plate", "");
@@ -42,8 +44,31 @@ class PatternRegistryCacheTest {
         var p1 = pattern("tinactory:p1", "tinactory:iron_plate");
         assertTrue(repo.addCellPort(machine, 3, 0, new TestCellPort(List.of(p2, p1))));
 
-        assertEquals(List.of("tinactory:p1", "tinactory:p2"),
-            repo.findPatternsProducing(out).stream().map(CraftPattern::patternId).toList());
+        assertEquals(List.of(uuid("tinactory:p2"), uuid("tinactory:p1")),
+            repo.findPatternsProducing(out).stream().map(CraftPattern::patternUuid).toList());
+    }
+
+    @Test
+    void listPatternsShouldReturnOutputThenUuidSortedImmutableSnapshot() {
+        var repo = new PatternRegistryCache();
+        var machineA = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        var machineB = UUID.fromString("22222222-2222-2222-2222-222222222222");
+
+        assertTrue(repo.addCellPort(machineA, 1, 0, new TestCellPort(List.of(
+            pattern("tinactory:p3", "tinactory:iron_plate"),
+            pattern("tinactory:p1", "tinactory:copper_plate")))));
+        assertTrue(repo.addCellPort(machineB, 1, 0, new TestCellPort(List.of(
+            pattern("tinactory:p2", "tinactory:gold_plate")))));
+
+        var snapshot = repo.listPatterns();
+
+        assertEquals(List.of(uuid("tinactory:p1"), uuid("tinactory:p2"), uuid("tinactory:p3")),
+            snapshot.stream().map(CraftPattern::patternUuid).toList());
+        assertThrows(UnsupportedOperationException.class,
+            () -> snapshot.add(pattern("tinactory:p5", "tinactory:diamond_plate")));
+        assertTrue(repo.addPattern(pattern("tinactory:p4", "tinactory:steel_plate")));
+        assertEquals(List.of(uuid("tinactory:p1"), uuid("tinactory:p2"), uuid("tinactory:p3")),
+            snapshot.stream().map(CraftPattern::patternUuid).toList());
     }
 
     @Test
@@ -60,8 +85,8 @@ class PatternRegistryCacheTest {
         var target = pattern("tinactory:p-new", "tinactory:steel_plate");
         assertTrue(repo.addPattern(target));
 
-        assertTrue(highPort.contains("tinactory:p-new"));
-        assertFalse(lowPort.contains("tinactory:p-new"));
+        assertTrue(highPort.contains(uuid("tinactory:p-new")));
+        assertFalse(lowPort.contains(uuid("tinactory:p-new")));
     }
 
     @Test
@@ -72,8 +97,8 @@ class PatternRegistryCacheTest {
         var port = new TestCellPort(List.of(existing));
 
         assertTrue(repo.addCellPort(machine, 1, 0, port));
-        assertTrue(repo.removePattern(existing.patternId()));
-        assertFalse(repo.containsPatternId(existing.patternId()));
+        assertTrue(repo.removePattern(existing.patternUuid()));
+        assertFalse(repo.containsPatternUuid(existing.patternUuid()));
         assertTrue(repo.findPatternsProducing(
             TestStackKey.item("tinactory:iron_plate", "")).isEmpty());
     }
@@ -90,7 +115,7 @@ class PatternRegistryCacheTest {
 
         assertTrue(repo.addCellPort(machine, 1, 0, port));
         assertFalse(repo.updatePattern(updated));
-        assertTrue(repo.containsPatternId(original.patternId()));
+        assertTrue(repo.containsPatternUuid(original.patternUuid()));
         assertEquals(List.of(original),
             repo.findPatternsProducing(TestStackKey.item("tinactory:iron_plate", "")));
         assertTrue(repo.findPatternsProducing(TestStackKey.item("tinactory:gold_plate", "")).isEmpty());
@@ -107,8 +132,8 @@ class PatternRegistryCacheTest {
             new TestCellPort(List.of(pattern("tinactory:p2", "tinactory:iron_gear")))));
 
         assertEquals(2, repo.removeCellPorts(machine));
-        assertFalse(repo.containsPatternId("tinactory:p1"));
-        assertFalse(repo.containsPatternId("tinactory:p2"));
+        assertFalse(repo.containsPatternUuid(uuid("tinactory:p1")));
+        assertFalse(repo.containsPatternUuid(uuid("tinactory:p2")));
     }
 
     @Test
@@ -131,7 +156,7 @@ class PatternRegistryCacheTest {
         var initialRevision = repo.revision();
         var pattern = pattern("tinactory:p1", "tinactory:iron_plate");
 
-        assertFalse(repo.removePattern(pattern.patternId()));
+        assertFalse(repo.removePattern(pattern.patternUuid()));
         assertEquals(initialRevision, repo.revision());
         assertTrue(repo.addCellPort(machine, 1, 0, new TestCellPort(List.of(pattern))));
         var addedCellRevision = repo.revision();
@@ -147,16 +172,20 @@ class PatternRegistryCacheTest {
         assertTrue(repo.revision() > updatedRevision);
     }
 
-    private static CraftPattern pattern(String patternId, String outputId) {
+    private static CraftPattern pattern(String patternKey, String outputId) {
         return TestAutocraftHelper.pattern(
-            patternId,
+            uuid(patternKey),
             List.of(new CraftAmount(TestStackKey.item("tinactory:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item(outputId, ""), 1)),
-            TestAutocraftHelper.machineRequirement("tinactory:mixer", 0));
+            TestAutocraftHelper.constraints("tinactory:mixer", 0));
+    }
+
+    private static UUID uuid(String value) {
+        return UUID.nameUUIDFromBytes(value.getBytes(StandardCharsets.UTF_8));
     }
 
     private static final class TestCellPort implements IPatternCellPort {
-        private final Map<String, CraftPattern> patterns = new HashMap<>();
+        private final Map<UUID, CraftPattern> patterns = new HashMap<>();
         private final Predicate<CraftPattern> insertRule;
 
         private TestCellPort(List<CraftPattern> initial) {
@@ -166,7 +195,7 @@ class PatternRegistryCacheTest {
         private TestCellPort(List<CraftPattern> initial, Predicate<CraftPattern> insertRule) {
             this.insertRule = insertRule;
             for (var pattern : initial) {
-                patterns.put(pattern.patternId(), pattern);
+                patterns.put(pattern.patternUuid(), pattern);
             }
         }
 
@@ -180,13 +209,13 @@ class PatternRegistryCacheTest {
             if (!insertRule.test(pattern)) {
                 return false;
             }
-            patterns.put(pattern.patternId(), pattern);
+            patterns.put(pattern.patternUuid(), pattern);
             return true;
         }
 
         @Override
-        public boolean remove(String patternId) {
-            return patterns.remove(patternId) != null;
+        public boolean remove(UUID patternUuid) {
+            return patterns.remove(patternUuid) != null;
         }
 
         @Override
@@ -199,8 +228,8 @@ class PatternRegistryCacheTest {
             return patterns.size() * 256;
         }
 
-        private boolean contains(String patternId) {
-            return patterns.containsKey(patternId);
+        private boolean contains(UUID patternUuid) {
+            return patterns.containsKey(patternUuid);
         }
     }
 }

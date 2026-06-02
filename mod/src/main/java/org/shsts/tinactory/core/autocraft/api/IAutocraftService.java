@@ -14,9 +14,17 @@ import java.util.Optional;
 public interface IAutocraftService {
     boolean isBusy();
 
+    default long memoryLimit() {
+        return Long.MAX_VALUE;
+    }
+
     Optional<AutocraftJobSnapshot> getJob();
 
     boolean cancel();
 
-    void submitPrepared(List<CraftAmount> targets, CraftPlan plan);
+    default void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
+        submitPrepared(targets, plan, 0L);
+    }
+
+    void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage);
 }

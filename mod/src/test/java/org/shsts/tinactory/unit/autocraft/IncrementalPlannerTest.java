@@ -56,13 +56,13 @@ class IncrementalPlannerTest {
         assertTrue(first.isEmpty());
         assertNotNull(progress.plan());
         var plannedPlateIntermediate = progress.plan().steps().stream()
-            .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
+            .filter(step -> step.pattern().patternUuid().equals(TestAutocraftHelper.uuid("tinactory:plate_from_ingot")))
             .flatMap(step -> step.requiredIntermediateOutputs().stream())
             .filter(amount -> amount.key().equals(plate))
             .mapToLong(CraftAmount::amount)
             .sum();
         var plannedPlateFinal = progress.plan().steps().stream()
-            .filter(step -> step.pattern().patternId().equals("tinactory:plate_from_ingot"))
+            .filter(step -> step.pattern().patternUuid().equals(TestAutocraftHelper.uuid("tinactory:plate_from_ingot")))
             .flatMap(step -> step.requiredFinalOutputs().stream())
             .filter(amount -> amount.key().equals(plate))
             .mapToLong(CraftAmount::amount)
@@ -167,7 +167,7 @@ class IncrementalPlannerTest {
             @Override
             public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
-                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList()) {
                     for (var output : pattern.outputs()) {
                         if (output.key().equals(key)) {
                             out.add(pattern);
@@ -189,8 +189,13 @@ class IncrementalPlannerTest {
             }
 
             @Override
-            public boolean containsPatternId(String patternId) {
-                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            public List<CraftPattern> listPatterns() {
+                return patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList();
+            }
+
+            @Override
+            public boolean containsPatternUuid(UUID patternUuid) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternUuid().equals(patternUuid));
             }
 
             @Override
@@ -199,7 +204,7 @@ class IncrementalPlannerTest {
             }
 
             @Override
-            public boolean removePattern(String patternId) {
+            public boolean removePattern(UUID patternUuid) {
                 throw new UnsupportedOperationException();
             }
 

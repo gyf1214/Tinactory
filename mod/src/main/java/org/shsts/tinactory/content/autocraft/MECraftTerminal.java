@@ -15,18 +15,18 @@ import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AutocraftTerminal extends MEStorageAccess {
+public class MECraftTerminal extends MEStorageAccess {
     public static final String ID = "autocraft/terminal";
 
     @Nullable
     private AutocraftComponent autocraft;
 
-    public AutocraftTerminal(BlockEntity blockEntity, double power) {
+    public MECraftTerminal(BlockEntity blockEntity, double power) {
         super(blockEntity, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new AutocraftTerminal(be, power));
+        return $ -> $.capability(ID, be -> new MECraftTerminal(be, power));
     }
 
     @Override

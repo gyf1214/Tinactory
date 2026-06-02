@@ -44,8 +44,8 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         var steps = snapshot.plan().steps();
         assertEquals(2, steps.size());
-        assertEquals("tinactory:plate_from_ingot", steps.get(0).pattern().patternId());
-        assertEquals("tinactory:gear_from_plate", steps.get(1).pattern().patternId());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:plate_from_ingot"), steps.get(0).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:gear_from_plate"), steps.get(1).pattern().patternUuid());
     }
 
     @Test
@@ -69,7 +69,9 @@ class GoalReductionPlannerTest {
         var snapshot = planner.plan(List.of(new CraftAmount(plate, 1)));
 
         assertNotNull(snapshot.plan());
-        assertEquals("tinactory:a_ore_to_plate", snapshot.plan().steps().get(0).pattern().patternId());
+        assertEquals(
+            TestAutocraftHelper.uuid("tinactory:a_ore_to_plate"),
+            snapshot.plan().steps().get(0).pattern().patternUuid());
     }
 
     @Test
@@ -114,8 +116,10 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         assertEquals(2, snapshot.plan().steps().size());
         assertEquals(
-            List.of("tinactory:refine_oil", "tinactory:residue_to_carbon"),
-            snapshot.plan().steps().stream().map(step -> step.pattern().patternId()).toList());
+            List.of(
+                TestAutocraftHelper.uuid("tinactory:refine_oil"),
+                TestAutocraftHelper.uuid("tinactory:residue_to_carbon")),
+            snapshot.plan().steps().stream().map(step -> step.pattern().patternUuid()).toList());
         assertEquals(List.of(new CraftAmount(residue, 1)),
             snapshot.plan().steps().get(0).requiredIntermediateOutputs());
         assertEquals(List.of(new CraftAmount(plastic, 1)),
@@ -174,10 +178,10 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         var steps = snapshot.plan().steps();
         assertEquals(List.of(
-                "tinactory:part_from_ore",
-                "tinactory:machine_a_from_part",
-                "tinactory:machine_b_from_part"),
-            steps.stream().map($ -> $.pattern().patternId()).toList());
+                TestAutocraftHelper.uuid("tinactory:part_from_ore"),
+                TestAutocraftHelper.uuid("tinactory:machine_a_from_part"),
+                TestAutocraftHelper.uuid("tinactory:machine_b_from_part")),
+            steps.stream().map($ -> $.pattern().patternUuid()).toList());
         assertEquals(List.of(new CraftAmount(part, 2)), steps.get(0).requiredIntermediateOutputs());
         assertEquals(List.of(), steps.get(0).requiredFinalOutputs());
     }
@@ -210,9 +214,9 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         var steps = snapshot.plan().steps();
         assertEquals(3, steps.size());
-        assertEquals("tinactory:part_from_ore", steps.get(0).pattern().patternId());
-        assertEquals("tinactory:part_from_plate", steps.get(1).pattern().patternId());
-        assertEquals("tinactory:machine_from_part", steps.get(2).pattern().patternId());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:part_from_ore"), steps.get(0).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:part_from_plate"), steps.get(1).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:machine_from_part"), steps.get(2).pattern().patternUuid());
         assertEquals(List.of(new CraftAmount(part, 1)), steps.get(0).requiredIntermediateOutputs());
         assertEquals(List.of(), steps.get(0).requiredFinalOutputs());
         assertEquals(List.of(new CraftAmount(part, 1)), steps.get(1).requiredIntermediateOutputs());
@@ -247,10 +251,10 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         var steps = snapshot.plan().steps();
         assertEquals(4, steps.size());
-        assertEquals("tinactory:a_part_from_ore", steps.get(0).pattern().patternId());
-        assertEquals("tinactory:a_part_from_ore", steps.get(1).pattern().patternId());
-        assertEquals("tinactory:b_part_from_plate", steps.get(2).pattern().patternId());
-        assertEquals("tinactory:machine_from_part", steps.get(3).pattern().patternId());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:a_part_from_ore"), steps.get(0).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:a_part_from_ore"), steps.get(1).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:b_part_from_plate"), steps.get(2).pattern().patternUuid());
+        assertEquals(TestAutocraftHelper.uuid("tinactory:machine_from_part"), steps.get(3).pattern().patternUuid());
     }
 
     @Test
@@ -272,8 +276,8 @@ class GoalReductionPlannerTest {
         var snapshot = planner.plan(List.of(new CraftAmount(plate, 1)));
 
         assertNotNull(snapshot.plan());
-        assertEquals(List.of("tinactory:b_plate_from_dust"),
-            snapshot.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+        assertEquals(List.of(TestAutocraftHelper.uuid("tinactory:b_plate_from_dust")),
+            snapshot.plan().steps().stream().map($ -> $.pattern().patternUuid()).toList());
     }
 
     @Test
@@ -303,8 +307,10 @@ class GoalReductionPlannerTest {
 
         assertNotNull(snapshot.plan());
         assertEquals(
-            List.of("tinactory:b_ingot_from_dust", "tinactory:gear_from_ingot"),
-            snapshot.plan().steps().stream().map($ -> $.pattern().patternId()).toList());
+            List.of(
+                TestAutocraftHelper.uuid("tinactory:b_ingot_from_dust"),
+                TestAutocraftHelper.uuid("tinactory:gear_from_ingot")),
+            snapshot.plan().steps().stream().map($ -> $.pattern().patternUuid()).toList());
     }
 
     @Test
@@ -376,7 +382,7 @@ class GoalReductionPlannerTest {
             @Override
             public List<CraftPattern> findPatternsProducing(IStackKey key) {
                 var out = new ArrayList<CraftPattern>();
-                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternId)).toList()) {
+                for (var pattern : patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList()) {
                     for (var output : pattern.outputs()) {
                         if (output.key().equals(key)) {
                             out.add(pattern);
@@ -398,8 +404,13 @@ class GoalReductionPlannerTest {
             }
 
             @Override
-            public boolean containsPatternId(String patternId) {
-                return patterns.stream().anyMatch(pattern -> pattern.patternId().equals(patternId));
+            public List<CraftPattern> listPatterns() {
+                return patterns.stream().sorted(Comparator.comparing(CraftPattern::patternUuid)).toList();
+            }
+
+            @Override
+            public boolean containsPatternUuid(UUID patternUuid) {
+                return patterns.stream().anyMatch(pattern -> pattern.patternUuid().equals(patternUuid));
             }
 
             @Override
@@ -408,7 +419,7 @@ class GoalReductionPlannerTest {
             }
 
             @Override
-            public boolean removePattern(String patternId) {
+            public boolean removePattern(UUID patternUuid) {
                 throw new UnsupportedOperationException();
             }
 

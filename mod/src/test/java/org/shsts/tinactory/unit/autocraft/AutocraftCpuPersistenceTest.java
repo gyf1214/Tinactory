@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -13,11 +12,11 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -76,10 +75,10 @@ class AutocraftCpuPersistenceTest {
         var step = new CraftStep(
             "s1",
             new CraftPattern(
-                "tinactory:s1",
+                TestAutocraftHelper.uuid("tinactory:s1"),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 2)),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2)),
-                new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())),
+                TestAutocraftHelper.constraints("tinactory:mixer", 0)),
             1,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)));
@@ -116,10 +115,10 @@ class AutocraftCpuPersistenceTest {
 
     private static CraftStep step(String id) {
         return new CraftStep(id, new CraftPattern(
-            "tinactory:" + id,
+            TestAutocraftHelper.uuid("tinactory:" + id),
             List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
+            TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);
     }
 
     private static SequentialCraftExecutor executor() {

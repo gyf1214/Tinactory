@@ -1,18 +1,17 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineRequirement;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
+import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -138,10 +137,10 @@ class AutocraftJobServiceTest {
 
     private static CraftStep step() {
         return new CraftStep("s1", new CraftPattern(
-            "tinactory:test",
+            TestAutocraftHelper.uuid("tinactory:test"),
             List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            new MachineRequirement(new ResourceLocation("tinactory", "mixer"), 0, List.of())), 1);
+            TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);
     }
 
     private static CraftPlan testPlan() {

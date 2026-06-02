@@ -8,106 +8,62 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.client.GridViewGroup;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
-
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class ButtonPanel extends Panel {
-    private static final Rect PANEL_OFFSET = Rect.corners(0, 0, 0, -21);
-    private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
-    private static final Rect PAGE_OFFSET = new Rect(0, -18, 12, 18);
-    private static final int PAGE_MARGIN = 12;
-    private static final Rect LEFT_PAGE_OFFSET = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_OFFSET.width(), 0);
-    private static final Rect RIGHT_PAGE_OFFSET = PAGE_OFFSET.offset(PAGE_MARGIN, 0);
-
-    protected final GridViewGroup<ItemButton> gridViewGroup;
-    protected int page = 0;
-
-    private final PageButton leftPageButton;
-    private final PageButton rightPageButton;
-
+public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> {
     public class ItemButton extends Button {
-        private int index = 0;
+        private final int slotIndex;
 
-        public ItemButton() {
+        public ItemButton(int slotIndex) {
             super(ButtonPanel.this.menu);
+            this.slotIndex = slotIndex;
         }
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return buttonTooltip(index, mouseX - rect.x(), mouseY - rect.y());
+            return buttonTooltip(itemIndex(), mouseX - rect.x(), mouseY - rect.y());
         }
 
         @Override
         public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             renderButton(poseStack, mouseX - rect.x(), mouseY - rect.y(), partialTick,
-                rect, index, isHovering(mouseX, mouseY));
+                rect, itemIndex(), isHovered(mouseX, mouseY));
         }
 
         @Override
         protected boolean canClick(int button, double mouseX, double mouseY) {
-            return canClickButton(index, mouseX - rect.x(), mouseY - rect.y(), button);
+            return canClickButton(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             playButtonSound();
-            onSelect(index, mouseX - rect.x(), mouseY - rect.y(), button);
+            onSelect(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
         }
 
-        public int getIndex() {
-            return index;
+        public int itemIndex() {
+            return page * gridViewGroup.getSlotCount() + slotIndex;
         }
 
-        public ButtonPanel getParent() {
+        public ButtonPanel parent() {
             return ButtonPanel.this;
         }
     }
 
-    private class PageButton extends SimpleButton {
-        private static final int TEX_Y = 208;
-
-        private final int pageChange;
-
-        public PageButton(int texX, int pageChange) {
-            super(ButtonPanel.this.menu, RECIPE_BOOK_BG, null, texX, TEX_Y,
-                texX, TEX_Y + PAGE_OFFSET.height());
-            this.pageChange = pageChange;
-        }
-
-        @Override
-        protected void playDownSound() {
-            ClientUtil.playSound(SoundEvents.BOOK_PAGE_TURN);
-        }
-
-        @Override
-        public void onMouseClicked(double mouseX, double mouseY, int button) {
-            super.onMouseClicked(mouseX, mouseY, button);
-            setPage(page + pageChange);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen, new GridViewGroup<ItemButton>(buttonWidth, buttonHeight, verticalSpacing, PANEL_OFFSET));
-        this.gridViewGroup = (GridViewGroup<ItemButton>) viewGroup;
-        this.leftPageButton = new PageButton(15, -1);
-        this.rightPageButton = new PageButton(1, 1);
-        gridViewGroup.setSlotFactory(index -> new ItemButton());
-
-        addChild(PAGE_ANCHOR, LEFT_PAGE_OFFSET, leftPageButton);
-        addChild(PAGE_ANCHOR, RIGHT_PAGE_OFFSET, rightPageButton);
+        super(screen, buttonWidth, buttonHeight, verticalSpacing);
     }
 
-    protected abstract int getItemCount();
+    @Override
+    protected ItemButton createSlot(int index) {
+        return new ItemButton(index);
+    }
 
     /**
      * mouseX and mouseY are relative to the button rect
@@ -132,33 +88,4 @@ public abstract class ButtonPanel extends Panel {
      * mouseX and mouseY are relative to the button rect
      */
     protected abstract Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY);
-
-    protected void setPage(int index) {
-        gridViewGroup.setItemCount(getItemCount());
-        gridViewGroup.setPage(index);
-        leftPageButton.setActive(gridViewGroup.isLeftPageEnabled());
-        rightPageButton.setActive(gridViewGroup.isRightPageEnabled());
-        for (var i = 0; i < gridViewGroup.getSlotCount(); i++) {
-            var button = gridViewGroup.getSlot(i);
-            var j = gridViewGroup.getVisibleIndex(i);
-
-            if (j >= 0) {
-                button.index = j;
-                button.setActive(true);
-            } else {
-                button.setActive(false);
-            }
-        }
-        page = gridViewGroup.getPage();
-    }
-
-    @Override
-    protected void postLayout() {
-        refresh();
-    }
-
-    @Override
-    protected void doRefresh() {
-        setPage(page);
-    }
 }

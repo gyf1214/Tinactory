@@ -124,7 +124,5 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     @Override
-    public void buildSchedulings(ISchedulingRegister builder) {
-        // Autocraft CPUs own runtime ticking via machine lifecycle scheduling.
-    }
+    public void buildSchedulings(ISchedulingRegister builder) {}
 }

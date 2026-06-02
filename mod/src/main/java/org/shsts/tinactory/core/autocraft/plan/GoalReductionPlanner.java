@@ -246,7 +246,8 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     private List<CraftPattern> choosePatterns(IStackKey key) {
         return patterns.findPatternsProducing(key).stream()
-            .sorted(Comparator.comparing(CraftPattern::patternId))
+            .sorted(Comparator.comparing((CraftPattern pattern) -> pattern.outputs().get(0).key())
+                .thenComparing(CraftPattern::patternUuid))
             .toList();
     }
 
