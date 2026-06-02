@@ -35,7 +35,6 @@ import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
-import org.shsts.tinactory.datagen.content.RegistryHelper.getBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
@@ -239,6 +238,7 @@ object Multiblocks {
         }
 
         val itemFilter = getItem("component/item_filter")
+        val advancedAlloy = getItem("component/advanced_alloy")
 
         assembler {
             defaults {
@@ -314,7 +314,7 @@ object Multiblocks {
             componentVoltage = Voltage.HV
             misc("launch_site_base") {
                 input("aluminium", "stick", 2)
-                input(getItem("component/advanced_alloy"), 2)
+                input(advancedAlloy, 2)
                 input("soldering_alloy", amount = 1.5)
                 workTicks(140)
                 tech(Technologies.ROCKET_SCIENCE)
@@ -383,13 +383,13 @@ object Multiblocks {
                 solid("robust_tungstensteel")
                 circuit(1)
                 machine("electric_furnace")
-                input(getItem("component/advanced_alloy"), 4)
+                input(advancedAlloy, 4)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.LARGE_BOILER)
             }
             solid("reinforced_alloy") {
                 solid("stable_titanium")
-                input(getItem("component/advanced_alloy"), 6)
+                input(advancedAlloy, 6)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.NUCLEAR_PHYSICS)
                 workTicks(140)
@@ -400,7 +400,7 @@ object Multiblocks {
                 component("robot_arm")
                 component("electric_pump")
                 input("lead", "plate", 24)
-                input(getItem("component/advanced_alloy"), 6)
+                input(advancedAlloy, 6)
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.NUCLEAR_PHYSICS)
             }
@@ -447,11 +447,11 @@ object Multiblocks {
     private fun <B : ProcessingRecipe.BuilderBase<*, B>,
         RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
         name: String, amount: Int = 1, block: RB.() -> Unit) {
-        output(getBlock("multiblock/misc/$name"), amount, block = block)
+        output(getItem("multiblock/misc/$name"), amount, block = block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
-        input(getBlock("multiblock/misc/$name"))
+        input(getItem("multiblock/misc/$name"))
     }
 
     private fun AssemblyRecipeFactory.solid(name: String,
@@ -575,6 +575,7 @@ object Multiblocks {
 
     private fun machineRecipes() {
         val itemFilter = getItem("component/item_filter")
+        val advancedAlloy = getItem("component/advanced_alloy")
 
         assembler {
             componentVoltage = Voltage.ULV
@@ -712,7 +713,7 @@ object Multiblocks {
                 component("robot_arm", 4)
                 component("conveyor_module", 4)
                 component("cable", 4)
-                input(getItem("component/advanced_alloy"), 4)
+                input(advancedAlloy, 4)
                 tech(Technologies.ROCKET_SCIENCE)
             }
 
@@ -780,7 +781,7 @@ object Multiblocks {
                 component("conveyor_module", 4)
                 component("electric_pump", 4)
                 component("cable", 4)
-                input(getItem("component/advanced_alloy"), 8)
+                input(advancedAlloy, 8)
                 tech(Technologies.LARGE_BOILER)
             }
             multiblock("nuclear_reactor") {
@@ -789,7 +790,7 @@ object Multiblocks {
                 component("field_generator", 4)
                 component("electric_pump", 4)
                 component("cable", 8)
-                input(getItem("component/advanced_alloy"), 12)
+                input(advancedAlloy, 12)
                 tech(Technologies.NUCLEAR_PHYSICS)
             }
         }
