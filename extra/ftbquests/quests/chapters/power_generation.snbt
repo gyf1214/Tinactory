@@ -10,14 +10,14 @@
 	quests: [
 		{
 			title: "{tinactory.quests.power_generation.000.title}"
+			x: 0.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.000.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.000.description.0}"
 				""
 				"{tinactory.quests.power_generation.000.description.1}"
 			]
-			x: 0.0d
-			y: 0.0d
 			dependencies: ["60E67F1969C46975"]
 			id: "3B814E5A86CB22E7"
 			tasks: [{
@@ -28,14 +28,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.001.title}"
+			x: 0.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.001.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.001.description.0}"
 				""
 				"{tinactory.quests.power_generation.001.description.1}"
 			]
-			x: 0.0d
-			y: 2.0d
 			dependencies: [
 				"3B814E5A86CB22E7"
 				"3375F9C747DB6DD4"
@@ -49,14 +49,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.002.title}"
+			x: 2.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.002.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.002.description.0}"
 				""
 				"{tinactory.quests.power_generation.002.description.1}"
 			]
-			x: 2.0d
-			y: 0.0d
 			dependencies: ["1B76C2DFABED3E63"]
 			id: "363746D1E8189E50"
 			tasks: [{
@@ -67,14 +67,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.003.title}"
+			x: 2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.003.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.003.description.0}"
 				""
 				"{tinactory.quests.power_generation.003.description.1}"
 			]
-			x: 2.0d
-			y: 2.0d
 			dependencies: [
 				"363746D1E8189E50"
 				"13E4096767FAA495"
@@ -97,14 +97,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.004.title}"
+			x: 2.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.004.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.004.description.0}"
 				""
 				"{tinactory.quests.power_generation.004.description.1}"
 			]
-			x: 2.0d
-			y: 4.0d
 			dependencies: [
 				"7FC43799DC08AC4E"
 				"4BC5CC00BBABBC80"
@@ -128,14 +128,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.005.title}"
+			x: 4.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.005.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.005.description.0}"
 				""
 				"{tinactory.quests.power_generation.005.description.1}"
 			]
-			x: 4.0d
-			y: 0.0d
 			dependencies: ["1B76C2DFABED3E63"]
 			id: "1213D571D21C3386"
 			tasks: [{
@@ -146,14 +146,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.006.title}"
+			x: 4.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.006.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.006.description.0}"
 				""
 				"{tinactory.quests.power_generation.006.description.1}"
 			]
-			x: 4.0d
-			y: 2.0d
 			dependencies: [
 				"1213D571D21C3386"
 				"13E4096767FAA495"
@@ -176,14 +176,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.007.title}"
+			x: 4.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.007.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.007.description.0}"
 				""
 				"{tinactory.quests.power_generation.007.description.1}"
 			]
-			x: 4.0d
-			y: 4.0d
 			dependencies: [
 				"7902ED312A19F27B"
 				"79DF7E4A2DFFCC09"
@@ -207,14 +207,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.008.title}"
+			x: 2.0d
+			y: -2.0d
 			subtitle: "{tinactory.quests.power_generation.008.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.008.description.0}"
 				""
 				"{tinactory.quests.power_generation.008.description.1}"
 			]
-			x: 2.0d
-			y: -2.0d
 			dependencies: [
 				"3B814E5A86CB22E7"
 				"363746D1E8189E50"
@@ -231,14 +231,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.009.title}"
+			x: 0.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.009.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.009.description.0}"
 				""
 				"{tinactory.quests.power_generation.009.description.1}"
 			]
-			x: 0.0d
-			y: 4.0d
 			dependencies: ["7890894D11E55E47"]
 			size: 2.0d
 			id: "24366ACA10086991"
@@ -250,14 +250,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.010.title}"
+			x: -2.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.010.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.010.description.0}"
 				""
 				"{tinactory.quests.power_generation.010.description.1}"
 			]
-			x: -2.0d
-			y: 0.0d
 			dependencies: [
 				"3B814E5A86CB22E7"
 				"4BC5CC00BBABBC80"
@@ -280,14 +280,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.011.title}"
+			x: 6.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.011.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.011.description.0}"
 				""
 				"{tinactory.quests.power_generation.011.description.1}"
 			]
-			x: 6.0d
-			y: 2.0d
 			dependencies: ["6D4396F046AC59FA"]
 			size: 2.0d
 			id: "6A56C38D3F934B21"
@@ -299,14 +299,14 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.012.title}"
+			x: -2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.012.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.012.description.0}"
 				""
 				"{tinactory.quests.power_generation.012.description.1}"
 			]
-			x: -2.0d
-			y: 2.0d
 			dependencies: [
 				"180A7F8DD9AD0580"
 				"6D4396F046AC59FA"

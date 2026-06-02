@@ -10,14 +10,14 @@
 	quests: [
 		{
 			title: "{tinactory.quests.logistics.000.title}"
+			x: -2.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.logistics.000.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.000.description.0}"
 				""
 				"{tinactory.quests.logistics.000.description.1}"
 			]
-			x: -2.0d
-			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4BE9B26C04647BD8"
 			tasks: [{
@@ -28,14 +28,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.001.title}"
+			x: 0.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.logistics.001.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.001.description.0}"
 				""
 				"{tinactory.quests.logistics.001.description.1}"
 			]
-			x: 0.0d
-			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "7A00FA0C45702638"
 			tasks: [{
@@ -46,14 +46,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.002.title}"
+			x: -2.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.logistics.002.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.002.description.0}"
 				""
 				"{tinactory.quests.logistics.002.description.1}"
 			]
-			x: -2.0d
-			y: 2.0d
 			dependencies: [
 				"4BE9B26C04647BD8"
 				"3375F9C747DB6DD4"
@@ -67,14 +67,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.003.title}"
+			x: 0.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.logistics.003.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.003.description.0}"
 				""
 				"{tinactory.quests.logistics.003.description.1}"
 			]
-			x: 0.0d
-			y: 2.0d
 			dependencies: [
 				"7A00FA0C45702638"
 				"3375F9C747DB6DD4"
@@ -88,14 +88,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.004.title}"
+			x: 6.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.logistics.004.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.004.description.0}"
 				""
 				"{tinactory.quests.logistics.004.description.1}"
 			]
-			x: 6.0d
-			y: 2.0d
 			dependencies: [
 				"35AFA1FBD784B4D2"
 				"3375F9C747DB6DD4"
@@ -110,14 +110,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.005.title}"
+			x: 10.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.logistics.005.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.005.description.0}"
 				""
 				"{tinactory.quests.logistics.005.description.1}"
 			]
-			x: 10.0d
-			y: 2.0d
 			dependencies: [
 				"2463E4F002BC25EE"
 				"6885F61C806D96E5"
@@ -132,14 +132,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.006.title}"
+			x: 0.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.logistics.006.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.006.description.0}"
 				""
 				"{tinactory.quests.logistics.006.description.1}"
 			]
-			x: 0.0d
-			y: 4.0d
 			dependencies: ["69A0DE7834E046EF"]
 			id: "1378262C4553AE71"
 			tasks: [{
@@ -150,14 +150,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.007.title}"
+			x: -2.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.logistics.007.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.007.description.0}"
 				""
 				"{tinactory.quests.logistics.007.description.1}"
 			]
-			x: -2.0d
-			y: 4.0d
 			dependencies: ["7A85227BDB6CB5A2"]
 			id: "011CB57C780EE663"
 			tasks: [{
@@ -168,14 +168,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.008.title}"
+			x: -2.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.logistics.008.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.008.description.0}"
 				""
 				"{tinactory.quests.logistics.008.description.1}"
 			]
-			x: -2.0d
-			y: 8.0d
 			dependencies: ["56D39B7C7922E621"]
 			size: 2.0d
 			id: "61C306A510164241"
@@ -187,14 +187,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.009.title}"
+			x: 6.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.logistics.009.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.009.description.0}"
 				""
 				"{tinactory.quests.logistics.009.description.1}"
 			]
-			x: 6.0d
-			y: 12.0d
 			dependencies: ["4034E621C42EBF60"]
 			size: 2.0d
 			id: "1E73498504A1B6C4"
@@ -206,14 +206,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.010.title}"
+			x: 2.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.logistics.010.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.010.description.0}"
 				""
 				"{tinactory.quests.logistics.010.description.1}"
 			]
-			x: 2.0d
-			y: 8.0d
 			dependencies: ["756F380B2118DD7F"]
 			id: "4034E621C42EBF60"
 			tasks: [{
@@ -224,14 +224,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.011.title}"
+			x: 2.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.logistics.011.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.011.description.0}"
 				""
 				"{tinactory.quests.logistics.011.description.1}"
 			]
-			x: 2.0d
-			y: 10.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
@@ -245,14 +245,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.012.title}"
+			x: 10.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.logistics.012.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.012.description.0}"
 				""
 				"{tinactory.quests.logistics.012.description.1}"
 			]
-			x: 4.0d
-			y: 16.0d
 			dependencies: ["7696374781756109"]
 			id: "3EDE299FA6EF6A78"
 			tasks: [{
@@ -262,16 +262,16 @@
 			}]
 		}
 		{
-			icon: "tinactory:component/annihilation_core"
 			title: "{tinactory.quests.logistics.013.title}"
+			icon: "tinactory:component/annihilation_core"
+			x: -2.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.logistics.013.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.013.description.0}"
 				""
 				"{tinactory.quests.logistics.013.description.1}"
 			]
-			x: -2.0d
-			y: 12.0d
 			dependencies: [
 				"7696374781756109"
 				"4034E621C42EBF60"
@@ -293,14 +293,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.014.title}"
+			x: 2.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.logistics.014.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.014.description.0}"
 				""
 				"{tinactory.quests.logistics.014.description.1}"
 			]
-			x: 2.0d
-			y: 12.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
@@ -314,14 +314,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.015.title}"
+			x: 6.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.logistics.015.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.015.description.0}"
 				""
 				"{tinactory.quests.logistics.015.description.1}"
 			]
-			x: 6.0d
-			y: 14.0d
 			dependencies: ["1E73498504A1B6C4"]
 			id: "340A59CCBC050E4A"
 			tasks: [{
@@ -332,14 +332,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.016.title}"
+			x: 6.0d
+			y: 16.0d
 			subtitle: "{tinactory.quests.logistics.016.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.016.description.0}"
 				""
 				"{tinactory.quests.logistics.016.description.1}"
 			]
-			x: 6.0d
-			y: 16.0d
 			dependencies: [
 				"340A59CCBC050E4A"
 				"3EDE299FA6EF6A78"
@@ -353,14 +353,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.017.title}"
+			x: 6.0d
+			y: 18.0d
 			subtitle: "{tinactory.quests.logistics.017.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.017.description.0}"
 				""
 				"{tinactory.quests.logistics.017.description.1}"
 			]
-			x: 6.0d
-			y: 18.0d
 			dependencies: ["41B2E83E7E86A9A6"]
 			id: "2669AE71AD768BC1"
 			tasks: [{
@@ -371,14 +371,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.018.title}"
+			x: -2.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.logistics.018.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.018.description.0}"
 				""
 				"{tinactory.quests.logistics.018.description.1}"
 			]
-			x: -2.0d
-			y: 14.0d
 			dependencies: ["1B073B0E13E0484E"]
 			id: "76896CF4A26C08CD"
 			tasks: [{
@@ -389,14 +389,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.019.title}"
+			x: 10.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.logistics.019.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.019.description.0}"
 				""
 				"{tinactory.quests.logistics.019.description.1}"
 			]
-			x: 10.0d
-			y: 8.0d
 			dependencies: [
 				"4D7BE161FBFBB80C"
 				"062113D36F9444CD"
@@ -411,14 +411,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.020.title}"
+			x: 10.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.logistics.020.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.020.description.0}"
 				""
 				"{tinactory.quests.logistics.020.description.1}"
 			]
-			x: 10.0d
-			y: 6.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4D7BE161FBFBB80C"
 			tasks: [{
@@ -429,14 +429,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.021.title}"
+			x: 10.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.logistics.021.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.021.description.0}"
 				""
 				"{tinactory.quests.logistics.021.description.1}"
 			]
-			x: 10.0d
-			y: 10.0d
 			dependencies: ["5EDD9D5E4EE9487D"]
 			id: "51A3CD15BE4A96D2"
 			tasks: [{
@@ -447,14 +447,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.022.title}"
+			x: 2.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.logistics.022.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.022.description.0}"
 				""
 				"{tinactory.quests.logistics.022.description.1}"
 			]
-			x: 2.0d
-			y: 14.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
@@ -470,14 +470,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.023.title}"
+			x: 12.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.logistics.023.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.023.description.0}"
 				""
 				"{tinactory.quests.logistics.023.description.1}"
 			]
-			x: 10.0d
-			y: 14.0d
 			dependencies: [
 				"3EDE299FA6EF6A78"
 				"0F38B05E2E11756A"
@@ -491,14 +491,14 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.024.title}"
+			x: 12.0d
+			y: 16.0d
 			subtitle: "{tinactory.quests.logistics.024.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.024.description.0}"
 				""
 				"{tinactory.quests.logistics.024.description.1}"
 			]
-			x: 12.0d
-			y: 14.0d
 			dependencies: [
 				"65D0B60510463343"
 				"4FF5F28B05D7D3BD"
@@ -512,35 +512,35 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.025.title}"
+			x: 12.0d
+			y: 20.0d
 			subtitle: "{tinactory.quests.logistics.025.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.025.description.0}"
 				""
 				"{tinactory.quests.logistics.025.description.1}"
 			]
-			x: 14.0d
-			y: 16.0d
 			dependencies: [
 				"7B958900C6A6AC26"
 				"0DFE5BEF57423538"
 			]
-			id: "022A8ABF3D58C41"
+			id: "0022A8ABF3D58C41"
 			tasks: [{
-				id: "409D3611E7A4662"
+				id: "0409D3611E7A4662"
 				type: "item"
 				item: "tinactory:component/calculation_processor"
 			}]
 		}
 		{
 			title: "{tinactory.quests.logistics.026.title}"
+			x: 10.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.logistics.026.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.026.description.0}"
 				""
 				"{tinactory.quests.logistics.026.description.1}"
 			]
-			x: 8.0d
-			y: 16.0d
 			dependencies: [
 				"65D0B60510463343"
 				"1E73498504A1B6C4"
@@ -555,21 +555,19 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.027.title}"
+			icon: "tinactory:logistics/me_pattern_terminal"
+			x: 10.0d
+			y: 16.0d
 			subtitle: "{tinactory.quests.logistics.027.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.027.description.0}"
 				""
 				"{tinactory.quests.logistics.027.description.1}"
 			]
-			x: 10.0d
-			y: 18.0d
 			dependencies: [
-				"7B958900C6A6AC26"
 				"7617169E5734A74B"
-				"76896CF4A26C08CD"
-				"1B073B0E13E0484E"
+				"7B958900C6A6AC26"
 			]
-			size: 2.0d
 			id: "2DBD0C0A32F12F52"
 			tasks: [
 				{
@@ -578,7 +576,7 @@
 					item: "tinactory:logistics/me_pattern_terminal"
 				}
 				{
-					id: "361556F57161B6C"
+					id: "0361556F57161B6C"
 					type: "item"
 					item: "tinactory:logistics/me_craft_terminal"
 				}
@@ -586,44 +584,38 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.028.title}"
+			x: 10.0d
+			y: 18.0d
 			subtitle: "{tinactory.quests.logistics.028.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.028.description.0}"
 				""
 				"{tinactory.quests.logistics.028.description.1}"
 			]
-			x: 12.0d
-			y: 20.0d
-			dependencies: [
-				"2DBD0C0A32F12F52"
-				"7B958900C6A6AC26"
-				"7617169E5734A74B"
-			]
+			dependencies: ["2DBD0C0A32F12F52"]
 			size: 2.0d
-			id: "2FC118547396205"
+			id: "02FC118547396205"
 			tasks: [{
-				id: "27740CD7531F1DA"
+				id: "027740CD7531F1DA"
 				type: "item"
 				item: "tinactory:logistics/me_craft_cpu/basic"
 			}]
 		}
 		{
 			title: "{tinactory.quests.logistics.029.title}"
+			x: 10.0d
+			y: 20.0d
 			subtitle: "{tinactory.quests.logistics.029.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.029.description.0}"
 				""
 				"{tinactory.quests.logistics.029.description.1}"
 			]
-			x: 14.0d
-			y: 22.0d
 			dependencies: [
-				"2FC118547396205"
-				"022A8ABF3D58C41"
-				"340A59CCBC050E4A"
+				"02FC118547396205"
+				"0022A8ABF3D58C41"
 				"15A12C982E065F64"
 			]
-			size: 2.0d
 			id: "0046CC5063E9B6AD"
 			tasks: [{
 				id: "39FE594EC92F6C1B"
