@@ -617,29 +617,26 @@ object Multiblocks {
                 tech(Technologies.POWER_SUBSTATION)
             }
 
-            powerBlock(Voltage.HV, 2) {
+            powerBlock(Voltage.HV) {
                 input("battery_powder", "dust", 10)
             }
-            powerBlock(Voltage.EV, 2, "energy_crystal", 10)
-            powerBlock(Voltage.IV, 2, "lapotron_crystal", 8)
-            powerBlock(Voltage.LUV, 2, "lapotronic_energy_orb") {
-                tech(Technologies.RHODIUM_PLATED_PALLADIUM)
-            }
+            powerBlock(Voltage.EV, "energy_crystal", 10)
+            powerBlock(Voltage.IV, "lapotron_crystal", 8)
+            powerBlock(Voltage.LUV, "lapotronic_energy_orb")
         }
     }
 
-    private fun AssemblyRecipeFactory.powerBlock(v: Voltage, picAmount: Int,
-        powerComponent: String? = null, powerComponentAmount: Int = 1,
+    private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
+        component: String? = null, amount: Int = 1,
         block: AssemblyRecipeBuilder.() -> Unit = {}) {
         componentVoltage = v
-        misc("power_block/${v.id}") powerBlock@{
+        misc("power_block/${v.id}") {
             input("aluminium", "stick", 2)
             input("battery_alloy", "plate", 3)
-            pic(picAmount)
+            pic(2)
             component("cable", 4)
-            val component = powerComponent
             if (component != null) {
-                input(getItem("component/$component"), powerComponentAmount)
+                input(getItem("component/$component"), amount)
             }
             voltage(v)
             block()

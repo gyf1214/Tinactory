@@ -25,8 +25,8 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
@@ -437,11 +437,12 @@ object MiscComponents {
                 misc("lapotron_crystal", 8)
                 misc("energy_chip", 24)
                 component("field_generator", voltage = Voltage.IV)
-                chip("pic", 4)
+                pic(4)
                 component("cable", 4)
+                input("battery_alloy", "plate", 3)
                 voltage(Voltage.LUV)
                 workTicks(800)
-                tech(Technologies.POWER_SUBSTATION, Technologies.RHODIUM_PLATED_PALLADIUM)
+                tech(Technologies.POWER_SUBSTATION)
             }
         }
     }
