@@ -650,6 +650,32 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.05_post_ev.034.title}"
+			icon: "tinactory:network/luv/transformer"
+			x: -2.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.05_post_ev.034.subtitle}"
+			description: [
+				"{tinactory.quests.05_post_ev.034.description.0}"
+				""
+				"{tinactory.quests.05_post_ev.034.description.1}"
+			]
+			dependencies: ["05A550E7057E0043"]
+			id: "05A550E7057E0057"
+			tasks: [
+				{
+					id: "05A550E7057E0058"
+					type: "item"
+					item: "tinactory:network/luv/transformer"
+				}
+				{
+					id: "05A550E7057E0059"
+					type: "item"
+					item: "tinactory:network/luv/electric_buffer"
+				}
+			]
+		}
+		{
 			title: "{tinactory.quests.05_post_ev.028.title}"
 			icon: "tinactory:component/luv/electric_pump"
 			x: 8.0d

@@ -490,6 +490,28 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.logistics.030.title}"
+			x: 4.0d
+			y: 16.0d
+			subtitle: "{tinactory.quests.logistics.030.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.030.description.0}"
+				""
+				"{tinactory.quests.logistics.030.description.1}"
+			]
+			dependencies: [
+				"247F2D17E69312E2"
+				"05A550E7057E0043"
+				"05A550E7057E0048"
+			]
+			id: "02FC118547396206"
+			tasks: [{
+				id: "02FC118547396207"
+				type: "item"
+				item: "tinactory:multiblock/luv/digital_interface"
+			}]
+		}
+		{
 			title: "{tinactory.quests.logistics.024.title}"
 			x: 12.0d
 			y: 16.0d

@@ -298,6 +298,64 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.power_generation.015.title}"
+			x: 14.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.power_generation.015.subtitle}"
+			description: [
+				"{tinactory.quests.power_generation.015.description.0}"
+				""
+				"{tinactory.quests.power_generation.015.description.1}"
+			]
+			dependencies: ["6A56C38D3F934B21"]
+			id: "18A01183DF6A59D5"
+			tasks: [{
+				id: "18A01183DF6A59D6"
+				type: "item"
+				item: "tinactory:component/energy_crystal"
+			}]
+		}
+		{
+			title: "{tinactory.quests.power_generation.016.title}"
+			x: 16.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.power_generation.016.subtitle}"
+			description: [
+				"{tinactory.quests.power_generation.016.description.0}"
+				""
+				"{tinactory.quests.power_generation.016.description.1}"
+			]
+			dependencies: ["18A01183DF6A59D5"]
+			id: "18A01183DF6A59D7"
+			tasks: [{
+				id: "18A01183DF6A59D8"
+				type: "item"
+				item: "tinactory:component/lapotron_crystal"
+			}]
+		}
+		{
+			title: "{tinactory.quests.power_generation.017.title}"
+			x: 18.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.power_generation.017.subtitle}"
+			description: [
+				"{tinactory.quests.power_generation.017.description.0}"
+				""
+				"{tinactory.quests.power_generation.017.description.1}"
+			]
+			dependencies: [
+				"18A01183DF6A59D7"
+				"05A550E7057E0043"
+				"05A550E7057E0041"
+			]
+			id: "18A01183DF6A59D9"
+			tasks: [{
+				id: "18A01183DF6A59DA"
+				type: "item"
+				item: "tinactory:component/lapotronic_energy_orb"
+			}]
+		}
+		{
 			title: "{tinactory.quests.power_generation.013.title}"
 			x: -4.0d
 			y: 0.0d
