@@ -48,6 +48,7 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
@@ -1142,6 +1143,16 @@ object Multiblocks {
                 voltage(Voltage.IV)
                 workTicks(ADVANCED_MULTIBLOCK_TICKS)
                 tech(Technologies.FUSION)
+            }
+        }
+
+        fusionReactor {
+            recipe("multiblock/fusion_reactor_smoke") {
+                input("water", "liquid", 1)
+                input("water", "gas", 1)
+                output("water", "gas", 2)
+                voltage(Voltage.LUV)
+                workTicks(200)
             }
         }
     }

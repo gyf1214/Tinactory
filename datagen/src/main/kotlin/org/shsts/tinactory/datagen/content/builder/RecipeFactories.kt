@@ -354,6 +354,14 @@ object RecipeFactories {
         }.block()
     }
 
+    fun fusionReactor(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("fusion_reactor") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            amperage = 0.75
+        }.block()
+    }
+
     fun marker(block: MarkerFactory.() -> Unit) {
         val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
         RecipeFactory(recipeType, ::MarkerBuilder).block()
