@@ -159,6 +159,9 @@ object Materials {
         material("ruthenium", BRIGHT)
         material("iridium", METALLIC) {
             machineProcess(Voltage.HV, 2.0)
+            blast(Voltage.EV, 4500, 1280) {
+                component("nitrogen")
+            }
         }
         material("osmium", METALLIC)
     }

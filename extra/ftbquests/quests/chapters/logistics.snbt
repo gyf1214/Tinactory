@@ -501,6 +501,27 @@
 			]
 			dependencies: [
 				"247F2D17E69312E2"
+				"05A550E7057E0001"
+			]
+			id: "02FC118547396204"
+			tasks: [{
+				id: "02FC118547396208"
+				type: "item"
+				item: "tinactory:multiblock/iv/digital_interface"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.031.title}"
+			x: 2.0d
+			y: 18.0d
+			subtitle: "{tinactory.quests.logistics.031.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.031.description.0}"
+				""
+				"{tinactory.quests.logistics.031.description.1}"
+			]
+			dependencies: [
+				"02FC118547396204"
 				"05A550E7057E0043"
 				"05A550E7057E0048"
 			]
