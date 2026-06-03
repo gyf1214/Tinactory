@@ -52,12 +52,12 @@ object ProcessingMachines {
         advancedMachine(Voltage.LUV)
     }
 
-    private fun AssemblyRecipeFactory.commonMachine() {
+    private fun AssemblyRecipeFactory.commonMachine(lastVoltage: Voltage) {
         component("transformer") {
             circuit(4)
             pic(2)
             component("cable")
-            component("cable", 4, voltage = Voltage.IV)
+            component("cable", 4, voltage = lastVoltage)
             tech(Technologies.BATTERY)
         }
         component("electric_buffer") {
@@ -86,7 +86,7 @@ object ProcessingMachines {
                 voltage(lastVoltage)
                 workTicks(MACHINE_TICKS)
             }
-            commonMachine()
+            commonMachine(lastVoltage)
             machine("research_bench") {
                 circuit(2)
                 component("sensor")
@@ -321,7 +321,7 @@ object ProcessingMachines {
                 voltage(lastVoltage)
                 workTicks(MACHINE_TICKS)
             }
-            commonMachine()
+            commonMachine(lastVoltage)
         }
         assemblyLine {
             componentVoltage = v
