@@ -2,12 +2,7 @@ package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
-import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.MaterialBuilder.Companion.material
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.model.IconSet.BRIGHT
 import org.shsts.tinactory.datagen.content.model.IconSet.CERTUS
 import org.shsts.tinactory.datagen.content.model.IconSet.DULL
@@ -498,17 +493,16 @@ object Materials {
                 component("lithium", 9)
             }
         }
-        material("energy_dust", SHINY) {
+        material("energy", SHINY) {
             mix(Voltage.EV) {
                 component("battery_powder", 2)
                 component("redstone", 3)
                 component("ruby")
             }
         }
-        material("lapotron_dust", CERTUS) {
+        material("lapotron", CERTUS) {
             mix(Voltage.IV) {
-                amount(16)
-                component("energy_dust", 12)
+                component("energy", 12)
                 component("lapis", 4)
             }
         }
@@ -526,63 +520,6 @@ object Materials {
         }
         material("ev_superconductor", SHINY)
         material("iv_superconductor", SHINY)
-        batteryMaterials()
-    }
-
-    private fun batteryMaterials() {
-        autoclave {
-            output(getItem("component/energy_crystal")) {
-                input("energy_dust", "dust", 6)
-                input("salt_water")
-                voltage(Voltage.EV)
-                workTicks(600)
-                extra {
-                    requireCleanness(0.0, 0.85)
-                }
-            }
-            output(getItem("component/lapotron_crystal")) {
-                input("lapotron_dust", "dust", 8)
-                input("salt_water")
-                voltage(Voltage.IV)
-                workTicks(800)
-                extra {
-                    requireCleanness(0.5, 0.9)
-                }
-            }
-        }
-        laserEngraver {
-            output(getItem("component/energy_chip")) {
-                input(getItem("component/energy_crystal"))
-                input("ruby", "lens", 0, port = 1)
-                voltage(Voltage.IV)
-                workTicks(800)
-                extra {
-                    requireCleanness(0.4, 1.4)
-                }
-            }
-            output(getItem("component/lapotron_chip")) {
-                input(getItem("component/lapotron_crystal"))
-                input("blue_topaz", "lens", 0, port = 1)
-                voltage(Voltage.LUV)
-                workTicks(1200)
-                extra {
-                    requireCleanness(0.5, 1.5)
-                }
-            }
-        }
-        assembler {
-            componentVoltage = Voltage.LUV
-            output(getItem("component/lapotronic_energy_orb")) {
-                input(getItem("component/lapotron_crystal"), 8)
-                input(getItem("component/energy_chip"), 24)
-                input(getItem("component/iv/field_generator"))
-                input(getItem("chip/pic"), 4)
-                component("cable", 4)
-                voltage(Voltage.LUV)
-                workTicks(800)
-                tech(Technologies.POWER_SUBSTATION, Technologies.RHODIUM_PLATED_PALLADIUM)
-            }
-        }
     }
 
     private fun ores() {

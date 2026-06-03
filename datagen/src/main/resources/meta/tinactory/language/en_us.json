@@ -20,17 +20,7 @@
     "soc": "SoC",
     "ptfe": "PTFE",
     "me": "ME",
-    "hssg": "HSS-G",
-    "ruridit": "Ruridit",
-    "rhodium_plated_palladium": "Rhodium Plated Palladium",
-    "vanadium_gallium": "Vanadium Gallium",
-    "energy_dust": "Energy",
-    "lapotron_dust": "Lapotron",
-    "fusion_casing": "Fusion Casing",
-    "fusion_glass": "Fusion Glass",
-    "superconducting_coil": "Superconducting Coil",
-    "fusion_reactor": "Fusion Reactor",
-    "fusion": "Fusion"
+    "hssg": "HSS-G"
   },
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1 $2",

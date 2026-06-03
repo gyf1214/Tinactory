@@ -15,11 +15,13 @@ import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Circuits.getCircuit
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
@@ -645,7 +647,8 @@ object CircuitComponents {
         input(getCircuit(name).item, amount)
     }
 
-    fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
+    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.chip(
+        name: String, amount: Int = 1) {
         input(CHIP.item(name), amount)
     }
 

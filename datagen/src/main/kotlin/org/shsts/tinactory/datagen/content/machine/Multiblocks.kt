@@ -617,36 +617,30 @@ object Multiblocks {
                 tech(Technologies.POWER_SUBSTATION)
             }
 
-            powerBlock(Voltage.HV, "aluminium", "battery_alloy") {
-                input(getItem("chip/low_pic"), 2)
-                component("cable", 4)
+            powerBlock(Voltage.HV, 2) {
                 input("battery_powder", "dust", 10)
             }
-            powerBlock(Voltage.EV, "aluminium", "battery_alloy") {
-                input(getItem("chip/low_pic"), 2)
-                component("cable", 4)
-                input(getItem("component/energy_crystal"), 4)
-            }
-            powerBlock(Voltage.IV, "aluminium", "battery_alloy") {
-                input(getItem("chip/pic"), 2)
-                component("cable", 4)
-                input(getItem("component/lapotron_crystal"), 8)
-            }
-            powerBlock(Voltage.LUV, "hssg", "rhodium_plated_palladium") {
-                input(getItem("chip/pic"), 2)
-                component("cable", 4)
-                input(getItem("component/lapotronic_energy_orb"))
+            powerBlock(Voltage.EV, 2, "energy_crystal", 10)
+            powerBlock(Voltage.IV, 2, "lapotron_crystal", 8)
+            powerBlock(Voltage.LUV, 2, "lapotronic_energy_orb") {
                 tech(Technologies.RHODIUM_PLATED_PALLADIUM)
             }
         }
     }
 
-    private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
-        stick: String, plate: String, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun AssemblyRecipeFactory.powerBlock(v: Voltage, picAmount: Int,
+        powerComponent: String? = null, powerComponentAmount: Int = 1,
+        block: AssemblyRecipeBuilder.() -> Unit = {}) {
         componentVoltage = v
-        misc("power_block/${v.id}") {
-            input(stick, "stick", 2)
-            input(plate, "plate", 3)
+        misc("power_block/${v.id}") powerBlock@{
+            input("aluminium", "stick", 2)
+            input("battery_alloy", "plate", 3)
+            pic(picAmount)
+            component("cable", 4)
+            val component = powerComponent
+            if (component != null) {
+                input(getItem("component/$component"), powerComponentAmount)
+            }
             voltage(v)
             block()
         }
