@@ -652,8 +652,8 @@
 		{
 			title: "{tinactory.quests.05_post_ev.034.title}"
 			icon: "tinactory:network/luv/transformer"
-			x: -2.0d
-			y: 12.0d
+			x: -8.0d
+			y: 14.0d
 			subtitle: "{tinactory.quests.05_post_ev.034.subtitle}"
 			description: [
 				"{tinactory.quests.05_post_ev.034.description.0}"

@@ -281,7 +281,7 @@
 		{
 			title: "{tinactory.quests.power_generation.011.title}"
 			x: 12.0d
-			y: 4.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.power_generation.011.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.011.description.0}"
@@ -299,8 +299,8 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.015.title}"
-			x: 14.0d
-			y: 4.0d
+			x: 12.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.power_generation.015.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.015.description.0}"
@@ -317,7 +317,7 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.016.title}"
-			x: 16.0d
+			x: 12.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.power_generation.016.subtitle}"
 			description: [
@@ -335,8 +335,8 @@
 		}
 		{
 			title: "{tinactory.quests.power_generation.017.title}"
-			x: 18.0d
-			y: 4.0d
+			x: 12.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.power_generation.017.subtitle}"
 			description: [
 				"{tinactory.quests.power_generation.017.description.0}"

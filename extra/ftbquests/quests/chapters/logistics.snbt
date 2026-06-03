@@ -245,8 +245,8 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.012.title}"
-			x: 4.0d
-			y: 16.0d
+			x: 10.0d
+			y: 12.0d
 			subtitle: "{tinactory.quests.logistics.012.subtitle}"
 			description: [
 				"{tinactory.quests.logistics.012.description.0}"
@@ -491,7 +491,7 @@
 		}
 		{
 			title: "{tinactory.quests.logistics.030.title}"
-			x: 4.0d
+			x: 2.0d
 			y: 16.0d
 			subtitle: "{tinactory.quests.logistics.030.subtitle}"
 			description: [
