@@ -144,6 +144,26 @@ object Components {
                 model(basicItem(ResourceLocation("gregtech4", "items/iridium_alloy_ingot")))
             }
 
+            component("energy_crystal") {
+                model(basicItem("metaitems/energy_crystal/1"))
+            }
+
+            component("lapotron_crystal") {
+                model(basicItem("metaitems/lapotron_crystal/1"))
+            }
+
+            component("energy_chip") {
+                model(basicItem("metaitems/engraved.crystal_chip"))
+            }
+
+            component("lapotron_chip") {
+                model(basicItem("metaitems/engraved.lapotron_chip"))
+            }
+
+            component("lapotronic_energy_orb") {
+                model(basicItem("metaitems/energy.lapotronic_orb/1"))
+            }
+
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {

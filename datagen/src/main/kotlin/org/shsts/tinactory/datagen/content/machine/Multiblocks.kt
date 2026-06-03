@@ -606,22 +606,49 @@ object Multiblocks {
             }
         }
 
+        powerBlocks()
+    }
+
+    private fun powerBlocks() {
         assembler {
             defaults {
-                input("aluminium", "stick", 2)
-                input("battery_alloy", "plate", 3)
-                pic(2)
-                component("cable", 4)
                 input("soldering_alloy", amount = 1.5)
                 workTicks(COIL_TICKS)
                 tech(Technologies.POWER_SUBSTATION)
             }
 
-            componentVoltage = Voltage.HV
-            misc("power_block/hv") {
+            powerBlock(Voltage.HV, "aluminium", "battery_alloy") {
+                input(getItem("chip/low_pic"), 2)
+                component("cable", 4)
                 input("battery_powder", "dust", 10)
-                voltage(Voltage.HV)
             }
+            powerBlock(Voltage.EV, "aluminium", "battery_alloy") {
+                input(getItem("chip/low_pic"), 2)
+                component("cable", 4)
+                input(getItem("component/energy_crystal"), 4)
+            }
+            powerBlock(Voltage.IV, "aluminium", "battery_alloy") {
+                input(getItem("chip/pic"), 2)
+                component("cable", 4)
+                input(getItem("component/lapotron_crystal"), 8)
+            }
+            powerBlock(Voltage.LUV, "hssg", "rhodium_plated_palladium") {
+                input(getItem("chip/pic"), 2)
+                component("cable", 4)
+                input(getItem("component/lapotronic_energy_orb"))
+                tech(Technologies.RHODIUM_PLATED_PALLADIUM)
+            }
+        }
+    }
+
+    private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
+        stick: String, plate: String, block: AssemblyRecipeBuilder.() -> Unit) {
+        componentVoltage = v
+        misc("power_block/${v.id}") {
+            input(stick, "stick", 2)
+            input(plate, "plate", 3)
+            voltage(v)
+            block()
         }
     }
 

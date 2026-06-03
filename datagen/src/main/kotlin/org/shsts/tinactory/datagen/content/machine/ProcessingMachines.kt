@@ -5,6 +5,7 @@ import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
@@ -44,6 +45,7 @@ object ProcessingMachines {
             electric = "platinum",
             pipe = "ptfe",
             rotor = "titanium")
+        luvSupport()
     }
 
     private fun machine(v: Voltage, main: String,
@@ -294,6 +296,47 @@ object ProcessingMachines {
                 component("electric_pump", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+            }
+        }
+    }
+
+    private fun luvSupport() {
+        assembler {
+            componentVoltage = Voltage.LUV
+            defaults {
+                component("machine_hull")
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS)
+            }
+            component("transformer") {
+                circuit(4)
+                pic(2)
+                component("cable")
+                component("cable", 4, voltage = Voltage.IV)
+                tech(Technologies.BATTERY)
+            }
+            component("electric_buffer") {
+                circuit(4)
+                pic(2)
+                component("cable", 2)
+                tech(Technologies.BATTERY)
+            }
+        }
+        assemblyLine {
+            componentVoltage = Voltage.LUV
+            machine("multiblock/digital_interface") {
+                component("machine_hull")
+                circuit(4)
+                input(getItem("chip/pic"), 8)
+                input(getItem("component/annihilation_core"), 2)
+                input(getItem("component/formation_core"), 2)
+                input(getItem("component/storage_component/4m"), 2)
+                component("conveyor_module", 2)
+                component("electric_pump", 2)
+                component("cable", 2)
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS * 4)
+                tech(Technologies.ASSEMBLY_LINE, Technologies.DIGITAL_STORAGE)
             }
         }
     }
