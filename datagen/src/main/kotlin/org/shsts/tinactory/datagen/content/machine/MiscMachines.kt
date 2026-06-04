@@ -278,7 +278,7 @@ object MiscMachines {
                 circuit(2)
                 misc("logic_processor", 2)
                 component("sensor", 2)
-                misc("storage_component/1m", 2)
+                misc("storage_component/1m", 4)
                 input("titanium", "plate", 4)
                 tech(Technologies.AUTOCRAFTING)
             }
@@ -295,7 +295,7 @@ object MiscMachines {
                 circuit(2)
                 misc("calculation_processor", 2)
                 component("sensor", 2)
-                misc("storage_component/4m", 2)
+                misc("storage_component/16m", 2)
                 input("tungsten_steel", "plate", 4)
                 tech(Technologies.AUTOCRAFTING)
             }

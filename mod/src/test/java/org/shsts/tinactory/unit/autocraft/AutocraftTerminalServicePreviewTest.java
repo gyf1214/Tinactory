@@ -52,13 +52,15 @@ class AutocraftTerminalServicePreviewTest {
             new PatternRegistryCache(),
             new TestCpuRuntime(),
             10L,
+            2L,
             5L,
+            3L,
             7L);
 
         var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
 
-        assertEquals(41L, result.memoryUsage());
-        assertEquals(41L, service.preview().orElseThrow().memoryUsage());
+        assertEquals(3049L, result.memoryUsage());
+        assertEquals(3049L, service.preview().orElseThrow().memoryUsage());
     }
 
     @Test
@@ -68,6 +70,8 @@ class AutocraftTerminalServicePreviewTest {
             new PatternRegistryCache(),
             new TestCpuRuntime(),
             Long.MAX_VALUE - 1L,
+            10L,
+            10L,
             10L,
             10L);
 

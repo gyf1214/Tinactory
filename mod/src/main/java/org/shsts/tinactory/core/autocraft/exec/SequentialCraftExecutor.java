@@ -370,9 +370,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return true;
         }
         var step = plan.steps().get(nextStep);
-        for (var output : step.pattern().outputs()) {
-            stepRequiredOutputs.merge(output.key(), output.amount() * step.runs(), Long::sum);
-        }
         for (var input : step.pattern().inputs()) {
             var amount = input.amount() * step.runs();
             stepRequiredInputs.merge(input.key(), amount, Long::sum);
@@ -433,9 +430,28 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
         lease = allocated.get();
         leasedMachineId = lease.machineId();
+        initializeRequiredOutputs(step, lease);
         error = ExecutionError.NONE;
         state = JobState.RUNNING;
         return true;
+    }
+
+    private void initializeRequiredOutputs(CraftStep step, IMachineLease lease) {
+        if (!stepRequiredOutputs.isEmpty()) {
+            return;
+        }
+        for (var output : step.requiredOutputs()) {
+            mergeMax(stepRequiredOutputs, output.key(), output.amount());
+        }
+        var routedOutputs = new HashMap<IStackKey, Boolean>();
+        for (var route : lease.outputRoutes()) {
+            routedOutputs.put(route.key(), true);
+        }
+        for (var output : step.pattern().outputs()) {
+            if (routedOutputs.containsKey(output.key())) {
+                mergeMax(stepRequiredOutputs, output.key(), output.amount() * step.runs());
+            }
+        }
     }
 
     private long pullOutputs(long bandwidth) {
@@ -556,6 +572,10 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             out.merge(amount.key(), amount.amount() * multiplier, Long::sum);
         }
         return out;
+    }
+
+    private static void mergeMax(Map<IStackKey, Long> amounts, IStackKey key, long amount) {
+        amounts.merge(key, amount, Math::max);
     }
 
     private void beginFinalFlushing() {

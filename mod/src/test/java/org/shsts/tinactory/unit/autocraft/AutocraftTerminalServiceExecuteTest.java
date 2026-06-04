@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
@@ -29,6 +30,7 @@ import org.shsts.tinactory.unit.fixture.TestStackKey;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -92,21 +94,25 @@ class AutocraftTerminalServiceExecuteTest {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
         var service = new AutocraftTerminalService(
-            new StaticPlanner(planRequiring(
+            new StaticPlanner(PlanResult.completed(planRequiring(
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
+                new PlanSummary(Map.of(TestStackKey.item("minecraft:iron_ingot", ""),
+                    new PlanSummary.Entry(8, 1, 1))))),
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.of(cpu),
                 id -> Optional.of(jobService)),
             50L,
             10L,
-            5L);
+            5L,
+            1L,
+            3L);
         var preview = service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
 
-        assertEquals(60L, preview.memoryUsage());
+        assertEquals(75L, preview.memoryUsage());
         assertTrue(service.execute(cpu));
-        assertEquals(60L, jobService.getJob().orElseThrow().memoryUsage());
+        assertEquals(75L, jobService.getJob().orElseThrow().memoryUsage());
     }
 
     @Test
@@ -122,6 +128,8 @@ class AutocraftTerminalServiceExecuteTest {
                 () -> List.of(cpu),
                 id -> Optional.of(jobService)),
             50L,
+            0L,
+            0L,
             0L,
             0L);
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
@@ -417,6 +425,7 @@ class AutocraftTerminalServiceExecuteTest {
 
     private static final class StaticPlanner implements ICraftPlanner {
         private final CraftPlan plan;
+        private final PlanResult result;
         private int calls;
 
         private StaticPlanner() {
@@ -425,12 +434,18 @@ class AutocraftTerminalServiceExecuteTest {
 
         private StaticPlanner(CraftPlan plan) {
             this.plan = plan;
+            this.result = PlanResult.completed(plan);
+        }
+
+        private StaticPlanner(PlanResult result) {
+            this.plan = result.plan();
+            this.result = result;
         }
 
         @Override
         public PlanResult plan(List<CraftAmount> targets) {
             calls++;
-            return PlanResult.completed(plan);
+            return result;
         }
 
         @Override

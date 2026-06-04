@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
@@ -22,9 +23,11 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    private final long baseMemory;
     private final long stepMemory;
-    private final long ingredientMemory;
+    private final long bytesPerItem;
+    private final long bytesPerItemType;
+    private final long bytesPerFluid;
+    private final long bytesPerFluidType;
     private AutocraftPreview previewResult = AutocraftPreview.empty();
     @Nullable
     private List<CraftAmount> previewTargets;
@@ -33,16 +36,20 @@ public class AutocraftTerminalService {
         ICraftPlanner planner,
         IPatternRepository patternRepository,
         ICpuRuntime cpuRuntime,
-        long baseMemory,
         long stepMemory,
-        long ingredientMemory) {
+        long bytesPerItem,
+        long bytesPerItemType,
+        long bytesPerFluid,
+        long bytesPerFluidType) {
 
         this.planner = planner;
         this.patternRepository = patternRepository;
         this.cpuRuntime = cpuRuntime;
-        this.baseMemory = Math.max(0L, baseMemory);
         this.stepMemory = Math.max(0L, stepMemory);
-        this.ingredientMemory = Math.max(0L, ingredientMemory);
+        this.bytesPerItem = Math.max(0L, bytesPerItem);
+        this.bytesPerItemType = Math.max(0L, bytesPerItemType);
+        this.bytesPerFluid = Math.max(0L, bytesPerFluid);
+        this.bytesPerFluidType = Math.max(0L, bytesPerFluidType);
     }
 
     public AutocraftTerminalService(
@@ -50,7 +57,7 @@ public class AutocraftTerminalService {
         IPatternRepository patternRepository,
         ICpuRuntime cpuRuntime) {
 
-        this(planner, patternRepository, cpuRuntime, 0L, 0L, 0L);
+        this(planner, patternRepository, cpuRuntime, 0L, 0L, 0L, 0L, 0L);
     }
 
     public List<IStackKey> listRequestables() {
@@ -162,10 +169,23 @@ public class AutocraftTerminalService {
 
     private long calculateMemoryUsage(CraftPlan planSnapshot, PlanSummary summary) {
 
-        var ret = baseMemory;
+        var ret = 0L;
         ret = saturatedAdd(ret, saturatedMultiply(stepMemory, planSnapshot.steps().size()));
-        ret = saturatedAdd(ret, saturatedMultiply(ingredientMemory, summary.entries().size()));
+        for (var entry : summary.entries().entrySet()) {
+            ret = saturatedAdd(ret, calculateSummaryEntryMemory(entry.getKey(), entry.getValue()));
+        }
         return ret;
+    }
+
+    private long calculateSummaryEntryMemory(IStackKey key, PlanSummary.Entry entry) {
+        var amount = saturatedAdd(entry.consumedFromInventory(), entry.craftedAmount());
+        if (key.type() == PortType.ITEM) {
+            return saturatedAdd(bytesPerItemType, saturatedMultiply(bytesPerItem, amount));
+        } else if (key.type() == PortType.FLUID) {
+            return saturatedAdd(bytesPerFluidType, saturatedMultiply(bytesPerFluid, amount));
+        } else {
+            return 0L;
+        }
     }
 
     private static long saturatedMultiply(long left, long right) {

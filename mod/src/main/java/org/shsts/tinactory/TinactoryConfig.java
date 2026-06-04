@@ -15,9 +15,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> bytesPerItemType;
     public final ConfigValue<Integer> bytesPerFluid;
     public final ConfigValue<Integer> bytesPerFluidType;
-    public final ConfigValue<Long> autocraftPlanBaseMemory;
     public final ConfigValue<Long> autocraftPlanStepMemory;
-    public final ConfigValue<Long> autocraftPlanIngredientMemory;
     public final ConfigValue<Double> primitiveWorkSpeed;
     public final ConfigValue<List<? extends Double>> machineResistanceFactor;
     public final ConfigValue<Double> workFactorExponent;
@@ -41,12 +39,8 @@ public final class TinactoryConfig {
             .defineInRange("bytes_per_fluid", 1, 1, Integer.MAX_VALUE);
         bytesPerFluidType = builder.comment("Bytes used per fluid type by digital storage")
             .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
-        autocraftPlanBaseMemory = builder.comment("Base memory used by each autocraft plan")
-            .defineInRange("autocraft_plan_base_memory", 1024L, 0L, Long.MAX_VALUE);
         autocraftPlanStepMemory = builder.comment("Memory used by each autocraft plan step")
-            .defineInRange("autocraft_plan_step_memory", 256L, 0L, Long.MAX_VALUE);
-        autocraftPlanIngredientMemory = builder.comment("Memory used by each autocraft plan summary entry")
-            .defineInRange("autocraft_plan_ingredient_memory", 128L, 0L, Long.MAX_VALUE);
+            .defineInRange("autocraft_plan_step_memory", 8192L, 0L, Long.MAX_VALUE);
 
         builder.pop();
 

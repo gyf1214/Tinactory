@@ -3,5 +3,5 @@
   "power": 8192,
   "transmissionBandwidth": 64,
   "executionIntervalTicks": 10,
-  "memoryLimit": 65536
+  "memoryLimit": 33554432
 }
