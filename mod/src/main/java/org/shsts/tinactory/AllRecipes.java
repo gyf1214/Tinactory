@@ -49,6 +49,7 @@ public final class AllRecipes {
             .recipeClass(MarkerRecipe.class)
             .serializer(ProcessingHelper.MARKER_SERIALIZER)
             .register();
+
     }
 
     public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {

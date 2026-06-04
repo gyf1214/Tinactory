@@ -25,6 +25,10 @@
     "iv": {
       "resistance": 0.05,
       "material": "annealed_copper"
+    },
+    "luv": {
+      "resistance": 0.05,
+      "material": "platinum"
     }
   }
 }

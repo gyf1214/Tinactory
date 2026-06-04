@@ -66,6 +66,7 @@ public class LitematicaMeta extends MetaConsumer {
             modLoc("multiblock/coil"), modLoc("multiblock/coil/cupronickel"),
             modLoc("multiblock/power"), modLoc("multiblock/misc/power_block/hv"),
             modLoc("multiblock/glass_casing"), modLoc("multiblock/misc/hardened_glass"),
+            modLoc("multiblock/fusion_shell"), modLoc("multiblock/misc/fusion_glass"),
             modLoc("multiblock/lithography_lens"), modLoc("multiblock/misc/lithography_lens/good"));
 
         private BlockState parseDefine(char ch, JsonElement je) {
@@ -83,6 +84,12 @@ public class LitematicaMeta extends MetaConsumer {
                 case "block_or_interface" -> {
                     interfaceCh.add(ch);
                     return parseDefine(GsonHelper.getAsString(jo, "block"));
+                }
+                case "tag_or_interface" -> {
+                    interfaceCh.add(ch);
+                    var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
+                    assert TAG_MAP.containsKey(tag) : tag;
+                    return BLOCKS.getEntry(TAG_MAP.get(tag)).get().defaultBlockState();
                 }
                 case "tag", "tag_with_same_block", "tag_or_block" -> {
                     var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));

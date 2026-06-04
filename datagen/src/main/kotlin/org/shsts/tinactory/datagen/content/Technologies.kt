@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder.Companion.VEIN_TECH_RANK
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.provider.TechProvider
@@ -90,10 +91,18 @@ object Technologies {
     val NUCLEAR_PHYSICS: ResourceLocation
     val TUNGSTEN_STEEL: ResourceLocation
     val METAL_FORMER: ResourceLocation
+    val EXTRUSION_PRESS: ResourceLocation
+    val MINERAL_BENEFICIATION: ResourceLocation
+    val PROSPECTING_STATION: ResourceLocation
+    val MATERIAL_CONDITIONING: ResourceLocation
+    val ELECTROCHEMICAL_PROCESSING: ResourceLocation
     val LARGE_BOILER: ResourceLocation
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
+    val ASSEMBLY_LINE: ResourceLocation
+    val RHODIUM_PLATED_PALLADIUM: ResourceLocation
+    val FUSION: ResourceLocation
 
     init {
         Factory().apply {
@@ -328,7 +337,7 @@ object Technologies {
 
             ROCKET_T1 = tech("rocket_t1") {
                 maxProgress(250)
-                displayItem(Items.FIREWORK_ROCKET)
+                displayItem(Items.CRYING_OBSIDIAN)
                 noResearch()
             }
 
@@ -353,7 +362,7 @@ object Technologies {
 
             voltage = Voltage.EV
 
-            NUCLEAR_PHYSICS = child("nuclear_physics") {
+            NUCLEAR_PHYSICS = tech("nuclear_physics") {
                 maxProgress(120)
                 displayItem(getComponent("field_generator").item(Voltage.EV))
             }
@@ -364,10 +373,36 @@ object Technologies {
                 depends(HYDROMETALLURGY)
             }
 
-            METAL_FORMER = tech("metal_former") {
+            METAL_FORMER = child("metal_former") {
                 maxProgress(140)
                 displayItem(getMultiblock("metal_former").block)
             }
+
+            EXTRUSION_PRESS = tech("extrusion_press") {
+                maxProgress(200)
+                displayItem(getMultiblock("extrusion_press").block)
+            }
+
+            base = TUNGSTEN_STEEL
+
+            MINERAL_BENEFICIATION = tech("mineral_beneficiation") {
+                maxProgress(200)
+                displayItem(getMultiblock("ore_processing_unit").block)
+                depends(MULTI_SMELTER)
+            }
+
+            MATERIAL_CONDITIONING = child("material_conditioning") {
+                maxProgress(220)
+                displayItem(getMultiblock("phase_exchange_chamber").block)
+            }
+
+            ELECTROCHEMICAL_PROCESSING = tech("electrochemical_processing") {
+                maxProgress(260)
+                displayItem(getMultiblock("electrochemical_processor").block)
+                depends(ELECTROLYZING, LITHOGRAPHY)
+            }
+
+            base = TUNGSTEN_STEEL
 
             LARGE_BOILER = tech("large_boiler") {
                 maxProgress(140)
@@ -376,19 +411,45 @@ object Technologies {
 
             ROCKET_T2 = child("rocket_t2") {
                 maxProgress(350)
-                displayItem(Items.FIREWORK_ROCKET)
+                displayItem(Items.END_PORTAL_FRAME)
                 depends(ROCKET_T1, DIGITAL_STORAGE, CARBON_FIBER)
                 noResearch()
             }
 
-            ENDER_CHEMISTRY = tech("ender_chemistry") {
+            ENDER_CHEMISTRY = child("ender_chemistry") {
                 maxProgress(160)
                 displayItem(Items.ENDER_EYE)
+            }
+
+            PROSPECTING_STATION = tech("prospecting_station") {
+                maxProgress(220)
+                displayItem(getMultiblock("prospecting_station").block)
+                depends(MINERAL_BENEFICIATION)
             }
 
             PLATINUM_GROUP_METAL = tech("platinum_group_metal") {
                 maxProgress(160)
                 displayMaterial("platinum_metallic", "dust")
+            }
+
+            voltage = Voltage.IV
+
+            ASSEMBLY_LINE = tech("assembly_line") {
+                maxProgress(220)
+                displayItem(getMultiblock("assembly_line").block)
+            }
+
+            base = PLATINUM_GROUP_METAL
+
+            RHODIUM_PLATED_PALLADIUM = child("rhodium_plated_palladium") {
+                maxProgress(200)
+                displayItem(getItem("component/raw_rhodium_plated_palladium"))
+            }
+
+            FUSION = tech("fusion") {
+                maxProgress(400)
+                displayItem(getMultiblock("fusion_reactor").block)
+                depends(NUCLEAR_PHYSICS)
             }
         }
     }

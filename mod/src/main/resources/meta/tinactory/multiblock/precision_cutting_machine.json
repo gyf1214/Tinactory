@@ -1,0 +1,88 @@
+{
+  "recipes": {
+    "tinactory:cutter": {},
+    "tinactory:lathe": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_slice",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
+    ],
+    [
+      "CGGGC",
+      "GTATG",
+      "GTATG",
+      "GTATG",
+      "CGGGC"
+    ],
+    [
+      "CGGGC",
+      "GAAAG",
+      "GAAAG",
+      "GAAAG",
+      "CGGGC"
+    ],
+    [
+      "CGGGC",
+      "GAAAG",
+      "GTTTG",
+      "GAAAG",
+      "CGGGC"
+    ],
+    [
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "T": "tinactory:multiblock/misc/precision_tooling_casing",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "A": "air"
+  }
+}

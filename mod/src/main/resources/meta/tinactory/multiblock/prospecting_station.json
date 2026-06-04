@@ -1,0 +1,112 @@
+{
+  "recipes": {
+    "tinactory:ore_analyzer": {},
+    "tinactory:stone_generator": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 19
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 54,
+        "y": 37
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_sift",
+      "x": 26,
+      "y": 18,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
+    ],
+    [
+      "     ",
+      " CSC ",
+      " SSS ",
+      " CSC ",
+      "     "
+    ],
+    [
+      "     ",
+      " CSC ",
+      " SSS ",
+      " CSC ",
+      "     "
+    ],
+    [
+      "     ",
+      "     ",
+      "  S  ",
+      "     ",
+      "     "
+    ],
+    [
+      "     ",
+      "     ",
+      "  S  ",
+      "     ",
+      "     "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "S": "tinactory:multiblock/misc/geological_sensor_casing"
+  }
+}

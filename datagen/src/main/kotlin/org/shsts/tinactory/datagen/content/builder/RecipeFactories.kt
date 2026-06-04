@@ -7,9 +7,9 @@ import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
+import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
-import org.shsts.tinactory.core.recipe.MarkerRecipe
 
 typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
 typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
@@ -84,10 +84,19 @@ object RecipeFactories {
         }.block()
     }
 
+    fun assemblyLine(block: AssemblyRecipeFactory.() -> Unit) {
+        assembly("assembly_line") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 0.75
+        }.block()
+    }
+
     fun stoneGenerator(block: AssemblyRecipeFactory.() -> Unit) {
         assembly("stone_generator") {
-            defaultOutputItem = 0
-            defaultOutputFluid = 1
+            defaultOutputItem = 1
+            defaultOutputFluid = 2
             amperage = 0.125
             workTicks(20)
         }.block()
@@ -95,7 +104,8 @@ object RecipeFactories {
 
     fun macerator(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("macerator") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 0.25
         }.block()
     }
@@ -156,7 +166,8 @@ object RecipeFactories {
 
     fun polarizer(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("polarizer") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 0.25
         }.block()
     }
@@ -342,6 +353,14 @@ object RecipeFactories {
             defaultInputFluid = 0
             defaultOutputFluid = 2
             amperage = 2.5
+        }.block()
+    }
+
+    fun fusionReactor(block: ProcessingRecipeFactory.() -> Unit) {
+        simpleProcessing("fusion_reactor") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            amperage = 0.75
         }.block()
     }
 

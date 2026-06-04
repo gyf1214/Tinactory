@@ -6,7 +6,9 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
+import org.shsts.tinactory.datagen.content.component.Components.ADVANCED_COMPONENT_TICKS
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import org.shsts.tinactory.integration.network.CableBlock
 
@@ -98,7 +100,19 @@ object MachineComponents {
             rotor = "titanium",
             magnetic = "neodymium",
             sensor = "platinum",
-            quartz = "ender_eye")
+            quartz = "ender_pearl")
+
+        advancedComponent(Voltage.LUV,
+            main = "hssg",
+            casing = "rhodium_plated_palladium",
+            insulation = "ptfe",
+            motorWire = "ruridit",
+            pipe = "niobium_titanium",
+            rotor = "hssg",
+            magnetic = "neodymium",
+            sensorCore = "ender_eye",
+            sensorBody = "ruridit",
+            sensorFoil = "palladium")
     }
 
     private fun component(v: Voltage, main: String, motor: String,
@@ -202,6 +216,103 @@ object MachineComponents {
         }
     }
 
+    private fun advancedComponent(v: Voltage, main: String, casing: String,
+        insulation: String, motorWire: String, pipe: String, rotor: String,
+        magnetic: String, sensorCore: String, sensorBody: String, sensorFoil: String) {
+        val v1 = Voltage.fromRank(v.rank - 1)
+        assembler {
+            componentVoltage = v
+            defaults {
+                voltage(v1)
+                workTicks(ADVANCED_COMPONENT_TICKS)
+            }
+            component("machine_hull") {
+                input(main, "stick", 4)
+                input(casing, "plate", 8)
+                component("cable", 2)
+                input(insulation, amount = 2)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.RHODIUM_PLATED_PALLADIUM)
+            }
+        }
+        assemblyLine {
+            componentVoltage = v
+            defaults {
+                voltage(v1)
+                workTicks(ADVANCED_COMPONENT_TICKS)
+                tech(Technologies.ASSEMBLY_LINE)
+            }
+            component("electric_motor") {
+                input(magnetic, "magnetic")
+                input(main, "stick", 4)
+                input(main, "ring", 2)
+                input(motorWire, "wire", 32)
+                component("cable", 2)
+                input("soldering_alloy")
+            }
+            component("electric_pump") {
+                component("electric_motor")
+                input(pipe, "pipe")
+                input(main, "plate", 2)
+                input(main, "screw", 8)
+                input(rotor, "rotor")
+                input("silicone_rubber", "ring", 4)
+                component("cable", 2)
+                input("soldering_alloy")
+            }
+            component("electric_piston") {
+                component("electric_motor")
+                input(main, "plate", 4)
+                input(main, "ring", 4)
+                input(main, "stick", 4)
+                input(main, "gear", 6)
+                component("cable", 2)
+                input(insulation, amount = 2)
+                input("soldering_alloy")
+            }
+            component("conveyor_module") {
+                component("electric_motor", 2)
+                input(main, "plate", 2)
+                input(main, "ring", 4)
+                input(main, "screw", 4)
+                component("cable", 2)
+                input("silicone_rubber", amount = 8)
+                input("soldering_alloy", amount = 2)
+            }
+            component("robot_arm") {
+                component("electric_motor", 2)
+                component("electric_piston")
+                input(main, "stick", 8)
+                input(main, "gear", 7)
+                circuit(1)
+                circuit(2, Voltage.fromRank(v.rank - 1))
+                component("cable", 4)
+                input("soldering_alloy", amount = 4)
+            }
+        }
+        assemblyLine {
+            componentVoltage = v
+            defaults {
+                input(main, "stick", 3)
+                component("electric_motor")
+                input(sensorCore, "gem")
+                circuit(2)
+                input(sensorFoil, "foil", 64)
+                component("cable", 4)
+                input("soldering_alloy", amount = 2)
+                voltage(v1)
+                workTicks(ADVANCED_COMPONENT_TICKS)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
+            component("sensor") {
+                input(sensorBody, "plate", 4)
+            }
+            component("emitter") {
+                input(sensorBody, "stick", 4)
+            }
+        }
+    }
+
     private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust") {
         val wires = v.rank - 1
         val plates = wires * wires
@@ -221,6 +332,7 @@ object MachineComponents {
                 tech(Technologies.NUCLEAR_PHYSICS)
             }
             superconductor(Voltage.EV, "niobium_titanium", "ptfe", "coolant")
+            superconductor(Voltage.IV, "vanadium_gallium", "niobium_titanium", "coolant")
         }
     }
 

@@ -2,8 +2,10 @@
   "color": "0xFF808080",
   "items": [
     "dust",
+    "foil",
     "ingot",
-    "ingot_hot"
+    "ingot_hot",
+    "plate"
   ],
   "fluids": {},
   "aliases": {

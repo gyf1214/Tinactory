@@ -1,7 +1,14 @@
 {
   "color": "0xFFFFFBC5",
+  "ore": "end_stone",
   "items": [
-    "dust"
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "raw"
   ],
   "fluids": {},
   "aliases": {},

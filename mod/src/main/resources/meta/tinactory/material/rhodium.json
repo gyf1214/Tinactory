@@ -3,7 +3,8 @@
   "items": [
     "dust",
     "ingot",
-    "ingot_hot"
+    "ingot_hot",
+    "plate"
   ],
   "fluids": {},
   "aliases": {

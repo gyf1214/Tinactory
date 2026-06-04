@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
+import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.integration.machine.MachineProcessor;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 
@@ -19,6 +20,10 @@ public class MultiblockProcessor extends MachineProcessor {
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe) {
         super(blockEntity, processorFactories, autoRecipe);
+    }
+
+    public MultiblockProcessor(BlockEntity blockEntity, ProcessingRuntime runtime) {
+        super(blockEntity, runtime);
     }
 
     @Override

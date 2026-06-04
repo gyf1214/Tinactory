@@ -15,6 +15,7 @@ import org.shsts.tinactory.AllTags.CLEANROOM_DOOR
 import org.shsts.tinactory.AllTags.CLEANROOM_WALL
 import org.shsts.tinactory.AllTags.COIL
 import org.shsts.tinactory.AllTags.ELECTRIC_FURNACE
+import org.shsts.tinactory.AllTags.FUSION_SHELL
 import org.shsts.tinactory.AllTags.GLASS_CASING
 import org.shsts.tinactory.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.AllTags.POWER_BLOCK
@@ -46,6 +47,8 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
@@ -56,6 +59,11 @@ import org.shsts.tinactory.integration.network.PrimitiveBlock
 import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Multiblocks {
+    private const val CASING_TICKS = 140L
+    private const val COIL_TICKS = 200L
+    private const val MULTIBLOCK_TICKS = 320L
+    private const val ADVANCED_MULTIBLOCK_TICKS = 2400L
+
     fun init() {
         components()
         componentRecipes()
@@ -101,6 +109,11 @@ object Multiblocks {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
             }
 
+            misc("assembler_machine_casing") {
+                blockState(cubeColumn("casings/mechanic/machine_casing_assembly_line",
+                    "casings/solid/machine_casing_solid_steel"))
+            }
+
             misc("autofarm_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
@@ -112,7 +125,7 @@ object Multiblocks {
             }
 
             misc("clear_glass") {
-                blockState(solidBlock("casings/transparent/fusion_glass"))
+                blockState { ctx -> solidBlock(ctx, modLoc("blocks/multiblock/glass/quartz_glass_a")) }
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS)
             }
@@ -161,6 +174,41 @@ object Multiblocks {
                     "casings/solid/machine_casing_robust_tungstensteel"))
             }
 
+            misc("ore_processing_chamber") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_filter"))
+            }
+
+            misc("precision_tooling_casing") {
+                blockState(cubeColumn("casings/gearbox/machine_casing_gearbox_titanium",
+                    "casings/solid/machine_casing_stable_titanium"))
+            }
+
+            misc("batch_rotor_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_inert_ptfe",
+                    "overlay/machine/overlay_filter"))
+            }
+
+            misc("phase_converter_casing") {
+                blockState(cubeColumn("casings/solid/machine_casing_inert_ptfe",
+                    "casings/pipe/machine_casing_pipe_polytetrafluoroethylene"))
+            }
+
+            misc("extrusion_die_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_pipe_out"))
+            }
+
+            misc("geological_sensor_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_stable_titanium",
+                    "cover/overlay_activity_detector"))
+            }
+
+            misc("electrode_casing") {
+                blockState(cubeCasing("casings/solid/machine_casing_inert_ptfe",
+                    "overlay/machine/overlay_energy_out"))
+            }
+
             misc("turbine_blade") {
                 blockState { ctx ->
                     turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
@@ -199,6 +247,20 @@ object Multiblocks {
             misc("nuclear_chamber") {
                 blockState(cubeColumn(ic2("blocks/generator/reactor/reactor_chamber_sides"),
                     ic2("blocks/generator/reactor/reactor_chamber_top")))
+            }
+
+            misc("fusion_casing") {
+                blockState(solidBlock("casings/fusion/machine_casing_fusion"))
+                tag(FUSION_SHELL)
+            }
+
+            misc("fusion_glass") {
+                blockState(solidBlock("casings/transparent/fusion_glass"))
+                tag(FUSION_SHELL)
+            }
+
+            misc("superconducting_coil") {
+                blockState(solidBlock("casings/fusion/machine_coil_superconductor"))
             }
         }
 
@@ -252,7 +314,7 @@ object Multiblocks {
                 input("tin", "rotor")
                 input(itemFilter, 6)
                 input("soldering_alloy", amount = 2)
-                workTicks(140)
+                workTicks(CASING_TICKS)
                 tech(Technologies.SIFTING)
             }
             misc("autofarm_base") {
@@ -316,7 +378,7 @@ object Multiblocks {
                 input("aluminium", "stick", 2)
                 input(advancedAlloy, 2)
                 input("soldering_alloy", amount = 1.5)
-                workTicks(140)
+                workTicks(CASING_TICKS)
                 tech(Technologies.ROCKET_SCIENCE)
             }
 
@@ -330,7 +392,7 @@ object Multiblocks {
                 input("emerald", "lens", 16)
                 input("steel", "plate", 6)
                 input("soldering_alloy", amount = 3)
-                workTicks(320)
+                workTicks(MULTIBLOCK_TICKS)
                 tech(Technologies.LITHOGRAPHY)
             }
             misc("turbine_blade") {
@@ -357,17 +419,15 @@ object Multiblocks {
         assembler {
             defaults {
                 voltage(Voltage.EV)
-                workTicks(320)
+                workTicks(MULTIBLOCK_TICKS)
             }
 
             componentVoltage = Voltage.EV
             misc("metal_processing_chamber") {
                 solid("robust_tungstensteel")
                 circuit(2)
-                component("electric_motor", 8)
+                component("electric_motor", 12)
                 component("electric_piston", 4)
-                component("robot_arm", 2)
-                component("conveyor_module", 2)
                 component("cable", 16)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.METAL_FORMER)
@@ -377,7 +437,7 @@ object Multiblocks {
                 input("battery_alloy", "plate", 3)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.POWER_SUBSTATION)
-                workTicks(140)
+                workTicks(CASING_TICKS)
             }
             misc("firebox_casing") {
                 solid("robust_tungstensteel")
@@ -392,7 +452,7 @@ object Multiblocks {
                 input(advancedAlloy, 6)
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.NUCLEAR_PHYSICS)
-                workTicks(140)
+                workTicks(CASING_TICKS)
             }
             misc("nuclear_chamber") {
                 solid("reinforced_alloy")
@@ -403,6 +463,36 @@ object Multiblocks {
                 input(advancedAlloy, 6)
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.NUCLEAR_PHYSICS)
+            }
+            misc("ore_processing_chamber") {
+                solid("robust_tungstensteel")
+                circuit(2)
+                component("electric_motor", 6)
+                component("electric_piston", 2)
+                input("annealed_copper", "wire", 32)
+                component("grinder", 4)
+                component("cable", 8)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.MINERAL_BENEFICIATION)
+            }
+            misc("precision_tooling_casing") {
+                solid("stable_titanium")
+                circuit(2)
+                component("electric_motor", 6)
+                component("electric_piston", 2)
+                component("grinder", 4)
+                component("buzzsaw", 4)
+                component("cable", 8)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.METAL_FORMER)
+            }
+            misc("batch_rotor_casing") {
+                solid("inert_ptfe")
+                circuit(1)
+                component("electric_motor", 16)
+                component("cable", 16)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.MATERIAL_CONDITIONING)
             }
 
             componentVoltage = Voltage.IV
@@ -415,24 +505,128 @@ object Multiblocks {
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.LITHOGRAPHY)
             }
+            misc("phase_converter_casing") {
+                misc("ptfe_pipe_casing")
+                circuit(2)
+                component("electric_pump", 8)
+                component("electric_piston", 4)
+                input("annealed_copper", "wire", 32)
+                input("glass", "primary", 4)
+                component("cable", 12)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.MATERIAL_CONDITIONING)
+            }
+            misc("extrusion_die_casing") {
+                solid("robust_tungstensteel")
+                circuit(1)
+                component("electric_piston", 12)
+                input("niobium_titanium", "wire", 32)
+                input("ptfe", "pipe", 4)
+                component("cable", 12)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.EXTRUSION_PRESS)
+            }
+            misc("geological_sensor_casing") {
+                solid("stable_titanium")
+                circuit(3)
+                component("sensor", 8)
+                component("electric_pump", 4)
+                component("emitter", 4)
+                component("cable", 16)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.PROSPECTING_STATION)
+            }
+            misc("electrode_casing") {
+                solid("inert_ptfe")
+                circuit(1)
+                component("emitter", 4)
+                input("platinum", "wire", 64)
+                input("glass", "primary", 4)
+                component("cable", 4)
+                input("soldering_alloy", amount = 2)
+                tech(Technologies.ELECTROCHEMICAL_PROCESSING)
+            }
+            misc("assembler_machine_casing", 2) {
+                solid("solid_steel")
+                circuit(3)
+                component("robot_arm", 8)
+                component("conveyor_module", 4)
+                component("electric_motor", 4)
+                input("tungsten_steel", "plate", 8)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.ASSEMBLY_LINE)
+            }
         }
 
         assembler {
             defaults {
-                input("aluminium", "stick", 2)
-                input("battery_alloy", "plate", 3)
-                pic(2)
-                component("cable", 4)
+                voltage(Voltage.IV)
+                workTicks(MULTIBLOCK_TICKS)
+            }
+
+            componentVoltage = Voltage.IV
+            misc("fusion_casing") {
+                input("hssg", "stick", 2)
+                input("rhodium_plated_palladium", "plate", 3)
+                input("ruridit", "foil", 8)
+                input("soldering_alloy", amount = 2)
+                workTicks(CASING_TICKS)
+                tech(Technologies.FUSION)
+            }
+            misc("fusion_glass") {
+                misc("hardened_glass", 2)
+                input("hssg", "stick", 2)
+                input("rhodium_plated_palladium", "plate", 3)
+                input("ruridit", "foil", 8)
+                input("soldering_alloy", amount = 3)
+                workTicks(CASING_TICKS)
+                tech(Technologies.FUSION)
+            }
+            misc("superconducting_coil") {
+                input("iv_superconductor", "wire", 32)
+                input("ruridit", "foil", 32)
+                input("rhodium_plated_palladium", "plate", 2)
+                input("ptfe", amount = 2)
+                input("soldering_alloy", amount = 4)
+                workTicks(COIL_TICKS)
+                tech(Technologies.FUSION)
+            }
+        }
+
+        powerBlocks()
+    }
+
+    private fun powerBlocks() {
+        assembler {
+            defaults {
                 input("soldering_alloy", amount = 1.5)
-                workTicks(200)
+                workTicks(COIL_TICKS)
                 tech(Technologies.POWER_SUBSTATION)
             }
 
-            componentVoltage = Voltage.HV
-            misc("power_block/hv") {
+            powerBlock(Voltage.HV) {
                 input("battery_powder", "dust", 10)
-                voltage(Voltage.HV)
             }
+            powerBlock(Voltage.EV, "energy_crystal", 10)
+            powerBlock(Voltage.IV, "lapotron_crystal", 8)
+            powerBlock(Voltage.LUV, "lapotronic_energy_orb")
+        }
+    }
+
+    private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
+        component: String? = null, amount: Int = 1,
+        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        componentVoltage = v
+        misc("power_block/${v.id}") {
+            input("aluminium", "stick", 2)
+            input("battery_alloy", "plate", 3)
+            pic(2)
+            component("cable", 4)
+            if (component != null) {
+                input(getItem("component/$component"), amount)
+            }
+            voltage(v)
+            block()
         }
     }
 
@@ -450,8 +644,9 @@ object Multiblocks {
         output(getItem("multiblock/misc/$name"), amount, block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(name: String) {
-        input(getItem("multiblock/misc/$name"))
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+        name: String, amount: Int = 1) {
+        input(getItem("multiblock/misc/$name"), amount)
     }
 
     private fun AssemblyRecipeFactory.solid(name: String,
@@ -463,7 +658,7 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
             }
             voltage(v)
-            workTicks(140)
+            workTicks(CASING_TICKS)
             tech(tech)
         }
     }
@@ -479,7 +674,7 @@ object Multiblocks {
                 input("pe", amount = 2)
             }
             voltage(v)
-            workTicks(200)
+            workTicks(COIL_TICKS)
             tech(tech)
         }
     }
@@ -526,6 +721,13 @@ object Multiblocks {
                 tag(itemEntry("multiblock/multi_smelter"), ELECTRIC_FURNACE)
             }
             multiblock("metal_former", "frost_proof", "blast_furnace")
+            multiblock("ore_processing_unit", "solid_steel", "blast_furnace")
+            multiblock("precision_cutting_machine", "stable_titanium", "blast_furnace")
+            multiblock("batching_vessel", "clean_stainless_steel", "blast_furnace")
+            multiblock("phase_exchange_chamber", "inert_ptfe", "blast_furnace")
+            multiblock("extrusion_press", "robust_tungstensteel", "blast_furnace")
+            multiblock("prospecting_station", "stable_titanium", "blast_furnace")
+            multiblock("electrochemical_processor", "stable_titanium", "blast_furnace")
             getMultiblock("large_turbine").apply {
                 block(block) {
                     blockState { ctx ->
@@ -552,6 +754,9 @@ object Multiblocks {
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
             multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"),
                 modLoc("blocks/multiblock/nuclear_reactor"))
+            multiblock("assembly_line", "solid_steel", "blast_furnace")
+            multiblock("fusion_reactor", gregtech("blocks/casings/fusion/machine_casing_fusion"),
+                gregtech("blocks/multiblock/fusion_reactor"))
         }
     }
 
@@ -792,6 +997,124 @@ object Multiblocks {
                 component("cable", 8)
                 input(advancedAlloy, 12)
                 tech(Technologies.NUCLEAR_PHYSICS)
+            }
+
+            componentVoltage = Voltage.IV
+            multiblock("ore_processing_unit") {
+                solid("solid_steel")
+                circuit(4)
+                machine("macerator")
+                machine("ore_washer")
+                machine("thermal_centrifuge")
+                component("robot_arm", 4)
+                component("electric_pump", 4)
+                component("cable", 8)
+                tech(Technologies.MINERAL_BENEFICIATION)
+            }
+            multiblock("precision_cutting_machine") {
+                solid("stable_titanium")
+                circuit(3)
+                machine("cutter")
+                machine("lathe")
+                component("robot_arm", 4)
+                component("conveyor_module", 4)
+                component("cable", 8)
+                tech(Technologies.METAL_FORMER)
+            }
+            multiblock("batching_vessel") {
+                solid("clean_stainless_steel")
+                circuit(3)
+                machine("mixer")
+                machine("centrifuge")
+                component("robot_arm", 4)
+                component("conveyor_module", 4)
+                component("cable", 8)
+                tech(Technologies.MATERIAL_CONDITIONING)
+            }
+            multiblock("assembly_line") {
+                misc("assembler_machine_casing")
+                circuit(3, Voltage.LUV)
+                machine("assembler")
+                machine("circuit_assembler")
+                component("robot_arm", 8)
+                component("conveyor_module", 8)
+                component("cable", 16)
+                tech(Technologies.ASSEMBLY_LINE)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.IV)
+                workTicks(MACHINE_TICKS)
+            }
+
+            componentVoltage = Voltage.IV
+            multiblock("phase_exchange_chamber") {
+                solid("inert_ptfe")
+                circuit(3)
+                machine("extractor")
+                machine("fluid_solidifier")
+                component("robot_arm", 4)
+                component("electric_pump", 4)
+                component("cable", 8)
+                tech(Technologies.MATERIAL_CONDITIONING)
+            }
+            multiblock("extrusion_press") {
+                solid("robust_tungstensteel")
+                circuit(2)
+                machine("extruder")
+                component("robot_arm", 4)
+                component("electric_piston", 4)
+                component("cable", 8)
+                tech(Technologies.EXTRUSION_PRESS)
+            }
+            multiblock("prospecting_station") {
+                solid("stable_titanium")
+                circuit(3)
+                machine("ore_analyzer")
+                machine("stone_generator")
+                component("emitter", 4)
+                component("conveyor_module", 4)
+                component("cable", 8)
+                tech(Technologies.PROSPECTING_STATION)
+            }
+            multiblock("electrochemical_processor") {
+                solid("stable_titanium")
+                circuit(3)
+                machine("polarizer")
+                machine("electrolyzer")
+                component("robot_arm", 4)
+                component("electric_pump", 4)
+                component("cable", 8)
+                tech(Technologies.ELECTROCHEMICAL_PROCESSING)
+            }
+        }
+
+        assemblyLine {
+            componentVoltage = Voltage.LUV
+            multiblock("fusion_reactor") {
+                component("machine_hull")
+                component("robot_arm", 4)
+                component("electric_pump", 4)
+                component("field_generator", 8, Voltage.IV)
+                circuit(8)
+                input("hssg", "stick", 8)
+                input("ruridit", "foil", 32)
+                input("soldering_alloy", amount = 16)
+                voltage(Voltage.IV)
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+                tech(Technologies.FUSION)
+            }
+        }
+
+        fusionReactor {
+            recipe("multiblock/fusion_reactor_smoke") {
+                input("water", "liquid", 1)
+                input("water", "gas", 1)
+                output("water", "gas", 2)
+                voltage(Voltage.LUV)
+                workTicks(200)
             }
         }
     }

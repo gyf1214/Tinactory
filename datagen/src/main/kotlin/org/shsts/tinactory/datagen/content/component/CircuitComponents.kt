@@ -15,11 +15,13 @@ import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Circuits.getCircuit
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
+import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
@@ -527,7 +529,7 @@ object CircuitComponents {
                     tech(Technologies.INTEGRATED_CIRCUIT)
                 }
                 output(board) {
-                    input(lastBoard, 2)
+                    input(lastBoard)
                     input("red_alloy", "wire_fine", 8)
                     input("soldering_alloy")
                 }
@@ -571,7 +573,7 @@ object CircuitComponents {
         circuitTier(CircuitTier.NANO) {
             assembler {
                 output(board) {
-                    input(lastBoard, 3)
+                    input(lastBoard)
                     input("silver", "wire_fine", 8)
                     input("soldering_alloy", amount = 1.5)
                     voltage(Voltage.MV)
@@ -595,18 +597,17 @@ object CircuitComponents {
             chemicalReactor {
                 defaults {
                     voltage(Voltage.HV)
-                    // TODO
-                    tech()
+                    tech(Technologies.ADVANCED_POLYMER)
                 }
                 output(board) {
                     input("epoxy", "sheet")
-                    input("annealed_copper", "foil", 8)
+                    input("electrum", "foil", 8)
                     input("sulfuric_acid", "dilute", 0.5)
                     workTicks(320)
                 }
                 output(circuitBoard) {
                     input(board)
-                    input("annealed_copper", "foil", 16)
+                    input("platinum", "foil", 16)
                     input("iron_chloride", amount = 0.75)
                     workTicks(480)
                 }
@@ -618,24 +619,22 @@ object CircuitComponents {
                 defaults {
                 }
                 output(board) {
-                    input(lastBoard, 4)
+                    input(lastBoard)
                     input("platinum", "wire_fine", 16)
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.EV)
                     workTicks(CIRCUIT_TICKS)
-                    // TODO
-                    tech()
+                    tech(Technologies.PLATINUM_GROUP_METAL)
                 }
             }
             chemicalReactor {
                 output(circuitBoard) {
                     input(board)
-                    input("platinum", "foil", 16)
+                    input("ruridit", "foil", 16)
                     input("iron_chloride")
                     voltage(Voltage.EV)
                     workTicks(480)
-                    // TODO
-                    tech()
+                    tech(Technologies.PLATINUM_GROUP_METAL)
                 }
             }
         }
@@ -645,7 +644,8 @@ object CircuitComponents {
         input(getCircuit(name).item, amount)
     }
 
-    fun SimpleProcessingBuilder.chip(name: String, amount: Int = 1) {
+    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.chip(
+        name: String, amount: Int = 1) {
         input(CHIP.item(name), amount)
     }
 

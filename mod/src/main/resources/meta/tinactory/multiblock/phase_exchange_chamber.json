@@ -1,0 +1,94 @@
+{
+  "recipes": {
+    "tinactory:extractor": {},
+    "tinactory:fluid_solidifier": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_extract",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/inert_ptfe",
+  "layers": [
+    [
+      "BBBBB",
+      "BFFFB",
+      "BFFFB",
+      "BFFFB",
+      "BB$BB"
+    ],
+    [
+      "     ",
+      " CCC ",
+      " CPC ",
+      " CCC ",
+      "     "
+    ],
+    [
+      "     ",
+      " FFF ",
+      " FPF ",
+      " FFF ",
+      "     "
+    ],
+    [
+      "     ",
+      " CCC ",
+      " CPC ",
+      " CCC ",
+      "     "
+    ],
+    [
+      "DDDDD",
+      "DFFFD",
+      "DFFFD",
+      "DFFFD",
+      "DDDDD"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "D": "tinactory:multiblock/solid/inert_ptfe",
+    "C": {
+      "type": "tag_with_same_block",
+      "key": "coil",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "F": "tinactory:multiblock/misc/phase_converter_casing"
+  }
+}

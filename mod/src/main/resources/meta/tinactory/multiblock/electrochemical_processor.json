@@ -1,0 +1,113 @@
+{
+  "recipes": {
+    "tinactory:polarizer": {},
+    "tinactory:electrolyzer": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 19
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_replicator",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/stable_titanium",
+  "layers": [
+    [
+      "CCC DDD",
+      "CCC DDD",
+      "CCC DDD"
+    ],
+    [
+      "GGG HHH",
+      "GEEBEEH",
+      "GGG HHH"
+    ],
+    [
+      "GGGBHHH",
+      "GEEEEEH",
+      "GGG$HHH"
+    ],
+    [
+      "GGG HHH",
+      "GEEBEEH",
+      "GGG HHH"
+    ],
+    [
+      "CCC DDD",
+      "CCC DDD",
+      "CCC DDD"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "C": "tinactory:multiblock/solid/stable_titanium",
+    "D": "tinactory:multiblock/solid/inert_ptfe",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "H": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "E": "tinactory:multiblock/misc/electrode_casing"
+  }
+}

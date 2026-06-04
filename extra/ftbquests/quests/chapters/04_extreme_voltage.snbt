@@ -694,6 +694,24 @@
 			}]
 		}
 		{
+			title: "{tinactory.quests.04_extreme_voltage.034.title}"
+			x: 6.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.04_extreme_voltage.034.subtitle}"
+			description: [
+				"{tinactory.quests.04_extreme_voltage.034.description.0}"
+				""
+				"{tinactory.quests.04_extreme_voltage.034.description.1}"
+			]
+			dependencies: ["108DE34B8777351F"]
+			id: "55C4BF2F153D12A2"
+			tasks: [{
+				id: "7CB678EE1B4A9878"
+				type: "item"
+				item: "tinactory:material/wire/annealed_copper"
+			}]
+		}
+		{
 			title: "{tinactory.quests.04_extreme_voltage.021.title}"
 			x: -2.0d
 			y: 16.0d
@@ -786,6 +804,7 @@
 			dependencies: [
 				"09CB7C63AE45690A"
 				"6ECD29DDE2637A82"
+				"55C4BF2F153D12A2"
 				"6D4396F046AC59FA"
 			]
 			size: 2.0d
@@ -842,7 +861,6 @@
 			title: "{tinactory.quests.04_extreme_voltage.027.title}"
 			x: 4.0d
 			y: 16.0d
-			shape: "pentagon"
 			subtitle: "{tinactory.quests.04_extreme_voltage.027.subtitle}"
 			description: [
 				"{tinactory.quests.04_extreme_voltage.027.description.0}"
@@ -865,7 +883,7 @@
 				id: "433A0522B2F3010E"
 				type: "custom"
 				title: "{tinactory.quests.04_extreme_voltage.027.title}"
-				icon: "tinactory:component/carbon_plate"
+				icon: "minecraft:end_portal_frame"
 				tags: [
 					"tinactory_technology"
 					"tinactory_technology_tinactory_rocket_t2"

@@ -1,0 +1,52 @@
+{
+  "recipe": "tinactory:extruder",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_extruder",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/robust_tungstensteel",
+  "layers": [
+    [
+      "BBBBBBB",
+      "BBBBBBB",
+      "BBBBBBB"
+    ],
+    [
+      "BBBBBBB",
+      "BDDDDDB",
+      "BBB$BBB"
+    ],
+    [
+      "BBBBBBB",
+      "BBBBBBB",
+      "BBBBBBB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/robust_tungstensteel"
+    },
+    "D": "tinactory:multiblock/misc/extrusion_die_casing"
+  }
+}

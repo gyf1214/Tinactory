@@ -1,0 +1,158 @@
+{
+  "recipes": {
+    "tinactory:assembler": {},
+    "tinactory:circuit_assembler": {},
+    "assembly": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 0
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 18
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 36
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 36
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 36
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 54,
+        "y": 36
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 54
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 54
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 54
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 54,
+        "y": 54
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 27
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_circuit",
+      "x": 80,
+      "y": 26,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/solid_steel",
+  "layers": [
+    [
+      "BBBBBBBBBBBBBBBB",
+      "BBBBBBBBBBBBBBBB",
+      "BBBBBBBBBBBBBBBB"
+    ],
+    [
+      "GGGGGGGGGGGGGGGG",
+      "GAAAAAAAAAAAAAAG",
+      "GGGGGGGGGGGGGGGG"
+    ],
+    [
+      "RRRRRRRRRRRRRRRR",
+      "SSSSSSSSSSSSSSSS",
+      "R$RRRRRRRRRRRRRR"
+    ],
+    [
+      "                ",
+      "CCCCCCCCCCCCCCCC",
+      "                "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "C": "tinactory:multiblock/solid/solid_steel",
+    "G": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/glass_casing"
+    },
+    "R": "tinactory:multiblock/misc/grate_machine_casing",
+    "S": "tinactory:multiblock/misc/assembler_machine_casing",
+    "A": "air"
+  }
+}

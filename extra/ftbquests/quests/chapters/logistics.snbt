@@ -1,7 +1,7 @@
 {
 	id: "021730EB05578B09"
 	group: ""
-	order_index: 6
+	order_index: 7
 	filename: "logistics"
 	title: "{tinactory.quests.logistics.title}"
 	icon: "tinactory:component/hv/conveyor_module"
@@ -487,6 +487,49 @@
 				id: "56244F730AB9A22A"
 				type: "item"
 				item: "tinactory:component/silicon_print"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.030.title}"
+			x: 2.0d
+			y: 16.0d
+			subtitle: "{tinactory.quests.logistics.030.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.030.description.0}"
+				""
+				"{tinactory.quests.logistics.030.description.1}"
+			]
+			dependencies: [
+				"247F2D17E69312E2"
+				"05A550E7057E0001"
+			]
+			id: "02FC118547396204"
+			tasks: [{
+				id: "02FC118547396208"
+				type: "item"
+				item: "tinactory:multiblock/iv/digital_interface"
+			}]
+		}
+		{
+			title: "{tinactory.quests.logistics.031.title}"
+			x: 2.0d
+			y: 18.0d
+			subtitle: "{tinactory.quests.logistics.031.subtitle}"
+			description: [
+				"{tinactory.quests.logistics.031.description.0}"
+				""
+				"{tinactory.quests.logistics.031.description.1}"
+			]
+			dependencies: [
+				"02FC118547396204"
+				"05A550E7057E0043"
+				"05A550E7057E0048"
+			]
+			id: "02FC118547396206"
+			tasks: [{
+				id: "02FC118547396207"
+				type: "item"
+				item: "tinactory:multiblock/luv/digital_interface"
 			}]
 		}
 		{

@@ -1,0 +1,13 @@
+{
+  "color": "0xFFFFC0E0",
+  "items": [
+    "ingot",
+    "ingot_hot",
+    "plate"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

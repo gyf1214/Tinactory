@@ -129,13 +129,18 @@ public class MachineModel {
 
     private <B extends ModelBuilder<B>> B applyOverlay(B model, boolean working,
         ExistingFileHelper existingHelper) {
+        var hasOverlay = false;
         for (var e : DIR_TEX_KEYS.entrySet()) {
             var tex = working ? getOverlay(e.getKey(), "_active", existingHelper) :
                 Optional.<ResourceLocation>empty();
             tex = tex.or(() -> getOverlay(e.getKey(), "", existingHelper));
             if (tex.isPresent()) {
                 model = model.texture(e.getValue() + "_overlay", tex.get());
+                hasOverlay = true;
             }
+        }
+        if (!hasOverlay) {
+            throw new IllegalStateException("apply overlay failed: " + overlay);
         }
         return model;
     }

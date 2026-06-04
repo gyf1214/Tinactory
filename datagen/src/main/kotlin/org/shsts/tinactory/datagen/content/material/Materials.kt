@@ -146,13 +146,22 @@ object Materials {
         material("niobium", METALLIC)
         material("palladium", SHINY) {
             machineProcess(Voltage.HV)
+            blast(Voltage.HV, 3200, 960) {
+                component("nitrogen")
+            }
         }
         material("rhodium", BRIGHT) {
             machineProcess(Voltage.HV, 1.5)
+            blast(Voltage.HV, 3600, 960) {
+                component("nitrogen")
+            }
         }
         material("ruthenium", BRIGHT)
         material("iridium", METALLIC) {
             machineProcess(Voltage.HV, 2.0)
+            blast(Voltage.EV, 4500, 1280) {
+                component("nitrogen")
+            }
         }
         material("osmium", METALLIC)
     }
@@ -351,6 +360,35 @@ object Materials {
                 component("titanium")
             }
         }
+        material("hssg", METALLIC) {
+            machineProcess(Voltage.EV, 2.0)
+            mix(Voltage.EV) {
+                component("tungsten_steel", 5)
+                component("chrome")
+                component("molybdenum", 2)
+                component("vanadium")
+            }
+            blast(Voltage.EV, 4200, 1280)
+        }
+        material("ruridit", BRIGHT) {
+            machineProcess(Voltage.EV, 2.0)
+            mix(Voltage.EV) {
+                component("ruthenium", 2)
+                component("iridium")
+            }
+            blast(Voltage.EV, 4500, 1280)
+        }
+        material("rhodium_plated_palladium", SHINY) {
+            machineProcess(Voltage.IV, 2.0)
+        }
+        material("vanadium_gallium", METALLIC) {
+            machineProcess(Voltage.EV, 1.5)
+            mix(Voltage.EV) {
+                component("vanadium", 3)
+                component("gallium")
+            }
+            blast(Voltage.EV, 4500, 1280)
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("chloroplatinate", DULL)
@@ -456,6 +494,19 @@ object Materials {
                 component("cadmium", 4)
                 component("sulfuric_acid", 8, sub = "dilute")
                 component("lithium", 9)
+            }
+        }
+        material("energy", SHINY) {
+            mix(Voltage.EV) {
+                component("battery_powder", 2)
+                component("redstone", 3)
+                component("ruby")
+            }
+        }
+        material("lapotron", CERTUS) {
+            mix(Voltage.IV) {
+                component("energy", 12)
+                component("lapis", 4)
             }
         }
         material("rocket_fuel", DULL) {
@@ -651,7 +702,11 @@ object Materials {
             machineProcess(Voltage.MV)
             implosionPrimary()
         }
-        material("platinum_metallic", METALLIC)
+        material("platinum_metallic", METALLIC) {
+            oreProcess {
+                byProducts("platinum_metallic", "raw_platinum", "platinum_metallic")
+            }
+        }
         material("lava", DULL) {
             fluidOre(400, Items.NETHERRACK)
         }
@@ -701,6 +756,10 @@ object Materials {
             crystallize("lava", Voltage.HV, 1000, 0.0, 0.5)
         }
         material("ender_pearl", FINE) {
+            oreProcess {
+                siftPrimary = true
+                byProducts("platinum_metallic", "ender_pearl", "platinum_metallic")
+            }
             machineProcess(Voltage.HV)
             crystallize("argon", Voltage.EV, 400, 0.5, 1.0, amount = 0.1)
         }

@@ -11,6 +11,12 @@
     "calculation_processor",
     "grinder/good",
     "grinder/advanced",
+    "raw_rhodium_plated_palladium",
+    "energy_crystal",
+    "lapotron_crystal",
+    "energy_chip",
+    "lapotron_chip",
+    "lapotronic_energy_orb",
     "carbon_fiber",
     "carbon_mesh",
     "carbon_plate"

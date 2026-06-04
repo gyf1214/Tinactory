@@ -25,6 +25,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
@@ -111,6 +112,14 @@ object MiscComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.ENDER_CHEMISTRY)
             }
+            misc("raw_rhodium_plated_palladium", 4) {
+                input("rhodium", "plate")
+                input("palladium", "ingot", 3)
+                input("soldering_alloy")
+                voltage(Voltage.IV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.RHODIUM_PLATED_PALLADIUM)
+            }
         }
 
         wiremill {
@@ -149,6 +158,7 @@ object MiscComponents {
 
         researches()
         ae()
+        powers()
         rockets()
         nuclear()
     }
@@ -376,6 +386,64 @@ object MiscComponents {
                 // TODO
                 input("platinum", "wire_fine", 16)
                 voltage(Voltage.EV)
+            }
+        }
+    }
+
+    private fun powers() {
+        autoclave {
+            misc("energy_crystal") {
+                input("energy", "dust", 6)
+                input("salt_water")
+                voltage(Voltage.EV)
+                workTicks(600)
+                extra {
+                    requireCleanness(0.0, 0.85)
+                }
+            }
+            misc("lapotron_crystal") {
+                input("lapotron", "dust", 8)
+                input("salt_water")
+                voltage(Voltage.IV)
+                workTicks(800)
+                extra {
+                    requireCleanness(0.5, 0.9)
+                }
+            }
+        }
+        laserEngraver {
+            misc("energy_chip") {
+                misc("energy_crystal")
+                input("ruby", "lens", 0, port = 1)
+                voltage(Voltage.IV)
+                workTicks(800)
+                extra {
+                    requireCleanness(0.4, 1.4)
+                }
+            }
+            misc("lapotron_chip") {
+                misc("lapotron_crystal")
+                input("blue_topaz", "lens", 0, port = 1)
+                voltage(Voltage.LUV)
+                workTicks(1200)
+                extra {
+                    requireCleanness(0.5, 1.5)
+                }
+            }
+        }
+        assembler {
+            componentVoltage = Voltage.LUV
+            misc("lapotronic_energy_orb") {
+                misc("lapotron_crystal", 8)
+                misc("energy_chip", 24)
+                component("field_generator", voltage = Voltage.IV)
+                pic(4)
+                component("cable", 4)
+                input("battery_alloy", "plate", 3)
+                input("soldering_alloy", amount = 2)
+                voltage(Voltage.LUV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.POWER_SUBSTATION)
             }
         }
     }

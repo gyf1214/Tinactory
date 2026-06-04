@@ -1,0 +1,20 @@
+{
+  "color": "0xFF999966",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "bolt",
+    "gear",
+    "ingot",
+    "plate",
+    "ring",
+    "rotor",
+    "screw",
+    "stick"
+  ],
+  "fluids": {},
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {}
+}

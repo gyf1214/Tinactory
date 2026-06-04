@@ -3,9 +3,13 @@ package org.shsts.tinactory.datagen.content.machine
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.component.MiscComponents.misc
+import org.shsts.tinactory.datagen.content.machine.Machines.ADVANCED_MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 
 object ProcessingMachines {
@@ -44,6 +48,28 @@ object ProcessingMachines {
             electric = "platinum",
             pipe = "ptfe",
             rotor = "titanium")
+
+        advancedMachine(Voltage.LUV)
+    }
+
+    private fun AssemblyRecipeFactory.commonMachine(lastVoltage: Voltage) {
+        component("transformer") {
+            circuit(4)
+            pic(2)
+            component("cable")
+            component("cable", 4, voltage = lastVoltage)
+            tech(Technologies.BATTERY)
+        }
+        component("electric_buffer") {
+            circuit(4)
+            pic(2)
+            component("cable", 2)
+            tech(Technologies.BATTERY)
+        }
+    }
+
+    private fun AssemblyRecipeBuilder.storage(amount: Int = 1) {
+        input(STORAGE_CELLS[(componentVoltage!!.rank - 5) / 2].component.get(), amount)
     }
 
     private fun machine(v: Voltage, main: String,
@@ -60,6 +86,7 @@ object ProcessingMachines {
                 voltage(lastVoltage)
                 workTicks(MACHINE_TICKS)
             }
+            commonMachine(lastVoltage)
             machine("research_bench") {
                 circuit(2)
                 component("sensor")
@@ -248,9 +275,9 @@ object ProcessingMachines {
             machine("multiblock/digital_interface") {
                 circuit(4)
                 pic(4)
-                input(getItem("component/annihilation_core"))
-                input(getItem("component/formation_core"))
-                input(STORAGE_CELLS[(v.rank - 5) / 2].component.get(), 2)
+                misc("annihilation_core")
+                misc("formation_core")
+                storage(2)
                 component("cable", 4)
                 tech(Technologies.DIGITAL_STORAGE)
             }
@@ -259,19 +286,6 @@ object ProcessingMachines {
                 pic(2)
                 component("cable", 4)
                 input(Items.CHEST)
-                tech(Technologies.BATTERY)
-            }
-            component("transformer") {
-                circuit(4)
-                pic(2)
-                component("cable")
-                component("cable", 4, voltage = lastVoltage)
-                tech(Technologies.BATTERY)
-            }
-            component("electric_buffer") {
-                circuit(4)
-                pic(2)
-                component("cable", 2)
                 tech(Technologies.BATTERY)
             }
             machine("logistics/electric_chest") {
@@ -294,6 +308,38 @@ object ProcessingMachines {
                 component("electric_pump", 2)
                 input(main, "plate", 4)
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+            }
+        }
+    }
+
+    private fun advancedMachine(v: Voltage) {
+        val lastVoltage = Voltage.fromRank(v.rank - 1)
+        assembler {
+            componentVoltage = v
+            defaults {
+                component("machine_hull")
+                voltage(lastVoltage)
+                workTicks(MACHINE_TICKS)
+            }
+            commonMachine(lastVoltage)
+        }
+        assemblyLine {
+            componentVoltage = v
+            defaults {
+                component("machine_hull")
+                autoCable = true
+                voltage(lastVoltage)
+                workTicks(ADVANCED_MACHINE_TICKS)
+            }
+            machine("multiblock/digital_interface") {
+                circuit(4)
+                pic(8)
+                misc("annihilation_core", 2)
+                misc("formation_core", 2)
+                storage(4)
+                component("conveyor_module", 2)
+                component("electric_pump", 2)
+                tech(Technologies.DIGITAL_STORAGE)
             }
         }
     }

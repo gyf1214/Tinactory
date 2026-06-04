@@ -1,0 +1,160 @@
+{
+  "recipes": {
+    "tinactory:mixer": {},
+    "tinactory:centrifuge": {}
+  },
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 37
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 10
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 126,
+        "y": 10
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 90,
+        "y": 28
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 28
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 126,
+        "y": 28
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
+      "x": 62,
+      "y": 18,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/clean_stainless_steel",
+  "layers": [
+    [
+      " BBB ",
+      "BBBBB",
+      "BBRBB",
+      "BBBBB",
+      " B$B "
+    ],
+    [
+      " GGG ",
+      "GAAAG",
+      "GARAG",
+      "GAAAG",
+      " GGG "
+    ],
+    [
+      " GGG ",
+      "GAAAG",
+      "GARAG",
+      "GAAAG",
+      " GGG "
+    ],
+    [
+      " GGG ",
+      "GAAAG",
+      "GARAG",
+      "GAAAG",
+      " GGG "
+    ],
+    [
+      " CCC ",
+      "CCCCC",
+      "CCRCC",
+      "CCCCC",
+      " CCC "
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "C": "tinactory:multiblock/solid/clean_stainless_steel",
+    "R": "tinactory:multiblock/misc/batch_rotor_casing",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/clean_stainless_steel"
+    },
+    "A": "air"
+  }
+}
