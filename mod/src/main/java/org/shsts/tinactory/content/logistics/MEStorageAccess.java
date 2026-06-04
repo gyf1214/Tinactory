@@ -36,18 +36,22 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     protected final BlockEntity blockEntity;
     protected final CombinedPort<ItemStack> combinedItem;
     protected final CombinedPort<FluidStack> combinedFluid;
-    private final LazyOptional<IElectricMachine> electricCap;
 
     protected IMachine machine;
+    @Nullable
+    protected IElectricMachine electric;
 
-    public MEStorageAccess(BlockEntity blockEntity, double power) {
+    public MEStorageAccess(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
         this.combinedItem = StoragePorts.combinedItem();
         this.combinedFluid = StoragePorts.combinedFluid();
+    }
+
+    public MEStorageAccess(BlockEntity blockEntity, double power) {
+        this(blockEntity);
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, power);
-        this.electricCap = LazyOptional.of(() -> electric);
+        electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
     private void onUpdateLogistics(LogisticComponent logistics) {
@@ -95,7 +99,11 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
+            if (electric == null) {
+                return LazyOptional.empty();
+            }
+            var electric1 = electric;
+            return LazyOptional.of(() -> electric1).cast();
         }
         return LazyOptional.empty();
     }

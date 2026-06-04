@@ -7,12 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
+import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -22,6 +24,7 @@ import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -42,10 +45,23 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks, long memoryLimit) {}
 
     public MECraftCpu(BlockEntity blockEntity, Properties properties) {
-        super(blockEntity, properties.power);
+        super(blockEntity);
         this.transmissionBandwidth = properties.transmissionBandwidth;
         this.executionIntervalTicks = properties.executionIntervalTicks;
         this.memoryLimit = properties.memoryLimit;
+
+        var voltage = getBlockVoltage(blockEntity);
+        electric = new SimpleElectricConsumer(voltage.value, properties.power) {
+            @Override
+            public ElectricMachineType getMachineType() {
+                return isConsumingPower() ? super.getMachineType() : ElectricMachineType.NONE;
+            }
+
+            @Override
+            public double getPowerCons() {
+                return isConsumingPower() ? super.getPowerCons() : 0;
+            }
+        };
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
@@ -105,6 +121,10 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         if (service.tick()) {
             blockEntity.setChanged();
         }
+    }
+
+    private boolean isConsumingPower() {
+        return service != null && service.isBusy();
     }
 
     @Override
