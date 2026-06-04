@@ -25,7 +25,6 @@ import org.shsts.tinycorelib.datagen.api.builder.IBlockDataBuilder
 
 object Machines {
     private const val TURBINE_SIDE = "generators/steam_turbine/overlay_side"
-    private const val SCREEN_GLASS = "overlay/machine/overlay_screen_glass"
     private const val BOILER_TEX = "generators/boiler/coal"
     const val MACHINE_TICKS = 200L
     const val ADVANCED_MACHINE_TICKS = 800L
@@ -82,13 +81,11 @@ object Machines {
 
     private fun logistics() {
         machine("logistics/electric_chest") {
-            overlay(Direction.UP, "overlay/machine/overlay_qchest")
-            overlay(Direction.NORTH, SCREEN_GLASS)
+            overlay("cover/overlay_item_detector")
             ioTex(ME_BUS)
         }
         machine("logistics/electric_tank") {
-            overlay(Direction.UP, "overlay/machine/overlay_qtank")
-            overlay(Direction.NORTH, SCREEN_GLASS)
+            overlay("cover/overlay_fluid_detector")
             ioTex(ME_BUS)
         }
         machine("logistics/logistic_worker") {
@@ -130,28 +127,28 @@ object Machines {
             block("logistics/me_craft_cpu/basic") {
                 machineModel {
                     casing(Voltage.HV)
-                    overlay("overlay/machine/overlay_screen")
+                    overlay("cover/overlay_display")
                     ioTex(ME_BUS)
                 }
             }
             block("logistics/me_craft_cpu/advanced") {
                 machineModel {
                     casing(Voltage.IV)
-                    overlay("overlay/machine/overlay_screen")
+                    overlay("cover/overlay_display")
                     ioTex(ME_BUS)
                 }
             }
             block("logistics/me_craft_terminal") {
                 machineModel {
                     casing(Voltage.HV)
-                    overlay("cover/overlay_controller")
+                    overlay("overlay/machine/hpca/bridge_active")
                     ioTex(ME_BUS)
                 }
             }
             block("logistics/me_pattern_terminal") {
                 machineModel {
                     casing(Voltage.HV)
-                    overlay("overlay/machine/overlay_screen")
+                    overlay("overlay/machine/overlay_data_hatch")
                     ioTex(ME_BUS)
                 }
             }

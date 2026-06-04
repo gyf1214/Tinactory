@@ -110,7 +110,8 @@ object Multiblocks {
             }
 
             misc("assembler_machine_casing") {
-                blockState(solidBlock("casings/solid/machine_casing_solid_steel"))
+                blockState(cubeColumn("casings/mechanic/machine_casing_assembly_line",
+                    "casings/solid/machine_casing_solid_steel"))
             }
 
             misc("autofarm_base") {
