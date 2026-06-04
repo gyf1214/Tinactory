@@ -1,4 +1,5 @@
 {
   "type": "casing",
-  "materialColor": 16
+  "materialColor": 16,
+  "renderType": "translucent"
 }

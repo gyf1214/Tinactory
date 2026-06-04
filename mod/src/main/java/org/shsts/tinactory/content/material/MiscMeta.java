@@ -83,10 +83,20 @@ public class MiscMeta extends MetaConsumer {
 
     private IEntry<Block> casing(String id, JsonObject jo) {
         var materialColor = parseMaterialColor(jo);
-        return REGISTRATE.block(id, Block::new)
+        var builder = REGISTRATE.block(id, Block::new)
             .material(Material.HEAVY_METAL, materialColor)
-            .properties(CASING_PROPERTY)
-            .register();
+            .properties(CASING_PROPERTY);
+        var renderType = GsonHelper.getAsString(jo, "renderType", "default");
+        switch (renderType) {
+            case "default":
+                break;
+            case "translucent":
+                builder.translucent();
+                break;
+            default:
+                throw new UnsupportedTypeException("renderType", renderType);
+        }
+        return builder.register();
     }
 
     private SmartEntityBlock.Factory<MachineBlock> simpleElectric(double power) {
