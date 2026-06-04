@@ -597,8 +597,7 @@ object CircuitComponents {
             chemicalReactor {
                 defaults {
                     voltage(Voltage.HV)
-                    // TODO
-                    tech()
+                    tech(Technologies.ADVANCED_POLYMER)
                 }
                 output(board) {
                     input("epoxy", "sheet")
@@ -625,8 +624,7 @@ object CircuitComponents {
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.EV)
                     workTicks(CIRCUIT_TICKS)
-                    // TODO
-                    tech()
+                    tech(Technologies.PLATINUM_GROUP_METAL)
                 }
             }
             chemicalReactor {
@@ -636,8 +634,7 @@ object CircuitComponents {
                     input("iron_chloride")
                     voltage(Voltage.EV)
                     workTicks(480)
-                    // TODO
-                    tech()
+                    tech(Technologies.PLATINUM_GROUP_METAL)
                 }
             }
         }

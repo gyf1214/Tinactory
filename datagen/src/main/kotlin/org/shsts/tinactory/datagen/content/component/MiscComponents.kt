@@ -440,8 +440,9 @@ object MiscComponents {
                 pic(4)
                 component("cable", 4)
                 input("battery_alloy", "plate", 3)
+                input("soldering_alloy", amount = 2)
                 voltage(Voltage.LUV)
-                workTicks(800)
+                workTicks(COMPONENT_TICKS)
                 tech(Technologies.POWER_SUBSTATION)
             }
         }
