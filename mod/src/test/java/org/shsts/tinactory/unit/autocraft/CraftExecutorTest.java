@@ -137,6 +137,136 @@ class CraftExecutorTest {
     }
 
     @Test
+    void batchedStepShouldWaitForAllDeclaredOutputs() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var slag = TestStackKey.item("tinactory:slag", "");
+        var inventory = new FakeInventory(Map.of(ore, 2L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(plate, 1), new CraftAmount(slag, 1))),
+            2,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        executor.start(new CraftPlan(List.of(step)));
+
+        executor.runCycle(2);
+        executor.runCycle(2);
+
+        assertEquals(JobState.RUNNING, executor.state());
+        assertEquals(0L, inventory.amountOf(plate));
+        assertEquals(0L, inventory.amountOf(slag));
+
+        for (var i = 0; i < 8; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(2L, inventory.amountOf(plate));
+        assertEquals(2L, inventory.amountOf(slag));
+    }
+
+    @Test
+    void batchedStepShouldRetainOnlyRequiredIntermediateOutputs() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var part = TestStackKey.item("tinactory:part", "");
+        var scrap = TestStackKey.item("tinactory:scrap", "");
+        var gear = TestStackKey.item("tinactory:gear", "");
+        var inventory = new FakeInventory(Map.of(ore, 2L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var firstStep = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:part",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(part, 2), new CraftAmount(scrap, 1))),
+            2,
+            List.of(new CraftAmount(part, 3)),
+            List.of(new CraftAmount(part, 1)));
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:gear",
+                List.of(new CraftAmount(part, 3)),
+                List.of(new CraftAmount(gear, 1))),
+            1,
+            List.of(),
+            List.of(new CraftAmount(gear, 1)));
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+
+        for (var i = 0; i < 16; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(1L, inventory.amountOf(gear));
+        assertEquals(1L, inventory.amountOf(part));
+        assertEquals(2L, inventory.amountOf(scrap));
+        assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+    }
+
+    @Test
+    void batchedMachineLossShouldBlockUntilScheduledRunOutputsRecovered() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ore, 2L));
+        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of());
+        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 2L));
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            new SequenceAllocator(List.of(firstLease, secondLease)),
+            new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+            2,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        executor.start(new CraftPlan(List.of(step)));
+
+        executor.runCycle(1);
+        firstLease.valid = false;
+        executor.runCycle(1);
+
+        assertEquals(JobState.BLOCKED, executor.state());
+        assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.error());
+        assertEquals(0L, inventory.amountOf(plate));
+    }
+
+    @Test
+    void batchedMachineLossShouldReassignWhenScheduledRunOutputsRecovered() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ore, 2L));
+        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var executor = new SequentialCraftExecutor(
+            inventory,
+            new SequenceAllocator(List.of(firstLease, secondLease)),
+            new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
+            2,
+            List.of(),
+            List.of(new CraftAmount(plate, 1)));
+        executor.start(new CraftPlan(List.of(step)));
+
+        executor.runCycle(2);
+        firstLease.valid = false;
+        for (var i = 0; i < 8; i++) {
+            executor.runCycle(64);
+        }
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(2L, inventory.amountOf(plate));
+    }
+
+    @Test
     void executorShouldExposeCheapExecutionStatus() {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
@@ -218,6 +348,84 @@ class CraftExecutorTest {
         @Override
         public Optional<IMachineLease> allocate(CraftStep step) {
             return Optional.of(new SimulatedLease(step));
+        }
+    }
+
+    private static final class SequenceAllocator implements IMachineAllocator {
+        private final List<IMachineLease> leases;
+        private int index;
+
+        private SequenceAllocator(List<IMachineLease> leases) {
+            this.leases = List.copyOf(leases);
+        }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step) {
+            var lease = leases.get(index);
+            index++;
+            return Optional.of(lease);
+        }
+    }
+
+    private static final class ManualLease implements IMachineLease {
+        private final UUID machineId = UUID.randomUUID();
+        private final Map<IStackKey, Long> inputCapacity;
+        private final Map<IStackKey, Long> outputCapacity;
+        private boolean valid = true;
+
+        private ManualLease(Map<IStackKey, Long> inputCapacity, Map<IStackKey, Long> outputCapacity) {
+            this.inputCapacity = new HashMap<>(inputCapacity);
+            this.outputCapacity = new HashMap<>(outputCapacity);
+        }
+
+        @Override
+        public UUID machineId() {
+            return machineId;
+        }
+
+        @Override
+        public List<IMachineRoute> inputRoutes() {
+            return inputCapacity.entrySet().stream()
+                .map(entry -> route(entry, PortDirection.INPUT))
+                .toList();
+        }
+
+        @Override
+        public List<IMachineRoute> outputRoutes() {
+            return outputCapacity.entrySet().stream()
+                .map(entry -> route(entry, PortDirection.OUTPUT))
+                .toList();
+        }
+
+        @Override
+        public boolean isValid() {
+            return valid;
+        }
+
+        @Override
+        public void release() {}
+
+        private static IMachineRoute route(Map.Entry<IStackKey, Long> entry, PortDirection direction) {
+            return new IMachineRoute() {
+                @Override
+                public IStackKey key() {
+                    return entry.getKey();
+                }
+
+                @Override
+                public PortDirection direction() {
+                    return direction;
+                }
+
+                @Override
+                public long transfer(long amount, boolean simulate) {
+                    var moved = Math.min(Math.max(0L, amount), entry.getValue());
+                    if (!simulate && moved > 0L) {
+                        entry.setValue(entry.getValue() - moved);
+                    }
+                    return moved;
+                }
+            };
         }
     }
 

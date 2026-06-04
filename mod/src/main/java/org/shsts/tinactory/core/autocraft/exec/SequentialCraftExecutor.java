@@ -370,8 +370,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return true;
         }
         var step = plan.steps().get(nextStep);
-        for (var output : step.requiredOutputs()) {
-            stepRequiredOutputs.merge(output.key(), output.amount(), Long::sum);
+        for (var output : step.pattern().outputs()) {
+            stepRequiredOutputs.merge(output.key(), output.amount() * step.runs(), Long::sum);
         }
         for (var input : step.pattern().inputs()) {
             var amount = input.amount() * step.runs();
@@ -516,8 +516,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     }
 
     private boolean canReassignAfterMachineLoss() {
+        var step = plan.steps().get(nextStep);
+        var inputsPerRun = aggregateAmounts(step.pattern().inputs(), 1L);
+        var outputsPerRun = aggregateAmounts(step.pattern().outputs(), 1L);
         long scheduledRuns = 0L;
-        for (var input : stepRequiredInputs.entrySet()) {
+        for (var input : inputsPerRun.entrySet()) {
             var requiredPerStep = input.getValue();
             if (requiredPerStep <= 0L) {
                 continue;
@@ -530,10 +533,10 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
 
         long recoveredRuns = Long.MAX_VALUE;
-        if (stepRequiredOutputs.isEmpty()) {
+        if (outputsPerRun.isEmpty()) {
             recoveredRuns = 0L;
         }
-        for (var output : stepRequiredOutputs.entrySet()) {
+        for (var output : outputsPerRun.entrySet()) {
             var requiredPerStep = output.getValue();
             if (requiredPerStep <= 0L) {
                 continue;
@@ -545,6 +548,14 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             }
         }
         return scheduledRuns <= recoveredRuns;
+    }
+
+    private static Map<IStackKey, Long> aggregateAmounts(List<CraftAmount> amounts, long multiplier) {
+        var out = new HashMap<IStackKey, Long>();
+        for (var amount : amounts) {
+            out.merge(amount.key(), amount.amount() * multiplier, Long::sum);
+        }
+        return out;
     }
 
     private void beginFinalFlushing() {
