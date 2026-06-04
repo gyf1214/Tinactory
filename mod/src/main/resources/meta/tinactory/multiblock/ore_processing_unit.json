@@ -55,35 +55,55 @@
   "appearance": "tinactory:multiblock/solid/robust_tungstensteel",
   "layers": [
     [
-      "BBBBB",
-      "BB$BB",
-      "BBBBB"
+      "BBBBB   ",
+      "BBBBBTTT",
+      "BBBBBTTT",
+      "BBBBBTTT",
+      "BB$BB   "
     ],
     [
-      "COGOC",
-      "OAAPA",
-      "COGOC"
+      "BGGGB   ",
+      "GOOOPOOO",
+      "GOOOPOOO",
+      "GOOOPOOO",
+      "BGGGB   "
     ],
     [
-      "COPOC",
-      "OAAAO",
-      "COPOC"
+      "BGGGB   ",
+      "GAAAPOOO",
+      "GAAAPOOO",
+      "GAAAPOOO",
+      "BGGGB   "
     ],
     [
-      " COC ",
-      " CPP ",
-      " COC "
+      "BBBBB   ",
+      "BPPPBCCC",
+      "BPPPBCCC",
+      "BPPPBCCC",
+      "BBBBB   "
+    ],
+    [
+      "        ",
+      " BBB    ",
+      " BBB    ",
+      " BBB    ",
+      "        "
     ]
   ],
   "defines": {
-    "B": {
+    "B": "tinactory:multiblock/solid/solid_steel",
+    "T": {
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/robust_tungstensteel"
     },
     "C": "tinactory:multiblock/solid/robust_tungstensteel",
     "O": "tinactory:multiblock/misc/ore_processing_chamber",
-    "G": "tinactory:multiblock/misc/grate_machine_casing",
-    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/solid_steel"
+    },
+    "P": "tinactory:multiblock/misc/grate_machine_casing",
     "A": "air"
   }
 }

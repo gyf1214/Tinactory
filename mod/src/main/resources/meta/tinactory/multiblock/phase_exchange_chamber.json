@@ -42,19 +42,39 @@
   "appearance": "tinactory:multiblock/solid/inert_ptfe",
   "layers": [
     [
-      "BBBB",
-      "B$BB",
-      "BBBB"
+      "BBBBB",
+      "BFFFB",
+      "BFFFB",
+      "BFFFB",
+      "BB$BB"
     ],
     [
-      "CPCF",
-      "PAAF",
-      "CPCF"
+      "     ",
+      " CCC ",
+      " CPC ",
+      " CCC ",
+      "     "
     ],
     [
-      "CWCW",
-      "CPPC",
-      "CWCW"
+      "     ",
+      " FFF ",
+      " FPF ",
+      " FFF ",
+      "     "
+    ],
+    [
+      "     ",
+      " CCC ",
+      " CPC ",
+      " CCC ",
+      "     "
+    ],
+    [
+      "DDDDD",
+      "DFFFD",
+      "DFFFD",
+      "DFFFD",
+      "DDDDD"
     ]
   ],
   "defines": {
@@ -62,14 +82,13 @@
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/inert_ptfe"
     },
-    "C": "tinactory:multiblock/solid/inert_ptfe",
-    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
-    "F": "tinactory:multiblock/misc/phase_converter_casing",
-    "W": {
-      "type": "tag_or_block",
-      "tag": "tinactory:multiblock/glass_casing",
-      "block": "tinactory:multiblock/solid/inert_ptfe"
+    "D": "tinactory:multiblock/solid/inert_ptfe",
+    "C": {
+      "type": "tag_with_same_block",
+      "key": "coil",
+      "tag": "tinactory:multiblock/coil"
     },
-    "A": "air"
+    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
+    "F": "tinactory:multiblock/misc/phase_converter_casing"
   }
 }

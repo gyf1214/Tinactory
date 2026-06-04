@@ -31,18 +31,38 @@
   "layers": [
     [
       "BBBBB",
-      "BB$BB",
-      "BBBBB"
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
     ],
     [
-      "CSASC",
-      "SAAPS",
-      "CCPCC"
+      "     ",
+      " CSC ",
+      " SSS ",
+      " CSC ",
+      "     "
     ],
     [
-      "CSGSC",
-      "CAWAC",
-      "CCCCC"
+      "     ",
+      " CSC ",
+      " SSS ",
+      " CSC ",
+      "     "
+    ],
+    [
+      "     ",
+      "     ",
+      "  S  ",
+      "     ",
+      "     "
+    ],
+    [
+      "     ",
+      "     ",
+      "  S  ",
+      "     ",
+      "     "
     ]
   ],
   "defines": {
@@ -51,14 +71,6 @@
       "block": "tinactory:multiblock/solid/stable_titanium"
     },
     "C": "tinactory:multiblock/solid/stable_titanium",
-    "S": "tinactory:multiblock/misc/geological_sensor_casing",
-    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
-    "G": "tinactory:multiblock/misc/grate_machine_casing",
-    "W": {
-      "type": "tag_or_block",
-      "tag": "tinactory:multiblock/glass_casing",
-      "block": "tinactory:multiblock/solid/stable_titanium"
-    },
-    "A": "air"
+    "S": "tinactory:multiblock/misc/geological_sensor_casing"
   }
 }

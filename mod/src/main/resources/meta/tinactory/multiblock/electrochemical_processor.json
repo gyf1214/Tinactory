@@ -42,19 +42,29 @@
   "appearance": "tinactory:multiblock/solid/stable_titanium",
   "layers": [
     [
-      "BBBBB",
-      "BB$BB",
-      "BBBBB"
+      "CCC DDD",
+      "CCC DDD",
+      "CCC DDD"
     ],
     [
-      "CPEPC",
-      "EAAAE",
-      "CPEPC"
+      "GGG HHH",
+      "GEEBEEH",
+      "GGG HHH"
     ],
     [
-      "CCCCC",
-      "CEPEC",
-      "CCCCC"
+      "GGGBHHH",
+      "GEEEEEH",
+      "GGG$HHH"
+    ],
+    [
+      "GGG HHH",
+      "GEEBEEH",
+      "GGG HHH"
+    ],
+    [
+      "CCC DDD",
+      "CCC DDD",
+      "CCC DDD"
     ]
   ],
   "defines": {
@@ -63,8 +73,17 @@
       "block": "tinactory:multiblock/solid/stable_titanium"
     },
     "C": "tinactory:multiblock/solid/stable_titanium",
-    "E": "tinactory:multiblock/misc/electrode_casing",
-    "P": "tinactory:multiblock/misc/ptfe_pipe_casing",
-    "A": "air"
+    "D": "tinactory:multiblock/solid/inert_ptfe",
+    "G": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/stable_titanium"
+    },
+    "H": {
+      "type": "tag_or_block",
+      "tag": "tinactory:multiblock/glass_casing",
+      "block": "tinactory:multiblock/solid/inert_ptfe"
+    },
+    "E": "tinactory:multiblock/misc/electrode_casing"
   }
 }

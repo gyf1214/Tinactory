@@ -37,18 +37,38 @@
   "layers": [
     [
       "BBBBB",
-      "BB$BB",
-      "BBBBB"
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
     ],
     [
-      "CTWTC",
-      "TAAAT",
-      "CTWTC"
+      "CGGGC",
+      "GTATG",
+      "GTATG",
+      "GTATG",
+      "CGGGC"
     ],
     [
-      "CWWWC",
-      "CAAAC",
-      "CWWWC"
+      "CGGGC",
+      "GAAAG",
+      "GAAAG",
+      "GAAAG",
+      "CGGGC"
+    ],
+    [
+      "CGGGC",
+      "GAAAG",
+      "GTTTG",
+      "GAAAG",
+      "CGGGC"
+    ],
+    [
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC",
+      "CCCCC"
     ]
   ],
   "defines": {
@@ -58,7 +78,7 @@
     },
     "C": "tinactory:multiblock/solid/stable_titanium",
     "T": "tinactory:multiblock/misc/precision_tooling_casing",
-    "W": {
+    "G": {
       "type": "tag_or_block",
       "tag": "tinactory:multiblock/glass_casing",
       "block": "tinactory:multiblock/solid/stable_titanium"

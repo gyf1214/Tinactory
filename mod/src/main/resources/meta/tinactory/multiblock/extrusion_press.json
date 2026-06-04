@@ -27,19 +27,19 @@
   "appearance": "tinactory:multiblock/solid/robust_tungstensteel",
   "layers": [
     [
-      "BBBBB",
-      "BB$BB",
-      "BBBBB"
+      "BBBBBBB",
+      "BBBBBBB",
+      "BBBBBBB"
     ],
     [
-      "CCTDC",
-      "CTAAD",
-      "CCTDC"
+      "BBBBBBB",
+      "BDDDDDB",
+      "BBB$BBB"
     ],
     [
-      "CCDDC",
-      "CTAAT",
-      "CCDDC"
+      "BBBBBBB",
+      "BBBBBBB",
+      "BBBBBBB"
     ]
   ],
   "defines": {
@@ -47,9 +47,6 @@
       "type": "block_or_interface",
       "block": "tinactory:multiblock/solid/robust_tungstensteel"
     },
-    "C": "tinactory:multiblock/solid/robust_tungstensteel",
-    "T": "tinactory:multiblock/misc/precision_tooling_casing",
-    "D": "tinactory:multiblock/misc/extrusion_die_casing",
-    "A": "air"
+    "D": "tinactory:multiblock/misc/extrusion_die_casing"
   }
 }
