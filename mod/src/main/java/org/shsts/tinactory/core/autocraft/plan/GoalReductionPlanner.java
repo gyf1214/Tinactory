@@ -142,11 +142,11 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         frame.ledgerSnapshot = session.ledger.copy();
         frame.stepCountSnapshot = session.steps.size();
         frame.stepIdSnapshot = session.nextStepId;
-        frame.runs = 1L;
         frame.inputIndex = 0;
         frame.childError = null;
         frame.childErrorSummary = null;
         var pattern = frame.candidates.get(frame.candidateIndex);
+        frame.runs = requiredRuns(pattern, frame.key, frame.remaining);
         for (var output : pattern.outputs()) {
             session.ledger.recordCraftedAmount(output.key(), output.amount() * frame.runs);
         }
@@ -304,6 +304,12 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         return aggregated;
     }
 
+    private static long requiredRuns(CraftPattern pattern, IStackKey key, long remainingDemand) {
+        var outputs = aggregateOutputs(pattern.outputs(), 1L);
+        var producedPerRun = outputs.getOrDefault(key, 0L);
+        return divideCeil(remainingDemand, producedPerRun);
+    }
+
     private static void addDemand(Map<IStackKey, Long> demandMap, IStackKey key, long amount) {
         if (amount <= 0L) {
             return;
@@ -326,6 +332,13 @@ public final class GoalReductionPlanner implements ICraftPlanner {
             demandMap.put(key, demand - consumed);
         }
         return consumed;
+    }
+
+    private static long divideCeil(long numerator, long denominator) {
+        if (denominator <= 0L || numerator <= 0L) {
+            return 0L;
+        }
+        return (numerator + denominator - 1L) / denominator;
     }
 
     private static final class PlanningSession {
