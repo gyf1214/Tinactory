@@ -5,6 +5,7 @@
 	filename: "logistics"
 	title: "{tinactory.quests.logistics.title}"
 	icon: "tinactory:component/hv/conveyor_module"
+	subtitle: ["{tinactory.quests.logistics.subtitle.0}"]
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [

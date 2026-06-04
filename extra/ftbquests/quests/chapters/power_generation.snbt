@@ -5,6 +5,7 @@
 	filename: "power_generation"
 	title: "{tinactory.quests.power_generation.title}"
 	icon: "tinactory:chip/low_pic"
+	subtitle: ["{tinactory.quests.power_generation.subtitle.0}"]
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [

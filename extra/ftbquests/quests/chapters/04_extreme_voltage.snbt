@@ -5,6 +5,7 @@
 	filename: "04_extreme_voltage"
 	title: "{tinactory.quests.04_extreme_voltage.title}"
 	icon: "tinactory:component/iv/electric_pump"
+	subtitle: ["{tinactory.quests.04_extreme_voltage.subtitle.0}"]
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
