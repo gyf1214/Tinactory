@@ -185,7 +185,9 @@ object RecoveryRegistry {
             return false
         }
         return loc.path.startsWith("component/") ||
+            loc.path.startsWith("logistics/") ||
             loc.path.startsWith("machine/") ||
+            loc.path.startsWith("multiblock/") ||
             loc.path.startsWith("network/")
     }
 
