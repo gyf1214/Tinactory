@@ -64,37 +64,37 @@
         "port": 2,
         "type": "item_output",
         "x": 90,
-        "y": 1
+        "y": 10
       },
       {
         "port": 2,
         "type": "item_output",
         "x": 108,
-        "y": 1
+        "y": 10
       },
       {
         "port": 2,
         "type": "item_output",
         "x": 126,
-        "y": 1
+        "y": 10
       },
       {
         "port": 3,
         "type": "fluid_output",
         "x": 90,
-        "y": 19
+        "y": 28
       },
       {
         "port": 3,
         "type": "fluid_output",
         "x": 108,
-        "y": 19
+        "y": 28
       },
       {
         "port": 3,
         "type": "fluid_output",
         "x": 126,
-        "y": 19
+        "y": 28
       }
     ],
     "progressBar": {

@@ -12,13 +12,13 @@
       {
         "port": 1,
         "type": "item_output",
-        "x": 72,
+        "x": 54,
         "y": 10
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
-      "x": 44,
+      "texture": "gregtech:gui/progress_bar/progress_bar_extruder",
+      "x": 26,
       "y": 9,
       "width": 20,
       "height": 20

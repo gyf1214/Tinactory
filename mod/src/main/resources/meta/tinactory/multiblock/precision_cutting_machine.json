@@ -26,7 +26,7 @@
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "texture": "gregtech:gui/progress_bar/progress_bar_slice",
       "x": 44,
       "y": 9,
       "width": 20,
