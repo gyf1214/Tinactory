@@ -95,8 +95,8 @@ object RecipeFactories {
 
     fun stoneGenerator(block: AssemblyRecipeFactory.() -> Unit) {
         assembly("stone_generator") {
-            defaultOutputItem = 0
-            defaultOutputFluid = 1
+            defaultOutputItem = 1
+            defaultOutputFluid = 2
             amperage = 0.125
             workTicks(20)
         }.block()
@@ -104,7 +104,8 @@ object RecipeFactories {
 
     fun macerator(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("macerator") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 0.25
         }.block()
     }
@@ -165,7 +166,8 @@ object RecipeFactories {
 
     fun polarizer(block: ProcessingRecipeFactory.() -> Unit) {
         simpleProcessing("polarizer") {
-            simpleDefaults()
+            defaultInputItem = 0
+            defaultOutputItem = 2
             amperage = 0.25
         }.block()
     }

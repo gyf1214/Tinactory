@@ -19,10 +19,46 @@
         "y": 1
       },
       {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 1
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 18,
+        "y": 19
+      },
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 36,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 37
+      },
+      {
         "port": 1,
         "type": "fluid_input",
         "x": 18,
-        "y": 19
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 36,
+        "y": 37
       },
       {
         "port": 2,
@@ -31,16 +67,40 @@
         "y": 1
       },
       {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 126,
+        "y": 1
+      },
+      {
         "port": 3,
         "type": "fluid_output",
         "x": 90,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 108,
+        "y": 19
+      },
+      {
+        "port": 3,
+        "type": "fluid_output",
+        "x": 126,
         "y": 19
       }
     ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
-      "x": 54,
-      "y": 9,
+      "x": 62,
+      "y": 18,
       "width": 20,
       "height": 20
     }

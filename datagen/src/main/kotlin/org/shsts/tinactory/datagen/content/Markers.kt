@@ -33,6 +33,16 @@ object Markers {
             baseMarker("alloy_smelter")
             baseMarker("arc_furnace")
             baseMarker("bender")
+            baseMarker("centrifuge")
+            baseMarker("cutter")
+            baseMarker("electrolyzer")
+            baseMarker("extractor")
+            baseMarker("lathe")
+            baseMarker("macerator")
+            baseMarker("ore_analyzer")
+            baseMarker("ore_washer")
+            baseMarker("polarizer")
+            baseMarker("thermal_centrifuge")
             baseMarker("wiremill")
 
             wash("crushed", "crushed_purified") {

@@ -10,19 +10,73 @@
         "port": 0,
         "type": "item_input",
         "x": 0,
-        "y": 10
+        "y": 28
       },
       {
         "port": 1,
         "type": "item_output",
         "x": 72,
-        "y": 10
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 108,
+        "y": 1
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 108,
+        "y": 19
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 72,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 90,
+        "y": 37
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 108,
+        "y": 37
+      },
+      {
+        "port": 2,
+        "type": "fluid_output",
+        "x": 126,
+        "y": 19
       }
     ],
     "progressBar": {
-      "texture": "gregtech:gui/progress_bar/progress_bar_arrow",
+      "texture": "gregtech:gui/progress_bar/progress_bar_sift",
       "x": 44,
-      "y": 9,
+      "y": 27,
       "width": 20,
       "height": 20
     }
