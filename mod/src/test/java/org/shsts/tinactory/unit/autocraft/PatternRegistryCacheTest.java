@@ -219,13 +219,13 @@ class PatternRegistryCacheTest {
         }
 
         @Override
-        public int bytesCapacity() {
+        public long bytesCapacity() {
             return Integer.MAX_VALUE;
         }
 
         @Override
-        public int bytesUsed() {
-            return patterns.size() * 256;
+        public long bytesUsed() {
+            return (long) patterns.size() * 256;
         }
 
         private boolean contains(UUID patternUuid) {

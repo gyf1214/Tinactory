@@ -64,7 +64,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     public static final int PRIORITY_DEFAULT = ElectricStorage.PRIORITY_DEFAULT;
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
 
-    public record ByteStats(int bytesUsed, int bytesCapacity) {}
+    public record ByteStats(long bytesUsed, long bytesCapacity) {}
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "logistics/me_drive";
@@ -112,12 +112,12 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public int bytesCapacity() {
+    public long bytesCapacity() {
         return collectByteStats().bytesCapacity();
     }
 
     @Override
-    public int bytesUsed() {
+    public long bytesUsed() {
         return collectByteStats().bytesUsed();
     }
 
@@ -138,8 +138,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     public static ByteStats aggregateByteStats(
         Iterable<? extends IBytesProvider> digitalProviders,
         Iterable<? extends IPatternCellPort> patternPorts) {
-        var bytesUsed = 0;
-        var bytesCapacity = 0;
+        var bytesUsed = 0L;
+        var bytesCapacity = 0L;
         for (var provider : digitalProviders) {
             bytesUsed += provider.bytesUsed();
             bytesCapacity += provider.bytesCapacity();

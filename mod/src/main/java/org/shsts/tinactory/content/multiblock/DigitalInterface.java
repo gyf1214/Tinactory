@@ -69,7 +69,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         private final CombinedPort<FluidStack> externalFluid;
         private final ContainerPort fluidPort;
         public SlotType type;
-        private int bytesUsed;
+        private long bytesUsed;
 
         private Storage() {
             this.internalItem = StoragePorts.itemStorage(this);
@@ -133,12 +133,12 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
          * This is not used.
          */
         @Override
-        public int bytesCapacity() {
+        public long bytesCapacity() {
             return bytesLimit;
         }
 
         @Override
-        public int bytesUsed() {
+        public long bytesUsed() {
             return bytesUsed;
         }
 
@@ -153,34 +153,34 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         }
 
         @Override
-        public void consume(int bytes) {
+        public void consume(long bytes) {
             assert bytes > 0;
-            consumeBytesWithoutKey(isInput(), bytes);
+            consumeBytesWithoutKey(isInput(), Math.toIntExact(bytes));
             bytesUsed += bytes;
             LOGGER.trace("consume {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         @Override
-        public void consume(IStackKey key, int bytes) {
+        public void consume(IStackKey key, long bytes) {
             assert bytes > 0;
-            consumeBytesForKey(isInput(), key, bytes);
+            consumeBytesForKey(isInput(), key, Math.toIntExact(bytes));
             bytesUsed += bytes;
             LOGGER.trace("consume {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
         }
 
         @Override
-        public void restore(int bytes) {
+        public void restore(long bytes) {
             assert bytes > 0;
-            restoreBytesWithoutKey(isInput(), bytes);
+            restoreBytesWithoutKey(isInput(), Math.toIntExact(bytes));
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
             LOGGER.trace("restore {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         @Override
-        public void restore(IStackKey key, int bytes) {
+        public void restore(IStackKey key, long bytes) {
             assert bytes > 0;
-            restoreBytesForKey(isInput(), key, bytes);
+            restoreBytesForKey(isInput(), key, Math.toIntExact(bytes));
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
             LOGGER.trace("restore {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
@@ -244,13 +244,13 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public int bytesCapacity() {
+    public long bytesCapacity() {
         return bytesLimit;
     }
 
     @Override
-    public int bytesUsed() {
-        var inputUsed = inputBytesUsed.values().stream().mapToInt(Integer::intValue).sum();
+    public long bytesUsed() {
+        var inputUsed = inputBytesUsed.values().stream().mapToLong(Integer::longValue).sum();
         return Math.min(bytesLimit, inputUsed + outputBytesUsed);
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IBytesProvider {
-    int bytesCapacity();
+    long bytesCapacity();
 
-    int bytesUsed();
+    long bytesUsed();
 }

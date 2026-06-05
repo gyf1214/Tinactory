@@ -63,7 +63,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
             if (!simulate) {
                 var insertedStack = stackAdapter.withAmount(stack, inserted);
                 contents.put(stackAdapter.keyOf(insertedStack), insertedStack);
-                provider.consume(key, bytesPerType + inserted * bytesPerUnit);
+                provider.consume(key, (long) bytesPerType + (long) inserted * bytesPerUnit);
                 invokeUpdate();
             }
             return remaining;
@@ -76,7 +76,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (!simulate) {
             var updated = stackAdapter.withAmount(existing, stackAdapter.amount(existing) + inserted);
             contents.put(key, updated);
-            provider.consume(key, inserted * bytesPerUnit);
+            provider.consume(key, (long) inserted * bytesPerUnit);
             invokeUpdate();
         }
         return remaining;
@@ -94,7 +94,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (stackAdapter.amount(stack) >= stackAdapter.amount(existing)) {
             if (!simulate) {
                 contents.remove(key);
-                provider.restore(key, bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
+                provider.restore(key, (long) bytesPerType + (long) bytesPerUnit * stackAdapter.amount(existing));
                 invokeUpdate();
             }
             return stackAdapter.copy(existing);
@@ -103,7 +103,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
             var updated = stackAdapter.withAmount(existing,
                 stackAdapter.amount(existing) - stackAdapter.amount(stack));
             contents.put(key, updated);
-            provider.restore(key, bytesPerUnit * stackAdapter.amount(stack));
+            provider.restore(key, (long) bytesPerUnit * stackAdapter.amount(stack));
             invokeUpdate();
         }
         return stackAdapter.copy(stack);
@@ -118,7 +118,8 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (limit >= stackAdapter.amount(existing)) {
             if (!simulate) {
                 contents.remove(entry.getKey());
-                provider.restore(entry.getKey(), bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
+                provider.restore(entry.getKey(),
+                    (long) bytesPerType + (long) bytesPerUnit * stackAdapter.amount(existing));
                 invokeUpdate();
             }
             return stackAdapter.copy(existing);
@@ -126,7 +127,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (!simulate) {
             var updated = stackAdapter.withAmount(existing, stackAdapter.amount(existing) - limit);
             contents.put(entry.getKey(), updated);
-            provider.restore(entry.getKey(), bytesPerUnit * limit);
+            provider.restore(entry.getKey(), (long) bytesPerUnit * limit);
             invokeUpdate();
         }
         return stackAdapter.withAmount(existing, limit);

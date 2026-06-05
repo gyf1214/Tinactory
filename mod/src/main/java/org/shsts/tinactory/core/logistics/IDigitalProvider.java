@@ -29,17 +29,17 @@ public interface IDigitalProvider extends IBytesProvider {
         return consumeLimit(key, 0, bytes) > 0;
     }
 
-    void consume(int bytes);
+    void consume(long bytes);
 
-    default void consume(IStackKey key, int bytes) {
+    default void consume(IStackKey key, long bytes) {
         consume(bytes);
     }
 
-    default void restore(int bytes) {
+    default void restore(long bytes) {
         consume(-bytes);
     }
 
-    default void restore(IStackKey key, int bytes) {
+    default void restore(IStackKey key, long bytes) {
         consume(key, -bytes);
     }
 

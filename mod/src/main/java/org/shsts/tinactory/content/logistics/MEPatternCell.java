@@ -78,12 +78,12 @@ public class MEPatternCell extends CapabilityItem {
         }
 
         @Override
-        public int bytesCapacity() {
+        public long bytesCapacity() {
             return state.bytesCapacity();
         }
 
         @Override
-        public int bytesUsed() {
+        public long bytesUsed() {
             return state.bytesUsed();
         }
 

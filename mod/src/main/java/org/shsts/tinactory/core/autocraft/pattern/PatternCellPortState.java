@@ -38,13 +38,13 @@ public final class PatternCellPortState implements IPatternCellPort {
     }
 
     @Override
-    public int bytesCapacity() {
+    public long bytesCapacity() {
         return bytesLimit;
     }
 
     @Override
-    public int bytesUsed() {
-        return patterns.size() * BYTES_PER_PATTERN;
+    public long bytesUsed() {
+        return (long) patterns.size() * BYTES_PER_PATTERN;
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class PatternCellPortState implements IPatternCellPort {
         if (patterns.containsKey(pattern.patternUuid())) {
             return true;
         }
-        if ((patterns.size() + 1) * BYTES_PER_PATTERN > bytesLimit) {
+        if ((long) (patterns.size() + 1) * BYTES_PER_PATTERN > bytesLimit) {
             return false;
         }
         patterns.put(pattern.patternUuid(), pattern);

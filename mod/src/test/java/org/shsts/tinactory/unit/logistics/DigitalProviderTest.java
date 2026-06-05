@@ -31,4 +31,16 @@ class DigitalProviderTest {
         assertEquals(0, provider.bytesUsed());
         assertEquals(16, provider.consumeLimit(1));
     }
+
+    @Test
+    void shouldTrackCapacityBeyondIntRange() {
+        var capacity = (long) Integer.MAX_VALUE + 1024L;
+        var provider = new DigitalProvider(capacity);
+
+        provider.consume(Integer.MAX_VALUE);
+
+        assertEquals(capacity, provider.bytesCapacity());
+        assertEquals(Integer.MAX_VALUE, provider.bytesUsed());
+        assertEquals(1024, provider.consumeLimit(1));
+    }
 }

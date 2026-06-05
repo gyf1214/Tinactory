@@ -6,31 +6,32 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DigitalProvider implements IDigitalProvider {
-    private final int bytesLimit;
-    private int bytesRemaining;
+    private final long bytesLimit;
+    private long bytesRemaining;
 
-    public DigitalProvider(int bytesLimit) {
+    public DigitalProvider(long bytesLimit) {
         this.bytesLimit = bytesLimit;
         this.bytesRemaining = bytesLimit;
     }
 
     @Override
-    public int bytesCapacity() {
+    public long bytesCapacity() {
         return bytesLimit;
     }
 
     @Override
-    public int bytesUsed() {
+    public long bytesUsed() {
         return bytesLimit - bytesRemaining;
     }
 
     @Override
     public int consumeLimit(int offset, int bytes) {
-        return Math.max(0, (bytesRemaining - offset) / bytes);
+        var limit = Math.max(0L, (bytesRemaining - offset) / bytes);
+        return limit > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) limit;
     }
 
     @Override
-    public void consume(int bytes) {
+    public void consume(long bytes) {
         bytesRemaining -= bytes;
         assert bytesRemaining >= 0 && bytesRemaining <= bytesLimit;
     }

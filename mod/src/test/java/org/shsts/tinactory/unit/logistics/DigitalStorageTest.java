@@ -153,12 +153,12 @@ class DigitalStorageTest {
         }
 
         @Override
-        public int bytesCapacity() {
+        public long bytesCapacity() {
             return capacity;
         }
 
         @Override
-        public int bytesUsed() {
+        public long bytesUsed() {
             return used;
         }
 
@@ -168,8 +168,8 @@ class DigitalStorageTest {
         }
 
         @Override
-        public void consume(int bytes) {
-            used += bytes;
+        public void consume(long bytes) {
+            used += Math.toIntExact(bytes);
         }
 
         @Override
