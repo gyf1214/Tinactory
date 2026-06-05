@@ -1,5 +1,6 @@
 package org.shsts.tinactory.gametest.dependency;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -48,6 +49,7 @@ import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+import org.slf4j.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,6 +67,8 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 public final class DependencyChecker {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     private record LithographyLensBlock(StackNode node, Collection<Item> lens) {}
 
     private static final ResourceLocation BOILER = AllRecipes.BOILER.loc();
@@ -97,20 +101,20 @@ public final class DependencyChecker {
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
     private List<LithographyLensBlock> lithographyLensBlocks = null;
 
-    public void addMethod(DependencyMethod method) {
+    private void addMethod(DependencyMethod method) {
         methods.add(method);
         for (var output : method.outputs()) {
             methodsByOutput.computeIfAbsent(output, $ -> new TreeSet<>()).add(method);
         }
     }
 
-    public static void runRuntimeCheck(ServerLevel world) {
+    public static boolean runRuntimeCheck(ServerLevel world) {
         var checker = new DependencyChecker();
         checker.extractRuntimeMethods(world);
         var solver = new DependencySolver(checker.methods);
         var startNodes = checker.startNodes();
         solver.solve(startNodes);
-        checker.writeReport(solver, startNodes, checker.intendedTargets(), checker.exemptTargets());
+        return checker.writeReport(solver, startNodes, checker.intendedTargets(), checker.exemptTargets());
     }
 
     private void extractRuntimeMethods(ServerLevel world) {
@@ -435,12 +439,10 @@ public final class DependencyChecker {
             if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
                 continue;
             }
-            cableNode(voltage).ifPresent(cable -> {
-                addMethod(new DependencyMethod(
-                    "voltage/generator/" + voltage.id,
-                    List.of(cable, new GeneratorNode(voltage)), List.of(new VoltageNode(voltage)),
-                    "voltage generator bridge"));
-            });
+            cableNode(voltage).ifPresent(cable -> addMethod(new DependencyMethod(
+                "voltage/generator/" + voltage.id,
+                List.of(cable, new GeneratorNode(voltage)), List.of(new VoltageNode(voltage)),
+                "voltage generator bridge")));
             transformerNode(voltage).ifPresent(transformer -> {
                 if (voltage.rank > Voltage.ULV.rank) {
                     cableNode(voltage).ifPresent(cable -> addMethod(new DependencyMethod(
@@ -624,9 +626,6 @@ public final class DependencyChecker {
 
     private void addMaterialExemptions(Map<IDependencyNode, String> exemptions, String materialName, String reason) {
         var material = AllMaterials.getMaterial(materialName);
-        if (material == null) {
-            return;
-        }
         for (var sub : material.itemSubs()) {
             if (!material.isAlias(sub)) {
                 stackNode(new ItemStack(material.item(sub))).ifPresent(node -> exemptions.put(node, reason));
@@ -634,12 +633,9 @@ public final class DependencyChecker {
         }
     }
 
-    private void writeReport(IDependencySolver solver, Collection<IDependencyNode> startNodes,
+    private boolean writeReport(IDependencySolver solver, Collection<IDependencyNode> startNodes,
         Set<IDependencyNode> targets, Map<IDependencyNode, String> exemptions) {
         var reportFile = System.getProperty("tinactory.dependencyChecker.reportFile", "");
-        if (reportFile.isBlank()) {
-            return;
-        }
         var lines = new ArrayList<String>();
         var verbose = Boolean.getBoolean("tinactory.dependencyChecker.verbose");
         if (verbose) {
@@ -657,25 +653,28 @@ public final class DependencyChecker {
                 lines.addAll(formatMissingTarget(solver, target, verbose));
             }
         }
-        var path = Path.of(reportFile);
-        try {
-            var parent = path.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
+        if (!reportFile.isBlank()) {
+            var path = Path.of(reportFile);
+            try {
+                var parent = path.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
+                Files.write(path, lines);
+                LOGGER.info("Tinactory dependency checker report: {}", path);
+            } catch (Exception e) {
+                LOGGER.warn("Failed to write Tinactory dependency checker report {}", path, e);
             }
-            Files.write(path, lines);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to write dependency checker report " + path, e);
-        }
-        var message = "Tinactory dependency checker found " + missingTargets + "/" + targets.size() +
-            " nodes unreachable: " + path;
-        if (missingTargets != ACCEPTED_UNREACHABLE_NODES) {
-            throw new IllegalStateException(message + " differs from accepted baseline " +
-                ACCEPTED_UNREACHABLE_NODES);
         }
         if (missingTargets > 0) {
-            System.err.println(message);
+            LOGGER.info("{}/{} nodes unreachable",
+                missingTargets, targets.size());
         }
+        if (missingTargets != ACCEPTED_UNREACHABLE_NODES) {
+            LOGGER.error("differs from baseline: {}", ACCEPTED_UNREACHABLE_NODES);
+            return false;
+        }
+        return true;
     }
 
     private Collection<String> formatMissingTarget(IDependencySolver solver, IDependencyNode target, boolean verbose) {
@@ -705,8 +704,7 @@ public final class DependencyChecker {
             .flatMap(stackIngredient -> stackNode(stackIngredient.stack()))
             .map(node -> (IDependencyNode) node)
             .or(() -> ProcessingHelper.asFluidIngredient(ingredient)
-                .flatMap(stackIngredient -> stackNode(stackIngredient.stack()))
-                .map(node -> node));
+                .flatMap(stackIngredient -> stackNode(stackIngredient.stack())));
     }
 
     private Optional<IDependencyNode> resultNode(IProcessingResult result) {
@@ -716,8 +714,7 @@ public final class DependencyChecker {
             .map(node -> (IDependencyNode) node)
             .or(() -> ProcessingHelper.asFluidResult(result)
                 .filter(stackResult -> stackResult.rate() > 0d)
-                .flatMap(stackResult -> stackNode(stackResult.stack()))
-                .map(node -> node));
+                .flatMap(stackResult -> stackNode(stackResult.stack())));
     }
 
     private Optional<IDependencyNode> ingredientNode(Ingredient ingredient, ResourceLocation recipeId, int inputIndex) {
@@ -730,7 +727,7 @@ public final class DependencyChecker {
             if (object.has("item")) {
                 var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("item").getAsString()));
                 if (item != null) {
-                    return stackNode(new ItemStack(item)).map(node -> (IDependencyNode) node);
+                    return stackNode(new ItemStack(item)).map(node -> node);
                 }
             }
         }
@@ -739,7 +736,7 @@ public final class DependencyChecker {
             return Optional.empty();
         }
         if (items.length == 1) {
-            return stackNode(items[0]).map(node -> (IDependencyNode) node);
+            return stackNode(items[0]).map(node -> node);
         }
         var node = new IngredientNode("recipe", recipeId, inputIndex);
         addIngredientBridgeMethods(node, List.of(items));
@@ -756,7 +753,7 @@ public final class DependencyChecker {
             return Optional.empty();
         }
         if (candidates.size() == 1) {
-            return stackNode(candidates.get(0)).map(node -> (IDependencyNode) node);
+            return stackNode(candidates.get(0)).map(node -> node);
         }
         var node = new IngredientNode("multiblock", multiblockId, inputIndex);
         addIngredientBridgeMethods(node, candidates);
