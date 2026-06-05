@@ -16,9 +16,9 @@ public class StructureHelper {
         var tag = new CompoundTag();
 
         var size = new ListTag();
-        size.add(IntTag.valueOf(1));
-        size.add(IntTag.valueOf(1));
-        size.add(IntTag.valueOf(1));
+        size.add(IntTag.valueOf(5));
+        size.add(IntTag.valueOf(5));
+        size.add(IntTag.valueOf(5));
         tag.put("size", size);
 
         var palette = new ListTag();
