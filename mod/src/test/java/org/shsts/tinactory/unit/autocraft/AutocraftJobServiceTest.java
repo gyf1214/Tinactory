@@ -62,6 +62,18 @@ class AutocraftJobServiceTest {
     }
 
     @Test
+    void serviceShouldForwardItemAndFluidBandwidths() {
+        var executor = new TestExecutor(JobState.RUNNING);
+        var service = new AutocraftJobService(executor, 16, 4000, 1);
+
+        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());
+        service.tick();
+
+        assertEquals(16L, executor.lastItemBandwidth);
+        assertEquals(4000L, executor.lastFluidBandwidth);
+    }
+
+    @Test
     void serviceShouldExposeEmptyWhenNoCurrentJob() {
         var service = new AutocraftJobService(new TestExecutor(JobState.IDLE));
 
@@ -154,6 +166,8 @@ class AutocraftJobServiceTest {
         private boolean restoreCalled;
         private ExecutionError blockedReason;
         private CraftPlan currentPlan = new CraftPlan(List.of());
+        private long lastItemBandwidth;
+        private long lastFluidBandwidth;
 
         private TestExecutor(JobState... states) {
             this.states = List.of(states);
@@ -170,7 +184,9 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public void runCycle(long transmissionBandwidth) {
+        public void runCycle(long itemBandwidth, long fluidBandwidth) {
+            lastItemBandwidth = itemBandwidth;
+            lastFluidBandwidth = fluidBandwidth;
             if (index + 1 < states.size()) {
                 index++;
             }

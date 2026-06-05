@@ -1,7 +1,8 @@
 {
   "type": "me_craft_cpu",
   "power": 8192,
-  "transmissionBandwidth": 64,
+  "itemBandwidth": 64,
+  "fluidBandwidth": 16000,
   "executionIntervalTicks": 10,
   "memoryLimit": 33554432
 }

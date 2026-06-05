@@ -34,7 +34,8 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
 
     private final PatternNbtCodec snapshotCodec =
         new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
-    private final long transmissionBandwidth;
+    private final long itemBandwidth;
+    private final long fluidBandwidth;
     private final int executionIntervalTicks;
     private final long memoryLimit;
     @Nullable
@@ -42,11 +43,13 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     @Nullable
     private CompoundTag pendingSnapshot;
 
-    public record Properties(double power, long transmissionBandwidth, int executionIntervalTicks, long memoryLimit) {}
+    public record Properties(double power, long itemBandwidth, long fluidBandwidth, int executionIntervalTicks,
+        long memoryLimit) {}
 
     public MECraftCpu(BlockEntity blockEntity, Properties properties) {
         super(blockEntity);
-        this.transmissionBandwidth = properties.transmissionBandwidth;
+        this.itemBandwidth = properties.itemBandwidth;
+        this.fluidBandwidth = properties.fluidBandwidth;
         this.executionIntervalTicks = properties.executionIntervalTicks;
         this.memoryLimit = properties.memoryLimit;
 
@@ -103,7 +106,8 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             logistics,
             combinedItem,
             combinedFluid,
-            transmissionBandwidth,
+            itemBandwidth,
+            fluidBandwidth,
             executionIntervalTicks,
             memoryLimit);
         if (snapshot != null) {

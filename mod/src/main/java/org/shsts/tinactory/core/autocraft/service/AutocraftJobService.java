@@ -19,11 +19,13 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AutocraftJobService implements IAutocraftService {
-    private static final long DEFAULT_TRANSMISSION_BANDWIDTH = 64L;
+    private static final long DEFAULT_ITEM_BANDWIDTH = 64L;
+    private static final long DEFAULT_FLUID_BANDWIDTH = 16000L;
     private static final int DEFAULT_EXECUTION_INTERVAL_TICKS = 1;
 
     private final ICraftExecutor executor;
-    private final long transmissionBandwidth;
+    private final long itemBandwidth;
+    private final long fluidBandwidth;
     private final int executionIntervalTicks;
     private final long memoryLimit;
 
@@ -33,22 +35,25 @@ public class AutocraftJobService implements IAutocraftService {
 
     public AutocraftJobService(
         ICraftExecutor executor,
-        long transmissionBandwidth,
+        long itemBandwidth,
+        long fluidBandwidth,
         int executionIntervalTicks,
         long memoryLimit) {
 
         this.executor = executor;
-        this.transmissionBandwidth = transmissionBandwidth;
+        this.itemBandwidth = itemBandwidth;
+        this.fluidBandwidth = fluidBandwidth;
         this.executionIntervalTicks = Math.max(1, executionIntervalTicks);
         this.memoryLimit = Math.max(0L, memoryLimit);
     }
 
-    public AutocraftJobService(ICraftExecutor executor, long transmissionBandwidth, int executionIntervalTicks) {
-        this(executor, transmissionBandwidth, executionIntervalTicks, Long.MAX_VALUE);
+    public AutocraftJobService(ICraftExecutor executor, long itemBandwidth, long fluidBandwidth,
+        int executionIntervalTicks) {
+        this(executor, itemBandwidth, fluidBandwidth, executionIntervalTicks, Long.MAX_VALUE);
     }
 
     public AutocraftJobService(ICraftExecutor executor) {
-        this(executor, DEFAULT_TRANSMISSION_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
+        this(executor, DEFAULT_ITEM_BANDWIDTH, DEFAULT_FLUID_BANDWIDTH, DEFAULT_EXECUTION_INTERVAL_TICKS);
     }
 
     @Override
@@ -129,7 +134,7 @@ public class AutocraftJobService implements IAutocraftService {
             return false;
         }
         pendingTicks = 0;
-        executor.runCycle(transmissionBandwidth);
+        executor.runCycle(itemBandwidth, fluidBandwidth);
         if (!executor.isBusy()) {
             currentTargets = List.of();
             currentMemoryUsage = 0L;

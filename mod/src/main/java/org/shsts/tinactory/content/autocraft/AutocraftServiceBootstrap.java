@@ -23,7 +23,8 @@ public final class AutocraftServiceBootstrap {
         LogisticComponent logistics,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
-        long transmissionBandwidth,
+        long itemBandwidth,
+        long fluidBandwidth,
         int executionIntervalTicks,
         long memoryLimit) {
 
@@ -32,7 +33,8 @@ public final class AutocraftServiceBootstrap {
         var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
         return new AutocraftJobService(
             executor,
-            transmissionBandwidth,
+            itemBandwidth,
+            fluidBandwidth,
             executionIntervalTicks,
             memoryLimit);
     }

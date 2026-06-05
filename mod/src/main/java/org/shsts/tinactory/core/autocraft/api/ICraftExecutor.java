@@ -13,7 +13,7 @@ public interface ICraftExecutor {
 
     void restore(CompoundTag tag, PatternNbtCodec codec);
 
-    void runCycle(long transmissionBandwidth);
+    void runCycle(long itemBandwidth, long fluidBandwidth);
 
     void cancel();
 

@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
@@ -97,18 +98,18 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     }
 
     @Override
-    public void runCycle(long transmissionBandwidth) {
+    public void runCycle(long itemBandwidth, long fluidBandwidth) {
         if (phase == ExecutionPhase.TERMINAL ||
             state == JobState.FAILED) {
             return;
         }
         if (phase == ExecutionPhase.FLUSHING) {
-            flushStepBuffer(transmissionBandwidth);
+            flushStepBuffer(itemBandwidth, fluidBandwidth);
             return;
         }
         if (nextStep >= plan.steps().size()) {
             beginFinalFlushing();
-            flushStepBuffer(transmissionBandwidth);
+            flushStepBuffer(itemBandwidth, fluidBandwidth);
             return;
         }
 
@@ -122,12 +123,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
 
-        if (transmissionBandwidth > 0L) {
-            var remaining = pullOutputs(transmissionBandwidth);
-            if (remaining > 0L) {
-                pushInputs(remaining);
-            }
-        }
+        transferStepStacks(PortType.ITEM, itemBandwidth);
+        transferStepStacks(PortType.FLUID, fluidBandwidth);
 
         if (stepCompleted()) {
             releaseLease();
@@ -454,7 +451,17 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private long pullOutputs(long bandwidth) {
+    private void transferStepStacks(PortType type, long bandwidth) {
+        if (bandwidth <= 0L) {
+            return;
+        }
+        var remaining = pullOutputs(type, bandwidth);
+        if (remaining > 0L) {
+            pushInputs(type, remaining);
+        }
+    }
+
+    private long pullOutputs(PortType type, long bandwidth) {
         if (lease == null) {
             return bandwidth;
         }
@@ -464,6 +471,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 break;
             }
             var key = route.key();
+            if (key.type() != type) {
+                continue;
+            }
             var needed = stepRequiredOutputs.getOrDefault(key, 0L) - transmittedRequiredOutputs.getOrDefault(key, 0L);
             if (needed <= 0L) {
                 continue;
@@ -484,6 +494,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (remaining <= 0L) {
                 break;
             }
+            if (route.key().type() != type) {
+                continue;
+            }
             var moved = route.transfer(remaining, false);
             if (moved <= 0L) {
                 continue;
@@ -495,7 +508,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return remaining;
     }
 
-    private void pushInputs(long bandwidth) {
+    private void pushInputs(PortType type, long bandwidth) {
         if (lease == null) {
             return;
         }
@@ -505,6 +518,9 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 break;
             }
             var key = route.key();
+            if (key.type() != type) {
+                continue;
+            }
             var buffered = stepBuffer.getOrDefault(key, 0L);
             if (buffered <= 0L) {
                 continue;
@@ -587,14 +603,17 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         state = JobState.RUNNING;
     }
 
-    private void flushStepBuffer(long bandwidth) {
+    private void flushStepBuffer(long itemBandwidth, long fluidBandwidth) {
         if (phase != ExecutionPhase.FLUSHING) {
             return;
         }
-        var remaining = bandwidth;
-        remaining = flushAmounts(pendingFlush, remaining);
-        if (flushStepBufferInPhase && remaining > 0L) {
-            remaining = flushAmounts(stepBuffer, remaining);
+        var remainingItems = flushAmounts(pendingFlush, PortType.ITEM, itemBandwidth);
+        var remainingFluids = flushAmounts(pendingFlush, PortType.FLUID, fluidBandwidth);
+        if (flushStepBufferInPhase && remainingItems > 0L) {
+            remainingItems = flushAmounts(stepBuffer, PortType.ITEM, remainingItems);
+        }
+        if (flushStepBufferInPhase && remainingFluids > 0L) {
+            remainingFluids = flushAmounts(stepBuffer, PortType.FLUID, remainingFluids);
         }
 
         var done = pendingFlush.isEmpty() && (!flushStepBufferInPhase || stepBuffer.isEmpty());
@@ -614,7 +633,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             flushStepBufferInPhase = false;
             return;
         }
-        if (remaining > 0L) {
+        if (remainingItems > 0L || remainingFluids > 0L) {
             error = ExecutionError.FLUSH_BACKPRESSURE;
             state = JobState.BLOCKED;
         } else {
@@ -625,11 +644,14 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         }
     }
 
-    private long flushAmounts(Map<IStackKey, Long> amounts, long bandwidth) {
+    private long flushAmounts(Map<IStackKey, Long> amounts, PortType type, long bandwidth) {
         var remaining = bandwidth;
         for (var entry : List.copyOf(amounts.entrySet())) {
             if (remaining <= 0L) {
                 break;
+            }
+            if (entry.getKey().type() != type) {
+                continue;
             }
             var target = Math.min(remaining, entry.getValue());
             var inserted = inventory.insert(entry.getKey(), target, false);

@@ -92,7 +92,7 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldSubmitPreparedPreviewMemoryUsage() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         var service = new AutocraftTerminalService(
             new StaticPlanner(PlanResult.completed(planRequiring(
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -118,7 +118,7 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void executeShouldFailWhenPreviewMemoryExceedsCpuLimit() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 1, 40L);
+        var jobService = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 40L);
         var service = new AutocraftTerminalService(
             new StaticPlanner(planRequiring(
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -238,13 +238,13 @@ class AutocraftTerminalServiceExecuteTest {
     void jobSnapshotShouldPersistAndRestoreMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
-        var service = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
             target), 256L);
 
         var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
-        var restored = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         restored.restoreRunningSnapshot(persisted, codec);
 
         assertEquals(256L, persisted.getLong("memoryUsage"));
@@ -255,14 +255,14 @@ class AutocraftTerminalServiceExecuteTest {
     void oldJobSnapshotShouldRestoreZeroMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
-        var service = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
             target), 256L);
         var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
         persisted.remove("memoryUsage");
 
-        var restored = new AutocraftJobService(new TestExecutor(), 64L, 1, 1024L);
+        var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         restored.restoreRunningSnapshot(persisted, codec);
 
         assertEquals(0L, restored.getJob().orElseThrow().memoryUsage());
@@ -473,7 +473,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public void runCycle(long transmissionBandwidth) {}
+        public void runCycle(long itemBandwidth, long fluidBandwidth) {}
 
         @Override
         public void cancel() {}

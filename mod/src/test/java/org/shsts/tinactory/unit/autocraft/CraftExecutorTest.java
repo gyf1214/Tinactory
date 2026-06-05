@@ -50,7 +50,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 12; i++) {
-            executor.runCycle(64);
+            executor.runCycle(64, 64);
         }
 
         assertEquals(JobState.IDLE, executor.state());
@@ -71,7 +71,7 @@ class CraftExecutorTest {
             1);
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(64);
+        executor.runCycle(64, 64);
 
         assertEquals(JobState.BLOCKED, executor.state());
         assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.error());
@@ -90,7 +90,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(step)));
 
         executor.cancel();
-        executor.runCycle(64);
+        executor.runCycle(64, 64);
 
         assertEquals(JobState.IDLE, executor.state());
         assertEquals(ExecutionError.NONE, executor.error());
@@ -126,7 +126,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
-            executor.runCycle(64);
+            executor.runCycle(64, 64);
         }
 
         assertEquals(JobState.IDLE, executor.state());
@@ -154,20 +154,49 @@ class CraftExecutorTest {
             List.of(new CraftAmount(plate, 1)));
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(2);
-        executor.runCycle(2);
+        executor.runCycle(2, 2);
+        executor.runCycle(2, 2);
 
         assertEquals(JobState.RUNNING, executor.state());
         assertEquals(0L, inventory.amountOf(plate));
         assertEquals(0L, inventory.amountOf(slag));
 
         for (var i = 0; i < 8; i++) {
-            executor.runCycle(64);
+            executor.runCycle(64, 64);
         }
 
         assertEquals(JobState.IDLE, executor.state());
         assertEquals(2L, inventory.amountOf(plate));
         assertEquals(2L, inventory.amountOf(slag));
+    }
+
+    @Test
+    void fluidOutputsShouldUseFluidBandwidth() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var steam = TestStackKey.fluid("tinactory:steam", "");
+        var inventory = new FakeInventory(Map.of(ore, 1L));
+        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:steam",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(steam, 1000))),
+            1);
+        executor.start(new CraftPlan(List.of(step)));
+
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+
+        assertEquals(JobState.RUNNING, executor.state());
+        assertEquals(0L, inventory.amountOf(steam));
+
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(1000L, inventory.amountOf(steam));
     }
 
     @Test
@@ -199,7 +228,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
-            executor.runCycle(64);
+            executor.runCycle(64, 64);
         }
 
         assertEquals(JobState.IDLE, executor.state());
@@ -228,9 +257,9 @@ class CraftExecutorTest {
             List.of(new CraftAmount(plate, 1)));
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(1);
+        executor.runCycle(1, 1);
         firstLease.valid = false;
-        executor.runCycle(1);
+        executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.state());
         assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.error());
@@ -256,10 +285,10 @@ class CraftExecutorTest {
             List.of(new CraftAmount(plate, 1)));
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(2);
+        executor.runCycle(2, 2);
         firstLease.valid = false;
         for (var i = 0; i < 8; i++) {
-            executor.runCycle(64);
+            executor.runCycle(64, 64);
         }
 
         assertEquals(JobState.IDLE, executor.state());

@@ -55,8 +55,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private final BlockEntity blockEntity;
     public final int workerSlots;
     private final int workerInterval;
-    private final int workerStack;
-    private final int workerFluidStack;
+    private final int itemBandwidth;
+    private final int fluidBandwidth;
     private final int[] nextValidSlot;
     private int tick = 0;
     private int currentSlot;
@@ -66,14 +66,14 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private final LazyOptional<IElectricMachine> electricCap;
 
-    public record Properties(int slots, int interval, int stack, int fluidStack, double power) {}
+    public record Properties(int slots, int interval, int itemBandwidth, int fluidBandwidth, double power) {}
 
     public LogisticWorker(BlockEntity blockEntity, Properties properties) {
         this.blockEntity = blockEntity;
         this.workerSlots = properties.slots;
         this.workerInterval = properties.interval;
-        this.workerStack = properties.stack;
-        this.workerFluidStack = properties.fluidStack;
+        this.itemBandwidth = properties.itemBandwidth;
+        this.fluidBandwidth = properties.fluidBandwidth;
         this.nextValidSlot = new int[workerSlots];
         // initialize current slot to the last slot so in the first tick it will select the first valid slot
         this.currentSlot = workerSlots - 1;
@@ -172,13 +172,13 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         LogisticWorkerConfig config) {
         var filterType = config.filterType();
         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-            return ITEM_TRANSMITTER.probe(from, to, config.itemFilter(), workerStack);
+            return ITEM_TRANSMITTER.probe(from, to, config.itemFilter(), itemBandwidth);
         }
 
         Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
             stack -> stack.is(config.tagFilter()) : StackHelper.TRUE_FILTER;
         return ITEM_TRANSMITTER.select(from, to,
-            from.getAllStorages().stream().filter(filter).toList(), workerStack);
+            from.getAllStorages().stream().filter(filter).toList(), itemBandwidth);
     }
 
     private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
@@ -195,9 +195,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private FluidStack selectTransmittedFluid(IPort<FluidStack> from, IPort<FluidStack> to,
         FluidStack filter) {
         if (!filter.isEmpty()) {
-            return FLUID_TRANSMITTER.probe(from, to, filter, workerFluidStack);
+            return FLUID_TRANSMITTER.probe(from, to, filter, fluidBandwidth);
         }
-        return FLUID_TRANSMITTER.select(from, to, from.getAllStorages(), workerFluidStack);
+        return FLUID_TRANSMITTER.select(from, to, from.getAllStorages(), fluidBandwidth);
     }
 
     private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {

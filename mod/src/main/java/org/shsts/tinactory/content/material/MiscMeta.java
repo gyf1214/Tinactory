@@ -246,7 +246,8 @@ public class MiscMeta extends MetaConsumer {
     private void meCraftCpu(String id, JsonObject jo) {
         var config = new MECraftCpu.Properties(
             GsonHelper.getAsDouble(jo, "power"),
-            GsonHelper.getAsLong(jo, "transmissionBandwidth"),
+            GsonHelper.getAsLong(jo, "itemBandwidth"),
+            GsonHelper.getAsLong(jo, "fluidBandwidth"),
             GsonHelper.getAsInt(jo, "executionIntervalTicks"),
             GsonHelper.getAsLong(jo, "memoryLimit"));
         BlockEntityBuilder.builder(id, simpleElectric(config.power()))
