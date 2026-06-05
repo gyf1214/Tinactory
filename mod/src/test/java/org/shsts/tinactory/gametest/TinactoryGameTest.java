@@ -7,7 +7,9 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -17,8 +19,12 @@ import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.api.logistics.ContainerAccess;
+import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.gametest.dependency.DependencyChecker;
 import org.shsts.tinactory.integration.network.CableBlock;
@@ -170,6 +176,31 @@ public final class TinactoryGameTest {
         });
     }
 
+    @GameTest
+    public static void testDigitalInterfaceReserveBuffers(GameTestHelper helper) {
+        var interfacePos = new BlockPos(1, 1, 1);
+        helper.setBlock(interfacePos, machineState("multiblock/digital_interface", Voltage.EV, Direction.NORTH));
+        var digitalInterface = (DigitalInterface) MACHINE.get(helper.getBlockEntity(interfacePos));
+        digitalInterface.setLayout(Layout.builder()
+            .slot(0, SlotType.ITEM_INPUT, 0, 0, Voltage.between(Voltage.EV, Voltage.EV))
+            .slot(1, SlotType.ITEM_INPUT, 18, 0, Voltage.between(Voltage.EV, Voltage.EV))
+            .slot(2, SlotType.ITEM_OUTPUT, 36, 0, Voltage.between(Voltage.EV, Voltage.EV))
+            .buildLayout(Voltage.EV));
+
+        var firstInput = digitalInterface.getPort(0, ContainerAccess.EXTERNAL).asItem();
+        var secondInput = digitalInterface.getPort(1, ContainerAccess.EXTERNAL).asItem();
+        var output = digitalInterface.getPort(2, ContainerAccess.INTERNAL).asItem();
+
+        assertInserted(helper, interfacePos, firstInput.insert(stack(Items.COBBLESTONE, 2048), false), 2048, 1072,
+            "first input type should use one input reserve slot plus shared capacity");
+        assertInserted(helper, interfacePos, secondInput.insert(stack(Items.DIRT, 2048), false), 2048, 48,
+            "second input type should still fit in a separate reserve slot after shared capacity is full");
+        assertInserted(helper, interfacePos, output.insert(stack(Items.IRON_INGOT, 2048), false), 2048, 496,
+            "output should use the output reserve inside total displayed capacity");
+
+        helper.succeed();
+    }
+
     @GameTest(timeoutTicks = 160)
     public static void testTransformerPowersOversizedEvConsumer(GameTestHelper helper) {
         var batteryBoxPos = new BlockPos(0, 1, 1);
@@ -233,6 +264,20 @@ public final class TinactoryGameTest {
             }
             helper.succeed();
         });
+    }
+
+    private static ItemStack stack(Item item, int count) {
+        var ret = new ItemStack(item);
+        ret.setCount(count);
+        return ret;
+    }
+
+    private static void assertInserted(GameTestHelper helper, BlockPos pos, ItemStack remaining, int requested,
+        int expected, String message) {
+        var inserted = requested - remaining.getCount();
+        if (inserted != expected) {
+            helper.fail(message + ": expected " + expected + ", got " + inserted, pos);
+        }
     }
 
     private static BlockState machineState(Direction ioFacing) {

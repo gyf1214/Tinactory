@@ -16,6 +16,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.logistics.ContainerPort;
@@ -32,12 +33,13 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -47,10 +49,15 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     private final int maxParallel;
     private final int bytesLimit;
-    private final int dedicatedLimit;
-    private final int amountByteLimit;
+    private final int inputTypeReserveBytes;
+    private final int inputTypeReserveSlots;
+    private final int outputReserveBytes;
 
     private int sharedBytes;
+    private int outputReserveUsed;
+    private int outputBytesUsed;
+    private final Map<IStackKey, Integer> inputReserveUsed = new HashMap<>();
+    private final Map<IStackKey, Integer> inputBytesUsed = new HashMap<>();
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
         private final StoragePorts.ItemStorage internalItem;
@@ -80,16 +87,20 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             internalFluid.onUpdate(this::onUpdate);
         }
 
+        private boolean isInput() {
+            return type.direction == PortDirection.INPUT;
+        }
+
         public void setType(SlotType val) {
             type = val;
             internalItem.resetFilters();
             internalFluid.resetFilters();
             if (type.direction == PortDirection.INPUT) {
-                internalItem.maxAmount = amountByteLimit / CONFIG.bytesPerItem.get();
+                internalItem.maxAmount = Integer.MAX_VALUE;
                 menuItem.allowInput = true;
                 externalItem.allowInput = true;
                 externalItem.allowOutput = false;
-                internalFluid.maxAmount = amountByteLimit / CONFIG.bytesPerFluid.get();
+                internalFluid.maxAmount = Integer.MAX_VALUE;
                 menuFluid.allowInput = true;
                 externalFluid.allowInput = true;
                 externalFluid.allowOutput = false;
@@ -133,41 +144,46 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
         @Override
         public int consumeLimit(int offset, int bytes) {
-            if (bytesUsed < dedicatedLimit) {
-                return Math.max(0, (sharedBytes + dedicatedLimit - bytesUsed - offset) / bytes);
-            } else {
-                return Math.max(0, (sharedBytes - offset) / bytes);
-            }
+            return Math.max(0, (availableBytesForNoKey(isInput()) - offset) / bytes);
+        }
+
+        @Override
+        public int consumeLimit(IStackKey key, int offset, int bytes) {
+            return Math.max(0, (availableBytesForKey(isInput(), key) - offset) / bytes);
         }
 
         @Override
         public void consume(int bytes) {
             assert bytes > 0;
-            if (bytesUsed >= dedicatedLimit) {
-                // consume only shared
-                sharedBytes -= bytes;
-            } else if (bytesUsed + bytes > dedicatedLimit) {
-                // shared is consumed by the exceeding part
-                sharedBytes -= bytesUsed + bytes - dedicatedLimit;
-            }
-            assert sharedBytes >= 0;
+            consumeBytesWithoutKey(isInput(), bytes);
             bytesUsed += bytes;
             LOGGER.trace("consume {}, bytesUsed={}", bytes, bytesUsed);
         }
 
         @Override
+        public void consume(IStackKey key, int bytes) {
+            assert bytes > 0;
+            consumeBytesForKey(isInput(), key, bytes);
+            bytesUsed += bytes;
+            LOGGER.trace("consume {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
+        }
+
+        @Override
         public void restore(int bytes) {
             assert bytes > 0;
-            if (bytes < bytesUsed - dedicatedLimit) {
-                // restore only shared
-                sharedBytes += bytes;
-            } else if (bytesUsed > dedicatedLimit) {
-                // restore all shared consumed
-                sharedBytes += bytesUsed - dedicatedLimit;
-            }
+            restoreBytesWithoutKey(isInput(), bytes);
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
             LOGGER.trace("restore {}, bytesUsed={}", bytes, bytesUsed);
+        }
+
+        @Override
+        public void restore(IStackKey key, int bytes) {
+            assert bytes > 0;
+            restoreBytesForKey(isInput(), key, bytes);
+            bytesUsed -= bytes;
+            assert bytesUsed >= 0;
+            LOGGER.trace("restore {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
         }
 
         /**
@@ -190,20 +206,32 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             internalItem.deserializeNBT(tag.getCompound("items"));
             internalFluid.deserializeNBT(tag.getCompound("fluids"));
         }
+
+        private void recomputeBytesUsed() {
+            var tag = serializeNBT();
+            deserializeNBT(tag);
+        }
     }
 
     private final List<Storage> storages = new ArrayList<>();
     private Layout layout = Layout.EMPTY;
 
-    public record Properties(int maxParallel, int bytesLimit, int dedicatedBytes, int amountByteLimit) {}
+    public record Properties(int maxParallel, int bytesLimit, int inputTypeReserveBytes,
+        int inputTypeReserveSlots, int outputReserveBytes) {}
 
     public DigitalInterface(BlockEntity be, Properties properties) {
         super(be);
         this.maxParallel = properties.maxParallel;
         this.bytesLimit = properties.bytesLimit;
-        this.dedicatedLimit = properties.dedicatedBytes;
-        this.sharedBytes = bytesLimit;
-        this.amountByteLimit = properties.amountByteLimit;
+        this.inputTypeReserveBytes = properties.inputTypeReserveBytes;
+        this.inputTypeReserveSlots = properties.inputTypeReserveSlots;
+        this.outputReserveBytes = properties.outputReserveBytes;
+        var reservedBytes = inputTypeReserveBytes * inputTypeReserveSlots + outputReserveBytes;
+        if (reservedBytes > bytesLimit) {
+            throw new IllegalArgumentException("Digital Interface reserve bytes exceed total capacity: " +
+                reservedBytes + " > " + bytesLimit);
+        }
+        this.sharedBytes = sharedCapacity();
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
@@ -222,7 +250,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     @Override
     public int bytesUsed() {
-        return bytesLimit - sharedBytes;
+        var inputUsed = inputBytesUsed.values().stream().mapToInt(Integer::intValue).sum();
+        return Math.min(bytesLimit, inputUsed + outputBytesUsed);
     }
 
     @Override
@@ -265,6 +294,10 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             var type = i < layout.ports.size() ? layout.ports.get(i).type() : SlotType.NONE;
             storage.setType(type);
         }
+        resetAccounting();
+        for (var storage : storages) {
+            storage.recomputeBytesUsed();
+        }
         this.layout = layout;
     }
 
@@ -279,6 +312,111 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     @Override
     protected void onLoad() {
         container = this;
+    }
+
+    private int sharedCapacity() {
+        return bytesLimit - inputTypeReserveBytes * inputTypeReserveSlots - outputReserveBytes;
+    }
+
+    private void resetAccounting() {
+        sharedBytes = sharedCapacity();
+        outputReserveUsed = 0;
+        outputBytesUsed = 0;
+        inputReserveUsed.clear();
+        inputBytesUsed.clear();
+    }
+
+    private int availableBytesForNoKey(boolean input) {
+        if (input) {
+            return sharedBytes;
+        }
+        return sharedBytes + outputReserveBytes - outputReserveUsed;
+    }
+
+    private int availableBytesForKey(boolean input, IStackKey key) {
+        if (!input) {
+            return availableBytesForNoKey(false);
+        }
+        var reserveUsed = inputReserveUsed.get(key);
+        if (reserveUsed != null) {
+            return sharedBytes + inputTypeReserveBytes - reserveUsed;
+        }
+        if (inputReserveUsed.size() < inputTypeReserveSlots) {
+            return sharedBytes + inputTypeReserveBytes;
+        }
+        return sharedBytes;
+    }
+
+    private void consumeBytesWithoutKey(boolean input, int bytes) {
+        if (input) {
+            sharedBytes -= bytes;
+            assert sharedBytes >= 0;
+            return;
+        }
+        var reserveBytes = Math.min(bytes, outputReserveBytes - outputReserveUsed);
+        outputReserveUsed += reserveBytes;
+        var sharedDelta = bytes - reserveBytes;
+        sharedBytes -= sharedDelta;
+        outputBytesUsed += bytes;
+        assert sharedBytes >= 0;
+    }
+
+    private void consumeBytesForKey(boolean input, IStackKey key, int bytes) {
+        if (!input) {
+            consumeBytesWithoutKey(false, bytes);
+            return;
+        }
+        var reserveUsed = inputReserveUsed.getOrDefault(key, 0);
+        var canUseReserve = reserveUsed > 0 || inputReserveUsed.containsKey(key) ||
+            inputReserveUsed.size() < inputTypeReserveSlots;
+        var reserveBytes = canUseReserve ? Math.min(bytes, inputTypeReserveBytes - reserveUsed) : 0;
+        if (reserveBytes > 0 || canUseReserve) {
+            inputReserveUsed.put(key, reserveUsed + reserveBytes);
+        }
+        var sharedDelta = bytes - reserveBytes;
+        sharedBytes -= sharedDelta;
+        inputBytesUsed.put(key, inputBytesUsed.getOrDefault(key, 0) + bytes);
+        assert sharedBytes >= 0;
+    }
+
+    private void restoreBytesWithoutKey(boolean input, int bytes) {
+        if (input) {
+            sharedBytes += bytes;
+            return;
+        }
+        var sharedUsed = outputBytesUsed - outputReserveUsed;
+        var sharedDelta = Math.min(bytes, sharedUsed);
+        sharedBytes += sharedDelta;
+        outputReserveUsed -= bytes - sharedDelta;
+        outputBytesUsed -= bytes;
+        assert outputReserveUsed >= 0 && outputBytesUsed >= 0;
+    }
+
+    private void restoreBytesForKey(boolean input, IStackKey key, int bytes) {
+        if (!input) {
+            restoreBytesWithoutKey(false, bytes);
+            return;
+        }
+        if (!inputBytesUsed.containsKey(key)) {
+            restoreBytesWithoutKey(true, bytes);
+            return;
+        }
+        var totalUsed = inputBytesUsed.get(key);
+        var reserveUsed = inputReserveUsed.getOrDefault(key, 0);
+        var sharedUsed = totalUsed - reserveUsed;
+        var sharedDelta = Math.min(bytes, sharedUsed);
+        sharedBytes += sharedDelta;
+        var reserveDelta = bytes - sharedDelta;
+        var newReserveUsed = reserveUsed - reserveDelta;
+        var newTotalUsed = totalUsed - bytes;
+        if (newTotalUsed <= 0) {
+            inputBytesUsed.remove(key);
+            inputReserveUsed.remove(key);
+        } else {
+            inputBytesUsed.put(key, newTotalUsed);
+            inputReserveUsed.put(key, newReserveUsed);
+        }
+        assert newReserveUsed >= 0 && newTotalUsed >= 0;
     }
 
     @Override
@@ -305,7 +443,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     public void deserializeNBT(CompoundTag tag) {
         super.deserializeNBT(tag);
 
-        sharedBytes = bytesLimit;
+        resetAccounting();
         storages.clear();
         for (var tag1 : tag.getList("storage", Tag.TAG_COMPOUND)) {
             var storage = new Storage();

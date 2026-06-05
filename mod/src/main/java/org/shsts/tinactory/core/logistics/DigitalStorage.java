@@ -42,9 +42,9 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         }
         var key = stackAdapter.keyOf(stack);
         if (contents.containsKey(key)) {
-            return stackAdapter.amount(contents.get(key)) < maxAmount && provider.canConsume(bytesPerUnit);
+            return stackAdapter.amount(contents.get(key)) < maxAmount && provider.canConsume(key, bytesPerUnit);
         }
-        return provider.canConsume(bytesPerUnit + bytesPerType);
+        return provider.canConsume(key, bytesPerUnit + bytesPerType);
     }
 
     public boolean acceptOutput() {
@@ -57,26 +57,26 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         }
         var key = stackAdapter.keyOf(stack);
         if (!contents.containsKey(key)) {
-            var limit = Math.min(provider.consumeLimit(bytesPerType, bytesPerUnit), maxAmount);
+            var limit = Math.min(provider.consumeLimit(key, bytesPerType, bytesPerUnit), maxAmount);
             var inserted = Math.min(stackAdapter.amount(stack), limit);
             var remaining = stackAdapter.withAmount(stack, stackAdapter.amount(stack) - inserted);
             if (!simulate) {
                 var insertedStack = stackAdapter.withAmount(stack, inserted);
                 contents.put(stackAdapter.keyOf(insertedStack), insertedStack);
-                provider.consume(bytesPerType + inserted * bytesPerUnit);
+                provider.consume(key, bytesPerType + inserted * bytesPerUnit);
                 invokeUpdate();
             }
             return remaining;
         }
         var existing = contents.get(key);
-        var limit = Math.min(provider.consumeLimit(bytesPerUnit),
+        var limit = Math.min(provider.consumeLimit(key, bytesPerUnit),
             maxAmount - stackAdapter.amount(existing));
         var inserted = Math.min(stackAdapter.amount(stack), limit);
         var remaining = stackAdapter.withAmount(stack, stackAdapter.amount(stack) - inserted);
         if (!simulate) {
             var updated = stackAdapter.withAmount(existing, stackAdapter.amount(existing) + inserted);
             contents.put(key, updated);
-            provider.consume(inserted * bytesPerUnit);
+            provider.consume(key, inserted * bytesPerUnit);
             invokeUpdate();
         }
         return remaining;
@@ -94,7 +94,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (stackAdapter.amount(stack) >= stackAdapter.amount(existing)) {
             if (!simulate) {
                 contents.remove(key);
-                provider.restore(bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
+                provider.restore(key, bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
                 invokeUpdate();
             }
             return stackAdapter.copy(existing);
@@ -103,7 +103,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
             var updated = stackAdapter.withAmount(existing,
                 stackAdapter.amount(existing) - stackAdapter.amount(stack));
             contents.put(key, updated);
-            provider.restore(bytesPerUnit * stackAdapter.amount(stack));
+            provider.restore(key, bytesPerUnit * stackAdapter.amount(stack));
             invokeUpdate();
         }
         return stackAdapter.copy(stack);
@@ -118,7 +118,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (limit >= stackAdapter.amount(existing)) {
             if (!simulate) {
                 contents.remove(entry.getKey());
-                provider.restore(bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
+                provider.restore(entry.getKey(), bytesPerType + bytesPerUnit * stackAdapter.amount(existing));
                 invokeUpdate();
             }
             return stackAdapter.copy(existing);
@@ -126,7 +126,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         if (!simulate) {
             var updated = stackAdapter.withAmount(existing, stackAdapter.amount(existing) - limit);
             contents.put(entry.getKey(), updated);
-            provider.restore(bytesPerUnit * limit);
+            provider.restore(entry.getKey(), bytesPerUnit * limit);
             invokeUpdate();
         }
         return stackAdapter.withAmount(existing, limit);

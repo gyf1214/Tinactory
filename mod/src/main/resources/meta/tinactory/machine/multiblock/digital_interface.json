@@ -1,27 +1,34 @@
 {
   "recipe": "none",
   "machine": "digital_interface",
-  "dedicatedBytes": 20480,
   "voltages": {
     "ev": {
       "maxParallel": 2,
-      "bytesLimit": 262144,
-      "amountByteLimit": 32768
+      "bytesLimit": 524288,
+      "inputTypeReserveBytes": 16384,
+      "inputTypeReserveSlots": 8,
+      "outputReserveBytes": 131072
     },
     "iv": {
       "maxParallel": 4,
-      "bytesLimit": 262144,
-      "amountByteLimit": 32768
+      "bytesLimit": 1048576,
+      "inputTypeReserveBytes": 32768,
+      "inputTypeReserveSlots": 8,
+      "outputReserveBytes": 262144
     },
     "luv": {
       "maxParallel": 8,
-      "bytesLimit": 1048576,
-      "amountByteLimit": 131072
+      "bytesLimit": 2097152,
+      "inputTypeReserveBytes": 32768,
+      "inputTypeReserveSlots": 16,
+      "outputReserveBytes": 524288
     },
     "zpm": {
       "maxParallel": 16,
-      "bytesLimit": 1048576,
-      "amountByteLimit": 131072
+      "bytesLimit": 4194304,
+      "inputTypeReserveBytes": 65536,
+      "inputTypeReserveSlots": 16,
+      "outputReserveBytes": 1048576
     }
   }
 }
