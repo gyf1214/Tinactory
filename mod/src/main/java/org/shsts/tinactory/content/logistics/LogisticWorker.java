@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -104,14 +103,12 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             .map(LogisticWorkerConfig::fromTag);
     }
 
-    private static Optional<IPort<?>> getPort(LogisticComponent logistic, BlockPos subnet,
-        LogisticComponent.PortKey key) {
-        return logistic.getPort(key, subnet)
+    private static Optional<IPort<?>> getPort(LogisticComponent logistic, LogisticComponent.PortKey key) {
+        return logistic.getPort(key)
             .map(LogisticComponent.PortInfo::port);
     }
 
-    private static boolean validateConfig(LogisticComponent logistic, BlockPos subnet,
-        LogisticWorkerConfig entry) {
+    private static boolean validateConfig(LogisticComponent logistic, LogisticWorkerConfig entry) {
         if (!entry.isValid()) {
             return true;
         }
@@ -120,8 +117,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (from.isEmpty() || to.isEmpty() || from.get().equals(to.get())) {
             return false;
         }
-        var from1 = getPort(logistic, subnet, from.get());
-        var to1 = getPort(logistic, subnet, to.get());
+        var from1 = getPort(logistic, from.get());
+        var to1 = getPort(logistic, to.get());
         return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type() &&
             (entry.filterType() == LogisticWorkerConfig.FilterType.NONE ||
                 entry.filterType().portType == from1.get().type());
@@ -142,7 +139,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
 
         var logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
-        var subnet = network.get().getSubnet(blockEntity.getBlockPos());
 
         var firstValidSlot = -1;
         var lastValidSlot = 0;
@@ -150,7 +146,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         for (var i = 0; i < workerSlots; i++) {
             var valid = getConfig(i)
                 .filter(LogisticWorkerConfig::isValid)
-                .filter(entry -> validateConfig(logistic, subnet, entry))
+                .filter(entry -> validateConfig(logistic, entry))
                 .isPresent();
 
             if (valid) {
@@ -241,12 +237,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         var entry1 = entry.get();
 
         var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
-        var subnet = network.getSubnet(blockEntity.getBlockPos());
 
-        if (validateConfig(logistic, subnet, entry1)) {
+        if (validateConfig(logistic, entry1)) {
             LOGGER.trace("{}: transmit entry slot {}", blockEntity, currentSlot);
-            var from = entry1.from().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
-            var to = entry1.to().flatMap(k -> getPort(logistic, subnet, k)).orElseThrow();
+            var from = entry1.from().flatMap(k -> getPort(logistic, k)).orElseThrow();
+            var to = entry1.to().flatMap(k -> getPort(logistic, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
                 transmitItem(from.asItem(), to.asItem(), entry1);
             } else {

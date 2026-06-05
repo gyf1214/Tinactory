@@ -162,8 +162,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
         logistics.unregisterPort(machine, 0);
         logistics.unregisterPort(machine, 1);
-        logistics.registerStoragePort(machine, 0, combinedItems, false, priority);
-        logistics.registerStoragePort(machine, 1, combinedFluids, false, priority);
+        logistics.registerStoragePort(machine, 0, combinedItems, priority);
+        logistics.registerStoragePort(machine, 1, combinedFluids, priority);
     }
 
     private void onConnect(INetwork network) {

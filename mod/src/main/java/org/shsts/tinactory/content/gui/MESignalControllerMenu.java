@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
@@ -29,7 +28,6 @@ public class MESignalControllerMenu extends MenuBase {
     public final IMachine machine;
     @Nullable
     private final SignalComponent signals;
-    private final BlockPos subnet;
     private final Runnable onUpdatePorts;
 
     public MESignalControllerMenu(Properties properties) {
@@ -44,11 +42,9 @@ public class MESignalControllerMenu extends MenuBase {
         var network = machine.network();
         if (network.isPresent()) {
             this.signals = network.get().getComponent(SIGNAL_COMPONENT.get());
-            this.subnet = network.get().getSubnet(blockEntity().getBlockPos());
             signals.onUpdate(onUpdatePorts);
         } else {
             this.signals = null;
-            this.subnet = null;
         }
 
         addSyncSlot(SIGNAL_SYNC, scheduler);
@@ -73,7 +69,7 @@ public class MESignalControllerMenu extends MenuBase {
             return Collections.emptyList();
         }
 
-        var infos = signals.getSubnetSignals(subnet).stream()
+        var infos = signals.getVisibleSignals().stream()
             .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_COMPARATOR))
             .toList();
 

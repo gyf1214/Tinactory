@@ -1,11 +1,8 @@
 package org.shsts.tinactory.content.logistics;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
@@ -27,7 +24,6 @@ public class SignalComponent extends NotifierComponent {
 
     private final Map<UUID, Map<String, IntSupplier>> readSignals = new HashMap<>();
     private final Map<UUID, Map<String, IntConsumer>> writeSignals = new HashMap<>();
-    private final SetMultimap<BlockPos, UUID> subnetMachines = HashMultimap.create();
     private final Map<UUID, IMachine> machines = new HashMap<>();
 
     public record SignalInfo(IMachine machine, String key, boolean isWrite) {}
@@ -39,7 +35,6 @@ public class SignalComponent extends NotifierComponent {
     public void registerRead(IMachine machine, String key, IntSupplier reader) {
         var uuid = machine.uuid();
         readSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, reader);
-        subnetMachines.put(getMachineSubnet(machine), uuid);
         machines.put(uuid, machine);
         invokeUpdate();
     }
@@ -47,15 +42,15 @@ public class SignalComponent extends NotifierComponent {
     public void registerWrite(IMachine machine, String key, IntConsumer writer) {
         var uuid = machine.uuid();
         writeSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, writer);
-        subnetMachines.put(getMachineSubnet(machine), uuid);
         machines.put(uuid, machine);
         invokeUpdate();
     }
 
-    public Collection<SignalInfo> getSubnetSignals(BlockPos subnet) {
+    public Collection<SignalInfo> getVisibleSignals() {
         var ret = new ArrayList<SignalInfo>();
-        for (var uuid : subnetMachines.get(subnet)) {
-            var machine = machines.get(uuid);
+        for (var entry : machines.entrySet()) {
+            var uuid = entry.getKey();
+            var machine = entry.getValue();
             if (readSignals.containsKey(uuid)) {
                 for (var key : readSignals.get(uuid).keySet()) {
                     ret.add(new SignalInfo(machine, key, false));
@@ -103,7 +98,7 @@ public class SignalComponent extends NotifierComponent {
         super.onDisconnect();
         readSignals.clear();
         writeSignals.clear();
-        subnetMachines.clear();
+        machines.clear();
     }
 
     @Override

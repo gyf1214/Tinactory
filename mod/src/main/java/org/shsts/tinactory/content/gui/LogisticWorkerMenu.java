@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -39,7 +38,6 @@ public class LogisticWorkerMenu extends InventoryMenu {
     public final IMachine machine;
     @Nullable
     private final LogisticComponent logistic;
-    private final BlockPos subnet;
     private final Runnable onUpdatePorts;
 
     public LogisticWorkerMenu(Properties properties) {
@@ -55,11 +53,9 @@ public class LogisticWorkerMenu extends InventoryMenu {
         var network = machine.network();
         if (network.isPresent()) {
             this.logistic = network.get().getComponent(LOGISTIC_COMPONENT.get());
-            this.subnet = network.get().getSubnet(blockEntity().getBlockPos());
             logistic.onUpdate(onUpdatePorts);
         } else {
             this.logistic = null;
-            this.subnet = null;
         }
 
         onEventPacket(SET_MACHINE_CONFIG, p -> MACHINE.get(blockEntity()).setConfig(p));
@@ -83,7 +79,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
             return Collections.emptyList();
         }
 
-        var infos = logistic.getVisiblePorts(subnet).stream()
+        var infos = logistic.getVisiblePorts().stream()
             .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
             .toList();
 
