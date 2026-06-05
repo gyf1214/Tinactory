@@ -566,8 +566,6 @@
     "tinactory.tooltip.chestStorage.3": "存储优先级：高",
     "tinactory.tooltip.chestStorage.4": "存储优先级：最高",
     "tinactory.tooltip.chestNotStorage": "存储禁用",
-    "tinactory.tooltip.chestLocal": "可从本地子网访问",
-    "tinactory.tooltip.chestGlobal": "可从全局网络访问",
     "tinactory.tooltip.fluidCell": "%s / %s",
     "tinactory.tooltip.battery": "%s / %s EU (%s)",
     "tinactory.tooltip.tool": "剩余 %s 次使用次数",

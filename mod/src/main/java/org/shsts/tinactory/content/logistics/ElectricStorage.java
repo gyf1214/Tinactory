@@ -36,7 +36,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     public static final String UNLOCK_KEY = "unlockChest";
     public static final boolean UNLOCK_DEFAULT = false;
     public static final String PRIORITY_KEY = "priority";
-    public static final int PRIORITY_DEFAULT = -1;
+    public static final int PRIORITY_DEFAULT = 2;
     public static final String VOID_KEY = "void";
     public static final boolean VOID_DEFAULT = false;
     public static final String AMOUNT_SIGNAL = "amount";

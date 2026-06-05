@@ -61,7 +61,7 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     ILayoutProvider, IBytesProvider, INBTSerializable<CompoundTag> {
     public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
-    public static final int PRIORITY_DEFAULT = 2;
+    public static final int PRIORITY_DEFAULT = ElectricStorage.PRIORITY_DEFAULT;
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
 
     public record ByteStats(int bytesUsed, int bytesCapacity) {}

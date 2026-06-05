@@ -149,8 +149,6 @@
     "tinactory.tooltip.chestStorage.3": "Storage priority: High",
     "tinactory.tooltip.chestStorage.4": "Storage priority: Highest",
     "tinactory.tooltip.chestNotStorage": "Storage disabled",
-    "tinactory.tooltip.chestLocal": "Accessible from local subnet",
-    "tinactory.tooltip.chestGlobal": "Accessible from global network",
     "tinactory.tooltip.fluidCell": "%s / %s",
     "tinactory.tooltip.battery": "%s / %s EU (%s)",
     "tinactory.tooltip.tool": "%s Crafting Uses",
