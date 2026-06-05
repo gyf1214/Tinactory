@@ -570,6 +570,7 @@
     "tinactory.tooltip.battery": "%s / %s EU (%s)",
     "tinactory.tooltip.tool": "剩余 %s 次使用次数",
     "tinactory.tooltip.meStorageCell": "%s B / %s B",
+    "tinactory.tooltip.mePatternCell": "%s 个配方",
     "tinactory.tooltip.coil": "最高温度：%s K",
     "tinactory.tooltip.cable.1": "电压：%s V (%s)",
     "tinactory.tooltip.cable.2": "线损：%s",

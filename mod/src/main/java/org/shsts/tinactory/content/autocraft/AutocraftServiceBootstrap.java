@@ -51,7 +51,7 @@ public final class AutocraftServiceBootstrap {
             planner,
             repository,
             autocraft,
-            TinactoryConfig.CONFIG.autocraftPlanStepMemory.get(),
+            TinactoryConfig.CONFIG.bytesPerCraftStep.get(),
             TinactoryConfig.CONFIG.bytesPerItem.get(),
             TinactoryConfig.CONFIG.bytesPerItemType.get(),
             TinactoryConfig.CONFIG.bytesPerFluid.get(),

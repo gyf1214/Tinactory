@@ -19,20 +19,22 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public final class PatternCellPortState implements IPatternCellPort {
     public static final String PATTERNS_KEY = "patterns";
-    public static final int BYTES_PER_PATTERN = 256;
 
+    private final int bytesPerPattern;
     private final int bytesLimit;
     private final PatternNbtCodec codec;
     private final Map<UUID, CraftPattern> patterns = new HashMap<>();
 
     public PatternCellPortState(
+        int bytesPerPattern,
         int bytesLimit,
         Codec<IMachineConstraint> constraintCodec,
         Codec<IStackKey> keyCodec) {
-        this(bytesLimit, new PatternNbtCodec(constraintCodec, keyCodec));
+        this(bytesPerPattern, bytesLimit, new PatternNbtCodec(constraintCodec, keyCodec));
     }
 
-    public PatternCellPortState(int bytesLimit, PatternNbtCodec codec) {
+    public PatternCellPortState(int bytesPerPattern, int bytesLimit, PatternNbtCodec codec) {
+        this.bytesPerPattern = bytesPerPattern;
         this.bytesLimit = bytesLimit;
         this.codec = codec;
     }
@@ -44,7 +46,7 @@ public final class PatternCellPortState implements IPatternCellPort {
 
     @Override
     public long bytesUsed() {
-        return (long) patterns.size() * BYTES_PER_PATTERN;
+        return (long) patterns.size() * bytesPerPattern;
     }
 
     @Override
@@ -57,7 +59,7 @@ public final class PatternCellPortState implements IPatternCellPort {
         if (patterns.containsKey(pattern.patternUuid())) {
             return true;
         }
-        if ((long) (patterns.size() + 1) * BYTES_PER_PATTERN > bytesLimit) {
+        if ((patterns.size() + 1) * bytesPerPattern > bytesLimit) {
             return false;
         }
         patterns.put(pattern.patternUuid(), pattern);

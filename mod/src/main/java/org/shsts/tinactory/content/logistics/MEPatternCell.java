@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
@@ -52,11 +53,13 @@ public class MEPatternCell extends CapabilityItem {
         @Nullable Level world,
         List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        stack.getCapability(PATTERN_CELL.get()).ifPresent(cell ->
+        stack.getCapability(PATTERN_CELL.get()).ifPresent(cell -> {
             addTooltip(tooltip, "mePatternCell",
-                NUMBER_FORMAT.format(cell.patterns().size()),
+                NUMBER_FORMAT.format(cell.patterns().size()));
+            addTooltip(tooltip, "meStorageCell",
                 NUMBER_FORMAT.format(cell.bytesUsed()),
-                NUMBER_FORMAT.format(bytesLimit)));
+                NUMBER_FORMAT.format(bytesLimit));
+        });
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MEPatternCell extends CapabilityItem {
         private PatternCapability(ItemStack stack, int bytesLimit) {
             super(stack, ID);
             this.state = new PatternCellPortState(
+                CONFIG.bytesPerPattern.get(),
                 bytesLimit,
                 MachineConstraintHelper.CODEC,
                 StackHelper.KEY_CODEC);

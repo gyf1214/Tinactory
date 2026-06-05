@@ -23,7 +23,7 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    private final long stepMemory;
+    private final long bytesPerStep;
     private final long bytesPerItem;
     private final long bytesPerItemType;
     private final long bytesPerFluid;
@@ -36,7 +36,7 @@ public class AutocraftTerminalService {
         ICraftPlanner planner,
         IPatternRepository patternRepository,
         ICpuRuntime cpuRuntime,
-        long stepMemory,
+        long bytesPerStep,
         long bytesPerItem,
         long bytesPerItemType,
         long bytesPerFluid,
@@ -45,7 +45,7 @@ public class AutocraftTerminalService {
         this.planner = planner;
         this.patternRepository = patternRepository;
         this.cpuRuntime = cpuRuntime;
-        this.stepMemory = Math.max(0L, stepMemory);
+        this.bytesPerStep = Math.max(0L, bytesPerStep);
         this.bytesPerItem = Math.max(0L, bytesPerItem);
         this.bytesPerItemType = Math.max(0L, bytesPerItemType);
         this.bytesPerFluid = Math.max(0L, bytesPerFluid);
@@ -168,40 +168,17 @@ public class AutocraftTerminalService {
     }
 
     private long calculateMemoryUsage(CraftPlan planSnapshot, PlanSummary summary) {
-
-        var ret = 0L;
-        ret = saturatedAdd(ret, saturatedMultiply(stepMemory, planSnapshot.steps().size()));
+        var ret = bytesPerStep * planSnapshot.steps().size();
         for (var entry : summary.entries().entrySet()) {
-            ret = saturatedAdd(ret, calculateSummaryEntryMemory(entry.getKey(), entry.getValue()));
+            var key = entry.getKey();
+            var value = entry.getValue();
+            var amount = value.consumedFromInventory() + value.craftedAmount();
+            if (key.type() == PortType.ITEM) {
+                ret += bytesPerItemType + bytesPerItem * amount;
+            } else if (key.type() == PortType.FLUID) {
+                ret += bytesPerFluidType + bytesPerFluid * amount;
+            }
         }
         return ret;
-    }
-
-    private long calculateSummaryEntryMemory(IStackKey key, PlanSummary.Entry entry) {
-        var amount = saturatedAdd(entry.consumedFromInventory(), entry.craftedAmount());
-        if (key.type() == PortType.ITEM) {
-            return saturatedAdd(bytesPerItemType, saturatedMultiply(bytesPerItem, amount));
-        } else if (key.type() == PortType.FLUID) {
-            return saturatedAdd(bytesPerFluidType, saturatedMultiply(bytesPerFluid, amount));
-        } else {
-            return 0L;
-        }
-    }
-
-    private static long saturatedMultiply(long left, long right) {
-        if (left == 0L || right == 0L) {
-            return 0L;
-        }
-        if (left > Long.MAX_VALUE / right) {
-            return Long.MAX_VALUE;
-        }
-        return left * right;
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        if (Long.MAX_VALUE - left < right) {
-            return Long.MAX_VALUE;
-        }
-        return left + right;
     }
 }

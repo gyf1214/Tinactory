@@ -153,6 +153,7 @@
     "tinactory.tooltip.battery": "%s / %s EU (%s)",
     "tinactory.tooltip.tool": "%s Crafting Uses",
     "tinactory.tooltip.meStorageCell": "%s B / %s B",
+    "tinactory.tooltip.mePatternCell": "%s Patterns",
     "tinactory.tooltip.coil": "Max Temperature: %s K",
     "tinactory.tooltip.cable.1": "Voltage: %s V (%s)",
     "tinactory.tooltip.cable.2": "Loss: %s",

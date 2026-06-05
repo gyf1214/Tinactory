@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PatternCellIntegrationTest {
     @Test
     void patternCellCapabilityShouldUseFixedByteAccounting() {
-        var port = new PatternCellPortState(2048, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var port = patternCell();
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -28,12 +28,12 @@ class PatternCellIntegrationTest {
 
         assertEquals(2048, port.bytesCapacity());
         assertEquals(2, port.patterns().size());
-        assertEquals(2 * PatternCellPortState.BYTES_PER_PATTERN, port.bytesUsed());
+        assertEquals(512, port.bytesUsed());
     }
 
     @Test
     void patternCellCapabilityShouldPersistToItemTag() {
-        var port = new PatternCellPortState(2048, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var port = patternCell();
         var first = pattern("tinactory:first");
         var second = pattern("tinactory:second");
 
@@ -41,8 +41,7 @@ class PatternCellIntegrationTest {
         assertTrue(port.insert(second));
         assertTrue(port.remove(first.patternUuid()));
 
-        var clonedPort = new PatternCellPortState(2048, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            TestStackKey.CODEC);
+        var clonedPort = patternCell();
         clonedPort.deserialize(port.serialize());
 
         assertEquals(List.of(second), clonedPort.patterns());
@@ -55,5 +54,10 @@ class PatternCellIntegrationTest {
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
             TestAutocraftHelper.constraints("tinactory:mixer", 0));
+    }
+
+    private static PatternCellPortState patternCell() {
+        return new PatternCellPortState(256, 2048,
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
     }
 }
