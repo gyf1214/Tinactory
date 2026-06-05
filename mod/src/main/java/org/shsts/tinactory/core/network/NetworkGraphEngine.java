@@ -113,7 +113,7 @@ public class NetworkGraphEngine<TNodeData> {
         if (!manager.hasNetworkAtPos(pos)) {
             manager.putNetworkAtPos(pos, this);
         }
-        adapter.onDiscover(pos, info.data(), subnet);
+        adapter.onDiscover(pos, info.data(), info.subnet());
         return true;
     }
 }

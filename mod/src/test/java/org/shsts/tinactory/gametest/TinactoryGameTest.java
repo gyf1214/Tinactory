@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -15,13 +16,22 @@ import net.minecraftforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
+import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.gametest.dependency.DependencyChecker;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 
+import java.util.Objects;
+
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class TinactoryGameTest {
@@ -103,22 +113,159 @@ public final class TinactoryGameTest {
             if (!network.getSubnet(absoluteCablePos).equals(absoluteMachinePos)) {
                 helper.fail("Cable did not inherit the machine subnet", cablePos);
             }
-            if (!network.getSubnet(absoluteSubnetPos).equals(absoluteSubnetPos)) {
-                helper.fail("Electric buffer was not recognized as a subnet", subnetPos);
+            if (!network.getSubnet(absoluteSubnetPos).equals(absoluteMachinePos)) {
+                helper.fail("Electric buffer did not inherit the parent subnet", subnetPos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testBatteryBoxPowersElectricConsumer(GameTestHelper helper) {
+        var voltage = Voltage.MV;
+        var consumerPos = new BlockPos(0, 1, 1);
+        var cablePos = consumerPos.east();
+        var batteryBoxPos = cablePos.east();
+
+        var cableState = componentBlock("cable", voltage).defaultBlockState()
+            .setValue(CableBlock.EAST, true)
+            .setValue(CableBlock.WEST, true);
+        var batteryBoxState = machineState("battery_box", voltage, Direction.WEST)
+            .setValue(MachineBlock.IO_FACING, Direction.WEST);
+
+        helper.setBlock(consumerPos, machineState("logistics/electric_chest", voltage, Direction.EAST));
+        helper.setBlock(cablePos, cableState);
+        helper.setBlock(batteryBoxPos, batteryBoxState);
+        var battery = batteryItem(voltage);
+        var batteryStack = new ItemStack(battery);
+        battery.setPowerLevel(batteryStack, battery.capacity);
+        var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
+        var batteryMachine = MACHINE.get(batteryBoxEntity);
+        batteryMachine.config().apply(SetMachineConfigPacket.builder()
+            .set(DISCHARGE_KEY, true)
+            .get());
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        useWithTeamMockPlayer(helper, consumerPos);
+
+        helper.runAfterDelay(24, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(consumerPos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var electric = network.getComponent(ELECTRIC_COMPONENT.get());
+            var consumer = ELECTRIC_MACHINE.get(helper.getBlockEntity(consumerPos));
+            var generator = ELECTRIC_MACHINE.get(batteryBoxEntity);
+            if (consumer.getMachineType() != ElectricMachineType.CONSUMER || consumer.getPowerCons() <= 0d) {
+                helper.fail("Electric storage did not expose consumer demand", consumerPos);
+            }
+            if (generator.getMachineType() != ElectricMachineType.GENERATOR || generator.getPowerGen() <= 0d) {
+                helper.fail("Battery box did not expose charged battery generation", batteryBoxPos);
+            }
+            if (electric.getWorkFactor() <= 0d) {
+                helper.fail("Battery box did not power the electric consumer", consumerPos);
+            }
+            if (battery.getPower(batteryStack) >= battery.capacity) {
+                helper.fail("Battery box did not consume stored battery power", batteryBoxPos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 160)
+    public static void testTransformerPowersOversizedEvConsumer(GameTestHelper helper) {
+        var batteryBoxPos = new BlockPos(0, 1, 1);
+        var hvCablePos = batteryBoxPos.east();
+        var transformerPos = hvCablePos.east();
+        var evCableStartPos = transformerPos.east();
+        var consumerCount = 17;
+
+        helper.setBlock(batteryBoxPos, machineState("battery_box", Voltage.HV, Direction.EAST));
+        helper.setBlock(hvCablePos, cableState(Voltage.HV, true, true));
+        helper.setBlock(transformerPos, componentBlock("transformer", Voltage.EV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        for (var i = 0; i < consumerCount; i++) {
+            var cablePos = evCableStartPos.east(i);
+            var consumerPos = cablePos.south();
+            helper.setBlock(cablePos, cableState(Voltage.EV, true, true)
+                .setValue(CableBlock.SOUTH, true));
+            helper.setBlock(consumerPos, machineState("logistics/logistic_worker", Voltage.EV, Direction.NORTH));
+        }
+
+        var battery = batteryItem(Voltage.HV);
+        var batteryStack = new ItemStack(battery);
+        battery.setPowerLevel(batteryStack, battery.capacity);
+        var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        useWithTeamMockPlayer(helper, batteryBoxPos);
+
+        helper.runAfterDelay(80, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(batteryBoxPos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var electric = network.getComponent(ELECTRIC_COMPONENT.get());
+            var consumerPower = 0d;
+            for (var i = 0; i < consumerCount; i++) {
+                var consumerPos = evCableStartPos.east(i).south();
+                var consumer = ELECTRIC_MACHINE.get(helper.getBlockEntity(consumerPos));
+                if (consumer.getMachineType() != ElectricMachineType.CONSUMER) {
+                    helper.fail("EV consumer was not active", consumerPos);
+                }
+                consumerPower += consumer.getPowerCons();
+            }
+            if (consumerPower <= Voltage.HV.value) {
+                helper.fail("EV consumers did not exceed one HV amp", evCableStartPos.south());
+            }
+            var batteryPower = battery.getPower(batteryStack);
+            var factorReport = "workFactor=" + electric.getWorkFactor() +
+                ", bufferFactor=" + electric.getBufferFactor() +
+                ", consumerPower=" + consumerPower +
+                ", batteryPower=" + batteryPower;
+            if (electric.getWorkFactor() <= 0d || electric.getWorkFactor() >= 1d) {
+                helper.fail("HV buffer through transformer should partially power oversized EV consumers: " +
+                    factorReport,
+                    evCableStartPos.south());
+            }
+            if (electric.getBufferFactor() >= 0d) {
+                helper.fail("HV battery box buffer did not discharge through transformer: " + factorReport,
+                    batteryBoxPos);
+            }
+            if (batteryPower >= battery.capacity) {
+                helper.fail("HV battery was not drained through transformer: " + factorReport, batteryBoxPos);
             }
             helper.succeed();
         });
     }
 
     private static BlockState machineState(Direction ioFacing) {
-        return AllBlockEntities.getMachine("electric_furnace")
-            .block(Voltage.LV)
+        return machineState("electric_furnace", ioFacing);
+    }
+
+    private static BlockState machineState(String name, Direction ioFacing) {
+        return machineState(name, Voltage.LV, ioFacing);
+    }
+
+    private static BlockState machineState(String name, Voltage voltage, Direction ioFacing) {
+        return Objects.requireNonNull(AllBlockEntities.getMachine(name), name)
+            .block(voltage)
             .defaultBlockState()
             .setValue(MachineBlock.IO_FACING, ioFacing);
     }
 
     private static Block componentBlock(String name) {
-        return (Block) AllItems.getComponent(name).get(Voltage.LV).get();
+        return componentBlock(name, Voltage.LV);
+    }
+
+    private static Block componentBlock(String name, Voltage voltage) {
+        return (Block) AllItems.getComponent(name).get(voltage).get();
+    }
+
+    private static BlockState cableState(Voltage voltage, boolean east, boolean west) {
+        return componentBlock("cable", voltage).defaultBlockState()
+            .setValue(CableBlock.EAST, east)
+            .setValue(CableBlock.WEST, west);
+    }
+
+    private static BatteryItem batteryItem(Voltage voltage) {
+        return (BatteryItem) AllItems.getComponent("battery").get(voltage).get();
     }
 
     private static void useWithTeamMockPlayer(GameTestHelper helper, BlockPos pos) {

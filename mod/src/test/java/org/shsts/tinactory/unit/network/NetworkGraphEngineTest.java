@@ -48,7 +48,7 @@ class NetworkGraphEngineTest {
     }
 
     @Test
-    void shouldPropagateSubnetFromParentUntilSubnetMarker() {
+    void shouldReportSubnetMarkerWithParentSubnetAndPropagateMarkerToChildren() {
         var center = new BlockPos(0, 0, 0);
         var east = center.east();
         var eastEast = east.east();
@@ -73,7 +73,7 @@ class NetworkGraphEngineTest {
         }
 
         assertEquals(center, events.subnets.get(center));
-        assertEquals(east, events.subnets.get(east));
+        assertEquals(center, events.subnets.get(east));
         assertEquals(east, events.subnets.get(eastEast));
     }
 
