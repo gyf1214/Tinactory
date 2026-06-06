@@ -9,6 +9,8 @@ import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.datagen.provider.LanguageDataProvider;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
@@ -31,18 +33,31 @@ public class LanguageMeta extends MetaConsumer {
         }
     }
 
+    private void parseExtra(JsonObject jo, String member, LanguageProcessor processor, List<String> extras) {
+        parse(jo, member, (key, val) -> {
+            extras.add(key);
+            processor.extra(key, val);
+        });
+    }
+
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         var locale = LocHelper.name(loc.getPath(), -1);
         var splitter = GsonHelper.getAsString(jo, "splitter", " ");
         var processor = new LanguageProcessor(locale, splitter);
+        var extras = new ArrayList<String>();
 
         parse(jo, "words", processor::word);
         parse(jo, "patterns", processor::pattern);
-        parse(jo, "extras", processor::extra);
-        parse(jo, "quests", processor::extra);
+        parseExtra(jo, "extras", processor, extras);
+        parseExtra(jo, "quests", processor, extras);
 
-        initDelayed(() -> DATA_GEN.addProvider((dataGen, event) ->
-            new LanguageDataProvider(dataGen, event, locale, processor)));
+        initDelayed(() -> {
+            for (var extra : extras) {
+                DATA_GEN.trackLang(extra);
+            }
+            DATA_GEN.addProvider((dataGen, event) ->
+                new LanguageDataProvider(dataGen, event, locale, processor));
+        });
     }
 }

@@ -47,7 +47,7 @@ public class TinactoryDatagen {
 
     private void onGatherData(GatherDataEvent event) {
         DATA_CORE = ITinyDataGen.get();
-        DATA_GEN = DATA_CORE.dataGen(REGISTRATE);
+        DATA_GEN = DATA_CORE.dataGen(REGISTRATE, true);
 
         AllData.init();
         DATA_GEN.onGatherData(event);

@@ -6,7 +6,7 @@ import net.minecraftforge.common.data.LanguageProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +16,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LanguageProcessor {
-    private static final String MISSING_TR = "<MISSING TRANSLATE>";
-    private static final String MISSING_WORD = "<MISSING WORD>";
-
-    private record Processor(Pattern pattern, Function<Matcher, String> func) {}
+    private record Processor(Pattern pattern, Function<Matcher, Optional<String>> func) {}
 
     private final String splitter;
     private final boolean isEnglish;
@@ -45,24 +41,45 @@ public class LanguageProcessor {
         extras.put(key, val);
     }
 
-    private String normalize(String str) {
+    private Optional<String> normalize(String str) {
         if (words.containsKey(str)) {
-            return words.get(str);
+            return Optional.of(words.get(str));
         }
-        if (!isEnglish) {
-            return MISSING_WORD;
-        }
-        return StringUtils.capitalize(str);
+        return isEnglish ? Optional.of(StringUtils.capitalize(str)) : Optional.empty();
     }
 
-    private String normalize(Matcher matcher, int group) {
+    private Optional<String> normalize(Matcher matcher, int group) {
         var key = matcher.group(group);
         if (words.containsKey(key)) {
-            return words.get(key);
+            return Optional.of(words.get(key));
         }
-        return Arrays.stream(key.split("_"))
-            .map(this::normalize)
-            .collect(Collectors.joining(splitter));
+        var sb = new StringBuilder();
+        var first = true;
+        for (var word : key.split("_")) {
+            var word1 = normalize(word);
+            if (word1.isPresent()) {
+                if (!first) {
+                    sb.append(splitter);
+                } else {
+                    first = false;
+                }
+                sb.append(word1.get());
+            } else {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(sb.toString());
+    }
+
+    private Optional<String> optionalFmt(String fmt, Collection<Optional<String>> args) {
+        var argsList = new ArrayList<String>(args.size());
+        for (var arg : args) {
+            if (arg.isEmpty()) {
+                return Optional.empty();
+            }
+            argsList.add(arg.get());
+        }
+        return Optional.of(fmt.formatted(argsList.toArray()));
     }
 
     public void pattern(String pattern, String val) {
@@ -70,7 +87,7 @@ public class LanguageProcessor {
 
         var groupPat = Pattern.compile("\\$[0-9]+");
         var groupMatcher = groupPat.matcher(val);
-        var groups = new ArrayList<Function<Matcher, String>>();
+        var groups = new ArrayList<Function<Matcher, Optional<String>>>();
 
         var sb = new StringBuilder();
         var lastPos = 0;
@@ -85,15 +102,15 @@ public class LanguageProcessor {
         sb.append(val, lastPos, val.length());
         var fmt = sb.toString();
 
-        processors.add(new Processor(pattern1, matcher -> fmt.formatted(
-            groups.stream().map($ -> $.apply(matcher)).toArray())));
+        processors.add(new Processor(pattern1, matcher -> optionalFmt(
+            fmt, groups.stream().map($ -> $.apply(matcher)).toList())));
     }
 
     private Optional<String> process(String key) {
         for (var processor : processors) {
             var matcher = processor.pattern.matcher(key);
             if (matcher.find()) {
-                return Optional.of(processor.func.apply(matcher));
+                return processor.func.apply(matcher);
             }
         }
         return Optional.empty();
@@ -102,17 +119,15 @@ public class LanguageProcessor {
     public void process(Set<String> keys, LanguageProvider prov, Consumer<String> onProcess) {
         for (var key : keys) {
             if (extras.containsKey(key)) {
+                prov.add(key, extras.get(key));
                 onProcess.accept(key);
                 continue;
             }
             var value = process(key);
             if (value.isPresent()) {
+                prov.add(key, value.get());
                 onProcess.accept(key);
             }
-            prov.add(key, value.orElse(MISSING_TR));
-        }
-        for (var entry : extras.entrySet()) {
-            prov.add(entry.getKey(), entry.getValue());
         }
     }
 }

@@ -558,8 +558,6 @@
     "tinactory.tooltip.chestUnlock": "空槽解锁",
     "tinactory.tooltip.autoVoid": "自动销毁多余物品",
     "tinactory.tooltip.noAutoVoid": "不自动销毁物品",
-    "tinactory.tooltip.chestVoid": "自动销毁多余物品",
-    "tinactory.tooltip.chestNotVoid": "自动销毁关闭",
     "tinactory.tooltip.chestStorage.0": "存储优先级：最低",
     "tinactory.tooltip.chestStorage.1": "存储优先级：低",
     "tinactory.tooltip.chestStorage.2": "存储优先级：普通",
