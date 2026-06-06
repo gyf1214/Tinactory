@@ -757,7 +757,6 @@ object Materials {
         }
         material("ender_pearl", FINE) {
             oreProcess {
-                siftPrimary = true
                 byProducts("platinum_metallic", "ender_pearl", "platinum_metallic")
             }
             machineProcess(Voltage.HV)
