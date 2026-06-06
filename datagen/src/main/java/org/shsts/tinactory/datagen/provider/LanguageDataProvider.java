@@ -16,13 +16,16 @@ import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 @MethodsReturnNonnullByDefault
 public class LanguageDataProvider extends LanguageProvider {
     private final String modid;
+    private final String locale;
     private final LanguageProcessor processor;
 
     public LanguageDataProvider(IDataGen dataGen, GatherDataEvent event,
         String locale, LanguageProcessor processor) {
         super(event.getGenerator(), dataGen.modid(), locale);
         this.modid = dataGen.modid();
+        this.locale = locale;
         this.processor = processor;
+        DATA_GEN.trackLocale(locale);
     }
 
     @Override
@@ -31,7 +34,7 @@ public class LanguageDataProvider extends LanguageProvider {
     @Override
     public void run(HashCache cache) throws IOException {
         var trackedKeys = DATA_GEN.getTrackedLang();
-        processor.process(trackedKeys, this, DATA_GEN::processLang);
+        processor.process(trackedKeys, this, $ -> DATA_GEN.processLang(locale, $));
         super.run(cache);
     }
 
