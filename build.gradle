@@ -24,7 +24,7 @@ subprojects {
     apply plugin: 'org.spongepowered.mixin'
     apply plugin: 'maven-publish'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
     checkstyle {
         toolVersion = "10.20.1"
