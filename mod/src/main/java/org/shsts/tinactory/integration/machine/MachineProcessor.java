@@ -56,10 +56,11 @@ public class MachineProcessor extends CapabilityProvider implements
     private final LazyOptional<IProcessor> processorCap;
 
     public MachineProcessor(BlockEntity blockEntity,
+        Function<ProcessingRuntime.Properties, ProcessingRuntime> runtimeFactory,
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe) {
         this.blockEntity = blockEntity;
-        this.runtime = new ProcessingRuntime(
+        var properties = new ProcessingRuntime.Properties(
             processorFactories.stream().map(factory -> factory.apply(blockEntity)).toList(),
             autoRecipe,
             this::machine,
@@ -67,13 +68,14 @@ public class MachineProcessor extends CapabilityProvider implements
             blockEntity::setChanged,
             this::reportProcessingObject,
             ProcessingHelper.INFO_CODEC);
+        this.runtime = runtimeFactory.apply(properties);
         this.processorCap = LazyOptional.of(() -> runtime);
     }
 
-    public MachineProcessor(BlockEntity blockEntity, ProcessingRuntime runtime) {
-        this.blockEntity = blockEntity;
-        this.runtime = runtime;
-        this.processorCap = LazyOptional.of(() -> runtime);
+    public MachineProcessor(BlockEntity blockEntity,
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
+        boolean autoRecipe) {
+        this(blockEntity, ProcessingRuntime::new, processorFactories, autoRecipe);
     }
 
     protected Optional<IMachine> machine() {

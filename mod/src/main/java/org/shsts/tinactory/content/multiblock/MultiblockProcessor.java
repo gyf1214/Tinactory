@@ -17,13 +17,16 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class MultiblockProcessor extends MachineProcessor {
     public MultiblockProcessor(BlockEntity blockEntity,
+        Function<ProcessingRuntime.Properties, ProcessingRuntime> runtimeFactory,
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
+        boolean autoRecipe) {
+        super(blockEntity, runtimeFactory, processorFactories, autoRecipe);
+    }
+
+    public MultiblockProcessor(BlockEntity blockEntity,
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
         boolean autoRecipe) {
         super(blockEntity, processorFactories, autoRecipe);
-    }
-
-    public MultiblockProcessor(BlockEntity blockEntity, ProcessingRuntime runtime) {
-        super(blockEntity, runtime);
     }
 
     @Override

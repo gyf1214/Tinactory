@@ -24,6 +24,7 @@ import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -31,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -86,9 +88,9 @@ class ProcessingRuntimeTest {
             .recipe(RECIPE_ID)
             .inputInfo(new ProcessingInfo(0, ingredient))
             .doneResult(result);
-        var runtime = new ProcessingRuntime(List.of(processor), true, () -> Optional.of(machine),
-            () -> false, () -> {}, (direction, object) -> reportedObjects.add(new Report(direction, object)),
-            TestProcessingObject.INFO_CODEC);
+        var runtime = runtimeBuilder(machine, processor)
+            .onReportObject((direction, object) -> reportedObjects.add(new Report(direction, object)))
+            .build();
 
         runtime.onPreWork();
         runtime.onWorkTick(1d);
@@ -130,8 +132,10 @@ class ProcessingRuntimeTest {
         var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer()).targetRecipe(RECIPE_ID);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
-        var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
-            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        var runtime = runtimeBuilder(machine, processor)
+            .autoRecipe(false)
+            .onUpdate(updates::incrementAndGet)
+            .build();
 
         runtime.onPreWork();
 
@@ -144,8 +148,10 @@ class ProcessingRuntimeTest {
         var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer());
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
-        var runtime = new ProcessingRuntime(List.of(processor), false, () -> Optional.of(machine),
-            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        var runtime = runtimeBuilder(machine, processor)
+            .autoRecipe(false)
+            .onUpdate(updates::incrementAndGet)
+            .build();
 
         runtime.onPreWork();
 
@@ -159,9 +165,11 @@ class ProcessingRuntimeTest {
     void shouldShortCircuitPreWorkWhenStopped() {
         var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer());
-        var runtime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
-            true, () -> Optional.of(machine), () -> false, updates::incrementAndGet,
-            TestProcessingObject.INFO_CODEC);
+        var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
+        var runtime = runtimeBuilder(machine, processor)
+            .onUpdate(updates::incrementAndGet)
+            .build();
+
         runtime.setStopped(true);
 
         runtime.onPreWork();
@@ -175,8 +183,11 @@ class ProcessingRuntimeTest {
         var machineRef = new AtomicReference<Optional<IMachine>>(Optional.of(new TestMachine(new TestContainer())));
         var updates = new AtomicInteger();
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID).maxProgress(10).progressPerTick(3);
-        var runtime = new ProcessingRuntime(List.of(processor), true, machineRef::get,
-            () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        var runtime = runtimeBuilder(processor)
+            .machineSupplier(machineRef::get)
+            .autoRecipe(true)
+            .onUpdate(updates::incrementAndGet)
+            .build();
 
         runtime.onPreWork();
         machineRef.set(Optional.empty());
@@ -185,8 +196,11 @@ class ProcessingRuntimeTest {
         assertEquals(0L, runtime.progressTicks());
         assertEquals(1, updates.get());
 
-        var emptyRuntime = new ProcessingRuntime(List.of(new TestRecipeProcessor().recipe(RECIPE_ID)),
-            true, Optional::<IMachine>empty, () -> false, updates::incrementAndGet, TestProcessingObject.INFO_CODEC);
+        var emptyRuntime = runtimeBuilder(new TestRecipeProcessor().recipe(RECIPE_ID))
+            .machineSupplier(Optional::empty)
+            .autoRecipe(true)
+            .onUpdate(updates::incrementAndGet)
+            .build();
         emptyRuntime.onPreWork();
         assertEquals(1, updates.get());
     }
@@ -264,9 +278,56 @@ class ProcessingRuntimeTest {
         assertTrue(runtime.serializeNBT().isEmpty());
     }
 
+    private static final class RuntimeBuilder {
+        private final List<IRecipeProcessor<?>> processors;
+        private Supplier<Optional<IMachine>> machineSupplier;
+        private boolean autoRecipe = true;
+        private Runnable onUpdate = () -> {};
+        private BiConsumer<PortDirection, IProcessingObject> onReportObject = (dir, obj) -> {};
+
+        private RuntimeBuilder(List<IRecipeProcessor<?>> processors) {
+            this.processors = processors;
+        }
+
+        public RuntimeBuilder machineSupplier(Supplier<Optional<IMachine>> val) {
+            machineSupplier = val;
+            return this;
+        }
+
+        public RuntimeBuilder autoRecipe(boolean val) {
+            autoRecipe = val;
+            return this;
+        }
+
+        public RuntimeBuilder onUpdate(Runnable val) {
+            onUpdate = val;
+            return this;
+        }
+
+        public RuntimeBuilder onReportObject(BiConsumer<PortDirection, IProcessingObject> val) {
+            onReportObject = val;
+            return this;
+        }
+
+        public ProcessingRuntime build() {
+            var properties = new ProcessingRuntime.Properties(
+                processors, autoRecipe, machineSupplier,
+                () -> false, onUpdate, onReportObject,
+                TestProcessingObject.INFO_CODEC);
+            return new ProcessingRuntime(properties);
+        }
+    }
+
+    private static RuntimeBuilder runtimeBuilder(TestRecipeProcessor... processors) {
+        return new RuntimeBuilder(Arrays.asList(processors));
+    }
+
+    private static RuntimeBuilder runtimeBuilder(TestMachine machine, TestRecipeProcessor... processors) {
+        return runtimeBuilder(processors).machineSupplier(() -> Optional.of(machine));
+    }
+
     private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
-        return new ProcessingRuntime(List.of(processors), true, () -> Optional.of(machine),
-            () -> false, () -> {}, TestProcessingObject.INFO_CODEC);
+        return runtimeBuilder(machine, processors).build();
     }
 
     private static final class TestRecipeProcessor implements IRecipeProcessor<ResourceLocation> {

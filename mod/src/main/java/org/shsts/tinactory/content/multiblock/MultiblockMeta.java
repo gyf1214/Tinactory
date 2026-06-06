@@ -335,10 +335,7 @@ public class MultiblockMeta extends MachineMeta {
                 parseRecipeType();
                 return switch (machineType) {
                     case "default", "engraving" -> RecipeProcessors.processing(recipeType());
-                    case "fusion_reactor" -> {
-                        var properties = FusionReactor.Properties.fromJson(jo);
-                        yield RecipeProcessors.fusion(recipeType(), properties);
-                    }
+                    case "fusion_reactor" -> RecipeProcessors.fusion(recipeType());
                     case "coil" -> {
                         var baseTemp = GsonHelper.getAsInt(jo, "baseTemperature");
                         yield RecipeProcessors.coil(recipeType(), baseTemp);

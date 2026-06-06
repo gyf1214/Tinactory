@@ -44,8 +44,7 @@ public final class RecipeProcessors {
     }
 
     public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> fusion(
-        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType,
-        FusionReactor.Properties properties) {
+        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType) {
         return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
     }
 
@@ -90,15 +89,15 @@ public final class RecipeProcessors {
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> multiblock(
-        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories, boolean autoRecipe) {
+        Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
+        boolean autoRecipe) {
         return $ -> $.capability(ID, be -> new MultiblockProcessor(be, processorFactories, autoRecipe));
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> fusionMultiblock(
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
-        boolean autoRecipe,
-        FusionReactor.Properties properties) {
-        return $ -> $.capability(ID, be -> new MultiblockProcessor(be,
-            new FusionReactor(be, processorFactories, autoRecipe, properties)));
+        boolean autoRecipe, FusionReactor.Properties properties) {
+        return $ -> $.capability(ID, be -> new MultiblockProcessor(
+            be, FusionReactor.factory(properties), processorFactories, autoRecipe));
     }
 }

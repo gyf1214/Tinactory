@@ -115,24 +115,19 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         }
     }
 
-    public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
-        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, BooleanSupplier sideSupplier,
-        Runnable onUpdate, Codec<ProcessingInfo> processingInfoCodec) {
-        this(processors, autoRecipe, machineSupplier, sideSupplier, onUpdate, (direction, object) -> {},
-            processingInfoCodec);
-    }
-
-    public ProcessingRuntime(Collection<? extends IRecipeProcessor<?>> processors,
+    public record Properties(Collection<? extends IRecipeProcessor<?>> processors,
         boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, BooleanSupplier sideSupplier,
         Runnable onUpdate, BiConsumer<PortDirection, IProcessingObject> onReportObject,
-        Codec<ProcessingInfo> processingInfoCodec) {
-        this.processors = List.copyOf(processors);
-        this.autoRecipe = autoRecipe;
-        this.machineSupplier = machineSupplier;
-        this.sideSupplier = sideSupplier;
-        this.onUpdate = onUpdate;
-        this.onReportObject = onReportObject;
-        this.processingInfoCodec = processingInfoCodec;
+        Codec<ProcessingInfo> processingInfoCodec) {}
+
+    public ProcessingRuntime(Properties properties) {
+        this.processors = List.copyOf(properties.processors);
+        this.autoRecipe = properties.autoRecipe;
+        this.machineSupplier = properties.machineSupplier;
+        this.sideSupplier = properties.sideSupplier;
+        this.onUpdate = properties.onUpdate;
+        this.onReportObject = properties.onReportObject;
+        this.processingInfoCodec = properties.processingInfoCodec;
     }
 
     private boolean isClientSide() {
@@ -144,7 +139,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         return isClientSide;
     }
 
-    private Optional<IMachine> machine() {
+    protected Optional<IMachine> machine() {
         return machineSupplier.get();
     }
 
@@ -207,6 +202,24 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         targetRecipe().ifPresentOrElse(this::setTargetRecipe, this::resetTargetRecipe);
     }
 
+    protected boolean hasCurrentRecipe() {
+        return currentRecipe != null;
+    }
+
+    protected void setChanged() {
+        onUpdate.run();
+    }
+
+    protected <T> boolean gateRecipe(IRecipeProcessor<T> processor, IMachine machine, T recipe) {
+        return true;
+    }
+
+    protected void beforeWorkBegin() {}
+
+    protected void afterWorkDone() {
+        clearFilters(PortDirection.OUTPUT);
+    }
+
     private <T> boolean newRecipe(int index, IRecipeProcessor<T> processor, IMachine machine,
         Optional<ResourceLocation> target) {
         if (!autoRecipe && target.isEmpty()) {
@@ -214,7 +227,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         }
         var recipe = processor.newRecipe(machine, target);
         clearFilters(PortDirection.OUTPUT);
-        if (recipe.isPresent()) {
+        if (recipe.filter($ -> gateRecipe(processor, machine, $)).isPresent()) {
             currentRecipe = new ProcessorRecipe<>(index, processor, recipe.get());
             return true;
         }
@@ -307,12 +320,13 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             }
         }
         if (currentRecipe != null) {
-            currentRecipe.onWorkBegin(machine.get(), machine.get().parallel(), infoList,
-                onReportObject);
+            beforeWorkBegin();
+            currentRecipe.onWorkBegin(machine.get(), machine.get().parallel(),
+                infoList, onReportObject);
             buildInfoMap();
         }
         needUpdate = false;
-        onUpdate.run();
+        setChanged();
     }
 
     @Override
@@ -327,11 +341,11 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         workProgress += currentRecipe.onWorkProcess(partial);
         workSpeed = currentRecipe.processor.workSpeed(partial);
         if (workProgress >= currentRecipe.maxProgress()) {
-            currentRecipe.onWorkDone(machine.get(), machine.get().random(), onReportObject);
-            clearFilters(PortDirection.OUTPUT);
             workProgress = currentRecipe.maxProgress();
+            currentRecipe.onWorkDone(machine.get(), machine.get().random(), onReportObject);
+            afterWorkDone();
         }
-        onUpdate.run();
+        setChanged();
     }
 
     @Override
