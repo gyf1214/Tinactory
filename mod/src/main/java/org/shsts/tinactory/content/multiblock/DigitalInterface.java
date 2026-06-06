@@ -48,16 +48,16 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final int maxParallel;
-    private final int bytesLimit;
-    private final int inputTypeReserveBytes;
+    private final long bytesLimit;
+    private final long inputTypeReserveBytes;
     private final int inputTypeReserveSlots;
-    private final int outputReserveBytes;
+    private final long outputReserveBytes;
 
-    private int sharedBytes;
-    private int outputReserveUsed;
-    private int outputBytesUsed;
-    private final Map<IStackKey, Integer> inputReserveUsed = new HashMap<>();
-    private final Map<IStackKey, Integer> inputBytesUsed = new HashMap<>();
+    private long sharedBytes;
+    private long outputReserveUsed;
+    private long outputBytesUsed;
+    private final Map<IStackKey, Long> inputReserveUsed = new HashMap<>();
+    private final Map<IStackKey, Long> inputBytesUsed = new HashMap<>();
 
     private class Storage implements IDigitalProvider, INBTSerializable<CompoundTag> {
         private final StoragePorts.ItemStorage internalItem;
@@ -144,18 +144,18 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
         @Override
         public int consumeLimit(int offset, int bytes) {
-            return Math.max(0, (availableBytesForNoKey(isInput()) - offset) / bytes);
+            return consumeLimitFor(availableBytesForNoKey(isInput()), offset, bytes);
         }
 
         @Override
         public int consumeLimit(IStackKey key, int offset, int bytes) {
-            return Math.max(0, (availableBytesForKey(isInput(), key) - offset) / bytes);
+            return consumeLimitFor(availableBytesForKey(isInput(), key), offset, bytes);
         }
 
         @Override
         public void consume(long bytes) {
             assert bytes > 0;
-            consumeBytesWithoutKey(isInput(), Math.toIntExact(bytes));
+            consumeBytesWithoutKey(isInput(), bytes);
             bytesUsed += bytes;
             LOGGER.trace("consume {}, bytesUsed={}", bytes, bytesUsed);
         }
@@ -163,7 +163,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         @Override
         public void consume(IStackKey key, long bytes) {
             assert bytes > 0;
-            consumeBytesForKey(isInput(), key, Math.toIntExact(bytes));
+            consumeBytesForKey(isInput(), key, bytes);
             bytesUsed += bytes;
             LOGGER.trace("consume {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
         }
@@ -171,7 +171,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         @Override
         public void restore(long bytes) {
             assert bytes > 0;
-            restoreBytesWithoutKey(isInput(), Math.toIntExact(bytes));
+            restoreBytesWithoutKey(isInput(), bytes);
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
             LOGGER.trace("restore {}, bytesUsed={}", bytes, bytesUsed);
@@ -180,7 +180,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         @Override
         public void restore(IStackKey key, long bytes) {
             assert bytes > 0;
-            restoreBytesForKey(isInput(), key, Math.toIntExact(bytes));
+            restoreBytesForKey(isInput(), key, bytes);
             bytesUsed -= bytes;
             assert bytesUsed >= 0;
             LOGGER.trace("restore {}, key={}, bytesUsed={}", bytes, key, bytesUsed);
@@ -216,8 +216,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private final List<Storage> storages = new ArrayList<>();
     private Layout layout = Layout.EMPTY;
 
-    public record Properties(int maxParallel, int bytesLimit, int inputTypeReserveBytes,
-        int inputTypeReserveSlots, int outputReserveBytes) {}
+    public record Properties(int maxParallel, long bytesLimit, long inputTypeReserveBytes,
+        int inputTypeReserveSlots, long outputReserveBytes) {}
 
     public DigitalInterface(BlockEntity be, Properties properties) {
         super(be);
@@ -226,7 +226,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         this.inputTypeReserveBytes = properties.inputTypeReserveBytes;
         this.inputTypeReserveSlots = properties.inputTypeReserveSlots;
         this.outputReserveBytes = properties.outputReserveBytes;
-        var reservedBytes = inputTypeReserveBytes * inputTypeReserveSlots + outputReserveBytes;
+        var reservedBytes = saturatedAdd(saturatedMultiply(inputTypeReserveBytes, inputTypeReserveSlots),
+            outputReserveBytes);
         if (reservedBytes > bytesLimit) {
             throw new IllegalArgumentException("Digital Interface reserve bytes exceed total capacity: " +
                 reservedBytes + " > " + bytesLimit);
@@ -250,7 +251,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
 
     @Override
     public long bytesUsed() {
-        var inputUsed = inputBytesUsed.values().stream().mapToLong(Integer::longValue).sum();
+        var inputUsed = inputBytesUsed.values().stream().mapToLong(Long::longValue).sum();
         return Math.min(bytesLimit, inputUsed + outputBytesUsed);
     }
 
@@ -314,7 +315,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         container = this;
     }
 
-    private int sharedCapacity() {
+    private long sharedCapacity() {
         return bytesLimit - inputTypeReserveBytes * inputTypeReserveSlots - outputReserveBytes;
     }
 
@@ -326,14 +327,14 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         inputBytesUsed.clear();
     }
 
-    private int availableBytesForNoKey(boolean input) {
+    private long availableBytesForNoKey(boolean input) {
         if (input) {
             return sharedBytes;
         }
         return sharedBytes + outputReserveBytes - outputReserveUsed;
     }
 
-    private int availableBytesForKey(boolean input, IStackKey key) {
+    private long availableBytesForKey(boolean input, IStackKey key) {
         if (!input) {
             return availableBytesForNoKey(false);
         }
@@ -347,7 +348,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         return sharedBytes;
     }
 
-    private void consumeBytesWithoutKey(boolean input, int bytes) {
+    private void consumeBytesWithoutKey(boolean input, long bytes) {
         if (input) {
             sharedBytes -= bytes;
             assert sharedBytes >= 0;
@@ -361,25 +362,25 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         assert sharedBytes >= 0;
     }
 
-    private void consumeBytesForKey(boolean input, IStackKey key, int bytes) {
+    private void consumeBytesForKey(boolean input, IStackKey key, long bytes) {
         if (!input) {
             consumeBytesWithoutKey(false, bytes);
             return;
         }
-        var reserveUsed = inputReserveUsed.getOrDefault(key, 0);
+        var reserveUsed = inputReserveUsed.getOrDefault(key, 0L);
         var canUseReserve = reserveUsed > 0 || inputReserveUsed.containsKey(key) ||
             inputReserveUsed.size() < inputTypeReserveSlots;
-        var reserveBytes = canUseReserve ? Math.min(bytes, inputTypeReserveBytes - reserveUsed) : 0;
+        var reserveBytes = canUseReserve ? Math.min(bytes, inputTypeReserveBytes - reserveUsed) : 0L;
         if (reserveBytes > 0 || canUseReserve) {
             inputReserveUsed.put(key, reserveUsed + reserveBytes);
         }
         var sharedDelta = bytes - reserveBytes;
         sharedBytes -= sharedDelta;
-        inputBytesUsed.put(key, inputBytesUsed.getOrDefault(key, 0) + bytes);
+        inputBytesUsed.put(key, inputBytesUsed.getOrDefault(key, 0L) + bytes);
         assert sharedBytes >= 0;
     }
 
-    private void restoreBytesWithoutKey(boolean input, int bytes) {
+    private void restoreBytesWithoutKey(boolean input, long bytes) {
         if (input) {
             sharedBytes += bytes;
             return;
@@ -392,7 +393,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         assert outputReserveUsed >= 0 && outputBytesUsed >= 0;
     }
 
-    private void restoreBytesForKey(boolean input, IStackKey key, int bytes) {
+    private void restoreBytesForKey(boolean input, IStackKey key, long bytes) {
         if (!input) {
             restoreBytesWithoutKey(false, bytes);
             return;
@@ -402,7 +403,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             return;
         }
         var totalUsed = inputBytesUsed.get(key);
-        var reserveUsed = inputReserveUsed.getOrDefault(key, 0);
+        var reserveUsed = inputReserveUsed.getOrDefault(key, 0L);
         var sharedUsed = totalUsed - reserveUsed;
         var sharedDelta = Math.min(bytes, sharedUsed);
         sharedBytes += sharedDelta;
@@ -417,6 +418,28 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             inputReserveUsed.put(key, newReserveUsed);
         }
         assert newReserveUsed >= 0 && newTotalUsed >= 0;
+    }
+
+    private static int consumeLimitFor(long availableBytes, int offset, int bytes) {
+        var limit = Math.max(0L, (availableBytes - offset) / bytes);
+        return limit > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) limit;
+    }
+
+    private static long saturatedMultiply(long left, long right) {
+        if (left == 0L || right == 0L) {
+            return 0L;
+        }
+        if (left > Long.MAX_VALUE / right) {
+            return Long.MAX_VALUE;
+        }
+        return left * right;
+    }
+
+    private static long saturatedAdd(long left, long right) {
+        if (Long.MAX_VALUE - left < right) {
+            return Long.MAX_VALUE;
+        }
+        return left + right;
     }
 
     @Override

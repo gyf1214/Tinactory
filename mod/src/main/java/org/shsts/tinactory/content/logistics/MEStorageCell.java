@@ -38,19 +38,19 @@ public class MEStorageCell extends CapabilityItem {
     private static final ResourceLocation ID = modLoc("logistics/me_storage_cell");
 
     private final boolean isFluid;
-    private final int bytesLimit;
+    private final long bytesLimit;
 
-    public MEStorageCell(Properties properties, boolean isFluid, int bytesLimit) {
+    public MEStorageCell(Properties properties, boolean isFluid, long bytesLimit) {
         super(properties.stacksTo(1));
         this.isFluid = isFluid;
         this.bytesLimit = bytesLimit;
     }
 
-    public static Function<Properties, MEStorageCell> itemCell(int bytesLimit) {
+    public static Function<Properties, MEStorageCell> itemCell(long bytesLimit) {
         return properties -> new MEStorageCell(properties, false, bytesLimit);
     }
 
-    public static Function<Properties, MEStorageCell> fluidCell(int bytesLimit) {
+    public static Function<Properties, MEStorageCell> fluidCell(long bytesLimit) {
         return properties -> new MEStorageCell(properties, true, bytesLimit);
     }
 
@@ -68,7 +68,7 @@ public class MEStorageCell extends CapabilityItem {
         private final LazyOptional<IItemPort> itemCap;
         private final LazyOptional<IBytesProvider> providerCap;
 
-        public ItemCapability(ItemStack stack, int bytesLimit) {
+        public ItemCapability(ItemStack stack, long bytesLimit) {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
             this.storage = StoragePorts.itemStorage(provider);
@@ -105,7 +105,7 @@ public class MEStorageCell extends CapabilityItem {
         private final LazyOptional<IFluidPort> fluidCap;
         private final LazyOptional<IBytesProvider> providerCap;
 
-        protected FluidCapability(ItemStack stack, int bytesLimit) {
+        protected FluidCapability(ItemStack stack, long bytesLimit) {
             super(stack, ID);
             this.provider = new DigitalProvider(bytesLimit);
             this.storage = StoragePorts.fluidStorage(provider);

@@ -32,6 +32,18 @@ class PatternCellIntegrationTest {
     }
 
     @Test
+    void patternCellCapabilityShouldRejectInsertPastLargeByteLimit() {
+        var port = new PatternCellPortState(1_500_000_000L, 3_000_000_000L,
+            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+
+        assertTrue(port.insert(pattern("tinactory:first")));
+        assertTrue(port.insert(pattern("tinactory:second")));
+        assertFalse(port.insert(pattern("tinactory:third")));
+        assertEquals(3_000_000_000L, port.bytesCapacity());
+        assertEquals(3_000_000_000L, port.bytesUsed());
+    }
+
+    @Test
     void patternCellCapabilityShouldPersistToItemTag() {
         var port = patternCell();
         var first = pattern("tinactory:first");

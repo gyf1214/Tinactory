@@ -329,10 +329,10 @@ public class MachineMeta extends MetaConsumer {
         private IEntry<MachineBlock> digitalInterface(Voltage v, JsonObject jo) {
             var properties = new DigitalInterface.Properties(
                 GsonHelper.getAsInt(jo, "maxParallel"),
-                GsonHelper.getAsInt(jo, "bytesLimit"),
-                GsonHelper.getAsInt(jo, "inputTypeReserveBytes"),
+                GsonHelper.getAsLong(jo, "bytesLimit"),
+                GsonHelper.getAsLong(jo, "inputTypeReserveBytes"),
                 GsonHelper.getAsInt(jo, "inputTypeReserveSlots"),
-                GsonHelper.getAsInt(jo, "outputReserveBytes"));
+                GsonHelper.getAsLong(jo, "outputReserveBytes"));
 
             return baseInterface(v,
                 tooltip -> {

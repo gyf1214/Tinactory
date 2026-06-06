@@ -36,14 +36,14 @@ import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 public class MEPatternCell extends CapabilityItem {
     private static final ResourceLocation ID = modLoc("logistics/me_pattern_cell");
 
-    private final int bytesLimit;
+    private final long bytesLimit;
 
-    public MEPatternCell(Properties properties, int bytesLimit) {
+    public MEPatternCell(Properties properties, long bytesLimit) {
         super(properties.stacksTo(1));
         this.bytesLimit = bytesLimit;
     }
 
-    public static Function<Properties, MEPatternCell> factory(int bytesLimit) {
+    public static Function<Properties, MEPatternCell> factory(long bytesLimit) {
         return properties -> new MEPatternCell(properties, bytesLimit);
     }
 
@@ -71,7 +71,7 @@ public class MEPatternCell extends CapabilityItem {
         private final PatternCellPortState state;
         private final LazyOptional<IPatternCellPort> patternCap;
 
-        private PatternCapability(ItemStack stack, int bytesLimit) {
+        private PatternCapability(ItemStack stack, long bytesLimit) {
             super(stack, ID);
             this.state = new PatternCellPortState(
                 CONFIG.bytesPerPattern.get(),

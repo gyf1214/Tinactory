@@ -20,20 +20,20 @@ import java.util.UUID;
 public final class PatternCellPortState implements IPatternCellPort {
     public static final String PATTERNS_KEY = "patterns";
 
-    private final int bytesPerPattern;
-    private final int bytesLimit;
+    private final long bytesPerPattern;
+    private final long bytesLimit;
     private final PatternNbtCodec codec;
     private final Map<UUID, CraftPattern> patterns = new HashMap<>();
 
     public PatternCellPortState(
-        int bytesPerPattern,
-        int bytesLimit,
+        long bytesPerPattern,
+        long bytesLimit,
         Codec<IMachineConstraint> constraintCodec,
         Codec<IStackKey> keyCodec) {
         this(bytesPerPattern, bytesLimit, new PatternNbtCodec(constraintCodec, keyCodec));
     }
 
-    public PatternCellPortState(int bytesPerPattern, int bytesLimit, PatternNbtCodec codec) {
+    public PatternCellPortState(long bytesPerPattern, long bytesLimit, PatternNbtCodec codec) {
         this.bytesPerPattern = bytesPerPattern;
         this.bytesLimit = bytesLimit;
         this.codec = codec;
@@ -46,7 +46,7 @@ public final class PatternCellPortState implements IPatternCellPort {
 
     @Override
     public long bytesUsed() {
-        return (long) patterns.size() * bytesPerPattern;
+        return saturatedMultiply(patterns.size(), bytesPerPattern);
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class PatternCellPortState implements IPatternCellPort {
         if (patterns.containsKey(pattern.patternUuid())) {
             return true;
         }
-        if ((patterns.size() + 1) * bytesPerPattern > bytesLimit) {
+        if (bytesPerPattern > 0L && (long) patterns.size() + 1L > bytesLimit / bytesPerPattern) {
             return false;
         }
         patterns.put(pattern.patternUuid(), pattern);
@@ -88,5 +88,15 @@ public final class PatternCellPortState implements IPatternCellPort {
             var pattern = codec.decodePattern((CompoundTag) tag1);
             patterns.put(pattern.patternUuid(), pattern);
         }
+    }
+
+    private static long saturatedMultiply(long left, long right) {
+        if (left == 0L || right == 0L) {
+            return 0L;
+        }
+        if (left > Long.MAX_VALUE / right) {
+            return Long.MAX_VALUE;
+        }
+        return left * right;
     }
 }

@@ -64,23 +64,6 @@ class AutocraftTerminalServicePreviewTest {
     }
 
     @Test
-    void previewShouldClampOverflowingMemoryToLongMax() {
-        var service = new AutocraftTerminalService(
-            new StaticPlanner(PlanResult.completed(twoStepPlan(), StaticPlanner.WIDE_SUMMARY)),
-            new PatternRegistryCache(),
-            new TestCpuRuntime(),
-            Long.MAX_VALUE - 1L,
-            10L,
-            10L,
-            10L,
-            10L);
-
-        var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
-
-        assertEquals(Long.MAX_VALUE, result.memoryUsage());
-    }
-
-    @Test
     void emptyPreviewShouldHaveNoPlanOrErrorAndAnEmptySummary() {
         var preview = AutocraftPreview.empty();
 

@@ -230,7 +230,7 @@ public class MiscMeta extends MetaConsumer {
         var parent = LocHelper.name(id, -2);
         var prefix = id.substring(0, id.length() - parent.length() - name.length() - 1);
         var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
-        var bytes = GsonHelper.getAsInt(jo, "bytes");
+        var bytes = GsonHelper.getAsLong(jo, "bytes");
 
         var component = REGISTRATE.item(componentPrefix + "/" + name).register();
         var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
