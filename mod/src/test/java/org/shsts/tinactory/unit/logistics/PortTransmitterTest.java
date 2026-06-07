@@ -24,6 +24,19 @@ class PortTransmitterTest {
     }
 
     @Test
+    void shouldProbeTransferByIdentityWithoutUsingStackAmount() {
+        var from = new TestPort("iron", 10, 8);
+        var to = new TestPort("iron", 10, 0);
+        var transmitter = new PortTransmitter<>(TestStack.ADAPTER);
+
+        var moved = transmitter.probeIdentity(from, to, new TestStack("iron", 1), 6);
+
+        assertEquals(6, moved.amount());
+        assertEquals(8, from.stored());
+        assertEquals(0, to.stored());
+    }
+
+    @Test
     void shouldSelectFirstTransferableCandidate() {
         var from = new TestPort("iron", 10, 5);
         var to = new TestPort("iron", 10, 0);

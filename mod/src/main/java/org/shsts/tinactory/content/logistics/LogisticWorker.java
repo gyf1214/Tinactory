@@ -172,7 +172,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         LogisticWorkerConfig config) {
         var filterType = config.filterType();
         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-            return ITEM_TRANSMITTER.probe(from, to, config.itemFilter(), itemBandwidth);
+            return ITEM_TRANSMITTER.probeIdentity(from, to, config.itemFilter(), itemBandwidth);
         }
 
         Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
@@ -195,7 +195,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private FluidStack selectTransmittedFluid(IPort<FluidStack> from, IPort<FluidStack> to,
         FluidStack filter) {
         if (!filter.isEmpty()) {
-            return FLUID_TRANSMITTER.probe(from, to, filter, fluidBandwidth);
+            return FLUID_TRANSMITTER.probeIdentity(from, to, filter, fluidBandwidth);
         }
         return FLUID_TRANSMITTER.select(from, to, from.getAllStorages(), fluidBandwidth);
     }

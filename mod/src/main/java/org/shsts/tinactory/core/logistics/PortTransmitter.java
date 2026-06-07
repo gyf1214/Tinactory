@@ -15,7 +15,16 @@ public final class PortTransmitter<T> {
     }
 
     public T probe(IPort<T> from, IPort<T> to, T stack, int limit) {
-        var expected = stackAdapter.withAmount(stack, Math.min(stackAdapter.amount(stack), limit));
+        return probe(from, to, stack, limit, true);
+    }
+
+    public T probeIdentity(IPort<T> from, IPort<T> to, T stack, int limit) {
+        return probe(from, to, stack, limit, false);
+    }
+
+    private T probe(IPort<T> from, IPort<T> to, T stack, int limit, boolean amountAware) {
+        var amount = amountAware ? Math.min(stackAdapter.amount(stack), limit) : limit;
+        var expected = stackAdapter.withAmount(stack, amount);
         var extracted = from.extract(expected, true);
         var remaining = to.insert(extracted, true);
         var moved = stackAdapter.amount(extracted) - stackAdapter.amount(remaining);
