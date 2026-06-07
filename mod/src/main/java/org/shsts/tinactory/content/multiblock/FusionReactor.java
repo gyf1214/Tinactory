@@ -90,9 +90,9 @@ public class FusionReactor extends ProcessingRuntime {
 
     @Override
     public void onWorkTick(double partial) {
+        var energyBefore = startupEnergy;
         if (charging) {
             startupEnergy = Math.min(startupCapacity(), startupEnergy + chargeRate() * partial);
-            setChanged();
             if (isFull()) {
                 onContainerChange();
             }
@@ -101,6 +101,8 @@ public class FusionReactor extends ProcessingRuntime {
             if (startupEnergy < 1d) {
                 startupEnergy = 0d;
             }
+        }
+        if (startupEnergy != energyBefore) {
             setChanged();
         }
         super.onWorkTick(partial);
