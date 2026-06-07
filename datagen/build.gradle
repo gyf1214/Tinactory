@@ -31,8 +31,7 @@ dependencies {
     runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
     runtimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
 
-    compileOnly project(path: ':mod')
-    runtimeOnly project(path: ':mod', configuration: 'dev')
+    implementation project(path: ':mod', configuration: 'dev')
 
     // kotlin
     minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
@@ -43,10 +42,8 @@ dependencies {
     implementation rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
 
     // FTB Quests SNBT
-    compileOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
-    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137931")
-    compileOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
-    runtimeOnly fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
+    implementation fg.deobf("curse.maven:architectury-api-419699:5137931")
+    implementation fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
 }
 
 compileKotlin {
