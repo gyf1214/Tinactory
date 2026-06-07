@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.shsts.tinactory.content.electric.Generator;
 import org.shsts.tinactory.content.multiblock.BlastFurnace;
 import org.shsts.tinactory.content.multiblock.CoilMachine;
-import org.shsts.tinactory.content.multiblock.FusionReactor;
+import org.shsts.tinactory.content.multiblock.FusionRuntime;
 import org.shsts.tinactory.content.multiblock.MultiblockProcessor;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -96,8 +96,8 @@ public final class RecipeProcessors {
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> fusionMultiblock(
         Collection<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processorFactories,
-        boolean autoRecipe, FusionReactor.Properties properties) {
+        boolean autoRecipe, FusionRuntime.Properties properties) {
         return $ -> $.capability(ID, be -> new MultiblockProcessor(
-            be, FusionReactor.factory(properties), processorFactories, autoRecipe));
+            be, FusionRuntime.factory(properties), processorFactories, autoRecipe));
     }
 }

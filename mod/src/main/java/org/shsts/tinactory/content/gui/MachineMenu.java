@@ -164,6 +164,10 @@ public class MachineMenu extends ProcessingMenu {
         return new NuclearReactorMenu(properties);
     }
 
+    public static ProcessingMenu fusion(Properties properties) {
+        return new FusionMenu(properties);
+    }
+
     public static ProcessingMenu digitalInterface(Properties properties) {
         return new DigitalInterfaceMenu(properties);
     }
@@ -174,5 +178,9 @@ public class MachineMenu extends ProcessingMenu {
 
     public static ProcessingMenu nuclearReactorDigitalInterface(Properties properties) {
         return new NuclearReactorMenu.DigitalInterface(properties);
+    }
+
+    public static ProcessingMenu fusionDigitalInterface(Properties properties) {
+        return new FusionMenu.DigitalInterface(properties);
     }
 }

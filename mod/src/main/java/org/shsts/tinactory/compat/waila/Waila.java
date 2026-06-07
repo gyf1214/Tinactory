@@ -33,6 +33,7 @@ public class Waila implements IWailaPlugin {
     public static final ResourceLocation HEAT = modLoc("heat");
     public static final ResourceLocation POWER = modLoc("power");
     public static final ResourceLocation CLEANNESS = modLoc("cleanness");
+    public static final ResourceLocation FUSION = modLoc("fusion");
     public static final ResourceLocation PROGRESS = modLoc("progress");
     public static final ResourceLocation RECIPE = modLoc("recipe");
     public static final ResourceLocation WORK_SPEED = modLoc("work_speed");
@@ -48,6 +49,7 @@ public class Waila implements IWailaPlugin {
         registration.addConfig(HEAT, true);
         registration.addConfig(POWER, true);
         registration.addConfig(CLEANNESS, true);
+        registration.addConfig(FUSION, true);
         registration.addConfig(PROGRESS, true);
         registration.addConfig(RECIPE, true);
         registration.addConfig(WORK_SPEED, true);

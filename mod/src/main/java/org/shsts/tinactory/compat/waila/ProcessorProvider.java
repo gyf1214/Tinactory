@@ -24,6 +24,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
+import org.shsts.tinactory.content.multiblock.FusionRuntime;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
@@ -38,6 +39,7 @@ import java.util.function.BiConsumer;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.compat.waila.Waila.CLEANNESS;
+import static org.shsts.tinactory.compat.waila.Waila.FUSION;
 import static org.shsts.tinactory.compat.waila.Waila.HEAT;
 import static org.shsts.tinactory.compat.waila.Waila.POWER;
 import static org.shsts.tinactory.compat.waila.Waila.PROGRESS;
@@ -101,6 +103,14 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             var cleanness = tag.getDouble("tinactoryCleanness");
             var text = tr("cleanness", PERCENTAGE_FORMAT.format(cleanness));
             addProgress((float) cleanness, text, CLEANNESS_COLOR);
+        }
+
+        if (config.get(FUSION) && tag.contains("tinactoryFusionEnergy", Tag.TAG_DOUBLE)) {
+            var energy = tag.getDouble("tinactoryFusionEnergy");
+            var capacity = tag.getDouble("tinactoryFusionCapacity");
+            var text = tr("fusionEnergy", ClientUtil.getNumberString(Math.round(energy)),
+                ClientUtil.getNumberString(Math.round(capacity)));
+            addProgress((float) (energy / capacity), text, POWER_COLOR);
         }
 
         if (config.get(PROGRESS) && tag.contains("tinactoryProgress", Tag.TAG_LONG)) {
@@ -202,6 +212,11 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
 
         if (processor instanceof Cleanroom cleanroom) {
             tag.putDouble("tinactoryCleanness", cleanroom.getProgress());
+        }
+
+        if (processor instanceof FusionRuntime fusion) {
+            tag.putDouble("tinactoryFusionEnergy", fusion.startupEnergy());
+            tag.putDouble("tinactoryFusionCapacity", fusion.startupCapacity());
         }
     }
 }

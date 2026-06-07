@@ -96,7 +96,7 @@ public class MultiblockMeta extends MachineMeta {
             if (!processors.isEmpty()) {
                 var autoRecipe = GsonHelper.getAsBoolean(jo, "autoRecipe", true);
                 if (machineType.equals("fusion_reactor")) {
-                    var properties = FusionReactor.Properties.fromJson(jo);
+                    var properties = FusionRuntime.Properties.fromJson(jo);
                     builder.transform(RecipeProcessors.fusionMultiblock(processors, autoRecipe, properties));
                 } else {
                     builder.transform(RecipeProcessors.multiblock(processors, autoRecipe));
@@ -104,7 +104,7 @@ public class MultiblockMeta extends MachineMeta {
             }
 
             return switch (machineType) {
-                case "default", "fusion_reactor" -> builder.child(Multiblock.builder(Multiblock::new));
+                case "default" -> builder.child(Multiblock.builder(Multiblock::new));
                 case "research" -> builder.child(Multiblock.builder(ResearchMultiblock::new));
                 case "coil", "blast_furnace" -> builder.child(Multiblock.builder(CoilMultiblock::new));
                 case "engraving" -> {
@@ -131,6 +131,7 @@ public class MultiblockMeta extends MachineMeta {
                     var properties = NuclearReactor.Properties.fromJson(jo);
                     yield builder.child(Multiblock.builder((be, $) -> new NuclearReactor(be, $, properties)));
                 }
+                case "fusion_reactor" -> builder.child(Multiblock.builder(FusionReactor::new));
                 default -> {
                     if (machineType.equals(recipeTypeStr)) {
                         yield builder.child(Multiblock.builder(Multiblock::new));

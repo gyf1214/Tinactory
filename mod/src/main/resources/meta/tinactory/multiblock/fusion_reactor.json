@@ -1,33 +1,42 @@
 {
   "recipe": "default",
   "machine": "fusion_reactor",
-  "startEnergyFactor": 8388608,
-  "chargeAmperage": 1,
+  "startEnergyFactor": 4194304,
+  "chargeAmperage": 8,
   "decayRate": 0.001,
   "layout": {
     "slots": [
       {
         "port": 0,
         "type": "fluid_input",
-        "x": 0,
+        "x": 2,
         "y": 10
       },
       {
         "port": 0,
         "type": "fluid_input",
-        "x": 18,
+        "x": 20,
         "y": 10
       },
       {
         "port": 1,
         "type": "fluid_output",
-        "x": 72,
+        "x": 74,
         "y": 10
+      }
+    ],
+    "images": [
+      {
+        "texture": "tinactory:void",
+        "x": 0,
+        "y": 0,
+        "width": 94,
+        "height": 7
       }
     ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_fusion",
-      "x": 44,
+      "x": 46,
       "y": 9,
       "width": 20,
       "height": 20

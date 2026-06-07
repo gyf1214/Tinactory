@@ -180,6 +180,7 @@
     "tinactory.tooltip.heat": "Temperature: %s K",
     "tinactory.tooltip.power": "Power: %s EU / %s EU",
     "tinactory.tooltip.cleanness": "Cleanness: %s",
+    "tinactory.tooltip.fusionEnergy": "Start Power: %s EU / %s EU",
     "tinactory.tooltip.inputs": "Inputs: ",
     "tinactory.tooltip.outputs": "Outputs: ",
     "tinactory.tooltip.workSpeed": "Work Speed: %s",

@@ -18,6 +18,7 @@ import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
 import org.shsts.tinactory.content.gui.client.BoilerScreen;
 import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
 import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
+import org.shsts.tinactory.content.gui.client.FusionScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MECraftTerminalScreen;
 import org.shsts.tinactory.content.gui.client.MEDriveScreen;
@@ -50,7 +51,12 @@ import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinycorelib.api.gui.IMenuEvent;
+import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.registrate.IRegistrate;
+import org.shsts.tinycorelib.api.registrate.builder.IMenuBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
+
+import java.util.function.Function;
 
 import static org.shsts.tinactory.Tinactory.CHANNEL;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -87,10 +93,12 @@ public final class AllMenus {
     public static final IMenuType BOILER;
     public static final IMenuType RESEARCH_BENCH;
     public static final IMenuType NUCLEAR_REACTOR;
+    public static final IMenuType FUSION;
     public static final IMenuType DIGITAL_INTERFACE;
     public static final IMenuType RESEARCH_DIGITAL_INTERFACE;
     public static final IMenuType BOILER_DIGITAL_INTERFACE;
     public static final IMenuType NUCLEAR_REACTOR_DIGITAL_INTERFACE;
+    public static final IMenuType FUSION_DIGITAL_INTERFACE;
 
     static {
         CHANNEL
@@ -129,8 +137,7 @@ public final class AllMenus {
 
         CHANNEL.registerPacket(OpenTechPacket.class, () -> OpenTechPacket.INSTANCE, TechMenu::onOpenGui);
 
-        BATTERY_BOX = REGISTRATE.menu("machine/battery_box", MachineMenu::simpleConfig)
-            .title(ProcessingMenu::getTitle)
+        BATTERY_BOX = processing("machine/battery_box", MachineMenu::simpleConfig)
             .screen(() -> () -> BatteryBoxScreen::new)
             .register();
 
@@ -139,13 +146,11 @@ public final class AllMenus {
             .screen(() -> () -> WorkbenchScreen::new)
             .register();
 
-        ELECTRIC_CHEST = REGISTRATE.menu("machine/electric_chest", ElectricChestMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricChestMenu::new)
             .screen(() -> () -> ElectricChestScreen::new)
             .register();
 
-        ELECTRIC_TANK = REGISTRATE.menu("machine/electric_tank", ElectricTankMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ELECTRIC_TANK = processing("machine/electric_tank", ElectricTankMenu::new)
             .screen(() -> () -> ElectricTankScreen::new)
             .register();
 
@@ -154,88 +159,86 @@ public final class AllMenus {
             .screen(() -> () -> TechScreen::new)
             .register();
 
-        LOGISTIC_WORKER = REGISTRATE.menu("logistics/logistic_worker", LogisticWorkerMenu::new)
-            .title(ProcessingMenu::getTitle)
+        LOGISTIC_WORKER = processing("logistics/logistic_worker", LogisticWorkerMenu::new)
             .screen(() -> () -> LogisticWorkerScreen::new)
             .register();
 
-        ME_DRIVE = REGISTRATE.menu("logistics/me_drive", MachineMenu::simpleConfig)
-            .title(ProcessingMenu::getTitle)
+        ME_DRIVE = processing("logistics/me_drive", MachineMenu::simpleConfig)
             .screen(() -> () -> MEDriveScreen::new)
             .register();
 
-        ME_STORAGE_INTERFACE = REGISTRATE.menu("logistics/me_storage_interface", MEStorageInterfaceMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::new)
             .screen(() -> () -> MEStorageInterfaceScreen::new)
             .register();
 
-        ME_SIGNAL_CONTROLLER = REGISTRATE.menu("logistics/me_signal_controller", MESignalControllerMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ME_SIGNAL_CONTROLLER = processing("logistics/me_signal_controller", MESignalControllerMenu::new)
             .screen(() -> () -> MESignalControllerScreen::new)
             .register();
 
-        ME_STORAGE_DETECTOR = REGISTRATE.menu("logistics/me_storage_detector", MEStorageDetectorMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ME_STORAGE_DETECTOR = processing("logistics/me_storage_detector", MEStorageDetectorMenu::new)
             .screen(() -> () -> MEStorageDetectorScreen::new)
             .register();
 
-        ME_CRAFT_TERMINAL = REGISTRATE.menu("logistics/me_craft_terminal", MECraftTerminalMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ME_CRAFT_TERMINAL = processing("logistics/me_craft_terminal", MECraftTerminalMenu::new)
             .screen(() -> () -> MECraftTerminalScreen::new)
             .register();
 
-        ME_PATTERN_TERMINAL = REGISTRATE.menu("logistics/me_pattern_terminal", MEPatternTerminalMenu::new)
-            .title(ProcessingMenu::getTitle)
+        ME_PATTERN_TERMINAL = processing("logistics/me_pattern_terminal", MEPatternTerminalMenu::new)
             .screen(() -> () -> MEPatternTerminalScreen::new)
             .register();
 
-        PRIMITIVE_MACHINE = REGISTRATE.menu("machine/primitive", ProcessingMenu::primitive)
-            .title(ProcessingMenu::getTitle)
+        PRIMITIVE_MACHINE = processing("machine/primitive", ProcessingMenu::primitive)
             .screen(() -> () -> ProcessingScreen::new)
             .register();
 
-        PROCESSING_MACHINE = REGISTRATE.menu("machine/processing", MachineMenu::machine)
-            .title(ProcessingMenu::getTitle)
+        PROCESSING_MACHINE = processing("machine/processing", MachineMenu::machine)
             .screen(() -> () -> MachineScreen::new)
             .register();
 
-        BOILER = REGISTRATE.menu("machine/boiler", MachineMenu::boiler)
-            .title(ProcessingMenu::getTitle)
+        BOILER = processing("machine/boiler", MachineMenu::boiler)
             .screen(() -> () -> BoilerScreen::new)
             .register();
 
-        RESEARCH_BENCH = REGISTRATE.menu("machine/research_bench", MachineMenu::machine)
-            .title(ProcessingMenu::getTitle)
+        RESEARCH_BENCH = processing("machine/research_bench", MachineMenu::machine)
             .screen(() -> () -> ResearchBenchScreen::new)
             .register();
 
-        NUCLEAR_REACTOR = REGISTRATE.menu("machine/nuclear_reactor", MachineMenu::nuclearReactor)
-            .title(ProcessingMenu::getTitle)
+        NUCLEAR_REACTOR = processing("machine/nuclear_reactor", MachineMenu::nuclearReactor)
             .screen(() -> () -> NuclearReactorScreen::new)
             .register();
 
-        DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/digital_interface", MachineMenu::digitalInterface)
-            .title(ProcessingMenu::getTitle)
+        FUSION = processing("multiblock/fusion", MachineMenu::fusion)
+            .screen(() -> () -> FusionScreen::new)
+            .register();
+
+        DIGITAL_INTERFACE = processing("multiblock/digital_interface", MachineMenu::digitalInterface)
             .screen(() -> () -> MachineScreen::new)
             .register();
 
-        RESEARCH_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/digital_interface/research",
-                MachineMenu::digitalInterface)
-            .title(ProcessingMenu::getTitle)
+        RESEARCH_DIGITAL_INTERFACE = processing("multiblock/digital_interface/research",
+            MachineMenu::digitalInterface)
             .screen(() -> () -> ResearchBenchScreen::new)
             .register();
 
-        BOILER_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/digital_interface/boiler",
-                MachineMenu::boilerDigitalInterface)
-            .title(ProcessingMenu::getTitle)
+        BOILER_DIGITAL_INTERFACE = processing("multiblock/digital_interface/boiler",
+            MachineMenu::boilerDigitalInterface)
             .screen(() -> () -> BoilerScreen::new)
             .register();
 
-        NUCLEAR_REACTOR_DIGITAL_INTERFACE = REGISTRATE.menu("multiblock/digital_interface/nuclear_reactor",
-                MachineMenu::nuclearReactorDigitalInterface)
-            .title(ProcessingMenu::getTitle)
+        NUCLEAR_REACTOR_DIGITAL_INTERFACE = processing("multiblock/digital_interface/nuclear_reactor",
+            MachineMenu::nuclearReactorDigitalInterface)
             .screen(() -> () -> NuclearReactorScreen::new)
             .register();
+
+        FUSION_DIGITAL_INTERFACE = processing("multiblock/digital_interface/fusion",
+            MachineMenu::fusionDigitalInterface)
+            .screen(() -> () -> FusionScreen::new)
+            .register();
+    }
+
+    public static <M extends MenuBase> IMenuBuilder<M, IRegistrate> processing(
+        String id, Function<MenuBase.Properties, M> factory) {
+        return REGISTRATE.menu(id, factory).title(ProcessingMenu::getTitle);
     }
 
     public static void init() {}

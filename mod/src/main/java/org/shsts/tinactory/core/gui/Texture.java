@@ -29,6 +29,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
 
     public static final Texture PROGRESS_BURN = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
+    public static final Texture PROGRESS_FUSION_ENERGY = new Texture(
+        gregtech("gui/progress_bar/progress_bar_fusion_energy"), 94, 14);
 
     public static final Texture HEAT_EMPTY = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_empty_steel"), 10, 54);

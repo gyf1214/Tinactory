@@ -595,6 +595,7 @@
     "tinactory.tooltip.heat": "温度：%s K",
     "tinactory.tooltip.power": "电量：%s EU / %s EU",
     "tinactory.tooltip.cleanness": "洁净度：%s",
+    "tinactory.tooltip.fusionEnergy": "启动电量: %s EU / %s EU",
     "tinactory.tooltip.inputs": "输入：",
     "tinactory.tooltip.outputs": "输出：",
     "tinactory.tooltip.workSpeed": "工作速度：%s",
