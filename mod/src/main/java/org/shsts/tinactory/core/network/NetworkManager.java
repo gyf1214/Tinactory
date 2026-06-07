@@ -6,16 +6,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.shsts.tinactory.core.common.WeakMap;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class NetworkManager {
     private final WeakMap<BlockPos, NetworkGraphEngine<?>> networkPosMap = new WeakMap<>();
-    private final Map<NetworkGraphEngine<?>, WeakMap.Ref<NetworkGraphEngine<?>>> networkRefs =
-        new IdentityHashMap<>();
 
     public boolean hasNetworkAtPos(BlockPos pos) {
         return getNetworkAtPos(pos).isPresent();
@@ -25,25 +21,18 @@ public final class NetworkManager {
         return networkPosMap.get(pos);
     }
 
-    public void putNetworkAtPos(BlockPos pos, NetworkGraphEngine<?> network) {
+    public WeakMap.Ref<NetworkGraphEngine<?>> putNetworkAtPos(BlockPos pos, NetworkGraphEngine<?> network) {
         assert !hasNetworkAtPos(pos);
-        var ref = networkRefs.get(network);
-        if (ref == null || ref.get().isEmpty()) {
-            ref = networkPosMap.put(pos, network);
-            networkRefs.put(network, ref);
-            return;
-        }
+        return networkPosMap.put(pos, network);
+    }
+
+    public void putNetworkAtPos(BlockPos pos, WeakMap.Ref<NetworkGraphEngine<?>> ref) {
+        assert !hasNetworkAtPos(pos);
         networkPosMap.put(pos, ref);
     }
 
     public void invalidatePos(BlockPos pos) {
-        getNetworkAtPos(pos).ifPresent(network -> {
-            network.invalidate();
-            var ref = networkRefs.remove(network);
-            if (ref != null) {
-                ref.invalidate();
-            }
-        });
+        getNetworkAtPos(pos).ifPresent(NetworkGraphEngine::invalidate);
     }
 
     public void invalidatePosDir(BlockPos pos, Direction dir) {
@@ -54,6 +43,5 @@ public final class NetworkManager {
 
     public void destroy() {
         networkPosMap.clear();
-        networkRefs.clear();
     }
 }

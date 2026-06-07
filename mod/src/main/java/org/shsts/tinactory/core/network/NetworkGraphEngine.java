@@ -1,9 +1,11 @@
 package org.shsts.tinactory.core.network;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.shsts.tinactory.core.common.WeakMap;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ public class NetworkGraphEngine<TNodeData> {
 
     private final Queue<BlockPos> queue = new ArrayDeque<>();
     private final Map<BlockPos, BlockInfo<TNodeData>> visited = new HashMap<>();
+    @Nullable
+    private WeakMap.Ref<NetworkGraphEngine<?>> ref = null;
     private State state;
 
     public NetworkGraphEngine(UUID priority, BlockPos center, NetworkManager manager,
@@ -65,8 +69,24 @@ public class NetworkGraphEngine<TNodeData> {
         }
         var wasConnected = state == State.CONNECTED;
         state = State.INVALIDATING;
+        clearManagerOwnership();
         adapter.onDisconnect(wasConnected);
         reset();
+    }
+
+    private void clearManagerOwnership() {
+        if (ref != null) {
+            ref.invalidate();
+            ref = null;
+        }
+    }
+
+    private void putNetworkAtPos(BlockPos pos) {
+        if (ref == null || ref.get().isEmpty()) {
+            ref = manager.putNetworkAtPos(pos, this);
+        } else {
+            manager.putNetworkAtPos(pos, ref);
+        }
     }
 
     public boolean connectNext() {
@@ -111,7 +131,7 @@ public class NetworkGraphEngine<TNodeData> {
             }
         }
         if (!manager.hasNetworkAtPos(pos)) {
-            manager.putNetworkAtPos(pos, this);
+            putNetworkAtPos(pos);
         }
         adapter.onDiscover(pos, info.data(), info.subnet());
         return true;

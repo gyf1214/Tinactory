@@ -31,9 +31,8 @@ class NetworkManagerTest {
     void shouldInvalidateOwningEngineByPosition() {
         var manager = new NetworkManager();
         var pos = new BlockPos(0, 0, 0);
-        var engine = createEngine(pos);
+        var engine = createEngine(manager, pos);
 
-        manager.putNetworkAtPos(pos, engine);
         while (engine.connectNext()) {
             // connect to connected state.
         }
@@ -50,11 +49,9 @@ class NetworkManagerTest {
         var manager = new NetworkManager();
         var pos = new BlockPos(0, 0, 0);
         var pos1 = pos.relative(Direction.EAST);
-        var engine0 = createEngine(pos);
-        var engine1 = createEngine(pos1);
+        var engine0 = createEngine(manager, pos);
+        var engine1 = createEngine(manager, pos1);
 
-        manager.putNetworkAtPos(pos, engine0);
-        manager.putNetworkAtPos(pos1, engine1);
         while (engine0.connectNext()) {
             // connect to connected state.
         }
@@ -73,10 +70,21 @@ class NetworkManagerTest {
         var manager = new NetworkManager();
         var pos = new BlockPos(0, 0, 0);
         var pos1 = pos.relative(Direction.NORTH);
-        var engine = createEngine(pos);
-
-        manager.putNetworkAtPos(pos, engine);
-        manager.putNetworkAtPos(pos1, engine);
+        var graph = new NetworkGraphEngineFixtures.Graph()
+            .addNode(pos, false)
+            .addNode(pos1, false)
+            .addEdge(pos, Direction.NORTH);
+        var engine = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000010"),
+            pos,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, new NetworkGraphEngineFixtures.Events())
+        );
+        while (engine.connectNext()) {
+            // connect to connected state.
+        }
+        assertSame(engine, manager.getNetworkAtPos(pos).orElseThrow());
+        assertSame(engine, manager.getNetworkAtPos(pos1).orElseThrow());
 
         manager.invalidatePos(pos);
 
@@ -85,7 +93,10 @@ class NetworkManagerTest {
     }
 
     private static NetworkGraphEngine<Boolean> createEngine(BlockPos center) {
-        var graphManager = new NetworkManager();
+        return createEngine(new NetworkManager(), center);
+    }
+
+    private static NetworkGraphEngine<Boolean> createEngine(NetworkManager graphManager, BlockPos center) {
         var adapter = new INetworkGraphAdapter<Boolean>() {
             @Override
             public boolean isNodeLoaded(BlockPos pos) {

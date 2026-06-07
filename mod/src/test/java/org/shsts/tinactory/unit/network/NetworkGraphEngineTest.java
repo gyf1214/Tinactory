@@ -160,4 +160,42 @@ class NetworkGraphEngineTest {
         assertEquals(1, loserEvents.disconnectCalls);
         assertEquals(NetworkGraphEngine.State.CONNECTING, loser.state());
     }
+
+    @Test
+    void shouldClearManagerOwnershipWhenEngineInvalidates() {
+        var center = new BlockPos(0, 0, 0);
+        var east = center.east();
+        var graph = new NetworkGraphEngineFixtures.Graph()
+            .addNode(center, false)
+            .addNode(east, false)
+            .addEdge(center, Direction.EAST);
+        var manager = new NetworkManager();
+        var staleEvents = new NetworkGraphEngineFixtures.Events();
+        var claimantEvents = new NetworkGraphEngineFixtures.Events();
+        var stale = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000010"),
+            center,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, staleEvents)
+        );
+        var claimant = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000020"),
+            east,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, claimantEvents)
+        );
+
+        assertTrue(stale.connectNext());
+        assertTrue(stale.connectNext());
+        stale.invalidate();
+        assertTrue(manager.getNetworkAtPos(east).isEmpty());
+
+        assertTrue(claimant.connectNext());
+        assertTrue(claimant.connectNext());
+        assertFalse(claimant.connectNext());
+
+        assertEquals(claimant, manager.getNetworkAtPos(east).orElseThrow());
+        assertEquals(0, claimantEvents.disconnectCalls);
+        assertEquals(NetworkGraphEngine.State.CONNECTED, claimant.state());
+    }
 }
