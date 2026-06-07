@@ -20,7 +20,11 @@ public class FusionMenu extends MachineMenu {
 
     public static double getStartupEnergy(IProcessor processor) {
         var runtime = (FusionRuntime) processor;
-        return MathUtil.clamp(runtime.startupEnergy() / runtime.startupCapacity(), 0d, 1d);
+        var capacity = runtime.startupCapacity();
+        if (MathUtil.compare(capacity) <= 0) {
+            return 0d;
+        }
+        return MathUtil.clamp(runtime.startupEnergy() / capacity, 0d, 1d);
     }
 
     public static void addProgressSlots(MachineMenu menu) {

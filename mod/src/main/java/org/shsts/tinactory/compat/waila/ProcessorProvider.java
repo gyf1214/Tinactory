@@ -26,6 +26,7 @@ import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.FusionRuntime;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -108,9 +109,11 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
         if (config.get(FUSION) && tag.contains("tinactoryFusionEnergy", Tag.TAG_DOUBLE)) {
             var energy = tag.getDouble("tinactoryFusionEnergy");
             var capacity = tag.getDouble("tinactoryFusionCapacity");
-            var text = tr("fusionEnergy", ClientUtil.getNumberString(Math.round(energy)),
-                ClientUtil.getNumberString(Math.round(capacity)));
-            addProgress((float) (energy / capacity), text, POWER_COLOR);
+            if (MathUtil.compare(capacity) > 0) {
+                var text = tr("fusionEnergy", ClientUtil.getNumberString(Math.round(energy)),
+                    ClientUtil.getNumberString(Math.round(capacity)));
+                addProgress((float) (energy / capacity), text, POWER_COLOR);
+            }
         }
 
         if (config.get(PROGRESS) && tag.contains("tinactoryProgress", Tag.TAG_LONG)) {
