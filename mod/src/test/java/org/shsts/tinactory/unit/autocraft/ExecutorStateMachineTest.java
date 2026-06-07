@@ -710,7 +710,6 @@ class ExecutorStateMachineTest {
 
     private static final class RouteLease implements IMachineLease {
         private final UUID machineId = UUID.randomUUID();
-        private final Map<IStackKey, Long> inputMove;
         private final Map<IStackKey, Long> outputMove;
         private final List<IMachineRoute> inputs;
         private final List<IMachineRoute> outputs;
@@ -718,7 +717,6 @@ class ExecutorStateMachineTest {
         private boolean valid;
 
         private RouteLease(Map<IStackKey, Long> inputMove, Map<IStackKey, Long> outputMove, boolean valid) {
-            this.inputMove = inputMove;
             this.outputMove = new HashMap<>(outputMove);
             this.valid = valid;
             inputs = inputMove.keySet().stream().map(key -> (IMachineRoute) new IMachineRoute() {

@@ -53,7 +53,7 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
             repo(patterns),
-            new TestCpuRuntime(() -> List.of(), id -> Optional.empty()));
+            new TestCpuRuntime(List::of, id -> Optional.empty()));
 
         var requestables = service.listRequestables();
 
@@ -84,7 +84,7 @@ class AutocraftTerminalServiceExecuteTest {
         assertTrue(service.previewResult().isEmpty());
         assertEquals(
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
-            jobService.getJob().get().targets());
+            jobService.getJob().orElseThrow().targets());
         assertEquals(1, previewPlanner.calls);
         assertDoesNotThrow(jobService::tick);
     }
@@ -424,7 +424,6 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
-        private final CraftPlan plan;
         private final PlanResult result;
         private int calls;
 
@@ -433,12 +432,10 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         private StaticPlanner(CraftPlan plan) {
-            this.plan = plan;
             this.result = PlanResult.completed(plan);
         }
 
         private StaticPlanner(PlanResult result) {
-            this.plan = result.plan();
             this.result = result;
         }
 
