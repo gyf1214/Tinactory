@@ -262,7 +262,7 @@ class CraftExecutorTest {
         executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.state());
-        assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.error());
+        assertEquals(ExecutionError.MACHINE_UNAVAILABLE, executor.error());
         assertEquals(0L, inventory.amountOf(plate));
     }
 

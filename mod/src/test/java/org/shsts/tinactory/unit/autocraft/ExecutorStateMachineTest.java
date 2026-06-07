@@ -271,7 +271,7 @@ class ExecutorStateMachineTest {
         executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.MACHINE_REASSIGNMENT_BLOCKED, executor.snapshot().error());
+        assertEquals(ExecutionError.MACHINE_UNAVAILABLE, executor.snapshot().error());
         assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
     }
 
@@ -557,7 +557,7 @@ class ExecutorStateMachineTest {
         var snapshot = new ExecutorSnapshot(
             JobState.BLOCKED,
             ExecutionPhase.FLUSHING,
-            ExecutionError.FLUSH_BACKPRESSURE,
+            ExecutionError.FLUSH_BLOCKED,
             JobState.IDLE,
             new CraftPlan(List.of()),
             0,

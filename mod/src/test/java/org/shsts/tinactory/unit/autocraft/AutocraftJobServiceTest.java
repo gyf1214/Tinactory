@@ -50,7 +50,7 @@ class AutocraftJobServiceTest {
     @Test
     void serviceShouldRemainBusyWhenExecutorBlockedRetriably() {
         var executor = new TestExecutor(JobState.BLOCKED, JobState.BLOCKED, JobState.IDLE);
-        executor.blockedReason = ExecutionError.FLUSH_BACKPRESSURE;
+        executor.blockedReason = ExecutionError.FLUSH_BLOCKED;
         var service = new AutocraftJobService(executor);
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("x:y", ""), 1)), testPlan());

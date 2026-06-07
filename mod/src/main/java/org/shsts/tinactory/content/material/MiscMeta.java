@@ -60,6 +60,7 @@ import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.material.MaterialMeta.parseColor;
+import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
@@ -250,7 +251,16 @@ public class MiscMeta extends MetaConsumer {
             GsonHelper.getAsLong(jo, "fluidBandwidth"),
             GsonHelper.getAsInt(jo, "executionIntervalTicks"),
             GsonHelper.getAsLong(jo, "memoryLimit"));
-        BlockEntityBuilder.builder(id, simpleElectric(config.power()))
+        BlockEntityBuilder.builder(id,
+                MachineBlocks.simple(tooltip -> {
+                    addTooltip(tooltip, "memory", NUMBER_FORMAT.format(config.memoryLimit()));
+                    addTooltip(tooltip, "execInterval",
+                        DOUBLE_FORMAT.format(config.executionIntervalTicks() / 20d));
+                    addTooltip(tooltip, "transmission",
+                        NUMBER_FORMAT.format(config.itemBandwidth()),
+                        NUMBER_FORMAT.format(config.fluidBandwidth()));
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(config.power()));
+                }))
             .transform(MachineSet::baseMachine)
             .blockEntity()
             .transform(MECraftCpu.factory(config))

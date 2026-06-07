@@ -12,8 +12,7 @@ public enum ExecutionError {
     OFFLINE,
     INPUT_UNAVAILABLE,
     MACHINE_UNAVAILABLE,
-    MACHINE_REASSIGNMENT_BLOCKED,
-    FLUSH_BACKPRESSURE;
+    FLUSH_BLOCKED;
 
     public final String id;
 

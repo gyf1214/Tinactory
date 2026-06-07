@@ -415,8 +415,9 @@ public class MachineMeta extends MetaConsumer {
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
                         addTooltip(tooltip, "logisticWorker.1", NUMBER_FORMAT.format(properties.slots()));
-                        addTooltip(tooltip, "logisticWorker.2", DOUBLE_FORMAT.format(properties.interval() / 20d));
-                        addTooltip(tooltip, "logisticWorker.3", NUMBER_FORMAT.format(properties.itemBandwidth()),
+                        addTooltip(tooltip, "execInterval", DOUBLE_FORMAT.format(properties.interval() / 20d));
+                        addTooltip(tooltip, "transmission",
+                            NUMBER_FORMAT.format(properties.itemBandwidth()),
                             NUMBER_FORMAT.format(properties.fluidBandwidth()));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(properties.power()));
                     }))

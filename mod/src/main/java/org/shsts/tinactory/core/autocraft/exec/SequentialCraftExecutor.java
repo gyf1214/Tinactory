@@ -140,7 +140,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 phase = ExecutionPhase.FLUSHING;
                 stateAfterFlush = JobState.RUNNING;
                 state = JobState.BLOCKED;
-                error = ExecutionError.FLUSH_BACKPRESSURE;
+                error = ExecutionError.FLUSH_BLOCKED;
                 flushStepBufferInPhase = false;
                 return;
             }
@@ -413,8 +413,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
                 return true;
             }
             if (!canReassignAfterMachineLoss()) {
-                blockStep(
-                    ExecutionError.MACHINE_REASSIGNMENT_BLOCKED);
+                blockStep(ExecutionError.MACHINE_UNAVAILABLE);
                 return false;
             }
             releaseLease();
@@ -622,7 +621,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             stateAfterFlush = null;
             if (state == JobState.RUNNING) {
                 phase = ExecutionPhase.RUN_STEP;
-                if (error == ExecutionError.FLUSH_BACKPRESSURE) {
+                if (error == ExecutionError.FLUSH_BLOCKED) {
                     error = ExecutionError.NONE;
                 }
             } else {
@@ -634,10 +633,10 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             return;
         }
         if (remainingItems > 0L || remainingFluids > 0L) {
-            error = ExecutionError.FLUSH_BACKPRESSURE;
+            error = ExecutionError.FLUSH_BLOCKED;
             state = JobState.BLOCKED;
         } else {
-            if (error == ExecutionError.FLUSH_BACKPRESSURE) {
+            if (error == ExecutionError.FLUSH_BLOCKED) {
                 error = ExecutionError.NONE;
             }
             state = JobState.RUNNING;

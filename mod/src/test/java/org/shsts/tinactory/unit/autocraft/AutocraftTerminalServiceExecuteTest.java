@@ -95,8 +95,8 @@ class AutocraftTerminalServiceExecuteTest {
         var jobService = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         var service = new AutocraftTerminalService(
             new StaticPlanner(PlanResult.completed(planRequiring(
-                new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
+                    new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
+                    new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
                 new PlanSummary(Map.of(TestStackKey.item("minecraft:iron_ingot", ""),
                     new PlanSummary.Entry(8, 1, 1))))),
             repo(List.of()),
@@ -212,7 +212,7 @@ class AutocraftTerminalServiceExecuteTest {
             JobState.BLOCKED,
             1,
             1,
-            ExecutionError.FLUSH_BACKPRESSURE,
+            ExecutionError.FLUSH_BLOCKED,
             256L);
         var service = new AutocraftTerminalService(
             new StaticPlanner(),
@@ -229,7 +229,7 @@ class AutocraftTerminalServiceExecuteTest {
         assertEquals(JobState.BLOCKED, statuses.get(0).state());
         assertEquals(1, statuses.get(0).completedSteps());
         assertEquals(1, statuses.get(0).totalSteps());
-        assertEquals(ExecutionError.FLUSH_BACKPRESSURE, statuses.get(0).error());
+        assertEquals(ExecutionError.FLUSH_BLOCKED, statuses.get(0).error());
         assertEquals(1024L, statuses.get(0).memoryLimit());
         assertEquals(256L, statuses.get(0).memoryUsage());
     }
