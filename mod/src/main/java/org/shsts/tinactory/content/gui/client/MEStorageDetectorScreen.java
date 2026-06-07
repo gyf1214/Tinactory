@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.logistics.MEStorageDetector;
@@ -21,8 +21,6 @@ import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
-
-import java.util.Optional;
 
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_AMOUNT_KEY;
@@ -90,19 +88,18 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
                 packet.reset(TARGET_ITEM_KEY)
                     .reset(TARGET_FLUID_KEY);
             } else {
-                var fluid = StackHelper.getFluidHandlerFromItem(carried)
-                    .filter($ -> button == 0)
-                    .flatMap(handler -> {
-                        var stack = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-                        return stack.isEmpty() ? Optional.empty() :
-                            Optional.of(StackHelper.copyWithAmount(stack, 1));
-                    });
-                fluid.ifPresentOrElse($ -> packet
-                        .set(TARGET_FLUID_KEY, StackHelper.serializeFluidStack($))
-                        .reset(TARGET_ITEM_KEY),
-                    () -> packet
+                var fluid = button == 0 ?
+                    StackHelper.copyWithAmount(StackHelper.getFluidFromItem(carried), 1) :
+                    FluidStack.EMPTY;
+                if (fluid.isEmpty()) {
+                    packet
                         .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).serializeNBT())
-                        .reset(TARGET_FLUID_KEY));
+                        .reset(TARGET_FLUID_KEY);
+                } else {
+                    packet
+                        .set(TARGET_FLUID_KEY, StackHelper.serializeFluidStack(fluid))
+                        .reset(TARGET_ITEM_KEY);
+                }
             }
 
             menu.triggerEvent(SET_MACHINE_CONFIG, packet);

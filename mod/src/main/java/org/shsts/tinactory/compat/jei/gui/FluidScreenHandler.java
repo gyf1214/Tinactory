@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.integration.gui.client.FluidSlot;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
@@ -28,9 +27,7 @@ public class FluidScreenHandler implements IGuiContainerHandler<AbstractContaine
         var slot = screen.getSlotUnderMouse();
         if (slot != null) {
             var item = slot.getItem();
-            var fluid = StackHelper.getFluidHandlerFromItem(item)
-                .map(h -> h.getFluidInTank(0))
-                .orElse(FluidStack.EMPTY);
+            var fluid = StackHelper.getFluidFromItem(item);
             if (!fluid.isEmpty()) {
                 return fluid;
             }

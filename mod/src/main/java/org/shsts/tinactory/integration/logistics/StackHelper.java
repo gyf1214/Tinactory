@@ -227,6 +227,16 @@ public final class StackHelper {
         return FluidUtil.getFluidHandler(stack).resolve();
     }
 
+    public static FluidStack getFluidFromItem(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
+        var stack1 = stack.getCount() == 1 ? stack : copyWithCount(stack, 1);
+        return getFluidHandlerFromItem(stack1)
+            .map(handler -> handler.getFluidInTank(0).copy())
+            .orElse(FluidStack.EMPTY);
+    }
+
     public static boolean transmitFluidFromHandler(IFluidHandler handler, IPort<FluidStack> port,
         FluidStack fluid) {
         if (fluid.isEmpty()) {

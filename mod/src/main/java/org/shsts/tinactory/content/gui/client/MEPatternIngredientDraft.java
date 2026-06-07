@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -47,11 +46,10 @@ public final class MEPatternIngredientDraft {
     }
 
     public static Optional<MEPatternIngredientDraft> fromItem(ItemStack stack) {
-        var fluid = StackHelper.getFluidHandlerFromItem(stack)
-            .map(handler -> handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE))
-            .filter(drained -> !drained.isEmpty());
-
-        return fluid.map($ -> from(FLUID_ADAPTER, $))
+        var fluid = StackHelper.getFluidFromItem(stack);
+        return Optional.of(fluid)
+            .filter($ -> !$.isEmpty())
+            .map($ -> from(FLUID_ADAPTER, $))
             .or(() -> stack.isEmpty() ? Optional.empty() : Optional.of(from(ITEM_ADAPTER, stack)));
     }
 

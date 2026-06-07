@@ -13,7 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
@@ -231,15 +231,14 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                         tagSelectList = null;
                     }
                 } else {
-                    var fluid = StackHelper.getFluidHandlerFromItem(carried)
-                        .filter($ -> button == 0)
-                        .flatMap(handler -> {
-                            var stack = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-                            return stack.isEmpty() ? Optional.empty() :
-                                Optional.of(StackHelper.copyWithAmount(stack, 1));
-                        });
-                    fluid.ifPresentOrElse(config::setFilter, () ->
-                        config.setFilter(StackHelper.copyWithCount(carried, 1)));
+                    var fluid = button == 0 ?
+                        StackHelper.copyWithAmount(StackHelper.getFluidFromItem(carried), 1) :
+                        FluidStack.EMPTY;
+                    if (fluid.isEmpty()) {
+                        config.setFilter(StackHelper.copyWithCount(carried, 1));
+                    } else {
+                        config.setFilter(fluid);
+                    }
                     tagSelectList = null;
                 }
 

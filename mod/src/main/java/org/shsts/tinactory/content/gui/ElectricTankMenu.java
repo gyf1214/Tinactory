@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
@@ -38,9 +37,7 @@ public class ElectricTankMenu extends ElectricStorageMenu {
         if (fluidHandler.getFluidInTank(tankIndex).isEmpty()) {
             var filter = tank.getFilter(tankIndex);
             var carried = getCarried();
-            var fluidCarried = StackHelper.getFluidHandlerFromItem(carried)
-                .map(h -> h.getFluidInTank(0))
-                .orElse(FluidStack.EMPTY);
+            var fluidCarried = StackHelper.getFluidFromItem(carried);
             if (carried.isEmpty() && !filter.isEmpty()) {
                 tank.resetFilter(tankIndex);
                 return;
