@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineAllocator;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
@@ -63,7 +64,7 @@ class ExecutorStateMachineTest {
         var plate = TestStackKey.item("tinactory:plate", "");
         var executor = new CraftExecutor(
             new MutableInventory(Map.of(ore, 1L)),
-            (step, excluded) -> Optional.empty(),
+            TestMachineAllocator.empty(),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(
@@ -126,7 +127,7 @@ class ExecutorStateMachineTest {
         var inventory = new MutableInventory(Map.of(ingot, 1L));
         var executor = new CraftExecutor(
             inventory,
-            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            TestMachineAllocator.single(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
@@ -163,7 +164,7 @@ class ExecutorStateMachineTest {
         inventory.forcedActualExtract.put(ingot, 1L);
         var executor = new CraftExecutor(
             inventory,
-            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            TestMachineAllocator.single(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
@@ -236,7 +237,7 @@ class ExecutorStateMachineTest {
         inventory.failSecondExtract = true;
         var executor = new CraftExecutor(
             inventory,
-            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            TestMachineAllocator.single(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
@@ -285,7 +286,7 @@ class ExecutorStateMachineTest {
         var lease = new RouteLease(Map.of(ingot, 3L), Map.of(plate, 1L), true);
         var executor = new CraftExecutor(
             new MutableInventory(Map.of(ingot, 3L)),
-            (step1, excluded) -> Optional.of(lease),
+            TestMachineAllocator.single(lease),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
@@ -327,6 +328,11 @@ class ExecutorStateMachineTest {
                     return Optional.of(firstLease);
                 }
                 return Optional.empty();
+            }
+
+            @Override
+            public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+                return firstLease.machineId().equals(machineId) ? Optional.of(firstLease) : Optional.empty();
             }
         };
         var inventory = new MutableInventory(Map.of(ore, 1L));
@@ -528,7 +534,7 @@ class ExecutorStateMachineTest {
     void restoreShouldResumeFinalFlushOfStepBuffer() {
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new MutableInventory(Map.of());
-        var executor = new CraftExecutor(inventory, (step, excluded) -> Optional.empty(), IJobEvents.NO_OP);
+        var executor = new CraftExecutor(inventory, TestMachineAllocator.empty(), IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.BLOCKED,
             ExecutionPhase.FLUSHING,
@@ -698,6 +704,11 @@ class ExecutorStateMachineTest {
         @Override
         public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             return excludedMachineIds.contains(lease.machineId()) ? Optional.empty() : Optional.of(lease);
+        }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return lease.machineId().equals(machineId) ? Optional.of(lease) : Optional.empty();
         }
     }
 

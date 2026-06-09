@@ -222,5 +222,10 @@ class AutocraftCpuPersistenceTest {
                 public void release() {}
             });
         }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return MACHINE_ID.equals(machineId) ? allocate(step, Set.of()) : Optional.empty();
+        }
     }
 }

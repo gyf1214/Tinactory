@@ -17,6 +17,8 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineAllocator;
+import org.shsts.tinactory.unit.fixture.TestMachineLease;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
@@ -239,8 +241,8 @@ class CraftExecutorTest {
         var ore = TestStackKey.item("tinactory:ore", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of());
-        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 2L));
+        var firstLease = new TestMachineLease(Map.of(ore, 1L), Map.of());
+        var secondLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 2L));
         var executor = new CraftExecutor(
             inventory,
             new SequenceAllocator(List.of(firstLease, secondLease)),
@@ -252,7 +254,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(1, 1);
-        firstLease.valid = false;
+        firstLease.setValid(false);
         executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.state());
@@ -265,8 +267,8 @@ class CraftExecutorTest {
         var ore = TestStackKey.item("tinactory:ore", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
-        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var firstLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var secondLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 1L));
         var executor = new CraftExecutor(
             inventory,
             new SequenceAllocator(List.of(firstLease, secondLease)),
@@ -278,7 +280,7 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(2, 2);
-        firstLease.valid = false;
+        firstLease.setValid(false);
         for (var i = 0; i < 8; i++) {
             executor.runCycle(64, 64);
         }
@@ -305,6 +307,23 @@ class CraftExecutorTest {
         assertEquals(ExecutionError.NONE, executor.error());
         assertEquals(0, executor.completedSteps());
         assertEquals(1, executor.totalSteps());
+    }
+
+    @Test
+    void targetedAllocationShouldNotUseNormalAllocationFallback() {
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1)),
+                List.of(new CraftAmount(TestStackKey.item("tinactory:plate", ""), 1))),
+            1);
+        var lease = new TestMachineLease(Map.of(), Map.of());
+        var allocator = TestMachineAllocator.single(lease);
+
+        assertEquals(Optional.empty(), allocator.allocate(step, UUID.randomUUID()));
+        assertEquals(0, allocator.normalCalls());
+        assertEquals(0, lease.releaseCalls());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -371,6 +390,11 @@ class CraftExecutorTest {
         public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             return Optional.of(new SimulatedLease(step));
         }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return Optional.empty();
+        }
     }
 
     private static final class SequenceAllocator implements IMachineAllocator {
@@ -387,67 +411,12 @@ class CraftExecutorTest {
             index++;
             return Optional.of(lease);
         }
-    }
-
-    private static final class ManualLease implements IMachineLease {
-        private final UUID machineId = UUID.randomUUID();
-        private final Map<IStackKey, Long> inputCapacity;
-        private final Map<IStackKey, Long> outputCapacity;
-        private boolean valid = true;
-
-        private ManualLease(Map<IStackKey, Long> inputCapacity, Map<IStackKey, Long> outputCapacity) {
-            this.inputCapacity = new HashMap<>(inputCapacity);
-            this.outputCapacity = new HashMap<>(outputCapacity);
-        }
 
         @Override
-        public UUID machineId() {
-            return machineId;
-        }
-
-        @Override
-        public List<IMachineRoute> inputRoutes() {
-            return inputCapacity.entrySet().stream()
-                .map(entry -> route(entry, PortDirection.INPUT))
-                .toList();
-        }
-
-        @Override
-        public List<IMachineRoute> outputRoutes() {
-            return outputCapacity.entrySet().stream()
-                .map(entry -> route(entry, PortDirection.OUTPUT))
-                .toList();
-        }
-
-        @Override
-        public boolean isValid() {
-            return valid;
-        }
-
-        @Override
-        public void release() {}
-
-        private static IMachineRoute route(Map.Entry<IStackKey, Long> entry, PortDirection direction) {
-            return new IMachineRoute() {
-                @Override
-                public IStackKey key() {
-                    return entry.getKey();
-                }
-
-                @Override
-                public PortDirection direction() {
-                    return direction;
-                }
-
-                @Override
-                public long transfer(long amount, boolean simulate) {
-                    var moved = Math.min(Math.max(0L, amount), entry.getValue());
-                    if (!simulate && moved > 0L) {
-                        entry.setValue(entry.getValue() - moved);
-                    }
-                    return moved;
-                }
-            };
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return leases.stream()
+                .filter(lease -> lease.machineId().equals(machineId))
+                .findFirst();
         }
     }
 

@@ -17,15 +17,5 @@ public interface IMachineAllocator {
 
     Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds);
 
-    default Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
-        var lease = allocate(step, Set.of());
-        if (lease.isEmpty()) {
-            return Optional.empty();
-        }
-        if (lease.get().machineId().equals(machineId)) {
-            return lease;
-        }
-        lease.get().release();
-        return Optional.empty();
-    }
+    Optional<IMachineLease> allocate(CraftStep step, UUID machineId);
 }
