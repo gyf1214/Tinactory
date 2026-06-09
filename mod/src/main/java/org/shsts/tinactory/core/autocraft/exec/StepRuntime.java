@@ -41,9 +41,9 @@ public final class StepRuntime {
         initializeRequiredInputs();
     }
 
-    public StepRuntime(CraftPlanStep planStep, Snapshot snapshot) {
+    public StepRuntime(CraftStep step, Snapshot snapshot) {
         stepIndex = snapshot.stepIndex();
-        step = planStep.step();
+        this.step = step;
         requiredInputs.putAll(snapshot.requiredInputs());
         requiredOutputs.putAll(snapshot.requiredOutputs());
         producedOutputs.putAll(snapshot.producedOutputs());
@@ -146,16 +146,14 @@ public final class StepRuntime {
         return scheduledRuns <= recoveredRuns;
     }
 
-    public boolean transfer(PortType type, long bandwidth, Map<IStackKey, Long> sharedBuffer) {
+    public void transfer(PortType type, long bandwidth, Map<IStackKey, Long> sharedBuffer) {
         if (lease == null || bandwidth <= 0L) {
-            return false;
+            return;
         }
-        var before = copyBuffer(sharedBuffer);
         var remaining = pullOutputs(type, bandwidth, sharedBuffer);
         if (remaining > 0L) {
             pushInputs(type, remaining, sharedBuffer);
         }
-        return !before.equals(sharedBuffer);
     }
 
     public boolean completed() {
@@ -204,7 +202,7 @@ public final class StepRuntime {
         }
         for (var output : step.pattern().outputs()) {
             if (routedOutputs.containsKey(output.key())) {
-                requiredOutputs.merge(output.key(), output.amount() * step.runs(), Math::max);
+                requiredOutputs.merge(output.key(), output.amount() * step.runs(), Long::sum);
             }
         }
     }
@@ -302,10 +300,6 @@ public final class StepRuntime {
         return out;
     }
 
-    private static Map<IStackKey, Long> copyBuffer(Map<IStackKey, Long> buffer) {
-        return new HashMap<>(buffer);
-    }
-
     private static long divideCeil(long numerator, long denominator) {
         if (denominator <= 0L || numerator <= 0L) {
             return 0L;
@@ -333,5 +327,4 @@ public final class StepRuntime {
         }
     }
 
-    public record CraftPlanStep(CraftStep step) {}
 }

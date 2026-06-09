@@ -106,14 +106,10 @@ class ExecutorStateMachineTest {
                 ExecutionError.NONE,
                 null,
                 plan,
-                0,
+                Map.of(),
                 Map.of(ore, 1L),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                Map.of(),
-                null)));
+                0,
+                List.of())));
     }
 
     @Test
@@ -135,21 +131,17 @@ class ExecutorStateMachineTest {
             ExecutionError.NONE,
             null,
             new CraftPlan(List.of(step)),
-            0,
+            Map.of(),
             Map.of(ingot, 1L),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+            0,
+            List.of());
 
         executor.restore(snapshot);
         executor.runCycle(0, 0);
 
         assertEquals(JobState.RUNNING, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(ingot));
-        assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(1L, executor.snapshot().sharedBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
@@ -172,14 +164,10 @@ class ExecutorStateMachineTest {
             ExecutionError.NONE,
             null,
             new CraftPlan(List.of(step)),
-            0,
+            Map.of(),
             Map.of(ingot, 1L),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+            0,
+            List.of());
 
         executor.restore(snapshot);
         executor.runCycle(0, 0);
@@ -187,7 +175,7 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.RUNNING, executor.snapshot().state());
         assertEquals(ExecutionError.NONE, executor.snapshot().error());
         assertEquals(2L, inventory.amountOf(ingot));
-        assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(1L, executor.snapshot().sharedBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
@@ -462,14 +450,10 @@ class ExecutorStateMachineTest {
             ExecutionError.NONE,
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
-            0,
+            Map.of(),
             Map.of(ore, 1L, part, 1L),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+            0,
+            List.of());
 
         executor.restore(snapshot);
         executor.runCycle(64, 64);
@@ -512,14 +496,10 @@ class ExecutorStateMachineTest {
             ExecutionError.NONE,
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
-            0,
+            Map.of(),
             Map.of(ore, 1L, carry, 1L),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+            0,
+            List.of());
 
         executor.restore(snapshot);
         executor.runCycle(64, 64);
@@ -528,7 +508,7 @@ class ExecutorStateMachineTest {
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertEquals(ExecutionPhase.FLUSHING, executor.snapshot().phase());
-        assertEquals(2, executor.snapshot().nextStepIndex());
+        assertEquals(2, executor.snapshot().nextUnscheduledStepIndex());
     }
 
     @Test
@@ -542,14 +522,10 @@ class ExecutorStateMachineTest {
             ExecutionError.FLUSH_BLOCKED,
             JobState.IDLE,
             new CraftPlan(List.of()),
-            0,
+            Map.of(),
             Map.of(plate, 1L),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            Map.of(),
-            null);
+            0,
+            List.of());
 
         executor.restore(snapshot);
         executor.runCycle(64, 64);

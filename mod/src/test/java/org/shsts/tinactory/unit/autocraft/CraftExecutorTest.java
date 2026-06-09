@@ -204,6 +204,29 @@ class CraftExecutorTest {
     }
 
     @Test
+    void stepShouldWaitForSummedDuplicateOutputKeys() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ore, 1L));
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(plate, 1), new CraftAmount(plate, 2))),
+            1);
+        executor.start(new CraftPlan(List.of(step)));
+
+        for (var i = 0; i < 8; i++) {
+            executor.runCycle(64, 64);
+        }
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(3L, inventory.amountOf(plate));
+    }
+
+    @Test
     void fluidOutputsShouldUseFluidBandwidth() {
         var ore = TestStackKey.item("tinactory:ore", "");
         var steam = TestStackKey.fluid("tinactory:steam", "");

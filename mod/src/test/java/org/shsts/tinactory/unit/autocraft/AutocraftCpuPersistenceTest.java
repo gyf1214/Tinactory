@@ -101,8 +101,9 @@ class AutocraftCpuPersistenceTest {
             .getCompound(0);
         var restoredPlan = restoredSerialized.getCompound("execution").getCompound("plan");
         assertEquals("s1", restoredStep.getString("stepId"));
-        assertEquals(1, restoredPlan.getList("summary", TAG_COMPOUND).size());
-        assertEquals(123L, restoredPlan.getLong("memoryUsage"));
+        assertFalse(restoredPlan.contains("summary"));
+        assertFalse(restoredPlan.contains("memoryUsage"));
+        assertEquals(123L, restoredSerialized.getLong("memoryUsage"));
     }
 
     @Test

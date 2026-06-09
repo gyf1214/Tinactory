@@ -17,8 +17,6 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
-import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
-import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -191,7 +189,7 @@ public final class CraftExecutor implements ICraftExecutor {
         activeRuntimes.clear();
         for (var runtime : snapshot.activeRuntimes()) {
             activeRuntimes.add(new StepRuntime(
-                new StepRuntime.CraftPlanStep(plan.steps().get(runtime.stepIndex())),
+                plan.steps().get(runtime.stepIndex()),
                 runtime));
         }
         activeRuntimes.sort(Comparator.comparingInt(StepRuntime::stepIndex));
@@ -540,8 +538,6 @@ public final class CraftExecutor implements ICraftExecutor {
             steps.add(stepTag);
         }
         tag.put("steps", steps);
-        tag.put("summary", serializeSummary(plan.summary(), codec));
-        tag.putLong("memoryUsage", plan.memoryUsage());
         return tag;
     }
 
@@ -555,36 +551,7 @@ public final class CraftExecutor implements ICraftExecutor {
                 codec.decodePattern(stepTag.getCompound("pattern")),
                 stepTag.getLong("runs")));
         }
-        var summary = tag.contains("summary", TAG_LIST) ?
-            deserializeSummary(tag.getList("summary", TAG_COMPOUND), codec) :
-            PlanSummary.empty();
-        return new CraftPlan(out, summary, tag.getLong("memoryUsage"));
-    }
-
-    private static ListTag serializeSummary(PlanSummary summary, PatternNbtCodec codec) {
-        var out = new ListTag();
-        for (var entry : summary.entries().entrySet()) {
-            var tag = new CompoundTag();
-            tag.put("key", CodecHelper.encodeTag(codec.keyCodec(), entry.getKey()));
-            tag.putLong("existingAmount", entry.getValue().existingAmount());
-            tag.putLong("consumedFromInventory", entry.getValue().consumedFromInventory());
-            tag.putLong("craftedAmount", entry.getValue().craftedAmount());
-            out.add(tag);
-        }
-        return out;
-    }
-
-    private static PlanSummary deserializeSummary(ListTag entries, PatternNbtCodec codec) {
-        var out = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
-        for (var i = 0; i < entries.size(); i++) {
-            var tag = entries.getCompound(i);
-            var key = CodecHelper.parseTag(codec.keyCodec(), tag.get("key"));
-            out.put(key, new PlanSummary.Entry(
-                tag.getLong("existingAmount"),
-                tag.getLong("consumedFromInventory"),
-                tag.getLong("craftedAmount")));
-        }
-        return new PlanSummary(out);
+        return new CraftPlan(out);
     }
 
     private static CompoundTag serializeError(ExecutionError error) {
