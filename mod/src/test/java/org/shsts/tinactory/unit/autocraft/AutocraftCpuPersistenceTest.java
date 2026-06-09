@@ -9,7 +9,7 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
+import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
@@ -113,7 +113,7 @@ class AutocraftCpuPersistenceTest {
 
         assertTrue(service.tick());
         assertTrue(service.tick());
-        assertFalse(service.tick());
+        assertTrue(service.tick());
         assertFalse(service.tick());
     }
 
@@ -125,8 +125,8 @@ class AutocraftCpuPersistenceTest {
             TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);
     }
 
-    private static SequentialCraftExecutor executor() {
-        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
+    private static CraftExecutor executor() {
+        return new CraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
     }
 
     private static final class NoOpInventory implements IInventoryView {

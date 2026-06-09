@@ -8,7 +8,7 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
-import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
+import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.plan.AutocraftMemoryConfig;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
@@ -31,7 +31,7 @@ public final class AutocraftServiceBootstrap {
 
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var allocator = new LogisticsMachineAllocator(logistics);
-        var executor = new SequentialCraftExecutor(inventory, allocator, IJobEvents.NO_OP);
+        var executor = new CraftExecutor(inventory, allocator, IJobEvents.NO_OP);
         return new AutocraftJobService(
             executor,
             itemBandwidth,

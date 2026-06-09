@@ -34,7 +34,7 @@ import static net.minecraft.nbt.Tag.TAG_LIST;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class SequentialCraftExecutor implements ICraftExecutor {
+public final class CraftExecutor implements ICraftExecutor {
     private final IInventoryView inventory;
     private final IMachineAllocator machineAllocator;
     private final IJobEvents jobEvents;
@@ -58,9 +58,10 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private final Map<IStackKey, Long> transmittedInputs = new HashMap<>();
     private final Map<IStackKey, Long> transmittedRequiredOutputs = new HashMap<>();
     private final Map<IStackKey, Long> pendingFlush = new HashMap<>();
+    private final Map<IStackKey, Long> requiredInventory = new LinkedHashMap<>();
     private boolean flushStepBufferInPhase;
 
-    public SequentialCraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
+    public CraftExecutor(IInventoryView inventory, IMachineAllocator machineAllocator, IJobEvents jobEvents) {
         this.inventory = inventory;
         this.machineAllocator = machineAllocator;
         this.jobEvents = jobEvents;
@@ -91,11 +92,18 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         } else {
             state = JobState.RUNNING;
         }
-        phase = state == JobState.RUNNING ? ExecutionPhase.RUN_STEP : ExecutionPhase.TERMINAL;
+        phase = state == JobState.RUNNING ? ExecutionPhase.RESERVING : ExecutionPhase.TERMINAL;
         error = ExecutionError.NONE;
         stateAfterFlush = null;
         releaseLease();
         clearStepState();
+        requiredInventory.clear();
+        for (var entry : plan.summary().entries().entrySet()) {
+            var amount = entry.getValue().consumedFromInventory();
+            if (amount > 0L) {
+                requiredInventory.put(entry.getKey(), amount);
+            }
+        }
         flushStepBufferInPhase = false;
     }
 
@@ -108,6 +116,13 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         if (phase == ExecutionPhase.FLUSHING) {
             flushStepBuffer(itemBandwidth, fluidBandwidth);
             return;
+        }
+        if (phase == ExecutionPhase.RESERVING) {
+            reserveRequiredInventory(itemBandwidth, fluidBandwidth);
+            if (!hasReservedRequiredInventory()) {
+                return;
+            }
+            phase = ExecutionPhase.RUN_STEP;
         }
         if (nextStep >= plan.steps().size()) {
             beginFinalFlushing();
@@ -130,22 +145,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
 
         if (stepCompleted()) {
             releaseLease();
-            var flushCandidates = extractFlushCandidates(step);
             clearStepProgressState();
             jobEvents.onStepCompleted(step);
             nextStep++;
             error = ExecutionError.NONE;
             state = JobState.RUNNING;
-
-            if (!flushStepBufferNow(flushCandidates)) {
-                pendingFlush.putAll(flushCandidates);
-                phase = ExecutionPhase.FLUSHING;
-                stateAfterFlush = JobState.RUNNING;
-                state = JobState.BLOCKED;
-                error = ExecutionError.FLUSH_BLOCKED;
-                flushStepBufferInPhase = false;
-                return;
-            }
             if (nextStep >= plan.steps().size()) {
                 beginFinalFlushing();
             }
@@ -420,6 +424,57 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return true;
     }
 
+    private void reserveRequiredInventory(long itemBandwidth, long fluidBandwidth) {
+        var movedItems = reserveRequiredInventory(PortType.ITEM, itemBandwidth);
+        var movedFluids = reserveRequiredInventory(PortType.FLUID, fluidBandwidth);
+        if (hasReservedRequiredInventory()) {
+            error = ExecutionError.NONE;
+            state = JobState.RUNNING;
+            return;
+        }
+        if (movedItems <= 0L && movedFluids <= 0L) {
+            blockStep(ExecutionError.INPUT_UNAVAILABLE);
+        } else {
+            error = ExecutionError.NONE;
+            state = JobState.RUNNING;
+        }
+    }
+
+    private long reserveRequiredInventory(PortType type, long bandwidth) {
+        var remaining = bandwidth;
+        var movedTotal = 0L;
+        for (var required : requiredInventory.entrySet()) {
+            if (remaining <= 0L) {
+                break;
+            }
+            var key = required.getKey();
+            if (key.type() != type) {
+                continue;
+            }
+            var missing = required.getValue() - stepBuffer.getOrDefault(key, 0L);
+            if (missing <= 0L) {
+                continue;
+            }
+            var moved = inventory.extract(key, Math.min(missing, remaining), false);
+            if (moved <= 0L) {
+                continue;
+            }
+            stepBuffer.merge(key, moved, Long::sum);
+            remaining -= moved;
+            movedTotal += moved;
+        }
+        return movedTotal;
+    }
+
+    private boolean hasReservedRequiredInventory() {
+        for (var required : requiredInventory.entrySet()) {
+            if (stepBuffer.getOrDefault(required.getKey(), 0L) < required.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private boolean ensureLease(CraftStep step) {
         if (lease != null) {
             if (lease.isValid()) {
@@ -530,11 +585,15 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (key.type() != type) {
                 continue;
             }
+            var needed = stepRequiredInputs.getOrDefault(key, 0L) - transmittedInputs.getOrDefault(key, 0L);
+            if (needed <= 0L) {
+                continue;
+            }
             var buffered = stepBuffer.getOrDefault(key, 0L);
             if (buffered <= 0L) {
                 continue;
             }
-            var moved = route.transfer(Math.min(remaining, buffered), false);
+            var moved = route.transfer(Math.min(Math.min(remaining, buffered), needed), false);
             if (moved <= 0L) {
                 continue;
             }
@@ -678,22 +737,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         return remaining;
     }
 
-    private boolean flushStepBufferNow(Map<IStackKey, Long> amounts) {
-        for (var entry : List.copyOf(amounts.entrySet())) {
-            var inserted = inventory.insert(entry.getKey(), entry.getValue(), false);
-            if (inserted < entry.getValue()) {
-                amounts.put(entry.getKey(), entry.getValue() - inserted);
-                return false;
-            }
-            amounts.remove(entry.getKey());
-        }
-        return true;
-    }
-
     private void clearStepState() {
         stepBuffer.clear();
         clearStepProgressState();
         pendingFlush.clear();
+        requiredInventory.clear();
         flushStepBufferInPhase = false;
     }
 
@@ -737,30 +785,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             lease = null;
         }
         leasedMachineId = null;
-    }
-
-    private Map<IStackKey, Long> extractFlushCandidates(CraftStep step) {
-        var flushCandidates = new HashMap<IStackKey, Long>();
-        for (var produced : stepProducedOutputs.entrySet()) {
-            var key = produced.getKey();
-            var buffered = stepBuffer.getOrDefault(key, 0L);
-            if (buffered <= 0L) {
-                continue;
-            }
-            var flush = produced.getValue();
-            if (flush <= 0L) {
-                continue;
-            }
-            flush = Math.min(flush, buffered);
-            var retained = buffered - flush;
-            if (retained > 0L) {
-                stepBuffer.put(key, retained);
-            } else {
-                stepBuffer.remove(key);
-            }
-            flushCandidates.put(key, flush);
-        }
-        return flushCandidates;
     }
 
     private static long divideCeil(long numerator, long denominator) {

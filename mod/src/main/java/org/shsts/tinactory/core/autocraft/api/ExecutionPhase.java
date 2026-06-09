@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum ExecutionPhase {
+    RESERVING,
     RUN_STEP,
     FLUSHING,
     TERMINAL
