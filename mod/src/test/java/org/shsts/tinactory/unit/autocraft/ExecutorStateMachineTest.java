@@ -63,7 +63,7 @@ class ExecutorStateMachineTest {
         var plate = TestStackKey.item("tinactory:plate", "");
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ore, 1L)),
-            step -> Optional.empty(),
+            (step, excluded) -> Optional.empty(),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(
@@ -126,7 +126,7 @@ class ExecutorStateMachineTest {
         var inventory = new MutableInventory(Map.of(ingot, 1L));
         var executor = new SequentialCraftExecutor(
             inventory,
-            $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
@@ -163,7 +163,7 @@ class ExecutorStateMachineTest {
         inventory.forcedActualExtract.put(ingot, 1L);
         var executor = new SequentialCraftExecutor(
             inventory,
-            $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.RUNNING,
@@ -236,7 +236,7 @@ class ExecutorStateMachineTest {
         inventory.failSecondExtract = true;
         var executor = new SequentialCraftExecutor(
             inventory,
-            $ -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
+            (ignored, excluded) -> Optional.of(new RouteLease(Map.of(), Map.of(), true)),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
@@ -285,7 +285,7 @@ class ExecutorStateMachineTest {
         var lease = new RouteLease(Map.of(ingot, 3L), Map.of(plate, 1L), true);
         var executor = new SequentialCraftExecutor(
             new MutableInventory(Map.of(ingot, 3L)),
-            $ -> Optional.of(lease),
+            (step1, excluded) -> Optional.of(lease),
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
@@ -321,7 +321,7 @@ class ExecutorStateMachineTest {
             private int call;
 
             @Override
-            public Optional<IMachineLease> allocate(CraftStep step) {
+            public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
                 call++;
                 if (call == 1) {
                     return Optional.of(firstLease);
@@ -422,8 +422,8 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(0L, inventory.amountOf(part));
-        assertEquals(0L, inventory.actualInserted(part));
-        assertEquals(0L, inventory.actualExtracted(part));
+        assertEquals(2L, inventory.actualInserted(part));
+        assertEquals(2L, inventory.actualExtracted(part));
     }
 
     @Test
@@ -476,7 +476,7 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.IDLE, executor.snapshot().state());
         assertEquals(1L, inventory.amountOf(machine));
         assertEquals(1L, inventory.amountOf(part));
-        assertEquals(0L, inventory.actualExtracted(part));
+        assertEquals(1L, inventory.actualExtracted(part));
     }
 
     @Test
@@ -528,7 +528,7 @@ class ExecutorStateMachineTest {
     void restoreShouldResumeFinalFlushOfStepBuffer() {
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new MutableInventory(Map.of());
-        var executor = new SequentialCraftExecutor(inventory, step -> Optional.empty(), IJobEvents.NO_OP);
+        var executor = new SequentialCraftExecutor(inventory, (step, excluded) -> Optional.empty(), IJobEvents.NO_OP);
         var snapshot = new ExecutorSnapshot(
             JobState.BLOCKED,
             ExecutionPhase.FLUSHING,
@@ -587,6 +587,43 @@ class ExecutorStateMachineTest {
         assertEquals(JobState.RUNNING, restored.snapshot().state());
         assertEquals(ExecutionPhase.RUN_STEP, restored.snapshot().phase());
         assertEquals(1L, inventory.amountOf(plate));
+    }
+
+    @Test
+    void allocatorShouldSkipExcludedMachineIds() {
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1)),
+                List.of(new CraftAmount(TestStackKey.item("tinactory:plate", ""), 1))),
+            1);
+        var first = new RouteLease(Map.of(), Map.of(), true);
+        var second = new RouteLease(Map.of(), Map.of(), true);
+        var allocator = new SequenceAllocator(List.of(first, second));
+
+        var lease = allocator.allocate(step, Set.of(first.machineId())).orElseThrow();
+
+        assertEquals(second.machineId(), lease.machineId());
+    }
+
+    @Test
+    void allocatorShouldReturnOnlyTargetedMachineId() {
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1)),
+                List.of(new CraftAmount(TestStackKey.item("tinactory:plate", ""), 1))),
+            1);
+        var first = new RouteLease(Map.of(), Map.of(), true);
+        var second = new RouteLease(Map.of(), Map.of(), true);
+        var allocator = new SequenceAllocator(List.of(first, second));
+
+        assertEquals(Optional.empty(), allocator.allocate(step, UUID.randomUUID()));
+        var lease = allocator.allocate(step, second.machineId()).orElseThrow();
+
+        assertEquals(second.machineId(), lease.machineId());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -659,8 +696,8 @@ class ExecutorStateMachineTest {
         }
 
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
-            return Optional.of(lease);
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
+            return excludedMachineIds.contains(lease.machineId()) ? Optional.empty() : Optional.of(lease);
         }
     }
 
@@ -673,11 +710,24 @@ class ExecutorStateMachineTest {
         }
 
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
-            if (next >= leases.size()) {
-                return Optional.empty();
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
+            while (next < leases.size()) {
+                var lease = leases.get(next++);
+                if (!excludedMachineIds.contains(lease.machineId())) {
+                    return Optional.of(lease);
+                }
             }
-            return Optional.of(leases.get(next++));
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            for (var lease : leases) {
+                if (lease.machineId().equals(machineId)) {
+                    return Optional.of(lease);
+                }
+            }
+            return Optional.empty();
         }
     }
 

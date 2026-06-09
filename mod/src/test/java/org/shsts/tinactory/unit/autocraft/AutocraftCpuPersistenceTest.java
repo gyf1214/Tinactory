@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
@@ -157,12 +158,17 @@ class AutocraftCpuPersistenceTest {
     }
 
     private static final class AlwaysMachineAllocator implements IMachineAllocator {
+        private static final UUID MACHINE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
+            if (excludedMachineIds.contains(MACHINE_ID)) {
+                return Optional.empty();
+            }
             return Optional.of(new IMachineLease() {
                 @Override
                 public UUID machineId() {
-                    return UUID.fromString("11111111-1111-1111-1111-111111111111");
+                    return MACHINE_ID;
                 }
 
                 @Override

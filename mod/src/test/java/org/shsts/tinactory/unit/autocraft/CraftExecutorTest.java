@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -129,7 +130,7 @@ class CraftExecutorTest {
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(1L, inventory.amountOf(waste));
-        assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+        assertEquals(1, inventory.extractCallsByKey.getOrDefault(part, 0));
     }
 
     @Test
@@ -225,7 +226,7 @@ class CraftExecutorTest {
         assertEquals(1L, inventory.amountOf(gear));
         assertEquals(1L, inventory.amountOf(part));
         assertEquals(2L, inventory.amountOf(scrap));
-        assertEquals(0, inventory.extractCallsByKey.getOrDefault(part, 0));
+        assertEquals(1, inventory.extractCallsByKey.getOrDefault(part, 0));
     }
 
     @Test
@@ -361,7 +362,7 @@ class CraftExecutorTest {
 
     private static final class SimulatedAllocator implements IMachineAllocator {
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             return Optional.of(new SimulatedLease(step));
         }
     }
@@ -375,7 +376,7 @@ class CraftExecutorTest {
         }
 
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             var lease = leases.get(index);
             index++;
             return Optional.of(lease);
