@@ -31,10 +31,6 @@ public final class PlannerLedger {
         summary.putAll(snapshot.summary);
     }
 
-    public long get(IStackKey key) {
-        return inventoryStock.getOrDefault(key, 0L) + craftedStock.getOrDefault(key, 0L);
-    }
-
     public void observeInventory(IStackKey key, long amount) {
         if (amount <= 0L) {
             return;

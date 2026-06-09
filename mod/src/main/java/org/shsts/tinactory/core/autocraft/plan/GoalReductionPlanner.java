@@ -256,8 +256,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     private List<CraftPattern> choosePatterns(IStackKey key) {
         return patterns.findPatternsProducing(key).stream()
-            .sorted(Comparator.comparing((CraftPattern pattern) -> pattern.outputs().get(0).key())
-                .thenComparing(CraftPattern::patternUuid))
+            .sorted(Comparator.comparing(CraftPattern::patternUuid))
             .toList();
     }
 
@@ -266,25 +265,14 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         return new CraftPlan(session.steps, summary, calculateMemoryUsage(session.steps, summary));
     }
 
-    private static Map<IStackKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
-        var aggregated = new LinkedHashMap<IStackKey, Long>();
-        for (var output : outputs) {
-            addDemand(aggregated, output.key(), output.amount() * runs);
-        }
-        return aggregated;
-    }
-
     private static long requiredRuns(CraftPattern pattern, IStackKey key, long remainingDemand) {
-        var outputs = aggregateOutputs(pattern.outputs(), 1L);
-        var producedPerRun = outputs.getOrDefault(key, 0L);
-        return divideCeil(remainingDemand, producedPerRun);
-    }
-
-    private static void addDemand(Map<IStackKey, Long> demandMap, IStackKey key, long amount) {
-        if (amount <= 0L) {
-            return;
+        var producedPerRun = 0L;
+        for (var output : pattern.outputs()) {
+            if (output.key().equals(key)) {
+                producedPerRun += output.amount();
+            }
         }
-        demandMap.put(key, demandMap.getOrDefault(key, 0L) + amount);
+        return divideCeil(remainingDemand, producedPerRun);
     }
 
     private long calculateMemoryUsage(List<CraftStep> steps, PlanSummary summary) {
