@@ -92,13 +92,13 @@ public class AutocraftJobService implements IAutocraftService {
     }
 
     @Override
-    public void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage) {
+    public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
         if (isBusy()) {
             throw new IllegalStateException("autocraft CPU is busy");
         }
         executor.start(plan);
         currentTargets = executor.isBusy() ? List.copyOf(targets) : List.of();
-        currentMemoryUsage = executor.isBusy() ? Math.max(0L, memoryUsage) : 0L;
+        currentMemoryUsage = executor.isBusy() ? plan.memoryUsage() : 0L;
         pendingTicks = 0;
     }
 

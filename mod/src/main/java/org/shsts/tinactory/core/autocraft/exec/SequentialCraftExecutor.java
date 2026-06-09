@@ -20,6 +20,7 @@ import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -318,7 +319,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private static ListTag serializeSummary(PlanSummary summary, PatternNbtCodec codec) {
         var out = new ListTag();
         for (var entry : summary.entries().entrySet()) {
-            var tag = codec.encodeAmount(entry.getKey(), 0L);
+            var tag = new CompoundTag();
+            tag.put("key", CodecHelper.encodeTag(codec.keyCodec(), entry.getKey()));
             tag.putLong("existingAmount", entry.getValue().existingAmount());
             tag.putLong("consumedFromInventory", entry.getValue().consumedFromInventory());
             tag.putLong("craftedAmount", entry.getValue().craftedAmount());
@@ -331,8 +333,8 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
         var out = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
         for (var i = 0; i < entries.size(); i++) {
             var tag = entries.getCompound(i);
-            var amount = codec.decodeAmount(tag);
-            out.put(amount.key(), new PlanSummary.Entry(
+            var key = CodecHelper.parseTag(codec.keyCodec(), tag.get("key"));
+            out.put(key, new PlanSummary.Entry(
                 tag.getLong("existingAmount"),
                 tag.getLong("consumedFromInventory"),
                 tag.getLong("craftedAmount")));
