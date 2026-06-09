@@ -200,8 +200,7 @@ class ExecutorStateMachineTest {
                 "tinactory:smelt",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(plate, 1), new CraftAmount(waste, 1))),
-            1,
-            List.of(new CraftAmount(plate, 1)));
+            1);
 
         var inventory = new MutableInventory(Map.of(ore, 1L));
         var allocator = new SingleLeaseAllocator(new RouteLease(
@@ -309,18 +308,14 @@ class ExecutorStateMachineTest {
                 "tinactory:part",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(part, 1))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of());
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:gear",
                 List.of(new CraftAmount(part, 1)),
                 List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 1L), true);
         var allocator = new IMachineAllocator() {
             private int call;
@@ -358,21 +353,15 @@ class ExecutorStateMachineTest {
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:part", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 2))),
-            1,
-            List.of(new CraftAmount(part, 2)),
-            List.of());
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern("tinactory:machine_a", List.of(new CraftAmount(part, 1)), List.of(new CraftAmount(machineA, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(machineA, 1)));
+            1);
         var thirdStep = new CraftStep(
             "s3",
             pattern("tinactory:machine_b", List.of(new CraftAmount(part, 1)), List.of(new CraftAmount(machineB, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(machineB, 1)));
+            1);
 
         var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 2L), true);
         var secondLease = new RouteLease(Map.of(part, 1L), Map.of(machineA, 1L), true);
@@ -402,27 +391,21 @@ class ExecutorStateMachineTest {
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:part_from_ore", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 1))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of());
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:part_from_plate",
                 List.of(new CraftAmount(plate, 1)),
                 List.of(new CraftAmount(part, 1))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of());
+            1);
         var thirdStep = new CraftStep(
             "s3",
             pattern(
                 "tinactory:machine_from_part",
                 List.of(new CraftAmount(part, 2)),
                 List.of(new CraftAmount(machine, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(machine, 1)));
+            1);
 
         var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 1L), true);
         var secondLease = new RouteLease(Map.of(plate, 1L), Map.of(part, 1L), true);
@@ -452,18 +435,14 @@ class ExecutorStateMachineTest {
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:part_from_ore", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(part, 2))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of());
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:machine_from_part",
                 List.of(new CraftAmount(part, 2)),
                 List.of(new CraftAmount(machine, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(machine, 1)));
+            1);
 
         var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(part, 2L), true);
         var secondLease = new RouteLease(Map.of(part, 2L), Map.of(machine, 1L), true);
@@ -509,15 +488,11 @@ class ExecutorStateMachineTest {
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern("tinactory:gear", List.of(new CraftAmount(plate, 1)), List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         var firstLease = new RouteLease(Map.of(ore, 1L), Map.of(plate, 1L), true);
         var secondLease = new RouteLease(Map.of(plate, 1L), Map.of(), true);
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
@@ -584,9 +559,7 @@ class ExecutorStateMachineTest {
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern("tinactory:gear", List.of(), List.of(new CraftAmount(gear, 1))),

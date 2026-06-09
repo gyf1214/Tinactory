@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -290,11 +291,11 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             stepTag.putString("stepId", step.stepId());
             stepTag.putLong("runs", step.runs());
             stepTag.put("pattern", codec.encodePattern(step.pattern()));
-            stepTag.put("requiredIntermediateOutputs", serializeAmounts(step.requiredIntermediateOutputs(), codec));
-            stepTag.put("requiredFinalOutputs", serializeAmounts(step.requiredFinalOutputs(), codec));
             steps.add(stepTag);
         }
         tag.put("steps", steps);
+        tag.put("summary", serializeSummary(plan.summary(), codec));
+        tag.putLong("memoryUsage", plan.memoryUsage());
         return tag;
     }
 
@@ -306,27 +307,37 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             out.add(new CraftStep(
                 stepTag.getString("stepId"),
                 codec.decodePattern(stepTag.getCompound("pattern")),
-                stepTag.getLong("runs"),
-                deserializeAmounts(stepTag.getList("requiredIntermediateOutputs", TAG_COMPOUND), codec),
-                deserializeAmounts(stepTag.getList("requiredFinalOutputs", TAG_COMPOUND), codec)));
+                stepTag.getLong("runs")));
         }
-        return new CraftPlan(out);
+        var summary = tag.contains("summary", TAG_LIST) ?
+            deserializeSummary(tag.getList("summary", TAG_COMPOUND), codec) :
+            PlanSummary.empty();
+        return new CraftPlan(out, summary, tag.getLong("memoryUsage"));
     }
 
-    private static ListTag serializeAmounts(List<CraftAmount> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeSummary(PlanSummary summary, PatternNbtCodec codec) {
         var out = new ListTag();
-        for (var amount : amounts) {
-            out.add(codec.encodeAmount(amount));
+        for (var entry : summary.entries().entrySet()) {
+            var tag = codec.encodeAmount(entry.getKey(), 0L);
+            tag.putLong("existingAmount", entry.getValue().existingAmount());
+            tag.putLong("consumedFromInventory", entry.getValue().consumedFromInventory());
+            tag.putLong("craftedAmount", entry.getValue().craftedAmount());
+            out.add(tag);
         }
         return out;
     }
 
-    private static List<CraftAmount> deserializeAmounts(ListTag amounts, PatternNbtCodec codec) {
-        var out = new ArrayList<CraftAmount>(amounts.size());
-        for (var i = 0; i < amounts.size(); i++) {
-            out.add(codec.decodeAmount(amounts.getCompound(i)));
+    private static PlanSummary deserializeSummary(ListTag entries, PatternNbtCodec codec) {
+        var out = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
+        for (var i = 0; i < entries.size(); i++) {
+            var tag = entries.getCompound(i);
+            var amount = codec.decodeAmount(tag);
+            out.put(amount.key(), new PlanSummary.Entry(
+                tag.getLong("existingAmount"),
+                tag.getLong("consumedFromInventory"),
+                tag.getLong("craftedAmount")));
         }
-        return out;
+        return new PlanSummary(out);
     }
 
     private static CompoundTag serializeError(ExecutionError error) {
@@ -435,9 +446,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     private void initializeRequiredOutputs(CraftStep step, IMachineLease lease) {
         if (!stepRequiredOutputs.isEmpty()) {
             return;
-        }
-        for (var output : step.requiredOutputs()) {
-            mergeMax(stepRequiredOutputs, output.key(), output.amount());
         }
         var routedOutputs = new HashMap<IStackKey, Boolean>();
         for (var route : lease.outputRoutes()) {
@@ -730,10 +738,6 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
     }
 
     private Map<IStackKey, Long> extractFlushCandidates(CraftStep step) {
-        var requiredIntermediateByKey = new HashMap<IStackKey, Long>();
-        for (var amount : step.requiredIntermediateOutputs()) {
-            requiredIntermediateByKey.merge(amount.key(), amount.amount(), Long::sum);
-        }
         var flushCandidates = new HashMap<IStackKey, Long>();
         for (var produced : stepProducedOutputs.entrySet()) {
             var key = produced.getKey();
@@ -741,7 +745,7 @@ public final class SequentialCraftExecutor implements ICraftExecutor {
             if (buffered <= 0L) {
                 continue;
             }
-            var flush = produced.getValue() - requiredIntermediateByKey.getOrDefault(key, 0L);
+            var flush = produced.getValue();
             if (flush <= 0L) {
                 continue;
             }

@@ -111,18 +111,14 @@ class CraftExecutorTest {
                 "tinactory:part",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(part, 2), new CraftAmount(waste, 1))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of(new CraftAmount(part, 1)));
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:gear",
                 List.of(new CraftAmount(part, 1)),
                 List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
@@ -149,9 +145,7 @@ class CraftExecutorTest {
                 "tinactory:plate",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(plate, 1), new CraftAmount(slag, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(2, 2);
@@ -213,18 +207,14 @@ class CraftExecutorTest {
                 "tinactory:part",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(part, 2), new CraftAmount(scrap, 1))),
-            2,
-            List.of(new CraftAmount(part, 3)),
-            List.of(new CraftAmount(part, 1)));
+            2);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:gear",
                 List.of(new CraftAmount(part, 3)),
                 List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
@@ -252,9 +242,7 @@ class CraftExecutorTest {
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(1, 1);
@@ -280,9 +268,7 @@ class CraftExecutorTest {
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(2, 2);

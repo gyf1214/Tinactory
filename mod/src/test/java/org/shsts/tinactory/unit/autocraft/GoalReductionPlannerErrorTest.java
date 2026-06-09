@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestInventoryView;
@@ -148,6 +149,7 @@ class GoalReductionPlannerErrorTest {
         assertSummaryEntry(snapshot.summary(), a, 0, 0, 1);
         assertSummaryEntry(snapshot.summary(), e, 0, 1, 0);
         assertSummaryEntry(snapshot.summary(), d, 0, 0, 1);
+        assertEquals(snapshot.summary(), PlanResult.failed(snapshot.error(), snapshot.summary()).summary());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {

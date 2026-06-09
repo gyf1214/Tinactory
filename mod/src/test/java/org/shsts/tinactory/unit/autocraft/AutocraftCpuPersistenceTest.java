@@ -15,6 +15,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
@@ -71,7 +72,8 @@ class AutocraftCpuPersistenceTest {
     }
 
     @Test
-    void serviceShouldPersistStepOutputRolesInExecutionPlan() {
+    void serviceShouldPersistPlanSummaryAndMemoryInExecutionPlan() {
+        var key = TestStackKey.item("minecraft:iron_ingot", "");
         var step = new CraftStep(
             "s1",
             new CraftPattern(
@@ -79,14 +81,13 @@ class AutocraftCpuPersistenceTest {
                 List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 2)),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2)),
                 TestAutocraftHelper.constraints("tinactory:mixer", 0)),
-            1,
-            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)));
-        var plan = new CraftPlan(List.of(step));
+            1);
+        var summary = new PlanSummary(Map.of(key, new PlanSummary.Entry(0L, 0L, 2L)));
+        var plan = new CraftPlan(List.of(step), summary, 123L);
         var service = new AutocraftJobService(executor());
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
-        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.submitPrepared(List.of(new CraftAmount(key, 1)), plan);
         service.tick();
         var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
         var restored = new AutocraftJobService(executor());
@@ -97,8 +98,10 @@ class AutocraftCpuPersistenceTest {
             .getCompound("plan")
             .getList("steps", TAG_COMPOUND)
             .getCompound(0);
-        assertEquals(1, restoredStep.getList("requiredIntermediateOutputs", TAG_COMPOUND).size());
-        assertEquals(1, restoredStep.getList("requiredFinalOutputs", TAG_COMPOUND).size());
+        var restoredPlan = restoredSerialized.getCompound("execution").getCompound("plan");
+        assertEquals("s1", restoredStep.getString("stepId"));
+        assertEquals(1, restoredPlan.getList("summary", TAG_COMPOUND).size());
+        assertEquals(123L, restoredPlan.getLong("memoryUsage"));
     }
 
     @Test

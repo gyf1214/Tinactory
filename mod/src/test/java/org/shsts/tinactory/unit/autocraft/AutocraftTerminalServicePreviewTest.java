@@ -42,6 +42,8 @@ class AutocraftTerminalServicePreviewTest {
         assertNull(result.error());
         assertEquals(StaticPlanner.SUMMARY, result.summary());
         assertEquals(0L, result.memoryUsage());
+        assertEquals(StaticPlanner.SUMMARY, result.planSnapshot().summary());
+        assertEquals(0L, result.planSnapshot().memoryUsage());
         assertEquals(StaticPlanner.SUMMARY, service.preview().get().summary());
     }
 
@@ -60,6 +62,7 @@ class AutocraftTerminalServicePreviewTest {
         var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
 
         assertEquals(3049L, result.memoryUsage());
+        assertEquals(3049L, result.planSnapshot().memoryUsage());
         assertEquals(3049L, service.preview().orElseThrow().memoryUsage());
     }
 
@@ -99,7 +102,7 @@ class AutocraftTerminalServicePreviewTest {
             TestAutocraftHelper.constraints("tinactory:mixer", 0));
         return new CraftPlan(List.of(
             new CraftStep("s1", pattern, 1L),
-            new CraftStep("s2", pattern, 1L)));
+            new CraftStep("s2", pattern, 1L)), StaticPlanner.WIDE_SUMMARY, 3049L);
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
@@ -116,7 +119,7 @@ class AutocraftTerminalServicePreviewTest {
         private final PlanResult result;
 
         private StaticPlanner() {
-            this(PlanResult.completed(new CraftPlan(List.of()), SUMMARY));
+            this(PlanResult.completed(new CraftPlan(List.of(), SUMMARY, 0L)));
         }
 
         private StaticPlanner(PlanResult result) {

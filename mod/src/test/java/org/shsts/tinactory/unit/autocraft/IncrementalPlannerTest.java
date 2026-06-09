@@ -55,20 +55,9 @@ class IncrementalPlannerTest {
 
         assertTrue(first.isEmpty());
         assertNotNull(progress.plan());
-        var plannedPlateIntermediate = progress.plan().steps().stream()
-            .filter(step -> step.pattern().patternUuid().equals(TestAutocraftHelper.uuid("tinactory:plate_from_ingot")))
-            .flatMap(step -> step.requiredIntermediateOutputs().stream())
-            .filter(amount -> amount.key().equals(plate))
-            .mapToLong(CraftAmount::amount)
-            .sum();
-        var plannedPlateFinal = progress.plan().steps().stream()
-            .filter(step -> step.pattern().patternUuid().equals(TestAutocraftHelper.uuid("tinactory:plate_from_ingot")))
-            .flatMap(step -> step.requiredFinalOutputs().stream())
-            .filter(amount -> amount.key().equals(plate))
-            .mapToLong(CraftAmount::amount)
-            .sum();
-        assertEquals(1L, plannedPlateIntermediate);
-        assertEquals(1L, plannedPlateFinal);
+        assertEquals(2L, progress.summary().entries().get(plate).craftedAmount());
+        assertEquals(progress.summary(), progress.plan().summary());
+        assertEquals(0L, progress.plan().memoryUsage());
         var sync = planner.plan(List.of(new CraftAmount(plate, 1), new CraftAmount(gear, 1)));
         assertEquals(sync.plan(), progress.plan());
         assertEquals(sync.summary(), progress.summary());
