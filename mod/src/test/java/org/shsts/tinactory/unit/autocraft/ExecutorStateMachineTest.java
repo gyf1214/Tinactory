@@ -72,7 +72,7 @@ class ExecutorStateMachineTest {
                 "s1",
                 pattern("tinactory:blocks", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
                 1))));
-        executor.runCycle(1, 1);
+        executor.runCycle(2, 1);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
         assertThrows(IllegalStateException.class, () ->
@@ -148,8 +148,8 @@ class ExecutorStateMachineTest {
         executor.runCycle(0, 0);
 
         assertEquals(JobState.RUNNING, executor.snapshot().state());
-        assertEquals(0L, inventory.amountOf(ingot));
-        assertEquals(2L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
+        assertEquals(1L, inventory.amountOf(ingot));
+        assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
 
     @Test
@@ -184,8 +184,8 @@ class ExecutorStateMachineTest {
         executor.restore(snapshot);
         executor.runCycle(0, 0);
 
-        assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
+        assertEquals(ExecutionError.NONE, executor.snapshot().error());
         assertEquals(2L, inventory.amountOf(ingot));
         assertEquals(1L, executor.snapshot().stepBuffer().getOrDefault(ingot, 0L));
     }
@@ -243,10 +243,10 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(step)));
         executor.runCycle(4, 4);
 
-        assertEquals(JobState.BLOCKED, executor.snapshot().state());
-        assertEquals(1L, inventory.amountOf(ingot));
+        assertEquals(JobState.RUNNING, executor.snapshot().state());
+        assertEquals(0L, inventory.amountOf(ingot));
         assertEquals(1L, inventory.amountOf(coal));
-        assertEquals(ExecutionError.INPUT_UNAVAILABLE, executor.snapshot().error());
+        assertEquals(ExecutionError.NONE, executor.snapshot().error());
     }
 
     @Test
@@ -257,7 +257,7 @@ class ExecutorStateMachineTest {
             "s1",
             pattern("tinactory:press", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
             1);
-        var firstLease = new RouteLease(Map.of(ingot, 1L), Map.of(), false);
+        var firstLease = new RouteLease(Map.of(ingot, 1L), Map.of(), true);
         var secondLease = new RouteLease(Map.of(ingot, 1L), Map.of(plate, 1L), true);
         var allocator = new SequenceAllocator(List.of(firstLease, secondLease));
         var executor = new CraftExecutor(
@@ -266,8 +266,9 @@ class ExecutorStateMachineTest {
             IJobEvents.NO_OP);
 
         executor.start(new CraftPlan(List.of(step)));
-        executor.runCycle(1, 1);
+        executor.runCycle(2, 1);
         firstLease.valid = false;
+        executor.runCycle(1, 1);
         executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.snapshot().state());
@@ -462,7 +463,7 @@ class ExecutorStateMachineTest {
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
             0,
-            Map.of(part, 1L),
+            Map.of(ore, 1L, part, 1L),
             Map.of(),
             Map.of(),
             Map.of(),
@@ -512,7 +513,7 @@ class ExecutorStateMachineTest {
             null,
             new CraftPlan(List.of(firstStep, secondStep)),
             0,
-            Map.of(carry, 1L),
+            Map.of(ore, 1L, carry, 1L),
             Map.of(),
             Map.of(),
             Map.of(),
@@ -525,9 +526,9 @@ class ExecutorStateMachineTest {
         executor.runCycle(64, 64);
         executor.runCycle(64, 64);
 
-        assertEquals(JobState.RUNNING, executor.snapshot().state());
-        assertEquals(ExecutionPhase.RUN_STEP, executor.snapshot().phase());
-        assertEquals(1, executor.snapshot().nextStepIndex());
+        assertEquals(JobState.BLOCKED, executor.snapshot().state());
+        assertEquals(ExecutionPhase.FLUSHING, executor.snapshot().phase());
+        assertEquals(2, executor.snapshot().nextStepIndex());
     }
 
     @Test

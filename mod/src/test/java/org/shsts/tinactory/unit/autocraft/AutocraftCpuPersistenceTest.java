@@ -58,7 +58,7 @@ class AutocraftCpuPersistenceTest {
 
     @Test
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
-        var plan = new CraftPlan(List.of(step("s1")));
+        var plan = new CraftPlan(List.of(step("s1"), step("s2")));
         var service = new AutocraftJobService(executor());
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
@@ -111,8 +111,6 @@ class AutocraftCpuPersistenceTest {
         var service = new AutocraftJobService(executor());
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
 
-        assertTrue(service.tick());
-        assertTrue(service.tick());
         assertTrue(service.tick());
         assertFalse(service.tick());
     }

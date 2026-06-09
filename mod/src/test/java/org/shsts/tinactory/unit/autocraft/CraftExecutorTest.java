@@ -64,6 +64,41 @@ class CraftExecutorTest {
     }
 
     @Test
+    void executorShouldStartIndependentStepsUpToActiveRuntimeLimit() {
+        var firstOre = TestStackKey.item("tinactory:first_ore", "");
+        var secondOre = TestStackKey.item("tinactory:second_ore", "");
+        var firstPlate = TestStackKey.item("tinactory:first_plate", "");
+        var secondPlate = TestStackKey.item("tinactory:second_plate", "");
+
+        var inventory = new FakeInventory(Map.of(firstOre, 1L, secondOre, 1L));
+        var events = new RecordingEvents();
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), events, 2);
+        var firstStep = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:first_plate",
+                List.of(new CraftAmount(firstOre, 1)),
+                List.of(new CraftAmount(firstPlate, 1))),
+            1);
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:second_plate",
+                List.of(new CraftAmount(secondOre, 1)),
+                List.of(new CraftAmount(secondPlate, 1))),
+            1);
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+
+        executor.runCycle(64, 64);
+        executor.runCycle(64, 64);
+
+        assertEquals(List.of("start:s1", "start:s2", "done:s1", "done:s2"), events.events);
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(1L, inventory.amountOf(firstPlate));
+        assertEquals(1L, inventory.amountOf(secondPlate));
+    }
+
+    @Test
     void executorShouldBlockWhenPreconditionsMissing() {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
@@ -253,7 +288,7 @@ class CraftExecutorTest {
             2);
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(1, 1);
+        executor.runCycle(2, 1);
         firstLease.setValid(false);
         executor.runCycle(1, 1);
 

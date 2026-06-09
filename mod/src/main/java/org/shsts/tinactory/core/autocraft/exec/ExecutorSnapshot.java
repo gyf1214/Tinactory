@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,25 +21,15 @@ public record ExecutorSnapshot(
     ExecutionError error,
     @Nullable JobState stateAfterFlush,
     CraftPlan plan,
-    int nextStepIndex,
-    Map<IStackKey, Long> pendingFlush,
-    boolean flushStepBufferInPhase,
-    Map<IStackKey, Long> stepBuffer,
-    Map<IStackKey, Long> stepProducedOutputs,
-    Map<IStackKey, Long> stepRequiredOutputs,
-    Map<IStackKey, Long> stepRequiredInputs,
-    Map<IStackKey, Long> transmittedInputs,
-    Map<IStackKey, Long> transmittedRequiredOutputs,
-    @Nullable UUID leasedMachineId) {
+    Map<IStackKey, Long> requiredInventory,
+    Map<IStackKey, Long> sharedBuffer,
+    int nextUnscheduledStepIndex,
+    List<StepRuntime.Snapshot> activeRuntimes) {
 
     public ExecutorSnapshot {
-        pendingFlush = Map.copyOf(pendingFlush);
-        stepBuffer = Map.copyOf(stepBuffer);
-        stepProducedOutputs = Map.copyOf(stepProducedOutputs);
-        stepRequiredOutputs = Map.copyOf(stepRequiredOutputs);
-        stepRequiredInputs = Map.copyOf(stepRequiredInputs);
-        transmittedInputs = Map.copyOf(transmittedInputs);
-        transmittedRequiredOutputs = Map.copyOf(transmittedRequiredOutputs);
+        requiredInventory = Map.copyOf(requiredInventory);
+        sharedBuffer = Map.copyOf(sharedBuffer);
+        activeRuntimes = List.copyOf(activeRuntimes);
     }
 
     public ExecutorSnapshot(
@@ -62,15 +53,56 @@ public record ExecutorSnapshot(
             error,
             stateAfterFlush,
             plan,
-            nextStepIndex,
             Map.of(),
-            phase == ExecutionPhase.FLUSHING && stateAfterFlush == JobState.IDLE,
             stepBuffer,
-            stepProducedOutputs,
-            stepRequiredOutputs,
+            nextStepIndex,
+            legacyRuntime(
+                plan,
+                nextStepIndex,
+                stepProducedOutputs,
+                stepRequiredOutputs,
+                stepRequiredInputs,
+                transmittedInputs,
+                transmittedRequiredOutputs,
+                leasedMachineId));
+    }
+
+    public int nextStepIndex() {
+        return nextUnscheduledStepIndex;
+    }
+
+    public Map<IStackKey, Long> stepBuffer() {
+        return sharedBuffer;
+    }
+
+    private static List<StepRuntime.Snapshot> legacyRuntime(
+        CraftPlan plan,
+        int nextStepIndex,
+        Map<IStackKey, Long> stepProducedOutputs,
+        Map<IStackKey, Long> stepRequiredOutputs,
+        Map<IStackKey, Long> stepRequiredInputs,
+        Map<IStackKey, Long> transmittedInputs,
+        Map<IStackKey, Long> transmittedRequiredOutputs,
+        @Nullable UUID leasedMachineId) {
+
+        if (nextStepIndex >= plan.steps().size() ||
+            leasedMachineId == null &&
+                stepProducedOutputs.isEmpty() &&
+                stepRequiredOutputs.isEmpty() &&
+                stepRequiredInputs.isEmpty() &&
+                transmittedInputs.isEmpty() &&
+                transmittedRequiredOutputs.isEmpty()) {
+            return List.of();
+        }
+        return List.of(new StepRuntime.Snapshot(
+            nextStepIndex,
+            leasedMachineId,
             stepRequiredInputs,
+            stepRequiredOutputs,
+            stepProducedOutputs,
             transmittedInputs,
             transmittedRequiredOutputs,
-            leasedMachineId);
+            null,
+            true));
     }
 }
