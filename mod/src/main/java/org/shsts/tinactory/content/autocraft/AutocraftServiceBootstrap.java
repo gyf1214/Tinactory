@@ -27,11 +27,12 @@ public final class AutocraftServiceBootstrap {
         long itemBandwidth,
         long fluidBandwidth,
         int executionIntervalTicks,
-        long memoryLimit) {
+        long memoryLimit,
+        int parallelism) {
 
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
         var allocator = new LogisticsMachineAllocator(logistics);
-        var executor = new CraftExecutor(inventory, allocator, IJobEvents.NO_OP);
+        var executor = new CraftExecutor(inventory, allocator, IJobEvents.NO_OP, parallelism);
         return new AutocraftJobService(
             executor,
             itemBandwidth,
