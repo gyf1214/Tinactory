@@ -4,8 +4,7 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 
 ## Requirements
 
-- JDK 21
-- idea IntelliJ is recommended. I have not tested on other IDEs.
+- JDK 17
 
 ## Setup
 
@@ -13,10 +12,9 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 - Import the repository into IntelliJ.
 - Download the following file: <https://www.shsts.org/m2/extra/tinactory_extra_resources_v2.zip>, put the file in
   `libs`.
-- Run gradle task `genIntellijRuns`. This will generate 3 tasks: `runClient`, `runServer`, and `runData`.
-- Run the task `runData` to generate data and asset files.
-- Run the task `runClient` to start the testing client.
-- Copy `libs/tinactory_extra_resources_v1.zip` to `run/client/resourcepacks`.
+- Run the Gradle task `runData` to generate data and asset files.
+- Run the Gradle task `runClient` to start the testing client.
+- Copy `libs/tinactory_extra_resources_v2.zip` to `run/client/resourcepacks`.
 - Restart the client. Load the resource pack `Tinactory extra texture resources`.
 
 ## Code Structure
