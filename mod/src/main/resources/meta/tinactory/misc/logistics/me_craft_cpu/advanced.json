@@ -5,5 +5,5 @@
   "fluidBandwidth": 16000,
   "executionIntervalTicks": 10,
   "memoryLimit": 33554432,
-  "parallelism": 1
+  "parallelism": 4
 }
