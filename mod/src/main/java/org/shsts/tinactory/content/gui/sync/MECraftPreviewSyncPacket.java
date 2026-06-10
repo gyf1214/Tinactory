@@ -7,13 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
-import org.shsts.tinactory.core.autocraft.service.AutocraftPreview;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -37,14 +38,15 @@ public class MECraftPreviewSyncPacket implements IPacket {
         this.memoryUsage = memoryUsage;
     }
 
-    public static MECraftPreviewSyncPacket of(AutocraftPreview preview) {
-        if (preview.isSuccess()) {
-            return ready(preview.summary(), preview.memoryUsage());
+    public static MECraftPreviewSyncPacket of(Optional<PlanResult> preview) {
+        if (preview.isEmpty()) {
+            return empty();
         }
-        if (preview.error() != null) {
-            return failed(preview.error(), preview.summary());
+        var result = preview.get();
+        if (result.plan() != null) {
+            return ready(result.plan().summary(), result.plan().memoryUsage());
         }
-        return empty();
+        return failed(result.error(), result.summary());
     }
 
     public static MECraftPreviewSyncPacket empty() {

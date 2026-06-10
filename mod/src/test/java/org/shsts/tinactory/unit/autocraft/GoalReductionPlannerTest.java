@@ -6,6 +6,7 @@ import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
+import org.shsts.tinactory.core.autocraft.plan.AutocraftMemoryConfig;
 import org.shsts.tinactory.core.autocraft.plan.GoalReductionPlanner;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
@@ -91,8 +92,36 @@ class GoalReductionPlannerTest {
         assertNotNull(snapshot.plan());
         assertEquals(1, snapshot.plan().steps().size());
         assertEquals(5L, snapshot.plan().steps().get(0).runs());
+        assertEquals(snapshot.summary(), snapshot.plan().summary());
         assertSummaryEntry(snapshot.summary(), plank, 5, 5, 0);
         assertSummaryEntry(snapshot.summary(), chest, 3, 0, 5);
+    }
+
+    @Test
+    void plannerShouldStoreDeterministicMemoryUsageOnSuccessfulPlan() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var water = TestStackKey.fluid("tinactory:water", "");
+        var wetPlate = TestStackKey.item("tinactory:wet_plate", "");
+        var makePlate = pattern(
+            "tinactory:plate_from_ore",
+            List.of(new CraftAmount(ore, 2)),
+            List.of(new CraftAmount(plate, 1)));
+        var washPlate = pattern(
+            "tinactory:wet_plate_from_plate",
+            List.of(new CraftAmount(plate, 1), new CraftAmount(water, 1000)),
+            List.of(new CraftAmount(wetPlate, 1)));
+        var config = new AutocraftMemoryConfig(10L, 2L, 5L, 3L, 7L);
+        var planner = planner(
+            repo(List.of(makePlate, washPlate)),
+            List.of(new CraftAmount(ore, 4), new CraftAmount(water, 1000)),
+            config);
+
+        var snapshot = planner.plan(List.of(new CraftAmount(wetPlate, 1)));
+
+        assertNotNull(snapshot.plan());
+        assertEquals(snapshot.summary(), snapshot.plan().summary());
+        assertEquals(3050L, snapshot.plan().memoryUsage());
     }
 
     @Test
@@ -112,7 +141,6 @@ class GoalReductionPlannerTest {
         assertEquals(1, steps.size());
         assertEquals(TestAutocraftHelper.uuid("tinactory:plate_from_ore"), steps.get(0).pattern().patternUuid());
         assertEquals(10L, steps.get(0).runs());
-        assertEquals(List.of(new CraftAmount(plate, 10)), steps.get(0).requiredFinalOutputs());
         assertSummaryEntry(snapshot.summary(), ore, 10, 10, 0);
         assertSummaryEntry(snapshot.summary(), plate, 0, 0, 10);
     }
@@ -133,7 +161,6 @@ class GoalReductionPlannerTest {
         var steps = snapshot.plan().steps();
         assertEquals(1, steps.size());
         assertEquals(3L, steps.get(0).runs());
-        assertEquals(List.of(new CraftAmount(part, 5)), steps.get(0).requiredFinalOutputs());
         assertSummaryEntry(snapshot.summary(), base, 3, 3, 0);
         assertSummaryEntry(snapshot.summary(), part, 0, 0, 6);
     }
@@ -164,17 +191,14 @@ class GoalReductionPlannerTest {
                 TestAutocraftHelper.uuid("tinactory:refine_oil"),
                 TestAutocraftHelper.uuid("tinactory:residue_to_carbon")),
             snapshot.plan().steps().stream().map(step -> step.pattern().patternUuid()).toList());
-        assertEquals(List.of(new CraftAmount(residue, 1)),
-            snapshot.plan().steps().get(0).requiredIntermediateOutputs());
-        assertEquals(List.of(new CraftAmount(plastic, 1)),
-            snapshot.plan().steps().get(0).requiredFinalOutputs());
-        assertEquals(List.of(), snapshot.plan().steps().get(1).requiredIntermediateOutputs());
-        assertEquals(List.of(new CraftAmount(carbon, 1)),
-            snapshot.plan().steps().get(1).requiredFinalOutputs());
+        assertSummaryEntry(snapshot.summary(), crude, 1, 1, 0);
+        assertSummaryEntry(snapshot.summary(), plastic, 0, 0, 1);
+        assertSummaryEntry(snapshot.summary(), residue, 0, 0, 1);
+        assertSummaryEntry(snapshot.summary(), carbon, 0, 0, 1);
     }
 
     @Test
-    void plannerShouldAggregateDuplicateOutputsByRole() {
+    void plannerShouldAggregateDuplicateOutputsInSummary() {
         var base = TestStackKey.item("tinactory:base", "");
         var part = TestStackKey.item("tinactory:part", "");
         var finalKey = TestStackKey.item("tinactory:final", "");
@@ -192,12 +216,12 @@ class GoalReductionPlannerTest {
 
         assertNotNull(snapshot.plan());
         var partStep = snapshot.plan().steps().get(0);
-        assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredIntermediateOutputs());
-        assertEquals(List.of(new CraftAmount(part, 1)), partStep.requiredFinalOutputs());
+        assertEquals(1L, partStep.runs());
+        assertSummaryEntry(snapshot.summary(), part, 0, 0, 2);
     }
 
     @Test
-    void plannerShouldMarkBranchProducerOutputAsIntermediate() {
+    void plannerShouldProduceBranchDependencyBeforeConsumers() {
         var ore = TestStackKey.item("tinactory:ore", "");
         var part = TestStackKey.item("tinactory:part", "");
         var machineA = TestStackKey.item("tinactory:machine_a", "");
@@ -226,8 +250,7 @@ class GoalReductionPlannerTest {
                 TestAutocraftHelper.uuid("tinactory:machine_a_from_part"),
                 TestAutocraftHelper.uuid("tinactory:machine_b_from_part")),
             steps.stream().map($ -> $.pattern().patternUuid()).toList());
-        assertEquals(List.of(new CraftAmount(part, 2)), steps.get(0).requiredIntermediateOutputs());
-        assertEquals(List.of(), steps.get(0).requiredFinalOutputs());
+        assertSummaryEntry(snapshot.summary(), part, 0, 0, 2);
     }
 
     @Test
@@ -262,8 +285,7 @@ class GoalReductionPlannerTest {
         assertEquals(2L, steps.get(0).runs());
         assertEquals(TestAutocraftHelper.uuid("tinactory:machine_from_part"), steps.get(1).pattern().patternUuid());
         assertEquals(1L, steps.get(1).runs());
-        assertEquals(List.of(new CraftAmount(part, 2)), steps.get(0).requiredIntermediateOutputs());
-        assertEquals(List.of(), steps.get(0).requiredFinalOutputs());
+        assertSummaryEntry(snapshot.summary(), part, 0, 0, 2);
     }
 
     @Test
@@ -403,6 +425,14 @@ class GoalReductionPlannerTest {
 
     private static GoalReductionPlanner planner(IPatternRepository repo, List<CraftAmount> available) {
         return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available));
+    }
+
+    private static GoalReductionPlanner planner(
+        IPatternRepository repo,
+        List<CraftAmount> available,
+        AutocraftMemoryConfig memoryConfig) {
+
+        return new GoalReductionPlanner(repo, TestInventoryView.fromAmounts(available), memoryConfig);
     }
 
     private static void assertSummaryEntry(

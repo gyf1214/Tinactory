@@ -38,13 +38,14 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     private final long fluidBandwidth;
     private final int executionIntervalTicks;
     private final long memoryLimit;
+    private final int parallelism;
     @Nullable
     private AutocraftJobService service;
     @Nullable
     private CompoundTag pendingSnapshot;
 
     public record Properties(double power, long itemBandwidth, long fluidBandwidth, int executionIntervalTicks,
-        long memoryLimit) {}
+        long memoryLimit, int parallelism) {}
 
     public MECraftCpu(BlockEntity blockEntity, Properties properties) {
         super(blockEntity);
@@ -52,6 +53,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         this.fluidBandwidth = properties.fluidBandwidth;
         this.executionIntervalTicks = properties.executionIntervalTicks;
         this.memoryLimit = properties.memoryLimit;
+        this.parallelism = properties.parallelism;
 
         var voltage = getBlockVoltage(blockEntity);
         electric = new SimpleElectricConsumer(voltage.value, properties.power) {
@@ -109,7 +111,8 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             itemBandwidth,
             fluidBandwidth,
             executionIntervalTicks,
-            memoryLimit);
+            memoryLimit,
+            parallelism);
         if (snapshot != null) {
             service.restoreRunningSnapshot(snapshot, snapshotCodec);
             pendingSnapshot = null;

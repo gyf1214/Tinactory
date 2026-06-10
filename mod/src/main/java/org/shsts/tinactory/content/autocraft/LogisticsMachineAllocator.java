@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -38,10 +39,27 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
     }
 
     @Override
-    public Optional<IMachineLease> allocate(CraftStep step) {
+    public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
+        return allocate(step, excludedMachineIds, Optional.empty());
+    }
+
+    @Override
+    public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+        return allocate(step, Set.of(), Optional.of(machineId));
+    }
+
+    private Optional<IMachineLease> allocate(
+        CraftStep step,
+        Set<UUID> excludedMachineIds,
+        Optional<UUID> targetMachineId) {
+
         var constraints = effectiveConstraints(step);
         var machines = groupMachinePorts();
         for (var entry : machines.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
+            if (excludedMachineIds.contains(entry.getKey()) ||
+                targetMachineId.isPresent() && !targetMachineId.get().equals(entry.getKey())) {
+                continue;
+            }
             var ports = entry.getValue();
             if (ports.isEmpty()) {
                 continue;

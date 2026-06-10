@@ -22,9 +22,5 @@ public interface IAutocraftService {
 
     boolean cancel();
 
-    default void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
-        submitPrepared(targets, plan, 0L);
-    }
-
-    void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage);
+    void submitPrepared(List<CraftAmount> targets, CraftPlan plan);
 }

@@ -4,18 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
+import org.shsts.tinactory.core.autocraft.api.ExecutionPhase;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
+import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
+import org.shsts.tinactory.unit.fixture.TestMachineAllocator;
+import org.shsts.tinactory.unit.fixture.TestMachineLease;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +42,7 @@ class CraftExecutorTest {
         var inventory = new FakeInventory(Map.of(ingot, 2L));
         var events = new RecordingEvents();
         var allocator = new SimulatedAllocator();
-        var executor = new SequentialCraftExecutor(inventory, allocator, events);
+        var executor = new CraftExecutor(inventory, allocator, events);
         var firstStep = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -60,11 +64,46 @@ class CraftExecutorTest {
     }
 
     @Test
+    void executorShouldStartIndependentStepsUpToActiveRuntimeLimit() {
+        var firstOre = TestStackKey.item("tinactory:first_ore", "");
+        var secondOre = TestStackKey.item("tinactory:second_ore", "");
+        var firstPlate = TestStackKey.item("tinactory:first_plate", "");
+        var secondPlate = TestStackKey.item("tinactory:second_plate", "");
+
+        var inventory = new FakeInventory(Map.of(firstOre, 1L, secondOre, 1L));
+        var events = new RecordingEvents();
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), events, 2);
+        var firstStep = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:first_plate",
+                List.of(new CraftAmount(firstOre, 1)),
+                List.of(new CraftAmount(firstPlate, 1))),
+            1);
+        var secondStep = new CraftStep(
+            "s2",
+            pattern(
+                "tinactory:second_plate",
+                List.of(new CraftAmount(secondOre, 1)),
+                List.of(new CraftAmount(secondPlate, 1))),
+            1);
+        executor.start(new CraftPlan(List.of(firstStep, secondStep)));
+
+        executor.runCycle(64, 64);
+        executor.runCycle(64, 64);
+
+        assertEquals(List.of("start:s1", "start:s2", "done:s1", "done:s2"), events.events);
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(1L, inventory.amountOf(firstPlate));
+        assertEquals(1L, inventory.amountOf(secondPlate));
+    }
+
+    @Test
     void executorShouldBlockWhenPreconditionsMissing() {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of());
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -82,7 +121,7 @@ class CraftExecutorTest {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ingot, 2L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -104,25 +143,21 @@ class CraftExecutorTest {
         var waste = TestStackKey.item("tinactory:waste", "");
         var gear = TestStackKey.item("tinactory:gear", "");
         var inventory = new FakeInventory(Map.of(ore, 1L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var firstStep = new CraftStep(
             "s1",
             pattern(
                 "tinactory:part",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(part, 2), new CraftAmount(waste, 1))),
-            1,
-            List.of(new CraftAmount(part, 1)),
-            List.of(new CraftAmount(part, 1)));
+            1);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:gear",
                 List.of(new CraftAmount(part, 1)),
                 List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
@@ -142,16 +177,14 @@ class CraftExecutorTest {
         var plate = TestStackKey.item("tinactory:plate", "");
         var slag = TestStackKey.item("tinactory:slag", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern(
                 "tinactory:plate",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(plate, 1), new CraftAmount(slag, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(2, 2);
@@ -171,11 +204,34 @@ class CraftExecutorTest {
     }
 
     @Test
+    void stepShouldWaitForSummedDuplicateOutputKeys() {
+        var ore = TestStackKey.item("tinactory:ore", "");
+        var plate = TestStackKey.item("tinactory:plate", "");
+        var inventory = new FakeInventory(Map.of(ore, 1L));
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(ore, 1)),
+                List.of(new CraftAmount(plate, 1), new CraftAmount(plate, 2))),
+            1);
+        executor.start(new CraftPlan(List.of(step)));
+
+        for (var i = 0; i < 8; i++) {
+            executor.runCycle(64, 64);
+        }
+
+        assertEquals(JobState.IDLE, executor.state());
+        assertEquals(3L, inventory.amountOf(plate));
+    }
+
+    @Test
     void fluidOutputsShouldUseFluidBandwidth() {
         var ore = TestStackKey.item("tinactory:ore", "");
         var steam = TestStackKey.fluid("tinactory:steam", "");
         var inventory = new FakeInventory(Map.of(ore, 1L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern(
@@ -194,6 +250,10 @@ class CraftExecutorTest {
 
         executor.runCycle(1, 250);
         executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
+        executor.runCycle(1, 250);
 
         assertEquals(JobState.IDLE, executor.state());
         assertEquals(1000L, inventory.amountOf(steam));
@@ -206,25 +266,21 @@ class CraftExecutorTest {
         var scrap = TestStackKey.item("tinactory:scrap", "");
         var gear = TestStackKey.item("tinactory:gear", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var firstStep = new CraftStep(
             "s1",
             pattern(
                 "tinactory:part",
                 List.of(new CraftAmount(ore, 1)),
                 List.of(new CraftAmount(part, 2), new CraftAmount(scrap, 1))),
-            2,
-            List.of(new CraftAmount(part, 3)),
-            List.of(new CraftAmount(part, 1)));
+            2);
         var secondStep = new CraftStep(
             "s2",
             pattern(
                 "tinactory:gear",
                 List.of(new CraftAmount(part, 3)),
                 List.of(new CraftAmount(gear, 1))),
-            1,
-            List.of(),
-            List.of(new CraftAmount(gear, 1)));
+            1);
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
 
         for (var i = 0; i < 16; i++) {
@@ -243,22 +299,20 @@ class CraftExecutorTest {
         var ore = TestStackKey.item("tinactory:ore", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of());
-        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 2L));
-        var executor = new SequentialCraftExecutor(
+        var firstLease = new TestMachineLease(Map.of(ore, 1L), Map.of());
+        var secondLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 2L));
+        var executor = new CraftExecutor(
             inventory,
             new SequenceAllocator(List.of(firstLease, secondLease)),
             new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
-        executor.runCycle(1, 1);
-        firstLease.valid = false;
+        executor.runCycle(2, 1);
+        firstLease.setValid(false);
         executor.runCycle(1, 1);
 
         assertEquals(JobState.BLOCKED, executor.state());
@@ -271,22 +325,20 @@ class CraftExecutorTest {
         var ore = TestStackKey.item("tinactory:ore", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ore, 2L));
-        var firstLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
-        var secondLease = new ManualLease(Map.of(ore, 1L), Map.of(plate, 1L));
-        var executor = new SequentialCraftExecutor(
+        var firstLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var secondLease = new TestMachineLease(Map.of(ore, 1L), Map.of(plate, 1L));
+        var executor = new CraftExecutor(
             inventory,
             new SequenceAllocator(List.of(firstLease, secondLease)),
             new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ore, 1)), List.of(new CraftAmount(plate, 1))),
-            2,
-            List.of(),
-            List.of(new CraftAmount(plate, 1)));
+            2);
         executor.start(new CraftPlan(List.of(step)));
 
         executor.runCycle(2, 2);
-        firstLease.valid = false;
+        firstLease.setValid(false);
         for (var i = 0; i < 8; i++) {
             executor.runCycle(64, 64);
         }
@@ -300,7 +352,7 @@ class CraftExecutorTest {
         var ingot = TestStackKey.item("tinactory:ingot", "");
         var plate = TestStackKey.item("tinactory:plate", "");
         var inventory = new FakeInventory(Map.of(ingot, 2L));
-        var executor = new SequentialCraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
+        var executor = new CraftExecutor(inventory, new SimulatedAllocator(), new RecordingEvents());
         var step = new CraftStep(
             "s1",
             pattern("tinactory:plate", List.of(new CraftAmount(ingot, 2)), List.of(new CraftAmount(plate, 1))),
@@ -309,9 +361,27 @@ class CraftExecutorTest {
         executor.start(new CraftPlan(List.of(step)));
 
         assertEquals(JobState.RUNNING, executor.state());
+        assertEquals(ExecutionPhase.RESERVING, executor.snapshot().phase());
         assertEquals(ExecutionError.NONE, executor.error());
         assertEquals(0, executor.completedSteps());
         assertEquals(1, executor.totalSteps());
+    }
+
+    @Test
+    void targetedAllocationShouldNotUseNormalAllocationFallback() {
+        var step = new CraftStep(
+            "s1",
+            pattern(
+                "tinactory:plate",
+                List.of(new CraftAmount(TestStackKey.item("tinactory:ore", ""), 1)),
+                List.of(new CraftAmount(TestStackKey.item("tinactory:plate", ""), 1))),
+            1);
+        var lease = new TestMachineLease(Map.of(), Map.of());
+        var allocator = TestMachineAllocator.single(lease);
+
+        assertEquals(Optional.empty(), allocator.allocate(step, UUID.randomUUID()));
+        assertEquals(0, allocator.normalCalls());
+        assertEquals(0, lease.releaseCalls());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> inputs, List<CraftAmount> outputs) {
@@ -375,8 +445,13 @@ class CraftExecutorTest {
 
     private static final class SimulatedAllocator implements IMachineAllocator {
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             return Optional.of(new SimulatedLease(step));
+        }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return Optional.empty();
         }
     }
 
@@ -389,72 +464,17 @@ class CraftExecutorTest {
         }
 
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
             var lease = leases.get(index);
             index++;
             return Optional.of(lease);
         }
-    }
-
-    private static final class ManualLease implements IMachineLease {
-        private final UUID machineId = UUID.randomUUID();
-        private final Map<IStackKey, Long> inputCapacity;
-        private final Map<IStackKey, Long> outputCapacity;
-        private boolean valid = true;
-
-        private ManualLease(Map<IStackKey, Long> inputCapacity, Map<IStackKey, Long> outputCapacity) {
-            this.inputCapacity = new HashMap<>(inputCapacity);
-            this.outputCapacity = new HashMap<>(outputCapacity);
-        }
 
         @Override
-        public UUID machineId() {
-            return machineId;
-        }
-
-        @Override
-        public List<IMachineRoute> inputRoutes() {
-            return inputCapacity.entrySet().stream()
-                .map(entry -> route(entry, PortDirection.INPUT))
-                .toList();
-        }
-
-        @Override
-        public List<IMachineRoute> outputRoutes() {
-            return outputCapacity.entrySet().stream()
-                .map(entry -> route(entry, PortDirection.OUTPUT))
-                .toList();
-        }
-
-        @Override
-        public boolean isValid() {
-            return valid;
-        }
-
-        @Override
-        public void release() {}
-
-        private static IMachineRoute route(Map.Entry<IStackKey, Long> entry, PortDirection direction) {
-            return new IMachineRoute() {
-                @Override
-                public IStackKey key() {
-                    return entry.getKey();
-                }
-
-                @Override
-                public PortDirection direction() {
-                    return direction;
-                }
-
-                @Override
-                public long transfer(long amount, boolean simulate) {
-                    var moved = Math.min(Math.max(0L, amount), entry.getValue());
-                    if (!simulate && moved > 0L) {
-                        entry.setValue(entry.getValue() - moved);
-                    }
-                    return moved;
-                }
-            };
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return leases.stream()
+                .filter(lease -> lease.machineId().equals(machineId))
+                .findFirst();
         }
     }
 

@@ -90,27 +90,24 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     @Test
-    void executeShouldSubmitPreparedPreviewMemoryUsage() {
+    void executeShouldSubmitPreparedPlanMemoryUsage() {
         var cpu = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var jobService = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
+        var input = TestStackKey.item("minecraft:iron_ingot", "");
+        var plan = planRequiring(
+            new CraftAmount(input, 1),
+            new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1),
+            new PlanSummary(Map.of(input, new PlanSummary.Entry(8, 1, 1))),
+            75L);
         var service = new AutocraftTerminalService(
-            new StaticPlanner(PlanResult.completed(planRequiring(
-                    new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-                    new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1)),
-                new PlanSummary(Map.of(TestStackKey.item("minecraft:iron_ingot", ""),
-                    new PlanSummary.Entry(8, 1, 1))))),
+            new StaticPlanner(PlanResult.completed(plan)),
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.of(cpu),
-                id -> Optional.of(jobService)),
-            50L,
-            10L,
-            5L,
-            1L,
-            3L);
+                id -> Optional.of(jobService)));
         var preview = service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
 
-        assertEquals(75L, preview.memoryUsage());
+        assertEquals(75L, preview.plan().memoryUsage());
         assertTrue(service.execute(cpu));
         assertEquals(75L, jobService.getJob().orElseThrow().memoryUsage());
     }
@@ -122,23 +119,20 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(planRequiring(
                 new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1))),
+                new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1),
+                PlanSummary.empty(),
+                50L)),
             repo(List.of()),
             new TestCpuRuntime(
                 () -> List.of(cpu),
-                id -> Optional.of(jobService)),
-            50L,
-            0L,
-            0L,
-            0L,
-            0L);
+                id -> Optional.of(jobService)));
         service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
 
         var execute = service.execute(cpu);
 
         assertFalse(execute);
         assertTrue(jobService.getJob().isEmpty());
-        assertTrue(service.previewResult().isSuccess());
+        assertTrue(service.previewResult().orElseThrow().plan() != null);
     }
 
     @Test
@@ -164,7 +158,7 @@ class AutocraftTerminalServiceExecuteTest {
         var execute = service.execute(cpu);
 
         assertFalse(execute);
-        assertTrue(service.previewResult().isSuccess());
+        assertTrue(service.previewResult().orElseThrow().plan() != null);
     }
 
     @Test
@@ -183,7 +177,7 @@ class AutocraftTerminalServiceExecuteTest {
         var execute = service.execute(cpu);
 
         assertFalse(execute);
-        assertTrue(service.previewResult().isSuccess());
+        assertTrue(service.previewResult().orElseThrow().plan() != null);
     }
 
     @Test
@@ -241,7 +235,9 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-            target), 256L);
+            target,
+            PlanSummary.empty(),
+            256L));
 
         var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
@@ -258,7 +254,9 @@ class AutocraftTerminalServiceExecuteTest {
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
-            target), 256L);
+            target,
+            PlanSummary.empty(),
+            256L));
         var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
         persisted.remove("memoryUsage");
 
@@ -362,11 +360,20 @@ class AutocraftTerminalServiceExecuteTest {
     }
 
     private static CraftPlan planRequiring(CraftAmount input, CraftAmount output) {
+        return planRequiring(input, output, PlanSummary.empty(), 0L);
+    }
+
+    private static CraftPlan planRequiring(
+        CraftAmount input,
+        CraftAmount output,
+        PlanSummary summary,
+        long memoryUsage) {
+
         var pattern = TestAutocraftHelper.pattern("tinactory:test",
             List.of(input),
             List.of(output),
             TestAutocraftHelper.constraints("tinactory:mixer", 0));
-        return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)));
+        return new CraftPlan(List.of(new CraftStep("s1", pattern, 1L)), summary, memoryUsage);
     }
 
     private static IAutocraftService staticService(AutocraftJobSnapshot job) {
@@ -392,7 +399,7 @@ class AutocraftTerminalServiceExecuteTest {
             }
 
             @Override
-            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan, long memoryUsage) {
+            public void submitPrepared(List<CraftAmount> targets, CraftPlan plan) {
                 throw new UnsupportedOperationException();
             }
         };

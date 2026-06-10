@@ -12,7 +12,6 @@ import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
-import org.shsts.tinactory.core.autocraft.service.AutocraftPreview;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
@@ -37,12 +36,13 @@ class AutocraftTerminalServicePreviewTest {
 
         var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
 
-        assertTrue(result.isSuccess());
-        assertEquals(0, result.planSnapshot().steps().size());
+        assertTrue(result.plan() != null);
+        assertEquals(0, result.plan().steps().size());
         assertNull(result.error());
         assertEquals(StaticPlanner.SUMMARY, result.summary());
-        assertEquals(0L, result.memoryUsage());
-        assertEquals(StaticPlanner.SUMMARY, service.preview().get().summary());
+        assertEquals(StaticPlanner.SUMMARY, result.plan().summary());
+        assertEquals(0L, result.plan().memoryUsage());
+        assertEquals(result, service.preview().get());
     }
 
     @Test
@@ -50,28 +50,28 @@ class AutocraftTerminalServicePreviewTest {
         var service = new AutocraftTerminalService(
             new StaticPlanner(PlanResult.completed(twoStepPlan(), StaticPlanner.WIDE_SUMMARY)),
             new PatternRegistryCache(),
-            new TestCpuRuntime(),
-            10L,
-            2L,
-            5L,
-            3L,
-            7L);
+            new TestCpuRuntime());
 
         var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 3);
 
-        assertEquals(3049L, result.memoryUsage());
-        assertEquals(3049L, service.preview().orElseThrow().memoryUsage());
+        assertTrue(result.plan() != null);
+        assertEquals(3049L, result.plan().memoryUsage());
+        assertEquals(3049L, service.preview().orElseThrow().plan().memoryUsage());
     }
 
     @Test
-    void emptyPreviewShouldHaveNoPlanOrErrorAndAnEmptySummary() {
-        var preview = AutocraftPreview.empty();
+    void invalidQuantityShouldClearStoredPreview() {
+        var service = new AutocraftTerminalService(
+            new StaticPlanner(),
+            new PatternRegistryCache(),
+            new TestCpuRuntime());
 
-        assertTrue(preview.isEmpty());
-        assertNull(preview.planSnapshot());
-        assertNull(preview.error());
-        assertEquals(PlanSummary.empty(), preview.summary());
-        assertEquals(0L, preview.memoryUsage());
+        var result = service.preview(TestStackKey.item("minecraft:iron_ingot", ""), 0);
+
+        assertNull(result.plan());
+        assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
+        assertEquals(PlanSummary.empty(), result.summary());
+        assertTrue(service.preview().isEmpty());
     }
 
     @Test
@@ -85,11 +85,10 @@ class AutocraftTerminalServicePreviewTest {
 
         var result = service.preview(missing, 3);
 
-        assertTrue(!result.isSuccess());
+        assertNull(result.plan());
         assertEquals(PlanError.Code.MISSING_PATTERN, result.error().code());
         assertEquals(missing, result.error().targetKey());
         assertEquals(summary, result.summary());
-        assertEquals(0L, result.memoryUsage());
     }
 
     private static CraftPlan twoStepPlan() {
@@ -99,7 +98,7 @@ class AutocraftTerminalServicePreviewTest {
             TestAutocraftHelper.constraints("tinactory:mixer", 0));
         return new CraftPlan(List.of(
             new CraftStep("s1", pattern, 1L),
-            new CraftStep("s2", pattern, 1L)));
+            new CraftStep("s2", pattern, 1L)), StaticPlanner.WIDE_SUMMARY, 3049L);
     }
 
     private static final class StaticPlanner implements ICraftPlanner {
@@ -116,7 +115,7 @@ class AutocraftTerminalServicePreviewTest {
         private final PlanResult result;
 
         private StaticPlanner() {
-            this(PlanResult.completed(new CraftPlan(List.of()), SUMMARY));
+            this(PlanResult.completed(new CraftPlan(List.of(), SUMMARY, 0L)));
         }
 
         private StaticPlanner(PlanResult result) {

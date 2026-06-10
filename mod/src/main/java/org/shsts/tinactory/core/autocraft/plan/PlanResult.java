@@ -17,11 +17,11 @@ public record PlanResult(
     }
 
     public static PlanResult completed(CraftPlan plan) {
-        return completed(plan, PlanSummary.empty());
+        return new PlanResult(plan, null, plan.summary());
     }
 
     public static PlanResult completed(CraftPlan plan, PlanSummary summary) {
-        return new PlanResult(plan, null, summary);
+        return completed(new CraftPlan(plan.steps(), summary, plan.memoryUsage()));
     }
 
     public static PlanResult failed(PlanError error, PlanSummary summary) {

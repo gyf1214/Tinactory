@@ -4,5 +4,6 @@
   "itemBandwidth": 16,
   "fluidBandwidth": 4000,
   "executionIntervalTicks": 20,
-  "memoryLimit": 4194304
+  "memoryLimit": 4194304,
+  "parallelism": 1
 }

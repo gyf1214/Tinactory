@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
@@ -22,12 +23,22 @@ import java.util.Optional;
 public final class GoalReductionPlanner implements ICraftPlanner {
     private final IPatternRepository patterns;
     private final IInventoryView inventory;
+    private final AutocraftMemoryConfig memoryConfig;
     @Nullable
     private PlanningSession activeSession;
 
     public GoalReductionPlanner(IPatternRepository patterns, IInventoryView inventory) {
+        this(patterns, inventory, AutocraftMemoryConfig.NONE);
+    }
+
+    public GoalReductionPlanner(
+        IPatternRepository patterns,
+        IInventoryView inventory,
+        AutocraftMemoryConfig memoryConfig) {
+
         this.patterns = patterns;
         this.inventory = inventory;
+        this.memoryConfig = memoryConfig;
     }
 
     @Override
@@ -55,7 +66,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         while (budget > 0 && session.result == null) {
             if (session.searchStack.isEmpty()) {
                 if (session.nextTargetIndex >= session.targets.size()) {
-                    session.result = PlanResult.completed(buildPlan(session), session.ledger.summary());
+                    session.result = PlanResult.completed(buildPlan(session));
                     return Optional.of(session.result);
                 }
                 var target = session.targets.get(session.nextTargetIndex);
@@ -68,7 +79,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
             return Optional.of(session.result);
         }
         if (session.nextTargetIndex >= session.targets.size() && session.searchStack.isEmpty()) {
-            session.result = PlanResult.completed(buildPlan(session), session.ledger.summary());
+            session.result = PlanResult.completed(buildPlan(session));
             return Optional.of(session.result);
         }
         return Optional.empty();
@@ -189,8 +200,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
         session.steps.add(new CraftStep(
             "step-" + session.nextStepId++,
             pattern,
-            frame.runs,
-            List.of(new CraftAmount(frame.key, fulfilled))));
+            frame.runs));
         frame.remaining -= fulfilled;
         if (frame.remaining <= 0L) {
             popSuccess(session);
@@ -246,92 +256,38 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     private List<CraftPattern> choosePatterns(IStackKey key) {
         return patterns.findPatternsProducing(key).stream()
-            .sorted(Comparator.comparing((CraftPattern pattern) -> pattern.outputs().get(0).key())
-                .thenComparing(CraftPattern::patternUuid))
+            .sorted(Comparator.comparing(CraftPattern::patternUuid))
             .toList();
     }
 
-    private static CraftPlan buildPlan(PlanningSession session) {
-        return new CraftPlan(classifyStepOutputRoles(session.steps, session.targets));
-    }
-
-    private static List<CraftStep> classifyStepOutputRoles(List<CraftStep> steps, List<CraftAmount> targets) {
-        var remainingIntermediateDemand = new LinkedHashMap<IStackKey, Long>();
-        var remainingFinalDemand = new LinkedHashMap<IStackKey, Long>();
-        for (var target : targets) {
-            addDemand(remainingFinalDemand, target.key(), target.amount());
-        }
-        var out = new ArrayList<CraftStep>(steps.size());
-        for (var i = steps.size() - 1; i >= 0; i--) {
-            var step = steps.get(i);
-            var stepOutputs = aggregateOutputs(step.pattern().outputs(), step.runs());
-            var requiredIntermediateOutputs = new ArrayList<CraftAmount>();
-            var requiredFinalOutputs = new ArrayList<CraftAmount>();
-            for (var output : stepOutputs.entrySet()) {
-                var intermediateRequired = consumeDemand(
-                    remainingIntermediateDemand,
-                    output.getKey(),
-                    output.getValue());
-                var finalRequired = consumeDemand(
-                    remainingFinalDemand,
-                    output.getKey(),
-                    output.getValue() - intermediateRequired);
-                if (intermediateRequired > 0L) {
-                    requiredIntermediateOutputs.add(new CraftAmount(output.getKey(), intermediateRequired));
-                }
-                if (finalRequired > 0L) {
-                    requiredFinalOutputs.add(new CraftAmount(output.getKey(), finalRequired));
-                }
-            }
-            out.add(0, new CraftStep(
-                step.stepId(),
-                step.pattern(),
-                step.runs(),
-                requiredIntermediateOutputs,
-                requiredFinalOutputs));
-            for (var input : step.pattern().inputs()) {
-                addDemand(remainingIntermediateDemand, input.key(), input.amount() * step.runs());
-            }
-        }
-        return out;
-    }
-
-    private static Map<IStackKey, Long> aggregateOutputs(List<CraftAmount> outputs, long runs) {
-        var aggregated = new LinkedHashMap<IStackKey, Long>();
-        for (var output : outputs) {
-            addDemand(aggregated, output.key(), output.amount() * runs);
-        }
-        return aggregated;
+    private CraftPlan buildPlan(PlanningSession session) {
+        var summary = session.ledger.summary();
+        return new CraftPlan(session.steps, summary, calculateMemoryUsage(session.steps, summary));
     }
 
     private static long requiredRuns(CraftPattern pattern, IStackKey key, long remainingDemand) {
-        var outputs = aggregateOutputs(pattern.outputs(), 1L);
-        var producedPerRun = outputs.getOrDefault(key, 0L);
+        var producedPerRun = 0L;
+        for (var output : pattern.outputs()) {
+            if (output.key().equals(key)) {
+                producedPerRun += output.amount();
+            }
+        }
         return divideCeil(remainingDemand, producedPerRun);
     }
 
-    private static void addDemand(Map<IStackKey, Long> demandMap, IStackKey key, long amount) {
-        if (amount <= 0L) {
-            return;
+    private long calculateMemoryUsage(List<CraftStep> steps, PlanSummary summary) {
+        var ret = memoryConfig.bytesPerStep() * steps.size();
+        for (var entry : summary.entries().entrySet()) {
+            var key = entry.getKey();
+            var value = entry.getValue();
+            var amount = value.consumedFromInventory() + value.craftedAmount();
+            if (key.type() == PortType.ITEM) {
+                ret += memoryConfig.bytesPerItemType() + memoryConfig.bytesPerItem() * amount;
+            } else if (key.type() == PortType.FLUID) {
+                ret += memoryConfig.bytesPerFluidType() + memoryConfig.bytesPerFluid() * amount;
+            }
         }
-        demandMap.put(key, demandMap.getOrDefault(key, 0L) + amount);
-    }
-
-    private static long consumeDemand(Map<IStackKey, Long> demandMap, IStackKey key, long availableAmount) {
-        if (availableAmount <= 0L) {
-            return 0L;
-        }
-        var demand = demandMap.getOrDefault(key, 0L);
-        var consumed = Math.min(demand, availableAmount);
-        if (consumed <= 0L) {
-            return 0L;
-        }
-        if (consumed == demand) {
-            demandMap.remove(key);
-        } else {
-            demandMap.put(key, demand - consumed);
-        }
-        return consumed;
+        return ret;
     }
 
     private static long divideCeil(long numerator, long denominator) {

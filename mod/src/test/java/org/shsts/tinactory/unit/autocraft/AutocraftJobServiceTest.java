@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
@@ -129,6 +130,17 @@ class AutocraftJobServiceTest {
     }
 
     @Test
+    void serviceShouldReadMemoryUsageFromPreparedPlan() {
+        var executor = new TestExecutor(JobState.RUNNING);
+        var service = new AutocraftJobService(executor);
+        var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
+
+        service.submitPrepared(List.of(target), testPlan(256L));
+
+        assertEquals(256L, service.getJob().orElseThrow().memoryUsage());
+    }
+
+    @Test
     void serviceShouldRestoreRunningSnapshotThroughExecutorPersistence() {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
@@ -156,7 +168,11 @@ class AutocraftJobServiceTest {
     }
 
     private static CraftPlan testPlan() {
-        return new CraftPlan(List.of(step()));
+        return testPlan(0L);
+    }
+
+    private static CraftPlan testPlan(long memoryUsage) {
+        return new CraftPlan(List.of(step()), PlanSummary.empty(), memoryUsage);
     }
 
     private static final class TestExecutor implements ICraftExecutor {

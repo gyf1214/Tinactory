@@ -250,10 +250,12 @@ public class MiscMeta extends MetaConsumer {
             GsonHelper.getAsLong(jo, "itemBandwidth"),
             GsonHelper.getAsLong(jo, "fluidBandwidth"),
             GsonHelper.getAsInt(jo, "executionIntervalTicks"),
-            GsonHelper.getAsLong(jo, "memoryLimit"));
+            GsonHelper.getAsLong(jo, "memoryLimit"),
+            GsonHelper.getAsInt(jo, "parallelism"));
         BlockEntityBuilder.builder(id,
                 MachineBlocks.simple(tooltip -> {
                     addTooltip(tooltip, "memory", NUMBER_FORMAT.format(config.memoryLimit()));
+                    addTooltip(tooltip, "parallelism", NUMBER_FORMAT.format(config.parallelism()));
                     addTooltip(tooltip, "execInterval",
                         DOUBLE_FORMAT.format(config.executionIntervalTicks() / 20d));
                     addTooltip(tooltip, "transmission",

@@ -176,6 +176,7 @@
     "tinactory.tooltip.digitalInterface.2": "Max Parallel: %s",
     "tinactory.tooltip.fuelRod": "Remaining Reactions: %s",
     "tinactory.tooltip.memory": "Memory: %s B",
+    "tinactory.tooltip.parallelism": "Parallelism: %s",
     "tinactory.tooltip.tag": "Tag: #%s",
     "tinactory.tooltip.progress": "Progress: %s s / %s s",
     "tinactory.tooltip.heat": "Temperature: %s K",

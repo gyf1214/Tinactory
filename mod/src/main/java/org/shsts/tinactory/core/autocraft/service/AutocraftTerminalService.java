@@ -4,13 +4,13 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IStackKey;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.autocraft.api.ICpuRuntime;
 import org.shsts.tinactory.core.autocraft.api.ICraftPlanner;
 import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
+import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 
 import java.util.List;
@@ -23,41 +23,18 @@ public class AutocraftTerminalService {
     private final ICraftPlanner planner;
     private final IPatternRepository patternRepository;
     private final ICpuRuntime cpuRuntime;
-    private final long bytesPerStep;
-    private final long bytesPerItem;
-    private final long bytesPerItemType;
-    private final long bytesPerFluid;
-    private final long bytesPerFluidType;
-    private AutocraftPreview previewResult = AutocraftPreview.empty();
+    private Optional<PlanResult> previewResult = Optional.empty();
     @Nullable
     private List<CraftAmount> previewTargets;
 
     public AutocraftTerminalService(
         ICraftPlanner planner,
         IPatternRepository patternRepository,
-        ICpuRuntime cpuRuntime,
-        long bytesPerStep,
-        long bytesPerItem,
-        long bytesPerItemType,
-        long bytesPerFluid,
-        long bytesPerFluidType) {
+        ICpuRuntime cpuRuntime) {
 
         this.planner = planner;
         this.patternRepository = patternRepository;
         this.cpuRuntime = cpuRuntime;
-        this.bytesPerStep = Math.max(0L, bytesPerStep);
-        this.bytesPerItem = Math.max(0L, bytesPerItem);
-        this.bytesPerItemType = Math.max(0L, bytesPerItemType);
-        this.bytesPerFluid = Math.max(0L, bytesPerFluid);
-        this.bytesPerFluidType = Math.max(0L, bytesPerFluidType);
-    }
-
-    public AutocraftTerminalService(
-        ICraftPlanner planner,
-        IPatternRepository patternRepository,
-        ICpuRuntime cpuRuntime) {
-
-        this(planner, patternRepository, cpuRuntime, 0L, 0L, 0L, 0L, 0L);
     }
 
     public List<IStackKey> listRequestables() {
@@ -90,28 +67,24 @@ public class AutocraftTerminalService {
         service.get().cancel();
     }
 
-    public AutocraftPreview preview(IStackKey target, long quantity) {
+    public PlanResult preview(IStackKey target, long quantity) {
         if (quantity <= 0L) {
             clearPreview();
-            return previewResult;
+            return PlanResult.failed(PlanError.missingPattern(target), PlanSummary.empty());
         }
         var targets = List.of(new CraftAmount(target, quantity));
         var result = planner.plan(targets);
+        previewResult = Optional.of(result);
         if (result.plan() == null) {
             previewTargets = null;
-            previewResult = AutocraftPreview.failure(result.error(), result.summary());
-            return previewResult;
+            return result;
         }
         previewTargets = targets;
-        previewResult = AutocraftPreview.success(
-            result.plan(),
-            result.summary(),
-            calculateMemoryUsage(result.plan(), result.summary()));
-        return previewResult;
+        return result;
     }
 
     public boolean execute(UUID cpuId) {
-        if (!previewResult.isSuccess() || previewTargets == null || previewResult.planSnapshot() == null) {
+        if (previewResult.isEmpty() || previewTargets == null || previewResult.get().plan() == null) {
             return false;
         }
         var service = cpuRuntime.findVisibleService(cpuId);
@@ -121,27 +94,26 @@ public class AutocraftTerminalService {
         if (service.get().isBusy()) {
             return false;
         }
-        if (previewResult.memoryUsage() > service.get().memoryLimit()) {
+        var plan = previewResult.get().plan();
+        if (plan.memoryUsage() > service.get().memoryLimit()) {
             return false;
         }
         var targets = previewTargets;
-        var plan = previewResult.planSnapshot();
-        var memoryUsage = previewResult.memoryUsage();
+        service.get().submitPrepared(targets, plan);
         clearPreview();
-        service.get().submitPrepared(targets, plan, memoryUsage);
         return true;
     }
 
-    public Optional<AutocraftPreview> preview() {
-        return previewResult.isSuccess() ? Optional.of(previewResult) : Optional.empty();
+    public Optional<PlanResult> preview() {
+        return previewResult.filter(result -> result.plan() != null);
     }
 
-    public AutocraftPreview previewResult() {
+    public Optional<PlanResult> previewResult() {
         return previewResult;
     }
 
     private void clearPreview() {
-        previewResult = AutocraftPreview.empty();
+        previewResult = Optional.empty();
         previewTargets = null;
     }
 
@@ -167,18 +139,4 @@ public class AutocraftTerminalService {
             job.memoryUsage());
     }
 
-    private long calculateMemoryUsage(CraftPlan planSnapshot, PlanSummary summary) {
-        var ret = bytesPerStep * planSnapshot.steps().size();
-        for (var entry : summary.entries().entrySet()) {
-            var key = entry.getKey();
-            var value = entry.getValue();
-            var amount = value.consumedFromInventory() + value.craftedAmount();
-            if (key.type() == PortType.ITEM) {
-                ret += bytesPerItemType + bytesPerItem * amount;
-            } else if (key.type() == PortType.FLUID) {
-                ret += bytesPerFluidType + bytesPerFluid * amount;
-            }
-        }
-        return ret;
-    }
 }

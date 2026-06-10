@@ -591,6 +591,7 @@
     "tinactory.tooltip.digitalInterface.2": "最大并行：%s",
     "tinactory.tooltip.fuelRod": "剩余反应: %s",
     "tinactory.tooltip.memory": "内存: %s B",
+    "tinactory.tooltip.parallelism": "并行数：%s",
     "tinactory.tooltip.tag": "下列任何物品: #%s",
     "tinactory.tooltip.progress": "进度：%s s / %s s",
     "tinactory.tooltip.heat": "温度：%s K",

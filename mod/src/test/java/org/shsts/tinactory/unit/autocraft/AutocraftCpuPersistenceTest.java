@@ -9,12 +9,13 @@ import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.IMachineLease;
 import org.shsts.tinactory.core.autocraft.api.IMachineRoute;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.exec.SequentialCraftExecutor;
+import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static net.minecraft.nbt.Tag.TAG_COMPOUND;
@@ -56,7 +58,7 @@ class AutocraftCpuPersistenceTest {
 
     @Test
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
-        var plan = new CraftPlan(List.of(step("s1")));
+        var plan = new CraftPlan(List.of(step("s1"), step("s2")));
         var service = new AutocraftJobService(executor());
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
@@ -71,7 +73,8 @@ class AutocraftCpuPersistenceTest {
     }
 
     @Test
-    void serviceShouldPersistStepOutputRolesInExecutionPlan() {
+    void serviceShouldPersistPlanSummaryAndMemoryInExecutionPlan() {
+        var key = TestStackKey.item("minecraft:iron_ingot", "");
         var step = new CraftStep(
             "s1",
             new CraftPattern(
@@ -79,14 +82,13 @@ class AutocraftCpuPersistenceTest {
                 List.of(new CraftAmount(TestStackKey.item("minecraft:cobblestone", ""), 2)),
                 List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 2)),
                 TestAutocraftHelper.constraints("tinactory:mixer", 0)),
-            1,
-            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),
-            List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)));
-        var plan = new CraftPlan(List.of(step));
+            1);
+        var summary = new PlanSummary(Map.of(key, new PlanSummary.Entry(0L, 0L, 2L)));
+        var plan = new CraftPlan(List.of(step), summary, 123L);
         var service = new AutocraftJobService(executor());
         var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
-        service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
+        service.submitPrepared(List.of(new CraftAmount(key, 1)), plan);
         service.tick();
         var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
         var restored = new AutocraftJobService(executor());
@@ -97,8 +99,11 @@ class AutocraftCpuPersistenceTest {
             .getCompound("plan")
             .getList("steps", TAG_COMPOUND)
             .getCompound(0);
-        assertEquals(1, restoredStep.getList("requiredIntermediateOutputs", TAG_COMPOUND).size());
-        assertEquals(1, restoredStep.getList("requiredFinalOutputs", TAG_COMPOUND).size());
+        var restoredPlan = restoredSerialized.getCompound("execution").getCompound("plan");
+        assertEquals("s1", restoredStep.getString("stepId"));
+        assertFalse(restoredPlan.contains("summary"));
+        assertFalse(restoredPlan.contains("memoryUsage"));
+        assertEquals(123L, restoredSerialized.getLong("memoryUsage"));
     }
 
     @Test
@@ -108,8 +113,6 @@ class AutocraftCpuPersistenceTest {
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
 
         assertTrue(service.tick());
-        assertTrue(service.tick());
-        assertFalse(service.tick());
         assertFalse(service.tick());
     }
 
@@ -121,8 +124,8 @@ class AutocraftCpuPersistenceTest {
             TestAutocraftHelper.constraints("tinactory:mixer", 0)), 1);
     }
 
-    private static SequentialCraftExecutor executor() {
-        return new SequentialCraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
+    private static CraftExecutor executor() {
+        return new CraftExecutor(new NoOpInventory(), new AlwaysMachineAllocator(), IJobEvents.NO_OP);
     }
 
     private static final class NoOpInventory implements IInventoryView {
@@ -154,12 +157,17 @@ class AutocraftCpuPersistenceTest {
     }
 
     private static final class AlwaysMachineAllocator implements IMachineAllocator {
+        private static final UUID MACHINE_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
         @Override
-        public Optional<IMachineLease> allocate(CraftStep step) {
+        public Optional<IMachineLease> allocate(CraftStep step, Set<UUID> excludedMachineIds) {
+            if (excludedMachineIds.contains(MACHINE_ID)) {
+                return Optional.empty();
+            }
             return Optional.of(new IMachineLease() {
                 @Override
                 public UUID machineId() {
-                    return UUID.fromString("11111111-1111-1111-1111-111111111111");
+                    return MACHINE_ID;
                 }
 
                 @Override
@@ -212,6 +220,11 @@ class AutocraftCpuPersistenceTest {
                 @Override
                 public void release() {}
             });
+        }
+
+        @Override
+        public Optional<IMachineLease> allocate(CraftStep step, UUID machineId) {
+            return MACHINE_ID.equals(machineId) ? allocate(step, Set.of()) : Optional.empty();
         }
     }
 }

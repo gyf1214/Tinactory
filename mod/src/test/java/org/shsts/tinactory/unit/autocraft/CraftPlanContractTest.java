@@ -13,6 +13,8 @@ import org.shsts.tinactory.core.autocraft.pattern.VoltageConstraint;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
+import org.shsts.tinactory.core.autocraft.plan.PlanResult;
+import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
@@ -20,6 +22,7 @@ import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,48 +36,51 @@ class CraftPlanContractTest {
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());
         var step = new CraftStep("step-1", pattern, 3);
-        var plan = new CraftPlan(List.of(step));
+        var plan = new CraftPlan(List.of(step), PlanSummary.empty(), 0L);
 
         assertEquals("step-1", plan.steps().get(0).stepId());
         assertThrows(UnsupportedOperationException.class, () -> plan.steps().add(step));
     }
 
     @Test
-    void craftStepShouldSplitRequiredOutputsByRole() {
+    void craftPlanShouldExposeSummaryAndMemoryUsage() {
         var pattern = new CraftPattern(
             TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());
-        var intermediate = List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2));
-        var finals = List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1));
+        var step = new CraftStep("step-1", pattern, 2);
+        var summary = new PlanSummary(Map.of(
+            TestStackKey.item("tinactory:ingot", ""),
+            new PlanSummary.Entry(3L, 2L, 0L),
+            TestStackKey.item("tinactory:gear", ""),
+            new PlanSummary.Entry(0L, 0L, 2L)));
 
-        var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
+        var plan = new CraftPlan(List.of(step), summary, 1234L);
 
-        assertEquals(intermediate, step.requiredIntermediateOutputs());
-        assertEquals(finals, step.requiredFinalOutputs());
+        assertEquals(summary, plan.summary());
+        assertEquals(1234L, plan.memoryUsage());
     }
 
     @Test
-    void craftStepShouldDefensivelyCopyRoleOutputs() {
+    void planResultCompletedShouldUsePlanSummary() {
         var pattern = new CraftPattern(
             TestAutocraftHelper.uuid("tinactory:gear"),
             List.of(new CraftAmount(TestStackKey.item("tinactory:ingot", ""), 2)),
             List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)),
             List.of());
-        var intermediate = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:half", ""), 2)));
-        var finals = new ArrayList<>(List.of(new CraftAmount(TestStackKey.item("tinactory:gear", ""), 1)));
-        var step = new CraftStep("step-1", pattern, 2, intermediate, finals);
+        var steps = new ArrayList<>(List.of(new CraftStep("step-1", pattern, 2)));
+        var summary = new PlanSummary(Map.of(
+            TestStackKey.item("tinactory:gear", ""),
+            new PlanSummary.Entry(0L, 0L, 2L)));
 
-        intermediate.clear();
-        finals.clear();
+        var plan = new CraftPlan(steps, summary, 4321L);
+        steps.clear();
+        var result = PlanResult.completed(plan);
 
-        assertEquals(1, step.requiredIntermediateOutputs().size());
-        assertEquals(1, step.requiredFinalOutputs().size());
-        assertThrows(UnsupportedOperationException.class, () -> step.requiredIntermediateOutputs().add(new CraftAmount(
-            TestStackKey.item("tinactory:x", ""), 1)));
-        assertThrows(UnsupportedOperationException.class, () -> step.requiredFinalOutputs().add(new CraftAmount(
-            TestStackKey.item("tinactory:y", ""), 1)));
+        assertEquals(1, plan.steps().size());
+        assertThrows(UnsupportedOperationException.class, () -> plan.steps().add(new CraftStep("step-2", pattern, 1)));
+        assertEquals(summary, result.summary());
     }
 
     @Test
