@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.chemical_reactor",
   "recipe": "chemical_reactor",
   "machine": "no_auto_recipe",
   "voltages": "mv-iv",

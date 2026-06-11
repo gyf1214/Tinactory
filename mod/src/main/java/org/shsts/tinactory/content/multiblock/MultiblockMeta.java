@@ -375,6 +375,7 @@ public class MultiblockMeta extends MachineMeta {
 
             return BlockEntityBuilder.builder("multiblock/" + id, FixedMachineBlock::new)
                 .blockEntity()
+                .transform(this::sound)
                 .child(Multiblock.builder((be, $) -> new Cleanroom(be, $, properties)))
                 .layout(layout)
                 .appearanceBlock(getBlock(jo, "appearance"))
@@ -423,6 +424,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
                 .blockEntity()
+                .transform(this::sound)
                 .child(this::multiblock)
                 .transform(machineType.equals("distillation") ? $ -> $ : $ -> $.layout(layout))
                 .appearanceBlock(getBlock(jo, "appearance"))

@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.chemical_reactor",
   "recipeTypeId": "oil_cracking",
   "machine": "coil",
   "autoRecipe": false,

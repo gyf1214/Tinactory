@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.boiler",
   "recipe": "distillation",
   "recipeTypeId": "distillation",
   "minHeight": 3,

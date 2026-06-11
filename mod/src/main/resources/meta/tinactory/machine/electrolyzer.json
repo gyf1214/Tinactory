@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.electrolyzer",
   "recipe": "display_input",
   "voltages": "mv-iv",
   "layout": {

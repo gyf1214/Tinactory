@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.turbine",
   "recipes": {
     "tinactory:steam_turbine": {
       "machine": "generator"

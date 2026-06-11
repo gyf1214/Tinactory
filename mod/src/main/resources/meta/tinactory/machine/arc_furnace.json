@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.arc",
   "recipe": "display_input",
   "voltages": "hv-iv",
   "layout": {

@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.science",
   "recipe": "tinactory:laser_engraver",
   "machine": "engraving",
   "autoRecipe": false,

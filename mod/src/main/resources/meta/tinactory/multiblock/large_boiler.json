@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.boiler",
   "recipes": {},
   "machine": "large_boiler",
   "baseHeat": 300,

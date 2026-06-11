@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.furnace",
   "recipe": "blast_furnace",
   "layout": {
     "slots": [

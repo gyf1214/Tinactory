@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -32,6 +33,7 @@ import org.shsts.tinactory.content.recipe.DistillationRecipe;
 import org.shsts.tinactory.content.recipe.EngravingRecipe;
 import org.shsts.tinactory.content.recipe.GeneratorRecipe;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
+import org.shsts.tinactory.content.sound.MachineSound;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
@@ -67,9 +69,11 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
+import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
@@ -155,6 +159,8 @@ public class MachineMeta extends MetaConsumer {
         protected String machineType;
         @Nullable
         protected IRecipeType<?> recipeType;
+        @Nullable
+        protected Supplier<SoundEvent> sound = null;
         private IMenuType menu;
         private Map<Voltage, Layout> layoutSet;
 
@@ -235,6 +241,13 @@ public class MachineMeta extends MetaConsumer {
             return layoutSet.get(v);
         }
 
+        protected <P> IBlockEntityTypeBuilder<P> sound(IBlockEntityTypeBuilder<P> builder) {
+            if (sound == null) {
+                return builder;
+            }
+            return builder.transform(MachineSound.factory(sound));
+        }
+
         private IEntry<PrimitiveBlock> primitive() {
             var machineId = "primitive/" + id;
             Function<BlockEntity, ? extends IRecipeProcessor<?>> processor =
@@ -245,6 +258,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(PrimitiveMachine::factory)
                 .transform(RecipeProcessors.machine(List.of(processor), true))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
+                .transform(this::sound)
                 .end()
                 .block()
                 .material(Material.WOOD)
@@ -296,6 +310,7 @@ public class MachineMeta extends MetaConsumer {
                 .blockEntity()
                 .transform(StackProcessingContainer.factory(getLayout(v)))
                 .transform(this::processor)
+                .transform(this::sound)
                 .end()
                 .buildObject();
         }
@@ -456,6 +471,10 @@ public class MachineMeta extends MetaConsumer {
                 recipeTypeId = GsonHelper.getAsString(jo, "recipeTypeId");
             } else {
                 recipeTypeId = id;
+            }
+            if (jo.has("sound")) {
+                var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+                sound = SOUND_EVENTS.getEntry(soundId);
             }
         }
 

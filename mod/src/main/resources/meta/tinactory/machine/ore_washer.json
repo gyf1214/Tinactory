@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.bath",
   "recipe": "display_input",
   "voltages": "primitive-iv",
   "layout": {

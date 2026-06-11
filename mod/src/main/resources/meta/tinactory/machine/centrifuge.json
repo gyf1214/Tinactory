@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.centrifuge",
   "recipe": "display_input",
   "voltages": "lv-iv",
   "layout": {

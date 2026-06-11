@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.furnace",
   "recipes": {
     "electric_furnace": {
       "amperage": 0.625,

@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.chemical_reactor",
   "recipe": "tinactory:chemical_reactor",
   "autoRecipe": false,
   "layout": {
