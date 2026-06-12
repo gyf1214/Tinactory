@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.motor",
   "recipe": "display_input",
   "voltages": "lv-iv",
   "layout": {

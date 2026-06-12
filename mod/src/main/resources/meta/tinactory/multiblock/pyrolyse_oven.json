@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.furnace",
   "machine": "coil",
   "baseTemperature": 1500,
   "layout": {

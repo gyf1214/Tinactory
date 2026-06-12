@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.boiler",
   "recipes": {},
   "machine": "nuclear_reactor",
   "baseHeat": 300,

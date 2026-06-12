@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.assembler",
   "recipes": {
     "tinactory:assembler": {},
     "tinactory:circuit_assembler": {},

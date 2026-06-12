@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.cooling",
   "recipes": {
     "tinactory:extractor": {},
     "tinactory:fluid_solidifier": {}

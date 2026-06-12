@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.science",
   "recipe": "ore_analyzer",
   "voltages": "primitive-iv",
   "layout": {

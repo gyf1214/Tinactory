@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.miner",
   "recipes": {
     "tinactory:ore_analyzer": {},
     "tinactory:stone_generator": {}

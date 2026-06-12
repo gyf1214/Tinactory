@@ -40,6 +40,7 @@ import org.shsts.tinactory.content.multiblock.FixedBlock;
 import org.shsts.tinactory.content.multiblock.LensBlock;
 import org.shsts.tinactory.content.multiblock.PowerBlock;
 import org.shsts.tinactory.content.network.MachineBlocks;
+import org.shsts.tinactory.content.sound.MachineSound;
 import org.shsts.tinactory.content.tool.NuclearRod;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -58,6 +59,7 @@ import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
 import static org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS;
+import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.material.MaterialMeta.parseColor;
 import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
@@ -297,14 +299,17 @@ public class MiscMeta extends MetaConsumer {
         var layout = MachineMeta.parseLayout(jo1).buildLayout();
 
         var properties = FireBoiler.Properties.fromJson(jo);
-        BlockEntityBuilder.builder(id, MachineBlocks.processing(Voltage.PRIMITIVE))
+        var builder = BlockEntityBuilder.builder(id, MachineBlocks.processing(Voltage.PRIMITIVE))
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
             .transform(BoilerProcessor.factory(properties))
-            .transform(StackProcessingContainer.factory(layout))
-            .end()
-            .build();
+            .transform(StackProcessingContainer.factory(layout));
+        if (jo.has("sound")) {
+            var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+            builder.transform(MachineSound.factory(SOUND_EVENTS.getEntry(soundId)));
+        }
+        builder.end().build();
     }
 
     private void meSignalController(String id, JsonObject jo) {

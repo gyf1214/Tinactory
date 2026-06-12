@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.macerator",
   "recipes": {
     "tinactory:macerator": {},
     "tinactory:ore_washer": {},

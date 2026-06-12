@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.science",
   "recipe": "engraving",
   "voltages": "lv-iv",
   "layout": {

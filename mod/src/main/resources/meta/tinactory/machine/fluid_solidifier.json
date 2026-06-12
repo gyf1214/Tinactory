@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.cooling",
   "machine": "no_auto_recipe",
   "voltages": "lv-iv",
   "layout": {

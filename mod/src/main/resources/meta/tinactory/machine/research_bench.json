@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.science",
   "recipe": "research",
   "voltages": "ulv-iv",
   "layout": {

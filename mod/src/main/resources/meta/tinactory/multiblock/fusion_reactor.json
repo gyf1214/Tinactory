@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.arc",
   "recipe": "default",
   "machine": "fusion_reactor",
   "startEnergyFactor": 4194304,

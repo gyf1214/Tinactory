@@ -1,4 +1,5 @@
 {
+  "sound": "tinactory:tick.compressor",
   "layout": {
     "slots": [
       {
