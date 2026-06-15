@@ -415,6 +415,16 @@ object CircuitComponents {
                     temperature(3000)
                 }
             }
+            output(BOULE.item("naquadah")) {
+                input("silicon", "ingot", 32)
+                input("naquadah", "ingot")
+                input("argon", amount = 6)
+                voltage(Voltage.IV)
+                workTicks(12800)
+                extra {
+                    temperature(3900)
+                }
+            }
         }
 
         cutter {

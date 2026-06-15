@@ -104,6 +104,7 @@ object Multiblocks {
             coil("kanthal")
             coil("nichrome")
             coil("tungsten", "rtm_alloy")
+            coil("naquadah")
 
             misc("grate_machine_casing") {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
@@ -293,10 +294,11 @@ object Multiblocks {
             solid("stable_titanium", Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
             solid("robust_tungstensteel", Voltage.EV, "tungsten_steel", Technologies.TUNGSTEN_STEEL)
 
-            coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
-            coil("kanthal", Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
-            coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", Technologies.TUNGSTEN_STEEL)
+            coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", null, Technologies.STEEL)
+            coil("kanthal", Voltage.LV, "kanthal", "silver", null, Technologies.KANTHAL)
+            coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", "pe", Technologies.NICHROME)
+            coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", "pe", Technologies.TUNGSTEN_STEEL)
+            coil("naquadah", Voltage.IV, "naquadah", "hssg", "ptfe", Technologies.NAQUADAH_PROCESSING)
         }
 
         val itemFilter = getItem("component/item_filter")
@@ -664,14 +666,14 @@ object Multiblocks {
     }
 
     private fun AssemblyRecipeFactory.coil(name: String,
-        v: Voltage, wire: String, foil: String, tech: ResourceLocation) {
+        v: Voltage, wire: String, foil: String, insulation: String?, tech: ResourceLocation) {
         val amount = 8 * v.rank
         val block = COIL_BLOCKS.getValue(name).get()
         output(block) {
             input(wire, "wire", amount)
             input(foil, "foil", amount)
-            if (v.rank >= Voltage.MV.rank) {
-                input("pe", amount = 2)
+            if (insulation != null) {
+                input(insulation, amount = 2)
             }
             voltage(v)
             workTicks(COIL_TICKS)
