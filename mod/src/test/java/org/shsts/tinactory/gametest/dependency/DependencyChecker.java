@@ -93,9 +93,10 @@ public final class DependencyChecker {
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
-    // Current IV-progress baseline: 22 curated stack targets remain unreachable. The remaining list includes
-    // LuV-voltage battery/power-block crafts plus later crystal-circuit, advanced-SMD, naquadah, and ZPM targets.
-    private static final int ACCEPTED_UNREACHABLE_NODES = 22;
+    // Current IV-progress baseline: 26 curated stack targets remain unreachable. The remaining list includes
+    // LuV-voltage battery/power-block crafts, LuV-only Naquadria/Trinium outputs, plus later crystal-circuit,
+    // advanced-SMD, Neutronium, and ZPM targets.
+    private static final int ACCEPTED_UNREACHABLE_NODES = 26;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
