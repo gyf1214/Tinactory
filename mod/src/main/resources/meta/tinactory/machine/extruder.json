@@ -1,5 +1,5 @@
 {
-  "sound": "tinactory:tick.motor",
+  "sound": "tinactory:tick.compressor",
   "machine": "no_auto_recipe",
   "voltages": "mv-iv",
   "layout": {
