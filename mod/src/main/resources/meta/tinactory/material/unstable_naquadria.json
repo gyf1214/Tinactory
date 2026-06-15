@@ -1,0 +1,21 @@
+{
+  "color": "0xFF28F0C8",
+  "items": [
+    "dust"
+  ],
+  "fluids": {
+    "plasma": {
+      "baseAmount": 144,
+      "texture": "gtceu:blocks/material_sets/dull/plasma"
+    },
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/molten"
+    }
+  },
+  "aliases": {
+    "primary": "dust",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

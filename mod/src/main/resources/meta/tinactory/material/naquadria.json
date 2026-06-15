@@ -1,0 +1,18 @@
+{
+  "color": "0xFF38E3B0",
+  "items": [
+    "ingot",
+    "ingot_hot"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/molten"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

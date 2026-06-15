@@ -1,0 +1,28 @@
+{
+  "color": "0xFF56D64E",
+  "ore": "end_stone",
+  "items": [
+    "bolt",
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
+    "dust",
+    "dust_impure",
+    "dust_pure",
+    "ingot",
+    "ingot_hot",
+    "raw",
+    "stick"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/molten"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

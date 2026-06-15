@@ -103,6 +103,7 @@ object Technologies {
     val ASSEMBLY_LINE: ResourceLocation
     val RHODIUM_PLATED_PALLADIUM: ResourceLocation
     val FUSION: ResourceLocation
+    val NAQUADAH_PROCESSING: ResourceLocation
 
     init {
         Factory().apply {
@@ -450,6 +451,11 @@ object Technologies {
                 maxProgress(400)
                 displayItem(getMultiblock("fusion_reactor").block)
                 depends(NUCLEAR_PHYSICS)
+            }
+
+            NAQUADAH_PROCESSING = child("naquadah_processing") {
+                maxProgress(220)
+                displayMaterial("naquadah", "raw")
             }
         }
     }

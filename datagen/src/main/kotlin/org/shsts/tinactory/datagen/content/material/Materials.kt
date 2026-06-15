@@ -164,6 +164,24 @@ object Materials {
             }
         }
         material("osmium", METALLIC)
+        material("naquadah", METALLIC) {
+            machineProcess(Voltage.IV, 2.0)
+            oreProcess {
+                byProducts("platinum_metallic", "enriched_naquadah")
+            }
+        }
+        material("enriched_naquadah", METALLIC) {
+            machineProcess(Voltage.IV, 1.5)
+            oreProcess {
+                byProducts("rhodium_metallic", "trinium_residue")
+            }
+        }
+        material("naquadria", BRIGHT) {
+            machineProcess(Voltage.LUV, 1.5)
+        }
+        material("trinium", METALLIC) {
+            machineProcess(Voltage.LUV, 1.5)
+        }
     }
 
     private fun firstDegrees() {
@@ -391,6 +409,13 @@ object Materials {
         }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
+        material("activated_naquadah", DULL)
+        material("unstable_naquadria", BRIGHT)
+        material("acidic_naquadria_solution", DULL)
+        material("naquadria_concentrate", BRIGHT)
+        material("trinium_residue", DULL)
+        material("trinium_sulfide", DULL)
+        material("naquadah_residue", DULL)
         material("chloroplatinate", DULL)
         material("raw_platinum", METALLIC)
         material("raw_rhodium", DULL)

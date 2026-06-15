@@ -106,6 +106,13 @@ object Veins {
             ore("platinum_metallic", 0.3)
             ore("ender_pearl", 0.1)
         }
+        vein("naquadah", 0.1) {
+            variant(OreVariant.END_STONE)
+            baseOre = false
+            ore("naquadah", 0.8)
+            ore("naquadah", 0.4)
+            ore("enriched_naquadah", 0.1)
+        }
     }
 
     private var rank = 0
