@@ -495,6 +495,12 @@ object MiscComponents {
                 misc("empty_nuclear_rod")
                 input("enriched_uranium_fuel", "dust")
             }
+            misc("enriched_naquadah_fuel_rod") {
+                misc("empty_nuclear_rod")
+                input("enriched_naquadah", "bolt")
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
             misc("moderator_rod") {
                 misc("empty_nuclear_rod")
                 input("carbon", "ingot", 16)
@@ -513,6 +519,12 @@ object MiscComponents {
             input(getItem("component/nuclear_waste_rod")) {
                 output(getItem("component/empty_nuclear_rod"))
                 output("nuclear_waste", "dust")
+            }
+            input(getItem("component/depleted_enriched_naquadah_fuel_rod")) {
+                output(getItem("component/empty_nuclear_rod"))
+                output("naquadah", "bolt")
+                voltage(Voltage.IV)
+                workTicks(400)
             }
         }
     }
