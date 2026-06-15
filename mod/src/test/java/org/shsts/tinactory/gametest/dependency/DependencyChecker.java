@@ -92,11 +92,10 @@ public final class DependencyChecker {
     private static final String COIL_TEMPERATURE = "coil_temperature";
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
-    private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.IV;
-    // Current IV-progress baseline: 26 curated stack targets remain unreachable. The remaining list includes
-    // LuV-voltage battery/power-block crafts, LuV-only Naquadria/Trinium outputs, plus later crystal-circuit,
-    // advanced-SMD, Neutronium, and ZPM targets.
-    private static final int ACCEPTED_UNREACHABLE_NODES = 26;
+    private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.LUV;
+    // Current LuV-progress baseline is calibrated from the runtime dependency-checker report. The remaining list
+    // includes later wetware-board, advanced-SMD, Neutronium, and ZPM targets.
+    private static final int ACCEPTED_UNREACHABLE_NODES = 17;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
@@ -204,9 +203,12 @@ public final class DependencyChecker {
                 }
                 addProcessingIngredients(recipe, requirements, true);
                 addProcessingSubtypeRequirements(recipe, requirements, false);
-                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethodIfUseful(
-                    recipe.loc() + "#lithography/" + entry.getKey() + "/" + lensBlock.node().id(),
-                    with(requirements, machineInterface), outputs, "lithography recipe " + recipe.loc()));
+                for (var machineInterface : multiblockInterfaceNodes(voltage)) {
+                    addMethodIfUseful(
+                        recipe.loc() + "#lithography/" + entry.getKey() + "/" + lensBlock.node().id() +
+                            "/" + machineInterface.id(),
+                        with(requirements, machineInterface), outputs, "lithography recipe " + recipe.loc());
+                }
             }
         }
     }
@@ -409,10 +411,12 @@ public final class DependencyChecker {
             if (!isGeneratorRecipeType(recipeTypeId)) {
                 requirements.add(new VoltageNode(voltage));
             }
-            multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
-                "multiblock_machine/" + multiblock.id() + "/" + output.id(),
-                with(requirements, machineInterface), List.of(output),
-                "multiblock machine bridge")));
+            for (var machineInterface : multiblockInterfaceNodes(voltage)) {
+                addMethod(new DependencyMethod(
+                    "multiblock_machine/" + multiblock.id() + "/" + output.id() + "/" + machineInterface.id(),
+                    with(requirements, machineInterface), List.of(output),
+                    "multiblock machine bridge"));
+            }
         }
     }
 
@@ -428,9 +432,11 @@ public final class DependencyChecker {
                 if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
                     continue;
                 }
-                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
-                    "boiler/" + multiblockId + "/" + voltage.id,
-                    List.of(multiblock, machineInterface), List.of(output), "multiblock boiler bridge")));
+                for (var machineInterface : multiblockInterfaceNodes(voltage)) {
+                    addMethod(new DependencyMethod(
+                        "boiler/" + multiblockId + "/" + voltage.id + "/" + machineInterface.id(),
+                        List.of(multiblock, machineInterface), List.of(output), "multiblock boiler bridge"));
+                }
             }
         }
     }
@@ -475,10 +481,12 @@ public final class DependencyChecker {
                 }
                 var cleanness = maxCleanroomCleanness(entry.getValue(), voltage);
                 var output = new NumericNode(CLEANROOM_CLEANNESS, cleanness);
-                multiblockInterfaceNode(voltage).ifPresent(machineInterface -> addMethod(new DependencyMethod(
-                    "cleanroom/cleanness/" + multiblock.id() + "/" + voltage.id,
-                    List.of(multiblock, new VoltageNode(voltage), machineInterface),
-                    List.of(output), "cleanroom bridge")));
+                for (var machineInterface : multiblockInterfaceNodes(voltage)) {
+                    addMethod(new DependencyMethod(
+                        "cleanroom/cleanness/" + multiblock.id() + "/" + voltage.id + "/" + machineInterface.id(),
+                        List.of(multiblock, new VoltageNode(voltage), machineInterface),
+                        List.of(output), "cleanroom bridge"));
+                }
             }
         }
     }
@@ -777,12 +785,15 @@ public final class DependencyChecker {
         return componentNode("transformer", voltage);
     }
 
-    private Optional<StackNode> multiblockInterfaceNode(Voltage voltage) {
-        var machineSet = AllBlockEntities.MACHINE_SETS.get("multiblock/interface");
-        if (machineSet == null || !machineSet.hasVoltage(voltage)) {
-            return Optional.empty();
+    private Collection<StackNode> multiblockInterfaceNodes(Voltage voltage) {
+        var ret = new ArrayList<StackNode>();
+        for (var name : List.of("multiblock/interface", "multiblock/digital_interface")) {
+            var machineSet = AllBlockEntities.MACHINE_SETS.get(name);
+            if (machineSet != null && machineSet.hasVoltage(voltage)) {
+                stackNode(new ItemStack(machineSet.block(voltage))).ifPresent(ret::add);
+            }
         }
-        return stackNode(new ItemStack(machineSet.block(voltage)));
+        return ret;
     }
 
     private Optional<StackNode> componentNode(String name, Voltage voltage) {
