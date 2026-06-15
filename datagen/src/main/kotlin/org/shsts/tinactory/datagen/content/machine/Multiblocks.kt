@@ -1111,6 +1111,13 @@ object Multiblocks {
         }
 
         fusionReactor {
+            recipe("multiblock/activated_naquadah") {
+                input("naquadah", "molten")
+                input("hydrogen", "gas", 0.125)
+                output("activated_naquadah", "plasma")
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
             recipe("multiblock/fusion_reactor_smoke") {
                 input("water", "liquid", 1)
                 input("water", "gas", 1)

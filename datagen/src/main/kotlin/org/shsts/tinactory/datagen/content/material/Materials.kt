@@ -166,12 +166,18 @@ object Materials {
         material("osmium", METALLIC)
         material("naquadah", METALLIC) {
             machineProcess(Voltage.IV, 2.0)
+            blast(Voltage.IV, 4500, 1600) {
+                component("nitrogen")
+            }
             oreProcess {
                 byProducts("platinum_metallic", "enriched_naquadah")
             }
         }
         material("enriched_naquadah", METALLIC) {
             machineProcess(Voltage.IV, 1.5)
+            blast(Voltage.IV, 5400, 1800) {
+                component("argon")
+            }
             oreProcess {
                 byProducts("rhodium_metallic", "trinium_residue")
             }
@@ -410,7 +416,9 @@ object Materials {
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("activated_naquadah", DULL)
-        material("unstable_naquadria", BRIGHT)
+        material("unstable_naquadria", BRIGHT) {
+            machineProcess(Voltage.IV)
+        }
         material("acidic_naquadria_solution", DULL)
         material("naquadria_concentrate", BRIGHT)
         material("trinium_residue", DULL)

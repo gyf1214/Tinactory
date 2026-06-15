@@ -29,6 +29,8 @@ import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -141,9 +143,97 @@ object MiscMaterials {
             }
         }
 
+        naquadahProcessing()
         generateStone()
         stone()
         tags()
+    }
+
+    private fun naquadahProcessing() {
+        distillation {
+            input("activated_naquadah", "plasma", 4) {
+                output("enriched_naquadah", "molten")
+                output("unstable_naquadria", "plasma")
+                output("trinium_residue")
+                output("naquadah_residue")
+                voltage(Voltage.IV)
+                workTicks(1000)
+            }
+        }
+
+        sifter {
+            input("naquadah_residue", "dust") {
+                output("naquadah", "dust", rate = 0.8)
+                output("titanium", "dust", rate = 0.2)
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
+        }
+
+        chemicalReactor {
+            output("acidic_naquadria_solution") {
+                input("unstable_naquadria")
+                input("hydrogen_fluoride", amount = 4)
+                voltage(Voltage.IV)
+                workTicks(800)
+            }
+        }
+
+        centrifuge {
+            input("acidic_naquadria_solution") {
+                output("naquadria_concentrate")
+                output("enriched_naquadah", "dust", rate = 0.2)
+                voltage(Voltage.IV)
+                workTicks(1200)
+            }
+        }
+
+        blastFurnace {
+            output("naquadria", "ingot_hot", suffix = "_from_concentrate") {
+                input("naquadria_concentrate")
+                input("potassium", amount = 2)
+                output("potassium_bifluoride", amount = 2)
+                voltage(Voltage.LUV)
+                workTicks(2400)
+                extra {
+                    temperature(5400)
+                }
+            }
+            output("trinium", "ingot_hot", suffix = "_from_sulfide") {
+                input("trinium_sulfide")
+                input("hydrogen")
+                output("sulfur")
+                voltage(Voltage.LUV)
+                workTicks(2400)
+                extra {
+                    temperature(5400)
+                }
+            }
+        }
+
+        vacuumFreezer {
+            output("naquadria", "ingot") {
+                input("naquadria", "ingot_hot")
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
+            output("trinium", "ingot") {
+                input("trinium", "ingot_hot")
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
+        }
+
+        chemicalReactor {
+            output("trinium_sulfide") {
+                input("trinium_residue")
+                input("sulfuric_acid", amount = 2)
+                output("rarest_metallic")
+                output("sulfuric_acid", "dilute", 2)
+                voltage(Voltage.IV)
+                workTicks(800)
+            }
+        }
     }
 
     private val VANILLA_METHODS = listOf("smelting", "blasting")
