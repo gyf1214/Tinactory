@@ -1111,6 +1111,20 @@ object Multiblocks {
         }
 
         fusionReactor {
+            recipe("multiblock/netherite") {
+                input("netherite_scrap", "molten")
+                input("gold", "molten")
+                output("netherite", "plasma", 0.25)
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
+            recipe("multiblock/nether_star") {
+                input("wither_matrix", "liquid")
+                input("enriched_naquadah", "molten")
+                output("nether_star", "plasma")
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
             recipe("multiblock/activated_naquadah") {
                 input("naquadah", "molten")
                 input("hydrogen", "gas", 0.125)

@@ -5,14 +5,18 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 
 object InorganicChemistry {
     fun init() {
@@ -22,6 +26,7 @@ object InorganicChemistry {
         ev()
         ender()
         platinum()
+        advancedNetherChemistry()
     }
 
     private fun blastOre() {
@@ -899,6 +904,80 @@ object InorganicChemistry {
                 output("mercury", amount = 8)
                 voltage(Voltage.IV)
                 workTicks(2400)
+            }
+        }
+    }
+
+    private fun advancedNetherChemistry() {
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.IV)
+                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
+            }
+            output("netherite_scrap") {
+                input(Items.ANCIENT_DEBRIS)
+                input("hydrogen_fluoride")
+                output("gold", "dust", rate = 0.2)
+                output("netherite_scrap", "slurry", 0.8)
+                workTicks(800)
+            }
+            output("potassium_bifluoride", suffix = "_from_netherite_scrap_slurry") {
+                input("netherite_scrap", "slurry")
+                input("potassium")
+                output("naquadah_residue", rate = 0.3)
+                workTicks(400)
+            }
+        }
+
+        mixer {
+            output("wither_matrix", "liquid") {
+                input(Items.SOUL_SAND)
+                input("netherite_scrap")
+                input("radon", "gas")
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
+            output("nether_star", "seed", 2) {
+                input("nether_star", "seed")
+                input("wither_matrix", "liquid")
+                voltage(Voltage.IV)
+                workTicks(128)
+            }
+        }
+
+        extractor {
+            output("nether_star", "molten") {
+                input("nether_star", "gem")
+                voltage(Voltage.LUV)
+                workTicks(160)
+            }
+        }
+
+        vacuumFreezer {
+            output("nether_star", "molten") {
+                input("nether_star", "plasma")
+                voltage(Voltage.LUV)
+                workTicks(1200)
+            }
+        }
+
+        lathe {
+            output("nether_star", "seed") {
+                input("nether_star", "gem")
+                voltage(Voltage.LUV)
+                workTicks(256)
+            }
+        }
+
+        autoclave {
+            output("nether_star", "gem") {
+                input("nether_star", "seed")
+                input("nether_star", "molten", 0.5)
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    requireCleanness(0.5, 1.0)
+                }
             }
         }
     }
