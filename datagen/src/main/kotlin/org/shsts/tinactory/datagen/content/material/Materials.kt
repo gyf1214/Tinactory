@@ -199,7 +199,7 @@ object Materials {
         }
         material("nether_star", SHINY) {
             machineProcess(Voltage.LUV, 1.5)
-            seeding(Voltage.LUV, 1.5, duplicateWithDust = false)
+            seeding(Voltage.LUV, 1.5)
         }
         material("wither_matrix", DULL)
     }
