@@ -944,7 +944,7 @@ object InorganicChemistry {
                 workTicks(128)
             }
             output("nether_star", "seed", suffix = "_from_molten_wither_matrix") {
-                input("nether_star", "molten", 0.5)
+                input("nether_star", "molten", 2.0)
                 input("wither_matrix", "liquid")
                 voltage(Voltage.LUV)
                 workTicks(800)
