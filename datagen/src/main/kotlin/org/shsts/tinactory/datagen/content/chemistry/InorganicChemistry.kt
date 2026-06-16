@@ -943,6 +943,20 @@ object InorganicChemistry {
                 voltage(Voltage.IV)
                 workTicks(128)
             }
+            output("nether_star", "seed", suffix = "_from_molten_wither_matrix") {
+                input("nether_star", "molten", 0.5)
+                input("wither_matrix", "liquid")
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+        }
+
+        extractor {
+            output("nether_star", "molten") {
+                input("nether_star", "gem")
+                voltage(Voltage.LUV)
+                workTicks(160)
+            }
         }
 
         autoclave {

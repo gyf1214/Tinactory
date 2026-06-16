@@ -17,9 +17,7 @@
       "displayColor": "0xFF7FD7E2"
     }
   },
-  "aliases": {
-    "primary": "gem"
-  },
+  "aliases": {},
   "existings": {
     "gem": "minecraft:nether_star",
     "lens": "tinactory:component/quantum_star"
