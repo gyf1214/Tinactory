@@ -154,6 +154,15 @@ object MiscComponents {
                     requireCleanness(0.5, 2.0)
                 }
             }
+            misc("quantum_star") {
+                input("nether_star", "gem")
+                input("naquadria", "molten")
+                voltage(Voltage.LUV)
+                workTicks(3200)
+                extra {
+                    requireCleanness(0.5, 2.0)
+                }
+            }
         }
 
         researches()

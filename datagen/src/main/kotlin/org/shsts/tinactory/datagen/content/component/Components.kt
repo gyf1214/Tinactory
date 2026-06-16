@@ -140,6 +140,10 @@ object Components {
                 model(basicItem("metaitems/quantumeye"))
             }
 
+            component("quantum_star") {
+                model(basicItem("metaitems/quantumstar"))
+            }
+
             component("raw_rhodium_plated_palladium") {
                 model(basicItem(ResourceLocation("gregtech4", "items/iridium_alloy_ingot")))
             }

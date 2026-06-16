@@ -22,6 +22,7 @@
     "primary": "gem"
   },
   "existings": {
-    "gem": "minecraft:nether_star"
+    "gem": "minecraft:nether_star",
+    "lens": "tinactory:component/quantum_star"
   }
 }
