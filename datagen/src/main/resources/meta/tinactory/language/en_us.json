@@ -358,6 +358,8 @@
     "tinactory.technology.rhodium_plated_palladium.details": "A plated palladium precursor for LuV machine casings and fusion containment parts, bridging platinum-group metallurgy into late-IV construction.",
     "tinactory.technology.fusion.details": "The physics foundation for controlled fusion, turning extreme plasma containment into a practical late-game energy system.",
     "tinactory.technology.naquadah_processing.details": "Unlocks End Stone Naquadah processing, high-temperature preparation, and the first Fusion-assisted refinement route.",
+    "tinactory.technology.advanced_nether_chemistry": "Advanced Nether Chemistry",
+    "tinactory.technology.advanced_nether_chemistry.details": "Unlocks Ancient Debris extraction, Netherite Fusion, and synthetic Nether Star chemistry for the late LuV bridge.",
     "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",
     "generator.tinactory.void": "Void",
     "key.tinactory.open_tech": "Technology Screen",

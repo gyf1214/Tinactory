@@ -877,6 +877,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
+    fun noOreProcessing() {
+        hasOreProcess = true
+    }
+
     fun fluidOre(workTicks: Long, base: ItemLike, voltage: Voltage = Voltage.MV) {
         centrifuge {
             input(material, "raw_fluid") {

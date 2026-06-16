@@ -188,6 +188,17 @@ object Materials {
         material("trinium", METALLIC) {
             machineProcess(Voltage.LUV, 1.5)
         }
+        material("netherite_scrap", DULL) {
+            machineProcess(Voltage.IV)
+            noOreProcessing()
+        }
+        material("netherite", METALLIC) {
+            machineProcess(Voltage.LUV, 1.5)
+            smelt()
+            blast(Voltage.LUV, 5400, 1200)
+        }
+        material("nether_star", SHINY)
+        material("wither_matrix", DULL)
     }
 
     private fun firstDegrees() {

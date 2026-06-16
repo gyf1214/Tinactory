@@ -104,6 +104,7 @@ object Technologies {
     val RHODIUM_PLATED_PALLADIUM: ResourceLocation
     val FUSION: ResourceLocation
     val NAQUADAH_PROCESSING: ResourceLocation
+    val ADVANCED_NETHER_CHEMISTRY: ResourceLocation
 
     init {
         Factory().apply {
@@ -456,6 +457,14 @@ object Technologies {
             NAQUADAH_PROCESSING = child("naquadah_processing") {
                 maxProgress(220)
                 displayMaterial("naquadah", "raw")
+            }
+
+            voltage = Voltage.EV
+
+            ADVANCED_NETHER_CHEMISTRY = child("advanced_nether_chemistry") {
+                maxProgress(240)
+                displayItem(Items.ANCIENT_DEBRIS)
+                depends(NAQUADAH_PROCESSING)
             }
         }
     }

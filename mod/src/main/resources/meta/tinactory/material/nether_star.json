@@ -1,0 +1,27 @@
+{
+  "color": "0xFFFEFFC6",
+  "items": [
+    "dust",
+    "seed"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFFFEFFC6",
+      "displayColor": "0xFFFEFFC6"
+    },
+    "plasma": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/fluid/plasma",
+      "textureColor": "0xFF7FD7E2",
+      "displayColor": "0xFF7FD7E2"
+    }
+  },
+  "aliases": {
+    "primary": "gem"
+  },
+  "existings": {
+    "gem": "minecraft:nether_star"
+  }
+}

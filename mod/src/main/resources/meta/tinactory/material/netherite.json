@@ -1,0 +1,27 @@
+{
+  "color": "0xFF4B4042",
+  "items": [
+    "dust",
+    "plate"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFF4B4042",
+      "displayColor": "0xFF4B4042"
+    },
+    "plasma": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/fluid/plasma",
+      "textureColor": "0xFF474447",
+      "displayColor": "0xFF474447"
+    }
+  },
+  "aliases": {
+    "primary": "ingot"
+  },
+  "existings": {
+    "ingot": "minecraft:netherite_ingot"
+  }
+}

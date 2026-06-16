@@ -109,9 +109,9 @@ object Veins {
         vein("naquadah", 0.1) {
             variant(OreVariant.END_STONE)
             baseOre = false
-            ore("naquadah", 0.8)
-            ore("naquadah", 0.4)
-            ore("enriched_naquadah", 0.1)
+            ore("naquadah", 1.0)
+            ore("enriched_naquadah", 0.2)
+            ore("netherite_scrap", 0.1)
         }
     }
 

@@ -60,6 +60,7 @@ object MiscMaterials {
         disableVanilla("redstone", "")
         disableVanilla("lapis", "lazuli")
         disableVanilla("emerald", "")
+        disableNetherChemistryBypasses()
         vanilla {
             nullRecipe("quartz", "quartz_from_blasting", "quartz_block")
         }
@@ -237,6 +238,17 @@ object MiscMaterials {
     }
 
     private val VANILLA_METHODS = listOf("smelting", "blasting")
+
+    private fun disableNetherChemistryBypasses() {
+        vanilla {
+            nullRecipe("netherite_block")
+            nullRecipe("netherite_ingot")
+            nullRecipe("netherite_ingot_from_netherite_block")
+            nullRecipe("netherite_scrap_from_smelting")
+            nullRecipe("netherite_scrap_from_blasting")
+            nullRecipe("beacon")
+        }
+    }
 
     private fun disableVanilla(name: String, suffix: String = "ingot") {
         val fullName = if (suffix.isEmpty()) name else "${name}_$suffix"
