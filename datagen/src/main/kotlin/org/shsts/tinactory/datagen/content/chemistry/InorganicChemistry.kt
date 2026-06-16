@@ -937,35 +937,11 @@ object InorganicChemistry {
                 voltage(Voltage.IV)
                 workTicks(400)
             }
-            output("nether_star", "seed", 2) {
+            output("nether_star", "seed", 2, suffix = "_from_wither_matrix") {
                 input("nether_star", "seed")
                 input("wither_matrix", "liquid")
                 voltage(Voltage.IV)
                 workTicks(128)
-            }
-        }
-
-        extractor {
-            output("nether_star", "molten") {
-                input("nether_star", "gem")
-                voltage(Voltage.LUV)
-                workTicks(160)
-            }
-        }
-
-        vacuumFreezer {
-            output("nether_star", "molten") {
-                input("nether_star", "plasma")
-                voltage(Voltage.LUV)
-                workTicks(1200)
-            }
-        }
-
-        lathe {
-            output("nether_star", "seed") {
-                input("nether_star", "gem")
-                voltage(Voltage.LUV)
-                workTicks(256)
             }
         }
 

@@ -197,7 +197,10 @@ object Materials {
             smelt()
             blast(Voltage.LUV, 5400, 1200)
         }
-        material("nether_star", SHINY)
+        material("nether_star", SHINY) {
+            machineProcess(Voltage.LUV, 1.5)
+            seeding(Voltage.LUV, 1.5)
+        }
         material("wither_matrix", DULL)
     }
 

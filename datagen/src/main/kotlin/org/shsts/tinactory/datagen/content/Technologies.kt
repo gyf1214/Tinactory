@@ -459,8 +459,6 @@ object Technologies {
                 displayMaterial("naquadah", "raw")
             }
 
-            voltage = Voltage.EV
-
             ADVANCED_NETHER_CHEMISTRY = child("advanced_nether_chemistry") {
                 maxProgress(240)
                 displayItem(Items.ANCIENT_DEBRIS)

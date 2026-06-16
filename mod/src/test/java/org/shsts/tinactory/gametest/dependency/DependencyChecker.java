@@ -94,8 +94,8 @@ public final class DependencyChecker {
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.LUV;
     // Current LuV-progress baseline is calibrated from the runtime dependency-checker report. The remaining list
-    // includes the Phase 3 vanilla Nether Star branch, later wetware-board, advanced-SMD, Neutronium, and ZPM targets.
-    private static final int ACCEPTED_UNREACHABLE_NODES = 21;
+    // includes later wetware-board, advanced-SMD, Neutronium, and ZPM targets.
+    private static final int ACCEPTED_UNREACHABLE_NODES = 17;
 
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
