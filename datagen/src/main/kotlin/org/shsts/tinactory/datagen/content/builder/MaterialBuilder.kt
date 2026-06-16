@@ -687,13 +687,16 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    fun seeding(voltage: Voltage, factor: Double = 1.0) {
+    fun seeding(voltage: Voltage, factor: Double = 1.0, duplicateWithDust: Boolean = true) {
         lathe {
             output(material, "seed") {
                 input(material, "gem")
                 voltage(voltage)
                 workTicks(round(256 * factor).toLong())
             }
+        }
+        if (!duplicateWithDust) {
+            return
         }
         mixer {
             output(material, "seed", 2) {

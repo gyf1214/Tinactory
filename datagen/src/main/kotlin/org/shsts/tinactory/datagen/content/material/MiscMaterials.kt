@@ -31,7 +31,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -223,14 +222,6 @@ object MiscMaterials {
                 input("trinium", "ingot_hot")
                 voltage(Voltage.IV)
                 workTicks(400)
-            }
-        }
-
-        extractor {
-            output("naquadria", "molten", suffix = "_from_ingot_luv") {
-                input("naquadria", "ingot")
-                voltage(Voltage.LUV)
-                workTicks(240)
             }
         }
 

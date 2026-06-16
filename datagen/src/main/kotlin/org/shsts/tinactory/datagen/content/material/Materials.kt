@@ -183,7 +183,7 @@ object Materials {
             }
         }
         material("naquadria", BRIGHT) {
-            machineProcess(Voltage.LUV, 1.5)
+            machineProcess(Voltage.IV, 1.5)
         }
         material("trinium", METALLIC) {
             machineProcess(Voltage.LUV, 1.5)
@@ -199,7 +199,7 @@ object Materials {
         }
         material("nether_star", SHINY) {
             machineProcess(Voltage.LUV, 1.5)
-            seeding(Voltage.LUV, 1.5)
+            seeding(Voltage.LUV, 1.5, duplicateWithDust = false)
         }
         material("wither_matrix", DULL)
     }
