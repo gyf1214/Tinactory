@@ -187,7 +187,7 @@ object Materials {
             machineProcess(Voltage.IV, 1.5)
         }
         material("trinium", METALLIC) {
-            machineProcess(Voltage.LUV, 1.5)
+            machineProcess(Voltage.IV, 1.5)
         }
         material("netherite_scrap", DULL) {
             machineProcess(Voltage.IV)
