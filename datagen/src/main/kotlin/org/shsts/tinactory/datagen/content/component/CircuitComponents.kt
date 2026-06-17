@@ -24,6 +24,7 @@ import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
@@ -381,6 +382,41 @@ object CircuitComponents {
                 }
             }
         }
+
+        componentTier(CircuitComponentTier.ADVANCED) {
+            assembler {
+                defaults {
+                    voltage(Voltage.IV)
+                    workTicks(COMPONENT_TICKS)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
+                }
+                component("resistor", 16) {
+                    input("graphite", "dust")
+                    input("naquadah", "wire_fine", 4)
+                    input("ptfe")
+                }
+                component("diode", 32) {
+                    input("indium", "dust")
+                    input("niobium_titanium", "wire_fine", 8)
+                    input("ptfe", amount = 2)
+                }
+                component("transistor", 16) {
+                    input("vanadium_gallium", "foil")
+                    input("ruridit", "wire_fine", 4)
+                    input("ptfe")
+                }
+                component("capacitor", 16) {
+                    input("epoxy", "foil", 2)
+                    input("palladium", "foil")
+                    input("ptfe")
+                }
+                component("inductor", 16) {
+                    input("hssg", "ring")
+                    input("platinum", "wire_fine", 4)
+                    input("ptfe")
+                }
+            }
+        }
     }
 
     private class ComponentTierFactory(val tier: CircuitComponentTier) {
@@ -395,6 +431,10 @@ object CircuitComponents {
     }
 
     private fun chips() {
+        val rawCrystalChip = getItem("component/raw_crystal_chip")
+        val rawCrystalChipPart = getItem("component/raw_crystal_chip_part")
+        val crystalCpu = getItem("component/crystal_cpu")
+
         blastFurnace {
             output(BOULE.item("silicon")) {
                 input("silicon", amount = 32)
@@ -427,6 +467,27 @@ object CircuitComponents {
             }
         }
 
+        autoclave {
+            output(rawCrystalChip, suffix = "_from_emerald") {
+                input("emerald", "gem_exquisite")
+                input("trinium", "molten")
+                voltage(Voltage.LUV)
+                workTicks(3200)
+                extra {
+                    requireCleanness(0.75, 1.0)
+                }
+            }
+            output(rawCrystalChip, suffix = "_from_part") {
+                input(rawCrystalChipPart)
+                input("wither_matrix", "liquid")
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    requireCleanness(0.75, 1.0)
+                }
+            }
+        }
+
         cutter {
             for ((i, entry) in WAFER_RAW_LIST.withIndex()) {
                 output(entry.get(), 8 shl i) {
@@ -444,6 +505,11 @@ object CircuitComponents {
                     workTicks(300)
                 }
             }
+            output(rawCrystalChipPart, 9) {
+                input(rawCrystalChip)
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
         }
 
         engraving("integrated_circuit", "ruby", 0, Voltage.LV, -1.0, 0.0)
@@ -456,6 +522,45 @@ object CircuitComponents {
         engraving("pic", "topaz", 1, Voltage.HV, 0.2, 1.2)
         engraving("qbit_cpu", "ender_eye", 1, Voltage.EV, 0.5, 1.5, "cpu")
         engraving("nand", "emerald", 1, Voltage.EV, 0.4, 1.4, "ram")
+
+        laserEngraver {
+            defaults {
+                workTicks(2000)
+            }
+            output(WAFER.item("soc"), suffix = "_from_naquadah") {
+                input(WAFER_RAW.item("naquadah"))
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.IV)
+                extra {
+                    requireCleanness(1.0, 2.0)
+                }
+            }
+            output(WAFER.item("high_pic"), suffix = "_from_pic") {
+                input(WAFER.item("pic"))
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.IV)
+                extra {
+                    requireCleanness(1.2, 2.0)
+                }
+            }
+            output(WAFER.item("advanced_soc"), suffix = "_from_soc") {
+                input(WAFER.item("soc"))
+                input("nether_star", "lens", 0, port = 1)
+                voltage(Voltage.LUV)
+                extra {
+                    requireCleanness(1.5, 2.0)
+                }
+            }
+            output(crystalCpu) {
+                input(rawCrystalChip)
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.LUV)
+                workTicks(1200)
+                extra {
+                    requireCleanness(0.75, 1.75)
+                }
+            }
+        }
     }
 
     private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,
@@ -634,7 +739,7 @@ object CircuitComponents {
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.EV)
                     workTicks(CIRCUIT_TICKS)
-                    tech(Technologies.PLATINUM_GROUP_METAL)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
                 }
             }
             chemicalReactor {
@@ -644,7 +749,7 @@ object CircuitComponents {
                     input("iron_chloride")
                     voltage(Voltage.EV)
                     workTicks(480)
-                    tech(Technologies.PLATINUM_GROUP_METAL)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
                 }
             }
         }
