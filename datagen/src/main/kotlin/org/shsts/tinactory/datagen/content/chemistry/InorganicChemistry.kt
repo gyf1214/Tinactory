@@ -946,6 +946,34 @@ object InorganicChemistry {
                 output("indium_concentrate", amount = 0.5)
                 workTicks(400)
             }
+            input("lithium_brine", amount = 4, suffix = "_to_barium_sulfate") {
+                input("sodium_sulfate")
+                output("barium_sulfate")
+                output("salt_water", amount = 4)
+                workTicks(400)
+            }
+        }
+
+        blastFurnace {
+            output("barium_sulfide", "dust") {
+                input("barium_sulfate", "dust")
+                input("carbon", "dust", amount = 2)
+                output("carbon_dioxide", amount = 2)
+                voltage(Voltage.IV)
+                workTicks(800)
+                extra {
+                    temperature(5100)
+                }
+            }
+        }
+
+        electrolyzer {
+            input("barium_sulfide") {
+                output("barium", "dust")
+                output("sulfur", "dust")
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
         }
 
         centrifuge {
