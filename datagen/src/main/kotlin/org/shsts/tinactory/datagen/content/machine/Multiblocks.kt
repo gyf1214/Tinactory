@@ -170,6 +170,18 @@ object Multiblocks {
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
 
+            misc("lithography_lens/advanced") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_laser_source"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
+            misc("lithography_lens/nether") {
+                blockState(cubeCasing("casings/fusion/machine_casing_fusion",
+                    "overlay/machine/overlay_laser_source"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
             misc("metal_processing_chamber") {
                 blockState(cubeColumn("casings/gearbox/machine_casing_gearbox_tungstensteel",
                     "casings/solid/machine_casing_robust_tungstensteel"))
@@ -592,6 +604,33 @@ object Multiblocks {
                 input("soldering_alloy", amount = 4)
                 workTicks(COIL_TICKS)
                 tech(Technologies.FUSION)
+            }
+            misc("lithography_lens/advanced") {
+                misc("lithography_lens/good")
+                component("robot_arm", 2)
+                input("ender_eye", "lens", 16)
+                input("hssg", "plate", 6)
+                input("soldering_alloy", amount = 3)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.LUV)
+                workTicks(MULTIBLOCK_TICKS)
+            }
+
+            componentVoltage = Voltage.LUV
+            misc("lithography_lens/nether") {
+                misc("lithography_lens/advanced")
+                component("robot_arm", 2)
+                input("nether_star", "lens", 16)
+                input("hssg", "stick", 4)
+                input("rhodium_plated_palladium", "plate", 6)
+                input("ruridit", "foil", 16)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
             }
         }
 

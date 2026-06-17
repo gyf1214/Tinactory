@@ -20,6 +20,31 @@
         "topaz",
         "blue_topaz"
       ]
+    },
+    "advanced": {
+      "materialColor": 25,
+      "materials": [
+        "ruby",
+        "diamond",
+        "sapphire",
+        "emerald",
+        "topaz",
+        "blue_topaz",
+        "ender_eye"
+      ]
+    },
+    "nether": {
+      "materialColor": 9,
+      "materials": [
+        "ruby",
+        "diamond",
+        "sapphire",
+        "emerald",
+        "topaz",
+        "blue_topaz",
+        "ender_eye",
+        "nether_star"
+      ]
     }
   }
 }
