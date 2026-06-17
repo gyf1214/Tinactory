@@ -26,6 +26,7 @@ object InorganicChemistry {
         ev()
         ender()
         platinum()
+        advancedHydrometallurgy()
         advancedNetherChemistry()
     }
 
@@ -925,6 +926,46 @@ object InorganicChemistry {
                 output("mercury", amount = 8)
                 voltage(Voltage.IV)
                 workTicks(2400)
+            }
+        }
+    }
+
+    private fun advancedHydrometallurgy() {
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.IV)
+                tech(Technologies.ADVANCED_HYDROMETALLURGY)
+            }
+            input("sphalerite", suffix = "_to_indium_concentrate") {
+                input("sulfuric_acid", amount = 2)
+                output("indium_concentrate", amount = 0.5)
+                workTicks(400)
+            }
+            input("galena", suffix = "_to_indium_concentrate") {
+                input("sulfuric_acid", amount = 2)
+                output("indium_concentrate", amount = 0.5)
+                workTicks(400)
+            }
+        }
+
+        centrifuge {
+            input("indium_concentrate", amount = 4) {
+                output("indium", "dust")
+                output("lead_zinc_solution", amount = 4)
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+        }
+
+        distillation {
+            input("lead_zinc_solution", amount = 4) {
+                output("sulfur", "dust", amount = 2)
+                output("lead", "dust")
+                output("zinc", "dust")
+                output("silver", "dust", rate = 0.25)
+                output("water", "gas", 4)
+                voltage(Voltage.LUV)
+                workTicks(800)
             }
         }
     }
