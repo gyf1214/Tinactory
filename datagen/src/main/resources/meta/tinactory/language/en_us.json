@@ -20,7 +20,16 @@
     "soc": "SoC",
     "ptfe": "PTFE",
     "me": "ME",
-    "hssg": "HSS-G"
+    "hssg": "HSS-G",
+    "samarium": "Samarium",
+    "yttrium": "Yttrium",
+    "barium": "Barium",
+    "barium_sulfate": "Barium Sulfate",
+    "barium_sulfide": "Barium Sulfide",
+    "heavy_rare_earth_solution": "Heavy Rare Earth Solution",
+    "indium": "Indium",
+    "indium_concentrate": "Indium Concentrate",
+    "lead_zinc_solution": "Lead Zinc Solution"
   },
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1 $2",
@@ -362,6 +371,8 @@
     "tinactory.technology.nuclear_physics.details": "Explores the forces binding atomic nuclei, unlocking immense power from the heart of matter itself. This knowledge paves the way for nuclear energy, advanced reactors, and devastating weaponry.",
     "tinactory.technology.assembly_line": "Assembly Line",
     "tinactory.technology.assembly_line.details": "A dedicated assembly system for LuV-scale components, combining high part counts and precision manufacturing into a repeatable late-IV production line.",
+    "tinactory.technology.advanced_hydrometallurgy": "Advanced Hydrometallurgy",
+    "tinactory.technology.advanced_hydrometallurgy.details": "Late aqueous separation chemistry recovers trace Indium, heavy rare earth products, and Barium feedstocks from established IV resource streams.",
     "tinactory.technology.rhodium_plated_palladium.details": "A plated palladium precursor for LuV machine casings and fusion containment parts, bridging platinum-group metallurgy into late-IV construction.",
     "tinactory.technology.fusion.details": "The physics foundation for controlled fusion, turning extreme plasma containment into a practical late-game energy system.",
     "tinactory.technology.naquadah_processing.details": "Unlocks End Stone Naquadah processing, high-temperature preparation, and the first Fusion-assisted refinement route.",

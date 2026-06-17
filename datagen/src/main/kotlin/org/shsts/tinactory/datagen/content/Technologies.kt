@@ -100,6 +100,7 @@ object Technologies {
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
+    val ADVANCED_HYDROMETALLURGY: ResourceLocation
     val ASSEMBLY_LINE: ResourceLocation
     val RHODIUM_PLATED_PALLADIUM: ResourceLocation
     val FUSION: ResourceLocation
@@ -443,6 +444,11 @@ object Technologies {
             }
 
             base = PLATINUM_GROUP_METAL
+
+            ADVANCED_HYDROMETALLURGY = tech("advanced_hydrometallurgy") {
+                maxProgress(200)
+                displayMaterial("indium", "dust")
+            }
 
             RHODIUM_PLATED_PALLADIUM = child("rhodium_plated_palladium") {
                 maxProgress(200)

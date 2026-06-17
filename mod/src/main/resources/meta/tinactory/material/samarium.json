@@ -1,0 +1,22 @@
+{
+  "color": "0xFFC8D2E8",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "ingot_hot",
+    "stick",
+    "magnetic"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/molten"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

@@ -128,6 +128,12 @@ object Materials {
             machineProcess(Voltage.HV)
             blast(Voltage.MV, 1300, 1200)
         }
+        material("samarium", METALLIC) {
+            machineProcess(Voltage.LUV)
+            blast(Voltage.LUV, 5100, 800)
+        }
+        material("yttrium", SHINY)
+        material("barium", DULL)
         material("molybdenum", SHINY) {
             machineProcess(Voltage.HV, 1.8)
             blast(Voltage.HV, 2800, 1600) {
@@ -331,6 +337,8 @@ object Materials {
         material("potassium_hydroxide", DULL)
         material("calcium_hydroxide", DULL)
         material("sodium_sulfate", DULL)
+        material("barium_sulfate", DULL)
+        material("barium_sulfide", DULL)
         material("potassium_nitrate", FINE)
         material("potassium_bifluoride", DULL)
         material("sulfuric_acid", DULL) {
@@ -796,6 +804,9 @@ object Materials {
         }
         material("glowstone", SHINY)
         material("rare_earth", ROUGH)
+        material("heavy_rare_earth_solution", DULL)
+        material("indium_concentrate", SHINY)
+        material("lead_zinc_solution", DULL)
         material("netherrack", ROUGH) {
             machineProcess(Voltage.LV, 0.5)
         }
