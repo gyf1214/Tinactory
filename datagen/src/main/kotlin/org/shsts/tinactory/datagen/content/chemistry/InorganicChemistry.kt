@@ -695,6 +695,16 @@ object InorganicChemistry {
                     temperature(2800)
                 }
             }
+            output("samarium", "ingot_hot", suffix = "_from_rare_earth_slurry") {
+                input("rare_earth", "slurry")
+                input("sodium")
+                output("heavy_rare_earth_solution")
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    temperature(5100)
+                }
+            }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
                 input("platinum_metallic")
                 input("nitrogen")
@@ -702,6 +712,17 @@ object InorganicChemistry {
                 extra {
                     temperature(2300)
                 }
+            }
+        }
+
+        distillation {
+            input("heavy_rare_earth_solution") {
+                output("yttrium", "dust", rate = 0.5)
+                output("indium", "dust", rate = 0.5)
+                output("sodium_sulfate")
+                output("water", "gas")
+                voltage(Voltage.LUV)
+                workTicks(800)
             }
         }
 
