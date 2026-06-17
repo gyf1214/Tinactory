@@ -105,6 +105,7 @@ object Technologies {
     val FUSION: ResourceLocation
     val NAQUADAH_PROCESSING: ResourceLocation
     val ADVANCED_NETHER_CHEMISTRY: ResourceLocation
+    val CRYSTAL_CIRCUITRY: ResourceLocation
 
     init {
         Factory().apply {
@@ -462,6 +463,13 @@ object Technologies {
             ADVANCED_NETHER_CHEMISTRY = child("advanced_nether_chemistry") {
                 maxProgress(240)
                 displayItem(Items.ANCIENT_DEBRIS)
+            }
+
+            base = FUSION
+
+            CRYSTAL_CIRCUITRY = child("crystal_circuitry") {
+                maxProgress(260)
+                displayItem(getItem("component/crystal_cpu"))
             }
         }
     }

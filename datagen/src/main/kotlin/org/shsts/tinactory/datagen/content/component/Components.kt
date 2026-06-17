@@ -144,6 +144,18 @@ object Components {
                 model(basicItem("metaitems/quantumstar"))
             }
 
+            component("raw_crystal_chip") {
+                model(basicItem("metaitems/crystal.raw_chip"))
+            }
+
+            component("raw_crystal_chip_part") {
+                model(basicItem("metaitems/crystal.raw"))
+            }
+
+            component("crystal_cpu") {
+                model(basicItem("metaitems/crystal.central_processing_unit"))
+            }
+
             component("raw_rhodium_plated_palladium") {
                 model(basicItem(ResourceLocation("gregtech4", "items/iridium_alloy_ingot")))
             }

@@ -49,6 +49,7 @@ object Materials {
         }
         material("sulfur", DULL)
         material("cadmium", SHINY)
+        material("indium", SHINY)
         material("cobalt", METALLIC) {
             toolProcess(1.25)
             smelt()

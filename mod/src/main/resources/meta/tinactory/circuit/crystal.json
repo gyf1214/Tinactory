@@ -1,0 +1,11 @@
+{
+  "type": "circuit",
+  "tier": "crystal",
+  "baseLevel": "normal",
+  "items": [
+    "crystal_processor",
+    "crystal_assembly",
+    "crystal_computer",
+    "crystal_mainframe"
+  ]
+}

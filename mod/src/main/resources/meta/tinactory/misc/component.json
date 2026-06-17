@@ -20,6 +20,9 @@
     "carbon_fiber",
     "carbon_mesh",
     "carbon_plate",
-    "quantum_star"
+    "quantum_star",
+    "raw_crystal_chip",
+    "raw_crystal_chip_part",
+    "crystal_cpu"
   ]
 }
