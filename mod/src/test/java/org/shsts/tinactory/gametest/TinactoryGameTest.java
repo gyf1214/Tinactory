@@ -38,6 +38,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -122,6 +123,12 @@ public final class TinactoryGameTest {
             }
             if (!network.getSubnet(absoluteSubnetPos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Electric buffer did not inherit the parent subnet", subnetPos);
+            }
+            if (!network.getSubnet(absoluteCablePos, LOGISTICS_SUBNET.get()).equals(absoluteMachinePos)) {
+                helper.fail("Cable did not inherit the logistics subnet", cablePos);
+            }
+            if (!network.getSubnet(absoluteSubnetPos, LOGISTICS_SUBNET.get()).equals(absoluteMachinePos)) {
+                helper.fail("Electric buffer split the logistics subnet", subnetPos);
             }
             helper.succeed();
         });

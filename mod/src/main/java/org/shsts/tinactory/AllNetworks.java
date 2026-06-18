@@ -36,6 +36,7 @@ public final class AllNetworks {
     public static final IEntry<ComponentType<AutocraftComponent>> AUTOCRAFT_COMPONENT;
     public static final IEntry<ComponentType<SignalComponent>> SIGNAL_COMPONENT;
     public static final IEntry<ISubnetLabel> ELECTRIC_SUBNET;
+    public static final IEntry<ISubnetLabel> LOGISTICS_SUBNET;
 
     static {
         PRE_WORK_SCHEDULING = scheduling("machine/pre_work").register();
@@ -60,6 +61,7 @@ public final class AllNetworks {
         AUTOCRAFT_COMPONENT = componentType("autocraft", AutocraftComponent.class, AutocraftComponent::new);
         SIGNAL_COMPONENT = componentType("signal", SignalComponent.class, SignalComponent::new);
         ELECTRIC_SUBNET = subnetLabel("electric");
+        LOGISTICS_SUBNET = subnetLabel("logistics");
     }
 
     public static void init() {}

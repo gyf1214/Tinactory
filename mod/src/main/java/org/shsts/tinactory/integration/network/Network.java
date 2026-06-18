@@ -19,12 +19,10 @@ import org.shsts.tinactory.core.network.NetworkRuntime;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
@@ -72,7 +70,7 @@ public class Network implements INetwork {
 
         @Override
         public Collection<ISubnetLabel> allSubnetLabels() {
-            return List.of(ELECTRIC_SUBNET.get());
+            return SubnetLabel.getSubnetLabels();
         }
 
         @Override

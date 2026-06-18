@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LogisticComponent extends NotifierComponent {
@@ -55,13 +57,13 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     public void registerPort(IMachine machine, int index, IPort<?> port) {
-        registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
+        registerPortInSubnet(machine, index, port, getMachineSubnet(machine, LOGISTICS_SUBNET.get()),
             -1);
     }
 
     public void registerStoragePort(IMachine machine, int index, IPort<?> port,
         int priority) {
-        registerPortInSubnet(machine, index, port, getMachineSubnet(machine),
+        registerPortInSubnet(machine, index, port, getMachineSubnet(machine, LOGISTICS_SUBNET.get()),
             priority);
     }
 
