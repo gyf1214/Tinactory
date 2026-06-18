@@ -5,6 +5,12 @@
     "gas": {
       "baseAmount": 1000,
       "texture": "gregtech:blocks/material_sets/dull/gas"
+    },
+    "liquid": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFF00BFC1",
+      "displayColor": "0xFF00BFC1"
     }
   },
   "aliases": {

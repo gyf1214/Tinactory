@@ -112,6 +112,10 @@ object MiscMaterials {
                 input("oxygen")
                 workTicks(200)
             }
+            output("nitrogen", "liquid") {
+                input("nitrogen")
+                workTicks(200)
+            }
         }
 
         mixer {

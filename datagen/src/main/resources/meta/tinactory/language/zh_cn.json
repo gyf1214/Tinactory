@@ -589,6 +589,7 @@
     "fluid.tinactory.material.fluid.lpg": "液化石油气",
     "fluid.tinactory.material.gas.coolant": "热冷却液",
     "fluid.tinactory.material.liquid.oxygen": "液氧",
+    "fluid.tinactory.material.liquid.nitrogen": "液氮",
     "tinactory.tooltip.openRecipeBook": "打开配方书",
     "tinactory.tooltip.unselectRecipe": "取消选择配方",
     "tinactory.tooltip.openPortPanel": "显示端口",

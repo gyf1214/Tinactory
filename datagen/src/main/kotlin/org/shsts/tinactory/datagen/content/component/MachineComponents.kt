@@ -333,16 +333,21 @@ object MachineComponents {
             }
             superconductor(Voltage.EV, "niobium_titanium", "ptfe", "coolant")
             superconductor(Voltage.IV, "vanadium_gallium", "niobium_titanium", "coolant")
+            superconductor(Voltage.LUV, "yttrium_barium_cuprate", "hsss", "nitrogen", "liquid")
         }
     }
 
     private fun AssemblyRecipeFactory.superconductor(v: Voltage, mat: String,
-        pipe: String, coolant: String) {
+        pipe: String, coolant: String, coolantSub: String? = null) {
         output(v.id + "_superconductor", "wire") {
             input(mat, "wire")
             component("electric_pump", voltage = v)
             input(pipe, "pipe")
-            input(coolant)
+            if (coolantSub == null) {
+                input(coolant)
+            } else {
+                input(coolant, coolantSub)
+            }
             voltage(v)
         }
     }
