@@ -417,6 +417,15 @@ object Materials {
             }
             blast(Voltage.EV, 4200, 1280)
         }
+        material("hsss", METALLIC) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("hssg", 4)
+                component("ruthenium", 2)
+                component("naquadah", 2)
+            }
+            blast(Voltage.LUV, 4800, 1280)
+        }
         material("ruridit", BRIGHT) {
             machineProcess(Voltage.EV, 2.0)
             mix(Voltage.EV) {
@@ -425,8 +434,25 @@ object Materials {
             }
             blast(Voltage.EV, 4500, 1280)
         }
+        material("osmiridium", SHINY) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("iridium", 4)
+                component("osmium")
+            }
+            blast(Voltage.LUV, 5200, 1280)
+        }
         material("rhodium_plated_palladium", SHINY) {
             machineProcess(Voltage.IV, 2.0)
+        }
+        material("naquadah_alloy", METALLIC) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("rhodium_plated_palladium", 5)
+                component("naquadah", 3)
+                component("osmium")
+            }
+            blast(Voltage.LUV, 5000, 1280)
         }
         material("vanadium_gallium", METALLIC) {
             machineProcess(Voltage.EV, 1.5)
@@ -435,6 +461,16 @@ object Materials {
                 component("gallium")
             }
             blast(Voltage.EV, 4500, 1280)
+        }
+        material("yttrium_barium_cuprate", BRIGHT) {
+            machineProcess(Voltage.LUV, 1.5)
+            mix(Voltage.LUV) {
+                component("yttrium")
+                component("barium", 2)
+                component("copper", 3)
+                component("oxygen")
+            }
+            blast(Voltage.LUV, 5400, 1280)
         }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
@@ -585,6 +621,7 @@ object Materials {
         }
         material("ev_superconductor", SHINY)
         material("iv_superconductor", SHINY)
+        material("luv_superconductor", SHINY)
     }
 
     private fun ores() {

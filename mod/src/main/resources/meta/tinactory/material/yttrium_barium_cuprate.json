@@ -1,11 +1,13 @@
 {
-  "color": "0xFFFFC0E0",
+  "color": "0xFF345C8A",
   "items": [
     "dust",
     "dust_tiny",
     "ingot",
     "ingot_hot",
-    "plate"
+    "plate",
+    "wire",
+    "wire_fine"
   ],
   "fluids": {},
   "aliases": {

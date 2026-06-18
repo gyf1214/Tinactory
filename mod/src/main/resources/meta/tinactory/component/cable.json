@@ -29,6 +29,10 @@
     "luv": {
       "resistance": 0.05,
       "material": "platinum"
+    },
+    "zpm": {
+      "resistance": 0.05,
+      "material": "niobium_titanium"
     }
   }
 }
