@@ -19,15 +19,18 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricBlock;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.IConnector;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tool.IWrenchable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.TinactoryConfig.listConfig;
 import static org.shsts.tinactory.integration.network.MachineBlock.IO_FACING;
@@ -131,8 +134,8 @@ public class SubnetBlock extends Block implements IWrenchable, IConnector, IElec
     }
 
     @Override
-    public boolean isSubnet(Level world, BlockPos pos, BlockState state) {
-        return true;
+    public Collection<ISubnetLabel> subnetLabels(Level world, BlockPos pos, BlockState state) {
+        return List.of(ELECTRIC_SUBNET.get());
     }
 
     private void onDestroy(Level world, BlockPos pos, BlockState state) {

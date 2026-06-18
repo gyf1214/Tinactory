@@ -7,6 +7,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISubnetLabel;
+
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -24,7 +27,11 @@ public abstract class NetworkComponent implements INetworkComponent {
     }
 
     protected BlockPos getMachineSubnet(IMachine machine) {
-        return network.getSubnet(machine.blockEntity().getBlockPos());
+        return getMachineSubnet(machine, ELECTRIC_SUBNET.get());
+    }
+
+    protected BlockPos getMachineSubnet(IMachine machine, ISubnetLabel label) {
+        return network.getSubnet(machine.blockEntity().getBlockPos(), label);
     }
 
     @Override

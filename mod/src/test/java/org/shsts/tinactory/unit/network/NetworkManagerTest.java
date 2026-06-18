@@ -3,11 +3,15 @@ package org.shsts.tinactory.unit.network;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkManager;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -114,12 +118,18 @@ class NetworkManagerTest {
             }
 
             @Override
-            public boolean isSubnet(BlockPos pos, Boolean data) {
-                return false;
+            public Collection<ISubnetLabel> allSubnetLabels() {
+                return List.of(NetworkGraphEngineFixtures.LABEL_A);
             }
 
             @Override
-            public void onDiscover(BlockPos pos, Boolean data, BlockPos subnet) {
+            public Collection<ISubnetLabel> subnetLabels(BlockPos pos, Boolean data) {
+                return List.of();
+            }
+
+            @Override
+            public void onDiscover(BlockPos pos, Boolean data,
+                Function<ISubnetLabel, BlockPos> subnets) {
             }
 
             @Override

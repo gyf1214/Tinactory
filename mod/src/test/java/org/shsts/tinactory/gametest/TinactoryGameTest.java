@@ -37,6 +37,7 @@ import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -116,10 +117,10 @@ public final class TinactoryGameTest {
             var network = MACHINE.tryGet(helper.getBlockEntity(machinePos))
                 .flatMap(machine -> machine.network())
                 .orElseThrow();
-            if (!network.getSubnet(absoluteCablePos).equals(absoluteMachinePos)) {
+            if (!network.getSubnet(absoluteCablePos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Cable did not inherit the machine subnet", cablePos);
             }
-            if (!network.getSubnet(absoluteSubnetPos).equals(absoluteMachinePos)) {
+            if (!network.getSubnet(absoluteSubnetPos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Electric buffer did not inherit the parent subnet", subnetPos);
             }
             helper.succeed();

@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.INetworkTicker;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public final class NetworkRuntime {
         return subnetMachines;
     }
 
-    public BlockPos getSubnet(BlockPos pos) {
+    public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
         return blockSubnets.get(pos);
     }
 

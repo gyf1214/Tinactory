@@ -3,6 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
@@ -10,10 +11,12 @@ import org.shsts.tinactory.content.logistics.SignalComponent;
 import org.shsts.tinactory.integration.builder.SchedulingBuilder;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.shsts.tinactory.integration.network.NetworkComponent;
+import org.shsts.tinactory.integration.network.SubnetLabel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.AllRegistries.COMPONENT_TYPES;
+import static org.shsts.tinactory.AllRegistries.SUBNET_LABELS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
@@ -32,6 +35,7 @@ public final class AllNetworks {
     public static final IEntry<ComponentType<LogisticComponent>> LOGISTIC_COMPONENT;
     public static final IEntry<ComponentType<AutocraftComponent>> AUTOCRAFT_COMPONENT;
     public static final IEntry<ComponentType<SignalComponent>> SIGNAL_COMPONENT;
+    public static final IEntry<ISubnetLabel> ELECTRIC_SUBNET;
 
     static {
         PRE_WORK_SCHEDULING = scheduling("machine/pre_work").register();
@@ -55,6 +59,7 @@ public final class AllNetworks {
         LOGISTIC_COMPONENT = componentType("logistics", LogisticComponent.class, LogisticComponent::new);
         AUTOCRAFT_COMPONENT = componentType("autocraft", AutocraftComponent.class, AutocraftComponent::new);
         SIGNAL_COMPONENT = componentType("signal", SignalComponent.class, SignalComponent::new);
+        ELECTRIC_SUBNET = subnetLabel("electric");
     }
 
     public static void init() {}
@@ -67,5 +72,9 @@ public final class AllNetworks {
 
     private static SchedulingBuilder<IRegistrate> scheduling(String id) {
         return new SchedulingBuilder<>(REGISTRATE, REGISTRATE, id);
+    }
+
+    private static IEntry<ISubnetLabel> subnetLabel(String id) {
+        return REGISTRATE.registryEntry(SUBNET_LABELS.getHandler(), id, SubnetLabel::new);
     }
 }

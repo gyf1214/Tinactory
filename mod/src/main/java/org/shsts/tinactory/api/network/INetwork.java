@@ -17,7 +17,7 @@ public interface INetwork {
 
     <T extends INetworkComponent> T getComponent(IComponentType<T> type);
 
-    BlockPos getSubnet(BlockPos pos);
+    BlockPos getSubnet(BlockPos pos, ISubnetLabel label);
 
     /**
      * @return multi map subnet -> machine.

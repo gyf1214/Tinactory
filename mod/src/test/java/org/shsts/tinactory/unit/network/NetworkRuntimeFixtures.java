@@ -21,6 +21,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public BlockPos getSubnet(BlockPos pos) {
+        public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
             throw new UnsupportedOperationException();
         }
 

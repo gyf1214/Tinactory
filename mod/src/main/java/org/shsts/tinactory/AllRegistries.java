@@ -15,10 +15,12 @@ import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.network.SchedulingSorter;
 import org.shsts.tinactory.integration.common.SimpleFluid;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.network.ComponentType;
+import org.shsts.tinactory.integration.network.SubnetLabel;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -33,6 +35,7 @@ import static org.shsts.tinycorelib.api.CoreLibKeys.EVENT_REGISTRY_KEY;
 public final class AllRegistries {
     public static final IRegistry<IScheduling> SCHEDULINGS;
     public static final IRegistry<IComponentType<?>> COMPONENT_TYPES;
+    public static final IRegistry<ISubnetLabel> SUBNET_LABELS;
     public static final IRegistry<IMetricsCallback> METRICS_CALLBACKS;
 
     public static final IEntryHandler<IEvent<?>> EVENTS;
@@ -52,6 +55,9 @@ public final class AllRegistries {
             .register();
         COMPONENT_TYPES = REGISTRATE.<IComponentType<?>>genericRegistry("component_type", IComponentType.class)
             .onBake((registry, stage) -> ComponentType.onBake(registry))
+            .register();
+        SUBNET_LABELS = REGISTRATE.registry("subnet_label", ISubnetLabel.class)
+            .onBake((registry, stage) -> SubnetLabel.onBake(registry))
             .register();
         METRICS_CALLBACKS = REGISTRATE.registry(TinactoryKeys.METRICS_CALLBACKS, IMetricsCallback.class)
             .onBake((registry, stage) -> MetricsManager.onBake(registry))

@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
@@ -19,10 +20,13 @@ import org.shsts.tinactory.core.network.NetworkRuntime;
 import org.slf4j.Logger;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
@@ -69,13 +73,19 @@ public class Network implements INetwork {
         }
 
         @Override
-        public boolean isSubnet(BlockPos pos, BlockState data) {
-            return IConnector.isSubnetInWorld(world, pos, data);
+        public Collection<ISubnetLabel> allSubnetLabels() {
+            return List.of(ELECTRIC_SUBNET.get());
         }
 
         @Override
-        public void onDiscover(BlockPos pos, BlockState data, BlockPos subnet) {
-            Network.this.putBlock(pos, data, subnet);
+        public Collection<ISubnetLabel> subnetLabels(BlockPos pos, BlockState data) {
+            return IConnector.subnetLabelsInWorld(world, pos, data);
+        }
+
+        @Override
+        public void onDiscover(BlockPos pos, BlockState data,
+            Function<ISubnetLabel, BlockPos> subnets) {
+            Network.this.putBlock(pos, data, subnets.apply(ELECTRIC_SUBNET.get()));
         }
 
         @Override
@@ -113,8 +123,8 @@ public class Network implements INetwork {
     }
 
     @Override
-    public BlockPos getSubnet(BlockPos pos) {
-        return runtime.getSubnet(pos);
+    public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
+        return runtime.getSubnet(pos, label);
     }
 
     @Override

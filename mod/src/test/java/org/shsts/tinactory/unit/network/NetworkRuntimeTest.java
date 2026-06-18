@@ -26,7 +26,7 @@ class NetworkRuntimeTest {
         runtime.putBlock(block, subnet, component1 -> component1.putBlock(block, null, subnet));
 
         assertSame(component, runtime.getComponent(type));
-        assertSame(subnet, runtime.getSubnet(block));
+        assertSame(subnet, runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_A));
         assertEquals(1, runtime.allBlocks().size());
         assertTrue(events.contains("component.putBlock:" + block + "->" + subnet));
     }
