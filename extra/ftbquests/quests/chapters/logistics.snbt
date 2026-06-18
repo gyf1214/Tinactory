@@ -1,7 +1,7 @@
 {
 	id: "021730EB05578B09"
 	group: ""
-	order_index: 7
+	order_index: 8
 	filename: "logistics"
 	title: "{tinactory.quests.logistics.title}"
 	icon: "tinactory:component/hv/conveyor_module"

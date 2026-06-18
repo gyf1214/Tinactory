@@ -1,0 +1,588 @@
+{
+	id: "06FE0000000000FE"
+	group: ""
+	order_index: 6
+	filename: "06_fusion_era"
+	title: "{tinactory.quests.06_fusion_era.title}"
+	icon: "tinactory:material/ingot/naquadah"
+	subtitle: ["{tinactory.quests.06_fusion_era.subtitle.0}"]
+	default_quest_shape: ""
+	default_hide_dependency_lines: false
+	quests: [
+		{
+			title: "{tinactory.quests.06_fusion_era.000.title}"
+			x: 0.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.06_fusion_era.000.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.000.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.000.description.1}"
+			]
+			dependencies: [
+				"05A550E7057E0055"
+				"5A4D1E6F0C2B3A10"
+			]
+			id: "06FE000000000000"
+			tasks: [{
+				id: "06FE000000000100"
+				type: "item"
+				item: "tinactory:material/ingot/naquadah"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.001.title}"
+			x: 2.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.001.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.001.description.0}"]
+			dependencies: ["06FE000000000000"]
+			id: "06FE000000000001"
+			tasks: [{
+				id: "06FE000000000101"
+				type: "item"
+				item: "tinactory:multiblock/coil/naquadah"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.002.title}"
+			x: 2.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.002.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.002.description.0}"]
+			dependencies: ["06FE000000000000"]
+			id: "06FE000000000002"
+			tasks: [
+				{
+					id: "06FE000000000102"
+					type: "item"
+					item: "tinactory:boule/naquadah"
+				}
+				{
+					id: "06FE000000000103"
+					type: "item"
+					item: "tinactory:wafer_raw/naquadah"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.003.title}"
+			x: 2.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.06_fusion_era.003.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.003.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.003.description.1}"
+			]
+			dependencies: [
+				"06FE000000000000"
+				"05A550E7057E0055"
+			]
+			id: "06FE000000000003"
+			tasks: [{
+				id: "06FE000000000104"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/plasma/activated_naquadah"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.004.title}"
+			x: 4.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.004.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.004.description.0}"]
+			dependencies: ["06FE000000000003"]
+			id: "06FE000000000004"
+			tasks: [
+				{
+					id: "06FE000000000105"
+					type: "item"
+					item: "tinactory:material/ingot/enriched_naquadah"
+				}
+				{
+					id: "06FE000000000106"
+					type: "item"
+					item: "tinactory:component/enriched_naquadah_fuel_rod"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.005.title}"
+			x: 4.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.06_fusion_era.005.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.005.description.0}"]
+			dependencies: ["06FE000000000003"]
+			id: "06FE000000000005"
+			tasks: [{
+				id: "06FE000000000107"
+				type: "item"
+				item: "tinactory:material/ingot/naquadria"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.006.title}"
+			x: 4.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.006.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.006.description.0}"]
+			dependencies: ["06FE000000000003"]
+			id: "06FE000000000006"
+			tasks: [{
+				id: "06FE000000000108"
+				type: "item"
+				item: "tinactory:material/ingot/trinium"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.007.title}"
+			x: 4.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.06_fusion_era.007.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.007.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.007.description.1}"
+			]
+			dependencies: ["06FE000000000001"]
+			id: "06FE000000000007"
+			tasks: [
+				{
+					id: "06FE000000000109"
+					type: "item"
+					item: "minecraft:ancient_debris"
+				}
+				{
+					id: "06FE00000000010A"
+					type: "item"
+					item: "minecraft:netherite_scrap"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.008.title}"
+			x: 6.0d
+			y: -6.0d
+			subtitle: "{tinactory.quests.06_fusion_era.008.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.008.description.0}"]
+			dependencies: [
+				"06FE000000000007"
+				"05A550E7057E0055"
+			]
+			id: "06FE000000000008"
+			tasks: [{
+				id: "06FE00000000010B"
+				type: "item"
+				item: "minecraft:netherite_ingot"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.009.title}"
+			x: 6.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.06_fusion_era.009.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.009.description.0}"]
+			dependencies: [
+				"06FE000000000007"
+				"05A550E7057E0011"
+			]
+			id: "06FE000000000009"
+			tasks: [{
+				id: "06FE00000000010C"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/wither_matrix"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.010.title}"
+			x: 8.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.06_fusion_era.010.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.010.description.0}"]
+			dependencies: [
+				"06FE000000000004"
+				"06FE000000000009"
+			]
+			id: "06FE00000000000A"
+			tasks: [
+				{
+					id: "06FE00000000010D"
+					type: "item"
+					item: "tinactory:material/seed/nether_star"
+				}
+				{
+					id: "06FE00000000010E"
+					type: "item"
+					item: "minecraft:nether_star"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.011.title}"
+			x: 10.0d
+			y: -4.0d
+			subtitle: "{tinactory.quests.06_fusion_era.011.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.011.description.0}"]
+			dependencies: ["06FE00000000000A"]
+			id: "06FE00000000000B"
+			tasks: [{
+				id: "06FE00000000010F"
+				type: "item"
+				item: "tinactory:component/quantum_star"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.012.title}"
+			x: 6.0d
+			y: 4.0d
+			subtitle: "{tinactory.quests.06_fusion_era.012.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.012.description.0}"]
+			dependencies: [
+				"06FE000000000000"
+				"05A550E7057E0043"
+			]
+			id: "06FE00000000000C"
+			tasks: [
+				{
+					id: "06FE000000000110"
+					type: "item"
+					item: "tinactory:circuit_component/resistor/advanced_smd"
+				}
+				{
+					id: "06FE000000000111"
+					type: "item"
+					item: "tinactory:circuit_component/capacitor/advanced_smd"
+				}
+				{
+					id: "06FE000000000112"
+					type: "item"
+					item: "tinactory:circuit_component/inductor/advanced_smd"
+				}
+				{
+					id: "06FE000000000113"
+					type: "item"
+					item: "tinactory:circuit_component/diode/advanced_smd"
+				}
+				{
+					id: "06FE000000000114"
+					type: "item"
+					item: "tinactory:circuit_component/transistor/advanced_smd"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.013.title}"
+			x: 12.0d
+			y: -2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.013.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.013.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.013.description.1}"
+			]
+			dependencies: [
+				"06FE000000000002"
+				"06FE00000000000B"
+			]
+			id: "06FE00000000000D"
+			tasks: [
+				{
+					id: "06FE000000000115"
+					type: "item"
+					item: "tinactory:wafer/soc"
+				}
+				{
+					id: "06FE000000000116"
+					type: "item"
+					item: "tinactory:wafer/high_pic"
+				}
+				{
+					id: "06FE000000000117"
+					type: "item"
+					item: "tinactory:wafer/advanced_soc"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.014.title}"
+			x: 8.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.06_fusion_era.014.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.014.description.0}"]
+			dependencies: [
+				"06FE000000000006"
+				"06FE000000000009"
+			]
+			id: "06FE00000000000E"
+			tasks: [{
+				id: "06FE000000000118"
+				type: "item"
+				item: "tinactory:component/raw_crystal_chip"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.015.title}"
+			x: 10.0d
+			y: 0.0d
+			subtitle: "{tinactory.quests.06_fusion_era.015.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.015.description.0}"]
+			dependencies: [
+				"06FE00000000000E"
+				"06FE00000000000D"
+			]
+			id: "06FE00000000000F"
+			tasks: [{
+				id: "06FE000000000119"
+				type: "item"
+				item: "tinactory:component/crystal_cpu"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.016.title}"
+			x: 12.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.016.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.016.description.0}"]
+			dependencies: [
+				"06FE00000000000C"
+				"06FE00000000000F"
+			]
+			id: "06FE000000000010"
+			tasks: [{
+				id: "06FE00000000011A"
+				type: "item"
+				item: "tinactory:circuit/crystal_processor"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.017.title}"
+			x: 14.0d
+			y: 2.0d
+			subtitle: "{tinactory.quests.06_fusion_era.017.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.017.description.0}"]
+			dependencies: ["06FE000000000010"]
+			id: "06FE000000000011"
+			tasks: [{
+				id: "06FE00000000011B"
+				type: "item"
+				item: "tinactory:circuit/crystal_assembly"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.018.title}"
+			x: 0.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.06_fusion_era.018.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.018.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.018.description.1}"
+			]
+			dependencies: ["190125F22C1A5EE0"]
+			id: "06FE000000000012"
+			tasks: [
+				{
+					id: "06FE00000000011C"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "tinactory:material/liquid/indium_concentrate"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+				{
+					id: "06FE00000000011D"
+					type: "item"
+					item: "tinactory:material/dust/indium"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.019.title}"
+			x: 4.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.06_fusion_era.019.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.019.description.0}"]
+			dependencies: [
+				"05A550E7057E0038"
+				"1EDE3A566356F600"
+			]
+			id: "06FE000000000013"
+			tasks: [
+				{
+					id: "06FE00000000011E"
+					type: "item"
+					item: {
+						id: "tinactory:tool/fluid_cell/iron"
+						Count: 1b
+						tag: {
+							Fluid: {
+								FluidName: "tinactory:material/liquid/heavy_rare_earth_solution"
+								Amount: 4000
+							}
+						}
+					}
+					match_nbt: true
+				}
+				{
+					id: "06FE00000000011F"
+					type: "item"
+					item: "tinactory:material/ingot/samarium"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.020.title}"
+			x: 6.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.06_fusion_era.020.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.020.description.0}"]
+			dependencies: ["06FE000000000013"]
+			id: "06FE000000000014"
+			tasks: [{
+				id: "06FE000000000120"
+				type: "item"
+				item: "tinactory:material/dust/yttrium"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.021.title}"
+			x: 4.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.06_fusion_era.021.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.021.description.0}"]
+			dependencies: [
+				"06FE000000000012"
+				"245CDFDE257E9DB5"
+			]
+			id: "06FE000000000015"
+			tasks: [{
+				id: "06FE000000000121"
+				type: "item"
+				item: "tinactory:material/dust/barium"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.022.title}"
+			x: 8.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.06_fusion_era.022.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.022.description.0}"]
+			dependencies: [
+				"06FE000000000014"
+				"06FE000000000015"
+			]
+			id: "06FE000000000016"
+			tasks: [{
+				id: "06FE000000000122"
+				type: "item"
+				item: "tinactory:material/wire/yttrium_barium_cuprate"
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.023.title}"
+			x: 8.0d
+			y: 12.0d
+			subtitle: "{tinactory.quests.06_fusion_era.023.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.023.description.0}"]
+			dependencies: ["4BC5CC00BBABBC80"]
+			id: "06FE000000000017"
+			tasks: [{
+				id: "06FE000000000123"
+				type: "item"
+				item: {
+					id: "tinactory:tool/fluid_cell/iron"
+					Count: 1b
+					tag: {
+						Fluid: {
+							FluidName: "tinactory:material/liquid/nitrogen"
+							Amount: 4000
+						}
+					}
+				}
+				match_nbt: true
+			}]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.024.title}"
+			x: 8.0d
+			y: 6.0d
+			subtitle: "{tinactory.quests.06_fusion_era.024.subtitle}"
+			description: ["{tinactory.quests.06_fusion_era.024.description.0}"]
+			dependencies: [
+				"06FE000000000000"
+				"06FE000000000006"
+				"05A550E7057E0033"
+				"05A550E7057E0043"
+			]
+			id: "06FE000000000018"
+			tasks: [
+				{
+					id: "06FE000000000124"
+					type: "item"
+					item: "tinactory:material/ingot/hsss"
+				}
+				{
+					id: "06FE000000000125"
+					type: "item"
+					item: "tinactory:material/ingot/osmiridium"
+				}
+				{
+					id: "06FE000000000126"
+					type: "item"
+					item: "tinactory:material/ingot/naquadah_alloy"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.06_fusion_era.025.title}"
+			x: 12.0d
+			y: 10.0d
+			subtitle: "{tinactory.quests.06_fusion_era.025.subtitle}"
+			description: [
+				"{tinactory.quests.06_fusion_era.025.description.0}"
+				""
+				"{tinactory.quests.06_fusion_era.025.description.1}"
+			]
+			dependencies: [
+				"06FE000000000016"
+				"06FE000000000017"
+				"06FE000000000018"
+			]
+			id: "06FE000000000019"
+			tasks: [{
+				id: "06FE000000000127"
+				type: "item"
+				item: "tinactory:material/wire/luv_superconductor"
+			}]
+		}
+	]
+	quest_links: [ ]
+}
