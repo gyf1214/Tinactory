@@ -605,6 +605,15 @@ object Multiblocks {
                 workTicks(COIL_TICKS)
                 tech(Technologies.FUSION)
             }
+            misc("superconducting_coil", suffix = "_from_luv_superconductor") {
+                input("luv_superconductor", "wire", 4)
+                input("ruridit", "foil", 4)
+                input("rhodium_plated_palladium", "plate", 2)
+                input("ptfe", amount = 2)
+                input("soldering_alloy", amount = 4)
+                workTicks(COIL_TICKS)
+                tech(Technologies.FUSION)
+            }
             misc("lithography_lens/advanced") {
                 misc("lithography_lens/good")
                 component("robot_arm", 2)
@@ -681,8 +690,8 @@ object Multiblocks {
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>,
         RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
-        name: String, amount: Int = 1, block: RB.() -> Unit) {
-        output(getItem("multiblock/misc/$name"), amount, block = block)
+        name: String, amount: Int = 1, suffix: String = "", block: RB.() -> Unit) {
+        output(getItem("multiblock/misc/$name"), amount, suffix = suffix, block = block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
