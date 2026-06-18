@@ -311,6 +311,24 @@ object MachineComponents {
                 input(sensorBody, "stick", 4)
             }
         }
+        assemblyLine {
+            componentVoltage = v
+            defaults {
+                voltage(v1)
+                workTicks(ADVANCED_COMPONENT_TICKS)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
+            component("field_generator") {
+                input(main, "stick", 3)
+                input(sensorBody, "plate", 6)
+                input(sensorCore, "gem")
+                component("emitter", 2)
+                circuit(2)
+                input(v.id + "_superconductor", "wire", 64)
+                component("cable", 4)
+                input("soldering_alloy", amount = 4)
+            }
+        }
     }
 
     private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust") {
