@@ -5,9 +5,15 @@
     "ingot",
     "ingot_hot"
   ],
-  "fluids": {},
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/dull/molten"
+    }
+  },
   "aliases": {
-    "primary": "ingot"
+    "primary": "ingot",
+    "fluid": "molten"
   },
   "existings": {}
 }

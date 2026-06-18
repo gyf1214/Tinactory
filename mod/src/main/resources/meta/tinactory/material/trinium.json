@@ -1,6 +1,7 @@
 {
   "color": "0xFFCACACA",
   "items": [
+    "dust",
     "ingot",
     "ingot_hot"
   ],

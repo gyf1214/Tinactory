@@ -131,20 +131,13 @@ object MiscMaterials {
         blastFurnace {
             recipe("material/rhodium_plated_palladium/ingot_hot_from_raw") {
                 input(getItem("component/raw_rhodium_plated_palladium"))
+                input("argon")
                 output("rhodium_plated_palladium", "ingot_hot")
                 voltage(Voltage.IV)
                 workTicks(1280)
                 extra {
                     temperature(4500)
                 }
-            }
-        }
-
-        vacuumFreezer {
-            output("rhodium_plated_palladium", "ingot") {
-                input("rhodium_plated_palladium", "ingot_hot")
-                voltage(Voltage.EV)
-                workTicks(200)
             }
         }
 
@@ -213,19 +206,6 @@ object MiscMaterials {
                 extra {
                     temperature(5400)
                 }
-            }
-        }
-
-        vacuumFreezer {
-            output("naquadria", "ingot") {
-                input("naquadria", "ingot_hot")
-                voltage(Voltage.IV)
-                workTicks(400)
-            }
-            output("trinium", "ingot") {
-                input("trinium", "ingot_hot")
-                voltage(Voltage.IV)
-                workTicks(400)
             }
         }
 
