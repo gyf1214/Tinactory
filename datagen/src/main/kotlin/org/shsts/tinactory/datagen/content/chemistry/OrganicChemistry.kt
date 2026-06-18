@@ -326,8 +326,7 @@ object OrganicChemistry {
         chemicalReactor {
             output(toluene, 12) {
                 input("toluene", amount = 1.8)
-                input("nitric_acid", amount = 5)
-                input("sulfuric_acid", amount = 5)
+                input("nitrating_mixture", amount = 10)
                 output("sulfuric_acid", "dilute", amount = 10)
                 voltage(Voltage.HV)
                 workTicks(360)

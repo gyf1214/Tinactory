@@ -446,6 +446,12 @@ object Materials {
                 component("nitric_acid", 1)
             }
         }
+        material("nitrating_mixture", DULL) {
+            fluidMix(Voltage.HV) {
+                component("nitric_acid")
+                component("sulfuric_acid")
+            }
+        }
         material("vanadium_steel", METALLIC) {
             machineProcess(Voltage.MV, 1.5)
             mix(Voltage.MV) {
