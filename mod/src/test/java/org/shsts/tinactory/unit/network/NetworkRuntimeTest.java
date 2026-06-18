@@ -2,12 +2,15 @@ package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.network.NetworkRuntime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,15 +23,48 @@ class NetworkRuntimeTest {
         var type = new NetworkRuntimeFixtures.ComponentTypeFixture(component);
         var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(scheduling));
         var block = new BlockPos(1, 2, 3);
-        var subnet = new BlockPos(7, 8, 9);
+        var subnetA = new BlockPos(7, 8, 9);
+        var subnetB = new BlockPos(3, 4, 5);
+        var subnets = subnets(subnetA, subnetB);
 
         runtime.attachComponent(type, ticker -> () -> ticker.tick(null, null));
-        runtime.putBlock(block, subnet, component1 -> component1.putBlock(block, null, subnet));
+        runtime.putBlock(block, labels(), subnets,
+            component1 -> component1.putBlock(block, null, subnets));
 
         assertSame(component, runtime.getComponent(type));
-        assertSame(subnet, runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_A));
-        assertEquals(1, runtime.allBlocks().size());
-        assertTrue(events.contains("component.putBlock:" + block + "->" + subnet));
+        assertSame(subnetA, runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_A));
+        assertSame(subnetB, runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_B));
+        assertEquals(List.of(block), List.copyOf(runtime.allBlocks()));
+        assertTrue(events.contains("component.putBlock:" + block +
+            "->A:" + subnetA + ",B:" + subnetB));
+    }
+
+    @Test
+    void shouldStoreEachBlockOnceWhenMultipleLabelsArePresent() {
+        var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of());
+        var block = new BlockPos(1, 2, 3);
+
+        runtime.putBlock(block, labels(), subnets(new BlockPos(1, 0, 0), new BlockPos(2, 0, 0)),
+            component -> {});
+
+        assertEquals(List.of(block), List.copyOf(runtime.allBlocks()));
+    }
+
+    @Test
+    void shouldTrackMachinesWithoutSubnetKeys() {
+        var events = new ArrayList<String>();
+        var scheduling = new NetworkRuntimeFixtures.SchedulingFixture("S");
+        var machine = new NetworkRuntimeFixtures.MachineFixture(
+            "00000000-0000-0000-0000-000000000444",
+            events,
+            scheduling
+        );
+        var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(scheduling));
+
+        runtime.putMachine(machine);
+
+        assertEquals(List.of(machine), List.copyOf(runtime.allMachines()));
+        assertTrue(events.contains("machine.assignNetwork"));
     }
 
     @Test
@@ -46,7 +82,7 @@ class NetworkRuntimeTest {
         var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(s2, s1));
 
         runtime.attachComponent(type, ticker -> () -> ticker.tick(null, null));
-        runtime.putMachine(BlockPos.ZERO, machine);
+        runtime.putMachine(machine);
         runtime.onConnectFinished(ticker -> () -> ticker.tick(null, null));
         runtime.tick();
 
@@ -70,15 +106,17 @@ class NetworkRuntimeTest {
             scheduling
         );
         var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(scheduling));
-        var subnet = new BlockPos(0, 0, 1);
         var block = new BlockPos(0, 0, 2);
 
-        runtime.putMachine(subnet, machine);
-        runtime.putBlock(block, subnet, component -> component.putBlock(block, null, subnet));
+        runtime.putMachine(machine);
+        runtime.putBlock(block, labels(), subnets(new BlockPos(0, 0, 1), new BlockPos(0, 0, 3)),
+            component -> {});
         runtime.onDisconnect(true);
 
         assertTrue(runtime.allMachines().isEmpty());
         assertTrue(runtime.allBlocks().isEmpty());
+        assertNull(runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_A));
+        assertNull(runtime.getSubnet(block, NetworkGraphEngineFixtures.LABEL_B));
         assertTrue(events.contains("machine.onDisconnect"));
     }
 
@@ -93,7 +131,7 @@ class NetworkRuntimeTest {
         );
         var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(scheduling));
 
-        runtime.putMachine(BlockPos.ZERO, machine);
+        runtime.putMachine(machine);
         runtime.onConnectFinished(ticker -> () -> ticker.tick(null, null));
         runtime.tick();
         runtime.onDisconnect(true);
@@ -104,5 +142,21 @@ class NetworkRuntimeTest {
             "machine.tick",
             "machine.onDisconnect"
         ), events);
+    }
+
+    private static Function<ISubnetLabel, BlockPos> subnets(BlockPos subnetA, BlockPos subnetB) {
+        return label -> {
+            if (label == NetworkGraphEngineFixtures.LABEL_A) {
+                return subnetA;
+            }
+            if (label == NetworkGraphEngineFixtures.LABEL_B) {
+                return subnetB;
+            }
+            throw new IllegalArgumentException("Unknown label " + label);
+        };
+    }
+
+    private static List<ISubnetLabel> labels() {
+        return List.of(NetworkGraphEngineFixtures.LABEL_A, NetworkGraphEngineFixtures.LABEL_B);
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.electric.IElectricBlock;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.network.ComponentType;
@@ -20,8 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.DoublePredicate;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SCHEDULING;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -84,8 +87,9 @@ public class ElectricComponent extends NetworkComponent {
     }
 
     @Override
-    public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
-        var sub = subnets.computeIfAbsent(subnet, Subnet::new);
+    public void putBlock(BlockPos pos, BlockState state, Function<ISubnetLabel, BlockPos> subnets) {
+        var subnet = subnets.apply(ELECTRIC_SUBNET.get());
+        var sub = this.subnets.computeIfAbsent(subnet, Subnet::new);
         if (state.getBlock() instanceof IElectricBlock electricBlock) {
             var voltage = electricBlock.getVoltage(state);
             if (voltage > 0) {
@@ -98,9 +102,8 @@ public class ElectricComponent extends NetworkComponent {
     @Override
     public void onConnect() {
         Subnet root = null;
-        for (var entry : network.allBlocks()) {
-            var child = entry.getKey();
-            var parent = entry.getValue();
+        for (var child : network.allBlocks()) {
+            var parent = network.getSubnet(child, ELECTRIC_SUBNET.get());
             if (parent.equals(child)) {
                 root = subnets.get(parent);
             } else if (subnets.containsKey(child)) {
@@ -161,9 +164,10 @@ public class ElectricComponent extends NetworkComponent {
         for (var sub : subnets.values()) {
             sub.reset();
         }
-        for (var entry : network.allMachines().entries()) {
-            entry.getValue().electric().ifPresent(electric -> {
-                var sub = subnets.get(entry.getKey());
+        for (var machine : network.allMachines()) {
+            machine.electric().ifPresent(electric -> {
+                var pos = machine.blockEntity().getBlockPos();
+                var sub = subnets.get(network.getSubnet(pos, ELECTRIC_SUBNET.get()));
 
                 switch (electric.getMachineType()) {
                     case GENERATOR -> sub.gen += electric.getPowerGen();

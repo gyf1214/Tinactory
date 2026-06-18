@@ -1,7 +1,5 @@
 package org.shsts.tinactory.unit.network;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -27,10 +25,10 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 final class NetworkRuntimeFixtures {
     private NetworkRuntimeFixtures() {}
@@ -52,12 +50,12 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public Multimap<BlockPos, IMachine> allMachines() {
-            return ArrayListMultimap.create();
+        public Collection<IMachine> allMachines() {
+            return List.of();
         }
 
         @Override
-        public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
+        public Collection<BlockPos> allBlocks() {
             return List.of();
         }
     }
@@ -118,8 +116,11 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public void putBlock(BlockPos pos, @Nullable BlockState state, BlockPos subnet) {
-            events.add("component.putBlock:" + pos + "->" + subnet);
+        public void putBlock(BlockPos pos, @Nullable BlockState state,
+            Function<ISubnetLabel, BlockPos> subnets) {
+            events.add("component.putBlock:" + pos +
+                "->A:" + subnets.apply(NetworkGraphEngineFixtures.LABEL_A) +
+                ",B:" + subnets.apply(NetworkGraphEngineFixtures.LABEL_B));
         }
 
         @Override

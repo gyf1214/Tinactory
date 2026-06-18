@@ -9,6 +9,8 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 
+import java.util.function.Function;
+
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 
 @ParametersAreNonnullByDefault
@@ -35,7 +37,7 @@ public abstract class NetworkComponent implements INetworkComponent {
     }
 
     @Override
-    public void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {}
+    public void putBlock(BlockPos pos, BlockState state, Function<ISubnetLabel, BlockPos> subnets) {}
 
     @Override
     public void onConnect() {}
