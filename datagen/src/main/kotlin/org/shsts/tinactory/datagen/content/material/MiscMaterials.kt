@@ -22,8 +22,8 @@ import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.cubeTint
-import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
@@ -228,7 +228,7 @@ object MiscMaterials {
             nullRecipe("netherite_block")
             nullRecipe("netherite_ingot")
             nullRecipe("netherite_ingot_from_netherite_block")
-            nullRecipe("netherite_scrap_from_smelting")
+            nullRecipe("netherite_scrap")
             nullRecipe("netherite_scrap_from_blasting")
             nullRecipe("beacon")
         }

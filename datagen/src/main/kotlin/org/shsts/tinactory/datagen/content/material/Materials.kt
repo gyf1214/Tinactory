@@ -207,7 +207,6 @@ object Materials {
         }
         material("netherite", METALLIC) {
             machineProcess(Voltage.LUV, 1.5)
-            smelt()
             blast(Voltage.LUV, 5400, 1200) {
                 component("argon")
             }
@@ -432,7 +431,7 @@ object Materials {
             mix(Voltage.LUV) {
                 component("hssg", 4)
                 component("ruthenium", 2)
-                component("naquadah", 2)
+                component("netherite", 2)
             }
             blast(Voltage.LUV, 4800, 1280) {
                 component("argon")

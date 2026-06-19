@@ -47,13 +47,13 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.002.title}"
+			icon: "tinactory:boule/naquadah"
 			x: -2.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.002.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.002.description.0}"]
 			dependencies: ["06FE000000000000"]
 			id: "06FE000000000002"
-			icon: "tinactory:boule/naquadah"
 			tasks: [
 				{
 					id: "06FE000000000102"
@@ -101,13 +101,13 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.004.title}"
+			icon: "tinactory:material/ingot/enriched_naquadah"
 			x: 2.0d
 			y: 4.0d
 			subtitle: "{tinactory.quests.06_fusion_era.004.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.004.description.0}"]
 			dependencies: ["06FE000000000003"]
 			id: "06FE000000000004"
-			icon: "tinactory:material/ingot/enriched_naquadah"
 			tasks: [
 				{
 					id: "06FE000000000105"
@@ -151,6 +151,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.007.title}"
+			icon: "minecraft:ancient_debris"
 			x: 2.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.007.subtitle}"
@@ -161,7 +162,6 @@
 			]
 			dependencies: ["06FE000000000000"]
 			id: "06FE000000000007"
-			icon: "minecraft:ancient_debris"
 			tasks: [
 				{
 					id: "06FE000000000109"
@@ -177,7 +177,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.008.title}"
-			x: 6.0d
+			x: 10.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.008.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.008.description.0}"]
@@ -221,6 +221,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.010.title}"
+			icon: "tinactory:material/seed/nether_star"
 			x: 2.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.010.subtitle}"
@@ -230,7 +231,6 @@
 				"06FE000000000009"
 			]
 			id: "06FE00000000000A"
-			icon: "tinactory:material/seed/nether_star"
 			tasks: [
 				{
 					id: "06FE00000000010D"
@@ -260,6 +260,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.012.title}"
+			icon: "tinactory:circuit_component/resistor/advanced_smd"
 			x: -2.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.012.subtitle}"
@@ -270,7 +271,6 @@
 				"06FE000000000012"
 			]
 			id: "06FE00000000000C"
-			icon: "tinactory:circuit_component/resistor/advanced_smd"
 			tasks: [
 				{
 					id: "06FE000000000110"
@@ -301,6 +301,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.013.title}"
+			icon: "tinactory:wafer/soc"
 			x: -4.0d
 			y: -2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.013.subtitle}"
@@ -314,7 +315,6 @@
 				"05A550E7057E0013"
 			]
 			id: "06FE00000000000D"
-			icon: "tinactory:wafer/soc"
 			tasks: [
 				{
 					id: "06FE000000000115"
@@ -361,8 +361,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.016.title}"
-			x: 12.0d
-			y: 0.0d
+			x: 6.0d
+			y: 8.0d
 			subtitle: "{tinactory.quests.06_fusion_era.016.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.016.description.0}"]
 			hide_dependency_lines: true
@@ -380,8 +380,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.017.title}"
-			x: 14.0d
-			y: 0.0d
+			x: 6.0d
+			y: 10.0d
 			subtitle: "{tinactory.quests.06_fusion_era.017.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.017.description.0}"]
 			dependencies: ["06FE000000000010"]
@@ -394,6 +394,7 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.018.title}"
+			icon: "tinactory:material/dust/indium"
 			x: -4.0d
 			y: 2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.018.subtitle}"
@@ -404,7 +405,6 @@
 			]
 			dependencies: ["05A550E7057E0043"]
 			id: "06FE000000000012"
-			icon: "tinactory:material/dust/indium"
 			tasks: [
 				{
 					id: "06FE00000000011C"
@@ -430,13 +430,13 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.019.title}"
-			x: 10.0d
-			y: 2.0d
+			icon: "tinactory:material/ingot/samarium"
+			x: 12.0d
+			y: 0.0d
 			subtitle: "{tinactory.quests.06_fusion_era.019.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.019.description.0}"]
 			dependencies: ["05A550E7057E0043"]
 			id: "06FE000000000013"
-			icon: "tinactory:material/ingot/samarium"
 			tasks: [
 				{
 					id: "06FE00000000011E"
@@ -462,8 +462,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.020.title}"
-			x: 10.0d
-			y: 4.0d
+			x: 12.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.020.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.020.description.0}"]
 			dependencies: ["06FE000000000013"]
@@ -476,8 +476,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.021.title}"
-			x: 8.0d
-			y: 4.0d
+			x: 14.0d
+			y: 2.0d
 			subtitle: "{tinactory.quests.06_fusion_era.021.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.021.description.0}"]
 			dependencies: ["05A550E7057E0043"]
@@ -490,8 +490,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.022.title}"
-			x: 10.0d
-			y: 6.0d
+			x: 12.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.06_fusion_era.022.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.022.description.0}"]
 			dependencies: [
@@ -507,8 +507,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.023.title}"
-			x: 12.0d
-			y: 6.0d
+			x: 14.0d
+			y: 4.0d
 			subtitle: "{tinactory.quests.06_fusion_era.023.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.023.description.0}"]
 			dependencies: [
@@ -534,17 +534,17 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.024.title}"
-			x: 6.0d
-			y: 8.0d
+			icon: "tinactory:material/ingot/hsss"
+			x: 10.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.06_fusion_era.024.subtitle}"
 			description: ["{tinactory.quests.06_fusion_era.024.description.0}"]
 			dependencies: [
 				"06FE000000000006"
-				"05A550E7057E0043"
+				"06FE000000000008"
 			]
 			size: 2.0d
 			id: "06FE000000000018"
-			icon: "tinactory:material/ingot/hsss"
 			tasks: [
 				{
 					id: "06FE000000000124"
@@ -565,8 +565,8 @@
 		}
 		{
 			title: "{tinactory.quests.06_fusion_era.025.title}"
-			x: 10.0d
-			y: 8.0d
+			x: 12.0d
+			y: 6.0d
 			subtitle: "{tinactory.quests.06_fusion_era.025.subtitle}"
 			description: [
 				"{tinactory.quests.06_fusion_era.025.description.0}"
