@@ -79,7 +79,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
             return Collections.emptyList();
         }
 
-        var infos = logistic.getVisiblePorts().stream()
+        var infos = logistic.getVisiblePorts(machine).stream()
             .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
             .toList();
 

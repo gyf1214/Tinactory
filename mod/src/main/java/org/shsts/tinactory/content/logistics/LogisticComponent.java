@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -33,6 +35,7 @@ public class LogisticComponent extends NotifierComponent {
 
     private final Map<PortKey, PortInfo> ports = new HashMap<>();
     private final Set<PortKey> storagePorts = new HashSet<>();
+    private final SetMultimap<BlockPos, PortKey> subnetPorts = HashMultimap.create();
 
     public LogisticComponent(ComponentType<LogisticComponent> type, INetwork network) {
         super(type, network);
@@ -50,6 +53,7 @@ public class LogisticComponent extends NotifierComponent {
     private void registerPortInSubnet(IMachine machine, int index, IPort<?> port,
         BlockPos subnet, int priority) {
         var key = createPort(machine, index, port, subnet, priority);
+        subnetPorts.put(subnet, key);
         if (priority >= 0) {
             storagePorts.add(key);
         }
@@ -69,31 +73,35 @@ public class LogisticComponent extends NotifierComponent {
 
     public void unregisterPort(IMachine machine, int index) {
         var key = new PortKey(machine.uuid(), index);
-        if (ports.containsKey(key)) {
+        var info = ports.get(key);
+        if (info != null) {
+            subnetPorts.remove(info.subnet(), key);
             storagePorts.remove(key);
             ports.remove(key);
             invokeUpdate();
         }
     }
 
-    public Collection<PortInfo> getVisiblePorts() {
-        return ports.values().stream().toList();
+    public Collection<PortInfo> getVisiblePorts(IMachine viewer) {
+        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        return subnetPorts.get(subnet).stream()
+            .map(ports::get)
+            .toList();
     }
 
-    public Collection<PortInfo> getAllPorts() {
-        return ports.values().stream().toList();
-    }
-
-    public Collection<? extends IPort<?>> getStoragePorts() {
-        return storagePorts.stream()
+    public Collection<? extends IPort<?>> getStoragePorts(IMachine viewer) {
+        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        return subnetPorts.get(subnet).stream()
+            .filter(storagePorts::contains)
             .map(ports::get)
             .sorted(Comparator.comparing(PortInfo::priority).reversed())
             .map(PortInfo::port)
             .toList();
     }
 
-    public Optional<PortInfo> getPort(PortKey key) {
-        return Optional.ofNullable(ports.get(key));
+    public Optional<PortInfo> getPort(IMachine viewer, PortKey key) {
+        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        return subnetPorts.get(subnet).contains(key) ? Optional.ofNullable(ports.get(key)) : Optional.empty();
     }
 
     @Override
@@ -101,6 +109,7 @@ public class LogisticComponent extends NotifierComponent {
         super.onDisconnect();
         ports.clear();
         storagePorts.clear();
+        subnetPorts.clear();
     }
 
     @Override

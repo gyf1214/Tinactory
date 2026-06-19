@@ -106,6 +106,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         }
         service = AutocraftServiceBootstrap.create(
             logistics,
+            machine,
             combinedItem,
             combinedFluid,
             itemBandwidth,

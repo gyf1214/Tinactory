@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
@@ -22,6 +23,7 @@ public final class AutocraftServiceBootstrap {
 
     public static AutocraftJobService create(
         LogisticComponent logistics,
+        IMachine machine,
         IPort<ItemStack> itemPort,
         IPort<FluidStack> fluidPort,
         long itemBandwidth,
@@ -31,7 +33,7 @@ public final class AutocraftServiceBootstrap {
         int parallelism) {
 
         var inventory = new LogisticsInventoryView(itemPort, fluidPort);
-        var allocator = new LogisticsMachineAllocator(logistics);
+        var allocator = new LogisticsMachineAllocator(logistics, machine);
         var executor = new CraftExecutor(inventory, allocator, IJobEvents.NO_OP, parallelism);
         return new AutocraftJobService(
             executor,

@@ -57,7 +57,7 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     private void onUpdateLogistics(LogisticComponent logistics) {
         var items = new ArrayList<IPort<ItemStack>>();
         var fluids = new ArrayList<IPort<FluidStack>>();
-        for (var port : logistics.getStoragePorts()) {
+        for (var port : logistics.getStoragePorts(machine)) {
             if (port.type() == PortType.ITEM) {
                 items.add(port.asItem());
             } else if (port.type() == PortType.FLUID) {
