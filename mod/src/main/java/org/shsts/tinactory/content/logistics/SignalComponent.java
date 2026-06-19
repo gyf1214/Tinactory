@@ -1,8 +1,11 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
@@ -17,6 +20,8 @@ import java.util.UUID;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SignalComponent extends NotifierComponent {
@@ -25,6 +30,7 @@ public class SignalComponent extends NotifierComponent {
     private final Map<UUID, Map<String, IntSupplier>> readSignals = new HashMap<>();
     private final Map<UUID, Map<String, IntConsumer>> writeSignals = new HashMap<>();
     private final Map<UUID, IMachine> machines = new HashMap<>();
+    private final SetMultimap<BlockPos, UUID> subnetMachines = HashMultimap.create();
 
     public record SignalInfo(IMachine machine, String key, boolean isWrite) {}
 
@@ -36,6 +42,7 @@ public class SignalComponent extends NotifierComponent {
         var uuid = machine.uuid();
         readSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, reader);
         machines.put(uuid, machine);
+        subnetMachines.put(getMachineSubnet(machine, LOGISTICS_SUBNET.get()), uuid);
         invokeUpdate();
     }
 
@@ -43,14 +50,15 @@ public class SignalComponent extends NotifierComponent {
         var uuid = machine.uuid();
         writeSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, writer);
         machines.put(uuid, machine);
+        subnetMachines.put(getMachineSubnet(machine, LOGISTICS_SUBNET.get()), uuid);
         invokeUpdate();
     }
 
-    public Collection<SignalInfo> getVisibleSignals() {
+    public Collection<SignalInfo> getVisibleSignals(IMachine viewer) {
         var ret = new ArrayList<SignalInfo>();
-        for (var entry : machines.entrySet()) {
-            var uuid = entry.getKey();
-            var machine = entry.getValue();
+        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        for (var uuid : subnetMachines.get(subnet)) {
+            var machine = machines.get(uuid);
             if (readSignals.containsKey(uuid)) {
                 for (var key : readSignals.get(uuid).keySet()) {
                     ret.add(new SignalInfo(machine, key, false));
@@ -73,20 +81,22 @@ public class SignalComponent extends NotifierComponent {
         return writeSignals.containsKey(machine) && writeSignals.get(machine).containsKey(key);
     }
 
-    public boolean has(UUID machine, String key, boolean isWrite) {
-        return isWrite ? hasWrite(machine, key) : hasRead(machine, key);
+    public boolean has(IMachine viewer, UUID machine, String key, boolean isWrite) {
+        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        return subnetMachines.get(subnet).contains(machine) &&
+            (isWrite ? hasWrite(machine, key) : hasRead(machine, key));
     }
 
-    public int read(UUID machine, String key) {
-        if (!hasRead(machine, key)) {
+    public int read(IMachine viewer, UUID machine, String key) {
+        if (!has(viewer, machine, key, false)) {
             LOGGER.warn("{}: Try to read signal failed {}:{}", network, machine, key);
             return 0;
         }
         return readSignals.get(machine).get(key).getAsInt();
     }
 
-    public void write(UUID machine, String key, int val) {
-        if (!hasWrite(machine, key)) {
+    public void write(IMachine viewer, UUID machine, String key, int val) {
+        if (!has(viewer, machine, key, true)) {
             LOGGER.warn("{}: Try to write signal failed {}:{}", network, machine, key);
             return;
         }
@@ -99,6 +109,7 @@ public class SignalComponent extends NotifierComponent {
         readSignals.clear();
         writeSignals.clear();
         machines.clear();
+        subnetMachines.clear();
     }
 
     @Override

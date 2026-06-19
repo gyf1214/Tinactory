@@ -69,7 +69,7 @@ public class MESignalControllerMenu extends MenuBase {
             return Collections.emptyList();
         }
 
-        var infos = signals.getVisibleSignals().stream()
+        var infos = signals.getVisibleSignals(machine).stream()
             .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_COMPARATOR))
             .toList();
 

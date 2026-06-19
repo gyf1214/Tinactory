@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.content.network.SignalMachineBlock;
@@ -64,9 +65,9 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
         return signal;
     }
 
-    private void validateConfig(SignalComponent component) {
+    private void validateConfig(IMachine machine, SignalComponent component) {
         needRevalidate = false;
-        var config1 = MACHINE.get(blockEntity).config()
+        var config1 = machine.config()
             .getCompound(SIGNAL_CONFIG_KEY)
             .map(SignalConfig::fromTag);
 
@@ -76,10 +77,10 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
         }
 
         var config2 = config1.get();
-        if (component.has(config2.machine(), config2.key(), false)) {
+        if (component.has(machine, config2.machine(), config2.key(), false)) {
             config = config2;
             isWrite = false;
-        } else if (component.has(config2.machine(), config2.key(), true)) {
+        } else if (component.has(machine, config2.machine(), config2.key(), true)) {
             config = config2;
             isWrite = true;
         } else {
@@ -89,12 +90,13 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
 
     private void readSignal(Level world, INetwork network) {
         var component = network.getComponent(SIGNAL_COMPONENT.get());
+        var machine = MACHINE.get(blockEntity);
         if (needRevalidate) {
-            validateConfig(component);
+            validateConfig(machine, component);
         }
         var oldSignal = signal;
         signal = config != null && !isWrite ?
-            component.read(config.machine(), config.key()) : 0;
+            component.read(machine, config.machine(), config.key()) : 0;
         if (signal != oldSignal) {
             SignalMachineBlock.updateSignal(world, blockEntity);
         }
@@ -102,8 +104,9 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
 
     private void writeSignal(Level world, INetwork network) {
         var component = network.getComponent(SIGNAL_COMPONENT.get());
+        var machine = MACHINE.get(blockEntity);
         if (needRevalidate) {
-            validateConfig(component);
+            validateConfig(machine, component);
         }
         if (config == null || !isWrite) {
             return;
@@ -117,7 +120,7 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
         var dir = state.getValue(FACING);
         var pos1 = pos.relative(dir);
         var signal = world.getDirectSignal(pos1, dir);
-        component.write(config.machine(), config.key(), signal);
+        component.write(machine, config.machine(), config.key(), signal);
     }
 
     private void buildScheduling(ISchedulingRegister builder) {
