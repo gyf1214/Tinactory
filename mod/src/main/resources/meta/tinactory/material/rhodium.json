@@ -9,7 +9,7 @@
   "fluids": {
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/molten"
+      "texture": "gregtech:blocks/material_sets/dull/liquid"
     }
   },
   "aliases": {
