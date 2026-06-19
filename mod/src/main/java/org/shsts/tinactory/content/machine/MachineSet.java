@@ -3,11 +3,11 @@ package org.shsts.tinactory.content.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
-import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -57,7 +57,7 @@ public class MachineSet {
         return layoutSet.get(voltage);
     }
 
-    public static <U extends SmartEntityBlock, P> BlockEntityBuilder<U, P> baseMachine(
+    public static <U extends Block & EntityBlock, P> BlockEntityBuilder<U, P> baseMachine(
         BlockEntityBuilder<U, P> builder) {
         return builder.blockEntity()
             .transform(Machine::factory)

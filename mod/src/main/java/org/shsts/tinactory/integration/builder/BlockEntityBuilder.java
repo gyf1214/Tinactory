@@ -87,12 +87,12 @@ public class BlockEntityBuilder<U extends Block & EntityBlock, P>
         return block;
     }
 
-    public static <U extends SmartEntityBlock, P> BlockEntityBuilder<U, P> builder(
+    public static <U extends Block & EntityBlock, P> BlockEntityBuilder<U, P> builder(
         P parent, String id, SmartEntityBlock.Factory<U> factory) {
         return new BlockEntityBuilder<>(REGISTRATE, parent, id, factory);
     }
 
-    public static <U extends SmartEntityBlock> BlockEntityBuilder<U, ?> builder(
+    public static <U extends Block & EntityBlock> BlockEntityBuilder<U, ?> builder(
         String id, SmartEntityBlock.Factory<U> factory) {
         return builder(Unit.INSTANCE, id, factory);
     }

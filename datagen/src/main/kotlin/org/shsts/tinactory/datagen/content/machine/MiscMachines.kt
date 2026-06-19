@@ -113,29 +113,31 @@ object MiscMachines {
         assembler {
             componentVoltage = Voltage.ULV
             defaults {
+                component("machine_hull")
+                circuit(2)
                 voltage(Voltage.ULV)
                 workTicks(MACHINE_TICKS)
             }
             machine("steam_turbine") {
-                component("machine_hull")
-                circuit(2)
                 component("cable", 2)
                 input("iron", "rotor", 2)
                 input("copper", "pipe", 2)
             }
             machine("alloy_smelter") {
-                machine("electric_furnace")
-                circuit(2)
                 component("cable", 4)
                 tech(Technologies.ALLOY_SMELTING)
             }
             machine("multiblock/interface") {
-                component("machine_hull")
-                circuit(2)
                 component("cable", 2)
                 input(Items.CHEST)
                 input("glass", "primary")
                 tech(Technologies.STEEL)
+            }
+            component("network_bridge") {
+                component("cable", 2)
+                input(Items.HOPPER, 2)
+                input("glass", "primary", 2)
+                tech(Technologies.SOLDERING)
             }
         }
     }

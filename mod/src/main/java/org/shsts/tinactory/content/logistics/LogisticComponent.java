@@ -64,6 +64,10 @@ public class LogisticComponent extends NotifierComponent {
         return getMachineSubnet(machine, LOGISTICS_SUBNET.get());
     }
 
+    public void registerPort(IMachine machine, int index, IPort<?> port, BlockPos subnet) {
+        registerPortInSubnet(machine, index, port, subnet, -1);
+    }
+
     public void registerPort(IMachine machine, int index, IPort<?> port) {
         registerPortInSubnet(machine, index, port, getMachineSubnet(machine), -1);
     }
@@ -90,13 +94,17 @@ public class LogisticComponent extends NotifierComponent {
             .toList();
     }
 
-    public Collection<? extends IPort<?>> getStoragePorts(IMachine viewer) {
-        return subnetPorts.get(getMachineSubnet(viewer)).stream()
+    public Collection<? extends IPort<?>> getStoragePorts(BlockPos subnet) {
+        return subnetPorts.get(subnet).stream()
             .filter(storagePorts::contains)
             .map(ports::get)
             .sorted(Comparator.comparing(PortInfo::priority).reversed())
             .map(PortInfo::port)
             .toList();
+    }
+
+    public Collection<? extends IPort<?>> getStoragePorts(IMachine viewer) {
+        return getStoragePorts(getMachineSubnet(viewer));
     }
 
     public Optional<PortInfo> getPort(IMachine viewer, PortKey key) {
