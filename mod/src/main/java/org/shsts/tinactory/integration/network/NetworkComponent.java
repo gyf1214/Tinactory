@@ -11,8 +11,6 @@ import org.shsts.tinactory.api.network.ISubnetLabel;
 
 import java.util.function.Function;
 
-import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class NetworkComponent implements INetworkComponent {
@@ -28,12 +26,8 @@ public abstract class NetworkComponent implements INetworkComponent {
         this.network = network;
     }
 
-    protected BlockPos getMachineSubnet(IMachine machine) {
-        return getMachineSubnet(machine, ELECTRIC_SUBNET.get());
-    }
-
     protected BlockPos getMachineSubnet(IMachine machine, ISubnetLabel label) {
-        return network.getSubnet(machine.blockEntity().getBlockPos(), label);
+        return network.getSubnet(machine.blockPos(), label);
     }
 
     @Override

@@ -148,12 +148,18 @@ final class NetworkRuntimeFixtures {
         private final UUID id;
         private final List<String> events;
         private final IScheduling scheduling;
+        private final BlockPos blockPos;
         private Optional<INetwork> network = Optional.empty();
 
         MachineFixture(String id, List<String> events, IScheduling scheduling) {
+            this(id, events, scheduling, BlockPos.ZERO);
+        }
+
+        MachineFixture(String id, List<String> events, IScheduling scheduling, BlockPos blockPos) {
             this.id = UUID.fromString(id);
             this.events = events;
             this.scheduling = scheduling;
+            this.blockPos = blockPos;
         }
 
         @Override
@@ -193,6 +199,11 @@ final class NetworkRuntimeFixtures {
         @Override
         public BlockEntity blockEntity() {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public BlockPos blockPos() {
+            return blockPos;
         }
 
         @Override

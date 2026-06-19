@@ -54,16 +54,19 @@ class NetworkRuntimeTest {
     void shouldTrackMachinesWithoutSubnetKeys() {
         var events = new ArrayList<String>();
         var scheduling = new NetworkRuntimeFixtures.SchedulingFixture("S");
+        var pos = new BlockPos(4, 5, 6);
         var machine = new NetworkRuntimeFixtures.MachineFixture(
             "00000000-0000-0000-0000-000000000444",
             events,
-            scheduling
+            scheduling,
+            pos
         );
         var runtime = new NetworkRuntime(new NetworkRuntimeFixtures.DummyNetwork(), List.of(scheduling));
 
         runtime.putMachine(machine);
 
         assertEquals(List.of(machine), List.copyOf(runtime.allMachines()));
+        assertEquals(pos, machine.blockPos());
         assertTrue(events.contains("machine.assignNetwork"));
     }
 

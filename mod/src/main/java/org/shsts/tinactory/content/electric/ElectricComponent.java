@@ -166,8 +166,7 @@ public class ElectricComponent extends NetworkComponent {
         }
         for (var machine : network.allMachines()) {
             machine.electric().ifPresent(electric -> {
-                var pos = machine.blockEntity().getBlockPos();
-                var sub = subnets.get(network.getSubnet(pos, ELECTRIC_SUBNET.get()));
+                var sub = subnets.get(network.getSubnet(machine.blockPos(), ELECTRIC_SUBNET.get()));
 
                 switch (electric.getMachineType()) {
                     case GENERATOR -> sub.gen += electric.getPowerGen();
