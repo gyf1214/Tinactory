@@ -38,11 +38,15 @@ public class SignalComponent extends NotifierComponent {
         super(type, network);
     }
 
+    private BlockPos getMachineSubnet(IMachine machine) {
+        return getMachineSubnet(machine, LOGISTICS_SUBNET.get());
+    }
+
     public void registerRead(IMachine machine, String key, IntSupplier reader) {
         var uuid = machine.uuid();
         readSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, reader);
         machines.put(uuid, machine);
-        subnetMachines.put(getMachineSubnet(machine, LOGISTICS_SUBNET.get()), uuid);
+        subnetMachines.put(getMachineSubnet(machine), uuid);
         invokeUpdate();
     }
 
@@ -50,13 +54,13 @@ public class SignalComponent extends NotifierComponent {
         var uuid = machine.uuid();
         writeSignals.computeIfAbsent(uuid, $ -> new HashMap<>()).put(key, writer);
         machines.put(uuid, machine);
-        subnetMachines.put(getMachineSubnet(machine, LOGISTICS_SUBNET.get()), uuid);
+        subnetMachines.put(getMachineSubnet(machine), uuid);
         invokeUpdate();
     }
 
     public Collection<SignalInfo> getVisibleSignals(IMachine viewer) {
         var ret = new ArrayList<SignalInfo>();
-        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        var subnet = getMachineSubnet(viewer);
         for (var uuid : subnetMachines.get(subnet)) {
             var machine = machines.get(uuid);
             if (readSignals.containsKey(uuid)) {
@@ -82,7 +86,7 @@ public class SignalComponent extends NotifierComponent {
     }
 
     public boolean has(IMachine viewer, UUID machine, String key, boolean isWrite) {
-        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
+        var subnet = getMachineSubnet(viewer);
         return subnetMachines.get(subnet).contains(machine) &&
             (isWrite ? hasWrite(machine, key) : hasRead(machine, key));
     }

@@ -1,17 +1,15 @@
-package org.shsts.tinactory.integration.common;
+package org.shsts.tinactory.content.network;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -20,47 +18,42 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.util.Lazy;
 import org.shsts.tinactory.AllEvents;
-import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.api.network.ISubnetLabel;
+import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
+import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IBlockEntityType;
-import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllEvents.BLOCK_PLACE;
 import static org.shsts.tinactory.AllEvents.BLOCK_USE;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class SmartEntityBlock extends Block implements EntityBlock {
+@MethodsReturnNonnullByDefault
+public class BridgeBlock extends SubnetBlock implements EntityBlock {
     private final Supplier<IBlockEntityType> entityType;
-    @Nullable
-    private final IMenuType menu;
 
-    @FunctionalInterface
-    public interface Factory<U extends EntityBlock> {
-        U create(Properties properties, Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu);
-    }
-
-    public SmartEntityBlock(Properties properties,
-        Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu) {
-        super(properties.isValidSpawn(AllItems::never));
+    public BridgeBlock(Properties properties, Voltage voltage, Supplier<IBlockEntityType> entityType) {
+        super(properties, voltage, voltage);
         this.entityType = Lazy.of(entityType);
-        this.menu = menu;
-        registerDefaultState(createDefaultBlockState());
     }
 
-    protected BlockState createDefaultBlockState() {
-        return stateDefinition.any();
+    /**
+     * Menu is ignored
+     */
+    public static SmartEntityBlock.Factory<BridgeBlock> factory(Voltage voltage) {
+        return (properties, entityType, menu) -> new BridgeBlock(properties, voltage, entityType);
     }
 
-    public BlockEntityType<?> getType() {
-        return entityType.get().get();
-    }
-
-    protected Optional<BlockEntity> getBlockEntity(Level world, BlockPos pos) {
+    private Optional<BlockEntity> getBlockEntity(Level world, BlockPos pos) {
         if (world.isLoaded(pos)) {
-            return world.getBlockEntity(pos, getType()).map($ -> $);
+            return world.getBlockEntity(pos, entityType.get().get()).map($ -> $);
         }
         return Optional.empty();
     }
@@ -72,9 +65,9 @@ public class SmartEntityBlock extends Block implements EntityBlock {
 
     @Nullable
     @Override
-    public <T1 extends BlockEntity> BlockEntityTicker<T1> getTicker(
-        Level world, BlockState state, BlockEntityType<T1> type) {
-        return type == getType() ? entityType.get().ticker() : null;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+        Level world, BlockState state, BlockEntityType<T> type) {
+        return type == entityType.get().get() ? entityType.get().ticker() : null;
     }
 
     @Override
@@ -99,12 +92,11 @@ public class SmartEntityBlock extends Block implements EntityBlock {
             return result;
         }
 
-        if (menu == null) {
-            return InteractionResult.PASS;
-        }
-        if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            menu.open(serverPlayer, pos);
-        }
         return InteractionResult.sidedSuccess(world.isClientSide);
+    }
+
+    @Override
+    public Collection<ISubnetLabel> subnetLabels(Level world, BlockPos pos, BlockState state) {
+        return List.of(ELECTRIC_SUBNET.get(), LOGISTICS_SUBNET.get());
     }
 }

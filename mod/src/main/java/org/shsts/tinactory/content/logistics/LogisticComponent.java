@@ -60,15 +60,17 @@ public class LogisticComponent extends NotifierComponent {
         invokeUpdate();
     }
 
+    private BlockPos getMachineSubnet(IMachine machine) {
+        return getMachineSubnet(machine, LOGISTICS_SUBNET.get());
+    }
+
     public void registerPort(IMachine machine, int index, IPort<?> port) {
-        registerPortInSubnet(machine, index, port, getMachineSubnet(machine, LOGISTICS_SUBNET.get()),
-            -1);
+        registerPortInSubnet(machine, index, port, getMachineSubnet(machine), -1);
     }
 
     public void registerStoragePort(IMachine machine, int index, IPort<?> port,
         int priority) {
-        registerPortInSubnet(machine, index, port, getMachineSubnet(machine, LOGISTICS_SUBNET.get()),
-            priority);
+        registerPortInSubnet(machine, index, port, getMachineSubnet(machine), priority);
     }
 
     public void unregisterPort(IMachine machine, int index) {
@@ -83,15 +85,13 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     public Collection<PortInfo> getVisiblePorts(IMachine viewer) {
-        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
-        return subnetPorts.get(subnet).stream()
+        return subnetPorts.get(getMachineSubnet(viewer)).stream()
             .map(ports::get)
             .toList();
     }
 
     public Collection<? extends IPort<?>> getStoragePorts(IMachine viewer) {
-        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
-        return subnetPorts.get(subnet).stream()
+        return subnetPorts.get(getMachineSubnet(viewer)).stream()
             .filter(storagePorts::contains)
             .map(ports::get)
             .sorted(Comparator.comparing(PortInfo::priority).reversed())
@@ -100,8 +100,8 @@ public class LogisticComponent extends NotifierComponent {
     }
 
     public Optional<PortInfo> getPort(IMachine viewer, PortKey key) {
-        var subnet = getMachineSubnet(viewer, LOGISTICS_SUBNET.get());
-        return subnetPorts.get(subnet).contains(key) ? Optional.ofNullable(ports.get(key)) : Optional.empty();
+        return subnetPorts.get(getMachineSubnet(viewer)).contains(key) ?
+            Optional.ofNullable(ports.get(key)) : Optional.empty();
     }
 
     @Override
