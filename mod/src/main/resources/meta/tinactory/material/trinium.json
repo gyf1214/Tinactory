@@ -1,11 +1,9 @@
 {
-  "color": "0xFF808080",
+  "color": "0xFFCACACA",
   "items": [
     "dust",
-    "foil",
     "ingot",
-    "ingot_hot",
-    "plate"
+    "ingot_hot"
   ],
   "fluids": {
     "molten": {

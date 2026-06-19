@@ -1,5 +1,5 @@
 {
-  "color": "0xFF999966",
+  "color": "0xFF2E4B42",
   "items": [
     "dust",
     "dust_tiny",
@@ -7,9 +7,9 @@
     "foil",
     "gear",
     "ingot",
+    "ingot_hot",
     "plate",
     "ring",
-    "rotor",
     "screw",
     "stick"
   ],

@@ -1,11 +1,20 @@
 {
-  "color": "0xFF808080",
+  "color": "0xFF333333",
+  "ore": "end_stone",
   "items": [
+    "bolt",
+    "crushed",
+    "crushed_centrifuged",
+    "crushed_purified",
     "dust",
-    "foil",
+    "dust_impure",
+    "dust_pure",
     "ingot",
     "ingot_hot",
-    "plate"
+    "raw",
+    "stick",
+    "wire",
+    "wire_fine"
   ],
   "fluids": {
     "molten": {

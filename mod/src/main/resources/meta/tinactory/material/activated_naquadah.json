@@ -1,0 +1,14 @@
+{
+  "color": "0xFF4FD84B",
+  "items": [],
+  "fluids": {
+    "plasma": {
+      "baseAmount": 144,
+      "texture": "gtceu:blocks/material_sets/dull/plasma"
+    }
+  },
+  "aliases": {
+    "fluid": "plasma"
+  },
+  "existings": {}
+}

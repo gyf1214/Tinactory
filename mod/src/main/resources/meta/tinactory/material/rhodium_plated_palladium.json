@@ -1,6 +1,7 @@
 {
   "color": "0xFFFFC0E0",
   "items": [
+    "dust",
     "ingot",
     "ingot_hot",
     "plate"

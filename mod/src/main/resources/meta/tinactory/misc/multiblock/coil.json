@@ -16,6 +16,10 @@
     "tungsten": {
       "materialColor": 25,
       "temperature": 4500
+    },
+    "naquadah": {
+      "materialColor": 22,
+      "temperature": 5400
     }
   }
 }

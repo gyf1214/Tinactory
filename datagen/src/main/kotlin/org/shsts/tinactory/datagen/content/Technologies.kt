@@ -100,9 +100,13 @@ object Technologies {
     val ROCKET_T2: ResourceLocation
     val ENDER_CHEMISTRY: ResourceLocation
     val PLATINUM_GROUP_METAL: ResourceLocation
+    val ADVANCED_HYDROMETALLURGY: ResourceLocation
     val ASSEMBLY_LINE: ResourceLocation
     val RHODIUM_PLATED_PALLADIUM: ResourceLocation
     val FUSION: ResourceLocation
+    val NAQUADAH_PROCESSING: ResourceLocation
+    val ADVANCED_NETHER_CHEMISTRY: ResourceLocation
+    val CRYSTAL_CIRCUITRY: ResourceLocation
 
     init {
         Factory().apply {
@@ -441,6 +445,11 @@ object Technologies {
 
             base = PLATINUM_GROUP_METAL
 
+            ADVANCED_HYDROMETALLURGY = tech("advanced_hydrometallurgy") {
+                maxProgress(200)
+                displayMaterial("indium", "dust")
+            }
+
             RHODIUM_PLATED_PALLADIUM = child("rhodium_plated_palladium") {
                 maxProgress(200)
                 displayItem(getItem("component/raw_rhodium_plated_palladium"))
@@ -450,6 +459,23 @@ object Technologies {
                 maxProgress(400)
                 displayItem(getMultiblock("fusion_reactor").block)
                 depends(NUCLEAR_PHYSICS)
+            }
+
+            NAQUADAH_PROCESSING = child("naquadah_processing") {
+                maxProgress(220)
+                displayMaterial("naquadah", "raw")
+            }
+
+            ADVANCED_NETHER_CHEMISTRY = child("advanced_nether_chemistry") {
+                maxProgress(240)
+                displayItem(Items.ANCIENT_DEBRIS)
+            }
+
+            base = FUSION
+
+            CRYSTAL_CIRCUITRY = child("crystal_circuitry") {
+                maxProgress(260)
+                displayItem(getItem("component/crystal_cpu"))
             }
         }
     }

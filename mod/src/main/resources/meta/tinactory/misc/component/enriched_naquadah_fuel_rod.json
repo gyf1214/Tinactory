@@ -1,0 +1,8 @@
+{
+  "type": "nuclear_rod",
+  "constantRate": 0.1,
+  "heatEmission": 8,
+  "reactionOut": true,
+  "maxReactions": 2400,
+  "depletedItem": "tinactory:component/depleted_enriched_naquadah_fuel_rod"
+}

@@ -104,6 +104,7 @@ object Multiblocks {
             coil("kanthal")
             coil("nichrome")
             coil("tungsten", "rtm_alloy")
+            coil("naquadah")
 
             misc("grate_machine_casing") {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
@@ -165,6 +166,18 @@ object Multiblocks {
 
             misc("lithography_lens/good") {
                 blockState(cubeCasing("casings/solid/machine_casing_stable_titanium",
+                    "overlay/machine/overlay_laser_source"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
+            misc("lithography_lens/advanced") {
+                blockState(cubeCasing("casings/solid/machine_casing_robust_tungstensteel",
+                    "overlay/machine/overlay_laser_source"))
+                tag(AllTags.LITHOGRAPHY_LENS)
+            }
+
+            misc("lithography_lens/nether") {
+                blockState(cubeCasing("casings/fusion/machine_casing_fusion",
                     "overlay/machine/overlay_laser_source"))
                 tag(AllTags.LITHOGRAPHY_LENS)
             }
@@ -293,10 +306,11 @@ object Multiblocks {
             solid("stable_titanium", Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
             solid("robust_tungstensteel", Voltage.EV, "tungsten_steel", Technologies.TUNGSTEN_STEEL)
 
-            coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", Technologies.STEEL)
-            coil("kanthal", Voltage.LV, "kanthal", "silver", Technologies.KANTHAL)
-            coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", Technologies.NICHROME)
-            coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", Technologies.TUNGSTEN_STEEL)
+            coil("cupronickel", Voltage.ULV, "cupronickel", "bronze", null, Technologies.STEEL)
+            coil("kanthal", Voltage.LV, "kanthal", "silver", null, Technologies.KANTHAL)
+            coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", "pe", Technologies.NICHROME)
+            coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", "pe", Technologies.TUNGSTEN_STEEL)
+            coil("naquadah", Voltage.IV, "naquadah", "hssg", "ptfe", Technologies.NAQUADAH_PROCESSING)
         }
 
         val itemFilter = getItem("component/item_filter")
@@ -591,6 +605,42 @@ object Multiblocks {
                 workTicks(COIL_TICKS)
                 tech(Technologies.FUSION)
             }
+            misc("superconducting_coil", suffix = "_from_luv_superconductor") {
+                input("luv_superconductor", "wire", 4)
+                input("ruridit", "foil", 4)
+                input("rhodium_plated_palladium", "plate", 2)
+                input("ptfe", amount = 2)
+                input("soldering_alloy", amount = 4)
+                workTicks(COIL_TICKS)
+                tech(Technologies.FUSION)
+            }
+            misc("lithography_lens/advanced") {
+                misc("lithography_lens/good")
+                component("robot_arm", 2)
+                input("ender_eye", "lens", 16)
+                input("hssg", "plate", 6)
+                input("soldering_alloy", amount = 3)
+                tech(Technologies.ENDER_CHEMISTRY)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.LUV)
+                workTicks(MULTIBLOCK_TICKS)
+            }
+
+            componentVoltage = Voltage.LUV
+            misc("lithography_lens/nether") {
+                misc("lithography_lens/advanced")
+                component("robot_arm", 2)
+                input("nether_star", "lens", 16)
+                input("hssg", "stick", 4)
+                input("rhodium_plated_palladium", "plate", 6)
+                input("ruridit", "foil", 16)
+                input("soldering_alloy", amount = 4)
+                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
+            }
         }
 
         powerBlocks()
@@ -640,8 +690,8 @@ object Multiblocks {
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>,
         RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
-        name: String, amount: Int = 1, block: RB.() -> Unit) {
-        output(getItem("multiblock/misc/$name"), amount, block = block)
+        name: String, amount: Int = 1, suffix: String = "", block: RB.() -> Unit) {
+        output(getItem("multiblock/misc/$name"), amount, suffix = suffix, block = block)
     }
 
     private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
@@ -664,14 +714,14 @@ object Multiblocks {
     }
 
     private fun AssemblyRecipeFactory.coil(name: String,
-        v: Voltage, wire: String, foil: String, tech: ResourceLocation) {
+        v: Voltage, wire: String, foil: String, insulation: String?, tech: ResourceLocation) {
         val amount = 8 * v.rank
         val block = COIL_BLOCKS.getValue(name).get()
         output(block) {
             input(wire, "wire", amount)
             input(foil, "foil", amount)
-            if (v.rank >= Voltage.MV.rank) {
-                input("pe", amount = 2)
+            if (insulation != null) {
+                input(insulation, amount = 2)
             }
             voltage(v)
             workTicks(COIL_TICKS)
@@ -1109,6 +1159,27 @@ object Multiblocks {
         }
 
         fusionReactor {
+            recipe("multiblock/netherite") {
+                input("netherite_scrap", "molten")
+                input("gold", "molten")
+                output("netherite", "plasma", 0.25)
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
+            recipe("multiblock/nether_star") {
+                input("wither_matrix", "liquid")
+                input("enriched_naquadah", "molten")
+                output("nether_star", "plasma")
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+            recipe("multiblock/activated_naquadah") {
+                input("naquadah", "molten")
+                input("hydrogen", "gas", 0.125)
+                output("activated_naquadah", "plasma")
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
             recipe("multiblock/fusion_reactor_smoke") {
                 input("water", "liquid", 1)
                 input("water", "gas", 1)

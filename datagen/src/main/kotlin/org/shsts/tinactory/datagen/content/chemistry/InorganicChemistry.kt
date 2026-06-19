@@ -5,14 +5,18 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 
 object InorganicChemistry {
     fun init() {
@@ -22,6 +26,8 @@ object InorganicChemistry {
         ev()
         ender()
         platinum()
+        advancedHydrometallurgy()
+        advancedNetherChemistry()
     }
 
     private fun blastOre() {
@@ -690,6 +696,16 @@ object InorganicChemistry {
                     temperature(2800)
                 }
             }
+            output("samarium", "ingot_hot", suffix = "_from_rare_earth_slurry") {
+                input("rare_earth", "slurry")
+                input("sodium")
+                output("heavy_rare_earth_solution")
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    temperature(5100)
+                }
+            }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
                 input("platinum_metallic")
                 input("nitrogen")
@@ -697,6 +713,17 @@ object InorganicChemistry {
                 extra {
                     temperature(2300)
                 }
+            }
+        }
+
+        distillation {
+            input("heavy_rare_earth_solution") {
+                output("yttrium", "dust", rate = 0.5)
+                output("indium", "dust", rate = 0.5)
+                output("sodium_sulfate")
+                output("water", "gas")
+                voltage(Voltage.LUV)
+                workTicks(800)
             }
         }
 
@@ -899,6 +926,138 @@ object InorganicChemistry {
                 output("mercury", amount = 8)
                 voltage(Voltage.IV)
                 workTicks(2400)
+            }
+        }
+    }
+
+    private fun advancedHydrometallurgy() {
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.IV)
+                tech(Technologies.ADVANCED_HYDROMETALLURGY)
+            }
+            input("sphalerite", suffix = "_to_indium_concentrate") {
+                input("sulfuric_acid", amount = 2)
+                output("indium_concentrate", amount = 0.5)
+                workTicks(400)
+            }
+            input("galena", suffix = "_to_indium_concentrate") {
+                input("sulfuric_acid", amount = 2)
+                output("indium_concentrate", amount = 0.5)
+                workTicks(400)
+            }
+            input("lithium_brine", amount = 4, suffix = "_to_barium_sulfate") {
+                input("sodium_sulfate")
+                output("barium_sulfate")
+                output("salt_water", amount = 4)
+                workTicks(400)
+            }
+        }
+
+        blastFurnace {
+            output("barium_sulfide", "dust") {
+                input("barium_sulfate", "dust")
+                input("carbon", "dust", amount = 2)
+                output("carbon_dioxide", amount = 2)
+                voltage(Voltage.IV)
+                workTicks(800)
+                extra {
+                    temperature(5100)
+                }
+            }
+        }
+
+        electrolyzer {
+            input("barium_sulfide") {
+                output("barium", "dust")
+                output("sulfur", "dust")
+                voltage(Voltage.LUV)
+                workTicks(400)
+            }
+        }
+
+        centrifuge {
+            input("indium_concentrate", amount = 4) {
+                output("indium", "dust")
+                output("lead_zinc_solution", amount = 4)
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+        }
+
+        distillation {
+            input("lead_zinc_solution", amount = 4) {
+                output("sulfur", "dust", amount = 2)
+                output("lead", "dust")
+                output("zinc", "dust")
+                output("silver", "dust", rate = 0.25)
+                output("water", "gas", 4)
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+        }
+    }
+
+    private fun advancedNetherChemistry() {
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.IV)
+                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
+            }
+            output("netherite_scrap") {
+                input(Items.ANCIENT_DEBRIS)
+                input("hydrogen_fluoride")
+                output("gold", "dust", rate = 0.2)
+                output("netherite_scrap", "slurry", 0.8)
+                workTicks(800)
+            }
+            output("potassium_bifluoride", suffix = "_from_netherite_scrap_slurry") {
+                input("netherite_scrap", "slurry")
+                input("potassium")
+                output("naquadah_residue", rate = 0.3)
+                workTicks(400)
+            }
+        }
+
+        mixer {
+            output("wither_matrix", "liquid") {
+                input(Items.SOUL_SAND)
+                input("netherite_scrap")
+                input("radon", "gas")
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
+            output("nether_star", "seed", 2, suffix = "_from_wither_matrix") {
+                input("nether_star", "seed")
+                input("wither_matrix", "liquid")
+                voltage(Voltage.IV)
+                workTicks(128)
+            }
+            output("nether_star", "seed", suffix = "_from_molten_wither_matrix") {
+                input("nether_star", "molten", 2.0)
+                input("wither_matrix", "liquid")
+                voltage(Voltage.LUV)
+                workTicks(800)
+            }
+        }
+
+        extractor {
+            output("nether_star", "molten") {
+                input("nether_star", "gem")
+                voltage(Voltage.LUV)
+                workTicks(160)
+            }
+        }
+
+        autoclave {
+            output("nether_star", "gem") {
+                input("nether_star", "seed")
+                input("nether_star", "molten", 0.5)
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    requireCleanness(0.5, 1.0)
+                }
             }
         }
     }

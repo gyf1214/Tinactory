@@ -24,6 +24,8 @@ import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
@@ -102,13 +104,13 @@ object CircuitComponents {
             circuitAssembler {
                 circuit("electronic") {
                     circuit("vacuum_tube", 2)
-                    component("resistor", 2)
+                    circuitComponent("resistor", 2)
                     input("red_alloy", "wire", 2)
                 }
                 circuit("good_electronic") {
                     input(circuitBoard)
                     circuit("electronic", 3)
-                    component("diode", 2)
+                    circuitComponent("diode", 2)
                     input("copper", "wire", 2)
                 }
             }
@@ -118,15 +120,15 @@ object CircuitComponents {
             circuitAssembler {
                 circuit("basic_integrated") {
                     chip("integrated_circuit")
-                    component("resistor", 2)
-                    component("diode", 2)
+                    circuitComponent("resistor", 2)
+                    circuitComponent("diode", 2)
                     input("copper", "wire_fine", 2)
                     input("tin", "bolt", 2)
                 }
                 circuit("good_integrated") {
                     circuit("basic_integrated", 1)
-                    component("resistor", 2)
-                    component("diode", 2)
+                    circuitComponent("resistor", 2)
+                    circuitComponent("diode", 2)
                     input("gold", "wire_fine", 4)
                     input("silver", "bolt", 4)
                 }
@@ -134,7 +136,7 @@ object CircuitComponents {
                     circuit("good_integrated", 2)
                     chip("integrated_circuit", 2)
                     chip("ram", 2)
-                    component("transistor", 4)
+                    circuitComponent("transistor", 4)
                     input("electrum", "wire_fine", 8)
                     input("copper", "bolt", 8)
                 }
@@ -150,29 +152,29 @@ object CircuitComponents {
                 }
                 circuit("microprocessor", 3) {
                     chip("cpu")
-                    component("resistor", 2)
-                    component("capacitor", 2)
-                    component("transistor", 2)
+                    circuitComponent("resistor", 2)
+                    circuitComponent("capacitor", 2)
+                    circuitComponent("transistor", 2)
                     input("copper", "wire_fine", 2)
                 }
                 circuit("processor") {
                     chip("cpu")
-                    component("resistor", 4)
-                    component("capacitor", 4)
-                    component("transistor", 4)
+                    circuitComponent("resistor", 4)
+                    circuitComponent("capacitor", 4)
+                    circuitComponent("transistor", 4)
                     input("red_alloy", "wire_fine", 4)
                 }
                 circuit("assembly") {
                     circuit("processor", 2)
-                    component("inductor", 4)
-                    component("capacitor", 8)
+                    circuitComponent("inductor", 4)
+                    circuitComponent("capacitor", 8)
                     chip("ram", 4)
                     input("red_alloy", "wire_fine", 8)
                 }
                 circuit("workstation") {
                     circuit("assembly", 2)
-                    component("resistor", 4)
-                    component("diode", 4)
+                    circuitComponent("resistor", 4)
+                    circuitComponent("diode", 4)
                     chip("ram", 4)
                     input("electrum", "wire_fine", 16)
                     input("gold", "bolt", 16)
@@ -180,8 +182,8 @@ object CircuitComponents {
                 circuit("mainframe") {
                     input("aluminium", "stick", 8)
                     circuit("workstation", 2)
-                    component("inductor", 8)
-                    component("capacitor", 16)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("capacitor", 16)
                     chip("nor", 8)
                     input("annealed_copper", "wire", 16)
                 }
@@ -202,22 +204,22 @@ object CircuitComponents {
             circuitAssembler {
                 circuit("nano_processor") {
                     chip("nano_cpu")
-                    component("resistor", 4)
-                    component("capacitor", 4)
-                    component("transistor", 4)
+                    circuitComponent("resistor", 4)
+                    circuitComponent("capacitor", 4)
+                    circuitComponent("transistor", 4)
                     input("electrum", "wire_fine", 4)
                 }
                 circuit("nano_assembly") {
                     circuit("nano_processor", 2)
-                    component("inductor", 4)
-                    component("capacitor", 8)
+                    circuitComponent("inductor", 4)
+                    circuitComponent("capacitor", 8)
                     chip("ram", 4)
                     input("electrum", "wire_fine", 8)
                 }
                 circuit("nano_computer") {
                     circuit("nano_assembly", 2)
-                    component("resistor", 4)
-                    component("diode", 4)
+                    circuitComponent("resistor", 4)
+                    circuitComponent("diode", 4)
                     chip("nor", 4)
                     input("annealed_copper", "wire_fine", 16)
                     input("gold", "bolt", 16)
@@ -225,8 +227,8 @@ object CircuitComponents {
                 circuit("nano_mainframe") {
                     input("titanium", "stick", 8)
                     circuit("nano_computer", 2)
-                    component("inductor", 8)
-                    component("capacitor", 16)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("capacitor", 16)
                     chip("nor", 16)
                     input("annealed_copper", "wire", 16)
                 }
@@ -243,21 +245,21 @@ object CircuitComponents {
                 circuit("quantum_processor") {
                     chip("qbit_cpu")
                     chip("nano_cpu")
-                    component("capacitor", 6)
-                    component("transistor", 6)
+                    circuitComponent("capacitor", 6)
+                    circuitComponent("transistor", 6)
                     input("platinum", "wire_fine", 8)
                 }
                 circuit("quantum_assembly") {
                     circuit("quantum_processor", 2)
-                    component("inductor", 6)
-                    component("capacitor", 12)
+                    circuitComponent("inductor", 6)
+                    circuitComponent("capacitor", 12)
                     chip("ram", 6)
                     input("platinum", "wire_fine", 16)
                 }
                 circuit("quantum_computer") {
                     circuit("quantum_processor", 2)
-                    component("resistor", 8)
-                    component("diode", 8)
+                    circuitComponent("resistor", 8)
+                    circuitComponent("diode", 8)
                     chip("nor", 8)
                     input("niobium_titanium", "wire_fine", 8)
                     input("platinum", "bolt", 16)
@@ -265,8 +267,8 @@ object CircuitComponents {
                 circuit("quantum_mainframe") {
                     input("tungsten_steel", "stick", 8)
                     circuit("quantum_computer", 2)
-                    component("inductor", 12)
-                    component("capacitor", 24)
+                    circuitComponent("inductor", 12)
+                    circuitComponent("capacitor", 24)
                     chip("nor", 32)
                     input("niobium_titanium", "wire", 8)
                 }
@@ -274,6 +276,49 @@ object CircuitComponents {
                     chip("soc")
                     input("platinum", "wire_fine", 2)
                     input("platinum", "bolt", 2)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.CRYSTAL) {
+            val crystalCpu = getItem("component/crystal_cpu")
+            circuitAssembler {
+                circuit("crystal_processor") {
+                    input(crystalCpu)
+                    chip("nano_cpu", 2)
+                    circuitComponent("capacitor", 6)
+                    circuitComponent("transistor", 6)
+                    input("niobium_titanium", "wire_fine", 8)
+                }
+                circuit("crystal_assembly", 2, voltage = Voltage.LUV) {
+                    circuit("crystal_processor", 2)
+                    circuitComponent("inductor", 4)
+                    circuitComponent("capacitor", 8)
+                    chip("ram", 24)
+                    input("niobium_titanium", "wire_fine", 16)
+                }
+                circuit("crystal_computer", voltage = Voltage.ZPM, workTicks = 400) {
+                    circuit("crystal_assembly", 2)
+                    chip("ram", 4)
+                    chip("nor", 32)
+                    chip("nand", 64)
+                    input("niobium_titanium", "wire_fine", 32)
+                }
+            }
+            assemblyLine {
+                output(getCircuit("crystal_mainframe").item) {
+                    input("hssg", "stick", 8)
+                    circuit("crystal_computer", 2)
+                    chip("ram", 32)
+                    chip("pic", 2)
+                    input("niobium_titanium", "wire", 8)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("capacitor", 16)
+                    circuitComponent("diode", 8)
+                    input("soldering_alloy", amount = 10)
+                    voltage(Voltage.LUV)
+                    workTicks(800)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
                 }
             }
         }
@@ -381,6 +426,41 @@ object CircuitComponents {
                 }
             }
         }
+
+        componentTier(CircuitComponentTier.ADVANCED) {
+            assembler {
+                defaults {
+                    voltage(Voltage.IV)
+                    workTicks(COMPONENT_TICKS)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
+                }
+                component("resistor", 16) {
+                    input("graphite", "dust")
+                    input("naquadah", "wire_fine", 4)
+                    input("ptfe")
+                }
+                component("diode", 32) {
+                    input("indium", "dust")
+                    input("niobium_titanium", "wire_fine", 8)
+                    input("ptfe", amount = 2)
+                }
+                component("transistor", 16) {
+                    input("vanadium_gallium", "foil")
+                    input("ruridit", "wire_fine", 4)
+                    input("ptfe")
+                }
+                component("capacitor", 16) {
+                    input("epoxy", "foil", 2)
+                    input("palladium", "foil")
+                    input("ptfe")
+                }
+                component("inductor", 16) {
+                    input("hssg", "ring")
+                    input("platinum", "wire_fine", 4)
+                    input("ptfe")
+                }
+            }
+        }
     }
 
     private class ComponentTierFactory(val tier: CircuitComponentTier) {
@@ -395,6 +475,10 @@ object CircuitComponents {
     }
 
     private fun chips() {
+        val rawCrystalChip = getItem("component/raw_crystal_chip")
+        val rawCrystalChipPart = getItem("component/raw_crystal_chip_part")
+        val crystalCpu = getItem("component/crystal_cpu")
+
         blastFurnace {
             output(BOULE.item("silicon")) {
                 input("silicon", amount = 32)
@@ -413,6 +497,37 @@ object CircuitComponents {
                 workTicks(9600)
                 extra {
                     temperature(3000)
+                }
+            }
+            output(BOULE.item("naquadah")) {
+                input("silicon", "ingot", 32)
+                input("naquadah", "ingot")
+                input("argon", amount = 6)
+                voltage(Voltage.IV)
+                workTicks(12800)
+                extra {
+                    temperature(3900)
+                }
+            }
+        }
+
+        autoclave {
+            output(rawCrystalChip, suffix = "_from_emerald") {
+                input("emerald", "gem_exquisite")
+                input("trinium", "molten")
+                voltage(Voltage.LUV)
+                workTicks(3200)
+                extra {
+                    requireCleanness(0.75, 1.0)
+                }
+            }
+            output(rawCrystalChip, suffix = "_from_part") {
+                input(rawCrystalChipPart)
+                input("wither_matrix", "liquid")
+                voltage(Voltage.LUV)
+                workTicks(1600)
+                extra {
+                    requireCleanness(0.75, 1.0)
                 }
             }
         }
@@ -434,6 +549,11 @@ object CircuitComponents {
                     workTicks(300)
                 }
             }
+            output(rawCrystalChipPart, 9) {
+                input(rawCrystalChip)
+                voltage(Voltage.IV)
+                workTicks(400)
+            }
         }
 
         engraving("integrated_circuit", "ruby", 0, Voltage.LV, -1.0, 0.0)
@@ -446,6 +566,45 @@ object CircuitComponents {
         engraving("pic", "topaz", 1, Voltage.HV, 0.2, 1.2)
         engraving("qbit_cpu", "ender_eye", 1, Voltage.EV, 0.5, 1.5, "cpu")
         engraving("nand", "emerald", 1, Voltage.EV, 0.4, 1.4, "ram")
+
+        laserEngraver {
+            defaults {
+                workTicks(2000)
+            }
+            output(WAFER.item("soc"), suffix = "_from_naquadah") {
+                input(WAFER_RAW.item("naquadah"))
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.IV)
+                extra {
+                    requireCleanness(1.0, 2.0)
+                }
+            }
+            output(WAFER.item("high_pic"), suffix = "_from_pic") {
+                input(WAFER.item("pic"))
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.IV)
+                extra {
+                    requireCleanness(1.2, 2.0)
+                }
+            }
+            output(WAFER.item("advanced_soc"), suffix = "_from_soc") {
+                input(WAFER.item("soc"))
+                input("nether_star", "lens", 0, port = 1)
+                voltage(Voltage.LUV)
+                extra {
+                    requireCleanness(1.5, 2.0)
+                }
+            }
+            output(crystalCpu) {
+                input(rawCrystalChip)
+                input("ender_eye", "lens", 0, port = 1)
+                voltage(Voltage.LUV)
+                workTicks(1200)
+                extra {
+                    requireCleanness(0.75, 1.75)
+                }
+            }
+        }
     }
 
     private fun engraving(name: String, lens: String, level: Int, voltage: Voltage,
@@ -624,7 +783,7 @@ object CircuitComponents {
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.EV)
                     workTicks(CIRCUIT_TICKS)
-                    tech(Technologies.PLATINUM_GROUP_METAL)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
                 }
             }
             chemicalReactor {
@@ -634,13 +793,14 @@ object CircuitComponents {
                     input("iron_chloride")
                     voltage(Voltage.EV)
                     workTicks(480)
-                    tech(Technologies.PLATINUM_GROUP_METAL)
+                    tech(Technologies.CRYSTAL_CIRCUITRY)
                 }
             }
         }
     }
 
-    private fun SimpleProcessingBuilder.circuit(name: String, amount: Int = 1) {
+    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuit(
+        name: String, amount: Int = 1) {
         input(getCircuit(name).item, amount)
     }
 
@@ -650,20 +810,20 @@ object CircuitComponents {
     }
 
     private fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
-        block: SimpleProcessingBuilder.() -> Unit) {
+        voltage: Voltage? = null, workTicks: Long? = null, block: SimpleProcessingBuilder.() -> Unit) {
         val circuit = getCircuit(name)
         output(circuit.item, amount) {
             if (circuit.level().voltageOffset < 2) {
                 input(circuit.circuitBoard)
             }
             block()
-            val voltage = circuit.tier().baseVoltage
-            val voltage1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
+            val circuitVoltage = circuit.tier().baseVoltage
+            val voltage1 = if (circuitVoltage.rank < Voltage.LV.rank) Voltage.LV else circuitVoltage
             val level = 1 + max(0, circuit.level().voltageOffset)
             val solder = (1 shl (level - 1)) / 2.0
             input("soldering_alloy", amount = solder)
-            voltage(voltage1)
-            workTicks(200L * level)
+            voltage(voltage ?: voltage1)
+            workTicks(workTicks ?: 200L * level)
         }
     }
 
@@ -689,7 +849,8 @@ object CircuitComponents {
 
         val circuitBoard = circuitBoard(tier).get()
 
-        fun SimpleProcessingBuilder.component(name: String, amount: Int = 1) {
+        fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuitComponent(
+            name: String, amount: Int = 1) {
             input(getCircuitComponent(name).tag(componentTier), amount)
         }
     }

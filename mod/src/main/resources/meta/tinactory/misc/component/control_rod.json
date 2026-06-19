@@ -1,6 +1,6 @@
 {
   "type": "nuclear_rod",
-  "fastRate": 0.5,
-  "slowRate": 0.5,
+  "fastRate": 0.9,
+  "slowRate": 0,
   "heatFast": 5
 }

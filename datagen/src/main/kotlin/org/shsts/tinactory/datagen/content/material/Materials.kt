@@ -49,6 +49,7 @@ object Materials {
         }
         material("sulfur", DULL)
         material("cadmium", SHINY)
+        material("indium", SHINY)
         material("cobalt", METALLIC) {
             toolProcess(1.25)
             smelt()
@@ -127,6 +128,12 @@ object Materials {
             machineProcess(Voltage.HV)
             blast(Voltage.MV, 1300, 1200)
         }
+        material("samarium", METALLIC) {
+            machineProcess(Voltage.LUV)
+            blast(Voltage.LUV, 5100, 800)
+        }
+        material("yttrium", SHINY)
+        material("barium", DULL)
         material("molybdenum", SHINY) {
             machineProcess(Voltage.HV, 1.8)
             blast(Voltage.HV, 2800, 1600) {
@@ -164,6 +171,52 @@ object Materials {
             }
         }
         material("osmium", METALLIC)
+        material("naquadah", METALLIC) {
+            machineProcess(Voltage.IV, 2.0)
+            blast(Voltage.IV, 4500, 1600) {
+                component("nitrogen")
+            }
+            oreProcess {
+                byProducts("platinum_metallic", "enriched_naquadah")
+            }
+        }
+        material("enriched_naquadah", METALLIC) {
+            machineProcess(Voltage.IV, 1.5)
+            blast(Voltage.IV, 5400, 1800) {
+                component("argon")
+            }
+            oreProcess {
+                byProducts("rhodium_metallic", "trinium_residue")
+            }
+        }
+        material("naquadria", BRIGHT) {
+            machineProcess(Voltage.IV, 1.5)
+            blast(Voltage.LUV, 5400, 1200) {
+                component("argon")
+            }
+        }
+        material("trinium", METALLIC) {
+            machineProcess(Voltage.IV, 1.5)
+            blast(Voltage.LUV, 5400, 1200) {
+                component("argon")
+            }
+        }
+        material("netherite_scrap", DULL) {
+            machineProcess(Voltage.IV)
+            noOreProcessing()
+        }
+        material("netherite", METALLIC) {
+            machineProcess(Voltage.LUV, 1.5)
+            smelt()
+            blast(Voltage.LUV, 5400, 1200) {
+                component("argon")
+            }
+        }
+        material("nether_star", SHINY) {
+            machineProcess(Voltage.LUV, 1.5)
+            seeding(Voltage.LUV, 1.5)
+        }
+        material("wither_matrix", DULL)
     }
 
     private fun firstDegrees() {
@@ -292,6 +345,8 @@ object Materials {
         material("potassium_hydroxide", DULL)
         material("calcium_hydroxide", DULL)
         material("sodium_sulfate", DULL)
+        material("barium_sulfate", DULL)
+        material("barium_sulfide", DULL)
         material("potassium_nitrate", FINE)
         material("potassium_bifluoride", DULL)
         material("sulfuric_acid", DULL) {
@@ -368,7 +423,20 @@ object Materials {
                 component("molybdenum", 2)
                 component("vanadium")
             }
-            blast(Voltage.EV, 4200, 1280)
+            blast(Voltage.EV, 4200, 1280) {
+                component("argon")
+            }
+        }
+        material("hsss", METALLIC) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("hssg", 4)
+                component("ruthenium", 2)
+                component("naquadah", 2)
+            }
+            blast(Voltage.LUV, 4800, 1280) {
+                component("argon")
+            }
         }
         material("ruridit", BRIGHT) {
             machineProcess(Voltage.EV, 2.0)
@@ -376,10 +444,36 @@ object Materials {
                 component("ruthenium", 2)
                 component("iridium")
             }
-            blast(Voltage.EV, 4500, 1280)
+            blast(Voltage.EV, 4500, 1280) {
+                component("argon")
+            }
+        }
+        material("osmiridium", SHINY) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("iridium", 4)
+                component("osmium")
+            }
+            blast(Voltage.LUV, 5200, 1280) {
+                component("argon")
+            }
         }
         material("rhodium_plated_palladium", SHINY) {
             machineProcess(Voltage.IV, 2.0)
+            blast(Voltage.IV, 4500, 640) {
+                component("argon")
+            }
+        }
+        material("naquadah_alloy", METALLIC) {
+            machineProcess(Voltage.LUV, 2.0)
+            mix(Voltage.LUV) {
+                component("rhodium_plated_palladium", 5)
+                component("naquadah", 3)
+                component("osmium")
+            }
+            blast(Voltage.LUV, 5000, 1280) {
+                component("argon")
+            }
         }
         material("vanadium_gallium", METALLIC) {
             machineProcess(Voltage.EV, 1.5)
@@ -387,10 +481,33 @@ object Materials {
                 component("vanadium", 3)
                 component("gallium")
             }
-            blast(Voltage.EV, 4500, 1280)
+            blast(Voltage.EV, 4500, 1280) {
+                component("argon")
+            }
+        }
+        material("yttrium_barium_cuprate", BRIGHT) {
+            machineProcess(Voltage.LUV, 1.5)
+            mix(Voltage.LUV) {
+                component("yttrium")
+                component("barium", 2)
+                component("copper", 3)
+                component("oxygen")
+            }
+            blast(Voltage.LUV, 5400, 1280) {
+                component("argon")
+            }
         }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
+        material("activated_naquadah", DULL)
+        material("unstable_naquadria", BRIGHT) {
+            machineProcess(Voltage.IV)
+        }
+        material("acidic_naquadria_solution", DULL)
+        material("naquadria_concentrate", BRIGHT)
+        material("trinium_residue", DULL)
+        material("trinium_sulfide", DULL)
+        material("naquadah_residue", DULL)
         material("chloroplatinate", DULL)
         material("raw_platinum", METALLIC)
         material("raw_rhodium", DULL)
@@ -529,6 +646,7 @@ object Materials {
         }
         material("ev_superconductor", SHINY)
         material("iv_superconductor", SHINY)
+        material("luv_superconductor", SHINY)
     }
 
     private fun ores() {
@@ -748,6 +866,9 @@ object Materials {
         }
         material("glowstone", SHINY)
         material("rare_earth", ROUGH)
+        material("heavy_rare_earth_solution", DULL)
+        material("indium_concentrate", SHINY)
+        material("lead_zinc_solution", DULL)
         material("netherrack", ROUGH) {
             machineProcess(Voltage.LV, 0.5)
         }

@@ -1,0 +1,25 @@
+{
+  "color": "0xFF4B4042",
+  "items": [],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFF4B4042",
+      "displayColor": "0xFF4B4042"
+    },
+    "slurry": {
+      "baseAmount": 1000,
+      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "textureColor": "0xFF5A443B",
+      "displayColor": "0xFF5A443B"
+    }
+  },
+  "aliases": {
+    "primary": "dust"
+  },
+  "existings": {
+    "raw": "minecraft:ancient_debris",
+    "dust": "minecraft:netherite_scrap"
+  }
+}

@@ -322,7 +322,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 return
             }
 
-            val v = if (material.hasItem("sheet")) voltage else Voltage.fromRank(voltage.rank + 1)
+            val v = if (material.hasItem("sheet") || input == "primary" && material.hasFluid("plasma")) {
+                voltage
+            } else {
+                Voltage.fromRank(voltage.rank + 1)
+            }
 
             extractor {
                 input(material, input) {
@@ -358,6 +362,20 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             molten("gear", 2f)
             molten("rotor", 4.25f)
             molten("pipe", 3f)
+        }
+
+        private fun plasma() {
+            if (!material.hasFluid("plasma") || !material.hasFluid("molten")) {
+                return
+            }
+
+            vacuumFreezer {
+                output(material, "molten") {
+                    input(material, "plasma")
+                    voltage(this@ProcessBuilder.voltage)
+                    workTicks(ticks(800))
+                }
+            }
         }
 
         private fun extrude(result: String, outAmount: Int, inAmount: Int) {
@@ -438,6 +456,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
             macerates()
             moltens()
+            plasma()
             extrudes()
 
             hasProcess = true
@@ -676,6 +695,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 workTicks(round(256 * factor).toLong())
             }
         }
+        if (!material.hasItem("dust")) {
+            return
+        }
         mixer {
             output(material, "seed", 2) {
                 input(material, "seed")
@@ -856,6 +878,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             block()
             build()
         }
+    }
+
+    fun noOreProcessing() {
+        hasOreProcess = true
     }
 
     fun fluidOre(workTicks: Long, base: ItemLike, voltage: Voltage = Voltage.MV) {

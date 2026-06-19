@@ -1,7 +1,7 @@
 {
 	id: "3B5374D34DFEC6AF"
 	group: ""
-	order_index: 6
+	order_index: 7
 	filename: "ore_veins"
 	title: "{tinactory.quests.ore_veins.title}"
 	icon: "minecraft:raw_iron"
@@ -401,6 +401,32 @@
 					id: "0E15D0E25A9B4C12"
 					type: "item"
 					item: "tinactory:material/raw/ender_pearl"
+				}
+			]
+		}
+		{
+			title: "{tinactory.quests.ore_veins.016.title}"
+			icon: "tinactory:material/raw/naquadah"
+			x: 10.0d
+			y: 8.0d
+			subtitle: "{tinactory.quests.ore_veins.016.subtitle}"
+			description: [
+				"{tinactory.quests.ore_veins.016.description.0}"
+				""
+				"{tinactory.quests.ore_veins.016.description.1}"
+			]
+			dependencies: ["0E15D0E25A9B4C10"]
+			id: "5A4D1E6F0C2B3A10"
+			tasks: [
+				{
+					id: "5A4D1E6F0C2B3A11"
+					type: "item"
+					item: "tinactory:material/raw/naquadah"
+				}
+				{
+					id: "5A4D1E6F0C2B3A12"
+					type: "item"
+					item: "tinactory:material/raw/enriched_naquadah"
 				}
 			]
 		}
