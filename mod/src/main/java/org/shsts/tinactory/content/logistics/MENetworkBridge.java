@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinactory.integration.network.IConnector;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -74,6 +75,18 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         combinePorts(logistics.getStoragePorts(backSubnet), backItem, backFluid);
     }
 
+    private boolean isConnectedEndpoint(Direction dir, BlockPos pos1) {
+        var world = blockEntity.getLevel();
+        if (world == null || !world.isLoaded(pos1)) {
+            return false;
+        }
+        var pos = blockEntity.getBlockPos();
+        var state = blockEntity.getBlockState();
+        var state1 = world.getBlockState(pos1);
+        return IConnector.isConnectedInWorld(world, pos, state, dir) &&
+            IConnector.isConnectedInWorld(world, pos1, state1, dir.getOpposite());
+    }
+
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.onUpdate(() -> onUpdateLogistics(logistics));
@@ -86,7 +99,8 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         var back = pos.relative(dir.getOpposite());
         var allBlocks = network.allBlocks();
 
-        if (!allBlocks.contains(front) || !allBlocks.contains(back)) {
+        if (!allBlocks.contains(front) || !allBlocks.contains(back) ||
+            !isConnectedEndpoint(dir, front) || !isConnectedEndpoint(dir.getOpposite(), back)) {
             return;
         }
 
