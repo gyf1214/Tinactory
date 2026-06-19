@@ -17,7 +17,6 @@ import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
-import org.shsts.tinactory.integration.network.IConnector;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -30,7 +29,6 @@ import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.MEStorageAccess.combinePorts;
-import static org.shsts.tinactory.integration.network.MachineBlock.IO_FACING;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -39,24 +37,20 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     private static final String ID = "logistics/me_network_bridge";
 
     private final BlockEntity blockEntity;
-    private final CombinedPort<ItemStack> frontItem;
-    private final CombinedPort<FluidStack> frontFluid;
-    private final CombinedPort<ItemStack> backItem;
-    private final CombinedPort<FluidStack> backFluid;
+    private final CombinedPort<ItemStack> parentItem;
+    private final CombinedPort<FluidStack> parentFluid;
+    private final CombinedPort<ItemStack> childItem;
+    private final CombinedPort<FluidStack> childFluid;
     private final LazyOptional<IElectricMachine> electricCap;
 
     private IMachine machine;
-    @Nullable
-    private BlockPos frontSubnet;
-    @Nullable
-    private BlockPos backSubnet;
 
     public MENetworkBridge(BlockEntity blockEntity, double power) {
         this.blockEntity = blockEntity;
-        this.frontItem = StoragePorts.combinedItem();
-        this.frontFluid = StoragePorts.combinedFluid();
-        this.backItem = StoragePorts.combinedItem();
-        this.backFluid = StoragePorts.combinedFluid();
+        this.parentItem = StoragePorts.combinedItem();
+        this.parentFluid = StoragePorts.combinedFluid();
+        this.childItem = StoragePorts.combinedItem();
+        this.childFluid = StoragePorts.combinedFluid();
 
         var voltage = getBlockVoltage(blockEntity);
         var electric = new SimpleElectricConsumer(voltage.value, power);
@@ -67,55 +61,26 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         return $ -> $.capability(ID, be -> new MENetworkBridge(be, power));
     }
 
-    private void onUpdateLogistics(LogisticComponent logistics) {
-        if (frontSubnet == null || backSubnet == null) {
-            return;
-        }
-        combinePorts(logistics.getStoragePorts(frontSubnet), frontItem, frontFluid);
-        combinePorts(logistics.getStoragePorts(backSubnet), backItem, backFluid);
-    }
-
-    private boolean isConnectedEndpoint(Direction dir, BlockPos pos1) {
-        var world = blockEntity.getLevel();
-        if (world == null || !world.isLoaded(pos1)) {
-            return false;
-        }
-        var pos = blockEntity.getBlockPos();
-        var state = blockEntity.getBlockState();
-        var state1 = world.getBlockState(pos1);
-        return IConnector.isConnectedInWorld(world, pos, state, dir) &&
-            IConnector.isConnectedInWorld(world, pos1, state1, dir.getOpposite());
+    private void onUpdateLogistics(LogisticComponent logistics, BlockPos parentSubnet, BlockPos childSubnet) {
+        combinePorts(logistics.getStoragePorts(parentSubnet), parentItem, parentFluid);
+        combinePorts(logistics.getStoragePorts(childSubnet), childItem, childFluid);
     }
 
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.onUpdate(() -> onUpdateLogistics(logistics));
-
-        frontSubnet = backSubnet = null;
 
         var pos = blockEntity.getBlockPos();
-        var dir = blockEntity.getBlockState().getValue(IO_FACING);
-        var front = pos.relative(dir);
-        var back = pos.relative(dir.getOpposite());
-        var allBlocks = network.allBlocks();
-
-        if (!allBlocks.contains(front) || !allBlocks.contains(back) ||
-            !isConnectedEndpoint(dir, front) || !isConnectedEndpoint(dir.getOpposite(), back)) {
+        var parentSubnet = network.getSubnet(pos, LOGISTICS_SUBNET.get());
+        var childSubnet = pos;
+        if (parentSubnet.equals(childSubnet)) {
             return;
         }
 
-        frontSubnet = network.getSubnet(front, LOGISTICS_SUBNET.get());
-        backSubnet = network.getSubnet(back, LOGISTICS_SUBNET.get());
-
-        if (frontSubnet.equals(backSubnet)) {
-            frontSubnet = backSubnet = null;
-            return;
-        }
-
-        logistics.registerPort(machine, 0, frontItem, backSubnet);
-        logistics.registerPort(machine, 1, frontFluid, backSubnet);
-        logistics.registerPort(machine, 2, backItem, frontSubnet);
-        logistics.registerPort(machine, 3, backFluid, frontSubnet);
+        logistics.registerPort(machine, 0, parentItem, childSubnet);
+        logistics.registerPort(machine, 1, parentFluid, childSubnet);
+        logistics.registerPort(machine, 2, childItem, parentSubnet);
+        logistics.registerPort(machine, 3, childFluid, parentSubnet);
+        logistics.onUpdate(() -> onUpdateLogistics(logistics, parentSubnet, childSubnet));
     }
 
     @Override
