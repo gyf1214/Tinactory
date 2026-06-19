@@ -12,7 +12,7 @@
     },
     "plasma": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/fluid/plasma",
+      "texture": "gregtech:blocks/material_sets/dull/plasma",
       "textureColor": "0xFF474447",
       "displayColor": "0xFF474447"
     }

@@ -84,6 +84,7 @@
     "fluid[.]tinactory[.]material[.]gas[.](.*)": "$1",
     "fluid[.]tinactory[.]material[.]liquid[.](.*)": "$1",
     "fluid[.]tinactory[.]material[.]fluid[.](.*)": "$1",
+    "fluid[.]tinactory[.]material[.]plasma[.](.*)": "$1 Plasma",
     "fluid[.]tinactory[.]material[.](.*)[.](.*)": "$1 $2",
     "tinactory[.]recipe[.]marker[.]ore_analyzer[.](.*)": "Analyze $1s",
     "tinactory[.]recipe[.]marker[.]extruder[.]material[.](.*)": "Extrude $1s",
