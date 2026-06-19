@@ -38,7 +38,7 @@ public class SmartEntityBlock extends Block implements EntityBlock {
     private final IMenuType menu;
 
     @FunctionalInterface
-    public interface Factory<U extends SmartEntityBlock> {
+    public interface Factory<U extends EntityBlock> {
         U create(Properties properties, Supplier<IBlockEntityType> entityType, @Nullable IMenuType menu);
     }
 

@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Unit;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
 import org.shsts.tinactory.core.common.ValueHolder;
 import org.shsts.tinactory.integration.common.SmartEntityBlock;
@@ -18,7 +20,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BlockEntityBuilder<U extends SmartEntityBlock, P>
+public class BlockEntityBuilder<U extends Block & EntityBlock, P>
     extends SimpleBuilder<IEntry<U>, P, BlockEntityBuilder<U, P>> {
     private final IRegistrate registrate;
     private final String id;
