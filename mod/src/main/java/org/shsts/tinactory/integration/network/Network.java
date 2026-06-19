@@ -16,7 +16,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
 import org.shsts.tinactory.core.network.NetworkRuntime;
-import org.shsts.tinactory.integration.common.SmartEntityBlock;
 import org.slf4j.Logger;
 
 import java.util.Collection;
@@ -132,10 +131,9 @@ public class Network implements INetwork {
         LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
             world.dimension(), pos, subnet);
         runtime.putBlock(pos, subnet, component -> component.putBlock(pos, state, subnet));
-        if (state.getBlock() instanceof SmartEntityBlock entityBlock) {
-            entityBlock.getBlockEntity(world, pos)
-                .flatMap(MACHINE::tryGet)
-                .ifPresent(machine -> putMachine(subnet, machine));
+        var be = world.getBlockEntity(pos);
+        if (be != null) {
+            MACHINE.tryGet(be).ifPresent(machine -> putMachine(subnet, machine));
         }
     }
 
