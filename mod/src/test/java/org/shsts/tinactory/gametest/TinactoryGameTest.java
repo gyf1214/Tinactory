@@ -153,7 +153,7 @@ public final class TinactoryGameTest {
     }
 
     @GameTest(timeoutTicks = 80)
-    public static void testNetworkBridgeSplitsLogisticsSubnet(GameTestHelper helper) {
+    public static void testNetworkBridgeSplitsElectricAndLogisticsSubnets(GameTestHelper helper) {
         var parentMachinePos = new BlockPos(1, 1, 1);
         var parentCablePos = parentMachinePos.east();
         var bridgePos = parentCablePos.east();
@@ -192,6 +192,15 @@ public final class TinactoryGameTest {
             }
             if (!network.getSubnet(absoluteChildMachinePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
                 helper.fail("Child machine did not inherit the bridge logistics subnet", childMachinePos);
+            }
+            if (!network.getSubnet(absoluteBridgePos, ELECTRIC_SUBNET.get()).equals(absoluteParentMachinePos)) {
+                helper.fail("Network bridge did not inherit the parent electric subnet", bridgePos);
+            }
+            if (!network.getSubnet(absoluteChildCablePos, ELECTRIC_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child cable did not inherit the bridge electric subnet", childCablePos);
+            }
+            if (!network.getSubnet(absoluteChildMachinePos, ELECTRIC_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child machine did not inherit the bridge electric subnet", childMachinePos);
             }
             helper.succeed();
         });
