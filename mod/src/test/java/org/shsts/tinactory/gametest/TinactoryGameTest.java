@@ -134,6 +134,68 @@ public final class TinactoryGameTest {
         });
     }
 
+    @GameTest(timeoutTicks = 40)
+    public static void testNetworkBridgeDoesNotCreateRootNetwork(GameTestHelper helper) {
+        var bridgePos = new BlockPos(1, 1, 1);
+        helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        useWithTeamMockPlayer(helper, bridgePos);
+
+        helper.runAfterDelay(12, () -> {
+            var manager = WorldNetworkManagers.get(helper.getLevel());
+            var absoluteBridgePos = helper.absolutePos(bridgePos);
+            if (manager.getNetworkAtPos(absoluteBridgePos).isPresent()) {
+                helper.fail("Network bridge created a root network", bridgePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgeSplitsLogisticsSubnet(GameTestHelper helper) {
+        var parentMachinePos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentMachinePos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childMachinePos = childCablePos.east();
+
+        helper.setBlock(parentMachinePos, machineState(Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.LV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.LV, true, true));
+        helper.setBlock(childMachinePos, machineState(Direction.WEST));
+        useWithTeamMockPlayer(helper, parentMachinePos);
+
+        helper.runAfterDelay(16, () -> {
+            var manager = WorldNetworkManagers.get(helper.getLevel());
+            var absoluteParentMachinePos = helper.absolutePos(parentMachinePos);
+            var absoluteBridgePos = helper.absolutePos(bridgePos);
+            var absoluteChildCablePos = helper.absolutePos(childCablePos);
+            var absoluteChildMachinePos = helper.absolutePos(childMachinePos);
+            var graph = manager.getNetworkAtPos(absoluteParentMachinePos).orElseThrow();
+            if (manager.getNetworkAtPos(absoluteBridgePos).orElse(null) != graph) {
+                helper.fail("Network bridge was not connected to the parent network", bridgePos);
+            }
+            if (manager.getNetworkAtPos(absoluteChildMachinePos).orElse(null) != graph) {
+                helper.fail("Child machine was not connected through the network bridge", childMachinePos);
+            }
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentMachinePos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            if (!network.getSubnet(absoluteBridgePos, LOGISTICS_SUBNET.get()).equals(absoluteParentMachinePos)) {
+                helper.fail("Network bridge did not inherit the parent logistics subnet", bridgePos);
+            }
+            if (!network.getSubnet(absoluteChildCablePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child cable did not inherit the bridge logistics subnet", childCablePos);
+            }
+            if (!network.getSubnet(absoluteChildMachinePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child machine did not inherit the bridge logistics subnet", childMachinePos);
+            }
+            helper.succeed();
+        });
+    }
+
     @GameTest(timeoutTicks = 80)
     public static void testBatteryBoxPowersElectricConsumer(GameTestHelper helper) {
         var voltage = Voltage.MV;

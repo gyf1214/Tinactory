@@ -177,7 +177,7 @@ public class ComponentMeta extends MetaConsumer {
                 v.value * GsonHelper.getAsDouble(jo1, "amperage");
             var block = BlockEntityBuilder.builder(id, BridgeBlock.factory(v, tooltip ->
                     addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
-                .transform(MachineSet::baseMachine)
+                .transform(MachineSet.baseMachine(false))
                 .blockEntity()
                 .transform(MENetworkBridge.factory(power))
                 .end()

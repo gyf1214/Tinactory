@@ -40,6 +40,7 @@ import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
+import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
@@ -79,6 +80,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     protected final BlockEntity blockEntity;
     protected final MachineConfig config = new MachineConfig();
+    private final boolean activeNetwork;
 
     private UUID uuid = UUID.randomUUID();
     @Nullable
@@ -89,11 +91,20 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     private ITeamProfile team = null;
 
     protected Machine(BlockEntity be) {
+        this(be, true);
+    }
+
+    protected Machine(BlockEntity be, boolean activeNetwork) {
         this.blockEntity = be;
+        this.activeNetwork = activeNetwork;
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(IBlockEntityTypeBuilder<P> builder) {
         return builder.capability(ID, Machine::new);
+    }
+
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(boolean activeNetwork) {
+        return builder -> builder.capability(ID, be -> new Machine(be, activeNetwork));
     }
 
     @Override
@@ -137,7 +148,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
      * Only called on server
      */
     private void createNetwork(Level world) {
-        if (team != null) {
+        if (activeNetwork && team != null) {
             network = new Network(world, uuid, blockEntity.getBlockPos(), team);
         }
     }

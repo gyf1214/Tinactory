@@ -123,10 +123,6 @@ object MiscMachines {
                 input("iron", "rotor", 2)
                 input("copper", "pipe", 2)
             }
-            machine("alloy_smelter") {
-                component("cable", 4)
-                tech(Technologies.ALLOY_SMELTING)
-            }
             machine("multiblock/interface") {
                 component("cable", 2)
                 input(Items.CHEST)
@@ -138,6 +134,20 @@ object MiscMachines {
                 input(Items.HOPPER, 2)
                 input("glass", "primary", 2)
                 tech(Technologies.SOLDERING)
+            }
+        }
+
+        assembler {
+            componentVoltage = Voltage.ULV
+            defaults {
+                voltage(Voltage.ULV)
+                workTicks(MACHINE_TICKS)
+            }
+            machine("alloy_smelter") {
+                machine("electric_furnace")
+                circuit(2)
+                component("cable", 4)
+                tech(Technologies.ALLOY_SMELTING)
             }
         }
     }

@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.Collection;
@@ -59,8 +60,18 @@ public class MachineSet {
 
     public static <U extends Block & EntityBlock, P> BlockEntityBuilder<U, P> baseMachine(
         BlockEntityBuilder<U, P> builder) {
+        return baseMachine(builder, true);
+    }
+
+    public static <U extends Block & EntityBlock, P> Transformer<BlockEntityBuilder<U, P>> baseMachine(
+        boolean activeNetwork) {
+        return builder -> baseMachine(builder, activeNetwork);
+    }
+
+    private static <U extends Block & EntityBlock, P> BlockEntityBuilder<U, P> baseMachine(
+        BlockEntityBuilder<U, P> builder, boolean activeNetwork) {
         return builder.blockEntity()
-            .transform(Machine::factory)
+            .transform(Machine.factory(activeNetwork))
             .end()
             .block()
             .material(Material.HEAVY_METAL)
