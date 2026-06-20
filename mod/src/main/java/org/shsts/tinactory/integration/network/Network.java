@@ -1,6 +1,5 @@
 package org.shsts.tinactory.integration.network;
 
-import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -12,6 +11,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 import org.shsts.tinactory.core.network.NetworkGraphEngine;
@@ -19,8 +19,8 @@ import org.shsts.tinactory.core.network.NetworkRuntime;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -69,13 +69,19 @@ public class Network implements INetwork {
         }
 
         @Override
-        public boolean isSubnet(BlockPos pos, BlockState data) {
-            return IConnector.isSubnetInWorld(world, pos, data);
+        public Collection<ISubnetLabel> allSubnetLabels() {
+            return SubnetLabel.getSubnetLabels();
         }
 
         @Override
-        public void onDiscover(BlockPos pos, BlockState data, BlockPos subnet) {
-            Network.this.putBlock(pos, data, subnet);
+        public Collection<ISubnetLabel> subnetLabels(BlockPos pos, BlockState data) {
+            return IConnector.subnetLabelsInWorld(world, pos, data);
+        }
+
+        @Override
+        public void onDiscover(BlockPos pos, BlockState data,
+            Function<ISubnetLabel, BlockPos> subnets) {
+            Network.this.putBlock(pos, data, allSubnetLabels(), subnets);
         }
 
         @Override
@@ -108,39 +114,39 @@ public class Network implements INetwork {
     }
 
     @Override
-    public Multimap<BlockPos, IMachine> allMachines() {
+    public Collection<IMachine> allMachines() {
         return runtime.allMachines();
     }
 
     @Override
-    public BlockPos getSubnet(BlockPos pos) {
-        return runtime.getSubnet(pos);
+    public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
+        return runtime.getSubnet(pos, label);
     }
 
     @Override
-    public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
+    public Collection<BlockPos> allBlocks() {
         return runtime.allBlocks();
     }
 
-    private void putMachine(BlockPos subnet, IMachine machine) {
+    private void putMachine(IMachine machine) {
         LOGGER.trace("{}: put machine {}", this, machine);
-        runtime.putMachine(subnet, machine);
+        runtime.putMachine(machine);
     }
 
-    private void putBlock(BlockPos pos, BlockState state, BlockPos subnet) {
-        LOGGER.trace("{}: add block {} at {}:{}, subnet = {}", this, state,
-            world.dimension(), pos, subnet);
-        runtime.putBlock(pos, subnet, component -> component.putBlock(pos, state, subnet));
+    private void putBlock(BlockPos pos, BlockState state, Collection<ISubnetLabel> labels,
+        Function<ISubnetLabel, BlockPos> subnets) {
+        LOGGER.trace("{}: add block {} at {}:{}", this, state, world.dimension(), pos);
+        runtime.putBlock(pos, labels, subnets, component -> component.putBlock(pos, state, subnets));
         var be = world.getBlockEntity(pos);
         if (be != null) {
-            MACHINE.tryGet(be).ifPresent(machine -> putMachine(subnet, machine));
+            MACHINE.tryGet(be).ifPresent(this::putMachine);
         }
     }
 
     private void onConnectFinished() {
         LOGGER.debug("{}: connect finished", this);
         delayTicks = 0;
-        LOGGER.debug("{}: {} machines connected", this, runtime.allMachines().values().size());
+        LOGGER.debug("{}: {} machines connected", this, runtime.allMachines().size());
         runtime.onConnectFinished(ticker -> () -> ticker.tick(world, this));
     }
 

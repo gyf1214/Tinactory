@@ -11,22 +11,29 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.INetworkTicker;
 import org.shsts.tinactory.api.network.IScheduling;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class NetworkRuntime {
+    private record SubnetKey(ISubnetLabel label, BlockPos pos) {}
+
     private final INetwork host;
     private final List<IScheduling> sortedSchedulings;
     private final Map<IComponentType<?>, INetworkComponent> components = new HashMap<>();
-    private final Multimap<BlockPos, IMachine> subnetMachines = ArrayListMultimap.create();
-    private final Map<BlockPos, BlockPos> blockSubnets = new HashMap<>();
+    private final Collection<IMachine> machines = new ArrayList<>();
+    private final Set<BlockPos> blocks = new LinkedHashSet<>();
+    private final Map<SubnetKey, BlockPos> blockSubnets = new HashMap<>();
     private final Multimap<IScheduling, Runnable> componentSchedulings = ArrayListMultimap.create();
     private final Multimap<IScheduling, Runnable> machineSchedulings = ArrayListMultimap.create();
 
@@ -49,25 +56,29 @@ public final class NetworkRuntime {
         return type.clazz().cast(components.get(type));
     }
 
-    public Multimap<BlockPos, IMachine> allMachines() {
-        return subnetMachines;
+    public Collection<IMachine> allMachines() {
+        return machines;
     }
 
-    public BlockPos getSubnet(BlockPos pos) {
-        return blockSubnets.get(pos);
+    public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
+        return blockSubnets.get(new SubnetKey(label, pos));
     }
 
-    public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
-        return blockSubnets.entrySet();
+    public Collection<BlockPos> allBlocks() {
+        return blocks;
     }
 
-    public void putMachine(BlockPos subnet, IMachine machine) {
+    public void putMachine(IMachine machine) {
         machine.assignNetwork(host);
-        subnetMachines.put(subnet, machine);
+        machines.add(machine);
     }
 
-    public void putBlock(BlockPos pos, BlockPos subnet, Consumer<INetworkComponent> componentCallback) {
-        blockSubnets.put(pos, subnet);
+    public void putBlock(BlockPos pos, Collection<ISubnetLabel> labels,
+        Function<ISubnetLabel, BlockPos> subnets, Consumer<INetworkComponent> componentCallback) {
+        blocks.add(pos);
+        for (var label : labels) {
+            blockSubnets.put(new SubnetKey(label, pos), subnets.apply(label));
+        }
         for (var component : components.values()) {
             componentCallback.accept(component);
         }
@@ -77,13 +88,13 @@ public final class NetworkRuntime {
         for (var component : components.values()) {
             component.onConnect();
         }
-        for (var machine : subnetMachines.values()) {
+        for (var machine : machines) {
             machine.onConnectToNetwork(host);
         }
         for (var component : components.values()) {
             component.onPostConnect();
         }
-        for (var machine : subnetMachines.values()) {
+        for (var machine : machines) {
             machine.buildSchedulings((scheduling, ticker) -> {
                 machineSchedulings.put(scheduling, tickerActionFactory.apply(ticker));
             });
@@ -92,14 +103,15 @@ public final class NetworkRuntime {
 
     public void onDisconnect(boolean connected) {
         if (connected) {
-            for (var machine : subnetMachines.values()) {
+            for (var machine : machines) {
                 machine.onDisconnectFromNetwork();
             }
             for (var component : components.values()) {
                 component.onDisconnect();
             }
         }
-        subnetMachines.clear();
+        machines.clear();
+        blocks.clear();
         blockSubnets.clear();
         machineSchedulings.clear();
     }

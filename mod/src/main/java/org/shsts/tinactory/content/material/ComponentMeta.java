@@ -10,10 +10,14 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
+import org.shsts.tinactory.content.logistics.MENetworkBridge;
+import org.shsts.tinactory.content.machine.MachineSet;
+import org.shsts.tinactory.content.network.BridgeBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
+import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.common.CellItem;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -29,6 +33,8 @@ import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.content.machine.MachineMeta.MACHINE_PROPERTY;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -161,6 +167,26 @@ public class ComponentMeta extends MetaConsumer {
         COMPONENTS.put(name, components);
     }
 
+    private void buildNetworkBridge(String name, JsonObject jo) {
+        var components = new HashMap<Voltage, IEntry<BridgeBlock>>();
+        for (var entry : parseVoltageConfig(jo, "items")) {
+            var v = entry.voltage();
+            var jo1 = entry.jo();
+            var id = "network/" + v.id + "/" + name;
+            var power = jo1.has("power") ? GsonHelper.getAsDouble(jo1, "power") :
+                v.value * GsonHelper.getAsDouble(jo1, "amperage");
+            var block = BlockEntityBuilder.builder(id, BridgeBlock.factory(v, tooltip ->
+                    addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
+                .transform(MachineSet.baseMachine(false))
+                .blockEntity()
+                .transform(MENetworkBridge.factory(power))
+                .end()
+                .buildObject();
+            components.put(v, block);
+        }
+        COMPONENTS.put(name, components);
+    }
+
     private void buildFluidCells(String name, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "items");
         var components = new HashMap<Voltage, IEntry<CellItem>>();
@@ -200,6 +226,7 @@ public class ComponentMeta extends MetaConsumer {
             case "battery" -> buildBatteries(name, jo);
             case "cable" -> buildCables(name, jo);
             case "subnet" -> buildSubnets(name, jo);
+            case "network_bridge" -> buildNetworkBridge(name, jo);
             case "fluid_cell" -> buildFluidCells(name, jo);
             case "set" -> buildSet(name, jo);
             default -> LOGGER.debug("Skip unknown type: {}", type);

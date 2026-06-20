@@ -2,29 +2,40 @@ package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraftforge.registries.ForgeRegistryEntry;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 final class NetworkGraphEngineFixtures {
+    static final ISubnetLabel LABEL_A = new TestSubnetLabel();
+    static final ISubnetLabel LABEL_B = new TestSubnetLabel();
+
     private NetworkGraphEngineFixtures() {}
+
+    private static final class TestSubnetLabel
+        extends ForgeRegistryEntry<ISubnetLabel> implements ISubnetLabel {
+    }
 
     static final class Node {
         private final EnumSet<Direction> edges = EnumSet.noneOf(Direction.class);
-        private final boolean subnet;
+        private final List<ISubnetLabel> subnetLabels;
 
-        Node(boolean subnet) {
-            this.subnet = subnet;
+        Node(List<ISubnetLabel> subnetLabels) {
+            this.subnetLabels = List.copyOf(subnetLabels);
         }
 
-        boolean isSubnet() {
-            return subnet;
+        List<ISubnetLabel> subnetLabels() {
+            return subnetLabels;
         }
     }
 
@@ -33,8 +44,16 @@ final class NetworkGraphEngineFixtures {
         private final Map<BlockPos, Node> nodes = new HashMap<>();
 
         Graph addNode(BlockPos pos, boolean subnet) {
+            return addNode(pos, subnet ? List.of(LABEL_A) : List.of());
+        }
+
+        Graph addNode(BlockPos pos, ISubnetLabel... subnetLabels) {
+            return addNode(pos, List.of(subnetLabels));
+        }
+
+        private Graph addNode(BlockPos pos, List<ISubnetLabel> subnetLabels) {
             loaded.add(pos);
-            nodes.put(pos, new Node(subnet));
+            nodes.put(pos, new Node(subnetLabels));
             return this;
         }
 
@@ -61,10 +80,14 @@ final class NetworkGraphEngineFixtures {
 
     static final class Events {
         final List<BlockPos> discovered = new ArrayList<>();
-        final Map<BlockPos, BlockPos> subnets = new HashMap<>();
+        final Map<BlockPos, Map<ISubnetLabel, BlockPos>> subnets = new HashMap<>();
         int connectFinishedCalls;
         int disconnectCalls;
         boolean lastDisconnectWasConnected;
+
+        BlockPos subnet(BlockPos pos, ISubnetLabel label) {
+            return subnets.get(pos).get(label);
+        }
     }
 
     static final class RecordingAdapter implements INetworkGraphAdapter<Node> {
@@ -92,14 +115,23 @@ final class NetworkGraphEngineFixtures {
         }
 
         @Override
-        public boolean isSubnet(BlockPos pos, Node data) {
-            return data.isSubnet();
+        public Collection<ISubnetLabel> allSubnetLabels() {
+            return List.of(LABEL_A, LABEL_B);
         }
 
         @Override
-        public void onDiscover(BlockPos pos, Node data, BlockPos subnet) {
+        public Collection<ISubnetLabel> subnetLabels(BlockPos pos, Node data) {
+            return data.subnetLabels();
+        }
+
+        @Override
+        public void onDiscover(BlockPos pos, Node data, Function<ISubnetLabel, BlockPos> subnets) {
             events.discovered.add(pos);
-            events.subnets.put(pos, subnet);
+            var snapshot = new HashMap<ISubnetLabel, BlockPos>();
+            for (var label : allSubnetLabels()) {
+                snapshot.put(label, subnets.apply(label));
+            }
+            events.subnets.put(pos, snapshot);
         }
 
         @Override

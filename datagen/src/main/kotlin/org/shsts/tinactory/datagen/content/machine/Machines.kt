@@ -12,6 +12,7 @@ import org.shsts.tinactory.AllTags.CLEANROOM_CONNECTOR
 import org.shsts.tinactory.AllTags.MINEABLE_WITH_WRENCH
 import org.shsts.tinactory.content.machine.MachineSet
 import org.shsts.tinactory.content.machine.ProcessingSet
+import org.shsts.tinactory.content.network.BridgeBlock
 import org.shsts.tinactory.content.network.SubnetBlock
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.cubeBlock
@@ -188,6 +189,16 @@ object Machines {
                     machineModel {
                         overlay(Direction.NORTH, IO_TEX)
                         overlay(Direction.SOUTH, IO_OUT_TEX)
+                    }
+                    tag(CLEANROOM_CONNECTOR)
+                }
+            }
+
+            for (entry in componentEntry<BridgeBlock>("network_bridge").values) {
+                block(entry) {
+                    machineModel {
+                        overlay(Direction.NORTH, ME_BUS)
+                        overlay(Direction.SOUTH, ME_BUS)
                     }
                     tag(CLEANROOM_CONNECTOR)
                 }

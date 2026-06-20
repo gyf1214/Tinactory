@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.common.WeakMap;
 
 import java.util.ArrayDeque;
@@ -22,7 +23,8 @@ public class NetworkGraphEngine<TNodeData> {
         INVALIDATING
     }
 
-    private record BlockInfo<TNodeData>(TNodeData data, BlockPos parent, BlockPos subnet) {}
+    private record BlockInfo<TNodeData>(TNodeData data, BlockPos parent,
+        Map<ISubnetLabel, BlockPos> subnets) {}
 
     private final BlockPos center;
     private final NetworkManager manager;
@@ -58,8 +60,12 @@ public class NetworkGraphEngine<TNodeData> {
         visited.clear();
         if (adapter.isNodeLoaded(center)) {
             var data = adapter.getNodeData(center);
+            var subnets = new HashMap<ISubnetLabel, BlockPos>();
+            for (var label : adapter.allSubnetLabels()) {
+                subnets.put(label, center);
+            }
             queue.add(center);
-            visited.put(center, new BlockInfo<>(data, center, center));
+            visited.put(center, new BlockInfo<>(data, center, Map.copyOf(subnets)));
         }
     }
 
@@ -101,7 +107,11 @@ public class NetworkGraphEngine<TNodeData> {
         var pos = queue.remove();
         var info = visited.get(pos);
         assert info != null;
-        var subnet = adapter.isSubnet(pos, info.data()) ? pos : info.subnet();
+        var childSubnets = new HashMap<>(info.subnets());
+        for (var label : adapter.subnetLabels(pos, info.data())) {
+            childSubnets.put(label, pos);
+        }
+        var childSubnetSnapshot = Map.copyOf(childSubnets);
         for (var dir : Direction.values()) {
             var pos1 = pos.relative(dir);
             if (!adapter.isConnected(pos, info.data(), dir)) {
@@ -116,7 +126,7 @@ public class NetworkGraphEngine<TNodeData> {
             var data1 = adapter.getNodeData(pos1);
             if (adapter.isConnected(pos1, data1, dir.getOpposite())) {
                 queue.add(pos1);
-                visited.put(pos1, new BlockInfo<>(data1, pos, subnet));
+                visited.put(pos1, new BlockInfo<>(data1, pos, childSubnetSnapshot));
             }
         }
         if (manager.hasNetworkAtPos(pos)) {
@@ -133,7 +143,7 @@ public class NetworkGraphEngine<TNodeData> {
         if (!manager.hasNetworkAtPos(pos)) {
             putNetworkAtPos(pos);
         }
-        adapter.onDiscover(pos, info.data(), info.subnet());
+        adapter.onDiscover(pos, info.data(), info.subnets()::get);
         return true;
     }
 }

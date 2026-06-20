@@ -37,6 +37,9 @@ import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
+import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -116,11 +119,163 @@ public final class TinactoryGameTest {
             var network = MACHINE.tryGet(helper.getBlockEntity(machinePos))
                 .flatMap(machine -> machine.network())
                 .orElseThrow();
-            if (!network.getSubnet(absoluteCablePos).equals(absoluteMachinePos)) {
+            if (!network.getSubnet(absoluteCablePos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Cable did not inherit the machine subnet", cablePos);
             }
-            if (!network.getSubnet(absoluteSubnetPos).equals(absoluteMachinePos)) {
+            if (!network.getSubnet(absoluteSubnetPos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Electric buffer did not inherit the parent subnet", subnetPos);
+            }
+            if (!network.getSubnet(absoluteCablePos, LOGISTICS_SUBNET.get()).equals(absoluteMachinePos)) {
+                helper.fail("Cable did not inherit the logistics subnet", cablePos);
+            }
+            if (!network.getSubnet(absoluteSubnetPos, LOGISTICS_SUBNET.get()).equals(absoluteMachinePos)) {
+                helper.fail("Electric buffer split the logistics subnet", subnetPos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 40)
+    public static void testNetworkBridgeDoesNotCreateRootNetwork(GameTestHelper helper) {
+        var bridgePos = new BlockPos(1, 1, 1);
+        helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        useWithTeamMockPlayer(helper, bridgePos);
+
+        helper.runAfterDelay(12, () -> {
+            var manager = WorldNetworkManagers.get(helper.getLevel());
+            var absoluteBridgePos = helper.absolutePos(bridgePos);
+            if (manager.getNetworkAtPos(absoluteBridgePos).isPresent()) {
+                helper.fail("Network bridge created a root network", bridgePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgeSplitsElectricAndLogisticsSubnets(GameTestHelper helper) {
+        var parentMachinePos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentMachinePos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childMachinePos = childCablePos.east();
+
+        helper.setBlock(parentMachinePos, machineState(Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.LV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.LV, true, true));
+        helper.setBlock(childMachinePos, machineState(Direction.WEST));
+        useWithTeamMockPlayer(helper, parentMachinePos);
+
+        helper.runAfterDelay(16, () -> {
+            var manager = WorldNetworkManagers.get(helper.getLevel());
+            var absoluteParentMachinePos = helper.absolutePos(parentMachinePos);
+            var absoluteBridgePos = helper.absolutePos(bridgePos);
+            var absoluteChildCablePos = helper.absolutePos(childCablePos);
+            var absoluteChildMachinePos = helper.absolutePos(childMachinePos);
+            var graph = manager.getNetworkAtPos(absoluteParentMachinePos).orElseThrow();
+            if (manager.getNetworkAtPos(absoluteBridgePos).orElse(null) != graph) {
+                helper.fail("Network bridge was not connected to the parent network", bridgePos);
+            }
+            if (manager.getNetworkAtPos(absoluteChildMachinePos).orElse(null) != graph) {
+                helper.fail("Child machine was not connected through the network bridge", childMachinePos);
+            }
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentMachinePos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            if (!network.getSubnet(absoluteBridgePos, LOGISTICS_SUBNET.get()).equals(absoluteParentMachinePos)) {
+                helper.fail("Network bridge did not inherit the parent logistics subnet", bridgePos);
+            }
+            if (!network.getSubnet(absoluteChildCablePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child cable did not inherit the bridge logistics subnet", childCablePos);
+            }
+            if (!network.getSubnet(absoluteChildMachinePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child machine did not inherit the bridge logistics subnet", childMachinePos);
+            }
+            if (!network.getSubnet(absoluteBridgePos, ELECTRIC_SUBNET.get()).equals(absoluteParentMachinePos)) {
+                helper.fail("Network bridge did not inherit the parent electric subnet", bridgePos);
+            }
+            if (!network.getSubnet(absoluteChildCablePos, ELECTRIC_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child cable did not inherit the bridge electric subnet", childCablePos);
+            }
+            if (!network.getSubnet(absoluteChildMachinePos, ELECTRIC_SUBNET.get()).equals(absoluteBridgePos)) {
+                helper.fail("Child machine did not inherit the bridge electric subnet", childMachinePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgeExposesParentStorageToChildWorkerAsBridgePort(GameTestHelper helper) {
+        var parentStoragePos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentStoragePos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childWorkerPos = childCablePos.east();
+
+        helper.setBlock(parentStoragePos, machineState("logistics/electric_chest", Voltage.MV, Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge", Voltage.MV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(childWorkerPos, machineState("logistics/logistic_worker", Voltage.MV, Direction.WEST));
+        useWithTeamMockPlayer(helper, parentStoragePos);
+
+        helper.runAfterDelay(24, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentStoragePos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+            var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
+            var parentStorage = MACHINE.get(helper.getBlockEntity(parentStoragePos));
+            var childWorker = MACHINE.get(helper.getBlockEntity(childWorkerPos));
+            var visible = logistics.getVisiblePorts(childWorker);
+            if (visible.stream().noneMatch(info -> info.machine().uuid().equals(bridge.uuid()) &&
+                info.portIndex() == 0)) {
+                helper.fail("Child worker did not see parent item storage through bridge port", childWorkerPos);
+            }
+            if (visible.stream().anyMatch(info -> info.machine().uuid().equals(parentStorage.uuid()))) {
+                helper.fail("Child worker saw parent storage directly instead of through bridge port", childWorkerPos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgePortsAreExcludedFromStorageAggregation(GameTestHelper helper) {
+        var parentWorkerPos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentWorkerPos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childStoragePos = childCablePos.east();
+
+        helper.setBlock(parentWorkerPos, machineState("logistics/logistic_worker", Voltage.MV, Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge", Voltage.MV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(childStoragePos, machineState("logistics/electric_chest", Voltage.MV, Direction.WEST));
+        useWithTeamMockPlayer(helper, parentWorkerPos);
+
+        helper.runAfterDelay(24, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentWorkerPos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+            var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
+            var childStorage = MACHINE.get(helper.getBlockEntity(childStoragePos));
+            var parentWorker = MACHINE.get(helper.getBlockEntity(parentWorkerPos));
+            var visible = logistics.getVisiblePorts(parentWorker);
+            if (visible.stream().noneMatch(info -> info.machine().uuid().equals(bridge.uuid()) &&
+                info.portIndex() == 2)) {
+                helper.fail("Parent worker did not see child item storage through bridge port", parentWorkerPos);
+            }
+            if (visible.stream().anyMatch(info -> info.machine().uuid().equals(childStorage.uuid()))) {
+                helper.fail("Parent worker saw child storage directly instead of through bridge port", parentWorkerPos);
+            }
+            if (!logistics.getStoragePorts(parentWorker).isEmpty()) {
+                helper.fail("Parent storage aggregation included bridge ports", parentWorkerPos);
             }
             helper.succeed();
         });
@@ -201,7 +356,7 @@ public final class TinactoryGameTest {
         helper.succeed();
     }
 
-    @GameTest(timeoutTicks = 160)
+    @GameTest(template = "empty_20x5x5", timeoutTicks = 160)
     public static void testTransformerPowersOversizedEvConsumer(GameTestHelper helper) {
         var batteryBoxPos = new BlockPos(0, 1, 1);
         var hvCablePos = batteryBoxPos.east();

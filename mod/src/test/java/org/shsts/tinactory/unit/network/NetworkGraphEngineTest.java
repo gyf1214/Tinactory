@@ -72,9 +72,49 @@ class NetworkGraphEngineTest {
             // step until finished.
         }
 
-        assertEquals(center, events.subnets.get(center));
-        assertEquals(center, events.subnets.get(east));
-        assertEquals(east, events.subnets.get(eastEast));
+        assertEquals(center, events.subnet(center, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(center, events.subnet(east, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(east, events.subnet(eastEast, NetworkGraphEngineFixtures.LABEL_A));
+    }
+
+    @Test
+    void shouldPropagateSubnetMarkersPerLabel() {
+        var center = new BlockPos(0, 0, 0);
+        var labelAMarker = center.east();
+        var beyondLabelA = labelAMarker.east();
+        var bothMarker = center.west();
+        var beyondBoth = bothMarker.west();
+        var graph = new NetworkGraphEngineFixtures.Graph()
+            .addNode(center, false)
+            .addNode(labelAMarker, NetworkGraphEngineFixtures.LABEL_A)
+            .addNode(beyondLabelA, false)
+            .addNode(bothMarker, NetworkGraphEngineFixtures.LABEL_A, NetworkGraphEngineFixtures.LABEL_B)
+            .addNode(beyondBoth, false)
+            .addEdge(center, Direction.EAST)
+            .addEdge(labelAMarker, Direction.EAST)
+            .addEdge(center, Direction.WEST)
+            .addEdge(bothMarker, Direction.WEST);
+        var events = new NetworkGraphEngineFixtures.Events();
+        var manager = new NetworkManager();
+
+        var engine = new NetworkGraphEngine<>(
+            UUID.fromString("00000000-0000-0000-0000-000000000010"),
+            center,
+            manager,
+            new NetworkGraphEngineFixtures.RecordingAdapter(graph, events)
+        );
+
+        while (engine.connectNext()) {
+            // step until finished.
+        }
+
+        assertEquals(center, events.subnet(labelAMarker, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(labelAMarker, events.subnet(beyondLabelA, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(center, events.subnet(beyondLabelA, NetworkGraphEngineFixtures.LABEL_B));
+        assertEquals(center, events.subnet(bothMarker, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(center, events.subnet(bothMarker, NetworkGraphEngineFixtures.LABEL_B));
+        assertEquals(bothMarker, events.subnet(beyondBoth, NetworkGraphEngineFixtures.LABEL_A));
+        assertEquals(bothMarker, events.subnet(beyondBoth, NetworkGraphEngineFixtures.LABEL_B));
     }
 
     @Test

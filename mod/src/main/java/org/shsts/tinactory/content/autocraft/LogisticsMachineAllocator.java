@@ -33,9 +33,11 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public final class LogisticsMachineAllocator implements IMachineAllocator {
     private final LogisticComponent logistics;
+    private final IMachine viewer;
 
-    public LogisticsMachineAllocator(LogisticComponent logistics) {
+    public LogisticsMachineAllocator(LogisticComponent logistics, IMachine viewer) {
         this.logistics = logistics;
+        this.viewer = viewer;
     }
 
     @Override
@@ -79,7 +81,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
 
     private Map<UUID, List<LogisticComponent.PortInfo>> groupMachinePorts() {
         var grouped = new HashMap<UUID, List<LogisticComponent.PortInfo>>();
-        for (var info : logistics.getAllPorts()) {
+        for (var info : logistics.getVisiblePorts(viewer)) {
             grouped.computeIfAbsent(info.machine().uuid(), $ -> new ArrayList<>()).add(info);
         }
         for (var ports : grouped.values()) {

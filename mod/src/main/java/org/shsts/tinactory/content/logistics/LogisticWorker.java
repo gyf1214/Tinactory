@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.core.logistics.PortTransmitter;
@@ -103,12 +104,14 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             .map(LogisticWorkerConfig::fromTag);
     }
 
-    private static Optional<IPort<?>> getPort(LogisticComponent logistic, LogisticComponent.PortKey key) {
-        return logistic.getPort(key)
+    private static Optional<IPort<?>> getPort(IMachine machine, LogisticComponent logistic,
+        LogisticComponent.PortKey key) {
+        return logistic.getPort(machine, key)
             .map(LogisticComponent.PortInfo::port);
     }
 
-    private static boolean validateConfig(LogisticComponent logistic, LogisticWorkerConfig entry) {
+    private static boolean validateConfig(IMachine machine, LogisticComponent logistic,
+        LogisticWorkerConfig entry) {
         if (!entry.isValid()) {
             return true;
         }
@@ -117,8 +120,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         if (from.isEmpty() || to.isEmpty() || from.get().equals(to.get())) {
             return false;
         }
-        var from1 = getPort(logistic, from.get());
-        var to1 = getPort(logistic, to.get());
+        var from1 = getPort(machine, logistic, from.get());
+        var to1 = getPort(machine, logistic, to.get());
         return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type() &&
             (entry.filterType() == LogisticWorkerConfig.FilterType.NONE ||
                 entry.filterType().portType == from1.get().type());
@@ -146,7 +149,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         for (var i = 0; i < workerSlots; i++) {
             var valid = getConfig(i)
                 .filter(LogisticWorkerConfig::isValid)
-                .filter(entry -> validateConfig(logistic, entry))
+                .filter(entry -> validateConfig(machine, logistic, entry))
                 .isPresent();
 
             if (valid) {
@@ -238,10 +241,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
         var logistic = network.getComponent(LOGISTIC_COMPONENT.get());
 
-        if (validateConfig(logistic, entry1)) {
+        var machine = MACHINE.get(blockEntity);
+        if (validateConfig(machine, logistic, entry1)) {
             LOGGER.trace("{}: transmit entry slot {}", blockEntity, currentSlot);
-            var from = entry1.from().flatMap(k -> getPort(logistic, k)).orElseThrow();
-            var to = entry1.to().flatMap(k -> getPort(logistic, k)).orElseThrow();
+            var from = entry1.from().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
+            var to = entry1.to().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
                 transmitItem(from.asItem(), to.asItem(), entry1);
             } else {

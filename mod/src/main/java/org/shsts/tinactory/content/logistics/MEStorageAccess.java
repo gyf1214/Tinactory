@@ -22,6 +22,7 @@ import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -54,18 +55,23 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
-    private void onUpdateLogistics(LogisticComponent logistics) {
+    public static void combinePorts(Collection<? extends IPort<?>> ports,
+        CombinedPort<ItemStack> item, CombinedPort<FluidStack> fluid) {
         var items = new ArrayList<IPort<ItemStack>>();
         var fluids = new ArrayList<IPort<FluidStack>>();
-        for (var port : logistics.getStoragePorts()) {
+        for (var port : ports) {
             if (port.type() == PortType.ITEM) {
                 items.add(port.asItem());
             } else if (port.type() == PortType.FLUID) {
                 fluids.add(port.asFluid());
             }
         }
-        combinedItem.setComposes(items);
-        combinedFluid.setComposes(fluids);
+        item.setComposes(items);
+        fluid.setComposes(fluids);
+    }
+
+    private void onUpdateLogistics(LogisticComponent logistics) {
+        combinePorts(logistics.getStoragePorts(machine), combinedItem, combinedFluid);
     }
 
     protected void onConnect(INetwork network) {

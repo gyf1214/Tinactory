@@ -6,6 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.network.ISubnetLabel;
+
+import java.util.Collection;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -33,8 +37,8 @@ public interface IConnector {
         return autoConnectWith(world, pos, state, dir, world.getBlockState(pos1));
     }
 
-    default boolean isSubnet(Level world, BlockPos pos, BlockState state) {
-        return false;
+    default Collection<ISubnetLabel> subnetLabels(Level world, BlockPos pos, BlockState state) {
+        return List.of();
     }
 
     static boolean allowConnectWith(Level world, BlockPos pos, Direction dir) {
@@ -61,8 +65,8 @@ public interface IConnector {
             connector.allowConnectWith(world, pos, state, dir);
     }
 
-    static boolean isSubnetInWorld(Level world, BlockPos pos, BlockState state) {
-        return state.getBlock() instanceof IConnector connector &&
-            connector.isSubnet(world, pos, state);
+    static Collection<ISubnetLabel> subnetLabelsInWorld(Level world, BlockPos pos, BlockState state) {
+        return state.getBlock() instanceof IConnector connector ?
+            connector.subnetLabels(world, pos, state) : List.of();
     }
 }

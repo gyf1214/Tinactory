@@ -1,7 +1,5 @@
 package org.shsts.tinactory.unit.network;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -21,15 +19,16 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 final class NetworkRuntimeFixtures {
     private NetworkRuntimeFixtures() {}
@@ -46,17 +45,17 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public BlockPos getSubnet(BlockPos pos) {
+        public BlockPos getSubnet(BlockPos pos, ISubnetLabel label) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Multimap<BlockPos, IMachine> allMachines() {
-            return ArrayListMultimap.create();
+        public Collection<IMachine> allMachines() {
+            return List.of();
         }
 
         @Override
-        public Collection<Map.Entry<BlockPos, BlockPos>> allBlocks() {
+        public Collection<BlockPos> allBlocks() {
             return List.of();
         }
     }
@@ -117,8 +116,11 @@ final class NetworkRuntimeFixtures {
         }
 
         @Override
-        public void putBlock(BlockPos pos, @Nullable BlockState state, BlockPos subnet) {
-            events.add("component.putBlock:" + pos + "->" + subnet);
+        public void putBlock(BlockPos pos, @Nullable BlockState state,
+            Function<ISubnetLabel, BlockPos> subnets) {
+            events.add("component.putBlock:" + pos +
+                "->A:" + subnets.apply(NetworkGraphEngineFixtures.LABEL_A) +
+                ",B:" + subnets.apply(NetworkGraphEngineFixtures.LABEL_B));
         }
 
         @Override
@@ -146,12 +148,18 @@ final class NetworkRuntimeFixtures {
         private final UUID id;
         private final List<String> events;
         private final IScheduling scheduling;
+        private final BlockPos blockPos;
         private Optional<INetwork> network = Optional.empty();
 
         MachineFixture(String id, List<String> events, IScheduling scheduling) {
+            this(id, events, scheduling, BlockPos.ZERO);
+        }
+
+        MachineFixture(String id, List<String> events, IScheduling scheduling, BlockPos blockPos) {
             this.id = UUID.fromString(id);
             this.events = events;
             this.scheduling = scheduling;
+            this.blockPos = blockPos;
         }
 
         @Override
@@ -191,6 +199,11 @@ final class NetworkRuntimeFixtures {
         @Override
         public BlockEntity blockEntity() {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public BlockPos blockPos() {
+            return blockPos;
         }
 
         @Override

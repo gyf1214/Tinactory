@@ -1,0 +1,26 @@
+{
+  "type": "network_bridge",
+  "items": {
+    "ulv": {
+      "power": 1
+    },
+    "lv": {
+      "power": 2
+    },
+    "mv": {
+      "power": 4
+    },
+    "hv": {
+      "power": 8
+    },
+    "ev": {
+      "power": 16
+    },
+    "iv": {
+      "power": 32
+    },
+    "luv": {
+      "power": 64
+    }
+  }
+}

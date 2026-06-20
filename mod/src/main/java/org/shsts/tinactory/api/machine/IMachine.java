@@ -2,6 +2,7 @@ package org.shsts.tinactory.api.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -46,6 +47,10 @@ public interface IMachine {
     ItemStack icon();
 
     BlockEntity blockEntity();
+
+    default BlockPos blockPos() {
+        return blockEntity().getBlockPos();
+    }
 
     default Level world() {
         var ret = blockEntity().getLevel();

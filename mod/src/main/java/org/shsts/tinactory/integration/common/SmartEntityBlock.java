@@ -58,7 +58,7 @@ public class SmartEntityBlock extends Block implements EntityBlock {
         return entityType.get().get();
     }
 
-    public Optional<BlockEntity> getBlockEntity(Level world, BlockPos pos) {
+    protected Optional<BlockEntity> getBlockEntity(Level world, BlockPos pos) {
         if (world.isLoaded(pos)) {
             return world.getBlockEntity(pos, getType()).map($ -> $);
         }

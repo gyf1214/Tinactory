@@ -66,6 +66,13 @@ object ProcessingMachines {
             component("cable", 2)
             tech(Technologies.BATTERY)
         }
+        component("network_bridge") {
+            circuit(4)
+            component("conveyor_module", 2)
+            component("electric_pump", 2)
+            pic(2)
+            tech(Technologies.CONVEYOR_MODULE)
+        }
     }
 
     private fun AssemblyRecipeBuilder.storage(amount: Int = 1) {
