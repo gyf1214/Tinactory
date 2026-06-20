@@ -347,7 +347,7 @@ public final class TinactoryGameTest {
         helper.succeed();
     }
 
-    @GameTest(timeoutTicks = 160)
+    @GameTest(template = "empty_20x5x5", timeoutTicks = 160)
     public static void testTransformerPowersOversizedEvConsumer(GameTestHelper helper) {
         var batteryBoxPos = new BlockPos(0, 1, 1);
         var hvCablePos = batteryBoxPos.east();

@@ -18,6 +18,6 @@ public abstract class MixinStructureUtils {
     @Inject(method = "getStructureTemplate", at = @At("HEAD"), cancellable = true)
     private static void injectGetStructureTemplate(String name, ServerLevel world,
         CallbackInfoReturnable<StructureTemplate> ci) {
-        ci.setReturnValue(StructureHelper.EMPTY);
+        ci.setReturnValue(StructureHelper.emptyFor(name));
     }
 }
