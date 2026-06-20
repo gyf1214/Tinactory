@@ -39,6 +39,7 @@ import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -191,6 +192,81 @@ public final class TinactoryGameTest {
             }
             if (!network.getSubnet(absoluteChildMachinePos, LOGISTICS_SUBNET.get()).equals(absoluteBridgePos)) {
                 helper.fail("Child machine did not inherit the bridge logistics subnet", childMachinePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgeExposesParentStorageToChildWorkerAsBridgePort(GameTestHelper helper) {
+        var parentStoragePos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentStoragePos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childWorkerPos = childCablePos.east();
+
+        helper.setBlock(parentStoragePos, machineState("logistics/electric_chest", Voltage.MV, Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge", Voltage.MV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(childWorkerPos, machineState("logistics/logistic_worker", Voltage.MV, Direction.WEST));
+        useWithTeamMockPlayer(helper, parentStoragePos);
+
+        helper.runAfterDelay(24, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentStoragePos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+            var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
+            var parentStorage = MACHINE.get(helper.getBlockEntity(parentStoragePos));
+            var childWorker = MACHINE.get(helper.getBlockEntity(childWorkerPos));
+            var visible = logistics.getVisiblePorts(childWorker);
+            if (visible.stream().noneMatch(info -> info.machine().uuid().equals(bridge.uuid()) &&
+                info.portIndex() == 0)) {
+                helper.fail("Child worker did not see parent item storage through bridge port", childWorkerPos);
+            }
+            if (visible.stream().anyMatch(info -> info.machine().uuid().equals(parentStorage.uuid()))) {
+                helper.fail("Child worker saw parent storage directly instead of through bridge port", childWorkerPos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testNetworkBridgePortsAreExcludedFromStorageAggregation(GameTestHelper helper) {
+        var parentWorkerPos = new BlockPos(1, 1, 1);
+        var parentCablePos = parentWorkerPos.east();
+        var bridgePos = parentCablePos.east();
+        var childCablePos = bridgePos.east();
+        var childStoragePos = childCablePos.east();
+
+        helper.setBlock(parentWorkerPos, machineState("logistics/logistic_worker", Voltage.MV, Direction.EAST));
+        helper.setBlock(parentCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(bridgePos, componentBlock("network_bridge", Voltage.MV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST));
+        helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
+        helper.setBlock(childStoragePos, machineState("logistics/electric_chest", Voltage.MV, Direction.WEST));
+        useWithTeamMockPlayer(helper, parentWorkerPos);
+
+        helper.runAfterDelay(24, () -> {
+            var network = MACHINE.tryGet(helper.getBlockEntity(parentWorkerPos))
+                .flatMap(machine -> machine.network())
+                .orElseThrow();
+            var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
+            var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
+            var childStorage = MACHINE.get(helper.getBlockEntity(childStoragePos));
+            var parentWorker = MACHINE.get(helper.getBlockEntity(parentWorkerPos));
+            var visible = logistics.getVisiblePorts(parentWorker);
+            if (visible.stream().noneMatch(info -> info.machine().uuid().equals(bridge.uuid()) &&
+                info.portIndex() == 2)) {
+                helper.fail("Parent worker did not see child item storage through bridge port", parentWorkerPos);
+            }
+            if (visible.stream().anyMatch(info -> info.machine().uuid().equals(childStorage.uuid()))) {
+                helper.fail("Parent worker saw child storage directly instead of through bridge port", parentWorkerPos);
+            }
+            if (!logistics.getStoragePorts(parentWorker).isEmpty()) {
+                helper.fail("Parent storage aggregation included bridge ports", parentWorkerPos);
             }
             helper.succeed();
         });
