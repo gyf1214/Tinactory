@@ -1,5 +1,6 @@
 archivesBaseName = "tinactory_datagen"
 apply plugin: 'kotlin'
+apply plugin: 'org.shsts.checksource'
 
 minecraft {
     runs {
@@ -50,6 +51,11 @@ compileKotlin {
     kotlinOptions {
         jvmTarget = "17"
     }
+}
+
+checkSource {
+    topPackage 'org.shsts.tinactory'
+    includeKotlin()
 }
 
 tasks.register('extractQuestLanguage', JavaExec) {

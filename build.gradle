@@ -13,6 +13,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.shsts.checksource' version '0.1.1' apply false
+}
+
 subprojects {
     group = 'org.shsts.tinactory'
     version = "${minecraft_version}-${mod_version}"
