@@ -1,94 +1,73 @@
-archivesBaseName = "tinactory"
+base {
+    archivesName = "tinactory"
+}
 apply plugin: 'jacoco'
 apply plugin: 'org.shsts.checksource'
 
-tasks.withType(JavaCompile).configureEach {
-    options.release = 17
-}
-
-minecraft {
+neoForge {
     runs {
-        client {
-            workingDirectory rootProject.file('run/client')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
-
-            ideaModule rootProject.name + "." + project.name + ".main"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                }
-            }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'forge.logging.console.level', 'debug'
+            jvmArgument '-ea'
         }
 
-        server {
-            workingDirectory rootProject.file('run/server')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
-
-            ideaModule rootProject.name + "." + project.name + ".main"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                }
-            }
+        create('client') {
+            client()
+            gameDirectory = rootProject.file('run/client')
+            ideName = "${rootProject.name}.${project.name}.main"
+            sourceSet = sourceSets.main
         }
 
-        gameTestServer {
-            workingDirectory rootProject.file('run/gameTestServer')
+        create('server') {
+            server()
+            gameDirectory = rootProject.file('run/server')
+            ideName = "${rootProject.name}.${project.name}.main"
+            sourceSet = sourceSets.main
+        }
 
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'tinactory.dependencyChecker.reportFile',
+        create('gameTestServer') {
+            type = 'gameTestServer'
+            gameDirectory = rootProject.file('run/gameTestServer')
+            sourceSet = sourceSets.test
+
+            systemProperty 'tinactory.dependencyChecker.reportFile',
                 layout.buildDirectory.file('reports/dependencyChecker/unreachable-targets.txt').get().asFile.absolutePath
-            property 'tinactory.dependencyChecker.verbose',
+            systemProperty 'tinactory.dependencyChecker.verbose',
                 providers.gradleProperty('tinactory.dependencyChecker.verbose')
                     .orElse(providers.systemProperty('tinactory.dependencyChecker.verbose'))
                     .orElse('false').get()
-            jvmArgs '-ea'
-            args '--mixin.config', 'mixins.tinactory.test.json'
+            ideName = "${rootProject.name}.${project.name}.test"
+        }
+    }
 
-            ideaModule rootProject.name + "." + project.name + ".test"
-
-            mods {
-                tinactory {
-                    source sourceSets.main
-                    source sourceSets.test
-                }
-            }
+    mods {
+        tinactory {
+            sourceSet sourceSets.main
         }
     }
 }
 
 dependencies {
-    // mixin
-    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
-
     compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
-    runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
+    runtimeOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}"
 
     // compile-time dependencies
     // JEI
-    implementation fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+    implementation "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
     // waila
-    implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
+    implementation "curse.maven:jade-324717:${jade_id}"
     // FTB Quests
-    implementation fg.deobf("curse.maven:architectury-api-419699:5137931")
-    implementation fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
-    implementation fg.deobf("curse.maven:ftb-teams-forge-404468:4579981")
-    implementation fg.deobf("curse.maven:ftb-quests-forge-289412:6113498")
+    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
+    implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    implementation "dev.ftb.mods:ftb-quests-neoforge:${ftb_quests_version}"
+    runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
 
     // runtime dependencies
     // CTM
-    runtimeOnly fg.deobf("curse.maven:ctm-267602:3933537")
+    runtimeOnly "curse.maven:ctm-267602:${ctm_id}"
     // FTB Quests
-    runtimeOnly fg.deobf("curse.maven:item-filters-309674:4553322")
+    runtimeOnly "dev.ftb.mods:ftb-filter-system-neoforge:${ftb_filter_system_version}"
 
     // unit test dependencies
     testImplementation platform('org.junit:junit-bom:5.12.0')
@@ -97,20 +76,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-mixin {
-    add sourceSets.main, 'mixins.tinactory.refmap.json'
-    add sourceSets.test, 'mixins.tinactory.test.refmap.json'
-    config 'mixins.tinactory.jei.json'
-}
-
 sourceSets.main.resources {
     srcDir 'src/generated/resources'
     exclude '.cache/'
 }
 
 configurations {
-    api
-    dev
+    maybeCreate('api')
 }
 
 task apiJar(type: Jar) {
@@ -124,14 +96,8 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-task devJar(type: Jar) {
-    archiveClassifier = 'dev'
-    from sourceSets.main.output
-}
-
 artifacts {
     api apiJar
-    dev devJar
 }
 
 build.dependsOn apiJar, sourcesJar

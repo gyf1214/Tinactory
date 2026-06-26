@@ -1,27 +1,36 @@
-archivesBaseName = "tinactory_datagen"
-apply plugin: 'kotlin'
+base {
+    archivesName = "tinactory_datagen"
+}
+apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.shsts.checksource'
 
-minecraft {
+neoForge {
     runs {
-        data {
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            jvmArgs '-ea'
+        create('data') {
+            data()
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'forge.logging.console.level', 'debug'
+            jvmArgument '-ea'
 
-            ideaModule rootProject.name + "." + project.name + ".main"
+            ideName = "${rootProject.name}.${project.name}.main"
+            gameDirectory = rootProject.file('run/data')
+            sourceSet = sourceSets.main
+            programArguments.addAll '--mod', 'tinactory_datagen', '--all', '--output',
+                rootProject.project(':mod').file('src/generated/resources/').absolutePath
+            programArguments.addAll '--existing', rootProject.project(':mod').file('src/main/resources/').absolutePath
+            programArguments.addAll '--existing', file('src/main/resources/').absolutePath
+            programArguments.addAll '--existing',
+                rootProject.file("libs/tinactory_extra_resources_${extra_resources_version}.zip").absolutePath
+        }
+    }
 
-            mods {
-                tinactory_datagen {
-                    source sourceSets.main
-                }
-            }
+    mods {
+        tinactory {
+            sourceSet project(':mod').sourceSets.main
+        }
 
-            workingDirectory rootProject.file('run/data')
-            args '--mod', 'tinactory_datagen', '--all', '--output', project(':mod').file('src/generated/resources/')
-            args '--existing', project(':mod').file('src/main/resources/')
-            args '--existing', file('src/main/resources/')
-            args '--existing', rootProject.file("libs/tinactory_extra_resources_${extra_resources_version}.zip")
+        tinactory_datagen {
+            sourceSet sourceSets.main
         }
     }
 }
@@ -29,13 +38,14 @@ minecraft {
 dependencies {
     compileOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}:api"
     compileOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}:api"
-    runtimeOnly fg.deobf("org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}")
-    runtimeOnly fg.deobf("org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}")
+    runtimeOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}"
+    runtimeOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}"
 
-    implementation project(path: ':mod', configuration: 'dev')
+    compileOnly project(':mod')
+    runtimeOnly project(':mod')
 
     // kotlin
-    minecraftLibrary("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version") {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25") {
         exclude group: "org.jetbrains", module: "annotations"
     }
 
@@ -43,13 +53,14 @@ dependencies {
     implementation rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")
 
     // FTB Quests SNBT
-    implementation fg.deobf("curse.maven:architectury-api-419699:5137931")
-    implementation fg.deobf("curse.maven:ftb-library-forge-404465:4396792")
+    implementation "dev.architectury:architectury-neoforge:${architectury_version}"
+    implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
+    runtimeOnly "dev.ftb.mods:ftb-filter-system-neoforge:${ftb_filter_system_version}"
 }
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 }
 

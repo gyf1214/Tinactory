@@ -1,20 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.9.25'
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: "${forgegradle_version}", changing: false
-        classpath "org.parchmentmc:librarian:${librarian_version}"
-        classpath "org.spongepowered:mixingradle:${mixingradle_version}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
-    }
-}
-
 plugins {
-    id 'org.shsts.checksource' version '0.1.1' apply false
+    id 'net.neoforged.moddev' apply false
+    id 'org.jetbrains.kotlin.jvm' apply false
+    id 'org.shsts.checksource' apply false
 }
 
 subprojects {
@@ -23,27 +10,51 @@ subprojects {
 
     apply plugin: 'checkstyle'
     apply plugin: 'eclipse'
-    apply plugin: 'net.minecraftforge.gradle'
-    apply plugin: 'org.parchmentmc.librarian.forgegradle'
-    apply plugin: 'org.spongepowered.mixin'
+    apply plugin: 'net.neoforged.moddev'
     apply plugin: 'maven-publish'
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-    checkstyle {
-        toolVersion = "10.20.1"
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
     }
 
-    minecraft {
-        mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
+    checkstyle {
+        toolVersion = checkstyle_version
+    }
+
+    tasks.withType(Checkstyle).configureEach {
+        classpath = files()
+    }
+
+    neoForge {
+        version = neo_version
+        parchment {
+            minecraftVersion = minecraft_version
+            mappingsVersion = parchment_version
+        }
     }
 
     repositories {
         mavenCentral()
         maven {
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases'
+        }
+        maven {
+            name = 'ParchmentMC'
+            url = 'https://maven.parchmentmc.org'
+        }
+        maven {
             // location of the maven that hosts JEI files since January 2023
             name = "Jared's maven"
             url = "https://maven.blamejared.com/"
+        }
+        maven {
+            name = 'FTB'
+            url = 'https://maven.ftb.dev/releases'
+        }
+        maven {
+            name = 'Architectury'
+            url = 'https://maven.architectury.dev'
         }
         maven {
             url = 'https://cursemaven.com'
@@ -57,25 +68,17 @@ subprojects {
         }
     }
 
-    dependencies {
-        minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    }
-
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+        options.release = 21
     }
 
     processResources {
-        from(sourceSets.main.resources.srcDirs) {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-            include 'META-INF/mods.toml'
-
+        inputs.property 'mod_version', version
+        filesMatching('META-INF/neoforge.mods.toml') {
             expand 'mod_version': "${version}"
         }
     }
-
-    jar.finalizedBy('reobfJar')
 
     publishing {
         repositories {
@@ -94,4 +97,4 @@ subprojects {
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-println "Minecraft: ${minecraft_version}, Forge: ${forge_version}, ForgeGradle: ${forgegradle_version}"
+println "Minecraft: ${minecraft_version}, NeoForge: ${neo_version}, ModDevGradle: ${moddev_version}"
