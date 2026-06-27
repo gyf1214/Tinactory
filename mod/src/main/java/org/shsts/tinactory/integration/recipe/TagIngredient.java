@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -32,7 +32,7 @@ public class TagIngredient extends ItemsIngredient {
 
     public static Codec<TagIngredient> codec() {
         return RecordCodecBuilder.create(instance -> instance.group(
-            TagKey.codec(Registry.ITEM_REGISTRY).fieldOf("tag").forGetter(TagIngredient::tag),
+            TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(TagIngredient::tag),
             Codec.INT.fieldOf("amount").forGetter($ -> $.amount)
         ).apply(instance, TagIngredient::new));
     }

@@ -2,7 +2,7 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -32,13 +32,13 @@ public class MEStorageInterfaceSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeCollection(items, StackHelper::serializeStackToBuf);
         buf.writeCollection(fluids, (buf1, stack) -> stack.writeToPacket(buf1));
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         items = buf.readList(StackHelper::deserializeStackFromBuf);
         fluids = buf.readList(FluidStack::readFromPacket);
     }

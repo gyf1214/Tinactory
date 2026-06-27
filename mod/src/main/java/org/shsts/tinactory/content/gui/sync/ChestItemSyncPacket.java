@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -26,7 +26,7 @@ public class ChestItemSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         StackHelper.serializeStackToBuf(buf, stack);
         buf.writeBoolean(filter != null);
         if (filter != null) {
@@ -35,7 +35,7 @@ public class ChestItemSyncPacket implements IPacket {
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         stack = StackHelper.deserializeStackFromBuf(buf);
         var hasFilter = buf.readBoolean();
         filter = hasFilter ? buf.readItem() : null;

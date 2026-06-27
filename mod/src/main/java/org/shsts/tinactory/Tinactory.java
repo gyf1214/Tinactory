@@ -19,11 +19,8 @@ import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
-import org.shsts.tinycorelib.api.network.IChannel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.slf4j.Logger;
-
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @Mod(TinactoryKeys.ID)
 @MethodsReturnNonnullByDefault
@@ -33,7 +30,6 @@ public class Tinactory {
 
     public static ITinyCoreLib CORE;
     public static IRegistrate REGISTRATE;
-    public static IChannel CHANNEL;
 
     private final IEventBus modEventBus;
     @Nullable
@@ -55,8 +51,7 @@ public class Tinactory {
     public void onConstruct() {
         try {
             CORE = ITinyCoreLib.get();
-            CHANNEL = CORE.createChannel(modLoc("channel"), "1");
-            REGISTRATE = CORE.registrate(TinactoryKeys.ID).setDefaultChannel(CHANNEL);
+            REGISTRATE = CORE.registrate(TinactoryKeys.ID);
 
             AllRegistries.init();
             AllMeta.init();

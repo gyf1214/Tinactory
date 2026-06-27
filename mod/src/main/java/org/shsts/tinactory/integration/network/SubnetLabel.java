@@ -2,19 +2,18 @@ package org.shsts.tinactory.integration.network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.core.Registry;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 
 import java.util.Collection;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class SubnetLabel extends ForgeRegistryEntry<ISubnetLabel> implements ISubnetLabel {
+public class SubnetLabel implements ISubnetLabel {
     private static Collection<ISubnetLabel> subnetLabels;
 
-    public static void onBake(IForgeRegistry<ISubnetLabel> registry) {
-        subnetLabels = registry.getValues();
+    public static void onBake(Registry<ISubnetLabel> registry) {
+        subnetLabels = registry.stream().toList();
     }
 
     public static Collection<ISubnetLabel> getSubnetLabels() {

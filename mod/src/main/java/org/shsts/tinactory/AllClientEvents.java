@@ -15,7 +15,8 @@ import org.shsts.tinactory.content.tool.WrenchOutlineRenderer;
 import org.shsts.tinactory.integration.tool.IWrenchable;
 import org.shsts.tinactory.integration.tool.UsableToolItem;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
+import static org.shsts.tinactory.AllMenus.OPEN_TECH;
+import static org.shsts.tinactory.Tinactory.CORE;
 
 @OnlyIn(Dist.CLIENT)
 public final class AllClientEvents {
@@ -41,7 +42,7 @@ public final class AllClientEvents {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         if (OPEN_TECH.consumeClick()) {
-            CHANNEL.sendToServer(OpenTechPacket.INSTANCE);
+            CORE.sendToServer(OPEN_TECH, OpenTechPacket.INSTANCE);
         }
     }
 

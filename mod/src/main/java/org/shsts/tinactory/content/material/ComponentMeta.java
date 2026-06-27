@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.logistics.MENetworkBridge;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.network.BridgeBlock;
@@ -137,10 +136,8 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
 
             var block = REGISTRATE.block(id, CableBlock.cable(v, resistance, mat, bare))
-                .material(Material.HEAVY_METAL)
                 .properties($ -> $.strength(2f).sound(bare ? SoundType.METAL : SoundType.WOOL))
                 .transform(CableBlock.tint(mat.color, bare))
-                .translucent()
                 .register();
             components.put(v, block);
         }
@@ -154,9 +151,7 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
             var v1 = Voltage.fromRank(v.rank + voltageOffset);
             var block = REGISTRATE.block(id, SubnetBlock.factory(v, v1))
-                .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
                 .tint(i -> switch (i) {
                     case 0 -> v.color;
                     case 1 -> v1.color;
@@ -210,7 +205,7 @@ public class ComponentMeta extends MetaConsumer {
         var components = new HashMap<Voltage, IEntry<Item>>();
         for (var entry : jo1.entrySet()) {
             var v = Voltage.fromName(entry.getKey());
-            var loc = new ResourceLocation(GsonHelper.convertToString(entry.getValue(), "items"));
+            var loc = ResourceLocation.parse(GsonHelper.convertToString(entry.getValue(), "items"));
             var item = ITEMS.getEntry(loc);
             components.put(v, item);
         }

@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -67,7 +67,7 @@ public class MEStorageInterfaceEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         if (item == null && fluid == null) {
             buf.writeBoolean(true);
         } else if (item != null) {
@@ -83,7 +83,7 @@ public class MEStorageInterfaceEventPacket implements IPacket {
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         if (buf.readBoolean()) {
             // isEmpty
             item = null;

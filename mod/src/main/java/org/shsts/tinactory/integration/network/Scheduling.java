@@ -2,7 +2,6 @@ package org.shsts.tinactory.integration.network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.api.network.IScheduling;
 
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.function.Supplier;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class Scheduling extends ForgeRegistryEntry<IScheduling> implements IScheduling {
+public class Scheduling implements IScheduling {
     private final List<Supplier<IScheduling>> befores;
     private final List<Supplier<IScheduling>> afters;
 

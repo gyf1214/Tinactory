@@ -4,8 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.content.material.MiscMeta;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilBlock;
@@ -38,20 +36,16 @@ public final class AllMultiblocks {
 
         // misc
         REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)
-            .material(Material.HEAVY_METAL, MaterialColor.DIRT)
             .properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.sound(SoundType.GRAVEL))
             .register();
 
         REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
-            .material(Material.HEAVY_METAL)
             .properties(MiscMeta.CASING_PROPERTY)
             .register();
 
         REGISTRATE.block("multiblock/misc/turbine_blade", TurbineBlock::new)
-            .material(Material.HEAVY_METAL, MaterialColor.COLOR_MAGENTA)
             .properties(MiscMeta.CASING_PROPERTY)
-            .translucent()
             .register();
     }
 

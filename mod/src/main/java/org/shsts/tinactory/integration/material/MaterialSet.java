@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllRegistries.simpleFluid;
-import static org.shsts.tinactory.AllTags.extend;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -180,7 +179,6 @@ public class MaterialSet {
         }
 
         private TagKey<Item> newTag(String sub) {
-            return extend(AllTags.material(sub), name);
         }
 
         public Builder<P> color(int value) {
@@ -262,10 +260,8 @@ public class MaterialSet {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
-                    .material(variant.blockMaterial, variant.materialColor)
                     .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance)
                         .sound(variant.soundType))
-                    .translucent()
                     .tint(color)
                     .noBlockItem()
                     .register();

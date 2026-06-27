@@ -446,7 +446,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         currentRecipe = null;
         infoList.clear();
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
-            currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
+            currentRecipeLoc = ResourceLocation.parse(tag.getString("currentRecipe"));
             processorIndex = tag.getInt("processorIndex");
             workProgress = tag.getLong("workProgress");
             processors.get(processorIndex).deserializeNBT(tag.getCompound("processorData"));

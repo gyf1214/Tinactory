@@ -71,7 +71,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
             var builder = super.buildFromJson(type, loc, jo);
             Streams.stream(GsonHelper.getAsJsonArray(jo, "required_tech"))
                 .map(JsonElement::getAsString)
-                .forEach(s -> builder.requireTech(new ResourceLocation(s)));
+                .forEach(s -> builder.requireTech(ResourceLocation.parse(s)));
             return builder;
         }
 

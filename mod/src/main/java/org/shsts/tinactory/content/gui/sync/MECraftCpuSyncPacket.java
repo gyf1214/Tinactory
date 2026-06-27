@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -23,14 +23,14 @@ import java.util.Objects;
 @MethodsReturnNonnullByDefault
 public class MECraftCpuSyncPacket implements IPacket {
     public record CpuInfo(CpuStatusEntry status, Component name, ItemStack icon) {
-        private static void serialize(FriendlyByteBuf buf, CpuInfo info) {
+        private static void serialize(RegistryFriendlyByteBuf buf, CpuInfo info) {
             serializeStatus(buf, info.status);
             buf.writeUtf(CodecHelper.encodeComponent(info.name));
             var jo = CodecHelper.encodeJson(ItemStack.CODEC, info.icon);
             buf.writeUtf(CodecHelper.jsonToStr(jo));
         }
 
-        private static CpuInfo deserialize(FriendlyByteBuf buf) {
+        private static CpuInfo deserialize(RegistryFriendlyByteBuf buf) {
             return new CpuInfo(
                 deserializeStatus(buf),
                 CodecHelper.parseComponent(buf.readUtf()),
@@ -70,12 +70,12 @@ public class MECraftCpuSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeCollection(entries, CpuInfo::serialize);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         entries.clear();
         entries.addAll(buf.readList(CpuInfo::deserialize));
     }
@@ -96,7 +96,7 @@ public class MECraftCpuSyncPacket implements IPacket {
         return Objects.hash(entries);
     }
 
-    private static void serializeStatus(FriendlyByteBuf buf, CpuStatusEntry entry) {
+    private static void serializeStatus(RegistryFriendlyByteBuf buf, CpuStatusEntry entry) {
         buf.writeUUID(entry.cpuId());
         buf.writeEnum(entry.state());
         buf.writeCollection(entry.targets(), (buf1, amount) -> {
@@ -110,7 +110,7 @@ public class MECraftCpuSyncPacket implements IPacket {
         buf.writeLong(entry.memoryUsage());
     }
 
-    private static CpuStatusEntry deserializeStatus(FriendlyByteBuf buf) {
+    private static CpuStatusEntry deserializeStatus(RegistryFriendlyByteBuf buf) {
         return new CpuStatusEntry(
             buf.readUUID(),
             buf.readEnum(JobState.class),

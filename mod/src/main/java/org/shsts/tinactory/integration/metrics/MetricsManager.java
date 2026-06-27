@@ -2,9 +2,9 @@ package org.shsts.tinactory.integration.metrics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
@@ -21,9 +21,9 @@ import java.util.List;
 public class MetricsManager {
     private static final List<IMetricsCallback> callbacks = new ArrayList<>();
 
-    public static void onBake(IForgeRegistry<IMetricsCallback> registry) {
+    public static void onBake(Registry<IMetricsCallback> registry) {
         callbacks.clear();
-        callbacks.addAll(registry.getValues());
+        registry.forEach(callbacks::add);
     }
 
     public static void report(String name, List<String> labels, double value) {

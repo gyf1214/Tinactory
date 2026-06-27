@@ -61,7 +61,7 @@ public class MaterialMeta extends MetaConsumer {
 
         var existings = GsonHelper.getAsJsonObject(jo, "existings");
         for (var entry : existings.entrySet()) {
-            var loc = new ResourceLocation(GsonHelper.convertToString(entry.getValue(), "existings"));
+            var loc = ResourceLocation.parse(GsonHelper.convertToString(entry.getValue(), "existings"));
             var item = ITEMS.getEntry(loc);
             builder.existing(entry.getKey(), item);
         }
@@ -70,11 +70,11 @@ public class MaterialMeta extends MetaConsumer {
     private void buildFluid(MaterialSet.Builder<?> builder, String sub, JsonObject jo) {
         var baseAmount = GsonHelper.getAsInt(jo, "baseAmount");
         if (jo.has("existing")) {
-            var loc = new ResourceLocation(GsonHelper.getAsString(jo, "existing"));
+            var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "existing"));
             var fluid = FLUIDS.getEntry(loc);
             builder.existing(sub, fluid, baseAmount);
         } else {
-            var tex = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
+            var tex = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "texture"));
             var texColor = jo.has("textureColor") ? parseColor(jo, "textureColor") : builder.getColor();
             var displayColor = jo.has("displayColor") ? parseColor(jo, "displayColor") : builder.getColor();
             builder.fluid(sub, tex, texColor, displayColor, baseAmount);
@@ -101,7 +101,7 @@ public class MaterialMeta extends MetaConsumer {
         var durability = GsonHelper.getAsInt(jo, "durability");
         Tier tier;
         if (jo.has("tier")) {
-            var loc = new ResourceLocation(GsonHelper.getAsString(jo, "tier"));
+            var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "tier"));
             tier = TierSortingRegistry.byName(loc);
         } else {
             tier = null;
@@ -121,7 +121,8 @@ public class MaterialMeta extends MetaConsumer {
             var jo2 = GsonHelper.convertToJsonObject(entry.getValue(), "usables");
 
             if (jo2.has("sound")) {
-                var sound = SOUND_EVENTS.getEntry(new ResourceLocation(GsonHelper.getAsString(jo2, "sound")));
+                var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo2, "sound"));
+                var sound = SOUND_EVENTS.getEntry(soundId);
                 toolBuilder.usable(category, sound);
             } else {
                 toolBuilder.usable(category);

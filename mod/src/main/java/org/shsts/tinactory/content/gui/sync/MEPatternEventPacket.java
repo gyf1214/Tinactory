@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
@@ -60,7 +60,7 @@ public class MEPatternEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(action);
         buf.writeBoolean(patternUuid != null);
         if (patternUuid != null) {
@@ -70,7 +70,7 @@ public class MEPatternEventPacket implements IPacket {
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
         patternUuid = buf.readBoolean() ? buf.readUUID() : null;
         var patternTag = buf.readNbt();

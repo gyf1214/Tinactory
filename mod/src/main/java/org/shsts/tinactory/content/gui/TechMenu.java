@@ -3,12 +3,13 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
@@ -194,9 +195,8 @@ public class TechMenu extends MenuBase {
         onRefreshName = cb;
     }
 
-    public static void onOpenGui(OpenTechPacket packet, NetworkEvent.Context ctx) {
-        var player = ctx.getSender();
-        if (player != null) {
+    public static void onOpenGui(OpenTechPacket packet, IPayloadContext ctx) {
+        if (ctx.player() instanceof ServerPlayer player) {
             TECH_MENU.open(player);
         }
     }

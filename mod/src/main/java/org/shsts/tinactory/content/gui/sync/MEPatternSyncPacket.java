@@ -2,7 +2,7 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
@@ -33,12 +33,12 @@ public class MEPatternSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeCollection(patterns, (buf1, pattern) -> buf1.writeNbt(CODEC.encodePattern(pattern)));
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         patterns.clear();
         patterns.addAll(buf.readList(buf1 ->
             CODEC.decodePattern(CodecHelper.readRequiredNbt(buf1, "pattern"))));

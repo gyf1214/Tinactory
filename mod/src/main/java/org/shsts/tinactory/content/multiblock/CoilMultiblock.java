@@ -64,7 +64,7 @@ public class CoilMultiblock extends Multiblock {
     public void deserializeOnUpdate(CompoundTag tag) {
         coilBlock = null;
         if (tag.contains("coilBlock", Tag.TAG_STRING)) {
-            var loc = new ResourceLocation(tag.getString("coilBlock"));
+            var loc = ResourceLocation.parse(tag.getString("coilBlock"));
             var block = BLOCKS.getEntry(loc).get();
             if (block instanceof CoilBlock coilBlock1) {
                 coilBlock = coilBlock1;

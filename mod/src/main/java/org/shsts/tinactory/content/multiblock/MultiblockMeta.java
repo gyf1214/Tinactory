@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.content.machine.FireBoiler;
@@ -63,12 +62,12 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static IEntry<Block> getBlock(JsonObject jo, String member) {
-        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, member));
         return BLOCKS.getEntry(loc);
     }
 
     private static TagKey<Block> getBlockTag(JsonObject jo, String member) {
-        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, member));
         return AllTags.block(loc);
     }
 
@@ -145,7 +144,7 @@ public class MultiblockMeta extends MachineMeta {
         @Override
         protected void parseRecipeType() {
             if (recipeTypeStr.contains(":")) {
-                recipeType = REGISTRATE.getRecipeType(new ResourceLocation(recipeTypeStr));
+                recipeType = REGISTRATE.getRecipeType(ResourceLocation.parse(recipeTypeStr));
             } else {
                 super.parseRecipeType();
             }
@@ -250,7 +249,7 @@ public class MultiblockMeta extends MachineMeta {
                 if (s.equals("air")) {
                     return $ -> $.check(ch, blockStateCheck(BlockState::isAir));
                 } else {
-                    var block = BLOCKS.getEntry(new ResourceLocation(s));
+                    var block = BLOCKS.getEntry(ResourceLocation.parse(s));
                     ingredientConsumer.accept(BlockIngredient.of(block));
                     return $ -> $.check(ch, block(block, false));
                 }
@@ -390,12 +389,9 @@ public class MultiblockMeta extends MachineMeta {
                 .maxConnectors(GsonHelper.getAsInt(jo1, "maxConnectors"))
                 .maxDoors(GsonHelper.getAsInt(jo1, "maxDoors"))
                 .build()
-                .build()
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
                 .end()
                 .buildObject();
         }
@@ -432,10 +428,8 @@ public class MultiblockMeta extends MachineMeta {
                 .build()
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
                 .properties(BlockBehaviour.Properties::requiresCorrectToolForDrops)
-                .translucent()
                 .end()
                 .buildObject();
 

@@ -1,10 +1,8 @@
 package org.shsts.tinactory;
 
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IFluidPort;
@@ -42,23 +40,23 @@ public final class AllCapabilities {
     public static final ICapability<ISignalMachine> SIGNAL_MACHINE;
 
     static {
-        ITEM_HANDLER = REGISTRATE.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-        FLUID_HANDLER = REGISTRATE.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-        EVENT_MANAGER = REGISTRATE.getCapability(new CapabilityToken<>() {});
+        ITEM_HANDLER = REGISTRATE.capability(Capabilities.ItemHandler.BLOCK);
+        FLUID_HANDLER = REGISTRATE.capability(Capabilities.FluidHandler.BLOCK);
+        EVENT_MANAGER = REGISTRATE.capability("event_manager", IEventManager.class);
 
-        PROCESSOR = REGISTRATE.capability(IProcessor.class, new CapabilityToken<>() {});
-        CONTAINER = REGISTRATE.capability(IContainer.class, new CapabilityToken<>() {});
-        ELECTRIC_MACHINE = REGISTRATE.capability(IElectricMachine.class, new CapabilityToken<>() {});
-        MENU_ITEM_HANDLER = REGISTRATE.capability(IMenuItemHandler.class, new CapabilityToken<>() {});
-        MENU_FLUID_HANDLER = REGISTRATE.capability(IFluidTanksHandler.class, new CapabilityToken<>() {});
-        ITEM_PORT = REGISTRATE.capability(IItemPort.class, new CapabilityToken<>() {});
-        FLUID_PORT = REGISTRATE.capability(IFluidPort.class, new CapabilityToken<>() {});
+        PROCESSOR = REGISTRATE.capability("processor", IProcessor.class);
+        CONTAINER = REGISTRATE.capability("container", IContainer.class);
+        ELECTRIC_MACHINE = REGISTRATE.capability("electric_machine", IElectricMachine.class);
+        MENU_ITEM_HANDLER = REGISTRATE.capability("menu_item_handler", IMenuItemHandler.class);
+        MENU_FLUID_HANDLER = REGISTRATE.capability("menu_fluid_handler", IFluidTanksHandler.class);
+        ITEM_PORT = REGISTRATE.capability("item_port", IItemPort.class);
+        FLUID_PORT = REGISTRATE.capability("fluid_port", IFluidPort.class);
 
-        LAYOUT_PROVIDER = REGISTRATE.capability(ILayoutProvider.class, new CapabilityToken<>() {});
-        MACHINE = REGISTRATE.capability(IMachine.class, new CapabilityToken<>() {});
-        BYTES_PROVIDER = REGISTRATE.capability(IBytesProvider.class, new CapabilityToken<>() {});
-        PATTERN_CELL = REGISTRATE.capability(IPatternCellPort.class, new CapabilityToken<>() {});
-        SIGNAL_MACHINE = REGISTRATE.capability(ISignalMachine.class, new CapabilityToken<>() {});
+        LAYOUT_PROVIDER = REGISTRATE.capability("layout_provider", ILayoutProvider.class);
+        MACHINE = REGISTRATE.capability("machine", IMachine.class);
+        BYTES_PROVIDER = REGISTRATE.capability("bytes_provider", IBytesProvider.class);
+        PATTERN_CELL = REGISTRATE.capability("pattern_cell", IPatternCellPort.class);
+        SIGNAL_MACHINE = REGISTRATE.capability("signal_machine", ISignalMachine.class);
     }
 
     public static void init() {}

@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
@@ -74,9 +73,7 @@ public class MachineSet {
             .transform(Machine.factory(activeNetwork))
             .end()
             .block()
-            .material(Material.HEAVY_METAL)
             .properties(MACHINE_PROPERTY)
-            .translucent()
             .end();
     }
 }

@@ -61,7 +61,7 @@ public class Lithography extends Multiblock {
     public void deserializeOnUpdate(CompoundTag tag) {
         lensBlock = null;
         if (tag.contains("lensBlock", Tag.TAG_STRING)) {
-            var loc = new ResourceLocation(tag.getString("lensBlock"));
+            var loc = ResourceLocation.parse(tag.getString("lensBlock"));
             var block = BLOCKS.getEntry(loc).get();
             if (block instanceof LensBlock lensBlock1) {
                 lensBlock = lensBlock1;

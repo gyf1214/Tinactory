@@ -10,10 +10,12 @@ import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
+import org.shsts.tinycorelib.api.network.IPacketType;
+import org.shsts.tinycorelib.api.network.PacketDirection;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
+import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -25,6 +27,19 @@ public final class TechManagers {
     private static ClientTechManager client = null;
     @Nullable
     private static TinactorySavedData savedData = null;
+    public static final IPacketType<TechInitPacket> TECH_INIT;
+    public static final IPacketType<TechUpdatePacket> TECH_UPDATE;
+
+    static {
+        TECH_INIT = REGISTRATE.packet("tech_init", TechInitPacket::new)
+            .direction(PacketDirection.CLIENTBOUND)
+            .handler((packet, ctx) -> client().handleTechInit(packet))
+            .register();
+        TECH_UPDATE = REGISTRATE.packet("tech_update", TechUpdatePacket::new)
+            .direction(PacketDirection.CLIENTBOUND)
+            .handler((packet, ctx) -> client().handleTechUpdate(packet))
+            .register();
+    }
 
     private TechManagers() {}
 
@@ -53,10 +68,6 @@ public final class TechManagers {
 
     public static void init() {
         server = new ServerTechManager();
-        CHANNEL.registerClientPacket(TechInitPacket.class, TechInitPacket::new,
-            (packet, ctx) -> client().handleTechInit(packet));
-        CHANNEL.registerClientPacket(TechUpdatePacket.class, TechUpdatePacket::new,
-            (packet, ctx) -> client().handleTechUpdate(packet));
     }
 
     public static void initClient() {

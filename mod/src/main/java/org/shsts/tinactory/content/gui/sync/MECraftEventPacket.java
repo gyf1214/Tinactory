@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -73,7 +73,7 @@ public class MECraftEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(action);
         buf.writeNbt(target == null ? null :
             (CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
@@ -85,7 +85,7 @@ public class MECraftEventPacket implements IPacket {
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
         var targetTag = buf.readNbt();
         target = targetTag == null ? null : CodecHelper.parseTag(StackHelper.KEY_CODEC, targetTag);

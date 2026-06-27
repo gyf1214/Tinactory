@@ -166,7 +166,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         var listTag = tag.getList("tech", Tag.TAG_COMPOUND);
         for (var tag1 : listTag) {
             var tag2 = (CompoundTag) tag1;
-            var loc = new ResourceLocation(tag2.getString("id"));
+            var loc = ResourceLocation.parse(tag2.getString("id"));
             var progress = tag2.getLong("progress");
             techManager.techByKey(loc).ifPresent(tech -> {
                 technologies.put(loc, progress);
@@ -176,7 +176,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             });
         }
         if (tag.contains("target", Tag.TAG_STRING)) {
-            var loc = new ResourceLocation(tag.getString("target"));
+            var loc = ResourceLocation.parse(tag.getString("target"));
             targetTech = techManager.techByKey(loc).orElse(null);
         }
     }

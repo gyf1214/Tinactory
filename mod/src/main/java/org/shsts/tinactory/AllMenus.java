@@ -50,31 +50,44 @@ import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
-import org.shsts.tinycorelib.api.gui.IMenuEvent;
 import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.network.IPacketType;
+import org.shsts.tinycorelib.api.network.PacketDirection;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.builder.IMenuBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.function.Function;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllMenus {
-    public static final IMenuEvent<SlotEventPacket> FLUID_SLOT_CLICK;
+    public static final IPacketType<SyncPackets.DoublePacket> DOUBLE_SYNC;
+    public static final IPacketType<SyncPackets.LongPacket> LONG_SYNC;
+    public static final IPacketType<SyncPackets.UnitPacket> UNIT_SYNC;
+    public static final IPacketType<FluidSyncPacket> FLUID_SYNC;
+    public static final IPacketType<ChestItemSyncPacket> CHEST_ITEM_SYNC;
+    public static final IPacketType<LogisticWorkerSyncPacket> LOGISTIC_WORKER_SYNC;
+    public static final IPacketType<MEStorageInterfaceSyncPacket> ME_STORAGE_INTERFACE_SYNC;
+    public static final IPacketType<MESignalControllerSyncPacket> ME_SIGNAL_CONTROLLER_SYNC;
+    public static final IPacketType<MECraftRequestSyncPacket> ME_CRAFT_REQUEST_SYNC;
+    public static final IPacketType<MECraftCpuSyncPacket> ME_CRAFT_CPU_SYNC;
+    public static final IPacketType<MECraftPreviewSyncPacket> ME_CRAFT_PREVIEW_SYNC;
+    public static final IPacketType<MEPatternSyncPacket> ME_PATTERN_SYNC;
+    public static final IPacketType<OpenTechPacket> OPEN_TECH;
+    public static final IPacketType<SlotEventPacket> FLUID_SLOT_CLICK;
     /**
      * Used only in special item slots that is not implemented by the vanilla slot system.
      */
-    public static final IMenuEvent<SlotEventPacket> ITEM_SLOT_CLICK;
-    public static final IMenuEvent<SlotEventPacket> PORT_CLICK;
-    public static final IMenuEvent<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
-    public static final IMenuEvent<RenameEventPacket> RENAME;
-    public static final IMenuEvent<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
-    public static final IMenuEvent<MECraftEventPacket> ME_CRAFT_ACTION;
-    public static final IMenuEvent<MEPatternEventPacket> ME_PATTERN_ACTION;
+    public static final IPacketType<SlotEventPacket> ITEM_SLOT_CLICK;
+    public static final IPacketType<SlotEventPacket> PORT_CLICK;
+    public static final IPacketType<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
+    public static final IPacketType<RenameEventPacket> RENAME;
+    public static final IPacketType<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
+    public static final IPacketType<MECraftEventPacket> ME_CRAFT_ACTION;
+    public static final IPacketType<MEPatternEventPacket> ME_PATTERN_ACTION;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType TECH_MENU;
@@ -101,41 +114,35 @@ public final class AllMenus {
     public static final IMenuType FUSION_DIGITAL_INTERFACE;
 
     static {
-        CHANNEL
-            .registerMenuSyncPacket(SyncPackets.DoublePacket.class, SyncPackets.DoublePacket::new)
-            .registerMenuSyncPacket(SyncPackets.LongPacket.class, SyncPackets.LongPacket::new)
-            .registerMenuSyncPacket(SyncPackets.UnitPacket.class, () -> SyncPackets.UnitPacket.INSTANCE)
-            .registerMenuSyncPacket(FluidSyncPacket.class, FluidSyncPacket::new)
-            .registerMenuSyncPacket(ChestItemSyncPacket.class, ChestItemSyncPacket::new)
-            .registerMenuSyncPacket(LogisticWorkerSyncPacket.class,
-                LogisticWorkerSyncPacket::new)
-            .registerMenuSyncPacket(MEStorageInterfaceSyncPacket.class,
-                MEStorageInterfaceSyncPacket::new)
-            .registerMenuSyncPacket(MESignalControllerSyncPacket.class,
-                MESignalControllerSyncPacket::new)
-            .registerMenuSyncPacket(MECraftRequestSyncPacket.class,
-                MECraftRequestSyncPacket::new)
-            .registerMenuSyncPacket(MECraftCpuSyncPacket.class,
-                MECraftCpuSyncPacket::new)
-            .registerMenuSyncPacket(MECraftPreviewSyncPacket.class,
-                MECraftPreviewSyncPacket::new)
-            .registerMenuSyncPacket(MEPatternSyncPacket.class,
-                MEPatternSyncPacket::new);
+        DOUBLE_SYNC = REGISTRATE.menuSyncPacket("sync/double", SyncPackets.DoublePacket::new);
+        LONG_SYNC = REGISTRATE.menuSyncPacket("sync/long", SyncPackets.LongPacket::new);
+        UNIT_SYNC = REGISTRATE.menuSyncPacket("sync/unit", () -> SyncPackets.UnitPacket.INSTANCE);
+        FLUID_SYNC = REGISTRATE.menuSyncPacket("sync/fluid", FluidSyncPacket::new);
+        CHEST_ITEM_SYNC = REGISTRATE.menuSyncPacket("sync/chest_item", ChestItemSyncPacket::new);
+        LOGISTIC_WORKER_SYNC = REGISTRATE.menuSyncPacket("sync/logistic_worker", LogisticWorkerSyncPacket::new);
+        ME_STORAGE_INTERFACE_SYNC = REGISTRATE.menuSyncPacket("sync/me_storage_interface",
+            MEStorageInterfaceSyncPacket::new);
+        ME_SIGNAL_CONTROLLER_SYNC = REGISTRATE.menuSyncPacket("sync/me_signal_controller",
+            MESignalControllerSyncPacket::new);
+        ME_CRAFT_REQUEST_SYNC = REGISTRATE.menuSyncPacket("sync/me_craft_request", MECraftRequestSyncPacket::new);
+        ME_CRAFT_CPU_SYNC = REGISTRATE.menuSyncPacket("sync/me_craft_cpu", MECraftCpuSyncPacket::new);
+        ME_CRAFT_PREVIEW_SYNC = REGISTRATE.menuSyncPacket("sync/me_craft_preview", MECraftPreviewSyncPacket::new);
+        ME_PATTERN_SYNC = REGISTRATE.menuSyncPacket("sync/me_pattern", MEPatternSyncPacket::new);
 
-        FLUID_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
-        ITEM_SLOT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
-        PORT_CLICK = CHANNEL.registerMenuEventPacket(SlotEventPacket.class, SlotEventPacket::new);
-        SET_MACHINE_CONFIG = CHANNEL.registerMenuEventPacket(ISetMachineConfigPacket.class,
-            SetMachineConfigPacket::new);
-        RENAME = CHANNEL.registerMenuEventPacket(RenameEventPacket.class, RenameEventPacket::new);
-        ME_STORAGE_INTERFACE_SLOT = CHANNEL.registerMenuEventPacket(MEStorageInterfaceEventPacket.class,
+        FLUID_SLOT_CLICK = REGISTRATE.menuEventPacket("event/fluid_slot_click", SlotEventPacket::new);
+        ITEM_SLOT_CLICK = REGISTRATE.menuEventPacket("event/item_slot_click", SlotEventPacket::new);
+        PORT_CLICK = REGISTRATE.menuEventPacket("event/port_click", SlotEventPacket::new);
+        SET_MACHINE_CONFIG = REGISTRATE.menuEventPacket("event/set_machine_config", SetMachineConfigPacket::new);
+        RENAME = REGISTRATE.menuEventPacket("event/rename", RenameEventPacket::new);
+        ME_STORAGE_INTERFACE_SLOT = REGISTRATE.menuEventPacket("event/me_storage_interface_slot",
             MEStorageInterfaceEventPacket::new);
-        ME_CRAFT_ACTION = CHANNEL.registerMenuEventPacket(MECraftEventPacket.class,
-            MECraftEventPacket::new);
-        ME_PATTERN_ACTION = CHANNEL.registerMenuEventPacket(MEPatternEventPacket.class,
-            MEPatternEventPacket::new);
+        ME_CRAFT_ACTION = REGISTRATE.menuEventPacket("event/me_craft_action", MECraftEventPacket::new);
+        ME_PATTERN_ACTION = REGISTRATE.menuEventPacket("event/me_pattern_action", MEPatternEventPacket::new);
 
-        CHANNEL.registerPacket(OpenTechPacket.class, () -> OpenTechPacket.INSTANCE, TechMenu::onOpenGui);
+        OPEN_TECH = REGISTRATE.packet("open_tech", () -> OpenTechPacket.INSTANCE)
+            .direction(PacketDirection.SERVERBOUND)
+            .handler(TechMenu::onOpenGui)
+            .register();
 
         BATTERY_BOX = processing("machine/battery_box", MachineMenu::simpleConfig)
             .screen(() -> () -> BatteryBoxScreen::new)

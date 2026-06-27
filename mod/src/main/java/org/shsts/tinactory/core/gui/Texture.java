@@ -61,7 +61,7 @@ public record Texture(ResourceLocation loc, int width, int height) {
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = loc.getPath().endsWith(".png") ? loc :
-            new ResourceLocation(loc.getNamespace(), "textures/" + loc.getPath() + ".png");
+            ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), "textures/" + loc.getPath() + ".png");
         this.width = width;
         this.height = height;
     }

@@ -2,15 +2,14 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.electric.Circuits;
 import org.shsts.tinactory.content.logistics.MEStorageCellSet;
 import org.shsts.tinactory.content.material.RubberLogBlock;
@@ -44,27 +43,25 @@ public final class AllItems {
         Circuits.buildBoards();
 
         RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
-            .material(Material.WOOD)
-            .properties(p -> p.strength(2f).sound(SoundType.WOOD))
+            .properties(p -> p.mapColor(Blocks.OAK_LOG.defaultMapColor())
+                .strength(2f).sound(SoundType.WOOD))
             .register();
 
         RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
-            .material(Material.LEAVES)
-            .properties(p -> p.strength(0.2f).randomTicks()
+            .properties(p -> p.mapColor(Blocks.OAK_LEAVES.defaultMapColor())
+                .strength(0.2f).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion()
                 .isValidSpawn(AllItems::never)
                 .isSuffocating(AllItems::never)
                 .isViewBlocking(AllItems::never))
-            .renderType(() -> RenderType::cutout)
             .tint(0xFF55FF55)
             .register();
 
         RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
-                prop -> new SaplingBlock(new RubberTreeGrower(), prop))
-            .material(Material.PLANT)
-            .properties(p -> p.noCollission().randomTicks()
+                prop -> new SaplingBlock(RubberTreeGrower.INSTANCE, prop))
+            .properties(p -> p.mapColor(Blocks.OAK_SAPLING.defaultMapColor())
+                .noCollission().randomTicks()
                 .instabreak().sound(SoundType.GRASS))
-            .renderType(() -> RenderType::cutout)
             .register();
     }
 

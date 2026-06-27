@@ -371,7 +371,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");
         if (tag.contains("filterRecipe", Tag.TAG_STRING)) {
-            filterRecipeLoc = new ResourceLocation(tag.getString("filterRecipe"));
+            filterRecipeLoc = ResourceLocation.parse(tag.getString("filterRecipe"));
         } else {
             filterRecipeLoc = null;
         }

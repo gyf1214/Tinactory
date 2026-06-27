@@ -2,7 +2,7 @@ package org.shsts.tinactory.integration.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -20,12 +20,12 @@ public class FluidSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         fluidStack.writeToPacket(buf);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         fluidStack = FluidStack.readFromPacket(buf);
     }
 

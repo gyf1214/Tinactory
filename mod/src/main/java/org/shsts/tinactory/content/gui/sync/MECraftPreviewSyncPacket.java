@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
@@ -83,7 +83,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(state);
         buf.writeLong(memoryUsage);
         buf.writeNbt(error == null ? null : serializeError(error));
@@ -96,7 +96,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         state = buf.readEnum(PreviewState.class);
         memoryUsage = buf.readLong();
         error = deserializeError(buf.readNbt());

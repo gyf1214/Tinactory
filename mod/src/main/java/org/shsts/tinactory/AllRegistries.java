@@ -2,15 +2,14 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.world.ForgeWorldPreset;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryBuilder;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
@@ -43,34 +42,31 @@ public final class AllRegistries {
     public static final IEntryHandler<Item> ITEMS;
     public static final IEntryHandler<Fluid> FLUIDS;
     public static final IEntryHandler<Feature<?>> FEATURES;
-    public static final IEntryHandler<ForgeWorldPreset> WORLD_TYPES;
     public static final IEntryHandler<SoundEvent> SOUND_EVENTS;
 
     static {
         SCHEDULINGS = REGISTRATE.registry("scheduling", IScheduling.class)
-            .onBake((registry, stage) -> {
+            .onBake(registry -> {
                 var sorted = SchedulingSorter.sort(registry);
                 WorldNetworkManagers.setSortedSchedulings(sorted);
             })
             .register();
         COMPONENT_TYPES = REGISTRATE.<IComponentType<?>>genericRegistry("component_type", IComponentType.class)
-            .onBake((registry, stage) -> ComponentType.onBake(registry))
+            .onBake(ComponentType::onBake)
             .register();
         SUBNET_LABELS = REGISTRATE.registry("subnet_label", ISubnetLabel.class)
-            .onBake((registry, stage) -> SubnetLabel.onBake(registry))
+            .onBake(SubnetLabel::onBake)
             .register();
         METRICS_CALLBACKS = REGISTRATE.registry(TinactoryKeys.METRICS_CALLBACKS, IMetricsCallback.class)
-            .onBake((registry, stage) -> MetricsManager.onBake(registry))
-            .builder(RegistryBuilder::disableSync)
+            .onBake(MetricsManager::onBake)
             .register();
 
         EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY, IEvent.class);
-        BLOCKS = REGISTRATE.getHandler(ForgeRegistries.BLOCKS);
-        ITEMS = REGISTRATE.getHandler(ForgeRegistries.ITEMS);
-        FLUIDS = REGISTRATE.getHandler(ForgeRegistries.FLUIDS);
-        FEATURES = REGISTRATE.getHandler(ForgeRegistries.FEATURES);
-        WORLD_TYPES = REGISTRATE.getHandler(ForgeRegistries.Keys.WORLD_TYPES, ForgeWorldPreset.class);
-        SOUND_EVENTS = REGISTRATE.getHandler(ForgeRegistries.SOUND_EVENTS);
+        BLOCKS = REGISTRATE.getHandler(Registries.BLOCK, BuiltInRegistries.BLOCK, Block.class);
+        ITEMS = REGISTRATE.getHandler(Registries.ITEM, BuiltInRegistries.ITEM, Item.class);
+        FLUIDS = REGISTRATE.getHandler(Registries.FLUID, BuiltInRegistries.FLUID, Fluid.class);
+        FEATURES = REGISTRATE.getHandler(Registries.FEATURE, BuiltInRegistries.FEATURE, Feature.class);
+        SOUND_EVENTS = REGISTRATE.getHandler(Registries.SOUND_EVENT, BuiltInRegistries.SOUND_EVENT, SoundEvent.class);
     }
 
     public static void init() {}

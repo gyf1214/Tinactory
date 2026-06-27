@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
@@ -99,7 +98,7 @@ public class MachineMeta extends MetaConsumer {
         var y = GsonHelper.getAsInt(jo, "y");
         var w = GsonHelper.getAsInt(jo, "width");
         var h = GsonHelper.getAsInt(jo, "height");
-        var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
+        var texLoc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "texture"));
         var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
         var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
         var tex = new Texture(texLoc, tw, th);
@@ -261,9 +260,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(this::sound)
                 .end()
                 .block()
-                .material(Material.WOOD)
                 .properties($ -> $.strength(2f).sound(SoundType.WOOD))
-                .translucent()
                 .end()
                 .buildObject();
         }
@@ -322,9 +319,7 @@ public class MachineMeta extends MetaConsumer {
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
                 .end();
         }
 
@@ -473,7 +468,7 @@ public class MachineMeta extends MetaConsumer {
                 recipeTypeId = id;
             }
             if (jo.has("sound")) {
-                var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+                var soundId = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "sound"));
                 sound = SOUND_EVENTS.getEntry(soundId);
             }
         }

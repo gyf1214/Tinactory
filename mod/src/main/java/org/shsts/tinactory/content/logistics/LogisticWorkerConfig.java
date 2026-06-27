@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -166,7 +166,7 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         itemFilter = ItemStack.EMPTY;
         fluidFilter = FluidStack.EMPTY;
         if (tag.contains("tagFilter", Tag.TAG_STRING)) {
-            tagFilter = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tag.getString("tagFilter")));
+            tagFilter = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getString("tagFilter")));
         } else if (tag.contains("itemFilter", Tag.TAG_COMPOUND)) {
             itemFilter = ItemStack.of(tag.getCompound("itemFilter"));
         } else if (tag.contains("fluidFilter", Tag.TAG_COMPOUND)) {

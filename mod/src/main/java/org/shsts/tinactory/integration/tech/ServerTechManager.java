@@ -17,6 +17,7 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.util.ServerUtil;
@@ -32,7 +33,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
+import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.integration.tech.TechManagers.TECH_INIT;
+import static org.shsts.tinactory.integration.tech.TechManagers.TECH_UPDATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -50,7 +53,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
         private Optional<Technology> loadResource(ResourceManager manager, ResourceLocation loc) {
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
-            var loc1 = new ResourceLocation(loc.getNamespace(), path1);
+            var loc1 = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), path1);
             try (var resource = manager.getResource(loc)) {
                 var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
                 var jo = CodecHelper.jsonFromReader(new BufferedReader(is));
@@ -90,6 +93,9 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
     @Override
     public void broadcastUpdate(ITeamProfile team, IPacket packet) {
+        if (!(packet instanceof TechUpdatePacket techUpdatePacket)) {
+            return;
+        }
         TechManagers.savedData().setDirty();
         invokeChange(team);
         var playerList = ServerUtil.getPlayerList();
@@ -97,7 +103,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
             for (var playerName : playerTeam.getPlayers()) {
                 var player = playerList.getPlayerByName(playerName);
                 if (player != null) {
-                    CHANNEL.sendToPlayer(player, packet);
+                    CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket);
                 }
             }
         });
@@ -122,7 +128,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
-        CHANNEL.sendToPlayer(player, team.fullUpdatePacket());
+        CORE.sendToPlayer(player, TECH_UPDATE, team.fullUpdatePacket());
     }
 
     @Override
@@ -156,7 +162,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     public void onPlayerJoin(ServerPlayer player) {
-        CHANNEL.sendToPlayer(player, new TechInitPacket(technologies.values()));
+        CORE.sendToPlayer(player, TECH_INIT, new TechInitPacket(technologies.values()));
         syncTeam(player);
     }
 }

@@ -2,7 +2,7 @@ package org.shsts.tinactory.core.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 @ParametersAreNonnullByDefault
@@ -19,13 +19,13 @@ public class SlotEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeVarInt(index);
         buf.writeVarInt(button);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         index = buf.readVarInt();
         button = buf.readVarInt();
     }

@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
@@ -87,14 +86,12 @@ public class MiscMeta extends MetaConsumer {
     private IEntry<Block> casing(String id, JsonObject jo) {
         var materialColor = parseMaterialColor(jo);
         var builder = REGISTRATE.block(id, Block::new)
-            .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY);
         var renderType = GsonHelper.getAsString(jo, "renderType", "default");
         switch (renderType) {
             case "default":
                 break;
             case "translucent":
-                builder.translucent();
                 break;
             default:
                 throw new UnsupportedTypeException("renderType", renderType);
@@ -115,19 +112,16 @@ public class MiscMeta extends MetaConsumer {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
         var materialColor = parseMaterialColor(jo);
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
-            .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.put(name, block);
     }
 
     private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {
-        return builder.material(Material.BARRIER)
-            .properties(MiscMeta.CASING_PROPERTY)
+        return builder.properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.isViewBlocking(AllItems::never)
                 .noOcclusion()
-                .sound(SoundType.GLASS))
-            .translucent();
+                .sound(SoundType.GLASS));
     }
 
     private void glass(String id) {
@@ -147,9 +141,7 @@ public class MiscMeta extends MetaConsumer {
         }
 
         REGISTRATE.block(id, LensBlock.factory(lens))
-            .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
-            .translucent()
             .register();
     }
 
@@ -158,7 +150,6 @@ public class MiscMeta extends MetaConsumer {
         var capacity = GsonHelper.getAsLong(jo, "capacity");
         var materialColor = parseMaterialColor(jo);
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
-            .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -166,7 +157,6 @@ public class MiscMeta extends MetaConsumer {
     private void fixed(String id, JsonObject jo) {
         var materialColor = parseMaterialColor(jo);
         REGISTRATE.block(id, FixedBlock::new)
-            .material(Material.HEAVY_METAL, materialColor)
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -176,7 +166,6 @@ public class MiscMeta extends MetaConsumer {
         var tint = parseColor(jo, "tint");
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
-            .material(Material.STONE, materialColor)
             .properties($ -> $.requiresCorrectToolForDrops().strength(5f, 6f))
             .tint(tint)
             .blockItem((block, properties) -> new BlockItem(block, properties) {
@@ -306,7 +295,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(BoilerProcessor.factory(properties))
             .transform(StackProcessingContainer.factory(layout));
         if (jo.has("sound")) {
-            var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+            var soundId = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "sound"));
             builder.transform(MachineSound.factory(SOUND_EVENTS.getEntry(soundId)));
         }
         builder.end().build();
