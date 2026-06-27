@@ -1,16 +1,13 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -24,9 +21,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -34,6 +29,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -49,6 +45,12 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public record Output(int port, IProcessingResult result) {}
 
+    @FunctionalInterface
+    public interface Factory<R extends ProcessingRecipe> {
+        R create(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power);
+    }
+
+    @Nullable
     protected final ResourceLocation loc;
     public final List<Input> inputs;
     public final List<Output> outputs;
@@ -58,12 +60,24 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     public final long power;
 
     protected ProcessingRecipe(BuilderBase<?, ?> builder) {
-        this.loc = builder.loc;
-        this.inputs = builder.getInputs();
-        this.outputs = builder.getOutputs();
-        this.workTicks = builder.workTicks;
-        this.voltage = builder.voltage;
-        this.power = builder.power;
+        this(builder.loc, builder.getInputs(), builder.getOutputs(), builder.workTicks, builder.voltage,
+            builder.power);
+    }
+
+    public ProcessingRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
+        this(null, inputs, outputs, workTicks, voltage, power);
+    }
+
+    protected ProcessingRecipe(@Nullable ResourceLocation loc, List<Input> inputs, List<Output> outputs,
+        long workTicks, long voltage, long power) {
+        this.loc = loc;
+        this.inputs = List.copyOf(inputs);
+        this.outputs = List.copyOf(outputs);
+        this.workTicks = workTicks;
+        this.voltage = voltage;
+        this.power = power;
+        assert power > 0;
+        assert workTicks > 0;
     }
 
     protected Optional<IProcessingIngredient> consumeInput(IContainer container, Input input,
@@ -187,9 +201,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             .map(Input::ingredient);
     }
 
-    @Override
     public ResourceLocation loc() {
-        return loc;
+        return Objects.requireNonNull(loc);
     }
 
     public static String getDescriptionId(ResourceLocation loc) {
@@ -198,7 +211,32 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + loc + "]";
+        return loc == null ? getClass().getSimpleName() : getClass().getSimpleName() + "[" + loc + "]";
+    }
+
+    public static Codec<Input> inputCodec(Codec<IProcessingIngredient> ingredientCodec) {
+        return RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("port").forGetter(Input::port),
+            ingredientCodec.fieldOf("ingredient").forGetter(Input::ingredient)
+        ).apply(instance, Input::new));
+    }
+
+    public static Codec<Output> outputCodec(Codec<IProcessingResult> resultCodec) {
+        return RecordCodecBuilder.create(instance -> instance.group(
+            Codec.INT.fieldOf("port").forGetter(Output::port),
+            resultCodec.fieldOf("result").forGetter(Output::result)
+        ).apply(instance, Output::new));
+    }
+
+    public static <R extends ProcessingRecipe> MapCodec<R> codec(Codec<IProcessingIngredient> ingredientCodec,
+        Codec<IProcessingResult> resultCodec, Factory<R> factory) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            inputCodec(ingredientCodec).listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            outputCodec(resultCodec).listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+            Codec.LONG.fieldOf("power").forGetter($ -> $.power)
+        ).apply(instance, factory::create));
     }
 
     public abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
@@ -211,7 +249,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         protected List<Input> resolvedInputs = null;
         protected List<Output> resolvedOutputs = null;
 
-        protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
+        protected BuilderBase(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
@@ -277,80 +315,13 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
         @Override
         protected ProcessingRecipe createObject() {
             return new ProcessingRecipe(this);
-        }
-    }
-
-    public static class Serializer<R extends ProcessingRecipe, B extends BuilderBase<R, B>>
-        implements IRecipeSerializer<R, B> {
-        private final Codec<IProcessingIngredient> ingredientCodec;
-        private final Codec<IProcessingResult> resultCodec;
-
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
-            this.ingredientCodec = ingredientCodec;
-            this.resultCodec = resultCodec;
-        }
-
-        protected Codec<IProcessingIngredient> ingredientCodec() {
-            return ingredientCodec;
-        }
-
-        protected Codec<IProcessingResult> resultCodec() {
-            return resultCodec;
-        }
-
-        protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
-            var builder = type.getBuilder(loc);
-            Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                .map(JsonElement::getAsJsonObject)
-                .forEach(je -> builder.input(
-                    GsonHelper.getAsInt(je, "port"),
-                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "ingredient"))));
-            Streams.stream(GsonHelper.getAsJsonArray(jo, "outputs"))
-                .map(JsonElement::getAsJsonObject)
-                .forEach(je -> builder.output(
-                    GsonHelper.getAsInt(je, "port"),
-                    CodecHelper.parseJson(resultCodec(), GsonHelper.getAsJsonObject(je, "result"))));
-            return builder
-                .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
-                .voltage(GsonHelper.getAsLong(jo, "voltage"))
-                .power(GsonHelper.getAsLong(jo, "power"));
-        }
-
-        @Override
-        public R fromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo, ICondition.IContext context) {
-            return buildFromJson(type, loc, jo).buildObject();
-        }
-
-        @Override
-        public void toJson(JsonObject jo, R recipe) {
-            var inputs = new JsonArray();
-            recipe.inputs.stream()
-                .map(input -> {
-                    var je = new JsonObject();
-                    je.addProperty("port", input.port);
-                    je.add("ingredient", CodecHelper.encodeJson(ingredientCodec(), input.ingredient));
-                    return je;
-                }).forEach(inputs::add);
-            var outputs = new JsonArray();
-            recipe.outputs.stream()
-                .map(output -> {
-                    var je = new JsonObject();
-                    je.addProperty("port", output.port);
-                    je.add("result", CodecHelper.encodeJson(resultCodec(), output.result));
-                    return je;
-                }).forEach(outputs::add);
-            jo.add("inputs", inputs);
-            jo.add("outputs", outputs);
-            jo.addProperty("work_ticks", recipe.workTicks);
-            jo.addProperty("voltage", recipe.voltage);
-            jo.addProperty("power", recipe.power);
         }
     }
 }

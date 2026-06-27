@@ -1,31 +1,28 @@
 package org.shsts.tinactory.content.recipe;
 
-import com.google.common.collect.Streams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.integration.builder.VanillaRecipeBuilder;
 import org.shsts.tinactory.integration.tool.ToolItem;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.recipe.IVanillaRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -36,11 +33,15 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static net.minecraft.world.item.crafting.RecipeSerializer.SHAPED_RECIPE;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class ToolRecipe implements IRecipe<Workbench> {
+    public static final MapCodec<ToolRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ShapedRecipe.Serializer.CODEC.forGetter($ -> $.shapedRecipe),
+        Ingredient.CODEC.listOf().fieldOf("tools").forGetter($ -> $.toolIngredients)
+    ).apply(instance, ToolRecipe::new));
+
+    @Nullable
     private final ResourceLocation loc;
     public final ShapedRecipe shapedRecipe;
     public final List<Ingredient> toolIngredients;
@@ -50,6 +51,10 @@ public class ToolRecipe implements IRecipe<Workbench> {
         this.loc = loc;
         this.shapedRecipe = shapedRecipe;
         this.toolIngredients = toolIngredients;
+    }
+
+    public ToolRecipe(ShapedRecipe shapedRecipe, List<Ingredient> toolIngredients) {
+        this(null, shapedRecipe, toolIngredients);
     }
 
     private boolean matchTools(IItemHandler toolStorage) {
@@ -83,8 +88,8 @@ public class ToolRecipe implements IRecipe<Workbench> {
         return shapedRecipe.getRemainingItems(container.getCraftingContainer());
     }
 
-    @Override
     public ResourceLocation loc() {
+        assert loc != null;
         return loc;
     }
 
@@ -191,7 +196,7 @@ public class ToolRecipe implements IRecipe<Workbench> {
         private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
         private final List<Supplier<Ingredient>> tools = new ArrayList<>();
 
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
@@ -256,33 +261,4 @@ public class ToolRecipe implements IRecipe<Workbench> {
             return new Finished(this);
         }
     }
-
-    private static class Serializer implements IVanillaRecipeSerializer<ToolRecipe> {
-        @Override
-        public ToolRecipe fromJson(ResourceLocation loc,
-            JsonObject jo, ICondition.IContext context) {
-            var shaped = SHAPED_RECIPE.fromJson(loc, jo, context);
-            var tools = Streams.stream(GsonHelper.getAsJsonArray(jo, "tools"))
-                .map(Ingredient::fromJson)
-                .toList();
-            return new ToolRecipe(loc, shaped, tools);
-        }
-
-        @Override
-        public ToolRecipe fromNetwork(ResourceLocation loc, FriendlyByteBuf buf) {
-            var shaped = SHAPED_RECIPE.fromNetwork(loc, buf);
-            assert shaped != null;
-            var tools = buf.readCollection(ArrayList::new, Ingredient::fromNetwork);
-            return new ToolRecipe(loc, shaped, tools);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, ToolRecipe recipe) {
-            SHAPED_RECIPE.toNetwork(buf, recipe.shapedRecipe);
-            buf.writeCollection(recipe.toolIngredients,
-                (buf1, ingredient) -> ingredient.toNetwork(buf1));
-        }
-    }
-
-    public static final IVanillaRecipeSerializer<ToolRecipe> SERIALIZER = new Serializer();
 }

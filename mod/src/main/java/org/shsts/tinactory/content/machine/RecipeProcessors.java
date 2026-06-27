@@ -16,7 +16,6 @@ import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.machine.MachineProcessor;
 import org.shsts.tinycorelib.api.core.Transformer;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -39,12 +38,12 @@ public final class RecipeProcessors {
     }
 
     public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> processing(
-        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType) {
+        IRecipeType<R> recipeType) {
         return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
     }
 
     public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> fusion(
-        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType) {
+        IRecipeType<ProcessingRecipe> recipeType) {
         return be -> new ProcessingMachine<>(recipeType, recipeManager(be), MARKER);
     }
 
@@ -59,12 +58,12 @@ public final class RecipeProcessors {
     }
 
     public static Function<BlockEntity, IRecipeProcessor<ProcessingRecipe>> generator(
-        IRecipeType<ProcessingRecipe.Builder> recipeType) {
+        IRecipeType<ProcessingRecipe> recipeType) {
         return be -> new Generator(recipeType, recipeManager(be), MARKER);
     }
 
     public static Function<BlockEntity, IRecipeProcessor<OreAnalyzerRecipe>> oreAnalyzer(
-        IRecipeType<OreAnalyzerRecipe.Builder> recipeType) {
+        IRecipeType<OreAnalyzerRecipe> recipeType) {
         return be -> new OreAnalyzer(recipeType, recipeManager(be), MARKER);
     }
 
@@ -74,7 +73,7 @@ public final class RecipeProcessors {
     }
 
     public static <R extends ProcessingRecipe> Function<BlockEntity, IRecipeProcessor<R>> coil(
-        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType, int baseTemperature) {
+        IRecipeType<R> recipeType, int baseTemperature) {
         return be -> new CoilMachine<>(recipeType, recipeManager(be), MARKER) {
             @Override
             protected int getRecipeTemperature(R recipe) {
@@ -84,7 +83,7 @@ public final class RecipeProcessors {
     }
 
     public static Function<BlockEntity, IRecipeProcessor<BlastFurnaceRecipe>> blastFurnace(
-        IRecipeType<BlastFurnaceRecipe.Builder> recipeType) {
+        IRecipeType<BlastFurnaceRecipe> recipeType) {
         return be -> new BlastFurnace(recipeType, recipeManager(be), MARKER);
     }
 

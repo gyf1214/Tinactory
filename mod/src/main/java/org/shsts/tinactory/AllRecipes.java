@@ -27,27 +27,24 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
-    public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
-    public static final IRecipeType<BoilerRecipe.Builder> BOILER;
+    public static final IRecipeType<ToolRecipe> TOOL_CRAFTING;
+    public static final IRecipeType<BoilerRecipe> BOILER;
     // Recipes only used to mark input for recipe book purpose
-    public static final IRecipeType<MarkerRecipe.Builder> MARKER;
+    public static final IRecipeType<MarkerRecipe> MARKER;
 
     public static final Map<String, RecipeTypeInfo> PROCESSING_TYPES = new HashMap<>();
 
     static {
-        TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
-            .recipeClass(ToolRecipe.class)
-            .serializer(ToolRecipe.SERIALIZER)
+        TOOL_CRAFTING = REGISTRATE.recipeType("tool_crafting", ToolRecipe.class)
+            .serializer(ToolRecipe.CODEC)
             .register();
 
-        BOILER = REGISTRATE.recipeType("boiler", BoilerRecipe.Builder::new)
-            .recipeClass(BoilerRecipe.class)
-            .serializer(BoilerRecipe.SERIALIZER)
+        BOILER = REGISTRATE.recipeType("boiler", BoilerRecipe.class)
+            .serializer(BoilerRecipe.CODEC)
             .register();
 
-        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
-            .recipeClass(MarkerRecipe.class)
-            .serializer(ProcessingHelper.MARKER_SERIALIZER)
+        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.class)
+            .serializer(ProcessingHelper.MARKER_CODEC)
             .register();
 
     }

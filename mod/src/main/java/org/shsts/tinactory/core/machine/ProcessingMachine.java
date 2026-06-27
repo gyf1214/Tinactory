@@ -22,7 +22,6 @@ import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -41,12 +40,12 @@ import java.util.stream.Stream;
 public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<R> {
     public static final long PROGRESS_PER_TICK = 256;
 
-    protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
+    protected final IRecipeType<R> recipeType;
     @Nullable
     private Supplier<IRecipeManager> recipeManagerSupplier;
     @Nullable
     private IRecipeManager recipeManager = null;
-    protected final IRecipeType<MarkerRecipe.Builder> markerType;
+    protected final IRecipeType<MarkerRecipe> markerType;
 
     protected int parallel = 1;
     protected double workFactor = 1d;
@@ -56,8 +55,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Nullable
     private ProcessingRecipe filterRecipe = null;
 
-    public ProcessingMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
-        Supplier<IRecipeManager> recipeManagerSupplier, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public ProcessingMachine(IRecipeType<R> recipeType,
+        Supplier<IRecipeManager> recipeManagerSupplier, IRecipeType<MarkerRecipe> markerType) {
         this.recipeType = recipeType;
         this.recipeManagerSupplier = recipeManagerSupplier;
         this.markerType = markerType;

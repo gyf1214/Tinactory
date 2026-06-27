@@ -24,8 +24,8 @@ import java.util.function.Supplier;
 public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     private boolean emptyRecipe = false;
 
-    public OreAnalyzer(IRecipeType<OreAnalyzerRecipe.Builder> recipeType,
-        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public OreAnalyzer(IRecipeType<OreAnalyzerRecipe> recipeType,
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

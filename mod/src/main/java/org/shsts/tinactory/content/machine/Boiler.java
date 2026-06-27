@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
@@ -91,7 +91,7 @@ public class Boiler implements INBTSerializable<CompoundTag> {
             lastOutput = FluidStack.EMPTY;
         }
         var absorb = (double) recipe
-            .map($ -> absorbHeat($, parallel, (input, output) -> {
+            .map($ -> absorbHeat($.get(), parallel, (input, output) -> {
                 lastInput = input;
                 lastOutput = output;
                 callback.accept(input, output);

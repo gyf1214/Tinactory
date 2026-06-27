@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Generator extends ProcessingMachine<ProcessingRecipe> {
-    public Generator(IRecipeType<ProcessingRecipe.Builder> recipeType,
-        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public Generator(IRecipeType<ProcessingRecipe> recipeType,
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

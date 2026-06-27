@@ -6,7 +6,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -17,8 +16,8 @@ import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class CoilMachine<R extends ProcessingRecipe> extends ProcessingMachine<R> {
-    public CoilMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
-        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public CoilMachine(IRecipeType<R> recipeType,
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

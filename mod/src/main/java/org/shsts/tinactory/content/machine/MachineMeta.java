@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.machine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -53,7 +54,6 @@ import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.Transformer;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -172,51 +172,41 @@ public class MachineMeta extends MetaConsumer {
             return MachineMeta.parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
         }
 
-        private IRecipeType<ProcessingRecipe.Builder> processingRecipe(
-            IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory,
-            Class<? extends ProcessingRecipe> clazz) {
-            return REGISTRATE.recipeType(recipeTypeId, builderFactory)
-                .recipeClass(clazz)
-                .serializer(ProcessingHelper.PROCESSING_SERIALIZER)
+        private <R extends ProcessingRecipe> IRecipeType<R> processingRecipe(Class<R> clazz, MapCodec<R> codec) {
+            return REGISTRATE.recipeType(recipeTypeId, clazz)
+                .serializer(codec)
                 .register();
         }
 
         protected void parseRecipeType() {
             recipeType = switch (recipeTypeStr) {
-                case "default" -> processingRecipe(ProcessingRecipe.Builder::new, ProcessingRecipe.class);
-                case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
-                case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.Builder::new)
-                    .recipeClass(GeneratorRecipe.class)
-                    .serializer(GeneratorRecipe.SERIALIZER)
+                case "default" -> processingRecipe(ProcessingRecipe.class, ProcessingHelper.PROCESSING_CODEC);
+                case "display_input" -> processingRecipe(DisplayInputRecipe.class,
+                    DisplayInputRecipe.codec(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC));
+                case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.class)
+                    .serializer(GeneratorRecipe.CODEC)
                     .register();
-                case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
-                case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
-                    .recipeClass(ResearchRecipe.class)
-                    .serializer(ProcessingHelper.RESEARCH_SERIALIZER)
+                case "distillation" -> processingRecipe(DistillationRecipe.class, DistillationRecipe.CODEC);
+                case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.class)
+                    .serializer(ProcessingHelper.RESEARCH_CODEC)
                     .register();
-                case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.Builder::new)
-                    .recipeClass(AssemblyRecipe.class)
-                    .serializer(ProcessingHelper.ASSEMBLY_SERIALIZER)
+                case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.class)
+                    .serializer(ProcessingHelper.ASSEMBLY_CODEC)
                     .register();
-                case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
-                    .recipeClass(CleanRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
+                case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.class)
+                    .serializer(CleanRecipe.CODEC)
                     .register();
-                case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe::builder)
-                    .recipeClass(EngravingRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
+                case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe.class)
+                    .serializer(EngravingRecipe.CODEC)
                     .register();
-                case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)
-                    .recipeClass(OreAnalyzerRecipe.class)
-                    .serializer(OreAnalyzerRecipe.SERIALIZER)
+                case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.class)
+                    .serializer(OreAnalyzerRecipe.CODEC)
                     .register();
-                case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.Builder::new)
-                    .recipeClass(ChemicalReactorRecipe.class)
-                    .serializer(ChemicalReactorRecipe.SERIALIZER)
+                case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.class)
+                    .serializer(ChemicalReactorRecipe.CODEC)
                     .register();
-                case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.Builder::new)
-                    .recipeClass(BlastFurnaceRecipe.class)
-                    .serializer(BlastFurnaceRecipe.SERIALIZER)
+                case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.class)
+                    .serializer(BlastFurnaceRecipe.CODEC)
                     .register();
                 case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
@@ -224,9 +214,9 @@ public class MachineMeta extends MetaConsumer {
         }
 
         @SuppressWarnings("unchecked")
-        protected <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> IRecipeType<B> recipeType() {
+        protected <R extends ProcessingRecipe> IRecipeType<R> recipeType() {
             assert recipeType != null;
-            return (IRecipeType<B>) recipeType;
+            return (IRecipeType<R>) recipeType;
         }
 
         private IMenuType getMenu() {

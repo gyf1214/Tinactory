@@ -1,32 +1,47 @@
 package org.shsts.tinactory.content.recipe;
 
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.List;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class GeneratorRecipe extends DisplayInputRecipe {
+    public static final MapCodec<GeneratorRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ProcessingRecipe.inputCodec(ProcessingHelper.INGREDIENT_CODEC).listOf().fieldOf("inputs")
+            .forGetter($ -> $.inputs),
+        ProcessingRecipe.outputCodec(ProcessingHelper.RESULT_CODEC).listOf().optionalFieldOf("outputs", List.of())
+            .forGetter($ -> $.outputs),
+        Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
+        Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+        Codec.LONG.fieldOf("power").forGetter($ -> $.power),
+        Codec.BOOL.optionalFieldOf("exactVoltage", false).forGetter($ -> $.exactVoltage)
+    ).apply(instance, GeneratorRecipe::new));
+
     // this is used to distinguish generator recipes that can be overclocked
     private final boolean exactVoltage;
 
     private GeneratorRecipe(Builder builder) {
         super(builder);
         this.exactVoltage = builder.exactVoltage;
+    }
+
+    public GeneratorRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+        boolean exactVoltage) {
+        super(inputs, outputs, workTicks, voltage, power);
+        this.exactVoltage = exactVoltage;
     }
 
     public boolean exactVoltage() {
@@ -56,7 +71,7 @@ public class GeneratorRecipe extends DisplayInputRecipe {
     public static class Builder extends BuilderBase<GeneratorRecipe, Builder> {
         private boolean exactVoltage = false;
 
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
@@ -76,25 +91,4 @@ public class GeneratorRecipe extends DisplayInputRecipe {
             return new GeneratorRecipe(this);
         }
     }
-
-    public static class Serializer extends ProcessingRecipe.Serializer<GeneratorRecipe, Builder> {
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
-            super(ingredientCodec, resultCodec);
-        }
-
-        @Override
-        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
-            return super.buildFromJson(type, loc, jo)
-                .exactVoltage(GsonHelper.getAsBoolean(jo, "exactVoltage", false));
-        }
-
-        @Override
-        public void toJson(JsonObject jo, GeneratorRecipe recipe) {
-            super.toJson(jo, recipe);
-            jo.addProperty("exactVoltage", recipe.exactVoltage);
-        }
-    }
-
-    public static IRecipeSerializer<GeneratorRecipe, Builder> SERIALIZER
-        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

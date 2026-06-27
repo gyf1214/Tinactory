@@ -1,10 +1,11 @@
 package org.shsts.tinactory.integration.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -38,10 +39,10 @@ public final class ProcessingHelper {
     public static final Codec<IProcessingResult> RESULT_CODEC;
     public static final Codec<ProcessingInfo> INFO_CODEC;
 
-    public static final ProcessingRecipe.Serializer<ProcessingRecipe, ProcessingRecipe.Builder> PROCESSING_SERIALIZER;
-    public static final AssemblyRecipe.Serializer<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLY_SERIALIZER;
-    public static final MarkerRecipe.Serializer MARKER_SERIALIZER;
-    public static final ResearchRecipe.Serializer RESEARCH_SERIALIZER;
+    public static final MapCodec<ProcessingRecipe> PROCESSING_CODEC;
+    public static final MapCodec<AssemblyRecipe> ASSEMBLY_CODEC;
+    public static final MapCodec<MarkerRecipe> MARKER_CODEC;
+    public static final MapCodec<ResearchRecipe> RESEARCH_CODEC;
 
     static {
         var ingredientCodecs = Map.of(
@@ -57,10 +58,10 @@ public final class ProcessingHelper {
 
         INFO_CODEC = ProcessingInfo.codec(INGREDIENT_CODEC, RESULT_CODEC);
 
-        PROCESSING_SERIALIZER = new ProcessingRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
-        ASSEMBLY_SERIALIZER = new AssemblyRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
-        MARKER_SERIALIZER = new MarkerRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC);
-        RESEARCH_SERIALIZER = new ResearchRecipe.Serializer(INGREDIENT_CODEC);
+        PROCESSING_CODEC = ProcessingRecipe.codec(INGREDIENT_CODEC, RESULT_CODEC, ProcessingRecipe::new);
+        ASSEMBLY_CODEC = AssemblyRecipe.codec(INGREDIENT_CODEC, RESULT_CODEC);
+        MARKER_CODEC = MarkerRecipe.codec(INGREDIENT_CODEC, RESULT_CODEC);
+        RESEARCH_CODEC = ResearchRecipe.codec(INGREDIENT_CODEC, RESULT_CODEC);
     }
 
     private ProcessingHelper() {}

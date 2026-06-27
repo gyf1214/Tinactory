@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BlastFurnace extends CoilMachine<BlastFurnaceRecipe> {
-    public BlastFurnace(IRecipeType<BlastFurnaceRecipe.Builder> recipeType,
-        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public BlastFurnace(IRecipeType<BlastFurnaceRecipe> recipeType,
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 

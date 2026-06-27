@@ -1,14 +1,11 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -26,7 +23,13 @@ public class AssemblyRecipe extends ProcessingRecipe {
 
     protected AssemblyRecipe(BuilderBase<?, ?> builder) {
         super(builder);
-        this.requiredTech = builder.requiredTech;
+        this.requiredTech = List.copyOf(builder.requiredTech);
+    }
+
+    public AssemblyRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+        List<ResourceLocation> requiredTech) {
+        super(inputs, outputs, workTicks, voltage, power);
+        this.requiredTech = List.copyOf(requiredTech);
     }
 
     @Override
@@ -39,7 +42,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
         ProcessingRecipe.BuilderBase<R, S> {
         protected final List<ResourceLocation> requiredTech = new ArrayList<>();
 
-        protected BuilderBase(IRecipeType<S> parent, ResourceLocation loc) {
+        protected BuilderBase(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
@@ -50,7 +53,7 @@ public class AssemblyRecipe extends ProcessingRecipe {
     }
 
     public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
+        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
             super(parent, loc);
         }
 
@@ -60,30 +63,27 @@ public class AssemblyRecipe extends ProcessingRecipe {
         }
     }
 
-    public static class Serializer<R extends AssemblyRecipe, B extends BuilderBase<R, B>> extends
-        ProcessingRecipe.Serializer<R, B> {
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
-            super(ingredientCodec, resultCodec);
-        }
-
-        @Override
-        protected B buildFromJson(IRecipeType<B> type, ResourceLocation loc, JsonObject jo) {
-            var builder = super.buildFromJson(type, loc, jo);
-            Streams.stream(GsonHelper.getAsJsonArray(jo, "required_tech"))
-                .map(JsonElement::getAsString)
-                .forEach(s -> builder.requireTech(ResourceLocation.parse(s)));
-            return builder;
-        }
-
-        @Override
-        public void toJson(JsonObject jo, R recipe) {
-            super.toJson(jo, recipe);
-            var ja = new JsonArray();
-            for (var tech : recipe.requiredTech) {
-                ja.add(tech.toString());
-            }
-            jo.add("required_tech", ja);
-        }
+    @FunctionalInterface
+    public interface Factory<R extends AssemblyRecipe> {
+        R create(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+            List<ResourceLocation> requiredTech);
     }
 
+    public static <R extends AssemblyRecipe> MapCodec<R> codec(Codec<IProcessingIngredient> ingredientCodec,
+        Codec<IProcessingResult> resultCodec, Factory<R> factory) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ProcessingRecipe.inputCodec(ingredientCodec).listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            ProcessingRecipe.outputCodec(resultCodec).listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+            Codec.LONG.fieldOf("power").forGetter($ -> $.power),
+            ResourceLocation.CODEC.listOf().optionalFieldOf("required_tech", List.of())
+                .forGetter($ -> $.requiredTech)
+        ).apply(instance, factory::create));
+    }
+
+    public static MapCodec<AssemblyRecipe> codec(Codec<IProcessingIngredient> ingredientCodec,
+        Codec<IProcessingResult> resultCodec) {
+        return codec(ingredientCodec, resultCodec, AssemblyRecipe::new);
+    }
 }
