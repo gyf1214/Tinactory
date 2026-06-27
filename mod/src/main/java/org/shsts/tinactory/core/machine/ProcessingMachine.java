@@ -23,6 +23,7 @@ import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.DistLazy;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -83,25 +84,20 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public Optional<R> byLoc(ResourceLocation loc) {
+    public Optional<IEntry<R>> byLoc(ResourceLocation loc) {
         return recipeManager().byLoc(recipeType, loc);
     }
 
-    @Override
-    public ResourceLocation toLoc(R recipe) {
-        return recipe.loc();
-    }
-
-    protected Stream<MarkerRecipe> markers(IMachine machine) {
+    protected Stream<IEntry<MarkerRecipe>> markers(IMachine machine) {
         return recipeManager().getAllRecipesFor(markerType).stream()
-            .filter($ -> $.matchesType(recipeType) && $.canCraft(machine));
+            .filter($ -> $.get().matchesType(recipeType) && $.get().canCraft(machine));
     }
 
-    protected List<ProcessingRecipe> targetRecipes(IMachine machine) {
-        var ret = new ArrayList<ProcessingRecipe>();
+    protected List<IEntry<? extends ProcessingRecipe>> targetRecipes(IMachine machine) {
+        var ret = new ArrayList<IEntry<? extends ProcessingRecipe>>();
         markers(machine).forEach(ret::add);
         recipeManager().getAllRecipesFor(recipeType).stream()
-            .filter($ -> $.canCraft(machine))
+            .filter($ -> $.get().canCraft(machine))
             .forEach(ret::add);
         return ret;
     }
@@ -109,8 +105,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(IMachine machine) {
         var loc = targetRecipes(machine);
-        var comparator = Comparator.<ProcessingRecipe>comparingLong($ -> $.voltage)
-            .thenComparing(ProcessingRecipe::loc, ResourceLocation::compareNamespaced);
+        var comparator = Comparator.<IEntry<? extends ProcessingRecipe>>comparingLong($ -> $.get().voltage)
+            .thenComparing(IEntry::loc, ResourceLocation::compareNamespaced);
         loc.sort(comparator);
 
         return () -> () -> loc.stream()
@@ -122,13 +118,13 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     public boolean allowTargetRecipe(boolean isClientSide, ResourceLocation loc, IMachine machine) {
         var marker = recipeManager().byLoc(markerType, loc);
         if (marker.isPresent()) {
-            var recipe = marker.get();
+            var recipe = marker.get().get();
             return recipe.matchesType(recipeType) && recipe.canCraft(machine);
         }
 
         var processing = recipeManager().byLoc(recipeType, loc);
         if (processing.isPresent()) {
-            var recipe = processing.get();
+            var recipe = processing.get().get();
             return isClientSide || recipe.canCraft(machine);
         }
 
@@ -195,10 +191,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         setFilters(container, PortDirection.OUTPUT, filters);
     }
 
-    private Optional<ProcessingRecipe> getTargetRecipe(ResourceLocation loc) {
+    private Optional<IEntry<? extends ProcessingRecipe>> getTargetRecipe(ResourceLocation loc) {
         return recipeManager().byLoc(markerType, loc)
-            .map($ -> (ProcessingRecipe) $)
-            .or(() -> recipeManager().byLoc(recipeType, loc));
+            .map($ -> (IEntry<? extends ProcessingRecipe>) $)
+            .or(() -> recipeManager().byLoc(recipeType, loc).map($ -> $));
     }
 
     @Override
@@ -207,7 +203,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         if (recipe.isEmpty()) {
             return;
         }
-        machine.container().ifPresent(container -> setInputFilters(recipe.get(), container));
+        machine.container().ifPresent(container -> setInputFilters(recipe.get().get(), container));
     }
 
     protected void setFilterRecipe(IMachine machine, @Nullable ProcessingRecipe recipe) {
@@ -218,27 +214,27 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public Optional<R> newRecipe(IMachine machine) {
+    public Optional<IEntry<R>> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
         return recipeManager().getRecipeFor(recipeType, machine);
     }
 
     @Override
-    public Optional<R> newRecipe(IMachine machine, ResourceLocation target) {
+    public Optional<IEntry<R>> newRecipe(IMachine machine, ResourceLocation target) {
         var processing = recipeManager().byLoc(recipeType, target);
         if (processing.isPresent()) {
-            setFilterRecipe(machine, processing.get());
-            return processing.filter($ -> $.matches(machine));
+            setFilterRecipe(machine, processing.get().get());
+            return processing.filter($ -> $.get().matches(machine));
         }
 
         var marker = recipeManager().byLoc(markerType, target);
         if (marker.isPresent()) {
-            var recipe = marker.get();
+            var recipe = marker.get().get();
             setFilterRecipe(machine, recipe);
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager().getAllRecipesFor(recipeType).stream()
-                    .filter($ -> $.matches(machine))
-                    .filter(marker.get()::matches)
+                    .filter($ -> $.get().matches(machine))
+                    .filter($ -> recipe.matches($))
                     .findAny();
             }
         }
@@ -296,7 +292,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public void onWorkContinue(R recipe, IMachine machine) {
         if (filterRecipeLoc != null) {
-            filterRecipe = getTargetRecipe(filterRecipeLoc).orElse(null);
+            filterRecipe = getTargetRecipe(filterRecipeLoc).map(IEntry::get).orElse(null);
             if (filterRecipe == null) {
                 filterRecipeLoc = null;
             }

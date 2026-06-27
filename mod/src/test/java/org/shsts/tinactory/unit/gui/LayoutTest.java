@@ -75,7 +75,7 @@ class LayoutTest {
             layout.getProcessingOutputs(recipe));
 
         var marker = new MarkerRecipe.Builder(
-            new TestRecipeType<>("layout_marker_type", MarkerRecipe.class, MarkerRecipe.Builder::new),
+            new TestRecipeType<>("layout_marker_type", MarkerRecipe.class),
             new ResourceLocation("tinactory", "layout_marker"))
             .baseType(new ResourceLocation("tinactory", "layout_base"))
             .output(2, new TestIngredient("marker_plate", 1))

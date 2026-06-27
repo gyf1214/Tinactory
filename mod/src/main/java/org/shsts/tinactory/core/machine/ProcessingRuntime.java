@@ -21,6 +21,7 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -70,52 +71,56 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     private boolean needUpdate = true;
     private long workProgress = 0L;
 
-    private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
+    private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, IEntry<T> entry) {
+        private T recipe() {
+            return entry.get();
+        }
+
         public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> infoList,
             BiConsumer<PortDirection, IProcessingObject> onReportObject) {
             infoList.clear();
-            processor.onWorkBegin(recipe, machine, maxParallel, info -> {
+            processor.onWorkBegin(recipe(), machine, maxParallel, info -> {
                 infoList.add(info);
                 onReportObject.accept(PortDirection.INPUT, info.object());
             });
         }
 
         public void onWorkContinue(IMachine machine) {
-            processor.onWorkContinue(recipe, machine);
+            processor.onWorkContinue(recipe(), machine);
         }
 
         public long onWorkProcess(double partial) {
-            return processor.onWorkProgress(recipe, partial);
+            return processor.onWorkProgress(recipe(), partial);
         }
 
         public void onWorkDone(IMachine machine, Random random,
             BiConsumer<PortDirection, IProcessingObject> onReportObject) {
-            processor.onWorkDone(recipe, machine, random,
+            processor.onWorkDone(recipe(), machine, random,
                 result -> onReportObject.accept(PortDirection.OUTPUT, result));
         }
 
         public long maxProgress() {
-            return processor.maxWorkProgress(recipe);
+            return processor.maxWorkProgress(recipe());
         }
 
         public long maxProgressTicks() {
-            return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe)));
+            return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe())));
         }
 
         public ResourceLocation loc() {
-            return processor.toLoc(recipe);
+            return entry.loc();
         }
 
         public ElectricMachineType machineType() {
-            return processor.electricMachineType(recipe);
+            return processor.electricMachineType(recipe());
         }
 
         public double powerGen() {
-            return processor.powerGen(recipe);
+            return processor.powerGen(recipe());
         }
 
         public double powerCons() {
-            return processor.powerCons(recipe);
+            return processor.powerCons(recipe());
         }
     }
 
@@ -231,7 +236,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         }
         var recipe = processor.newRecipe(machine, target);
         clearFilters(PortDirection.OUTPUT);
-        if (recipe.filter($ -> gateRecipe(processor, machine, $)).isPresent()) {
+        if (recipe.filter($ -> gateRecipe(processor, machine, $.get())).isPresent()) {
             currentRecipe = new ProcessorRecipe<>(index, processor, recipe.get());
             return true;
         }

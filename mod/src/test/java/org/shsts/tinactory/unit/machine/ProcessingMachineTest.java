@@ -30,10 +30,10 @@ import static org.shsts.tinactory.api.logistics.PortDirection.OUTPUT;
 class ProcessingMachineTest {
     private static final int INPUT_PORT = 0;
     private static final int OUTPUT_PORT = 1;
-    private static final TestRecipeType<TestRecipe.Builder> RECIPE_TYPE =
-        new TestRecipeType<>("test_machine", TestRecipe.class, TestRecipe.Builder::new);
-    private static final TestRecipeType<MarkerRecipe.Builder> MARKER_TYPE =
-        new TestRecipeType<>("marker", MarkerRecipe.class, MarkerRecipe.Builder::new);
+    private static final TestRecipeType<TestRecipe> RECIPE_TYPE =
+        new TestRecipeType<>("test_machine", TestRecipe.class);
+    private static final TestRecipeType<MarkerRecipe> MARKER_TYPE =
+        new TestRecipeType<>("marker", MarkerRecipe.class);
 
     @Test
     void shouldUseScaledPreviewForGenericResultsWhenBuildingOutputInfo() {
@@ -94,12 +94,12 @@ class ProcessingMachineTest {
         var processor = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
 
         var recipe = processor.newRecipe(machine, target.loc()).orElseThrow();
-        processor.onWorkBegin(recipe, machine, 1, $ -> {});
+        processor.onWorkBegin(recipe.get(), machine, 1, $ -> {});
         var saved = processor.serializeNBT();
 
         var restored = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
         restored.deserializeNBT(saved);
-        restored.onWorkContinue(recipe, machine);
+        restored.onWorkContinue(recipe.get(), machine);
         var restoredTag = restored.serializeNBT();
 
         assertEquals(target.loc().toString(), saved.getString("filterRecipe"));
@@ -120,8 +120,8 @@ class ProcessingMachineTest {
             .add(RECIPE_TYPE, other));
 
         assertEquals(Optional.of(matching.loc()),
-            processor.newRecipe(machine, marker.loc()).map(ProcessingRecipe::loc));
-        assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map(ProcessingRecipe::loc));
+            processor.newRecipe(machine, marker.loc()).map($ -> $.loc()));
+        assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map($ -> $.loc()));
     }
 
     @Test
@@ -161,7 +161,7 @@ class ProcessingMachineTest {
 
         var resolved = processor.newRecipe(machine, marker.loc());
 
-        assertEquals(Optional.of(matching.loc()), resolved.map(ProcessingRecipe::loc));
+        assertEquals(Optional.of(matching.loc()), resolved.map($ -> $.loc()));
         assertTrue(output.acceptInput(TestStack.item("dust", 1)));
     }
 
@@ -214,12 +214,12 @@ class ProcessingMachineTest {
         var target = recipe("targeted", 0);
         var original = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
         var recipe = original.newRecipe(machine, target.loc()).orElseThrow();
-        original.onWorkBegin(recipe, machine, 1, $ -> {});
+        original.onWorkBegin(recipe.get(), machine, 1, $ -> {});
         var saved = original.serializeNBT();
 
         var restored = new TestProcessingMachine(new TestRecipeManager());
         restored.deserializeNBT(saved);
-        restored.onWorkContinue(recipe, machine);
+        restored.onWorkContinue(recipe.get(), machine);
 
         assertFalse(restored.serializeNBT().contains("filterRecipe"));
     }
@@ -272,7 +272,7 @@ class ProcessingMachineTest {
         }
 
         private static final class Builder extends BuilderBase<TestRecipe, Builder> {
-            private Builder(IRecipeType<Builder> type, ResourceLocation loc) {
+            private Builder(IRecipeType<?> type, ResourceLocation loc) {
                 super(type, loc);
             }
 

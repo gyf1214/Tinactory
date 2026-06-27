@@ -11,6 +11,7 @@ import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         super(recipeType, recipeManager, markerType);
     }
 
-    private Optional<OreAnalyzerRecipe> newRecipe(List<OreAnalyzerRecipe> matches, IMachine machine) {
+    private Optional<IEntry<OreAnalyzerRecipe>> newRecipe(List<IEntry<OreAnalyzerRecipe>> matches, IMachine machine) {
         var size = matches.size();
         if (size == 0) {
             return Optional.empty();
@@ -39,7 +40,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
 
         var emptyRate = 1d;
         for (var match : matches) {
-            emptyRate *= 1 - match.rate;
+            emptyRate *= 1 - match.get().rate;
         }
         emptyRecipe = random.nextDouble() <= emptyRate;
 
@@ -47,7 +48,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
             return Optional.of(matches.get(0));
         }
 
-        var rates = matches.stream().mapToDouble(r -> r.rate).toArray();
+        var rates = matches.stream().mapToDouble(r -> r.get().rate).toArray();
         for (var i = 1; i < size; i++) {
             rates[i] += rates[i - 1];
         }
@@ -64,17 +65,17 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     }
 
     @Override
-    public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine) {
+    public Optional<IEntry<OreAnalyzerRecipe>> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
         var matches = recipeManager().getRecipesFor(recipeType, machine);
         return newRecipe(matches, machine);
     }
 
     @Override
-    public Optional<OreAnalyzerRecipe> newRecipe(IMachine machine, ResourceLocation target) {
+    public Optional<IEntry<OreAnalyzerRecipe>> newRecipe(IMachine machine, ResourceLocation target) {
         var marker = recipeManager().byLoc(markerType, target);
         if (marker.isPresent()) {
-            var recipe = marker.get();
+            var recipe = marker.get().get();
             setFilterRecipe(machine, recipe);
             var matches = recipeManager().getRecipesFor(recipeType, machine)
                 .stream().filter(recipe::matches)
@@ -84,7 +85,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
 
         var processing = recipeManager().byLoc(recipeType, target);
         if (processing.isPresent()) {
-            var recipe = processing.get();
+            var recipe = processing.get().get();
             setFilterRecipe(machine, recipe);
             if (recipe.matches(machine)) {
                 var random = machine.random();

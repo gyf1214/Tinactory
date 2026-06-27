@@ -11,6 +11,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +25,7 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
 
     Class<T> baseClass();
 
-    Optional<T> byLoc(ResourceLocation loc);
-
-    ResourceLocation toLoc(T recipe);
+    Optional<IEntry<T>> byLoc(ResourceLocation loc);
 
     DistLazy<List<IRecipeBookItem>> recipeBookItems(IMachine machine);
 
@@ -34,14 +33,14 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
 
     void setTargetRecipe(ResourceLocation loc, IMachine machine);
 
-    Optional<T> newRecipe(IMachine machine);
+    Optional<IEntry<T>> newRecipe(IMachine machine);
 
     /**
      * Call this when there's a target recipe.
      */
-    Optional<T> newRecipe(IMachine machine, ResourceLocation target);
+    Optional<IEntry<T>> newRecipe(IMachine machine, ResourceLocation target);
 
-    default Optional<T> newRecipe(IMachine machine, Optional<ResourceLocation> target) {
+    default Optional<IEntry<T>> newRecipe(IMachine machine, Optional<ResourceLocation> target) {
         return target.map($ -> newRecipe(machine, $))
             .orElseGet(() -> newRecipe(machine));
     }

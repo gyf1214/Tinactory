@@ -20,8 +20,10 @@ import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestRecipeManager.TestEntry;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinycorelib.api.core.DistLazy;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -422,13 +424,8 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Optional<ResourceLocation> byLoc(ResourceLocation loc) {
-            return recipe.filter(loc::equals);
-        }
-
-        @Override
-        public ResourceLocation toLoc(ResourceLocation value) {
-            return value;
+        public Optional<IEntry<ResourceLocation>> byLoc(ResourceLocation loc) {
+            return recipe.filter(loc::equals).map($ -> new TestEntry<>($, $));
         }
 
         @Override
@@ -447,13 +444,13 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Optional<ResourceLocation> newRecipe(IMachine machine) {
-            return recipe;
+        public Optional<IEntry<ResourceLocation>> newRecipe(IMachine machine) {
+            return recipe.map($ -> new TestEntry<>($, $));
         }
 
         @Override
-        public Optional<ResourceLocation> newRecipe(IMachine machine, ResourceLocation target) {
-            return recipe.filter(target::equals);
+        public Optional<IEntry<ResourceLocation>> newRecipe(IMachine machine, ResourceLocation target) {
+            return recipe.filter(target::equals).map($ -> new TestEntry<>($, $));
         }
 
         @Override
