@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.fixture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -127,7 +127,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public Component title() {
-        return new TextComponent("test-machine");
+        return Component.literal("test-machine");
     }
 
     @Override
@@ -436,12 +436,12 @@ public final class TestMachine implements IMachine {
 
         @Override
         public Component getDescription() {
-            return TextComponent.EMPTY;
+            return Component.empty();
         }
 
         @Override
         public Component getDetails() {
-            return TextComponent.EMPTY;
+            return Component.empty();
         }
 
         @Override

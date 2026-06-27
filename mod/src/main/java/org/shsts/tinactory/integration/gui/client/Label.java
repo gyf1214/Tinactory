@@ -6,7 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -99,7 +99,7 @@ public class Label extends MenuWidget {
         multiline = null;
         formattedLines.clear();
         while (lines.size() <= index) {
-            lines.add(TextComponent.EMPTY);
+            lines.add(Component.empty());
         }
         lines.set(index, value);
         updateSize();

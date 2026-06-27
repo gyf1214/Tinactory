@@ -8,13 +8,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import org.shsts.tinactory.integration.common.CapabilityItem;
 import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
@@ -46,8 +46,8 @@ public final class AllForgeEvents {
     }
 
     @SubscribeEvent
-    public static void onCreateWorldSpawn(WorldEvent.CreateSpawnPosition event) {
-        if (event.getWorld() instanceof ServerLevel world) {
+    public static void onCreateWorldSpawn(LevelEvent.CreateSpawnPosition event) {
+        if (event.getLevel() instanceof ServerLevel world) {
             var spawn = new BlockPos(0, 64, 0);
             if (!world.getBiome(spawn).is(AllWorldGens.VOID_BIOME)) {
                 return;
@@ -67,16 +67,16 @@ public final class AllForgeEvents {
     }
 
     @SubscribeEvent
-    public static void onLoadWorld(WorldEvent.Load event) {
-        var world = (Level) event.getWorld();
+    public static void onLoadWorld(LevelEvent.Load event) {
+        var world = (Level) event.getLevel();
         if (!world.isClientSide && world.dimension() == Level.OVERWORLD) {
             TechManagers.loadSavedData((ServerLevel) world);
         }
     }
 
     @SubscribeEvent
-    public static void onUnloadWorld(WorldEvent.Unload event) {
-        var world = (Level) event.getWorld();
+    public static void onUnloadWorld(LevelEvent.Unload event) {
+        var world = (Level) event.getLevel();
         if (!world.isClientSide) {
             WorldNetworkManagers.onUnload(world);
             WorldMultiblockManagers.onUnload(world);
@@ -98,7 +98,7 @@ public final class AllForgeEvents {
 
     @SubscribeEvent
     public static void onBlockChanged(BlockEvent.NeighborNotifyEvent event) {
-        var world = (Level) event.getWorld();
+        var world = (Level) event.getLevel();
         if (world.isClientSide) {
             return;
         }

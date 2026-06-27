@@ -4,18 +4,17 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -40,16 +39,17 @@ public class Tinactory {
     @Nullable
     private TechQuestIntegration techQuestIntegration = null;
 
-    public Tinactory() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
-
-        this.modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public Tinactory(IEventBus modEventBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
+        this.modEventBus = modEventBus;
         modEventBus.addListener(this::onConstructEvent);
     }
 
     private void onConstructEvent(FMLConstructModEvent event) {
         onConstruct();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::onConstructClient);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            onConstructClient();
+        }
     }
 
     public void onConstruct() {
@@ -80,7 +80,7 @@ public class Tinactory {
 
             REGISTRATE.register(modEventBus);
             modEventBus.addListener(Tinactory::init);
-            MinecraftForge.EVENT_BUS.register(AllForgeEvents.class);
+            NeoForge.EVENT_BUS.register(AllForgeEvents.class);
         } catch (Throwable e) {
             LOGGER.error("Fatal error encountered during construct!", e);
         }
@@ -91,7 +91,8 @@ public class Tinactory {
 
         REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
-        MinecraftForge.EVENT_BUS.register(AllClientEvents.class);
+        modEventBus.addListener(AllClientEvents::initKeys);
+        NeoForge.EVENT_BUS.register(AllClientEvents.class);
     }
 
     private static void init(FMLCommonSetupEvent event) {
@@ -99,7 +100,6 @@ public class Tinactory {
     }
 
     private static void initClient(FMLClientSetupEvent event) {
-        AllClientEvents.initKeys();
         LOGGER.info("hello Tinactory client!");
     }
 }

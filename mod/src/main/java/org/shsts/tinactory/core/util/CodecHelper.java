@@ -17,7 +17,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -91,7 +91,7 @@ public final class CodecHelper {
     }
 
     public static Component parseComponent(String json) {
-        return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json), TextComponent.EMPTY);
+        return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json), Component.empty());
     }
 
     public static <T> ListTag encodeList(List<T> list, Function<T, Tag> encoder) {

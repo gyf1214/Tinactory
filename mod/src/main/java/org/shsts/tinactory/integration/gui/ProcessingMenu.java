@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,7 +43,7 @@ public class ProcessingMenu extends LayoutMenu {
     public static Component getTitle(BlockEntity be) {
         return MACHINE.tryGet(be)
             .map(IMachine::title)
-            .orElse(TextComponent.EMPTY);
+            .orElse(Component.empty());
     }
 
     public static Component portLabel(PortType type, int index) {

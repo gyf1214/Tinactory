@@ -11,7 +11,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;

@@ -27,12 +27,11 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
@@ -207,7 +206,7 @@ public final class RenderUtil {
      */
     public static void renderBlockInWorld(ModelBlockRenderer renderer, Level world, BakedModel model,
         BlockState blockState, BlockPos pos, PoseStack poseStack, VertexConsumer vertexConsumer,
-        boolean checkSides, Random random, long seed, int packedOverlay, IModelData modelData) {
+        boolean checkSides, Random random, long seed, int packedOverlay, ModelData modelData) {
         poseStack.pushPose();
         renderer.tesselateBlock(world, model, blockState, pos, poseStack, vertexConsumer,
             checkSides, random, seed, packedOverlay, modelData);
@@ -231,7 +230,7 @@ public final class RenderUtil {
         PoseStack poseStack, VertexConsumer vertexConsumer, Random random,
         int packedLight, int packedOverlay) {
         // modelData requires a world, we just ignore that.
-        var modelData = EmptyModelData.INSTANCE;
+        var modelData = ModelData.EMPTY;
         var blockColors = Minecraft.getInstance().getBlockColors();
         var pose = poseStack.last();
 

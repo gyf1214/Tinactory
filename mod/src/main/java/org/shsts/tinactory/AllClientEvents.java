@@ -3,12 +3,12 @@ package org.shsts.tinactory;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.DrawSelectionEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.tool.WrenchOutlineRenderer;
@@ -20,7 +20,7 @@ import static org.shsts.tinactory.Tinactory.CHANNEL;
 @OnlyIn(Dist.CLIENT)
 public final class AllClientEvents {
     @SubscribeEvent
-    public static void onDrawHighlight(DrawSelectionEvent.HighlightBlock event) {
+    public static void onDrawHighlight(RenderHighlightEvent.Block event) {
         var mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
             return;
@@ -39,23 +39,21 @@ public final class AllClientEvents {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            if (OPEN_TECH.consumeClick()) {
-                CHANNEL.sendToServer(OpenTechPacket.INSTANCE);
-            }
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (OPEN_TECH.consumeClick()) {
+            CHANNEL.sendToServer(OpenTechPacket.INSTANCE);
         }
     }
 
     public static KeyMapping OPEN_TECH;
 
-    public static void initKeys() {
-        OPEN_TECH = createKey("open_tech", InputConstants.KEY_GRAVE, KeyMapping.CATEGORY_INTERFACE);
+    public static void initKeys(RegisterKeyMappingsEvent event) {
+        OPEN_TECH = createKey(event, "open_tech", InputConstants.KEY_GRAVE, KeyMapping.CATEGORY_INTERFACE);
     }
 
-    private static KeyMapping createKey(String id, int keycode, String category) {
+    private static KeyMapping createKey(RegisterKeyMappingsEvent event, String id, int keycode, String category) {
         var key = new KeyMapping("key." + TinactoryKeys.ID + "." + id, keycode, category);
-        ClientRegistry.registerKeyBinding(key);
+        event.register(key);
         return key;
     }
 }

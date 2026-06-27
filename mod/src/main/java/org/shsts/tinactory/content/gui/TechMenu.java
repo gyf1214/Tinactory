@@ -2,7 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -160,7 +160,7 @@ public class TechMenu extends MenuBase {
             if (StringUtils.isBlank(name)) {
                 renameResult.resetHoverName();
             } else {
-                renameResult.setHoverName(new TextComponent(name));
+                renameResult.setHoverName(Component.literal(name));
             }
         } else {
             renameResult = ItemStack.EMPTY;

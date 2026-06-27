@@ -5,9 +5,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -26,7 +26,7 @@ public final class Widgets {
     }
 
     public static EditBox editBox() {
-        return new EditBox(ClientUtil.getFont(), 0, 0, 0, 0, TextComponent.EMPTY) {
+        return new EditBox(ClientUtil.getFont(), 0, 0, 0, 0, Component.empty()) {
             @Override
             public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
                 // solve the bug

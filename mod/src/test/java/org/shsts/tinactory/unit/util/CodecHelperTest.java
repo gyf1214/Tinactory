@@ -5,7 +5,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -50,7 +50,7 @@ class CodecHelperTest {
 
     @Test
     void componentCodecRoundTripsTextAndThrowsOnInvalidJson() {
-        var component = new TextComponent("core util");
+        var component = Component.literal("core util");
         var encoded = CodecHelper.encodeComponent(component);
 
         assertEquals(component, CodecHelper.parseComponent(encoded));
