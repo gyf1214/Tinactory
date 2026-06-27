@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.recipe;
 import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -12,7 +11,6 @@ import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Random;
@@ -23,10 +21,6 @@ import java.util.function.Consumer;
 public class DistillationRecipe extends DisplayInputRecipe {
     public static final MapCodec<DistillationRecipe> CODEC =
         ProcessingHelper.PROCESSING_CODEC.xmap(DistillationRecipe::new, $ -> $);
-
-    private DistillationRecipe(BuilderBase<?, ?> builder) {
-        super(builder);
-    }
 
     public DistillationRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
         super(inputs, outputs, workTicks, voltage, power);
@@ -64,12 +58,4 @@ public class DistillationRecipe extends DisplayInputRecipe {
         }
     }
 
-    public static Builder builder(IRecipeType<?> parent, ResourceLocation loc) {
-        return new Builder(parent, loc) {
-            @Override
-            protected ProcessingRecipe createObject() {
-                return new DistillationRecipe(this);
-            }
-        };
-    }
 }

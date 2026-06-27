@@ -16,7 +16,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
@@ -32,6 +31,8 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
+import org.shsts.tinactory.datagen.content.builder.ResearchRecipeBuilder
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.component.CircuitComponents.chip
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
@@ -172,12 +173,12 @@ object MiscComponents {
         nuclear()
     }
 
-    fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.misc(
-        id: String, amount: Int = 1, block: RB.() -> Unit) {
+    fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.misc(
+        id: String, amount: Int = 1, block: B.() -> Unit) {
         output(getItem("component/$id"), amount, block = block)
     }
 
-    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+    fun ProcessingRecipeBuilder<*, *>.misc(
         id: String, amount: Int = 1) {
         input(getItem("component/$id"), amount)
     }
@@ -266,7 +267,7 @@ object MiscComponents {
         }
     }
 
-    private fun research(voltage: Voltage, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun research(voltage: Voltage, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
         assembler {
             output(getComponent("research_equipment").item(voltage)) {
                 voltage(voltage)
@@ -277,7 +278,7 @@ object MiscComponents {
     }
 
     private fun ProcessingRecipeFactory.storageComponent(i: Int,
-        block: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: SimpleProcessingBuilder.() -> Unit) {
         output(STORAGE_CELLS[i].component.get()) {
             input("pvc", "sheet")
             input(AllTags.circuit(Voltage.fromRank(i + 2)))
@@ -479,12 +480,10 @@ object MiscComponents {
         }
     }
 
-    private fun ProcessingRecipeFactoryBase<ResearchRecipe.Builder>.rocket(
-        loc: ResourceLocation, block: ProcessingRecipeBuilder<ResearchRecipe.Builder>.() -> Unit) {
+    private fun ResearchRecipeFactory.rocket(
+        loc: ResourceLocation, block: ResearchRecipeBuilder.() -> Unit) {
         recipe(loc) {
-            extra {
-                target(loc)
-            }
+            target(loc)
             block()
         }
     }

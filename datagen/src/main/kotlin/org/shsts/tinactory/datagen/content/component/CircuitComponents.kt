@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
@@ -32,6 +31,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssemb
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import kotlin.math.max
@@ -465,7 +465,7 @@ object CircuitComponents {
 
     private class ComponentTierFactory(val tier: CircuitComponentTier) {
         fun AssemblyRecipeFactory.component(name: String, amount: Int,
-            suffix: String = "", block: AssemblyRecipeBuilder.() -> Unit) {
+            suffix: String = "", block: SimpleAssemblyRecipeBuilder.() -> Unit) {
             output(getCircuitComponent(name).item(tier), amount, suffix, block = block)
         }
     }
@@ -799,12 +799,12 @@ object CircuitComponents {
         }
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuit(
+    private fun ProcessingRecipeBuilder<*, *>.circuit(
         name: String, amount: Int = 1) {
         input(getCircuit(name).item, amount)
     }
 
-    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.chip(
+    fun ProcessingRecipeBuilder<*, *>.chip(
         name: String, amount: Int = 1) {
         input(CHIP.item(name), amount)
     }
@@ -849,7 +849,7 @@ object CircuitComponents {
 
         val circuitBoard = circuitBoard(tier).get()
 
-        fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuitComponent(
+        fun ProcessingRecipeBuilder<*, *>.circuitComponent(
             name: String, amount: Int = 1) {
             input(getCircuitComponent(name).tag(componentTier), amount)
         }

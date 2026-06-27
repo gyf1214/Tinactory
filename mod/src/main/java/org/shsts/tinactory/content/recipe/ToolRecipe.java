@@ -1,37 +1,22 @@
 package org.shsts.tinactory.content.recipe;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.content.machine.Workbench;
-import org.shsts.tinactory.integration.builder.VanillaRecipeBuilder;
 import org.shsts.tinactory.integration.tool.ToolItem;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -123,142 +108,4 @@ public class ToolRecipe implements IRecipe<Workbench> {
         return getClass().getSimpleName() + "[" + loc + "]";
     }
 
-    private static class FinishedShaped extends ShapedRecipeBuilder.Result {
-        @SuppressWarnings("ConstantConditions")
-        public FinishedShaped(ResourceLocation loc, Item result,
-            int count, List<String> patterns, Map<Character, Ingredient> keys) {
-            super(loc, result, count, "", patterns, keys, null, null);
-        }
-
-        @Nullable
-        @Override
-        public JsonObject serializeAdvancement() {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public ResourceLocation getAdvancementId() {
-            return null;
-        }
-    }
-
-    private static class Finished implements FinishedRecipe {
-        private final ResourceLocation loc;
-        private final IRecipeType<?> type;
-        private final FinishedRecipe shaped;
-        private final List<Ingredient> tools;
-
-        public Finished(Builder builder) {
-            this.loc = builder.loc;
-            this.type = builder.getType();
-            this.shaped = builder.createShaped();
-            this.tools = builder.tools.stream()
-                .map(Supplier::get).toList();
-        }
-
-        @Override
-        public ResourceLocation getId() {
-            return loc;
-        }
-
-        @Override
-        public RecipeSerializer<?> getType() {
-            return type.getSerializer();
-        }
-
-        @Override
-        public void serializeRecipeData(JsonObject jo) {
-            shaped.serializeRecipeData(jo);
-            var toolTags = new JsonArray();
-            tools.stream().map(Ingredient::toJson).forEach(toolTags::add);
-            jo.add("tools", toolTags);
-        }
-
-        @Nullable
-        @Override
-        public JsonObject serializeAdvancement() {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public ResourceLocation getAdvancementId() {
-            return null;
-        }
-    }
-
-    public static class Builder extends VanillaRecipeBuilder<ToolRecipe, Builder> {
-        @Nullable
-        private Supplier<? extends ItemLike> result = null;
-        private int count = 0;
-        private final List<String> rows = new ArrayList<>();
-        private final Map<Character, Supplier<Ingredient>> keys = new HashMap<>();
-        private final List<Supplier<Ingredient>> tools = new ArrayList<>();
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder result(Supplier<? extends ItemLike> result, int count) {
-            this.result = result;
-            this.count = count;
-            return self();
-        }
-
-        public Builder result(Item result, int count) {
-            this.result = () -> result;
-            this.count = count;
-            return self();
-        }
-
-        public Builder pattern(String row) {
-            rows.add(row);
-            return self();
-        }
-
-        public Builder define(Character key, Supplier<? extends ItemLike> item) {
-            keys.put(key, () -> Ingredient.of(item.get()));
-            return self();
-        }
-
-        public Builder define(Character key, TagKey<Item> tag) {
-            keys.put(key, () -> Ingredient.of(tag));
-            return self();
-        }
-
-        public Builder define(Character key, Item item) {
-            keys.put(key, () -> Ingredient.of(item));
-            return self();
-        }
-
-        public Builder tool(Supplier<Ingredient> ingredient) {
-            tools.add(ingredient);
-            return self();
-        }
-
-        @SafeVarargs
-        public final Builder toolTag(TagKey<Item>... toolTags) {
-            for (var tag : toolTags) {
-                tool(() -> Ingredient.of(tag));
-            }
-            return self();
-        }
-
-        private IRecipeType<?> getType() {
-            return parent;
-        }
-
-        private FinishedRecipe createShaped() {
-            assert result != null;
-            var key = keys.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
-            return new FinishedShaped(loc, result.get().asItem(), count, rows, key);
-        }
-
-        @Override
-        protected FinishedRecipe createObject() {
-            return new Finished(this);
-        }
-    }
 }

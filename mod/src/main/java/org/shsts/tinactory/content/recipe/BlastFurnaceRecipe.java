@@ -5,12 +5,10 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 
@@ -30,11 +28,6 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
 
     public final int temperature;
 
-    private BlastFurnaceRecipe(Builder builder) {
-        super(builder);
-        this.temperature = builder.temperature;
-    }
-
     public BlastFurnaceRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         int temperature) {
         super(inputs, outputs, workTicks, voltage, power);
@@ -48,21 +41,4 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
             temperature <= machineTemp.getAsInt();
     }
 
-    public static class Builder extends BuilderBase<BlastFurnaceRecipe, Builder> {
-        private int temperature = 0;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder temperature(int value) {
-            this.temperature = value;
-            return this;
-        }
-
-        @Override
-        protected BlastFurnaceRecipe createObject() {
-            return new BlastFurnaceRecipe(this);
-        }
-    }
 }

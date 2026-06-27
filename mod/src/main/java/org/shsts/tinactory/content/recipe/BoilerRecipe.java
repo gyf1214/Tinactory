@@ -3,20 +3,15 @@ package org.shsts.tinactory.content.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.machine.Boiler;
-import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 @ParametersAreNonnullByDefault
@@ -32,8 +27,6 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         Codec.DOUBLE.fieldOf("absorbRate").forGetter($ -> $.absorbRate)
     ).apply(instance, BoilerRecipe::new));
 
-    @Nullable
-    private final ResourceLocation loc;
     public final FluidStack input;
     public final FluidStack output;
     private final double minHeat;
@@ -42,19 +35,8 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     private final double reactionRate;
     private final double absorbRate;
 
-    private BoilerRecipe(Builder builder) {
-        this(builder.loc, Objects.requireNonNull(builder.input), Objects.requireNonNull(builder.output),
-            builder.minHeat, builder.optimalHeat, builder.maxHeat, builder.reactionRate, builder.absorbRate);
-    }
-
     public BoilerRecipe(FluidStack input, FluidStack output, double minHeat, double optimalHeat, double maxHeat,
         double reactionRate, double absorbRate) {
-        this(null, input, output, minHeat, optimalHeat, maxHeat, reactionRate, absorbRate);
-    }
-
-    private BoilerRecipe(@Nullable ResourceLocation loc, FluidStack input, FluidStack output, double minHeat,
-        double optimalHeat, double maxHeat, double reactionRate, double absorbRate) {
-        this.loc = loc;
         this.input = input;
         this.output = output;
         this.minHeat = minHeat;
@@ -65,10 +47,6 @@ public class BoilerRecipe implements IRecipe<Boiler> {
 
         assert minHeat > 0 && optimalHeat > minHeat && maxHeat > optimalHeat &&
             reactionRate > 0 && absorbRate > 0;
-    }
-
-    public ResourceLocation loc() {
-        return Objects.requireNonNull(loc);
     }
 
     @Override
@@ -102,47 +80,4 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         return absorbRate * reaction1;
     }
 
-    public static class Builder extends RecipeBuilder<BoilerRecipe, Builder> {
-        @Nullable
-        private FluidStack input = null;
-        @Nullable
-        private FluidStack output = null;
-        private double minHeat = 0;
-        private double reactionRate = 0;
-        private double absorbRate = 0;
-        private double optimalHeat = 0;
-        private double maxHeat = 0;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder input(FluidStack val) {
-            input = val;
-            return this;
-        }
-
-        public Builder output(FluidStack val) {
-            output = val;
-            return this;
-        }
-
-        public Builder heat(double minHeat, double optimalHeat, double maxHeat) {
-            this.minHeat = minHeat;
-            this.optimalHeat = optimalHeat;
-            this.maxHeat = maxHeat;
-            return this;
-        }
-
-        public Builder reaction(double reactionRate, double absorbRate) {
-            this.reactionRate = reactionRate;
-            this.absorbRate = absorbRate;
-            return this;
-        }
-
-        @Override
-        protected BoilerRecipe createObject() {
-            return new BoilerRecipe(this);
-        }
-    }
 }

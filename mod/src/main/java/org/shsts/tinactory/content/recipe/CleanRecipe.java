@@ -7,7 +7,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -15,7 +14,6 @@ import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -31,13 +29,7 @@ public class CleanRecipe extends ProcessingRecipe {
     public final double minCleanness;
     public final double maxCleanness;
 
-    protected CleanRecipe(Builder builder) {
-        super(builder);
-        this.minCleanness = builder.minCleanness;
-        this.maxCleanness = builder.maxCleanness;
-    }
-
-    protected CleanRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+    public CleanRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         double minCleanness, double maxCleanness) {
         super(inputs, outputs, workTicks, voltage, power);
         this.minCleanness = minCleanness;
@@ -77,26 +69,6 @@ public class CleanRecipe extends ProcessingRecipe {
         }
         var parallel1 = rate < 1d ? MathUtil.sampleBinomial(parallel, rate, random) : parallel;
         super.insertOutputs(machine, parallel1, random, callback);
-    }
-
-    public static class Builder extends BuilderBase<CleanRecipe, Builder> {
-        private double minCleanness = 0d;
-        private double maxCleanness = 0d;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder requireCleanness(double min, double max) {
-            minCleanness = min;
-            maxCleanness = max;
-            return self();
-        }
-
-        @Override
-        protected CleanRecipe createObject() {
-            return new CleanRecipe(this);
-        }
     }
 
     @FunctionalInterface

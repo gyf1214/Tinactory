@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 
@@ -30,11 +29,6 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
 
     public final double rate;
 
-    private OreAnalyzerRecipe(Builder builder) {
-        super(builder);
-        this.rate = builder.rate;
-    }
-
     public OreAnalyzerRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         List<ResourceLocation> requiredTech, double rate) {
         super(inputs, outputs, workTicks, voltage, power, requiredTech);
@@ -42,22 +36,4 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         assert rate > 0d;
     }
 
-    public static class Builder extends AssemblyRecipe.BuilderBase<OreAnalyzerRecipe, Builder> {
-        public double rate = 0d;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder rate(double value) {
-            rate = value;
-            return this;
-        }
-
-        @Override
-        protected OreAnalyzerRecipe createObject() {
-            assert rate > 0d;
-            return new OreAnalyzerRecipe(this);
-        }
-    }
 }

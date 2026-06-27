@@ -1,31 +1,29 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import com.mojang.logging.LogUtils
-import net.minecraft.resources.ResourceLocation
 import org.shsts.tinactory.api.logistics.PortType
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
+import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 
-class ChemicalRecipeBuilder(builder: ChemicalReactorRecipe.Builder) :
-    ProcessingRecipeBuilder<ChemicalReactorRecipe.Builder>(builder) {
+class ChemicalRecipeBuilder(parent: IRecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder>) :
+    AssemblyRecipeBuilder<ChemicalReactorRecipe, ChemicalRecipeBuilder>(
+        parent,
+        { inputs, outputs, workTicks, voltage, power, requiredTech ->
+            ChemicalReactorRecipe(inputs, outputs, workTicks, voltage, power, requiredTech, false)
+        }) {
     companion object {
         private val LOGGER = LogUtils.getLogger()
     }
 
     private var requireMultiBlockSet = false
-
-    fun tech(vararg loc: ResourceLocation) {
-        builder.requireTech(*loc)
-    }
+    private var requireMultiblock = false
 
     fun requireMultiblock() {
-        builder.requireMultiblock(true)
+        requireMultiblock = true
         requireMultiBlockSet = true
     }
 
     private fun needMultiblock(): Boolean {
-        val inputs = builder.inputs
-        val outputs = builder.outputs
-
         var itemInputs = 0
         var fluidInputs = 0
         var itemOutputs = 0
@@ -50,11 +48,16 @@ class ChemicalRecipeBuilder(builder: ChemicalReactorRecipe.Builder) :
         return itemInputs > 2 || fluidInputs > 2 || itemOutputs > 2 || fluidOutputs > 2
     }
 
-    override fun build() {
+    override fun createObject(): ChemicalReactorRecipe {
+        return ChemicalReactorRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
+            requiredTech.toList(), requireMultiblock)
+    }
+
+    override fun build(): IRecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder> {
         if (!requireMultiBlockSet && needMultiblock()) {
-            LOGGER.trace("{} recipe need multiblock", builder.loc)
-            builder.requireMultiblock(true)
+            LOGGER.trace("chemical reactor recipe needs multiblock")
+            requireMultiblock = true
         }
-        super.build()
+        return super.build()
     }
 }

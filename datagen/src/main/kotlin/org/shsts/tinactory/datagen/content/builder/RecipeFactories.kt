@@ -5,18 +5,23 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
 import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
-typealias SimpleProcessingBuilder = ProcessingRecipeBuilder<ProcessingRecipe.Builder>
-typealias ProcessingRecipeFactoryBase<B> = RecipeFactory<B, ProcessingRecipeBuilder<B>>
-typealias ProcessingRecipeFactory = ProcessingRecipeFactoryBase<ProcessingRecipe.Builder>
-typealias BlastFurnaceRecipeFactory = ProcessingRecipeFactoryBase<BlastFurnaceRecipe.Builder>
-typealias ChemicalRecipeFactory = RecipeFactory<ChemicalReactorRecipe.Builder, ChemicalRecipeBuilder>
-typealias MarkerFactory = RecipeFactory<MarkerRecipe.Builder, MarkerBuilder>
+typealias ProcessingRecipeFactoryBase<R, B> = RecipeFactory<R, B>
+typealias ProcessingRecipeFactory = RecipeFactory<ProcessingRecipe, SimpleProcessingBuilder>
+typealias ResearchRecipeFactory = RecipeFactory<ResearchRecipe, ResearchRecipeBuilder>
+typealias CleanRecipeFactory = RecipeFactory<CleanRecipe, CleanRecipeBuilder>
+typealias GeneratorRecipeFactory = RecipeFactory<GeneratorRecipe, GeneratorRecipeBuilder>
+typealias BlastFurnaceRecipeFactory = RecipeFactory<BlastFurnaceRecipe, BlastFurnaceBuilder>
+typealias OreAnalyzerRecipeFactory = RecipeFactory<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>
+typealias ChemicalRecipeFactory = RecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder>
+typealias MarkerFactory = RecipeFactory<MarkerRecipe, MarkerBuilder>
 
 object RecipeFactories {
     fun vanilla(replace: Boolean = false, block: VanillaRecipeFactory.() -> Unit) {
@@ -31,26 +36,37 @@ object RecipeFactories {
         BoilerRecipeFactory().apply(block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> processing(name: String,
-        defaults: ProcessingRecipeBuilder<B>.() -> Unit):
-        RecipeFactory<B, ProcessingRecipeBuilder<B>> {
+    private fun processing(name: String, defaults: SimpleProcessingBuilder.() -> Unit):
+        RecipeFactory<ProcessingRecipe, SimpleProcessingBuilder> {
+        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<ProcessingRecipe>
+        return RecipeFactory(recipeType, ::SimpleProcessingBuilder, defaults)
+    }
 
-        val recipeType = REGISTRATE.getRecipeType<B>(name)
-        return RecipeFactory(recipeType, ::ProcessingRecipeBuilder, defaults)
+    private fun clean(name: String, defaults: CleanRecipeBuilder.() -> Unit):
+        CleanRecipeFactory {
+        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<CleanRecipe>
+        return RecipeFactory(recipeType, ::CleanRecipeBuilder, defaults)
+    }
+
+    private fun generator(name: String, defaults: GeneratorRecipeBuilder.() -> Unit):
+        GeneratorRecipeFactory {
+        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<GeneratorRecipe>
+        return RecipeFactory(recipeType, ::GeneratorRecipeBuilder, defaults)
     }
 
     private fun simpleProcessing(name: String,
-        defaults: ProcessingRecipeBuilder<ProcessingRecipe.Builder>.() -> Unit) =
+        defaults: SimpleProcessingBuilder.() -> Unit) =
         processing(name, defaults)
 
-    private fun assembly(name: String, defaults: AssemblyRecipeBuilder.() -> Unit):
+    private fun assembly(name: String, defaults: SimpleAssemblyRecipeBuilder.() -> Unit):
         AssemblyRecipeFactory {
-        val recipeType = REGISTRATE.getRecipeType<AssemblyRecipe.Builder>(name)
+        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<AssemblyRecipe>
         return AssemblyRecipeFactory(recipeType, defaults)
     }
 
-    fun rocket(block: ProcessingRecipeFactoryBase<ResearchRecipe.Builder>.() -> Unit) {
-        processing<ResearchRecipe.Builder>("rocket") {
+    fun rocket(block: ResearchRecipeFactory.() -> Unit) {
+        val recipeType = REGISTRATE.getRecipeType("rocket") as IRecipeType<ResearchRecipe>
+        RecipeFactory(recipeType, ::ResearchRecipeBuilder) {
             defaultInputItem = 0
             defaultInputFluid = 1
             amperage = 0.125
@@ -67,8 +83,8 @@ object RecipeFactories {
         }.block()
     }
 
-    fun laserEngraver(block: ProcessingRecipeFactoryBase<CleanRecipe.Builder>.() -> Unit) {
-        processing<CleanRecipe.Builder>("laser_engraver") {
+    fun laserEngraver(block: CleanRecipeFactory.() -> Unit) {
+        clean("laser_engraver") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 0.625
@@ -238,7 +254,7 @@ object RecipeFactories {
     }
 
     fun chemicalReactor(block: ChemicalRecipeFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType<ChemicalReactorRecipe.Builder>("chemical_reactor")
+        val recipeType = REGISTRATE.getRecipeType("chemical_reactor") as IRecipeType<ChemicalReactorRecipe>
         RecipeFactory(recipeType, ::ChemicalRecipeBuilder) {
             fullDefaults()
             amperage = 0.375
@@ -260,30 +276,31 @@ object RecipeFactories {
         }
     }
 
-    fun steamTurbine(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
-        processing<GeneratorRecipe.Builder>("steam_turbine") {
+    fun steamTurbine(block: GeneratorRecipeFactory.() -> Unit) {
+        generator("steam_turbine") {
             defaultInputFluid = 0
             defaultOutputFluid = 1
             amperage = 1.0
         }.block()
     }
 
-    fun gasTurbine(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
-        processing<GeneratorRecipe.Builder>("gas_turbine") {
+    fun gasTurbine(block: GeneratorRecipeFactory.() -> Unit) {
+        generator("gas_turbine") {
             defaultInputFluid = 0
             amperage = 1.0
         }.block()
     }
 
-    fun combustionGenerator(block: ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.() -> Unit) {
-        processing<GeneratorRecipe.Builder>("combustion_generator") {
+    fun combustionGenerator(block: GeneratorRecipeFactory.() -> Unit) {
+        generator("combustion_generator") {
             defaultInputFluid = 0
             amperage = 1.0
         }.block()
     }
 
     fun blastFurnace(block: BlastFurnaceRecipeFactory.() -> Unit) {
-        processing<BlastFurnaceRecipe.Builder>("blast_furnace") {
+        val recipeType = REGISTRATE.getRecipeType("blast_furnace") as IRecipeType<BlastFurnaceRecipe>
+        RecipeFactory(recipeType, ::BlastFurnaceBuilder) {
             fullDefaults()
             amperage = 4.0
         }.apply {
@@ -339,8 +356,8 @@ object RecipeFactories {
         }.block()
     }
 
-    fun autoclave(block: ProcessingRecipeFactoryBase<CleanRecipe.Builder>.() -> Unit) {
-        processing<CleanRecipe.Builder>("autoclave") {
+    fun autoclave(block: CleanRecipeFactory.() -> Unit) {
+        clean("autoclave") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -365,7 +382,7 @@ object RecipeFactories {
     }
 
     fun marker(block: MarkerFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType<MarkerRecipe.Builder>("marker")
+        val recipeType = REGISTRATE.getRecipeType("marker") as IRecipeType<MarkerRecipe>
         RecipeFactory(recipeType, ::MarkerBuilder).block()
     }
 }

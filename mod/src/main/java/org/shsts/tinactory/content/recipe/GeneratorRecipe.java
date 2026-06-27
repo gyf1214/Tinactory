@@ -5,13 +5,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +30,6 @@ public class GeneratorRecipe extends DisplayInputRecipe {
 
     // this is used to distinguish generator recipes that can be overclocked
     private final boolean exactVoltage;
-
-    private GeneratorRecipe(Builder builder) {
-        super(builder);
-        this.exactVoltage = builder.exactVoltage;
-    }
 
     public GeneratorRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         boolean exactVoltage) {
@@ -68,27 +61,4 @@ public class GeneratorRecipe extends DisplayInputRecipe {
         return super.matchElectric(electric);
     }
 
-    public static class Builder extends BuilderBase<GeneratorRecipe, Builder> {
-        private boolean exactVoltage = false;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder exactVoltage(boolean value) {
-            exactVoltage = value;
-            return this;
-        }
-
-        @Override
-        protected void validate() {
-            assert power > 0 : loc;
-            assert workTicks > 0 : loc;
-        }
-
-        @Override
-        protected GeneratorRecipe createObject() {
-            return new GeneratorRecipe(this);
-        }
-    }
 }

@@ -10,7 +10,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 
@@ -31,11 +30,6 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
 
     public final boolean requireMultiblock;
 
-    private ChemicalReactorRecipe(Builder builder) {
-        super(builder);
-        this.requireMultiblock = builder.requireMultiblock;
-    }
-
     public ChemicalReactorRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         List<ResourceLocation> requiredTech, boolean requireMultiblock) {
         super(inputs, outputs, workTicks, voltage, power, requiredTech);
@@ -48,21 +42,4 @@ public class ChemicalReactorRecipe extends AssemblyRecipe {
             (!requireMultiblock || machine.isMultiblock());
     }
 
-    public static class Builder extends BuilderBase<ChemicalReactorRecipe, Builder> {
-        private boolean requireMultiblock = false;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder requireMultiblock(boolean val) {
-            requireMultiblock = val;
-            return this;
-        }
-
-        @Override
-        protected ChemicalReactorRecipe createObject() {
-            return new ChemicalReactorRecipe(this);
-        }
-    }
 }

@@ -3,18 +3,15 @@ package org.shsts.tinactory.core.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,12 +23,6 @@ import java.util.function.Consumer;
 public class ResearchRecipe extends ProcessingRecipe {
     public final ResourceLocation target;
     public final long progress;
-
-    protected ResearchRecipe(Builder builder) {
-        super(builder);
-        this.target = builder.getTarget();
-        this.progress = builder.progress;
-    }
 
     public ResearchRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         ResourceLocation target, long progress) {
@@ -61,47 +52,6 @@ public class ResearchRecipe extends ProcessingRecipe {
         Consumer<IProcessingResult> callback) {
         machine.owner()
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
-    }
-
-    public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {
-        @Nullable
-        private ResourceLocation target = null;
-        private long progress = 1;
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder input(IProcessingIngredient ingredient) {
-            var port = ingredient.type() == PortType.ITEM ? 0 : 1;
-            return input(port, ingredient);
-        }
-
-        public Builder target(ResourceLocation value) {
-            target = value;
-            return this;
-        }
-
-        public Builder progress(long value) {
-            progress = value;
-            return this;
-        }
-
-        private ResourceLocation getTarget() {
-            assert target != null;
-            return target;
-        }
-
-        @Override
-        protected void validate() {
-            assert power > 0 : loc;
-            assert workTicks > 0 : loc;
-        }
-
-        @Override
-        protected ResearchRecipe createObject() {
-            return new ResearchRecipe(this);
-        }
     }
 
     public static MapCodec<ResearchRecipe> codec(Codec<IProcessingIngredient> ingredientCodec,

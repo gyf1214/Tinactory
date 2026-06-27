@@ -8,19 +8,19 @@ import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 class AssemblyRecipeFactory(
-    recipeType: IRecipeType<AssemblyRecipe.Builder>,
-    defaults: AssemblyRecipeBuilder.() -> Unit) :
-    RecipeFactory<AssemblyRecipe.Builder, AssemblyRecipeBuilder>(
-        recipeType, ::AssemblyRecipeBuilder, defaults) {
+    recipeType: IRecipeType<AssemblyRecipe>,
+    defaults: SimpleAssemblyRecipeBuilder.() -> Unit) :
+    RecipeFactory<AssemblyRecipe, SimpleAssemblyRecipeBuilder>(
+        recipeType, ::SimpleAssemblyRecipeBuilder, defaults) {
     var componentVoltage: Voltage? = null
 
-    override fun classDefaults(builder: AssemblyRecipeBuilder) {
+    override fun classDefaults(builder: SimpleAssemblyRecipeBuilder) {
         super.classDefaults(builder)
         builder.componentVoltage = componentVoltage
     }
 
     fun component(name: String, voltage: Voltage = this.componentVoltage!!,
-        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         val component = getComponent(name)
         if (!component.containsKey(voltage)) {
             return
@@ -32,7 +32,7 @@ class AssemblyRecipeFactory(
     }
 
     fun machine(name: String, voltage: Voltage = this.componentVoltage!!,
-        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         val machine = getMachine(name)
         if (!machine.hasVoltage(voltage)) {
             return

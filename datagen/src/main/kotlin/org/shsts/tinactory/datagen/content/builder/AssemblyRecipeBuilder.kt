@@ -8,6 +8,7 @@ import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.content.electric.Circuits.CHIP
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.recovery.RecoveryInput
 import org.shsts.tinactory.datagen.content.recovery.RecoveryItemInput
@@ -17,18 +18,30 @@ import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipe
 import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipeKey
 import org.shsts.tinactory.datagen.content.recovery.RecoveryRegistry
 import org.shsts.tinactory.integration.material.MaterialSet
+import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import kotlin.math.max
 
-class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
-    ProcessingRecipeBuilder<AssemblyRecipe.Builder>(builder) {
+open class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuilder<R, B>>(
+    parent: IRecipeFactory<R, B>,
+    private val assemblyFactory: (
+        List<ProcessingRecipe.Input>, List<ProcessingRecipe.Output>, Long, Long, Long,
+        List<ResourceLocation>) -> R
+) : ProcessingRecipeBuilder<R, B>(parent, { inputs, outputs, workTicks, voltage, power ->
+    assemblyFactory(inputs, outputs, workTicks, voltage, power, listOf())
+}) {
     var componentVoltage: Voltage? = null
-    private var components = 0
     var autoCable = false
+    private var components = 0
+    protected val requiredTech = mutableListOf<ResourceLocation>()
     private val recoveryInputs = mutableListOf<RecoveryInput>()
     private val recoveryOutputs = mutableListOf<RecoveryOutput>()
 
     fun tech(vararg loc: ResourceLocation) {
-        builder.requireTech(*loc)
+        requiredTech += loc
+    }
+
+    fun requireTech(vararg loc: ResourceLocation) {
+        tech(*loc)
     }
 
     fun component(name: String, amount: Int = 1,
@@ -78,16 +91,24 @@ class AssemblyRecipeBuilder(builder: AssemblyRecipe.Builder) :
         recoveryOutputs += RecoveryOutput(item, amount, voltage)
     }
 
-    override fun build() {
+    override fun createObject(): R {
+        return assemblyFactory(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
+            requiredTech.toList())
+    }
+
+    override fun build(): IRecipeFactory<R, B> {
         if (autoCable) {
             component("cable", amount = max(2, components * 2))
         }
         if (recoveryInputs.isNotEmpty() && recoveryOutputs.size == 1) {
             RecoveryRegistry.record(RecoveryRecipe(
-                RecoveryRecipeKey(builder.loc),
+                RecoveryRecipeKey(ResourceLocation("tinactory", "deferred_recipe_id")),
                 recoveryOutputs.single(),
                 recoveryInputs.toList()))
         }
-        super.build()
+        return super.build()
     }
 }
+
+class SimpleAssemblyRecipeBuilder(parent: IRecipeFactory<AssemblyRecipe, SimpleAssemblyRecipeBuilder>) :
+    AssemblyRecipeBuilder<AssemblyRecipe, SimpleAssemblyRecipeBuilder>(parent, ::AssemblyRecipe)

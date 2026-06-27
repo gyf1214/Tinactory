@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -15,7 +14,6 @@ import org.shsts.tinactory.content.multiblock.Lithography;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +23,7 @@ import java.util.Optional;
 public class EngravingRecipe extends CleanRecipe {
     public static final MapCodec<EngravingRecipe> CODEC = codec(EngravingRecipe::new);
 
-    private EngravingRecipe(Builder builder) {
-        super(builder);
-    }
-
-    protected EngravingRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+    public EngravingRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         double minCleanness, double maxCleanness) {
         super(inputs, outputs, workTicks, voltage, power, minCleanness, maxCleanness);
     }
@@ -76,12 +70,4 @@ public class EngravingRecipe extends CleanRecipe {
         return factor * super.getCleanness(machine, world, pos);
     }
 
-    public static Builder builder(IRecipeType<?> parent, ResourceLocation loc) {
-        return new Builder(parent, loc) {
-            @Override
-            protected CleanRecipe createObject() {
-                return new EngravingRecipe(this);
-            }
-        };
-    }
 }

@@ -39,7 +39,6 @@ import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -50,6 +49,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
@@ -665,7 +665,7 @@ object Multiblocks {
 
     private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
         component: String? = null, amount: Int = 1,
-        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         componentVoltage = v
         misc("power_block/${v.id}") {
             input("aluminium", "stick", 2)
@@ -680,21 +680,20 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.solid(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun AssemblyRecipeFactory.solid(name: String, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
         output(SOLID_CASINGS.getValue(name).get(), block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
+    private fun ProcessingRecipeBuilder<*, *>.solid(name: String) {
         input(SOLID_CASINGS.getValue(name).get())
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>,
-        RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
-        name: String, amount: Int = 1, suffix: String = "", block: RB.() -> Unit) {
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.misc(
+        name: String, amount: Int = 1, suffix: String = "", block: B.() -> Unit) {
         output(getItem("multiblock/misc/$name"), amount, suffix = suffix, block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+    private fun ProcessingRecipeBuilder<*, *>.misc(
         name: String, amount: Int = 1) {
         input(getItem("multiblock/misc/$name"), amount)
     }
@@ -1190,7 +1189,7 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.multiblock(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun AssemblyRecipeFactory.multiblock(name: String, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
         output(getMultiblock(name).block.get(), block = block)
     }
 }

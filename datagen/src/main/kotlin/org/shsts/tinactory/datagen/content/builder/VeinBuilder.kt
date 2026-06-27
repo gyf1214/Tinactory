@@ -11,19 +11,20 @@ import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE
 import org.shsts.tinactory.datagen.content.Technologies.TECHS
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.material.OreVariant
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 class VeinBuilder(private val id: String, private val rank: Int, private val rate: Double) {
     var primitive = false
     var baseOre = false
     private var variant: OreVariant? = null
-    private var block: ProcessingRecipeBuilder<OreAnalyzerRecipe.Builder>.() -> Unit = {}
+    private var block: OreAnalyzerRecipeBuilder.() -> Unit = {}
     private val ores = mutableListOf<MaterialSet>()
 
     companion object {
         const val VEIN_TECH_RANK = RANK_PER_VOLTAGE / 2
     }
 
-    private fun chain(another: ProcessingRecipeBuilder<OreAnalyzerRecipe.Builder>.() -> Unit) {
+    private fun chain(another: OreAnalyzerRecipeBuilder.() -> Unit) {
         val oldBlock = block
         block = {
             oldBlock()
@@ -81,11 +82,11 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         }
 
         val builder = run {
-            val recipeType = REGISTRATE.getRecipeType<OreAnalyzerRecipe.Builder>("ore_analyzer")
-            val builder = recipeType.recipe(DATA_GEN, id1).apply {
+            val recipeType = REGISTRATE.getRecipeType("ore_analyzer") as IRecipeType<OreAnalyzerRecipe>
+            val builder = DATA_GEN.recipeFactory(recipeType, ::OreAnalyzerRecipeBuilder).recipe(id1).apply {
                 rate(this@VeinBuilder.rate)
             }
-            ProcessingRecipeBuilder(builder).apply {
+            builder.apply {
                 simpleDefaults()
                 amperage = 0.125
                 workTicks(128)

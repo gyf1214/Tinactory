@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,16 +34,6 @@ public class MarkerRecipe extends ProcessingRecipe {
     private final Texture displayTex;
 
     public final List<Input> markerOutputs;
-
-    protected MarkerRecipe(Builder builder) {
-        super(builder);
-        this.baseTypeId = builder.getBaseTypeId();
-        this.prefix = builder.prefix;
-        this.requireMultiblock = builder.requireMultiblock;
-        this.displayIngredient = builder.displayIngredient;
-        this.displayTex = builder.displayTex != null ? new Texture(builder.displayTex, 16, 16) : null;
-        this.markerOutputs = builder.markerOutputs;
-    }
 
     public MarkerRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         ResourceLocation baseTypeId, String prefix, boolean requireMultiblock,
@@ -108,69 +97,6 @@ public class MarkerRecipe extends ProcessingRecipe {
         } else {
             var id = recipe.id();
             return id.equals(prefix) || id.startsWith(prefix + "/");
-        }
-    }
-
-    public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
-        @Nullable
-        private ResourceLocation baseTypeId;
-        private String prefix = "";
-        private boolean requireMultiblock = false;
-        @Nullable
-        private IProcessingIngredient displayIngredient = null;
-        @Nullable
-        private ResourceLocation displayTex = null;
-        private final List<Input> markerOutputs = new ArrayList<>();
-
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder baseType(ResourceLocation value) {
-            baseTypeId = value;
-            return this;
-        }
-
-        public Builder prefix(String value) {
-            prefix = value;
-            return this;
-        }
-
-        public Builder requireMultiblock(boolean value) {
-            requireMultiblock = value;
-            return this;
-        }
-
-        public Builder display(IProcessingIngredient value) {
-            this.displayIngredient = value;
-            this.displayTex = null;
-            return this;
-        }
-
-        public Builder display(ResourceLocation tex) {
-            this.displayTex = tex;
-            this.displayIngredient = null;
-            return this;
-        }
-
-        public Builder output(int port, IProcessingIngredient ingredient) {
-            markerOutputs.add(new Input(port, ingredient));
-            return this;
-        }
-
-        protected ResourceLocation getBaseTypeId() {
-            assert baseTypeId != null;
-            return baseTypeId;
-        }
-
-        @Override
-        protected void validate() {
-            assert baseTypeId != null : loc;
-        }
-
-        @Override
-        protected MarkerRecipe createObject() {
-            return new MarkerRecipe(this);
         }
     }
 

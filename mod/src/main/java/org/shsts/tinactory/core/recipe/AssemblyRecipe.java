@@ -9,10 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,11 +17,6 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class AssemblyRecipe extends ProcessingRecipe {
     public final List<ResourceLocation> requiredTech;
-
-    protected AssemblyRecipe(BuilderBase<?, ?> builder) {
-        super(builder);
-        this.requiredTech = List.copyOf(builder.requiredTech);
-    }
 
     public AssemblyRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
         List<ResourceLocation> requiredTech) {
@@ -36,31 +28,6 @@ public class AssemblyRecipe extends ProcessingRecipe {
     protected boolean matchTeam(Optional<ITeamProfile> team) {
         return team.map($ -> requiredTech.stream().allMatch($::isTechFinished))
             .orElse(requiredTech.isEmpty());
-    }
-
-    protected abstract static class BuilderBase<R extends AssemblyRecipe, S extends BuilderBase<R, S>> extends
-        ProcessingRecipe.BuilderBase<R, S> {
-        protected final List<ResourceLocation> requiredTech = new ArrayList<>();
-
-        protected BuilderBase(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public S requireTech(ResourceLocation... loc) {
-            requiredTech.addAll(Arrays.asList(loc));
-            return self();
-        }
-    }
-
-    public static class Builder extends BuilderBase<AssemblyRecipe, Builder> {
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        @Override
-        protected AssemblyRecipe createObject() {
-            return new AssemblyRecipe(this);
-        }
     }
 
     @FunctionalInterface

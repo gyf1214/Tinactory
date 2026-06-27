@@ -19,12 +19,9 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.builder.RecipeBuilder;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
 import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_KEY;
@@ -58,11 +54,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     public final long workTicks;
     public final long voltage;
     public final long power;
-
-    protected ProcessingRecipe(BuilderBase<?, ?> builder) {
-        this(builder.loc, builder.getInputs(), builder.getOutputs(), builder.workTicks, builder.voltage,
-            builder.power);
-    }
 
     public ProcessingRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
         this(null, inputs, outputs, workTicks, voltage, power);
@@ -239,89 +230,4 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         ).apply(instance, factory::create));
     }
 
-    public abstract static class BuilderBase<R extends ProcessingRecipe, S extends BuilderBase<R, S>>
-        extends RecipeBuilder<R, S> {
-        protected final List<Supplier<Input>> inputs = new ArrayList<>();
-        protected final List<Supplier<Output>> outputs = new ArrayList<>();
-        protected long workTicks = 0;
-        protected long voltage = 0;
-        protected long power = 0;
-        protected List<Input> resolvedInputs = null;
-        protected List<Output> resolvedOutputs = null;
-
-        protected BuilderBase(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public S input(int port, Supplier<IProcessingIngredient> ingredient) {
-            assert port >= 0;
-            inputs.add(() -> new Input(port, ingredient.get()));
-            return self();
-        }
-
-        public S input(int port, IProcessingIngredient ingredient) {
-            return input(port, () -> ingredient);
-        }
-
-        public S output(int port, Supplier<IProcessingResult> result) {
-            outputs.add(() -> new Output(port, result.get()));
-            return self();
-        }
-
-        public S output(int port, IProcessingResult result) {
-            return output(port, () -> result);
-        }
-
-        public S workTicks(long value) {
-            workTicks = value;
-            return self();
-        }
-
-        public S voltage(long value) {
-            voltage = value;
-            return self();
-        }
-
-        public S power(long value) {
-            power = value;
-            return self();
-        }
-
-        public List<Input> getInputs() {
-            if (resolvedInputs == null) {
-                resolvedInputs = inputs.stream().map(Supplier::get).toList();
-            }
-            return resolvedInputs;
-        }
-
-        public List<Output> getOutputs() {
-            if (resolvedOutputs == null) {
-                resolvedOutputs = outputs.stream().map(Supplier::get).toList();
-            }
-            return resolvedOutputs;
-        }
-
-        protected void validate() {
-            assert power > 0 : loc;
-            assert workTicks > 0 : loc;
-            assert !outputs.isEmpty() : loc;
-        }
-
-        @Override
-        public R buildObject() {
-            validate();
-            return super.buildObject();
-        }
-    }
-
-    public static class Builder extends BuilderBase<ProcessingRecipe, Builder> {
-        public Builder(IRecipeType<?> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        @Override
-        protected ProcessingRecipe createObject() {
-            return new ProcessingRecipe(this);
-        }
-    }
 }
