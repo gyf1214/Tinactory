@@ -40,7 +40,7 @@ public class NuclearRod extends Item implements INuclearItem {
                 GsonHelper.getAsDouble(jo, "heatFast", 0d),
                 GsonHelper.getAsBoolean(jo, "reactionOut", false),
                 GsonHelper.getAsDouble(jo, "maxReactions", 0d),
-                ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "depletedItem", "minecraft:air")));
+                ResourceLocation.parse(GsonHelper.getAsString(jo, "depletedItem", "minecraft:air")));
         }
     }
 

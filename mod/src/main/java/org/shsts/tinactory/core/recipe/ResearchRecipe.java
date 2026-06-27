@@ -119,7 +119,7 @@ public class ResearchRecipe extends ProcessingRecipe {
             Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
                 .map(je -> CodecHelper.parseJson(ingredientCodec(), je.getAsJsonObject()))
                 .forEach(builder::input);
-            return builder.target(ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "target")))
+            return builder.target(ResourceLocation.parse(GsonHelper.getAsString(jo, "target")))
                 .progress(GsonHelper.getAsLong(jo, "progress"))
                 .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
                 .voltage(GsonHelper.getAsLong(jo, "voltage"))

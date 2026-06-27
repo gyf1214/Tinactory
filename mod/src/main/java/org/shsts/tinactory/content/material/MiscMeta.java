@@ -295,7 +295,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(BoilerProcessor.factory(properties))
             .transform(StackProcessingContainer.factory(layout));
         if (jo.has("sound")) {
-            var soundId = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "sound"));
+            var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo, "sound"));
             builder.transform(MachineSound.factory(SOUND_EVENTS.getEntry(soundId)));
         }
         builder.end().build();

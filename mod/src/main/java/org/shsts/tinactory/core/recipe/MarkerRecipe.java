@@ -173,7 +173,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         @Override
         protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
             var builder = super.buildFromJson(type, loc, jo)
-                .baseType(ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "base_type")))
+                .baseType(ResourceLocation.parse(GsonHelper.getAsString(jo, "base_type")))
                 .prefix(GsonHelper.getAsString(jo, "prefix", ""))
                 .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
             if (jo.has("display")) {
@@ -181,7 +181,7 @@ public class MarkerRecipe extends ProcessingRecipe {
                     builder.display(CodecHelper.parseJson(
                         ingredientCodec(), GsonHelper.getAsJsonObject(jo, "display")));
                 } else {
-                    builder.display(ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "display")));
+                    builder.display(ResourceLocation.parse(GsonHelper.getAsString(jo, "display")));
                 }
             }
             Streams.stream(GsonHelper.getAsJsonArray(jo, "marker_outputs"))

@@ -70,11 +70,11 @@ public class MaterialMeta extends MetaConsumer {
     private void buildFluid(MaterialSet.Builder<?> builder, String sub, JsonObject jo) {
         var baseAmount = GsonHelper.getAsInt(jo, "baseAmount");
         if (jo.has("existing")) {
-            var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "existing"));
+            var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, "existing"));
             var fluid = FLUIDS.getEntry(loc);
             builder.existing(sub, fluid, baseAmount);
         } else {
-            var tex = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "texture"));
+            var tex = ResourceLocation.parse(GsonHelper.getAsString(jo, "texture"));
             var texColor = jo.has("textureColor") ? parseColor(jo, "textureColor") : builder.getColor();
             var displayColor = jo.has("displayColor") ? parseColor(jo, "displayColor") : builder.getColor();
             builder.fluid(sub, tex, texColor, displayColor, baseAmount);
@@ -101,7 +101,7 @@ public class MaterialMeta extends MetaConsumer {
         var durability = GsonHelper.getAsInt(jo, "durability");
         Tier tier;
         if (jo.has("tier")) {
-            var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "tier"));
+            var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, "tier"));
             tier = TierSortingRegistry.byName(loc);
         } else {
             tier = null;

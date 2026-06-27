@@ -98,7 +98,7 @@ public class MachineMeta extends MetaConsumer {
         var y = GsonHelper.getAsInt(jo, "y");
         var w = GsonHelper.getAsInt(jo, "width");
         var h = GsonHelper.getAsInt(jo, "height");
-        var texLoc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "texture"));
+        var texLoc = ResourceLocation.parse(GsonHelper.getAsString(jo, "texture"));
         var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
         var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
         var tex = new Texture(texLoc, tw, th);
@@ -468,7 +468,7 @@ public class MachineMeta extends MetaConsumer {
                 recipeTypeId = id;
             }
             if (jo.has("sound")) {
-                var soundId = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, "sound"));
+                var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo, "sound"));
                 sound = SOUND_EVENTS.getEntry(soundId);
             }
         }

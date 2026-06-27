@@ -62,12 +62,12 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static IEntry<Block> getBlock(JsonObject jo, String member) {
-        var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, member));
         return BLOCKS.getEntry(loc);
     }
 
     private static TagKey<Block> getBlockTag(JsonObject jo, String member) {
-        var loc = ResourceLocation.fromNamespaceAndPath(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, member));
         return AllTags.block(loc);
     }
 

@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllRegistries.simpleFluid;
+import static org.shsts.tinactory.AllTags.extend;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -179,6 +180,7 @@ public class MaterialSet {
         }
 
         private TagKey<Item> newTag(String sub) {
+            return extend(AllTags.material(sub), name);
         }
 
         public Builder<P> color(int value) {
