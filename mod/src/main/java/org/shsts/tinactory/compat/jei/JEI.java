@@ -17,7 +17,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.compat.jei.category.AssemblyCategory;
 import org.shsts.tinactory.compat.jei.category.BlastFurnaceCategory;

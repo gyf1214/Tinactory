@@ -23,7 +23,7 @@ import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -44,7 +44,7 @@ public class MECraftTerminalMenu extends MenuBase {
     public MECraftTerminalMenu(Properties properties) {
         super(properties);
         this.machine = MACHINE.get(blockEntity());
-        var terminal = getProvider(blockEntity(), MECraftTerminal.ID, MECraftTerminal.class);
+        var terminal = getContainer(blockEntity(), MECraftTerminal.ID, MECraftTerminal.class);
         this.service = world.isClientSide ? null : terminal.createService();
         this.cpuRuntime = world.isClientSide ? null : terminal.cpuRuntime();
         this.previewScheduler = new ActiveScheduler<>(this::previewPacket);

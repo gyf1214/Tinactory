@@ -1,15 +1,11 @@
 package org.shsts.tinactory.content.electric;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -22,6 +18,7 @@ import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -50,7 +47,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final Voltage voltage;
     private IMachine machine;
     private final WrapperItemHandler items;
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
+    private final IMenuItemHandler menuItemHandler;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -61,7 +58,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             items.setFilter(i, this::allowItem);
         }
-        this.menuItemHandlerCap = IMenuItemHandler.cap(items);
+        this.menuItemHandler = () -> items;
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -183,14 +180,11 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get() || cap == PROCESSOR.get() ||
-            cap == LAYOUT_PROVIDER.get()) {
-            return myself();
-        } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(ELECTRIC_MACHINE, this);
+        builder.attach(PROCESSOR, this);
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
     }
 
     @Override

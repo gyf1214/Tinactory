@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.recipe.IProcessingObject;

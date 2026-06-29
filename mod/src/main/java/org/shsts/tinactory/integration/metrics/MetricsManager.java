@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;

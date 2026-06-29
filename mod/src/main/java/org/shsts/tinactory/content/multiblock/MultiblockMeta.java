@@ -47,6 +47,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllMultiblocks.CLEANROOM_PROPERTIES;
 import static org.shsts.tinactory.AllMultiblocks.LITHOGRAPHY_CLEANNESS_FACTORS;
 import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
@@ -374,6 +376,7 @@ public class MultiblockMeta extends MachineMeta {
 
             return BlockEntityBuilder.builder("multiblock/" + id, FixedMachineBlock::new)
                 .blockEntity()
+                .capability(PROCESSOR, ELECTRIC_MACHINE)
                 .transform(this::sound)
                 .child(Multiblock.builder((be, $) -> new Cleanroom(be, $, properties)))
                 .layout(layout)
@@ -420,6 +423,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
                 .blockEntity()
+                .capability(PROCESSOR, ELECTRIC_MACHINE)
                 .transform(this::sound)
                 .child(this::multiblock)
                 .transform(machineType.equals("distillation") ? $ -> $ : $ -> $.layout(layout))

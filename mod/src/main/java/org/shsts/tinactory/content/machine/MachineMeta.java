@@ -71,6 +71,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -244,6 +254,8 @@ public class MachineMeta extends MetaConsumer {
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                    ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(PrimitiveMachine::factory)
                 .transform(RecipeProcessors.machine(List.of(processor), true))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
@@ -295,6 +307,8 @@ public class MachineMeta extends MetaConsumer {
             return baseMachine(v)
                 .menu(menu)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                    ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(StackProcessingContainer.factory(getLayout(v)))
                 .transform(this::processor)
                 .transform(this::sound)
@@ -316,6 +330,8 @@ public class MachineMeta extends MetaConsumer {
         private IEntry<MachineBlock> multiblockInterface(Voltage v) {
             return baseInterface(v, $ -> {})
                 .blockEntity()
+                .capability(MACHINE, CONTAINER, LAYOUT_PROVIDER, ITEM_HANDLER, FLUID_HANDLER,
+                    MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(MultiblockInterface::factory)
                 .transform(FlexibleStackContainer::factory)
                 .end()
@@ -340,6 +356,7 @@ public class MachineMeta extends MetaConsumer {
                     addTooltip(tooltip, "digitalInterface.2", NUMBER_FORMAT.format(properties.maxParallel()));
                 })
                 .blockEntity()
+                .capability(MACHINE, CONTAINER, LAYOUT_PROVIDER, BYTES_PROVIDER)
                 .transform(DigitalInterface.factory(properties))
                 .end()
                 .buildObject();
@@ -352,6 +369,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.BATTERY_BOX)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, LAYOUT_PROVIDER, MENU_ITEM_HANDLER)
                 .transform(BatteryBox.factory(layout))
                 .end()
                 .block()
@@ -381,6 +399,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, ITEM_HANDLER)
                 .transform(ElectricChest.factory(layout, slotSize, power))
                 .end()
                 .buildObject();
@@ -399,6 +418,8 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, FLUID_HANDLER,
+                    MENU_FLUID_HANDLER)
                 .transform(ElectricTank.factory(layout, slotSize, power))
                 .end()
                 .buildObject();
@@ -424,6 +445,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.LOGISTIC_WORKER)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(LogisticWorker.factory(properties))
                 .end()
                 .buildObject();

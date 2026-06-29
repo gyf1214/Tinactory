@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllItems.COMPONENTS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
@@ -174,6 +176,7 @@ public class ComponentMeta extends MetaConsumer {
                     addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
                 .transform(MachineSet.baseMachine(false))
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(MENetworkBridge.factory(power))
                 .end()
                 .buildObject();

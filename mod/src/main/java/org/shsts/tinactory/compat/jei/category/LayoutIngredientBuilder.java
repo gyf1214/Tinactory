@@ -8,7 +8,7 @@ import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.core.gui.Layout;
 

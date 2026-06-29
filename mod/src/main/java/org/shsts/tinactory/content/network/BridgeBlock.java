@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.util.Lazy;
+import net.neoforged.neoforge.common.util.Lazy;
 import org.shsts.tinactory.AllEvents;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.electric.Voltage;

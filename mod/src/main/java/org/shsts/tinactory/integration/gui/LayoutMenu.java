@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;

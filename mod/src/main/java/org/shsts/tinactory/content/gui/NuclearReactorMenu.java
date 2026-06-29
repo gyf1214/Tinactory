@@ -2,7 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.NuclearReactor;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;

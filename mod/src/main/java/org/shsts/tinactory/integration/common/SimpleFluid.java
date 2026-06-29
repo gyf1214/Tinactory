@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.neoforged.neoforge.fluids.FluidAttributes;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

@@ -1,21 +1,15 @@
 package org.shsts.tinactory.integration.machine;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.AllCapabilities;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -26,6 +20,7 @@ import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.tech.TechManagers;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -35,7 +30,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
@@ -53,7 +50,6 @@ public class MachineProcessor extends CapabilityProvider implements
     protected final BlockEntity blockEntity;
     protected final ProcessingRuntime runtime;
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
-    private final LazyOptional<IProcessor> processorCap;
 
     public MachineProcessor(BlockEntity blockEntity,
         Function<ProcessingRuntime.Properties, ProcessingRuntime> runtimeFactory,
@@ -69,7 +65,6 @@ public class MachineProcessor extends CapabilityProvider implements
             this::reportProcessingObject,
             ProcessingHelper.INFO_CODEC);
         this.runtime = runtimeFactory.apply(properties);
-        this.processorCap = LazyOptional.of(() -> runtime);
     }
 
     public MachineProcessor(BlockEntity blockEntity,
@@ -152,14 +147,9 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get()) {
-            return processorCap.cast();
-        }
-        if (cap == AllCapabilities.ELECTRIC_MACHINE.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(PROCESSOR, runtime);
+        builder.attach(ELECTRIC_MACHINE, this);
     }
 
     @Override

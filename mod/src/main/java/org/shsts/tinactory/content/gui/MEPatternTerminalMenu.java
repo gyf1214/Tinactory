@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -42,7 +42,7 @@ public class MEPatternTerminalMenu extends InventoryMenu {
     public MEPatternTerminalMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
-        var terminal = getProvider(blockEntity(), MEPatternTerminal.ID, MEPatternTerminal.class);
+        var terminal = getContainer(blockEntity(), MEPatternTerminal.ID, MEPatternTerminal.class);
         this.repository = world.isClientSide ? null : terminal.patternRepository();
         this.resultScheduler = new ActiveScheduler<>(() -> SyncPackets.UnitPacket.INSTANCE);
 

@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.compat.waila.Waila.ME_CRAFT_CPU;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetContainer;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
@@ -116,7 +116,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
     @Override
     public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
         BlockEntity blockEntity, boolean showDetails) {
-        var cpu = tryGetProvider(blockEntity, MECraftCpu.ID, MECraftCpu.class);
+        var cpu = tryGetContainer(blockEntity, MECraftCpu.ID, MECraftCpu.class);
         if (cpu.isEmpty()) {
             return;
         }

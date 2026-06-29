@@ -1,24 +1,20 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.CombinedFluidTank;
-import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperFluidTank;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
@@ -37,7 +33,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     private final WrapperFluidTank[] tanks;
     private final CombinedFluidTank port;
     private final FluidStack[] filters;
-    private final LazyOptional<IFluidTanksHandler> fluidHandlerCap;
 
     private class VoidableFluidTank extends WrapperFluidTank {
         public VoidableFluidTank(int capacity) {
@@ -73,8 +68,6 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         }
         this.port = new CombinedFluidTank(tanks);
         this.filters = new FluidStack[size];
-
-        this.fluidHandlerCap = LazyOptional.of(() -> port);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
@@ -123,11 +116,10 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == FLUID_HANDLER.get() || cap == MENU_FLUID_HANDLER.get()) {
-            return fluidHandlerCap.cast();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(FLUID_HANDLER, port);
+        builder.attach(MENU_FLUID_HANDLER, port);
     }
 
     @Override

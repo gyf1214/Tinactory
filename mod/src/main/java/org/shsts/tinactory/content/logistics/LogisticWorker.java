@@ -1,16 +1,12 @@
 package org.shsts.tinactory.content.logistics;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -23,6 +19,7 @@ import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -65,7 +62,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private boolean noValidSlot = true;
     private boolean needRevalidate = true;
 
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     public record Properties(int slots, int interval, int itemBandwidth, int fluidBandwidth, double power) {}
 
@@ -80,7 +77,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         this.currentSlot = workerSlots - 1;
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, properties.power) {
+        this.electric = new SimpleElectricConsumer(voltage.value, properties.power) {
             @Override
             public ElectricMachineType getMachineType() {
                 return stopped ? ElectricMachineType.NONE : super.getMachineType();
@@ -91,7 +88,6 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
                 return stopped ? 0 : super.getPowerCons();
             }
         };
-        this.electricCap = LazyOptional.of(() -> electric);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
@@ -271,18 +267,15 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 
     public static Optional<LogisticWorker> tryGet(BlockEntity be) {
-        return tryGetProvider(be, ID, LogisticWorker.class);
+        return tryGetContainer(be, ID, LogisticWorker.class);
     }
 
     public static LogisticWorker get(BlockEntity be) {
-        return getProvider(be, ID, LogisticWorker.class);
+        return getContainer(be, ID, LogisticWorker.class);
     }
 }

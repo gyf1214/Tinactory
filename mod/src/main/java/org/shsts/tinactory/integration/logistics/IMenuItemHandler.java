@@ -2,8 +2,7 @@ package org.shsts.tinactory.integration.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 /**
  * The forge capability system requires that every capability has different types,
@@ -14,9 +13,4 @@ import net.minecraftforge.items.IItemHandler;
 @MethodsReturnNonnullByDefault
 public interface IMenuItemHandler {
     IItemHandler asItemHandler();
-
-    static LazyOptional<IMenuItemHandler> cap(IItemHandler handler) {
-        IMenuItemHandler ret = () -> handler;
-        return LazyOptional.of(() -> ret);
-    }
 }

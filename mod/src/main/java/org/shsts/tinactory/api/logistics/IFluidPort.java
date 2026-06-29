@@ -2,7 +2,7 @@ package org.shsts.tinactory.api.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

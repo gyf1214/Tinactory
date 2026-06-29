@@ -1,12 +1,8 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -16,6 +12,7 @@ import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -43,7 +40,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     protected final BlockEntity blockEntity;
     private final Layout layout;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     protected IMachine machine;
     protected IMachineConfig machineConfig;
@@ -52,7 +49,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     protected ElectricStorage(BlockEntity blockEntity, Layout layout, IElectricMachine electric) {
         this.blockEntity = blockEntity;
         this.layout = layout;
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = electric;
     }
 
     protected ElectricStorage(BlockEntity blockEntity, Layout layout, double power) {
@@ -111,12 +108,8 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get()) {
-            return myself();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 }

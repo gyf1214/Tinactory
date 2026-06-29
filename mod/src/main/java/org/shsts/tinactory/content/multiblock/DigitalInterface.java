@@ -1,19 +1,15 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -28,6 +24,7 @@ import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
@@ -38,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 
@@ -443,11 +441,11 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(CONTAINER, this);
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(BYTES_PROVIDER, this);
     }
 
     @Override

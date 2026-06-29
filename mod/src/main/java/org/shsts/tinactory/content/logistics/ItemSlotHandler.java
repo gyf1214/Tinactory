@@ -3,7 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

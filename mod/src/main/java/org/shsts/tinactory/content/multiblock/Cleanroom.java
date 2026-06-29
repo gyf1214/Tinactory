@@ -12,9 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -30,6 +28,7 @@ import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -187,11 +186,9 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get() || cap == ELECTRIC_MACHINE.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(PROCESSOR, this);
+        builder.attach(ELECTRIC_MACHINE, this);
     }
 
     @Override

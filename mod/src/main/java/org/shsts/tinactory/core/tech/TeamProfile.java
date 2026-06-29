@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;

@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -12,20 +11,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -131,7 +129,7 @@ public class Workbench extends CapabilityProvider implements
     @Nullable
     private Object currentRecipe = null;
 
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
+    private final IMenuItemHandler menuItemHandler;
 
     private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
@@ -147,7 +145,7 @@ public class Workbench extends CapabilityProvider implements
             new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
 
-        this.menuItemHandlerCap = IMenuItemHandler.cap(itemView);
+        this.menuItemHandler = () -> itemView;
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
@@ -214,11 +212,11 @@ public class Workbench extends CapabilityProvider implements
 
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level, player, amount);
-        ForgeEventFactory.firePlayerCraftingEvent(player, stack, craftingStack);
+        EventHooks.firePlayerCraftingEvent(player, stack, craftingStack);
         if (currentRecipe instanceof CraftingRecipe crafting && !crafting.isSpecial()) {
             player.awardRecipes(List.of(crafting));
         }
-        ForgeHooks.setCraftingPlayer(player);
+        CommonHooks.setCraftingPlayer(player);
         List<ItemStack> remaining;
         if (currentRecipe instanceof ToolRecipe tool) {
             remaining = tool.getRemainingItems(this);
@@ -227,7 +225,7 @@ public class Workbench extends CapabilityProvider implements
         } else {
             throw new IllegalStateException();
         }
-        ForgeHooks.setCraftingPlayer(null);
+        CommonHooks.setCraftingPlayer(null);
 
         for (var i = 0; i < remaining.size(); i++) {
             // vanilla logic of decreasing material and set remaining items
@@ -265,11 +263,8 @@ public class Workbench extends CapabilityProvider implements
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
     }
 
     @Override
@@ -283,10 +278,10 @@ public class Workbench extends CapabilityProvider implements
     }
 
     public static Optional<Workbench> tryGet(BlockEntity be) {
-        return tryGetProvider(be, ID, Workbench.class);
+        return tryGetContainer(be, ID, Workbench.class);
     }
 
     public static Workbench get(BlockEntity be) {
-        return getProvider(be, ID, Workbench.class);
+        return getContainer(be, ID, Workbench.class);
     }
 }

@@ -1,20 +1,15 @@
 package org.shsts.tinactory.content.machine;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import org.shsts.tinactory.AllCapabilities;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.machine.Machine;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -24,6 +19,7 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
@@ -39,7 +35,6 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
 
     private final BlockEntity blockEntity;
     private final FireBoiler boiler;
-    private final LazyOptional<IProcessor> processorCap;
 
     protected BoilerProcessor(BlockEntity blockEntity, FireBoiler.Properties properties) {
         this.blockEntity = blockEntity;
@@ -64,7 +59,6 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
                 blockEntity.setChanged();
             }
         };
-        this.processorCap = LazyOptional.of(() -> boiler);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(FireBoiler.Properties properties) {
@@ -90,11 +84,8 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == AllCapabilities.PROCESSOR.get()) {
-            return processorCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(PROCESSOR, boiler);
     }
 
     @Override

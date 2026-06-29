@@ -7,7 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.ForgeHooks;
+import net.neoforged.neoforge.common.CommonHooks;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -63,7 +63,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     public void setContainer(IContainer container) {
         fuelPort = container.getPort(0, ContainerAccess.INTERNAL).asItem();
         fuelPort.asFilter().setFilters(List.of(item ->
-            ForgeHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
+            CommonHooks.getBurnTime(item, null) > 0 && !item.hasContainerItem()));
 
         var inputPort = container.getPort(1, ContainerAccess.INTERNAL).asFluid();
         var outputPort = container.getPort(2, ContainerAccess.INTERNAL).asFluid();
@@ -131,12 +131,12 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
         var maxParallel = burnParallel();
         burningItem = ItemStack.EMPTY;
         for (var stack : fuelPort.getAllStorages()) {
-            if (ForgeHooks.getBurnTime(stack, null) > 0) {
+            if (CommonHooks.getBurnTime(stack, null) > 0) {
                 var stack1 = StackHelper.copyWithCount(stack, maxParallel);
                 var extracted = fuelPort.extract(stack1, false);
                 if (!extracted.isEmpty()) {
                     MetricsManager.reportItem("item_consumed", machine1, extracted);
-                    maxBurn = ForgeHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;
+                    maxBurn = CommonHooks.getBurnTime(extracted, null) * PROGRESS_PER_TICK;
                     burningItem = extracted;
                     break;
                 }

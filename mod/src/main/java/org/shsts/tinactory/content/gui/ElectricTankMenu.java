@@ -9,7 +9,7 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -20,7 +20,7 @@ public class ElectricTankMenu extends ElectricStorageMenu {
 
     public ElectricTankMenu(Properties properties) {
         super(properties);
-        this.tank = getProvider(blockEntity(), ElectricTank.ID, ElectricTank.class);
+        this.tank = getContainer(blockEntity(), ElectricTank.ID, ElectricTank.class);
         this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity());
 
         for (var slot : layout.slots) {

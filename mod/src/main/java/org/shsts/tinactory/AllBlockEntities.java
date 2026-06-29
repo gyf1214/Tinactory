@@ -12,6 +12,8 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllBlockEntities {
@@ -25,6 +27,7 @@ public final class AllBlockEntities {
         WORKBENCH = BlockEntityBuilder.builder("primitive/workbench", PrimitiveBlock::new)
             .menu(AllMenus.WORKBENCH)
             .blockEntity()
+            .capability(MENU_ITEM_HANDLER)
             .transform(Workbench::factory)
             .end()
             .block()

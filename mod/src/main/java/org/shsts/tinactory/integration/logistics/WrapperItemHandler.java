@@ -3,8 +3,8 @@ package org.shsts.tinactory.integration.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.shsts.tinactory.core.logistics.PortNotifier;
 
 import java.util.Arrays;

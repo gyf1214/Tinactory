@@ -6,7 +6,7 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;

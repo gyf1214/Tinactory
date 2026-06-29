@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;

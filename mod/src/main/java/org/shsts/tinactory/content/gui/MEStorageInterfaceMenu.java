@@ -6,10 +6,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -27,7 +27,7 @@ import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -46,7 +46,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
         this.machineConfig = machine.config();
-        this.storageInterface = getProvider(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
+        this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
 
         var scheduler = new ActiveScheduler<>(() -> new MEStorageInterfaceSyncPacket(
             storageInterface.getAllItems(), storageInterface.getAllFluids()));

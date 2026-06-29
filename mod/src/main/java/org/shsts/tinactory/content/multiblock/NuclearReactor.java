@@ -1,20 +1,16 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -29,6 +25,7 @@ import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
@@ -308,11 +305,9 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(PROCESSOR, this);
     }
 
     @Override

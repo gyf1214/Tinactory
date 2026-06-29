@@ -54,6 +54,17 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
@@ -196,6 +207,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_INTERFACE)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEStorageInterface.factory(power))
             .end()
             .build();
@@ -213,6 +225,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_DRIVE)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, BYTES_PROVIDER, MENU_ITEM_HANDLER)
             .transform(MEDrive.factory(layout, power))
             .end()
             .build();
@@ -256,6 +269,7 @@ public class MiscMeta extends MetaConsumer {
                 }))
             .transform(MachineSet::baseMachine)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftCpu.factory(config))
             .end()
             .build();
@@ -267,6 +281,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_CRAFT_TERMINAL)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftTerminal.factory(power))
             .end()
             .build();
@@ -278,6 +293,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_PATTERN_TERMINAL)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEPatternTerminal.factory(power))
             .end()
             .build();
@@ -292,6 +308,8 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
+            .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
             .transform(BoilerProcessor.factory(properties))
             .transform(StackProcessingContainer.factory(layout));
         if (jo.has("sound")) {
@@ -307,6 +325,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_SIGNAL_CONTROLLER)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MESignalController.factory(power))
             .end()
             .build();
@@ -318,6 +337,7 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_DETECTOR)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MEStorageDetector.factory(power))
             .end()
             .build();

@@ -1,17 +1,13 @@
 package org.shsts.tinactory.content.logistics;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -30,6 +26,7 @@ import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -74,8 +71,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private final WrapperItemHandler storages;
     private final CombinedPort<ItemStack> combinedItems;
     private final CombinedPort<FluidStack> combinedFluids;
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IMenuItemHandler menuItemHandler;
+    private final IElectricMachine electric;
 
     private IMachine machine;
     private IMachineConfig machineConfig;
@@ -89,7 +86,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             storages.setFilter(i, this::allowItem);
         }
-        this.menuItemHandlerCap = IMenuItemHandler.cap(storages);
+        this.menuItemHandler = () -> storages;
         storages.onUpdate(this::onStorageChange);
 
         this.combinedItems = StoragePorts.combinedItem();
@@ -99,8 +96,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, power);
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
@@ -238,15 +234,11 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
-            return myself();
-        } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(BYTES_PROVIDER, this);
+        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 
     @Override

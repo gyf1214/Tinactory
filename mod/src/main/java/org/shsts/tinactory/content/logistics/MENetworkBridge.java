@@ -1,15 +1,11 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
@@ -17,6 +13,7 @@ import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -41,7 +38,7 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     private final CombinedPort<FluidStack> parentFluid;
     private final CombinedPort<ItemStack> childItem;
     private final CombinedPort<FluidStack> childFluid;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     private IMachine machine;
 
@@ -53,8 +50,7 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         this.childFluid = StoragePorts.combinedFluid();
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, power);
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
@@ -90,10 +86,7 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 }
