@@ -25,7 +25,6 @@ import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 

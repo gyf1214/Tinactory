@@ -216,7 +216,8 @@ public class Workbench extends CapabilityProvider implements
 
         if (currentRecipe instanceof ToolRecipe tool) {
             output = tool.assemble(this);
-        } else if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting) {
+        } else if (currentRecipe instanceof RecipeHolder<?> holder &&
+            holder.value() instanceof CraftingRecipe crafting) {
             output = crafting.assemble(craftingStack.asCraftInput(), world.registryAccess());
         } else {
             output = ItemStack.EMPTY;
@@ -268,7 +269,8 @@ public class Workbench extends CapabilityProvider implements
         List<ItemStack> remaining;
         if (currentRecipe instanceof ToolRecipe tool) {
             remaining = tool.getRemainingItems(this);
-        } else if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting) {
+        } else if (currentRecipe instanceof RecipeHolder<?> holder &&
+            holder.value() instanceof CraftingRecipe crafting) {
             remaining = crafting.getRemainingItems(craftingStack.asCraftInput());
         } else {
             throw new IllegalStateException();
