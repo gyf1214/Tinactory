@@ -6,9 +6,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.CommonHooks;
@@ -31,6 +34,7 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
@@ -45,13 +49,40 @@ public class Workbench extends CapabilityProvider implements
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "primitive/workbench_container";
 
-    private static class CraftingStack extends CraftingContainer {
+    private static class CraftingStack implements CraftingContainer {
         private final IItemHandlerModifiable items;
+        private final int width;
+        private final int height;
 
-        @SuppressWarnings("ConstantConditions")
         public CraftingStack(IItemHandlerModifiable items, int width, int height) {
-            super(null, width, height);
             this.items = items;
+            this.width = width;
+            this.height = height;
+        }
+
+        @Override
+        public int getWidth() {
+            return width;
+        }
+
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public List<ItemStack> getItems() {
+            return List.copyOf(getMutableItems());
+        }
+
+        public CraftingInput asCraftInput() {
+            return CraftingInput.of(width, height, getMutableItems());
+        }
+
+        private List<ItemStack> getMutableItems() {
+            return IntStream.range(0, getContainerSize())
+                .mapToObj(items::getStackInSlot)
+                .toList();
         }
 
         @Override
@@ -100,6 +131,22 @@ public class Workbench extends CapabilityProvider implements
             for (var i = 0; i < items.getSlots(); i++) {
                 items.setStackInSlot(i, ItemStack.EMPTY);
             }
+        }
+
+        @Override
+        public void fillStackedContents(StackedContents contents) {
+            for (var i = 0; i < getContainerSize(); i++) {
+                contents.accountStack(items.getStackInSlot(i));
+            }
+        }
+
+        @Override
+        public void setChanged() {
+        }
+
+        @Override
+        public boolean stillValid(Player player) {
+            return true;
         }
     }
 
@@ -164,13 +211,13 @@ public class Workbench extends CapabilityProvider implements
 
         currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this)
             .map($ -> (Object) $)
-            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack, world))
+            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack.asCraftInput(), world))
             .orElse(null);
 
         if (currentRecipe instanceof ToolRecipe tool) {
-            output = tool.assemble();
-        } else if (currentRecipe instanceof CraftingRecipe crafting) {
-            output = crafting.assemble(craftingStack);
+            output = tool.assemble(this);
+        } else if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting) {
+            output = crafting.assemble(craftingStack.asCraftInput(), world.registryAccess());
         } else {
             output = ItemStack.EMPTY;
         }
@@ -211,17 +258,18 @@ public class Workbench extends CapabilityProvider implements
         LOGGER.trace("{} on craft {}", this, stack);
 
         // vanilla logic of crafting triggers
-        stack.onCraftedBy(player.level, player, amount);
+        stack.onCraftedBy(player.level(), player, amount);
         EventHooks.firePlayerCraftingEvent(player, stack, craftingStack);
-        if (currentRecipe instanceof CraftingRecipe crafting && !crafting.isSpecial()) {
-            player.awardRecipes(List.of(crafting));
+        if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting &&
+            !crafting.isSpecial()) {
+            player.awardRecipes(List.of(holder));
         }
         CommonHooks.setCraftingPlayer(player);
         List<ItemStack> remaining;
         if (currentRecipe instanceof ToolRecipe tool) {
             remaining = tool.getRemainingItems(this);
-        } else if (currentRecipe instanceof CraftingRecipe crafting) {
-            remaining = crafting.getRemainingItems(craftingStack);
+        } else if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting) {
+            remaining = crafting.getRemainingItems(craftingStack.asCraftInput());
         } else {
             throw new IllegalStateException();
         }
@@ -250,6 +298,10 @@ public class Workbench extends CapabilityProvider implements
 
     public CraftingContainer getCraftingContainer() {
         return craftingStack;
+    }
+
+    public CraftingInput getCraftingInput() {
+        return craftingStack.asCraftInput();
     }
 
     public IItemHandlerModifiable getToolStorage() {

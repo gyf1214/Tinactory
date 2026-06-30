@@ -61,16 +61,16 @@ public class ToolRecipe implements IRecipe<Workbench> {
 
     @Override
     public boolean matches(Workbench container) {
-        return shapedRecipe.matches(container.getCraftingContainer(), container.world()) &&
+        return shapedRecipe.matches(container.getCraftingInput(), container.world()) &&
             matchTools(container.getToolStorage());
     }
 
-    public ItemStack assemble() {
-        return shapedRecipe.getResultItem().copy();
+    public ItemStack assemble(Workbench container) {
+        return shapedRecipe.getResultItem(container.world().registryAccess()).copy();
     }
 
     public List<ItemStack> getRemainingItems(Workbench container) {
-        return shapedRecipe.getRemainingItems(container.getCraftingContainer());
+        return shapedRecipe.getRemainingItems(container.getCraftingInput());
     }
 
     public ResourceLocation loc() {
