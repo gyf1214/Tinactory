@@ -30,7 +30,7 @@ public class ChestItemSyncPacket implements IPacket {
         StackHelper.serializeStackToBuf(buf, stack);
         buf.writeBoolean(filter != null);
         if (filter != null) {
-            buf.writeItem(filter);
+            StackHelper.serializeStackToBuf(buf, filter);
         }
     }
 
@@ -38,7 +38,7 @@ public class ChestItemSyncPacket implements IPacket {
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         stack = StackHelper.deserializeStackFromBuf(buf);
         var hasFilter = buf.readBoolean();
-        filter = hasFilter ? buf.readItem() : null;
+        filter = hasFilter ? StackHelper.deserializeStackFromBuf(buf) : null;
     }
 
     private boolean filterEqual(ChestItemSyncPacket that) {

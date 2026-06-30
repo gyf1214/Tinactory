@@ -77,7 +77,7 @@ public class MEStorageInterfaceEventPacket implements IPacket {
         } else {
             buf.writeBoolean(false);
             buf.writeBoolean(true);
-            fluid.writeToPacket(buf);
+            StackHelper.serializeFluidStackToBuf(buf, fluid);
         }
         buf.writeVarInt(button);
     }
@@ -90,7 +90,7 @@ public class MEStorageInterfaceEventPacket implements IPacket {
             fluid = null;
         } else if (buf.readBoolean()) {
             // isFluid
-            fluid = FluidStack.readFromPacket(buf);
+            fluid = StackHelper.deserializeFluidStackFromBuf(buf);
             item = null;
         } else {
             item = StackHelper.deserializeStackFromBuf(buf);

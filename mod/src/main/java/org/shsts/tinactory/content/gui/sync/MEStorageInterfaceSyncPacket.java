@@ -33,13 +33,17 @@ public class MEStorageInterfaceSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(items, StackHelper::serializeStackToBuf);
-        buf.writeCollection(fluids, (buf1, stack) -> stack.writeToPacket(buf1));
+        buf.writeCollection(items, (buf1, stack) ->
+            StackHelper.serializeStackToBuf((RegistryFriendlyByteBuf) buf1, stack));
+        buf.writeCollection(fluids, (buf1, stack) ->
+            StackHelper.serializeFluidStackToBuf((RegistryFriendlyByteBuf) buf1, stack));
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        items = buf.readList(StackHelper::deserializeStackFromBuf);
-        fluids = buf.readList(FluidStack::readFromPacket);
+        items = buf.readList(buf1 ->
+            StackHelper.deserializeStackFromBuf((RegistryFriendlyByteBuf) buf1));
+        fluids = buf.readList(buf1 ->
+            StackHelper.deserializeFluidStackFromBuf((RegistryFriendlyByteBuf) buf1));
     }
 }

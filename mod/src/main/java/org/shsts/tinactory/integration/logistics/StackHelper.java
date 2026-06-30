@@ -8,11 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -108,38 +107,27 @@ public final class StackHelper {
         }
     }
 
-    public static void serializeStackToBuf(FriendlyByteBuf buf, ItemStack stack) {
-        if (stack.isEmpty()) {
-            buf.writeBoolean(false);
-        } else {
-            buf.writeBoolean(true);
-            var item = stack.getItem();
-            buf.writeVarInt(Item.getId(item));
-            buf.writeVarInt(stack.getCount());
-            var tag = item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt() ?
-                stack.getShareTag() : null;
-            buf.writeNbt(tag);
-        }
+    public static void serializeStackToBuf(RegistryFriendlyByteBuf buf, ItemStack stack) {
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
     }
 
-    public static ItemStack deserializeStackFromBuf(FriendlyByteBuf buf) {
-        if (!buf.readBoolean()) {
-            return ItemStack.EMPTY;
-        }
-        int id = buf.readVarInt();
-        int count = buf.readVarInt();
-        var stack = new ItemStack(Item.byId(id), count);
-        stack.readShareTag(buf.readNbt());
-        return stack;
+    public static ItemStack deserializeStackFromBuf(RegistryFriendlyByteBuf buf) {
+        return ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+    }
+
+    public static void serializeFluidStackToBuf(RegistryFriendlyByteBuf buf, FluidStack stack) {
+        FluidStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
+    }
+
+    public static FluidStack deserializeFluidStackFromBuf(RegistryFriendlyByteBuf buf) {
+        return FluidStack.OPTIONAL_STREAM_CODEC.decode(buf);
     }
 
     /**
      * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
      */
     public static boolean canItemsStack(ItemStack a, ItemStack b) {
-        return !a.isEmpty() && !b.isEmpty() && a.sameItem(b) && a.hasTag() == b.hasTag() &&
-            (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
-            a.areCapsCompatible(b);
+        return !a.isEmpty() && !b.isEmpty() && ItemStack.isSameItemSameComponents(a, b);
     }
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {

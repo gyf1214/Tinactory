@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.tech;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -24,7 +25,7 @@ public class TechInitPacket implements IPacket {
         return techs;
     }
 
-    private static Technology techFromBuf(RegistryFriendlyByteBuf buf) {
+    private static Technology techFromBuf(FriendlyByteBuf buf) {
         var loc = buf.readResourceLocation();
         var jo = CodecHelper.jsonFromStr(buf.readUtf());
         var tech = CodecHelper.parseJson(Technology.CODEC, jo);
@@ -32,7 +33,7 @@ public class TechInitPacket implements IPacket {
         return tech;
     }
 
-    private static void techToBuf(RegistryFriendlyByteBuf buf, Technology tech) {
+    private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
         buf.writeResourceLocation(tech.loc());
         var je = CodecHelper.encodeJson(Technology.CODEC, tech);
         buf.writeUtf(CodecHelper.jsonToStr(je));

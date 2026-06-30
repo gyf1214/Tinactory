@@ -36,13 +36,13 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeNbt(sets);
-        buf.writeCollection(resets, RegistryFriendlyByteBuf::writeUtf);
+        buf.writeCollection(resets, (buf1, reset) -> buf1.writeUtf(reset));
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         sets = CodecHelper.readRequiredNbt(buf, "machine config sets");
-        resets = buf.readCollection(ArrayList::new, RegistryFriendlyByteBuf::readUtf);
+        resets = buf.readCollection(ArrayList::new, buf1 -> buf1.readUtf());
     }
 
     public static class Builder implements ISetMachineConfigPacket.Builder {

@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
@@ -21,12 +22,12 @@ public class FluidSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        fluidStack.writeToPacket(buf);
+        StackHelper.serializeFluidStackToBuf(buf, fluidStack);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        fluidStack = FluidStack.readFromPacket(buf);
+        fluidStack = StackHelper.deserializeFluidStackFromBuf(buf);
     }
 
     @Override

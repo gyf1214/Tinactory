@@ -68,19 +68,20 @@ public class TechUpdatePacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeMap(progress, RegistryFriendlyByteBuf::writeResourceLocation, RegistryFriendlyByteBuf::writeLong);
+        buf.writeMap(progress, (buf1, loc) -> buf1.writeResourceLocation(loc),
+            (buf1, value) -> buf1.writeLong(value));
         buf.writeBoolean(updateTarget);
         if (updateTarget) {
-            buf.writeOptional(Optional.ofNullable(targetTech), RegistryFriendlyByteBuf::writeResourceLocation);
+            buf.writeOptional(Optional.ofNullable(targetTech), (buf1, loc) -> buf1.writeResourceLocation(loc));
         }
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        progress = buf.readMap(RegistryFriendlyByteBuf::readResourceLocation, RegistryFriendlyByteBuf::readLong);
+        progress = buf.readMap(buf1 -> buf1.readResourceLocation(), buf1 -> buf1.readLong());
         updateTarget = buf.readBoolean();
         if (updateTarget) {
-            targetTech = buf.readOptional(RegistryFriendlyByteBuf::readResourceLocation).orElse(null);
+            targetTech = buf.readOptional(buf1 -> buf1.readResourceLocation()).orElse(null);
         }
     }
 }
