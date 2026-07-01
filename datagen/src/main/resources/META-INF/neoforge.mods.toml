@@ -25,14 +25,14 @@ side = "BOTH"
 [[dependencies.tinactory_datagen]]
 modId = "tinycorelib"
 type = "required"
-versionRange = "[1.21.1-0.0.3.1,)"
+versionRange = "[1.21.1-0.0.3.2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.tinactory_datagen]]
 modId = "tinydatagen"
 type = "required"
-versionRange = "[1.21.1-0.0.3.1,)"
+versionRange = "[1.21.1-0.0.3.2,)"
 ordering = "NONE"
 side = "BOTH"
 
