@@ -145,4 +145,18 @@ class PatternNbtCodecTest {
         assertEquals(expected, codec.decodeAmount(fromKeyAndAmount));
         assertEquals(fromAmount, fromKeyAndAmount);
     }
+
+    @Test
+    void craftPatternCodecShouldRoundTripPattern() {
+        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var pattern = new CraftPattern(
+            TEST_UUID,
+            List.of(new CraftAmount(TestStackKey.item("minecraft:copper_ingot", ""), 2L)),
+            List.of(new CraftAmount(TestStackKey.item("minecraft:copper_block", ""), 1L)),
+            List.of(new TestMachineConstraint("codec")));
+
+        var decoded = CodecHelper.parseTag(codec.patternCodec(), CodecHelper.encodeTag(codec.patternCodec(), pattern));
+
+        assertEquals(pattern, decoded);
+    }
 }

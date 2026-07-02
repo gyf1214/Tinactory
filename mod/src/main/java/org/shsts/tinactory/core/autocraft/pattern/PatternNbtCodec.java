@@ -28,6 +28,10 @@ public final class PatternNbtCodec {
         return keyCodec;
     }
 
+    public Codec<CraftPattern> patternCodec() {
+        return CompoundTag.CODEC.xmap(this::decodePattern, this::encodePattern);
+    }
+
     public CompoundTag encodePattern(CraftPattern pattern) {
         var tag = new CompoundTag();
         tag.putUUID("patternUuid", pattern.patternUuid());
