@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllItems.COMPONENTS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
@@ -196,6 +197,7 @@ public class ComponentMeta extends MetaConsumer {
             var id = "tool/" + name + "/" + mat.name;
 
             var item = REGISTRATE.item(id, CellItem.factory(capacity))
+                .capability(FLUID_HANDLER_ITEM)
                 .tint(() -> () -> CellItem::getTint)
                 .register();
             components.put(v, item);

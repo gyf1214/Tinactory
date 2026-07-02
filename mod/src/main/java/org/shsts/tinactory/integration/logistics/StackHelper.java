@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
+
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public final class StackHelper {
@@ -211,7 +213,7 @@ public final class StackHelper {
         if (stack.isEmpty()) {
             return Optional.empty();
         }
-        return FluidUtil.getFluidHandler(stack).resolve();
+        return FLUID_HANDLER_ITEM.tryGet(stack).or(() -> FluidUtil.getFluidHandler(stack));
     }
 
     public static FluidStack getFluidFromItem(ItemStack stack) {
