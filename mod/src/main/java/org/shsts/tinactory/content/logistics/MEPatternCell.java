@@ -3,39 +3,25 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
-import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
-import org.shsts.tinactory.core.autocraft.pattern.PatternCellPortState;
-import org.shsts.tinactory.integration.common.CapabilityItem;
-import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
-import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinycorelib.api.item.ICapabilityItem;
+import org.shsts.tinycorelib.api.registrate.entry.IItemCapability;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEPatternCell extends CapabilityItem {
-    private static final ResourceLocation ID = modLoc("logistics/me_pattern_cell");
-
+public class MEPatternCell extends Item implements ICapabilityItem {
     private final long bytesLimit;
 
     public MEPatternCell(Properties properties, long bytesLimit) {
@@ -53,7 +39,7 @@ public class MEPatternCell extends CapabilityItem {
         @Nullable Level world,
         List<Component> tooltip,
         TooltipFlag isAdvanced) {
-        stack.getCapability(PATTERN_CELL.get()).ifPresent(cell -> {
+        PATTERN_CELL_ITEM.tryGet(stack).ifPresent(cell -> {
             addTooltip(tooltip, "mePatternCell",
                 NUMBER_FORMAT.format(cell.patterns().size()));
             addTooltip(tooltip, "meStorageCell",
@@ -63,73 +49,11 @@ public class MEPatternCell extends CapabilityItem {
     }
 
     @Override
-    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-        event.addCapability(ID, new PatternCapability(event.getObject(), bytesLimit));
-    }
-
-    private static final class PatternCapability extends ItemCapabilityProvider implements IPatternCellPort {
-        private final PatternCellPortState state;
-        private final LazyOptional<IPatternCellPort> patternCap;
-
-        private PatternCapability(ItemStack stack, long bytesLimit) {
-            super(stack, ID);
-            this.state = new PatternCellPortState(
-                CONFIG.bytesPerPattern.get(),
-                bytesLimit,
-                MachineConstraintHelper.CODEC,
-                StackHelper.KEY_CODEC);
-            this.patternCap = LazyOptional.of(() -> this);
+    @Nullable
+    public <T> T getCapability(ItemStack stack, IItemCapability<T> capability) {
+        if (PATTERN_CELL_ITEM.is(capability)) {
+            return capability.cast(new PatternCellPort(stack, bytesLimit, CONFIG.bytesPerPattern.get()));
         }
-
-        @Override
-        public long bytesCapacity() {
-            return state.bytesCapacity();
-        }
-
-        @Override
-        public long bytesUsed() {
-            return state.bytesUsed();
-        }
-
-        @Override
-        public List<CraftPattern> patterns() {
-            return state.patterns();
-        }
-
-        @Override
-        public boolean insert(CraftPattern pattern) {
-            if (!state.insert(pattern)) {
-                return false;
-            }
-            syncTag();
-            return true;
-        }
-
-        @Override
-        public boolean remove(UUID patternUuid) {
-            if (!state.remove(patternUuid)) {
-                return false;
-            }
-            syncTag();
-            return true;
-        }
-
-        @Override
-        protected CompoundTag serializeNBT() {
-            return state.serialize();
-        }
-
-        @Override
-        protected void deserializeNBT(CompoundTag tag) {
-            state.deserialize(tag);
-        }
-
-        @Override
-        public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == PATTERN_CELL.get()) {
-                return patternCap.cast();
-            }
-            return LazyOptional.empty();
-        }
+        return null;
     }
 }

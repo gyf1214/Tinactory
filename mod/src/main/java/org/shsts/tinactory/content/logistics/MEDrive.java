@@ -43,7 +43,7 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
@@ -127,7 +127,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
                 continue;
             }
             BYTES_PROVIDER_ITEM.tryGet(storage).ifPresent(digital::add);
-            storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
+            PATTERN_CELL_ITEM.tryGet(storage).ifPresent(patterns::add);
         }
         return aggregateByteStats(digital, patterns);
     }
@@ -212,7 +212,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
                 continue;
             }
             var slotIndex = i;
-            stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
+            PATTERN_CELL_ITEM.tryGet(stack).ifPresent(port ->
                 patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
         }
     }

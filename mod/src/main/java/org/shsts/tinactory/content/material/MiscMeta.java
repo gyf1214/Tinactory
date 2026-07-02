@@ -66,6 +66,7 @@ import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
@@ -250,7 +251,9 @@ public class MiscMeta extends MetaConsumer {
             .capability(FLUID_PORT_ITEM, BYTES_PROVIDER_ITEM)
             .register();
         var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
-            MEPatternCell.factory(bytes)).register();
+            MEPatternCell.factory(bytes))
+            .capability(PATTERN_CELL_ITEM)
+            .register();
 
         STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid, pattern));
     }
