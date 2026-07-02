@@ -1,9 +1,9 @@
 package org.shsts.tinactory.compat.jei.ingredient;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -17,9 +17,9 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> {
     @Override
-    public void render(PoseStack poseStack, FluidStack ingredient) {
+    public void render(GuiGraphics graphics, FluidStack ingredient) {
         var rect = new Rect(0, 0, 16, 16);
-        RenderUtil.renderFluidWithDecoration(poseStack, ingredient, rect, 0);
+        RenderUtil.renderFluidWithDecoration(graphics, ingredient, rect, 0);
     }
 
     @Override

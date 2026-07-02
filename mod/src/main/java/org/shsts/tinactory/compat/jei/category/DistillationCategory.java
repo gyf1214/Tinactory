@@ -5,14 +5,13 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DistillationCategory extends ProcessingCategory<ProcessingRecipe> {
     public DistillationCategory(
-        IRecipeType<? extends IRecipeBuilderBase<ProcessingRecipe>> recipeType,
+        IRecipeType<ProcessingRecipe> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, icon);
     }

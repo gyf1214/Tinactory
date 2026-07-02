@@ -1,12 +1,11 @@
 package org.shsts.tinactory.compat.jei.category;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -16,7 +15,7 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 @MethodsReturnNonnullByDefault
 public class ChemicalReactorCategory extends AssemblyCategory<ChemicalReactorRecipe> {
     public ChemicalReactorCategory(
-        IRecipeType<? extends IRecipeBuilderBase<ChemicalReactorRecipe>> recipeType,
+        IRecipeType<ChemicalReactorRecipe> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, icon);
     }
@@ -27,10 +26,10 @@ public class ChemicalReactorCategory extends AssemblyCategory<ChemicalReactorRec
     }
 
     @Override
-    protected int drawExtraText(ChemicalReactorRecipe recipe, int y, PoseStack stack) {
-        y = super.drawExtraText(recipe, y, stack);
+    protected int drawExtraText(ChemicalReactorRecipe recipe, int y, GuiGraphics graphics) {
+        y = super.drawExtraText(recipe, y, graphics);
         if (recipe.requireMultiblock) {
-            drawTextLine(stack, tr("requireLargeChemicalReactor"), y);
+            drawTextLine(graphics, tr("requireLargeChemicalReactor"), y);
         }
         return y + FONT_HEIGHT + SPACING;
     }

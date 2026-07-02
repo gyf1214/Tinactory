@@ -14,7 +14,7 @@ public record TechIngredient(ResourceLocation loc) {
 
     public static final IngredientHelper<TechIngredient> HELPER = new IngredientHelper<>(TYPE) {
         @Override
-        public String getWildcardId(TechIngredient ingredient) {
+        public String getGroupingUid(TechIngredient ingredient) {
             return "tech:" + ingredient.loc;
         }
 

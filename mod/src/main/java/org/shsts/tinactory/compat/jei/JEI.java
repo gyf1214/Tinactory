@@ -11,7 +11,6 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
-import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +33,6 @@ import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
-import org.shsts.tinactory.compat.jei.ingredient.PartialNbtInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
@@ -44,12 +42,11 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
-import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -81,8 +78,7 @@ public class JEI implements IModPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    private static <A extends IRecipeBuilderBase<?>,
-        B extends IRecipeBuilderBase<?>> IRecipeType<B> cast(IRecipeType<A> type) {
+    private static <A extends IRecipe<?>, B extends IRecipe<?>> IRecipeType<B> cast(IRecipeType<A> type) {
         return (IRecipeType<B>) type;
     }
 
@@ -120,15 +116,6 @@ public class JEI implements IModPlugin {
             TechIngredient.HELPER, IngredientRenderers.empty());
         registration.register(RecipeMarker.TYPE, Collections.emptyList(),
             RecipeMarker.HELPER, IngredientRenderers.empty());
-    }
-
-    @Override
-    public void registerItemSubtypes(ISubtypeRegistration registration) {
-        for (var item : ForgeRegistries.ITEMS) {
-            if (item instanceof BatteryItem) {
-                registration.registerSubtypeInterpreter(item, PartialNbtInterpreter.INSTANCE);
-            }
-        }
     }
 
     @Override

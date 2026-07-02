@@ -15,7 +15,7 @@ public record RecipeMarker(ResourceLocation loc) {
 
     public static final IngredientHelper<RecipeMarker> HELPER = new IngredientHelper<>(TYPE) {
         @Override
-        public String getWildcardId(RecipeMarker ingredient) {
+        public String getGroupingUid(RecipeMarker ingredient) {
             return "recipe:" + ingredient.loc;
         }
 

@@ -2,7 +2,7 @@ package org.shsts.tinactory.compat.jei.mixin;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientTypeWithSubtypes;
-import mezz.jei.common.ingredients.fluid.FluidIngredientHelper;
+import mezz.jei.library.plugins.vanilla.ingredients.fluid.FluidIngredientHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;

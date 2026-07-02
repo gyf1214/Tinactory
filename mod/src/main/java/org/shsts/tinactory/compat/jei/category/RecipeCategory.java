@@ -3,7 +3,6 @@ package org.shsts.tinactory.compat.jei.category;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
@@ -18,6 +17,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -30,9 +30,10 @@ import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.util.I18n.tr;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
@@ -43,19 +44,18 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     protected static final int WIDTH = Menu.CONTENT_WIDTH;
 
     private final ResourceLocation loc;
-    protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
+    protected final IRecipeType<R> recipeType;
     public final RecipeType<R> type;
     protected final Layout layout;
     protected final int xOffset;
     private final Ingredient catalyst;
     private final ItemStack iconItem;
 
-    @SuppressWarnings("unchecked")
-    public RecipeCategory(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
+    public RecipeCategory(IRecipeType<R> recipeType,
         Layout layout, Ingredient catalyst, ItemStack iconItem) {
         this.recipeType = recipeType;
         this.loc = prepend(recipeType.loc(), "jei/category");
-        this.type = new RecipeType<>(loc, (Class<R>) recipeType.recipeClass());
+        this.type = new RecipeType<>(loc, recipeType.recipeClass());
         this.layout = layout;
         this.xOffset = (WIDTH - layout.rect.width()) / 2;
         this.catalyst = catalyst;
@@ -86,7 +86,7 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {}
 
     protected void drawExtra(R recipe, ICategoryDrawHelper helper,
-        IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {}
+        IRecipeSlotsView slotsView, GuiGraphics graphics, double mouseX, double mouseY) {}
 
     public RecipeType<R> jeiRecipeType() {
         return type;
@@ -136,10 +136,10 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         }
 
         @Override
-        public void drawProgressBar(PoseStack stack, int cycle) {
+        public void drawProgressBar(GuiGraphics graphics, int cycle) {
             if (cachedProgressBar != null && progressBarRect != null) {
                 var bar = cachedProgressBar.getUnchecked(cycle);
-                bar.draw(stack, progressBarRect.x(), progressBarRect.y());
+                bar.draw(graphics, progressBarRect.x(), progressBarRect.y());
             }
         }
 
@@ -149,19 +149,15 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         }
 
         @Override
-        public IDrawable getBackground() {
-            return background;
-        }
-
-        @Override
         public IDrawable getIcon() {
             return icon;
         }
 
         @Override
         public void draw(R recipe, IRecipeSlotsView slotsView,
-            PoseStack stack, double mouseX, double mouseY) {
-            drawExtra(recipe, this, slotsView, stack, mouseX, mouseY);
+            GuiGraphics graphics, double mouseX, double mouseY) {
+            background.draw(graphics);
+            drawExtra(recipe, this, slotsView, graphics, mouseX, mouseY);
         }
 
         @Override
@@ -170,18 +166,6 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
             RecipeCategory.this.setRecipe(recipe, ingredientBuilder);
             extraLayout(recipe, builder);
             builder.moveRecipeTransferButton(WIDTH - Menu.SLOT_SIZE, 0);
-        }
-
-        @Override
-        @SuppressWarnings("removal")
-        public ResourceLocation getUid() {
-            return type.getUid();
-        }
-
-        @Override
-        @SuppressWarnings("removal")
-        public Class<? extends R> getRecipeClass() {
-            return type.getRecipeClass();
         }
 
         @Override
@@ -203,7 +187,9 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
     }
 
     public void registerRecipes(IRecipeRegistration registration, IRecipeManager recipeManager) {
-        var list = recipeManager.getAllRecipesFor(recipeType);
+        var list = recipeManager.getAllRecipesFor(recipeType).stream()
+            .map(Supplier::get)
+            .toList();
         registration.addRecipes(type, list);
     }
 }

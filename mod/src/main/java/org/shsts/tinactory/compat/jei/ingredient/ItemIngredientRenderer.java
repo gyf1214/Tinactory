@@ -1,15 +1,15 @@
 package org.shsts.tinactory.compat.jei.ingredient;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.client.RenderProperties;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -20,8 +20,8 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
-    public void render(PoseStack poseStack, ItemStack ingredient) {
-        var poseStack1 = RenderUtil.applyToModelViewStack(poseStack);
+    public void render(GuiGraphics graphics, ItemStack ingredient) {
+        var poseStack1 = RenderUtil.applyToModelViewStack(graphics);
         RenderUtil.renderFakeItemWithDecoration(ingredient, 0, 0);
         RenderUtil.popModelViewStack(poseStack1);
     }
@@ -33,10 +33,10 @@ public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
 
     @Override
     public Font getFontRenderer(Minecraft minecraft, ItemStack ingredient) {
-        var renderProperty = RenderProperties.get(ingredient.getItem());
-        var font = renderProperty.getFont(ingredient);
-        if (font != null) {
-            return font;
+        var renderProperties = IClientItemExtensions.of(ingredient);
+        var fontRenderer = renderProperties.getFont(ingredient, IClientItemExtensions.FontContext.TOOLTIP);
+        if (fontRenderer != null) {
+            return fontRenderer;
         }
         return minecraft.font;
     }

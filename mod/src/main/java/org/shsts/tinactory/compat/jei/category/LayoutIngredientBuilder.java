@@ -2,9 +2,9 @@ package org.shsts.tinactory.compat.jei.category;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.forge.ForgeTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
@@ -47,8 +47,8 @@ public class LayoutIngredientBuilder implements IIngredientBuilder {
     @Override
     public void fluidInput(Layout.SlotInfo slot, FluidStack fluid) {
         addSlot(slot, RecipeIngredientRole.INPUT)
-            .addIngredient(ForgeTypes.FLUID_STACK, fluid)
-            .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
+            .addIngredient(NeoForgeTypes.FLUID_STACK, fluid)
+            .setCustomRenderer(NeoForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
     }
 
     @Override
@@ -67,14 +67,14 @@ public class LayoutIngredientBuilder implements IIngredientBuilder {
     @Override
     public void fluidOutput(Layout.SlotInfo slot, FluidStack fluid) {
         addSlot(slot, RecipeIngredientRole.OUTPUT)
-            .addIngredient(ForgeTypes.FLUID_STACK, fluid)
-            .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
+            .addIngredient(NeoForgeTypes.FLUID_STACK, fluid)
+            .setCustomRenderer(NeoForgeTypes.FLUID_STACK, IngredientRenderers.FLUID);
     }
 
     @Override
     public void ratedFluidOutput(Layout.SlotInfo slot, FluidStack fluid, double rate) {
         addSlot(slot, RecipeIngredientRole.OUTPUT)
-            .addIngredient(ForgeTypes.FLUID_STACK, fluid)
-            .setCustomRenderer(ForgeTypes.FLUID_STACK, IngredientRenderers.ratedFluid(rate));
+            .addIngredient(NeoForgeTypes.FLUID_STACK, fluid)
+            .setCustomRenderer(NeoForgeTypes.FLUID_STACK, IngredientRenderers.ratedFluid(rate));
     }
 }

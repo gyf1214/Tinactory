@@ -1,14 +1,13 @@
 package org.shsts.tinactory.compat.jei.category;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -30,7 +29,6 @@ import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.util.ClientUtil;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Arrays;
@@ -50,12 +48,12 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     private static final int EXTRA_HEIGHT = FONT_HEIGHT * 3 + SPACING * 2 + SLOT_SIZE / 2;
 
     public ProcessingCategory(
-        IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
+        IRecipeType<R> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, Ingredient.of(machine(recipeType)), new ItemStack(icon));
     }
 
-    public static TranslatableComponent tr(String key, Object... args) {
+    public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.jei.processing." + key, args);
     }
 
@@ -71,15 +69,15 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
             0, layout.rect.endY());
     }
 
-    protected int drawTextLine(PoseStack stack, Component text, int y) {
-        RenderUtil.renderText(stack, text, 0, y);
+    protected int drawTextLine(GuiGraphics graphics, Component text, int y) {
+        RenderUtil.renderText(graphics, text, 0, y);
         return y + FONT_HEIGHT + SPACING;
     }
 
-    protected int drawRequiredTechText(PoseStack stack, boolean empty, int y) {
+    protected int drawRequiredTechText(GuiGraphics graphics, boolean empty, int y) {
         if (!empty) {
             y += (TECH_SIZE - FONT_HEIGHT) / 2 + 1;
-            drawTextLine(stack, tr("requiredTech"), y);
+            drawTextLine(graphics, tr("requiredTech"), y);
             y += (TECH_SIZE + FONT_HEIGHT) / 2 + SPACING;
         } else {
             y += TECH_SIZE + SPACING;
@@ -90,51 +88,50 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     /**
      * return endY
      */
-    protected int drawExtraText(R recipe, int y, PoseStack stack) {
+    protected int drawExtraText(R recipe, int y, GuiGraphics graphics) {
         return y;
     }
 
     protected static void addIngredient(IIngredientBuilder builder, Layout.SlotInfo slot,
         IProcessingObject ingredient) {
-        if (ingredient instanceof StackIngredient<?> stackIngredient && stackIngredient.type() == PortType.ITEM) {
-            builder.itemInput(slot, (ItemStack) stackIngredient.stack());
-        } else if (ingredient instanceof ItemsIngredient item) {
-            if (item.amount <= 0) {
-                builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
-            } else {
-                var items = Arrays.stream(item.ingredient.getItems())
-                    .map(stack -> StackHelper.copyWithCount(stack, item.amount))
-                    .toList();
-                builder.itemInput(slot, items);
+        switch (ingredient) {
+            case StackIngredient<?> stackIngredient when stackIngredient.type() == PortType.ITEM ->
+                builder.itemInput(slot, (ItemStack) stackIngredient.stack());
+            case ItemsIngredient item -> {
+                if (item.amount <= 0) {
+                    builder.itemNotConsumedInput(slot, List.of(item.ingredient.getItems()));
+                } else {
+                    var items = Arrays.stream(item.ingredient.getItems())
+                        .map(stack -> StackHelper.copyWithCount(stack, item.amount))
+                        .toList();
+                    builder.itemInput(slot, items);
+                }
             }
-        } else if (
-            ingredient instanceof StackIngredient<?> stackIngredient && stackIngredient.type() == PortType.FLUID
-        ) {
-            builder.fluidInput(slot, (FluidStack) stackIngredient.stack());
-        } else if (ingredient instanceof StackResult<?> stackResult && stackResult.type() == PortType.ITEM) {
-            builder.itemOutput(slot, (ItemStack) stackResult.stack(), stackResult.rate());
-        } else if (ingredient instanceof StackResult<?> stackResult && stackResult.type() == PortType.FLUID) {
-            builder.fluidOutput(slot, (FluidStack) stackResult.stack(), stackResult.rate());
-        } else {
-            throw new IllegalArgumentException("Unknown processing ingredient type %s"
+            case StackIngredient<?> stackIngredient when stackIngredient.type() == PortType.FLUID ->
+                builder.fluidInput(slot, (FluidStack) stackIngredient.stack());
+            case StackResult<?> stackResult when stackResult.type() == PortType.ITEM ->
+                builder.itemOutput(slot, (ItemStack) stackResult.stack(), stackResult.rate());
+            case StackResult<?> stackResult when stackResult.type() == PortType.FLUID ->
+                builder.fluidOutput(slot, (FluidStack) stackResult.stack(), stackResult.rate());
+            default -> throw new IllegalArgumentException("Unknown processing ingredient type %s"
                 .formatted(ingredient.getClass()));
         }
     }
 
     @Override
     protected void drawExtra(R recipe, ICategoryDrawHelper helper,
-        IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        helper.drawProgressBar(stack, (int) recipe.workTicks);
+        IRecipeSlotsView slotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+        helper.drawProgressBar(graphics, (int) recipe.workTicks);
         var y = layout.rect.endY() + SLOT_SIZE / 2;
         var total = recipe.power * recipe.workTicks;
         var duration = DOUBLE_FORMAT.format((double) recipe.workTicks / 20d);
         var voltage = Voltage.fromValue(recipe.voltage).displayName();
 
-        y = drawExtraText(recipe, y, stack);
+        y = drawExtraText(recipe, y, graphics);
 
-        y = drawTextLine(stack, tr("total", total), y);
-        y = drawTextLine(stack, tr("power", recipe.power, voltage), y);
-        drawTextLine(stack, tr("duration", duration), y);
+        y = drawTextLine(graphics, tr("total", total), y);
+        y = drawTextLine(graphics, tr("power", recipe.power, voltage), y);
+        drawTextLine(graphics, tr("duration", duration), y);
     }
 
     @Override

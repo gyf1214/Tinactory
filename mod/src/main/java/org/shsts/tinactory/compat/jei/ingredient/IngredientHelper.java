@@ -30,35 +30,29 @@ public abstract class IngredientHelper<V> implements IIngredientHelper<V> {
     }
 
     @Override
-    public abstract String getWildcardId(V ingredient);
+    public abstract String getGroupingUid(V ingredient);
 
     @Override
-    public String getUniqueId(V ingredient, UidContext context) {
-        var result = new StringBuilder(getWildcardId(ingredient));
+    public String getUid(V ingredient, UidContext context) {
+        var result = new StringBuilder(getGroupingUid(ingredient));
         if (subtypeManager != null && type instanceof IIngredientTypeWithSubtypes<?, V> withSubtypes) {
-            var subtypeInfo = subtypeManager.getSubtypeInfo(withSubtypes, ingredient, context);
-            if (!subtypeInfo.isEmpty()) {
+            var subtypeData = subtypeManager.getSubtypeData(withSubtypes, ingredient, context);
+            if (subtypeData != null) {
                 result.append(":");
-                result.append(subtypeInfo);
+                result.append(subtypeData);
             }
         }
         return result.toString();
     }
 
     @Override
+    @SuppressWarnings("removal")
+    public String getUniqueId(V ingredient, UidContext context) {
+        return getUid(ingredient, context);
+    }
+
+    @Override
     public abstract ResourceLocation getResourceLocation(V ingredient);
-
-    @SuppressWarnings("removal")
-    @Override
-    public String getModId(V ingredient) {
-        return getResourceLocation(ingredient).getNamespace();
-    }
-
-    @SuppressWarnings("removal")
-    @Override
-    public String getResourceId(V ingredient) {
-        return getResourceLocation(ingredient).getPath();
-    }
 
     @Override
     public String getErrorInfo(@Nullable V ingredient) {
