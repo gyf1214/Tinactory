@@ -36,9 +36,10 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
-import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT_ITEM;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
@@ -125,7 +126,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (storage.isEmpty()) {
                 continue;
             }
-            storage.getCapability(BYTES_PROVIDER.get()).ifPresent(digital::add);
+            BYTES_PROVIDER_ITEM.tryGet(storage).ifPresent(digital::add);
             storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
         }
         return aggregateByteStats(digital, patterns);
@@ -190,8 +191,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (stack.isEmpty()) {
                 continue;
             }
-            stack.getCapability(ITEM_PORT.get()).ifPresent(items::add);
-            stack.getCapability(FLUID_PORT.get()).ifPresent(fluids::add);
+            ITEM_PORT_ITEM.tryGet(stack).ifPresent(items::add);
+            FLUID_PORT_ITEM.tryGet(stack).ifPresent(fluids::add);
         }
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);

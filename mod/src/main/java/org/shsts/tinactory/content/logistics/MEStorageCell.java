@@ -3,40 +3,29 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import org.shsts.tinactory.api.logistics.IFluidPort;
-import org.shsts.tinactory.api.logistics.IItemPort;
-import org.shsts.tinactory.core.logistics.DigitalProvider;
-import org.shsts.tinactory.core.logistics.IBytesProvider;
-import org.shsts.tinactory.core.logistics.IDigitalProvider;
-import org.shsts.tinactory.integration.common.CapabilityItem;
-import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
-import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinycorelib.api.item.ICapabilityItem;
+import org.shsts.tinycorelib.api.registrate.entry.IItemCapability;
 
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
-import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
-import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT_ITEM;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
+import static org.shsts.tinactory.AllDataComponents.ME_FLUID_CELL_CONTENT;
+import static org.shsts.tinactory.AllDataComponents.ME_ITEM_CELL_CONTENT;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEStorageCell extends CapabilityItem {
-    private static final ResourceLocation ID = modLoc("logistics/me_storage_cell");
-
+public class MEStorageCell extends Item implements ICapabilityItem {
     private final boolean isFluid;
     private final long bytesLimit;
 
@@ -57,92 +46,43 @@ public class MEStorageCell extends CapabilityItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world,
         List<Component> tooltip, TooltipFlag isAdvanced) {
-        stack.getCapability(BYTES_PROVIDER.get())
+        BYTES_PROVIDER_ITEM.tryGet(stack)
             .ifPresent(provider -> addTooltip(tooltip, "meStorageCell",
                 NUMBER_FORMAT.format(provider.bytesUsed()), NUMBER_FORMAT.format(bytesLimit)));
     }
 
-    private static class ItemCapability extends ItemCapabilityProvider {
-        private final IDigitalProvider provider;
-        private final StoragePorts.ItemStorage storage;
-        private final LazyOptional<IItemPort> itemCap;
-        private final LazyOptional<IBytesProvider> providerCap;
-
-        public ItemCapability(ItemStack stack, long bytesLimit) {
-            super(stack, ID);
-            this.provider = new DigitalProvider(bytesLimit);
-            this.storage = StoragePorts.itemStorage(provider);
-            this.itemCap = LazyOptional.of(() -> storage);
-            this.providerCap = LazyOptional.of(() -> provider);
-
-            storage.onUpdate(this::syncTag);
-        }
-
-        @Override
-        protected CompoundTag serializeNBT() {
-            return storage.serializeNBT();
-        }
-
-        @Override
-        protected void deserializeNBT(CompoundTag tag) {
-            storage.deserializeNBT(tag);
-        }
-
-        @Override
-        public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == ITEM_PORT.get()) {
-                return itemCap.cast();
-            } else if (cap == BYTES_PROVIDER.get()) {
-                return providerCap.cast();
-            }
-            return LazyOptional.empty();
-        }
-    }
-
-    private static class FluidCapability extends ItemCapabilityProvider {
-        private final IDigitalProvider provider;
-        private final StoragePorts.FluidStorage storage;
-        private final LazyOptional<IFluidPort> fluidCap;
-        private final LazyOptional<IBytesProvider> providerCap;
-
-        protected FluidCapability(ItemStack stack, long bytesLimit) {
-            super(stack, ID);
-            this.provider = new DigitalProvider(bytesLimit);
-            this.storage = StoragePorts.fluidStorage(provider);
-            this.fluidCap = LazyOptional.of(() -> storage);
-            this.providerCap = LazyOptional.of(() -> provider);
-
-            storage.onUpdate(this::syncTag);
-        }
-
-        @Override
-        protected CompoundTag serializeNBT() {
-            return storage.serializeNBT();
-        }
-
-        @Override
-        protected void deserializeNBT(CompoundTag tag) {
-            storage.deserializeNBT(tag);
-        }
-
-        @Override
-        public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-            if (cap == FLUID_PORT.get()) {
-                return fluidCap.cast();
-            } else if (cap == BYTES_PROVIDER.get()) {
-                return providerCap.cast();
-            }
-            return LazyOptional.empty();
-        }
-    }
-
     @Override
-    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-        var stack = event.getObject();
+    @Nullable
+    public <T> T getCapability(ItemStack stack, IItemCapability<T> capability) {
         if (isFluid) {
-            event.addCapability(ID, new FluidCapability(stack, bytesLimit));
+            var port = fluidPort(stack);
+            if (FLUID_PORT_ITEM.is(capability) || BYTES_PROVIDER_ITEM.is(capability)) {
+                return capability.cast(port);
+            }
         } else {
-            event.addCapability(ID, new ItemCapability(stack, bytesLimit));
+            var port = itemPort(stack);
+            if (ITEM_PORT_ITEM.is(capability) || BYTES_PROVIDER_ITEM.is(capability)) {
+                return capability.cast(port);
+            }
         }
+        return null;
+    }
+
+    private DigitalCellPort.Item itemPort(ItemStack stack) {
+        return new DigitalCellPort.Item(
+            stack,
+            ME_ITEM_CELL_CONTENT,
+            bytesLimit,
+            CONFIG.bytesPerItemType.get(),
+            CONFIG.bytesPerItem.get());
+    }
+
+    private DigitalCellPort.Fluid fluidPort(ItemStack stack) {
+        return new DigitalCellPort.Fluid(
+            stack,
+            ME_FLUID_CELL_CONTENT,
+            bytesLimit,
+            CONFIG.bytesPerFluidType.get(),
+            CONFIG.bytesPerFluid.get());
     }
 }

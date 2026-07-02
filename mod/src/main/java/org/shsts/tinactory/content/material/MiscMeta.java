@@ -55,10 +55,13 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
@@ -239,9 +242,13 @@ public class MiscMeta extends MetaConsumer {
 
         var component = REGISTRATE.item(componentPrefix + "/" + name).register();
         var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
-            MEStorageCell.itemCell(bytes)).register();
+            MEStorageCell.itemCell(bytes))
+            .capability(ITEM_PORT_ITEM, BYTES_PROVIDER_ITEM)
+            .register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
-            MEStorageCell.fluidCell(bytes)).register();
+            MEStorageCell.fluidCell(bytes))
+            .capability(FLUID_PORT_ITEM, BYTES_PROVIDER_ITEM)
+            .register();
         var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
             MEPatternCell.factory(bytes)).register();
 
