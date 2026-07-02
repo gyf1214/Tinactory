@@ -5,18 +5,14 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import org.shsts.tinactory.integration.common.CapabilityItem;
-import org.shsts.tinactory.integration.common.ItemCapabilityProvider;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -28,18 +24,6 @@ import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllForgeEvents {
-    @SubscribeEvent
-    public static void onAttachItemStack(AttachCapabilitiesEvent<ItemStack> event) {
-        if (event.getObject().getItem() instanceof CapabilityItem capabilityItem) {
-            capabilityItem.attachCapabilities(event);
-        }
-        for (var cap : event.getCapabilities().values()) {
-            if (cap instanceof ItemCapabilityProvider itemCap) {
-                itemCap.init();
-            }
-        }
-    }
-
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
         TechManagers.server().addReloadListener(event);
