@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -43,7 +42,7 @@ public class Tinactory {
 
     private void onConstructEvent(FMLConstructModEvent event) {
         onConstruct();
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.dist.isClient()) {
             onConstructClient();
         }
     }
@@ -88,6 +87,7 @@ public class Tinactory {
         REGISTRATE.registerClient(modEventBus);
         modEventBus.addListener(Tinactory::initClient);
         modEventBus.addListener(AllClientEvents::initKeys);
+        modEventBus.addListener(AllClientEvents::registerClientExtensions);
         NeoForge.EVENT_BUS.register(AllClientEvents.class);
     }
 

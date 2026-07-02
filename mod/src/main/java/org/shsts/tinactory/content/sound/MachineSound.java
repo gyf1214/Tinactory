@@ -40,7 +40,7 @@ public class MachineSound extends CapabilityProvider implements IEventSubscriber
     }
 
     private void onClientTick(Level world) {
-        if (world.isClientSide && FMLEnvironment.dist == Dist.CLIENT) {
+        if (world.isClientSide && FMLEnvironment.dist.isClient()) {
             tickClient();
         }
     }
@@ -78,5 +78,4 @@ public class MachineSound extends CapabilityProvider implements IEventSubscriber
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CLIENT_TICK.get(), this::onClientTick);
     }
-
 }

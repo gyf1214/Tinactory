@@ -9,8 +9,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.TierSortingRegistry;
 import org.shsts.tinactory.AllMaterials;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.integration.material.MaterialSet;
@@ -101,8 +101,8 @@ public class MaterialMeta extends MetaConsumer {
         var durability = GsonHelper.getAsInt(jo, "durability");
         Tier tier;
         if (jo.has("tier")) {
-            var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, "tier"));
-            tier = TierSortingRegistry.byName(loc);
+            var name = GsonHelper.getAsString(jo, "tier").toUpperCase(Locale.ROOT);
+            tier = Tiers.valueOf(name);
         } else {
             tier = null;
         }

@@ -262,7 +262,9 @@ public class MaterialSet {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
-                    .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance)
+                    .properties(p -> p
+                        .strength(variant.destroyTime, variant.explodeResistance)
+                        .mapColor(variant.mapColor)
                         .sound(variant.soundType))
                     .tint(color)
                     .noBlockItem()
