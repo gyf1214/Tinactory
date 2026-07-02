@@ -54,10 +54,11 @@ public class Tinactory {
             REGISTRATE = CORE.registrate(TinactoryKeys.ID);
 
             AllRegistries.init();
+            AllCapabilities.init();
+            AllDataComponents.init();
             AllMeta.init();
 
             AllRecipes.init();
-            AllCapabilities.init();
             AllEvents.init();
             AllNetworks.init();
 
