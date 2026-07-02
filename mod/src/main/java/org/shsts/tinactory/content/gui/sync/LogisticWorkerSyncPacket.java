@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -21,19 +20,19 @@ import java.util.UUID;
 public class LogisticWorkerSyncPacket implements IPacket {
     public record PortInfo(UUID machineId, int portIndex, Component machineName,
         ItemStack icon, Component portName) {
-        public static void serialize(FriendlyByteBuf buf, PortInfo info) {
+        public static void serialize(RegistryFriendlyByteBuf buf, PortInfo info) {
             buf.writeUUID(info.machineId);
             buf.writeVarInt(info.portIndex);
-            buf.writeUtf(CodecHelper.encodeComponent(info.machineName));
-            StackHelper.serializeStackToBuf((RegistryFriendlyByteBuf) buf, info.icon);
-            buf.writeUtf(CodecHelper.encodeComponent(info.portName));
+            CodecHelper.encodeComponentToBuf(buf, info.machineName);
+            StackHelper.serializeStackToBuf(buf, info.icon);
+            CodecHelper.encodeComponentToBuf(buf, info.portName);
         }
 
-        public static PortInfo deserialize(FriendlyByteBuf buf) {
+        public static PortInfo deserialize(RegistryFriendlyByteBuf buf) {
             return new PortInfo(buf.readUUID(), buf.readVarInt(),
-                CodecHelper.parseComponent(buf.readUtf()),
-                StackHelper.deserializeStackFromBuf((RegistryFriendlyByteBuf) buf),
-                CodecHelper.parseComponent(buf.readUtf()));
+                CodecHelper.parseComponentFromBuf(buf),
+                StackHelper.deserializeStackFromBuf(buf),
+                CodecHelper.parseComponentFromBuf(buf));
         }
 
         public LogisticComponent.PortKey getKey() {

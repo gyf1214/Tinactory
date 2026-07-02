@@ -25,7 +25,7 @@ public class MEPatternTerminal extends MEStorageAccess {
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MEPatternTerminal(be, power));
+        return $ -> $.container(ID, be -> new MEPatternTerminal(be, power));
     }
 
     @Override

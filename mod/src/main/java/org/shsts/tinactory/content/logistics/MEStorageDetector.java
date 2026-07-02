@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -37,18 +38,18 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MEStorageDetector(be, power));
+        return $ -> $.container(ID, be -> new MEStorageDetector(be, power));
     }
 
-    public static ItemStack targetItem(IMachineConfig config) {
+    public static ItemStack targetItem(HolderLookup.Provider provider, IMachineConfig config) {
         return config.getCompound(TARGET_ITEM_KEY)
-            .map(ItemStack::of)
+            .map($ -> ItemStack.parseOptional(provider, $))
             .orElse(ItemStack.EMPTY);
     }
 
-    public static FluidStack targetFluid(IMachineConfig config) {
+    public static FluidStack targetFluid(HolderLookup.Provider provider, IMachineConfig config) {
         return config.getCompound(TARGET_FLUID_KEY)
-            .map(FluidStack::loadFluidStackFromNBT)
+            .map($ -> FluidStack.parseOptional(provider, $))
             .orElse(FluidStack.EMPTY);
     }
 
@@ -58,8 +59,8 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
             return;
         }
         var config = machine.config();
-        targetItem = targetItem(config);
-        targetFluid = targetFluid(config);
+        targetItem = targetItem(world.registryAccess(), config);
+        targetFluid = targetFluid(world.registryAccess(), config);
         targetAmount = config.getInt(TARGET_AMOUNT_KEY, 0);
 
         updateSignal();

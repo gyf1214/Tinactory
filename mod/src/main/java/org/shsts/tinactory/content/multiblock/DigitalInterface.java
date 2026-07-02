@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -191,23 +192,23 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         public void reset() {}
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
-            tag.put("items", internalItem.serializeNBT());
-            tag.put("fluids", internalFluid.serializeNBT());
+            tag.put("items", internalItem.serializeNBT(provider));
+            tag.put("fluids", internalFluid.serializeNBT(provider));
             return tag;
         }
 
         @Override
-        public void deserializeNBT(CompoundTag tag) {
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
             bytesUsed = 0;
-            internalItem.deserializeNBT(tag.getCompound("items"));
-            internalFluid.deserializeNBT(tag.getCompound("fluids"));
+            internalItem.deserializeNBT(provider, tag.getCompound("items"));
+            internalFluid.deserializeNBT(provider, tag.getCompound("fluids"));
         }
 
         private void recomputeBytesUsed() {
-            var tag = serializeNBT();
-            deserializeNBT(tag);
+            var tag = serializeNBT(world().registryAccess());
+            deserializeNBT(world().registryAccess(), tag);
         }
     }
 
@@ -234,7 +235,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
-        return $ -> $.capability(ID, be -> new DigitalInterface(be, properties));
+        return $ -> $.container(ID, be -> new DigitalInterface(be, properties));
     }
 
     @Override
@@ -449,26 +450,26 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        var tag = super.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        var tag = super.serializeNBT(provider);
 
         var tag1 = new ListTag();
         for (var storage : storages) {
-            tag1.add(storage.serializeNBT());
+            tag1.add(storage.serializeNBT(provider));
         }
         tag.put("storage", tag1);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        super.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeNBT(provider, tag);
 
         resetAccounting();
         storages.clear();
         for (var tag1 : tag.getList("storage", Tag.TAG_COMPOUND)) {
             var storage = new Storage();
-            storage.deserializeNBT((CompoundTag) tag1);
+            storage.deserializeNBT(provider, (CompoundTag) tag1);
             storages.add(storage);
         }
     }

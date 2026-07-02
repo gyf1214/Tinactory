@@ -8,6 +8,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -59,6 +60,10 @@ public class InventoryMenu extends MenuBase {
 
     public InventoryMenu(Properties properties, int beginY) {
         this(properties, 0, beginY);
+    }
+
+    public Level world() {
+        return world;
     }
 
     @Override

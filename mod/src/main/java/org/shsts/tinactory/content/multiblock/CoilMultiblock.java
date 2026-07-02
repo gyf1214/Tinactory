@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -52,16 +53,16 @@ public class CoilMultiblock extends Multiblock {
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
-        if (coilBlock != null && coilBlock.getRegistryName() != null) {
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
+        if (coilBlock != null) {
             tag.putString("coilBlock", coilBlock.getRegistryName().toString());
         }
         return tag;
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
         coilBlock = null;
         if (tag.contains("coilBlock", Tag.TAG_STRING)) {
             var loc = ResourceLocation.parse(tag.getString("coilBlock"));
@@ -70,6 +71,6 @@ public class CoilMultiblock extends Multiblock {
                 coilBlock = coilBlock1;
             }
         }
-        super.deserializeOnUpdate(tag);
+        super.deserializeOnUpdate(provider, tag);
     }
 }

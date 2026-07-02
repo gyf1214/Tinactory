@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -101,7 +102,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
-        return $ -> $.capability(ID, be -> new MEDrive(be, layout, power));
+        return $ -> $.container(ID, be -> new MEDrive(be, layout, power));
     }
 
     private boolean allowItem(ItemStack stack) {
@@ -253,12 +254,12 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(storages);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, storages);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(storages, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, storages, tag);
     }
 }

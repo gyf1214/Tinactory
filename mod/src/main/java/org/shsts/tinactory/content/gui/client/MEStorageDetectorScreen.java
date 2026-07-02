@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.neoforged.api.distmarker.Dist;
@@ -40,6 +41,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
     private static final int SLOT_Y_OFFSET = SLOT_SIZE / 2;
     private static final int EDIT_Y_OFFSET = SLOT_Y_OFFSET + (SLOT_SIZE - EDIT_HEIGHT) / 2;
 
+    private final HolderLookup.Provider provider;
     private final IMachineConfig config;
 
     private class MarkerSlot extends MenuWidget {
@@ -52,8 +54,9 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
             var z = getBlitOffset();
             RenderUtil.blit(poseStack, SLOT_BACKGROUND, z, rect);
 
-            var targetItem = MEStorageDetector.targetItem(config);
-            var targetFluid = MEStorageDetector.targetFluid(config);
+            var registries = MEStorageDetectorScreen.this.menu.world().registryAccess();
+            var targetItem = MEStorageDetector.targetItem(registries, config);
+            var targetFluid = MEStorageDetector.targetFluid(registries, config);
 
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
             if (!targetItem.isEmpty()) {
@@ -93,11 +96,11 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
                     FluidStack.EMPTY;
                 if (fluid.isEmpty()) {
                     packet
-                        .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).serializeNBT())
+                        .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).save(provider))
                         .reset(TARGET_FLUID_KEY);
                 } else {
                     packet
-                        .set(TARGET_FLUID_KEY, StackHelper.serializeFluidStack(fluid))
+                        .set(TARGET_FLUID_KEY, fluid.save(provider))
                         .reset(TARGET_ITEM_KEY);
                 }
             }
@@ -110,6 +113,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
     public MEStorageDetectorScreen(MEStorageDetectorMenu menu, Component title) {
         super(menu, title);
+        this.provider = menu.world().registryAccess();
         this.config = menu.machine.config();
 
         var slot = new MarkerSlot();

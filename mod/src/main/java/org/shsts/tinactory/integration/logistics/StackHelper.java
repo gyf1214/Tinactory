@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -20,7 +21,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.slf4j.Logger;
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static net.minecraft.world.item.ItemStack.isSameItemSameComponents;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
 
 @MethodsReturnNonnullByDefault
@@ -49,39 +50,33 @@ public final class StackHelper {
     );
 
     /**
-     * Use this if the itemStack can have more than 255 items.
+     * Use this if the itemStack can have more than 99 items.
      */
-    public static CompoundTag serializeItemStack(ItemStack stack) {
+    public static CompoundTag serializeItemStack(HolderLookup.Provider provider, ItemStack stack) {
         var tag = new CompoundTag();
-        stack.save(tag);
+        stack.save(provider, tag);
         tag.putInt("CountInt", stack.getCount());
         return tag;
     }
 
     /**
-     * Use this if the itemStack can have more than 255 items.
+     * Use this if the itemStack can have more than 99 items.
      */
-    public static ItemStack deserializeItemStack(CompoundTag tag) {
-        var stack = ItemStack.of(tag);
-        if (tag.contains("CountInt", Tag.TAG_INT)) {
+    public static ItemStack deserializeItemStack(HolderLookup.Provider provider, CompoundTag tag) {
+        var stack = ItemStack.parseOptional(provider, tag);
+        if (!stack.isEmpty() && tag.contains("CountInt", Tag.TAG_INT)) {
             stack.setCount(tag.getInt("CountInt"));
         }
         return stack;
     }
 
-    public static CompoundTag serializeFluidStack(FluidStack stack) {
-        var tag = new CompoundTag();
-        stack.writeToNBT(tag);
-        return tag;
-    }
-
-    public static CompoundTag serializeItemHandler(IItemHandler itemHandler) {
+    public static CompoundTag serializeItemHandler(HolderLookup.Provider provider, IItemHandler itemHandler) {
         var listTag = new ListTag();
         var size = itemHandler.getSlots();
         for (var i = 0; i < size; i++) {
             var stack = itemHandler.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                var itemTag = serializeItemStack(stack);
+                var itemTag = serializeItemStack(provider, stack);
                 itemTag.putInt("Slot", i);
                 listTag.add(itemTag);
             }
@@ -92,7 +87,8 @@ public final class StackHelper {
         return tag;
     }
 
-    public static void deserializeItemHandler(IItemHandlerModifiable itemHandler, CompoundTag tag) {
+    public static void deserializeItemHandler(HolderLookup.Provider provider, IItemHandlerModifiable itemHandler,
+        CompoundTag tag) {
         var size = itemHandler.getSlots();
         for (int i = 0; i < size; i++) {
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
@@ -102,7 +98,7 @@ public final class StackHelper {
             var itemTag = (CompoundTag) tag1;
             int slot = itemTag.getInt("Slot");
             if (slot >= 0 && slot < size) {
-                var stack = deserializeItemStack(itemTag);
+                var stack = deserializeItemStack(provider, itemTag);
                 itemHandler.setStackInSlot(slot, stack);
             }
         }
@@ -128,7 +124,7 @@ public final class StackHelper {
      * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
      */
     public static boolean canItemsStack(ItemStack a, ItemStack b) {
-        return !a.isEmpty() && !b.isEmpty() && ItemStack.isSameItemSameComponents(a, b);
+        return !a.isEmpty() && !b.isEmpty() && isSameItemSameComponents(a, b);
     }
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {
@@ -139,7 +135,7 @@ public final class StackHelper {
         if (stack.isEmpty() || count <= 0) {
             return ItemStack.EMPTY;
         }
-        return ItemHandlerHelper.copyStackWithSize(stack, count);
+        return stack.copyWithCount(count);
     }
 
     public static FluidStack copyWithAmount(FluidStack stack, int amount) {
@@ -202,9 +198,9 @@ public final class StackHelper {
         if (item2.isEmpty()) {
             return Optional.of(item1);
         }
-        if (ItemHandlerHelper.canItemStacksStack(item1, item2) &&
+        if (isSameItemSameComponents(item1, item2) &&
             item1.getCount() + item2.getCount() <= item1.getMaxStackSize()) {
-            return Optional.of(ItemHandlerHelper.copyStackWithSize(item1, item1.getCount() + item2.getCount()));
+            return Optional.of(copyWithCount(item1, item1.getCount() + item2.getCount()));
         }
         return Optional.empty();
     }

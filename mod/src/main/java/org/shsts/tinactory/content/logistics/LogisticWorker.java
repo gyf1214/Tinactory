@@ -91,13 +91,14 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
-        return $ -> $.capability(ID, be -> new LogisticWorker(be, properties));
+        return $ -> $.container(ID, be -> new LogisticWorker(be, properties));
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {
         var machine = MACHINE.get(blockEntity);
+        var provider = machine.world().registryAccess();
         return machine.config().getCompound(PREFIX + index)
-            .map(LogisticWorkerConfig::fromTag);
+            .map($ -> LogisticWorkerConfig.fromTag(provider, $));
     }
 
     private static Optional<IPort<?>> getPort(IMachine machine, LogisticComponent logistic,

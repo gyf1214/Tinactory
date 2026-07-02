@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
@@ -101,15 +102,15 @@ public class FusionRuntime extends ProcessingRuntime {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        var tag = super.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        var tag = super.serializeNBT(provider);
         tag.putDouble("startupEnergy", startupEnergy);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        super.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeNBT(provider, tag);
         startupEnergy = tag.getDouble("startupEnergy");
     }
 }

@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.common;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -37,8 +38,8 @@ public abstract class UpdatableCapabilityProvider extends CapabilityProvider
     }
 
     @Override
-    public abstract CompoundTag serializeOnUpdate();
+    public abstract CompoundTag serializeOnUpdate(HolderLookup.Provider provider);
 
     @Override
-    public abstract void deserializeOnUpdate(CompoundTag tag);
+    public abstract void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag);
 }

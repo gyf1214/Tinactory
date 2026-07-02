@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -153,12 +154,12 @@ public class MachineProcessor extends CapabilityProvider implements
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return runtime.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return runtime.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        runtime.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        runtime.deserializeNBT(provider, tag);
     }
 }

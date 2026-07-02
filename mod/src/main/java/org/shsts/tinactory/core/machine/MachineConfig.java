@@ -2,6 +2,7 @@ package org.shsts.tinactory.core.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.api.machine.IMachineConfig;
@@ -36,6 +37,11 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
+    public Optional<Tag> getTag(String key) {
+        return Optional.ofNullable(tag.get(key));
+    }
+
+    @Override
     public Optional<CompoundTag> getCompound(String key) {
         return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) :
             Optional.empty();
@@ -55,12 +61,12 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         return tag.copy();
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         this.tag = tag.copy();
     }
 }

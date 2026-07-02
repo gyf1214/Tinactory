@@ -23,7 +23,7 @@ public class MEStorageInterface extends MEStorageAccess {
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MEStorageInterface(be, power));
+        return $ -> $.container(ID, be -> new MEStorageInterface(be, power));
     }
 
     @Override

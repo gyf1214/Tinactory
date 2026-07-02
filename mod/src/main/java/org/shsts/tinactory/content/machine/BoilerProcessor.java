@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -62,7 +63,7 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(FireBoiler.Properties properties) {
-        return $ -> $.capability(ID, be -> new BoilerProcessor(be, properties));
+        return $ -> $.container(ID, be -> new BoilerProcessor(be, properties));
     }
 
     private void onLoad() {
@@ -89,12 +90,12 @@ public class BoilerProcessor extends CapabilityProvider implements IEventSubscri
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return boiler.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return boiler.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        boiler.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        boiler.deserializeNBT(provider, tag);
     }
 }

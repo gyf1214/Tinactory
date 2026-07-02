@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -49,16 +50,16 @@ public class Lithography extends Multiblock {
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
-        if (lensBlock != null && lensBlock.getRegistryName() != null) {
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
+        if (lensBlock != null) {
             tag.putString("lensBlock", lensBlock.getRegistryName().toString());
         }
         return tag;
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
         lensBlock = null;
         if (tag.contains("lensBlock", Tag.TAG_STRING)) {
             var loc = ResourceLocation.parse(tag.getString("lensBlock"));
@@ -67,6 +68,6 @@ public class Lithography extends Multiblock {
                 lensBlock = lensBlock1;
             }
         }
-        super.deserializeOnUpdate(tag);
+        super.deserializeOnUpdate(provider, tag);
     }
 }

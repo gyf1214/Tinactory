@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -107,13 +108,13 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         if (tank instanceof FluidTank fluidTank) {
             var tag = new CompoundTag();
-            fluidTank.writeToNBT(tag);
+            fluidTank.writeToNBT(provider, tag);
             return tag;
         } else if (tank instanceof INBTSerializable<?> serializable) {
-            return (CompoundTag) serializable.serializeNBT();
+            return (CompoundTag) serializable.serializeNBT(provider);
         } else {
             throw new IllegalCallerException();
         }
@@ -121,16 +122,16 @@ public class WrapperFluidTank extends PortNotifier implements IFluidTankModifiab
 
     @SuppressWarnings("unchecked")
     private static <T1 extends Tag, T2 extends Tag> void deserializeNBT(
-        INBTSerializable<T1> serializable, T2 tag) {
-        serializable.deserializeNBT((T1) tag);
+        INBTSerializable<T1> serializable, HolderLookup.Provider provider, T2 tag) {
+        serializable.deserializeNBT(provider, (T1) tag);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         if (tank instanceof FluidTank fluidTank) {
-            fluidTank.readFromNBT(tag);
+            fluidTank.readFromNBT(provider, tag);
         } else if (tank instanceof INBTSerializable<?> serializable) {
-            deserializeNBT(serializable, tag);
+            deserializeNBT(serializable, provider, tag);
         } else {
             throw new IllegalCallerException();
         }

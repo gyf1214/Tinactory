@@ -5,6 +5,7 @@ import com.google.common.collect.ListMultimap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -66,6 +67,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
     private static final int WIDTH = CONFIG_WIDTH + PANEL_WIDTH + PORT_WIDTH + 2 * MARGIN_X;
 
+    private final HolderLookup.Provider provider;
     private final int workerSlots;
     private final IMachineConfig machineConfig;
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -246,7 +248,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
             if (needUpdate) {
                 var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + index, config.serializeNBT());
+                    .set(PREFIX + index, config.serializeNBT(provider));
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             }
         }
@@ -334,7 +336,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     config.setTo(port.machineId(), port.portIndex());
                 }
                 var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + selectedConfig, config.serializeNBT());
+                    .set(PREFIX + selectedConfig, config.serializeNBT(provider));
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             });
         }
@@ -358,6 +360,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.contentHeight = menu.endY();
 
         var blockEntity = menu.blockEntity();
+        this.provider = menu.world().registryAccess();
         this.machineConfig = menu.machine.config();
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
@@ -414,7 +417,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private LogisticWorkerConfig getConfig(int slot) {
         return machineConfig.getCompound(PREFIX + slot)
-            .map(LogisticWorkerConfig::fromTag)
+            .map($ -> LogisticWorkerConfig.fromTag(provider, $))
             .orElseGet(LogisticWorkerConfig::new);
     }
 }

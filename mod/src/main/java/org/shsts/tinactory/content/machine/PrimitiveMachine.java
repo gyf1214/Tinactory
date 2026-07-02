@@ -2,7 +2,9 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -51,7 +53,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, PrimitiveMachine::new);
+        return builder.container(ID, PrimitiveMachine::new);
     }
 
     private void onServerTick(Level world) {
@@ -92,17 +94,22 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
         }
 
         @Override
+        public Optional<Tag> getTag(String key) {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<CompoundTag> getCompound(String key) {
             return Optional.empty();
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             return new CompoundTag();
         }
 
         @Override
-        public void deserializeNBT(CompoundTag tag) {}
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {}
     }
 
     private final EmptyMachineConfig machineConfig = new EmptyMachineConfig();

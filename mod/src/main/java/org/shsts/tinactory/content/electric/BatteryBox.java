@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.electric;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -62,7 +63,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new BatteryBox(be, layout));
+        return $ -> $.container(ID, be -> new BatteryBox(be, layout));
     }
 
     private boolean allowItem(ItemStack stack) {
@@ -188,12 +189,12 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(items);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, items);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(items, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, items, tag);
     }
 }

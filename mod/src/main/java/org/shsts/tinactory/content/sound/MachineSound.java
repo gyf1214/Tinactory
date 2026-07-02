@@ -36,7 +36,7 @@ public class MachineSound extends CapabilityProvider implements IEventSubscriber
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Supplier<SoundEvent> sound) {
-        return builder -> builder.capability(ID, be -> new MachineSound(be, sound));
+        return builder -> builder.container(ID, be -> new MachineSound(be, sound));
     }
 
     private void onClientTick(Level world) {

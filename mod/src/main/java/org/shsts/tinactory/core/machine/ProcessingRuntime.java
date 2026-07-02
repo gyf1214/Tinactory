@@ -7,6 +7,7 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -426,20 +427,20 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         if (currentRecipe != null) {
             tag.putString("currentRecipe", currentRecipe.loc().toString());
             tag.putInt("processorIndex", currentRecipe.index());
             tag.putLong("workProgress", workProgress);
-            tag.put("processorData", currentRecipe.processor().serializeNBT());
+            tag.put("processorData", currentRecipe.processor().serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
                 info -> encodeTag(processingInfoCodec, info)));
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
-            tag.put("processorData", processors.get(processorIndex).serializeNBT());
+            tag.put("processorData", processors.get(processorIndex).serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
                 info -> encodeTag(processingInfoCodec, info)));
         }
@@ -447,14 +448,14 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         currentRecipe = null;
         infoList.clear();
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
             currentRecipeLoc = ResourceLocation.parse(tag.getString("currentRecipe"));
             processorIndex = tag.getInt("processorIndex");
             workProgress = tag.getLong("workProgress");
-            processors.get(processorIndex).deserializeNBT(tag.getCompound("processorData"));
+            processors.get(processorIndex).deserializeNBT(provider, tag.getCompound("processorData"));
             // TODO: backward compatibility of old save data before ProcessingObject changes
             try {
                 parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),

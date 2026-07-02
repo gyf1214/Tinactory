@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -222,19 +223,19 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        var tag = super.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        var tag = super.serializeNBT(provider);
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
-        tag.put("burningItem", burningItem.serializeNBT());
+        tag.put("burningItem", burningItem.save(provider));
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        super.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeNBT(provider, tag);
         maxBurn = tag.getLong("maxBurn");
         currentBurn = tag.getLong("currentBurn");
-        burningItem = ItemStack.of(tag.getCompound("burningItem"));
+        burningItem = ItemStack.parseOptional(provider, tag.getCompound("burningItem"));
     }
 }

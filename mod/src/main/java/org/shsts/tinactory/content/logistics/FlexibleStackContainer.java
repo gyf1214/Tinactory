@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -99,7 +100,7 @@ public class FlexibleStackContainer extends CapabilityProvider
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, be -> new FlexibleStackContainer(be, 16, 8));
+        return builder.container(ID, be -> new FlexibleStackContainer(be, 16, 8));
     }
 
     private ContainerPort createItemPort(SlotType type, List<Layout.SlotInfo> slots) {
@@ -236,16 +237,16 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("stack", StackHelper.serializeItemHandler(internalItems));
-        tag.put("fluid", combinedFluids.serializeNBT());
+        tag.put("stack", StackHelper.serializeItemHandler(provider, internalItems));
+        tag.put("fluid", combinedFluids.serializeNBT(provider));
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
-        combinedFluids.deserializeNBT(tag.getCompound("fluid"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("stack"));
+        combinedFluids.deserializeNBT(provider, tag.getCompound("fluid"));
     }
 }

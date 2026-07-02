@@ -3,6 +3,7 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -29,6 +30,6 @@ public interface ISetMachineConfigPacket extends IPacket {
             return set(key, val.toString());
         }
 
-        Builder set(String key, CompoundTag tag);
+        Builder set(String key, Tag tag);
     }
 }

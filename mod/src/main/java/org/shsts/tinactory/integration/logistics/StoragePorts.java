@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -66,22 +67,22 @@ public final class StoragePorts {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
             var listTag = new ListTag();
             for (var stack : getAllStorages()) {
-                listTag.add(StackHelper.serializeItemStack(stack));
+                listTag.add(StackHelper.serializeItemStack(provider, stack));
             }
             tag.put("Items", listTag);
             return tag;
         }
 
         @Override
-        public void deserializeNBT(CompoundTag tag) {
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
             clear();
             var listTag = tag.getList("Items", Tag.TAG_COMPOUND);
             for (var itemTag : listTag) {
-                var stack = StackHelper.deserializeItemStack((CompoundTag) itemTag);
+                var stack = StackHelper.deserializeItemStack(provider, (CompoundTag) itemTag);
                 insert(stack, false);
             }
         }
@@ -94,22 +95,22 @@ public final class StoragePorts {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
             var listTag = new ListTag();
             for (var stack : getAllStorages()) {
-                listTag.add(StackHelper.serializeFluidStack(stack));
+                listTag.add(stack.save(provider));
             }
             tag.put("Fluids", listTag);
             return tag;
         }
 
         @Override
-        public void deserializeNBT(CompoundTag tag) {
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
             clear();
             var listTag = tag.getList("Fluids", Tag.TAG_COMPOUND);
             for (var fluidTag : listTag) {
-                var stack = FluidStack.loadFluidStackFromNBT((CompoundTag) fluidTag);
+                var stack = FluidStack.parseOptional(provider, (CompoundTag) fluidTag);
                 insert(stack, false);
             }
         }

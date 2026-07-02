@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
@@ -236,8 +237,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     @Override
-    @Override
-    public CompoundTag serializeOnUpdate() {
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         if (multiblockInterface != null) {
             var pos = multiblockInterface.blockEntity().getBlockPos();
@@ -247,7 +247,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
         multiblockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
             CodecHelper.parseBlockPos(tag.getCompound("interfacePos")) : null;
         if (firstTick) {
@@ -275,7 +275,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
             super(parent);
             this.factory = factory;
 
-            onCreateObject($ -> parent.capability(ID, $::apply));
+            onCreateObject($ -> parent.container(ID, $::apply));
         }
 
         public Builder<P> layout(Layout val) {

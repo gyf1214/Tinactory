@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -19,18 +18,18 @@ import java.util.UUID;
 public class MESignalControllerSyncPacket implements IPacket {
     public record SignalInfo(UUID machineId, Component machineName, ItemStack icon,
         String key, boolean isWrite) {
-        private static void serialize(FriendlyByteBuf buf, SignalInfo info) {
+        private static void serialize(RegistryFriendlyByteBuf buf, SignalInfo info) {
             buf.writeUUID(info.machineId);
-            buf.writeUtf(CodecHelper.encodeComponent(info.machineName));
-            StackHelper.serializeStackToBuf((RegistryFriendlyByteBuf) buf, info.icon);
+            CodecHelper.encodeComponentToBuf(buf, info.machineName);
+            StackHelper.serializeStackToBuf(buf, info.icon);
             buf.writeUtf(info.key);
             buf.writeBoolean(info.isWrite);
         }
 
-        public static SignalInfo deserialize(FriendlyByteBuf buf) {
+        public static SignalInfo deserialize(RegistryFriendlyByteBuf buf) {
             return new SignalInfo(buf.readUUID(),
-                CodecHelper.parseComponent(buf.readUtf()),
-                StackHelper.deserializeStackFromBuf((RegistryFriendlyByteBuf) buf),
+                CodecHelper.parseComponentFromBuf(buf),
+                StackHelper.deserializeStackFromBuf(buf),
                 buf.readUtf(), buf.readBoolean());
         }
     }

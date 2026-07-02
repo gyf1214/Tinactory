@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -154,7 +155,7 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new StackProcessingContainer(be, layout));
+        return $ -> $.container(ID, be -> new StackProcessingContainer(be, layout));
     }
 
     private void onUpdate() {
@@ -208,16 +209,16 @@ public class StackProcessingContainer extends CapabilityProvider
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("stack", StackHelper.serializeItemHandler(internalItems));
-        tag.put("fluid", combinedFluids.serializeNBT());
+        tag.put("stack", StackHelper.serializeItemHandler(provider, internalItems));
+        tag.put("fluid", combinedFluids.serializeNBT(provider));
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
-        combinedFluids.deserializeNBT(tag.getCompound("fluid"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("stack"));
+        combinedFluids.deserializeNBT(provider, tag.getCompound("fluid"));
     }
 }

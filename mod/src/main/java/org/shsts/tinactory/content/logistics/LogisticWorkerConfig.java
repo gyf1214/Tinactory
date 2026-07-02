@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -13,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -128,7 +128,7 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putBoolean("valid", valid);
         if (from != null) {
@@ -142,15 +142,15 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         if (tagFilter != null) {
             tag.putString("tagFilter", tagFilter.location().toString());
         } else if (!itemFilter.isEmpty()) {
-            tag.put("itemFilter", itemFilter.serializeNBT());
+            tag.put("itemFilter", itemFilter.save(provider));
         } else if (!fluidFilter.isEmpty()) {
-            tag.put("fluidFilter", StackHelper.serializeFluidStack(fluidFilter));
+            tag.put("fluidFilter", fluidFilter.save(provider));
         }
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         valid = tag.getBoolean("valid");
         if (tag.contains("fromMachine", Tag.TAG_INT_ARRAY) && tag.contains("fromPortIndex", Tag.TAG_INT)) {
             from = new LogisticComponent.PortKey(tag.getUUID("fromMachine"), tag.getInt("fromPortIndex"));
@@ -168,16 +168,16 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         if (tag.contains("tagFilter", Tag.TAG_STRING)) {
             tagFilter = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getString("tagFilter")));
         } else if (tag.contains("itemFilter", Tag.TAG_COMPOUND)) {
-            itemFilter = ItemStack.of(tag.getCompound("itemFilter"));
+            itemFilter = ItemStack.parseOptional(provider, tag.getCompound("itemFilter"));
         } else if (tag.contains("fluidFilter", Tag.TAG_COMPOUND)) {
-            fluidFilter = FluidStack.loadFluidStackFromNBT(tag.getCompound("fluidFilter"));
+            fluidFilter = FluidStack.parseOptional(provider, tag.getCompound("fluidFilter"));
         }
     }
 
-    public static LogisticWorkerConfig fromTag(CompoundTag tag) {
+    public static LogisticWorkerConfig fromTag(HolderLookup.Provider provider, CompoundTag tag) {
         var ret = new LogisticWorkerConfig();
         ret.valid = true;
-        ret.deserializeNBT(tag);
+        ret.deserializeNBT(provider, tag);
         return ret;
     }
 }

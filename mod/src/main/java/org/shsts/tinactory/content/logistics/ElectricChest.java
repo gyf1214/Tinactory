@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -113,7 +114,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
         Layout layout, int slotSize, double power) {
-        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, slotSize, power));
+        return $ -> $.container(ID, be -> new ElectricChest(be, layout, slotSize, power));
     }
 
     public ItemStack getStackInSlot(int slot) {
@@ -186,14 +187,14 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("items", StackHelper.serializeItemHandler(internalItems));
+        tag.put("items", StackHelper.serializeItemHandler(provider, internalItems));
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
             if (filters[i] != null) {
                 var tag2 = new CompoundTag();
-                filters[i].save(tag2);
+                filters[i].save(provider, tag2);
                 tag2.putInt("Slot", i);
                 tag1.add(tag2);
             }
@@ -203,14 +204,14 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("items"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("items"));
         var tag1 = tag.getList("filters", Tag.TAG_COMPOUND);
         Arrays.fill(filters, null);
         for (var tag2 : tag1) {
             var tag3 = (CompoundTag) tag2;
             var slot = tag3.getInt("Slot");
-            var item = ItemStack.of(tag3);
+            var item = ItemStack.parseOptional(provider, tag3);
             filters[slot] = item;
         }
     }

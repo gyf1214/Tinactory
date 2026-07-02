@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import com.google.gson.JsonObject;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -311,10 +312,10 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("boiler", boiler.serializeNBT());
-        tag.put("reactorItems", StackHelper.serializeItemHandler(reactorItems));
+        tag.put("boiler", boiler.serializeNBT(provider));
+        tag.put("reactorItems", StackHelper.serializeItemHandler(provider, reactorItems));
 
         var listTag = new ListTag();
         for (var cell : cells) {
@@ -328,9 +329,9 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        boiler.deserializeNBT(tag.getCompound("boiler"));
-        StackHelper.deserializeItemHandler(reactorItems, tag.getCompound("reactorItems"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        boiler.deserializeNBT(provider, tag.getCompound("boiler"));
+        StackHelper.deserializeItemHandler(provider, reactorItems, tag.getCompound("reactorItems"));
 
         var i = 0;
         for (var tag1 : tag.getList("cells", Tag.TAG_COMPOUND)) {
@@ -342,8 +343,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
         if (multiblockInterface != null) {
             tag.putInt("rows", rows);
             tag.putInt("columns", columns);
@@ -352,8 +353,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        super.deserializeOnUpdate(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeOnUpdate(provider, tag);
         if (tag.contains("rows", Tag.TAG_INT)) {
             rows = tag.getInt("rows");
             columns = tag.getInt("columns");

@@ -5,6 +5,7 @@ import com.google.common.collect.ListMultimap;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -78,9 +79,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Class<R> baseClass() {
-        return (Class<R>) recipeType.recipeClass();
+        return recipeType.recipeClass();
     }
 
     @Override
@@ -191,10 +191,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         setFilters(container, PortDirection.OUTPUT, filters);
     }
 
-    private Optional<IEntry<? extends ProcessingRecipe>> getTargetRecipe(ResourceLocation loc) {
-        return recipeManager().byLoc(markerType, loc)
-            .map($ -> (IEntry<? extends ProcessingRecipe>) $)
-            .or(() -> recipeManager().byLoc(recipeType, loc).map($ -> $));
+    private Optional<? extends IEntry<? extends ProcessingRecipe>> getTargetRecipe(ResourceLocation loc) {
+        var marker = recipeManager().byLoc(markerType, loc);
+        if (marker.isPresent()) {
+            return marker;
+        }
+        return recipeManager().byLoc(recipeType, loc);
     }
 
     @Override
@@ -234,7 +236,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager().getAllRecipesFor(recipeType).stream()
                     .filter($ -> $.get().matches(machine))
-                    .filter($ -> recipe.matches($))
+                    .filter(recipe::matches)
                     .findAny();
             }
         }
@@ -349,7 +351,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putInt("parallel", parallel);
         tag.putDouble("workFactor", workFactor);
@@ -361,7 +363,7 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         parallel = tag.getInt("parallel");
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");

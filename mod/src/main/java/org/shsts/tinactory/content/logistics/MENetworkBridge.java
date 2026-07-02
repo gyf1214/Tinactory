@@ -54,7 +54,7 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MENetworkBridge(be, power));
+        return $ -> $.container(ID, be -> new MENetworkBridge(be, power));
     }
 
     private void onUpdateLogistics(LogisticComponent logistics, BlockPos parentSubnet, BlockPos childSubnet) {
@@ -65,9 +65,8 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
 
-        var pos = blockEntity.getBlockPos();
-        var parentSubnet = network.getSubnet(pos, LOGISTICS_SUBNET.get());
-        var childSubnet = pos;
+        var childSubnet = blockEntity.getBlockPos();
+        var parentSubnet = network.getSubnet(childSubnet, LOGISTICS_SUBNET.get());
         if (parentSubnet.equals(childSubnet)) {
             return;
         }

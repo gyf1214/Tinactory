@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.autocraft;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -70,7 +71,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
-        return $ -> $.capability(ID, be -> new MECraftCpu(be, properties));
+        return $ -> $.container(ID, be -> new MECraftCpu(be, properties));
     }
 
     public CpuStatusEntry status() {
@@ -143,7 +144,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         var snapshot = service == null ? pendingSnapshot :
             service.serializeRunningSnapshot(snapshotCodec).orElse(null);
@@ -154,7 +155,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         if (tag.contains(SNAPSHOT_KEY, Tag.TAG_COMPOUND)) {
             pendingSnapshot = tag.getCompound(SNAPSHOT_KEY).copy();
         } else {

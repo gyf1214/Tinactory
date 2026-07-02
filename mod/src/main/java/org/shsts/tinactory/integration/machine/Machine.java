@@ -4,9 +4,12 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +31,7 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.UpdatableCapabilityProvider;
@@ -98,11 +102,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, Machine::new);
+        return builder.container(ID, Machine::new);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(boolean activeNetwork) {
-        return builder -> builder.capability(ID, be -> new Machine(be, activeNetwork));
+        return builder -> builder.container(ID, be -> new Machine(be, activeNetwork));
     }
 
     @Override
@@ -138,8 +142,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     private void setName(Component name) {
-        var jo = Component.Serializer.toJson(name);
-        setConfig(SetMachineConfigPacket.builder().set("name", jo).get());
+        var tag = CodecHelper.encodeTag(ComponentSerialization.CODEC, name);
+        setConfig(SetMachineConfigPacket.builder().set("name", tag).get());
     }
 
     /**
@@ -168,7 +172,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
             return;
         }
         var item = arg.stack();
-        if (item.hasCustomHoverName()) {
+        if (item.has(DataComponents.CUSTOM_NAME)) {
             setName(item.getHoverName());
         }
         if (arg.placer() instanceof Player player) {
@@ -180,12 +184,12 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var player = arg.player();
         // TODO: unfortunately client does not know whether the player can interact with this machine,
         //       so on client we simply pass.
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             return;
         }
 
         if (team == null) {
-            setPlayerTeam(player.level, player);
+            setPlayerTeam(player.level(), player);
         }
 
         if (!canPlayerInteract(player)) {
@@ -194,10 +198,10 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
 
         var item = player.getItemInHand(arg.hand());
-        if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
+        if (item.is(Items.NAME_TAG) && item.has(DataComponents.CUSTOM_NAME)) {
             setName(item.getHoverName());
             item.shrink(1);
-            result.set(InteractionResult.sidedSuccess(player.level.isClientSide));
+            result.set(InteractionResult.sidedSuccess(player.level().isClientSide));
             return;
         }
 
@@ -257,8 +261,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
-        return config.getString("name")
-            .map(Component.Serializer::fromJson)
+        return config.getTag("name")
+            .map($ -> CodecHelper.parseTag(ComponentSerialization.CODEC, $))
             .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 
@@ -386,9 +390,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("config", config.serializeNBT());
+        tag.put("config", config.serializeNBT(provider));
         tag.putUUID("uuid", uuid);
         if (team != null) {
             tag.putString("owner", team.getName());
@@ -399,21 +403,21 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         LOGGER.trace("{} deserializer machine NBT, tag={}", blockEntity, tag);
-        config.deserializeNBT(tag.getCompound("config"));
+        config.deserializeNBT(provider, tag.getCompound("config"));
         uuid = tag.getUUID("uuid");
         teamName = tag.contains("owner", Tag.TAG_STRING) ? tag.getString("owner") : null;
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        return serializeNBT();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        return serializeNBT(provider);
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        deserializeNBT(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        deserializeNBT(provider, tag);
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 

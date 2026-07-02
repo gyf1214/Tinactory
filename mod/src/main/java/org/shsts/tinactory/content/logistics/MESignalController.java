@@ -54,7 +54,7 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MESignalController(be, power));
+        return $ -> $.container(ID, be -> new MESignalController(be, power));
     }
 
     @Override

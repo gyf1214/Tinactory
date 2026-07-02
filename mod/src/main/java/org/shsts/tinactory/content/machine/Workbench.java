@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
@@ -49,17 +50,8 @@ public class Workbench extends CapabilityProvider implements
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "primitive/workbench_container";
 
-    private static class CraftingStack implements CraftingContainer {
-        private final IItemHandlerModifiable items;
-        private final int width;
-        private final int height;
-
-        public CraftingStack(IItemHandlerModifiable items, int width, int height) {
-            this.items = items;
-            this.width = width;
-            this.height = height;
-        }
-
+    private record CraftingStack(IItemHandlerModifiable items, int width, int height)
+        implements CraftingContainer {
         @Override
         public int getWidth() {
             return width;
@@ -197,7 +189,7 @@ public class Workbench extends CapabilityProvider implements
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, Workbench::new);
+        return builder.container(ID, Workbench::new);
     }
 
     private void onUpdate() {
@@ -322,13 +314,13 @@ public class Workbench extends CapabilityProvider implements
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(itemView);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, itemView);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(itemView, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, itemView, tag);
     }
 
     public static Optional<Workbench> tryGet(BlockEntity be) {

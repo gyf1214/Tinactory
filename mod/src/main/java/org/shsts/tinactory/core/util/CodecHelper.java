@@ -16,15 +16,15 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
 
 import java.io.Reader;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,7 +33,7 @@ import java.util.function.Function;
 public final class CodecHelper {
     public static final Gson GSON = new Gson();
     public static final Codec<PortDirection> PORT_DIRECTION_CODEC =
-        StringRepresentable.fromEnum(PortDirection::values, PortDirection::fromName);
+        StringRepresentable.fromEnum(PortDirection::values);
 
     public static JsonObject jsonFromStr(String s) {
         return GSON.fromJson(s, JsonObject.class);
@@ -48,19 +48,19 @@ public final class CodecHelper {
     }
 
     public static <P> P parseJson(Decoder<P> decoder, JsonElement je) {
-        return decoder.parse(JsonOps.INSTANCE, je).getOrThrow(false, $ -> {});
+        return decoder.parse(JsonOps.INSTANCE, je).getOrThrow();
     }
 
     public static <P> JsonElement encodeJson(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(JsonOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+        return encoder.encodeStart(JsonOps.INSTANCE, sth).getOrThrow();
     }
 
     public static <P> P parseTag(Decoder<P> decoder, Tag tag) {
-        return decoder.parse(NbtOps.INSTANCE, tag).getOrThrow(false, $ -> {});
+        return decoder.parse(NbtOps.INSTANCE, tag).getOrThrow();
     }
 
     public static <P> Tag encodeTag(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+        return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow();
     }
 
     public static CompoundTag readRequiredNbt(FriendlyByteBuf buf, String name) {
@@ -86,12 +86,12 @@ public final class CodecHelper {
         return new BlockPos(x, y, z);
     }
 
-    public static String encodeComponent(Component component) {
-        return Component.Serializer.toJson(component);
+    public static void encodeComponentToBuf(RegistryFriendlyByteBuf buf, Component component) {
+        ComponentSerialization.STREAM_CODEC.encode(buf, component);
     }
 
-    public static Component parseComponent(String json) {
-        return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json), Component.empty());
+    public static Component parseComponentFromBuf(RegistryFriendlyByteBuf buf) {
+        return ComponentSerialization.STREAM_CODEC.decode(buf);
     }
 
     public static <T> ListTag encodeList(List<T> list, Function<T, Tag> encoder) {

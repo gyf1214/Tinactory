@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -171,12 +172,12 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return boiler.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return boiler.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        boiler.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        boiler.deserializeNBT(provider, tag);
     }
 }

@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -75,7 +76,7 @@ public class MultiblockInterface extends Machine {
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, MultiblockInterface::new);
+        return builder.container(ID, MultiblockInterface::new);
     }
 
     /**
@@ -229,7 +230,7 @@ public class MultiblockInterface extends Machine {
         }
 
         var player = arg.player();
-        var world = player.level;
+        var world = player.level();
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
             multiblock.menu(this).open(serverPlayer, blockEntity.getBlockPos());
         }
@@ -319,8 +320,8 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
         if (multiblock != null) {
             var pos = multiblock.blockEntity.getBlockPos();
             tag.put("multiblockPos", CodecHelper.encodeBlockPos(pos));
@@ -329,8 +330,8 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        super.deserializeOnUpdate(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeOnUpdate(provider, tag);
 
         multiblockPos = tag.contains("multiblockPos", Tag.TAG_COMPOUND) ?
             CodecHelper.parseBlockPos(tag.getCompound("multiblockPos")) : null;
