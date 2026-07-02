@@ -113,9 +113,9 @@ public class JEI implements IModPlugin {
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
         registration.register(TechIngredient.TYPE, Collections.emptyList(),
-            TechIngredient.HELPER, IngredientRenderers.empty());
+            TechIngredient.HELPER, IngredientRenderers.empty(), TechIngredient.CODEC);
         registration.register(RecipeMarker.TYPE, Collections.emptyList(),
-            RecipeMarker.HELPER, IngredientRenderers.empty());
+            RecipeMarker.HELPER, IngredientRenderers.empty(), RecipeMarker.CODEC);
     }
 
     @Override

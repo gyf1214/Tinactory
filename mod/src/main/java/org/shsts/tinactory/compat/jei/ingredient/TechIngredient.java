@@ -1,5 +1,6 @@
 package org.shsts.tinactory.compat.jei.ingredient;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientType;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -33,4 +34,7 @@ public record TechIngredient(ResourceLocation loc) {
             return new TechIngredient(ingredient.loc);
         }
     };
+
+    public static final Codec<TechIngredient> CODEC =
+        ResourceLocation.CODEC.xmap(TechIngredient::new, TechIngredient::loc);
 }

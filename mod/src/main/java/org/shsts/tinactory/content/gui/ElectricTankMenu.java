@@ -7,6 +7,7 @@ import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import static net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
@@ -41,7 +42,7 @@ public class ElectricTankMenu extends ElectricStorageMenu {
             if (carried.isEmpty() && !filter.isEmpty()) {
                 tank.resetFilter(tankIndex);
                 return;
-            } else if (!fluidCarried.isEmpty() && !filter.isFluidEqual(fluidCarried)) {
+            } else if (!fluidCarried.isEmpty() && !isSameFluidSameComponents(filter, fluidCarried)) {
                 tank.setFilter(tankIndex, fluidCarried);
                 if (!filter.isEmpty() || !tank.isUnlocked()) {
                     return;

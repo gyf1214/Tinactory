@@ -44,7 +44,7 @@ public class MetricsManager {
 
     public static void reportFluid(String name, IMachine machine, FluidStack fluid) {
         if (!fluid.isEmpty()) {
-            report(name, List.of(ownerName(machine), fluid.getTranslationKey()), fluid.getAmount());
+            report(name, List.of(ownerName(machine), fluid.getDescriptionId()), fluid.getAmount());
         }
     }
 

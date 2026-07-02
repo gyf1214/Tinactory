@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -75,10 +76,10 @@ public final class TechManagers {
     }
 
     public static void loadSavedData(ServerLevel world) {
-        savedData = world.getDataStorage().computeIfAbsent(
-            tag -> TinactorySavedData.fromTag(tag, server()),
+        var factory = new SavedData.Factory<>(
             () -> new TinactorySavedData(server()),
-            SAVED_DATA_NAME);
+            (tag, provider) -> TinactorySavedData.fromTag(tag, provider, server()));
+        savedData = world.getDataStorage().computeIfAbsent(factory, SAVED_DATA_NAME);
     }
 
     public static void unloadSavedData() {

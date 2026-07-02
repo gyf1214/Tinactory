@@ -51,7 +51,7 @@ public final class TinactoryConfig {
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
-            .defineList("machine_resistance_factor", List.of(0d),
+            .defineList("machine_resistance_factor", List.of(0d), () -> 0d,
                 i -> ((Number) i).doubleValue() >= 0d);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
