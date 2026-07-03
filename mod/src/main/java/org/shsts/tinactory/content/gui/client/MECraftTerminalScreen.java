@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -57,7 +56,7 @@ public class MECraftTerminalScreen extends MenuScreen<MECraftTerminalMenu> {
         tab.select(0);
     }
 
-    public static TranslatableComponent tr(String key, Object... args) {
+    public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.autocraft." + key, args);
     }
 

@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
@@ -44,7 +43,7 @@ public class MEPatternTerminalScreen extends MenuScreen<MEPatternTerminalMenu> {
         menu.setRecipeDraftImporter(this::importRecipeDraft);
     }
 
-    public static TranslatableComponent tr(String key, Object... args) {
+    public static Component tr(String key, Object... args) {
         return I18n.tr("tinactory.gui.pattern." + key, args);
     }
 
