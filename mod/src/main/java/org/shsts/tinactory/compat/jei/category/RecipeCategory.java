@@ -161,6 +161,16 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         }
 
         @Override
+        public int getWidth() {
+            return background.getWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return background.getHeight();
+        }
+
+        @Override
         public void setRecipe(IRecipeLayoutBuilder builder, R recipe, IFocusGroup focuses) {
             var ingredientBuilder = new LayoutIngredientBuilder(builder, xOffset);
             RecipeCategory.this.setRecipe(recipe, ingredientBuilder);
