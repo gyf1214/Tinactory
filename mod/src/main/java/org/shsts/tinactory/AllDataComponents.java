@@ -7,7 +7,6 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
@@ -32,15 +31,15 @@ public final class AllDataComponents {
     public static final IEntry<DataComponentType<SimpleFluidContent>> FLUID_CELL_CONTENT =
         component("fluid_cell_content", SimpleFluidContent.CODEC, SimpleFluidContent.STREAM_CODEC);
     public static final IEntry<DataComponentType<DigitalCellData>> ME_ITEM_CELL_CONTENT =
-        component("me_item_cell_content", DIGITAL_CELL_CODEC, streamCodec(DIGITAL_CELL_CODEC));
+        component("me_item_cell_content", DIGITAL_CELL_CODEC);
     public static final IEntry<DataComponentType<DigitalCellData>> ME_FLUID_CELL_CONTENT =
-        component("me_fluid_cell_content", DIGITAL_CELL_CODEC, streamCodec(DIGITAL_CELL_CODEC));
+        component("me_fluid_cell_content", DIGITAL_CELL_CODEC);
     public static final IEntry<DataComponentType<PatternCellData>> ME_PATTERN_CELL_CONTENT =
-        component("me_pattern_cell_content", PATTERN_CELL_CODEC, streamCodec(PATTERN_CELL_CODEC));
+        component("me_pattern_cell_content", PATTERN_CELL_CODEC);
+    public static final IEntry<DataComponentType<Long>> BATTERY = component("battery", Codec.LONG);
 
     private static <T> IEntry<DataComponentType<T>> component(
-        String name,
-        Codec<T> codec,
+        String name, Codec<T> codec,
         StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
         return REGISTRATE.registryEntry(DATA_COMPONENT_TYPES, name, () -> DataComponentType.<T>builder()
             .persistent(codec)
@@ -48,8 +47,10 @@ public final class AllDataComponents {
             .build());
     }
 
-    private static <T> StreamCodec<RegistryFriendlyByteBuf, T> streamCodec(Codec<T> codec) {
-        return ByteBufCodecs.fromCodecWithRegistries(codec);
+    private static <T> IEntry<DataComponentType<T>> component(String name, Codec<T> codec) {
+        return REGISTRATE.registryEntry(DATA_COMPONENT_TYPES, name, () -> DataComponentType.<T>builder()
+            .persistent(codec)
+            .build());
     }
 
     public static void init() {}

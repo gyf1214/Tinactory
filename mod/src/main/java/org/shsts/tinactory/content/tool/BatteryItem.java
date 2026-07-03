@@ -1,6 +1,5 @@
 package org.shsts.tinactory.content.tool;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -11,7 +10,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.IItemRenderProperties;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
@@ -19,6 +17,7 @@ import org.shsts.tinactory.core.util.MathUtil;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.AllDataComponents.BATTERY;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
@@ -44,15 +43,12 @@ public class BatteryItem extends Item {
     }
 
     public long getPower(ItemStack stack) {
-        if (stack.getTag() == null) {
-            return 0L;
-        }
-        return MathUtil.clamp(stack.getTag().getLong("power"), 0, capacity);
+        return Math.clamp(stack.getOrDefault(BATTERY, 0L), 0L, capacity);
     }
 
     public void setPowerLevel(ItemStack stack, long value) {
-        var tag = stack.getOrCreateTag();
-        tag.putLong("power", value);
+        var val1 = Math.clamp(value, 0, capacity);
+        stack.set(BATTERY, val1);
     }
 
     public void charge(ItemStack stack, long delta) {
@@ -76,7 +72,7 @@ public class BatteryItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
         TooltipFlag isAdvanced) {
         addTooltip(tooltip, "battery", NUMBER_FORMAT.format(getPower(stack)),
             NUMBER_FORMAT.format(capacity), voltage.displayName());
