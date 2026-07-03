@@ -1,6 +1,6 @@
 {
   "type": "power",
-  "materialColor": 32,
+  "mapColor": 32,
   "items": {
     "hv": {
       "capacity": 3072000

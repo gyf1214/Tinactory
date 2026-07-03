@@ -12,10 +12,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
@@ -93,24 +93,16 @@ public class MiscMeta extends MetaConsumer {
         super("Misc");
     }
 
-    private static MaterialColor parseMaterialColor(JsonObject jo) {
+    private static MapColor parseMapColor(JsonObject jo) {
         // TODO: use string instead of integer
-        return MaterialColor.byId(GsonHelper.getAsInt(jo, "materialColor"));
+        return MapColor.byId(GsonHelper.getAsInt(jo, "mapColor"));
     }
 
     private IEntry<Block> casing(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var builder = REGISTRATE.block(id, Block::new)
+            .properties($ -> $.mapColor(mapColor))
             .properties(CASING_PROPERTY);
-        var renderType = GsonHelper.getAsString(jo, "renderType", "default");
-        switch (renderType) {
-            case "default":
-                break;
-            case "translucent":
-                break;
-            default:
-                throw new UnsupportedTypeException("renderType", renderType);
-        }
         return builder.register();
     }
 
@@ -125,8 +117,9 @@ public class MiscMeta extends MetaConsumer {
 
     private void coil(String name, String id, JsonObject jo) {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
+            .properties($ -> $.mapColor(mapColor))
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.put(name, block);
@@ -140,13 +133,13 @@ public class MiscMeta extends MetaConsumer {
     }
 
     private void glass(String id) {
-        REGISTRATE.block(id, GlassBlock::new)
+        REGISTRATE.block(id, TransparentBlock::new)
             .transform(MiscMeta::glass)
             .register();
     }
 
     private void lens(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var ja = GsonHelper.getAsJsonArray(jo, "materials");
         var lens = new ArrayList<Supplier<? extends Item>>();
         for (var je : ja) {
@@ -156,6 +149,7 @@ public class MiscMeta extends MetaConsumer {
         }
 
         REGISTRATE.block(id, LensBlock.factory(lens))
+            .properties($ -> $.mapColor(mapColor))
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -163,25 +157,27 @@ public class MiscMeta extends MetaConsumer {
     private void power(String name, String id, JsonObject jo) {
         var voltage = Voltage.fromName(GsonHelper.getAsString(jo, "voltage", name));
         var capacity = GsonHelper.getAsLong(jo, "capacity");
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
+            .properties($ -> $.mapColor(mapColor))
             .properties(CASING_PROPERTY)
             .register();
     }
 
     private void fixed(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, FixedBlock::new)
+            .properties($ -> $.mapColor(mapColor))
             .properties(CASING_PROPERTY)
             .register();
     }
 
     private void coalBlock(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var tint = parseColor(jo, "tint");
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
-            .properties($ -> $.requiresCorrectToolForDrops().strength(5f, 6f))
+            .properties($ -> $.mapColor(mapColor).requiresCorrectToolForDrops().strength(5f, 6f))
             .tint(tint)
             .blockItem((block, properties) -> new BlockItem(block, properties) {
                 @Override
@@ -243,15 +239,15 @@ public class MiscMeta extends MetaConsumer {
 
         var component = REGISTRATE.item(componentPrefix + "/" + name).register();
         var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
-            MEStorageCell.itemCell(bytes))
+                MEStorageCell.itemCell(bytes))
             .capability(ITEM_PORT_ITEM, BYTES_PROVIDER_ITEM)
             .register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
-            MEStorageCell.fluidCell(bytes))
+                MEStorageCell.fluidCell(bytes))
             .capability(FLUID_PORT_ITEM, BYTES_PROVIDER_ITEM)
             .register();
         var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
-            MEPatternCell.factory(bytes))
+                MEPatternCell.factory(bytes))
             .capability(PATTERN_CELL_ITEM)
             .register();
 

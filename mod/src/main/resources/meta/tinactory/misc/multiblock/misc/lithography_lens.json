@@ -2,7 +2,7 @@
   "type": "lens",
   "items": {
     "basic": {
-      "materialColor": 21,
+      "mapColor": 21,
       "materials": [
         "ruby",
         "diamond",
@@ -11,7 +11,7 @@
       ]
     },
     "good": {
-      "materialColor": 16,
+      "mapColor": 16,
       "materials": [
         "ruby",
         "diamond",
@@ -22,7 +22,7 @@
       ]
     },
     "advanced": {
-      "materialColor": 25,
+      "mapColor": 25,
       "materials": [
         "ruby",
         "diamond",
@@ -34,7 +34,7 @@
       ]
     },
     "nether": {
-      "materialColor": 9,
+      "mapColor": 9,
       "materials": [
         "ruby",
         "diamond",

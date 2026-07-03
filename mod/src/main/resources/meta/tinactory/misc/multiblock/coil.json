@@ -2,23 +2,23 @@
   "type": "coil",
   "items": {
     "cupronickel": {
-      "materialColor": 15,
+      "mapColor": 15,
       "temperature": 1800
     },
     "kanthal": {
-      "materialColor": 5,
+      "mapColor": 5,
       "temperature": 2700
     },
     "nichrome": {
-      "materialColor": 17,
+      "mapColor": 17,
       "temperature": 3600
     },
     "tungsten": {
-      "materialColor": 25,
+      "mapColor": 25,
       "temperature": 4500
     },
     "naquadah": {
-      "materialColor": 22,
+      "mapColor": 22,
       "temperature": 5400
     }
   }

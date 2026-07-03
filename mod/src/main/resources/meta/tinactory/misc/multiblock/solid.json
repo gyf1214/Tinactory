@@ -2,31 +2,31 @@
   "type": "solid",
   "items": {
     "heatproof": {
-      "materialColor": 27
+      "mapColor": 27
     },
     "solid_steel": {
-      "materialColor": 21
+      "mapColor": 21
     },
     "frost_proof": {
-      "materialColor": 25
+      "mapColor": 25
     },
     "clean_stainless_steel": {
-      "materialColor": 17
+      "mapColor": 17
     },
     "inert_ptfe": {
-      "materialColor": 29
+      "mapColor": 29
     },
     "stable_titanium": {
-      "materialColor": 16
+      "mapColor": 16
     },
     "robust_tungstensteel": {
-      "materialColor": 25
+      "mapColor": 25
     },
     "insulated_battery": {
-      "materialColor": 14
+      "mapColor": 14
     },
     "reinforced_alloy": {
-      "materialColor": 41
+      "mapColor": 41
     }
   }
 }
