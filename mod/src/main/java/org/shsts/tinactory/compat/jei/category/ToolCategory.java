@@ -13,6 +13,7 @@ import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
+import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,8 @@ public class ToolCategory extends RecipeCategory<ToolRecipe> {
         var shaped = recipe.shapedRecipe;
         var slots = layout.slots;
 
-        builder.itemOutput(slots.get(0).setType(SlotType.ITEM_OUTPUT), shaped.getResultItem());
+        builder.itemOutput(slots.getFirst().setType(SlotType.ITEM_OUTPUT),
+            shaped.getResultItem(ClientUtil.registryAccess()));
         for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 3; j++) {
                 var slot = slots.get(10 + i * 3 + j);

@@ -141,7 +141,7 @@ public class ElectricFurnace implements IRecipeProcessor<RecipeHolder<SmeltingRe
                 ret.add(new ProcessingRecipeBookItem(marker));
             }
             for (var recipe : recipes) {
-                ret.add(new SmeltingRecipeBookItem(recipe.value(), inputPort, outputPort));
+                ret.add(new SmeltingRecipeBookItem(recipe, inputPort, outputPort));
             }
             return ret;
         };

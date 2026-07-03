@@ -2,8 +2,6 @@ package org.shsts.tinactory.content.tool;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Camera;
@@ -13,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.tool.UsableToolItem;
 
@@ -23,17 +23,15 @@ public final class WrenchOutlineRenderer {
     private static final Vector4f COLOR = new Vector4f(0f, 0f, 0f, 0.4f);
 
     private static void renderLine(VertexConsumer vb, PoseStack.Pose pose, Vector3f pos1, Vector3f pos2) {
-        var norm = pos2.copy();
+        var norm = new Vector3f(pos2);
         norm.sub(pos1);
         norm.normalize();
-        vb.vertex(pose.pose(), pos1.x(), pos1.y(), pos1.z())
-            .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
-            .normal(pose.normal(), -norm.x(), -norm.y(), -norm.z())
-            .endVertex();
-        vb.vertex(pose.pose(), pos2.x(), pos2.y(), pos2.z())
-            .color(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
-            .normal(pose.normal(), norm.x(), norm.y(), norm.z())
-            .endVertex();
+        vb.addVertex(pose.pose(), pos1.x(), pos1.y(), pos1.z())
+            .setColor(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
+            .setNormal(pose, -norm.x(), -norm.y(), -norm.z());
+        vb.addVertex(pose.pose(), pos2.x(), pos2.y(), pos2.z())
+            .setColor(COLOR.x(), COLOR.y(), COLOR.z(), COLOR.w())
+            .setNormal(pose, norm.x(), norm.y(), norm.z());
     }
 
     private static void renderFaceOutline(VertexConsumer vb, PoseStack.Pose pose,

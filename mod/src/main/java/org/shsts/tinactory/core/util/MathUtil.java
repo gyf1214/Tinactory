@@ -1,12 +1,12 @@
 package org.shsts.tinactory.core.util;
 
 import com.mojang.math.MethodsReturnNonnullByDefault;
-import com.mojang.math.Vector3f;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -34,17 +34,17 @@ public final class MathUtil {
     }
 
     public static Vector3f mulVecf(Vector3f x, float k) {
-        x = x.copy();
-        x.mul(k);
-        return x;
+        var y = new Vector3f(x);
+        y.mul(k);
+        return y;
     }
 
     public static Vector3f addVecf(Vector3f x, Vector3f... other) {
-        x = x.copy();
+        var y = new Vector3f(x);
         for (var vec : other) {
-            x.add(vec);
+            y.add(vec);
         }
-        return x;
+        return y;
     }
 
     public static Vec3 blockCenter(BlockPos pos) {

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvent;
@@ -59,13 +60,24 @@ public final class ClientUtil {
         return player;
     }
 
+    private static Item.TooltipContext tooltipContext() {
+        return Item.TooltipContext.of(Minecraft.getInstance().level);
+    }
+
+    public static RegistryAccess registryAccess() {
+        var world = Minecraft.getInstance().level;
+        assert world != null;
+        return world.registryAccess();
+    }
+
     public static List<Component> itemTooltip(ItemStack stack) {
-        return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
-            TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        return stack.getTooltipLines(tooltipContext(), getPlayer(),
+            Minecraft.getInstance().options.advancedItemTooltips ?
+                TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
     }
 
     public static List<Component> itemTooltip(ItemStack stack, TooltipFlag tooltipFlag) {
-        return stack.getTooltipLines(getPlayer(), tooltipFlag);
+        return stack.getTooltipLines(tooltipContext(), getPlayer(), tooltipFlag);
     }
 
     public static List<Component> tagTooltip(TagKey<Item> tag) {
@@ -123,7 +135,7 @@ public final class ClientUtil {
     }
 
     public static MutableComponent fluidName(FluidStack stack) {
-        return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : (MutableComponent) stack.getDisplayName();
+        return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : stack.getHoverName().copy();
     }
 
     public static MutableComponent fluidAmount(int amount) {
@@ -136,8 +148,8 @@ public final class ClientUtil {
 
     public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
         var line1 = fluidName(stack);
-        return showAmount ? List.of(line1, fluidAmount(stack)
-                                           .withStyle(ChatFormatting.GRAY)) : List.of(line1);
+        return showAmount ? List.of(line1, fluidAmount(stack).withStyle(ChatFormatting.GRAY)) :
+            List.of(line1);
     }
 
     public static void addTooltip(List<Component> tooltip, MutableComponent line) {
