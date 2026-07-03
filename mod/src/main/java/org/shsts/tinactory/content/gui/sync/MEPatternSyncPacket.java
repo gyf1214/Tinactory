@@ -34,13 +34,14 @@ public class MEPatternSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(patterns, (buf1, pattern) -> buf1.writeNbt(CODEC.encodePattern(pattern)));
+        CodecHelper.encodeCollectionToBuf(buf, patterns, (buf1, pattern) ->
+            buf1.writeNbt(CODEC.encodePattern(pattern)));
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         patterns.clear();
-        patterns.addAll(buf.readList(buf1 ->
+        patterns.addAll(CodecHelper.parseListFromBuf(buf, buf1 ->
             CODEC.decodePattern(CodecHelper.readRequiredNbt(buf1, "pattern"))));
     }
 }

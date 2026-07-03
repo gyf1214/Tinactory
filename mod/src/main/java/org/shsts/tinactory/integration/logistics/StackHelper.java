@@ -10,6 +10,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
@@ -48,6 +50,9 @@ public final class StackHelper {
         StackHelper::keyCodecName,
         StackHelper::keyCodec
     );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
+        ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
 
     /**
      * Use this if the itemStack can have more than 99 items.

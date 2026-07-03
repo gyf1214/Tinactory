@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -69,13 +68,13 @@ public class MECraftCpuSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(entries, CpuInfo::serialize);
+        CodecHelper.encodeCollectionToBuf(buf, entries, CpuInfo::serialize);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         entries.clear();
-        entries.addAll(buf.readList(CpuInfo::deserialize));
+        entries.addAll(CodecHelper.parseListFromBuf(buf, CpuInfo::deserialize));
     }
 
     @Override
@@ -94,11 +93,11 @@ public class MECraftCpuSyncPacket implements IPacket {
         return Objects.hash(entries);
     }
 
-    private static void serializeStatus(FriendlyByteBuf buf, CpuStatusEntry entry) {
+    private static void serializeStatus(RegistryFriendlyByteBuf buf, CpuStatusEntry entry) {
         buf.writeUUID(entry.cpuId());
         buf.writeEnum(entry.state());
-        buf.writeCollection(entry.targets(), (buf1, amount) -> {
-            buf1.writeNbt(CodecHelper.encodeTag(StackHelper.KEY_CODEC, amount.key()));
+        CodecHelper.encodeCollectionToBuf(buf, entry.targets(), (buf1, amount) -> {
+            StackHelper.KEY_STREAM_CODEC.encode(buf1, amount.key());
             buf1.writeLong(amount.amount());
         });
         buf.writeInt(entry.completedSteps());
@@ -108,16 +107,13 @@ public class MECraftCpuSyncPacket implements IPacket {
         buf.writeLong(entry.memoryUsage());
     }
 
-    private static CpuStatusEntry deserializeStatus(FriendlyByteBuf buf) {
+    private static CpuStatusEntry deserializeStatus(RegistryFriendlyByteBuf buf) {
         return new CpuStatusEntry(
             buf.readUUID(),
             buf.readEnum(JobState.class),
-            buf.readList(buf1 -> {
-                var tag = CodecHelper.readRequiredNbt(buf1, "craft target key");
-                var key = CodecHelper.parseTag(StackHelper.KEY_CODEC, tag);
-                var amount = buf1.readLong();
-                return new CraftAmount(key, amount);
-            }),
+            CodecHelper.parseListFromBuf(buf, buf1 -> new CraftAmount(
+                StackHelper.KEY_STREAM_CODEC.decode(buf1),
+                buf1.readLong())),
             buf.readInt(),
             buf.readInt(),
             buf.readEnum(ExecutionError.class),

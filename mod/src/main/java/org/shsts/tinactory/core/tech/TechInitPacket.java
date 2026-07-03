@@ -7,7 +7,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 @ParametersAreNonnullByDefault
@@ -41,11 +40,11 @@ public class TechInitPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(techs, TechInitPacket::techToBuf);
+        CodecHelper.encodeCollectionToBuf(buf, techs, TechInitPacket::techToBuf);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        techs = buf.readCollection(ArrayList::new, TechInitPacket::techFromBuf);
+        techs = CodecHelper.parseListFromBuf(buf, TechInitPacket::techFromBuf);
     }
 }

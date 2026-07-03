@@ -87,7 +87,7 @@ public class MECraftPreviewSyncPacket implements IPacket {
         buf.writeEnum(state);
         buf.writeLong(memoryUsage);
         buf.writeNbt(error == null ? null : serializeError(error));
-        buf.writeCollection(summary.entries().entrySet(), (buf1, entry) -> {
+        CodecHelper.encodeCollectionToBuf(buf, summary.entries().entrySet(), (buf1, entry) -> {
             buf1.writeNbt(encodeIngredientKey(entry.getKey()));
             buf1.writeLong(entry.getValue().existingAmount());
             buf1.writeLong(entry.getValue().consumedFromInventory());
@@ -101,13 +101,11 @@ public class MECraftPreviewSyncPacket implements IPacket {
         memoryUsage = buf.readLong();
         error = deserializeError(buf.readNbt());
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
-        for (var entry : buf.readList(buf1 -> {
+        buf.readWithCount(buf1 -> {
             var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "summary key"));
             var summaryEntry = new PlanSummary.Entry(buf1.readLong(), buf1.readLong(), buf1.readLong());
-            return new SummaryEntry(key, summaryEntry);
-        })) {
-            entries.put(entry.key(), entry.entry());
-        }
+            entries.put(key, summaryEntry);
+        });
         summary = new PlanSummary(entries);
     }
 
@@ -137,8 +135,6 @@ public class MECraftPreviewSyncPacket implements IPacket {
     private static IStackKey decodeIngredientKey(CompoundTag tag) {
         return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
     }
-
-    private record SummaryEntry(IStackKey key, PlanSummary.Entry entry) {}
 
     public enum PreviewState {
         EMPTY,

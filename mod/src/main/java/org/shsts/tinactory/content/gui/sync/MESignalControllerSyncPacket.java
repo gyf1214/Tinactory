@@ -50,11 +50,11 @@ public class MESignalControllerSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(visibleSignals, SignalInfo::serialize);
+        CodecHelper.encodeCollectionToBuf(buf, visibleSignals, SignalInfo::serialize);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        visibleSignals.addAll(buf.readList(SignalInfo::deserialize));
+        visibleSignals.addAll(CodecHelper.parseListFromBuf(buf, SignalInfo::deserialize));
     }
 }

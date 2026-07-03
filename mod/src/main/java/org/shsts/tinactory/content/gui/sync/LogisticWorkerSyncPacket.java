@@ -56,11 +56,11 @@ public class LogisticWorkerSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeCollection(visiblePorts, PortInfo::serialize);
+        CodecHelper.encodeCollectionToBuf(buf, visiblePorts, PortInfo::serialize);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        visiblePorts.addAll(buf.readList(PortInfo::deserialize));
+        visiblePorts.addAll(CodecHelper.parseListFromBuf(buf, PortInfo::deserialize));
     }
 }

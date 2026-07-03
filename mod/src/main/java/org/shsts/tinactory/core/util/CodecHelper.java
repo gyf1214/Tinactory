@@ -19,11 +19,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.StreamDecoder;
+import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
 
 import java.io.Reader;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -112,5 +115,15 @@ public final class CodecHelper {
             ret[i++] = x;
         }
         return ret;
+    }
+
+    public static <T> void encodeCollectionToBuf(RegistryFriendlyByteBuf buf,
+        Collection<T> collection, StreamEncoder<RegistryFriendlyByteBuf, T> encoder) {
+        buf.writeCollection(collection, (buf1, sth) -> encoder.encode((RegistryFriendlyByteBuf) buf1, sth));
+    }
+
+    public static <T> List<T> parseListFromBuf(RegistryFriendlyByteBuf buf,
+        StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
+        return buf.readList(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
     }
 }
