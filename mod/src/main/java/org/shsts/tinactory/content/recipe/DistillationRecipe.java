@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.recipe;
 import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -13,7 +14,6 @@ import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
@@ -42,14 +42,14 @@ public class DistillationRecipe extends DisplayInputRecipe {
 
     @Override
     protected boolean matchOutputs(IMachine machine, IContainer container,
-        int parallel, Random random) {
+        int parallel, RandomSource random) {
         var slots = getSlots(machine);
         return outputs.stream().limit(slots)
             .allMatch(output -> canInsertOutput(container, output, parallel, random));
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         var container = machine.container().orElseThrow();
         var slots = Math.min(outputs.size(), getSlots(machine));
@@ -57,5 +57,4 @@ public class DistillationRecipe extends DisplayInputRecipe {
             insertOutput(container, outputs.get(i), parallel, random, false).ifPresent(callback);
         }
     }
-
 }

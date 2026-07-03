@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
@@ -17,7 +18,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -46,7 +46,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
         emptyRecipe = random.nextDouble() <= emptyRate;
 
         if (emptyRecipe || size == 1) {
-            return Optional.of(matches.get(0));
+            return Optional.of(matches.getFirst());
         }
 
         var rates = matches.stream().mapToDouble(r -> r.get().rate).toArray();
@@ -106,7 +106,7 @@ public class OreAnalyzer extends ProcessingMachine<OreAnalyzerRecipe> {
     }
 
     @Override
-    public void onWorkDone(OreAnalyzerRecipe recipe, IMachine machine, Random random,
+    public void onWorkDone(IEntry<OreAnalyzerRecipe> recipe, IMachine machine, RandomSource random,
         Consumer<IProcessingResult> callback) {
         if (!emptyRecipe) {
             super.onWorkDone(recipe, machine, random, callback);

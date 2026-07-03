@@ -9,6 +9,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<R> {
+public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<IEntry<R>> {
     public static final long PROGRESS_PER_TICK = 256;
 
     protected final IRecipeType<R> recipeType;
@@ -79,13 +79,13 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public Class<R> baseClass() {
-        return recipeType.recipeClass();
+    public Optional<IEntry<R>> byLoc(ResourceLocation loc) {
+        return recipeManager().byLoc(recipeType, loc);
     }
 
     @Override
-    public Optional<IEntry<R>> byLoc(ResourceLocation loc) {
-        return recipeManager().byLoc(recipeType, loc);
+    public ResourceLocation toLoc(IEntry<R> recipe) {
+        return recipe.loc();
     }
 
     protected Stream<IEntry<MarkerRecipe>> markers(IMachine machine) {
@@ -283,16 +283,17 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback) {
-        parallel = calculateParallel(recipe, machine, maxParallel);
-        recipe.consumeInputs(machine.container().orElseThrow(), parallel, callback);
-        addOutputInfo(recipe, parallel, callback);
-        calculateFactors(recipe, machine, parallel);
+    public void onWorkBegin(IEntry<R> recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback) {
+        var recipe1 = recipe.get();
+        parallel = calculateParallel(recipe1, machine, maxParallel);
+        recipe1.consumeInputs(machine.container().orElseThrow(), parallel, callback);
+        addOutputInfo(recipe1, parallel, callback);
+        calculateFactors(recipe1, machine, parallel);
         filterRecipeLoc = filterRecipe == null ? null : filterRecipe.loc();
     }
 
     @Override
-    public void onWorkContinue(R recipe, IMachine machine) {
+    public void onWorkContinue(IEntry<R> recipe, IMachine machine) {
         if (filterRecipeLoc != null) {
             filterRecipe = getTargetRecipe(filterRecipeLoc).map(IEntry::get).orElse(null);
             if (filterRecipe == null) {
@@ -304,25 +305,26 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public long onWorkProgress(R recipe, double partial) {
+    public long onWorkProgress(IEntry<R> recipe, double partial) {
         return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
     }
 
     @Override
-    public void onWorkDone(R recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback) {
+    public void onWorkDone(IEntry<R> recipe, IMachine machine, RandomSource random,
+        Consumer<IProcessingResult> callback) {
         machine.container().ifPresent(container -> {
             if (filterRecipe != null) {
                 setOutputFilters(filterRecipe, container);
             }
         });
-        recipe.insertOutputs(machine, parallel, random, callback);
+        recipe.get().insertOutputs(machine, parallel, random, callback);
         filterRecipe = null;
         filterRecipeLoc = null;
     }
 
     @Override
-    public long maxWorkProgress(R recipe) {
-        return recipe.workTicks * PROGRESS_PER_TICK;
+    public long maxWorkProgress(IEntry<R> recipe) {
+        return recipe.get().workTicks * PROGRESS_PER_TICK;
     }
 
     @Override
@@ -336,18 +338,18 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public ElectricMachineType electricMachineType(R recipe) {
+    public ElectricMachineType electricMachineType(IEntry<R> recipe) {
         return ElectricMachineType.CONSUMER;
     }
 
     @Override
-    public double powerGen(R recipe) {
+    public double powerGen(IEntry<R> recipe) {
         return 0;
     }
 
     @Override
-    public double powerCons(R recipe) {
-        return energyFactor * recipe.power;
+    public double powerCons(IEntry<R> recipe) {
+        return energyFactor * recipe.get().power;
     }
 
     @Override

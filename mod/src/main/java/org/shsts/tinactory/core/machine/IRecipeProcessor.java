@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -11,11 +12,9 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
@@ -23,9 +22,9 @@ import java.util.function.Consumer;
 public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     ResourceLocation recipeTypeId();
 
-    Class<T> baseClass();
+    Optional<T> byLoc(ResourceLocation loc);
 
-    Optional<IEntry<T>> byLoc(ResourceLocation loc);
+    ResourceLocation toLoc(T recipe);
 
     DistLazy<List<IRecipeBookItem>> recipeBookItems(IMachine machine);
 
@@ -33,14 +32,14 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
 
     void setTargetRecipe(ResourceLocation loc, IMachine machine);
 
-    Optional<IEntry<T>> newRecipe(IMachine machine);
+    Optional<T> newRecipe(IMachine machine);
 
     /**
      * Call this when there's a target recipe.
      */
-    Optional<IEntry<T>> newRecipe(IMachine machine, ResourceLocation target);
+    Optional<T> newRecipe(IMachine machine, ResourceLocation target);
 
-    default Optional<IEntry<T>> newRecipe(IMachine machine, Optional<ResourceLocation> target) {
+    default Optional<T> newRecipe(IMachine machine, Optional<ResourceLocation> target) {
         return target.map($ -> newRecipe(machine, $))
             .orElseGet(() -> newRecipe(machine));
     }
@@ -57,7 +56,7 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     /**
      * Result is for returning actual result.
      */
-    void onWorkDone(T recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback);
+    void onWorkDone(T recipe, IMachine machine, RandomSource random, Consumer<IProcessingResult> callback);
 
     long maxWorkProgress(T recipe);
 

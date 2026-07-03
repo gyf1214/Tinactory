@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
@@ -16,7 +17,6 @@ import org.shsts.tinactory.core.util.MathUtil;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
@@ -64,7 +64,7 @@ public class StackResult<T> implements IProcessingResult, IProcessingDisplay {
     }
 
     @Override
-    public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, Random random, boolean simulate) {
+    public Optional<IProcessingResult> insertPort(IPort<?> port, int parallel, RandomSource random, boolean simulate) {
         if (port.type() != type) {
             return Optional.empty();
         }

@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
@@ -85,17 +85,17 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     protected Optional<IProcessingResult> insertOutput(IContainer container, Output output, int parallel,
-        Random random, boolean simulate) {
+        RandomSource random, boolean simulate) {
         var port = container.getPort(output.port, ContainerAccess.INTERNAL);
         return output.result.insertPort(port, parallel, random, simulate);
     }
 
-    protected boolean canInsertOutput(IContainer container, Output output, int parallel, Random random) {
+    protected boolean canInsertOutput(IContainer container, Output output, int parallel, RandomSource random) {
         return insertOutput(container, output, parallel, random, true).isPresent();
     }
 
     protected boolean canInsertOutput(IContainer container, Output output, int parallel,
-        Random random, Map<Integer, Integer> outputSlots) {
+        RandomSource random, Map<Integer, Integer> outputSlots) {
         var port = container.getPort(output.port, ContainerAccess.INTERNAL);
         var limit = port instanceof ILimitedPort limitedPort ?
             limitedPort.getPortLimit() : Integer.MAX_VALUE;
@@ -112,7 +112,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     }
 
     protected boolean matchOutputs(IMachine machine, IContainer container,
-        int parallel, Random random) {
+        int parallel, RandomSource random) {
         var outputSlots = new HashMap<Integer, Integer>();
         return outputs.stream().allMatch(output ->
             canInsertOutput(container, output, parallel, random, outputSlots));
@@ -154,12 +154,12 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         }
     }
 
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         machine.container().ifPresent(container -> insertOutputs(container, parallel, random, callback));
     }
 
-    public void insertOutputs(IContainer container, int parallel, Random random,
+    public void insertOutputs(IContainer container, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         for (var output : outputs) {
             insertOutput(container, output, parallel, random, false).ifPresent(callback);
@@ -229,5 +229,4 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             Codec.LONG.fieldOf("power").forGetter($ -> $.power)
         ).apply(instance, factory::create));
     }
-
 }

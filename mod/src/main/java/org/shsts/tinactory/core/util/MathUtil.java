@@ -5,9 +5,8 @@ import com.mojang.math.Vector3f;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Random;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -61,7 +60,7 @@ public final class MathUtil {
         return a > EPS ? Math.pow(a, b) : 0d;
     }
 
-    private static int directBinomial(int n, double p, Random random) {
+    private static int directBinomial(int n, double p, RandomSource random) {
         var ret = 0;
         for (var i = 0; i < n; i++) {
             if (random.nextDouble() <= p) {
@@ -74,7 +73,7 @@ public final class MathUtil {
     /**
      * Sample from Poisson(lambda)
      */
-    private static int samplePoisson(double lambda, Random random) {
+    private static int samplePoisson(double lambda, RandomSource random) {
         var l = Math.exp(-lambda);
         var p = random.nextDouble();
         var k = 0;
@@ -88,7 +87,7 @@ public final class MathUtil {
     /**
      * Sample from Binomial(n, p).
      */
-    public static int sampleBinomial(int n, double p, Random random) {
+    public static int sampleBinomial(int n, double p, RandomSource random) {
         // if n is small, sample directly
         if (n < 32) {
             return directBinomial(n, p, random);
@@ -111,7 +110,8 @@ public final class MathUtil {
         if (n * p >= 10 && n * (1 - p) >= 10) {
             var mean = n * p;
             var std = Math.sqrt(n * p * (1 - p));
-            var ret = clamp(Math.round(random.nextGaussian(mean, std)), 0, n);
+            var r = random.nextGaussian() * std + mean;
+            var ret = clamp(Math.round(r), 0, n);
             return (int) ret;
         }
 

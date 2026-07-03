@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
@@ -15,7 +16,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
@@ -40,7 +40,7 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    protected boolean matchOutputs(IMachine machine, IContainer container, int parallel, Random random) {
+    protected boolean matchOutputs(IMachine machine, IContainer container, int parallel, RandomSource random) {
         var progress1 = parallel <= 1 ? 1 : progress * parallel;
         return machine.owner()
             .filter($ -> $.canResearch(target, progress1))
@@ -48,7 +48,7 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         machine.owner()
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));

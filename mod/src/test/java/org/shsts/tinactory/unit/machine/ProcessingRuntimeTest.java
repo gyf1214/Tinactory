@@ -419,11 +419,6 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Class<ResourceLocation> baseClass() {
-            return ResourceLocation.class;
-        }
-
-        @Override
         public Optional<IEntry<ResourceLocation>> byLoc(ResourceLocation loc) {
             return recipe.filter(loc::equals).map($ -> new TestEntry<>($, $));
         }

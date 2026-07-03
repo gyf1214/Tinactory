@@ -11,6 +11,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -22,7 +23,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -72,56 +71,52 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     private boolean needUpdate = true;
     private long workProgress = 0L;
 
-    private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, IEntry<T> entry) {
-        private T recipe() {
-            return entry.get();
-        }
-
+    private record ProcessorRecipe<T>(int index, IRecipeProcessor<T> processor, T recipe) {
         public void onWorkBegin(IMachine machine, int maxParallel, List<ProcessingInfo> infoList,
             BiConsumer<PortDirection, IProcessingObject> onReportObject) {
             infoList.clear();
-            processor.onWorkBegin(recipe(), machine, maxParallel, info -> {
+            processor.onWorkBegin(recipe, machine, maxParallel, info -> {
                 infoList.add(info);
                 onReportObject.accept(PortDirection.INPUT, info.object());
             });
         }
 
         public void onWorkContinue(IMachine machine) {
-            processor.onWorkContinue(recipe(), machine);
+            processor.onWorkContinue(recipe, machine);
         }
 
         public long onWorkProcess(double partial) {
-            return processor.onWorkProgress(recipe(), partial);
+            return processor.onWorkProgress(recipe, partial);
         }
 
-        public void onWorkDone(IMachine machine, Random random,
+        public void onWorkDone(IMachine machine, RandomSource random,
             BiConsumer<PortDirection, IProcessingObject> onReportObject) {
-            processor.onWorkDone(recipe(), machine, random,
+            processor.onWorkDone(recipe, machine, random,
                 result -> onReportObject.accept(PortDirection.OUTPUT, result));
         }
 
         public long maxProgress() {
-            return processor.maxWorkProgress(recipe());
+            return processor.maxWorkProgress(recipe);
         }
 
         public long maxProgressTicks() {
-            return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe())));
+            return Math.max(1, processor.workTicksFromProgress(processor.maxWorkProgress(recipe)));
         }
 
         public ResourceLocation loc() {
-            return entry.loc();
+            return processor.toLoc(recipe);
         }
 
         public ElectricMachineType machineType() {
-            return processor.electricMachineType(recipe());
+            return processor.electricMachineType(recipe);
         }
 
         public double powerGen() {
-            return processor.powerGen(recipe());
+            return processor.powerGen(recipe);
         }
 
         public double powerCons() {
-            return processor.powerCons(recipe());
+            return processor.powerCons(recipe);
         }
     }
 
@@ -237,7 +232,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         }
         var recipe = processor.newRecipe(machine, target);
         clearFilters(PortDirection.OUTPUT);
-        if (recipe.filter($ -> gateRecipe(processor, machine, $.get())).isPresent()) {
+        if (recipe.filter($ -> gateRecipe(processor, machine, $)).isPresent()) {
             currentRecipe = new ProcessorRecipe<>(index, processor, recipe.get());
             return true;
         }
