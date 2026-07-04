@@ -1,13 +1,11 @@
 package org.shsts.tinactory.content.electric;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -42,8 +40,8 @@ public final class Circuits {
         var voltage = getVoltage(tier, level);
         var item = REGISTRATE.item("circuit/" + id, (properties) -> (Item) new Item(properties) {
             @Override
-            public void appendHoverText(ItemStack stack, @Nullable Level world,
-                List<Component> tooltip, TooltipFlag isAdvanced) {
+            public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+                TooltipFlag flag) {
                 addTooltip(tooltip, "circuit", voltage.displayName());
             }
         }).register();

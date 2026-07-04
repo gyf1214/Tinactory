@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.shsts.tinycorelib.api.item.ICapabilityItem;
 import org.shsts.tinycorelib.api.registrate.entry.IItemCapability;
 
@@ -34,11 +33,8 @@ public class MEPatternCell extends Item implements ICapabilityItem {
     }
 
     @Override
-    public void appendHoverText(
-        ItemStack stack,
-        @Nullable Level world,
-        List<Component> tooltip,
-        TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         PATTERN_CELL_ITEM.tryGet(stack).ifPresent(cell -> {
             addTooltip(tooltip, "mePatternCell",
                 NUMBER_FORMAT.format(cell.patterns().size()));

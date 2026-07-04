@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
@@ -62,9 +61,9 @@ public class CellItem extends Item implements ICapabilityItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack item, @Nullable Level world,
-        List<Component> tooltip, TooltipFlag flag) {
-        var fluid = getFluid(item);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
+        var fluid = getFluid(stack);
         addTooltip(tooltip, fluidName(fluid));
         addTooltip(tooltip, "fluidCell", fluidAmount(fluid), fluidAmount(capacity));
     }

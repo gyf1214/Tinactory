@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -150,27 +151,24 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         return shouldRenderOverlay(ctx) ? Shapes.block() : getRealShape(state);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
         return getRealShape(state);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext ctx) {
         return getRenderShape(state, ctx);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter world, BlockPos pos) {
         return getRealShape(state);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-        List<Component> tooltip, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         addTooltip(tooltip, "cable.1", NUMBER_FORMAT.format(voltage.value), voltage.displayName());
         addTooltip(tooltip, "cable.2", DOUBLE_FORMAT.format(resistance));
     }
@@ -266,7 +264,6 @@ public class CableBlock extends Block implements IWrenchable, IConnector, IElect
         });
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public BlockState updateShape(BlockState state, Direction dir, BlockState state1,
         LevelAccessor levelAccessor, BlockPos pos, BlockPos pos1) {

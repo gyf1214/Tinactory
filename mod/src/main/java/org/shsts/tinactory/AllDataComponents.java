@@ -37,6 +37,8 @@ public final class AllDataComponents {
     public static final IEntry<DataComponentType<PatternCellData>> ME_PATTERN_CELL_CONTENT =
         component("me_pattern_cell_content", PATTERN_CELL_CODEC);
     public static final IEntry<DataComponentType<Long>> BATTERY = component("battery", Codec.LONG);
+    public static final IEntry<DataComponentType<Long>> REACTIONS = component("reaction", Codec.LONG);
+    public static final IEntry<DataComponentType<Boolean>> HIDE_BAR = component("hide_bar", Codec.BOOL);
 
     private static <T> IEntry<DataComponentType<T>> component(
         String name, Codec<T> codec,

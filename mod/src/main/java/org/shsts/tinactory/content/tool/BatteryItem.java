@@ -2,20 +2,15 @@ package org.shsts.tinactory.content.tool;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraftforge.client.IItemRenderProperties;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.shsts.tinactory.AllDataComponents.BATTERY;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -34,12 +29,6 @@ public class BatteryItem extends Item {
         super(properties.stacksTo(1));
         this.voltage = voltage;
         this.capacity = capacity;
-    }
-
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        ItemProperties.register(this, ITEM_PROPERTY, (stack, $1, $2, $3) ->
-            (float) getPower(stack) / capacity);
     }
 
     public long getPower(ItemStack stack) {
@@ -73,19 +62,8 @@ public class BatteryItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
-        TooltipFlag isAdvanced) {
+        TooltipFlag flag) {
         addTooltip(tooltip, "battery", NUMBER_FORMAT.format(getPower(stack)),
             NUMBER_FORMAT.format(capacity), voltage.displayName());
-    }
-
-    @Override
-    public void fillItemCategory(CreativeModeTab category, NonNullList<ItemStack> list) {
-        if (!allowdedIn(category)) {
-            return;
-        }
-        list.add(new ItemStack(this));
-        var stack1 = new ItemStack(this);
-        setPowerLevel(stack1, capacity);
-        list.add(stack1);
     }
 }
