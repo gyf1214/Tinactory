@@ -10,6 +10,7 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 import static net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
@@ -25,9 +26,9 @@ public class ElectricTankMenu extends ElectricStorageMenu {
         this.fluidHandler = MENU_FLUID_HANDLER.get(blockEntity());
 
         for (var slot : layout.slots) {
-            addSyncSlot(FLUID_SYNC + slot.index(), () ->
+            addSyncSlot(FLUID_SYNC + slot.index(), FLUID_STACK_SYNC, () ->
                 new FluidSyncPacket(fluidHandler.getFluidInTank(slot.index())));
-            addSyncSlot(FILTER_SYNC + slot.index(), () ->
+            addSyncSlot(FILTER_SYNC + slot.index(), FLUID_STACK_SYNC, () ->
                 new FluidSyncPacket(tank.getFilter(slot.index())));
         }
 

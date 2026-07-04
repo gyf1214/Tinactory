@@ -20,6 +20,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SYNC;
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
 import static org.shsts.tinactory.integration.gui.LayoutMenu.FLUID_SYNC;
@@ -37,7 +38,7 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         }
 
         private FluidStack getFilterFluid() {
-            return menu.getSyncPacket(filterName, FluidSyncPacket.class)
+            return menu.getSyncPacket(filterName, FLUID_STACK_SYNC)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         }
 

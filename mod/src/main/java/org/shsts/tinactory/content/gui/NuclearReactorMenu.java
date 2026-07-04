@@ -7,6 +7,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.NuclearReactor;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -40,7 +41,7 @@ public class NuclearReactorMenu extends MachineMenu {
             }
         }
 
-        menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(nuclearReactor.heatProgress()));
+        menu.addSyncSlot(HEAT_SYNC, DOUBLE_SYNC, () -> doublePacket(nuclearReactor.heatProgress()));
     }
 
     public static class DigitalInterface extends DigitalInterfaceMenu {

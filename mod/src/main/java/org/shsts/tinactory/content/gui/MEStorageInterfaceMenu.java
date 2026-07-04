@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SLOT;
+import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SYNC;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -48,7 +49,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         this.machineConfig = machine.config();
         this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
 
-        var scheduler = new ActiveScheduler<>(() -> new MEStorageInterfaceSyncPacket(
+        var scheduler = new ActiveScheduler<>(ME_STORAGE_INTERFACE_SYNC, () -> new MEStorageInterfaceSyncPacket(
             storageInterface.getAllItems(), storageInterface.getAllFluids()));
         this.updateListener = scheduler::invokeUpdate;
 

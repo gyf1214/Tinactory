@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.sound;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,7 +19,7 @@ public class MachineSoundInstance extends AbstractTickableSoundInstance {
     private final BlockEntity blockEntity;
 
     public MachineSoundInstance(BlockEntity blockEntity, SoundEvent sound) {
-        super(sound, SoundSource.BLOCKS);
+        super(sound, SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
         this.blockEntity = blockEntity;
         var pos = blockEntity.getBlockPos();
         this.looping = true;

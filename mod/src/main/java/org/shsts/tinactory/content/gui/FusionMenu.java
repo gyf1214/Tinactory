@@ -6,6 +6,7 @@ import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.multiblock.FusionRuntime;
 import org.shsts.tinactory.core.util.MathUtil;
 
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
 
 @ParametersAreNonnullByDefault
@@ -28,7 +29,7 @@ public class FusionMenu extends MachineMenu {
     }
 
     public static void addProgressSlots(MachineMenu menu) {
-        menu.addSyncSlot(ENERGY_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
+        menu.addSyncSlot(ENERGY_SYNC, DOUBLE_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
             .map(FusionMenu::getStartupEnergy)
             .orElse(0d)));
     }

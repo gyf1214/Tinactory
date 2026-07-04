@@ -11,6 +11,8 @@ import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
+
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -38,7 +40,7 @@ public class ProgressBar extends MenuWidget {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, SyncPackets.DoublePacket.class)
+        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, DOUBLE_SYNC)
             .map(SyncPackets.DoublePacket::getData).orElse(0d), 0d, 1d);
         var rect = requireRect();
         var h = rect.height();

@@ -2,6 +2,7 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -159,9 +160,9 @@ public class TechMenu extends MenuBase {
         if (item.is(Items.NAME_TAG)) {
             renameResult = item.copy();
             if (StringUtils.isBlank(name)) {
-                renameResult.resetHoverName();
+                renameResult.remove(DataComponents.CUSTOM_NAME);
             } else {
-                renameResult.setHoverName(Component.literal(name));
+                renameResult.set(DataComponents.CUSTOM_NAME, Component.literal(name));
             }
         } else {
             renameResult = ItemStack.EMPTY;
@@ -173,7 +174,7 @@ public class TechMenu extends MenuBase {
             return;
         }
         var item = renameItem.getStackInSlot(0);
-        var name = item.hasCustomHoverName() ? item.getHoverName().getString() : "";
+        var name = item.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty()).getString();
         refreshName(name, true);
     }
 

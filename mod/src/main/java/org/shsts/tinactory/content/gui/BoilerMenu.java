@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.content.machine.IBoiler;
 
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
 
 @ParametersAreNonnullByDefault
@@ -24,10 +25,10 @@ public class BoilerMenu extends MachineMenu {
     }
 
     public static void addProgressSlots(MachineMenu menu) {
-        menu.addSyncSlot(BURN_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
+        menu.addSyncSlot(BURN_SYNC, DOUBLE_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
             .map(BoilerMenu::getBurn)
             .orElse(0d)));
-        menu.addSyncSlot(HEAT_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
+        menu.addSyncSlot(HEAT_SYNC, DOUBLE_SYNC, () -> doublePacket(getProcessor(menu.blockEntity())
             .map($ -> ((IBoiler) $).heatProgress())
             .orElse(0d)));
     }

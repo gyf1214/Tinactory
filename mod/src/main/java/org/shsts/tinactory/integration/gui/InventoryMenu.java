@@ -17,6 +17,7 @@ import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinycorelib.api.network.IPacketType;
 import org.slf4j.Logger;
 
 import java.util.function.Supplier;
@@ -67,8 +68,8 @@ public class InventoryMenu extends MenuBase {
     }
 
     @Override
-    public <P extends IPacket> void addSyncSlot(String name, Supplier<P> factory) {
-        super.addSyncSlot(name, factory);
+    public <P extends IPacket> void addSyncSlot(String name, IPacketType<P> type, Supplier<P> factory) {
+        super.addSyncSlot(name, type, factory);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class InventoryMenu extends MenuBase {
             var stack1 = slot.safeTake(stack.getCount(), Integer.MAX_VALUE, player);
             ItemHandlerHelper.insertItemStacked(inv, stack1, false);
 
-            return ItemStack.isSame(oldStack, slot.getItem());
+            return ItemStack.isSameItemSameComponents(oldStack, slot.getItem());
         } else {
             var invIndex = slot.getContainerSlot();
             var oldStack = inv.getStackInSlot(invIndex).copy();
@@ -126,7 +127,7 @@ public class InventoryMenu extends MenuBase {
                 var reminder = targetSlot.safeInsert(stack);
                 if (reminder.getCount() < amount) {
                     inv.extractItem(invIndex, amount - reminder.getCount(), false);
-                    return ItemStack.isSame(oldStack, slot.getItem());
+                    return ItemStack.isSameItemSameComponents(oldStack, slot.getItem());
                 }
             }
             return false;

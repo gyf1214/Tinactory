@@ -18,6 +18,7 @@ import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 
@@ -71,7 +72,8 @@ public class DigitalInterfaceMenu extends MachineMenu {
     }
 
     private void addFluidSlot(int slot, int port, int index) {
-        addSyncSlot(FLUID_SYNC + slot, () -> new FluidSyncPacket(getInfoFluid(port, index)));
+        addSyncSlot(FLUID_SYNC + slot, FLUID_STACK_SYNC,
+            () -> new FluidSyncPacket(getInfoFluid(port, index)));
     }
 
     @Override

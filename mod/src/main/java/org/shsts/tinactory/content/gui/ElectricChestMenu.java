@@ -13,6 +13,7 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllMenus.CHEST_ITEM_SYNC;
 import static org.shsts.tinactory.AllMenus.ITEM_SLOT_CLICK;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -109,7 +110,7 @@ public class ElectricChestMenu extends ElectricStorageMenu {
 
         var size = layout.slots.size() / 2;
         for (var i = 0; i < size; i++) {
-            var syncSlot = addSyncSlot(itemSyncPacket(i));
+            var syncSlot = addSyncSlot(CHEST_ITEM_SYNC, itemSyncPacket(i));
             onSyncPacket(syncSlot, onItemSync(i));
         }
         for (var i = 0; i < size * 2; i++) {

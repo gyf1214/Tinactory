@@ -23,6 +23,8 @@ import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
+import static org.shsts.tinactory.AllMenus.ME_PATTERN_SYNC;
+import static org.shsts.tinactory.AllMenus.UNIT_SYNC;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
@@ -44,9 +46,10 @@ public class MEPatternTerminalMenu extends InventoryMenu {
         this.machine = MACHINE.get(blockEntity());
         var terminal = getContainer(blockEntity(), MEPatternTerminal.ID, MEPatternTerminal.class);
         this.repository = world.isClientSide ? null : terminal.patternRepository();
-        this.resultScheduler = new ActiveScheduler<>(() -> SyncPackets.UnitPacket.INSTANCE);
+        this.resultScheduler = new ActiveScheduler<>(UNIT_SYNC, () -> SyncPackets.UnitPacket.INSTANCE);
 
-        addSyncSlot(PATTERN_SYNC, new RevisionScheduler<>(this::patternRevision, this::patternPacket));
+        addSyncSlot(PATTERN_SYNC, new RevisionScheduler<>(ME_PATTERN_SYNC, this::patternRevision,
+            this::patternPacket));
         addSyncSlot(PATTERN_RESULT_SYNC, resultScheduler);
         onEventPacket(ME_PATTERN_ACTION, this::onAction);
     }

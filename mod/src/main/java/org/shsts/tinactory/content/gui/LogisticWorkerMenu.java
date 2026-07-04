@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -18,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.LOGISTIC_WORKER_SYNC;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
@@ -32,7 +34,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
 
     public static final Comparator<IMachine> MACHINE_COMPARATOR =
         Comparator.<IMachine>comparingLong($ -> $.electric().map(IElectricMachine::getVoltage).orElse(0L))
-            .thenComparing($ -> $.blockEntity().getBlockState().getBlock().getRegistryName())
+            .thenComparing($ -> BuiltInRegistries.BLOCK.getKey($.blockEntity().getBlockState().getBlock()))
             .thenComparing($ -> $.title().getString());
 
     public final IMachine machine;
@@ -43,7 +45,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
     public LogisticWorkerMenu(Properties properties) {
         super(properties, MARGIN_X + CONFIG_WIDTH, Menu.PANEL_HEIGHT);
 
-        var scheduler = new ActiveScheduler<>(() ->
+        var scheduler = new ActiveScheduler<>(LOGISTIC_WORKER_SYNC, () ->
             new LogisticWorkerSyncPacket(getVisiblePorts()));
         this.onUpdatePorts = scheduler::invokeUpdate;
         addSyncSlot(SLOT_SYNC, scheduler);

@@ -72,8 +72,7 @@ public final class RenderUtil {
         graphics.setColor(1f, 1f, 1f, 1f);
     }
 
-    public static void blitAtlas(GuiGraphics graphics, ResourceLocation atlas, TextureAtlasSprite sprite,
-        int color, Rect dstRect) {
+    public static void blitAtlas(GuiGraphics graphics, TextureAtlasSprite sprite, int color, Rect dstRect) {
         setColor(graphics, color);
         graphics.blit(dstRect.x(), dstRect.y(), dstRect.width(), dstRect.height(), 0, sprite);
         graphics.setColor(1f, 1f, 1f, 1f);
@@ -108,7 +107,7 @@ public final class RenderUtil {
             var extension = IClientFluidTypeExtensions.of(fluid);
             var sprite = atlas.apply(extension.getStillTexture(stack));
             var renderColor = mixColor(extension.getTintColor(stack), color);
-            blitAtlas(graphics, InventoryMenu.BLOCK_ATLAS, sprite, renderColor, rect);
+            blitAtlas(graphics, sprite, renderColor, rect);
         }
     }
 
@@ -166,15 +165,15 @@ public final class RenderUtil {
         var blockColors = Minecraft.getInstance().getBlockColors();
         var pose = poseStack.last();
 
-        // we don't consider cull
+        // we don't consider cull, model data, or render type
         for (var dir : Direction.values()) {
-            var quads = model.getQuads(blockState, dir, random);
+            var quads = model.getQuads(blockState, dir, random, ModelData.EMPTY, RenderType.translucent());
             for (var quad : quads) {
                 renderBlockQuad(quad, blockColors, blockState, pose, vertexConsumer,
                     packedLight, packedOverlay);
             }
         }
-        for (var quad : model.getQuads(blockState, null, random)) {
+        for (var quad : model.getQuads(blockState, null, random, ModelData.EMPTY, RenderType.translucent())) {
             renderBlockQuad(quad, blockColors, blockState, pose, vertexConsumer,
                 packedLight, packedOverlay);
         }
@@ -201,51 +200,29 @@ public final class RenderUtil {
     }
 
     public static void renderDescriptor(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
-        if (descriptor instanceof EmptyRenderDescriptor) {
-            return;
-        }
-        if (descriptor instanceof TextureRenderDescriptor texture) {
-            blit(graphics, texture.texture(), rect);
-            return;
-        }
-        if (descriptor instanceof ItemIdRenderDescriptor itemId) {
-            BuiltInRegistries.ITEM.getOptional(itemId.itemId())
+        switch (descriptor) {
+            case EmptyRenderDescriptor ignored -> {}
+            case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
+            case ItemIdRenderDescriptor(ResourceLocation id) -> BuiltInRegistries.ITEM.getOptional(id)
                 .ifPresent(item -> renderItem(graphics, new ItemStack(item), rect.x(), rect.y()));
-            return;
+            case ItemRenderDescriptor(ItemStack stack) -> renderItem(graphics, stack, rect.x(), rect.y());
+            case FluidRenderDescriptor(FluidStack stack) -> renderFluid(graphics, stack, rect.x(), rect.y());
+            default -> throw new IllegalArgumentException(
+                "Unsupported render descriptor: " + descriptor.getClass().getName());
         }
-        if (descriptor instanceof ItemRenderDescriptor item) {
-            renderItem(graphics, item.stack(), rect.x(), rect.y());
-            return;
-        }
-        if (descriptor instanceof FluidRenderDescriptor fluid) {
-            renderFluid(graphics, fluid.stack(), rect.x(), rect.y());
-            return;
-        }
-        throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
     public static void renderGhostDescriptor(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
-        if (descriptor instanceof EmptyRenderDescriptor) {
-            return;
-        }
-        if (descriptor instanceof TextureRenderDescriptor texture) {
-            blit(graphics, texture.texture(), rect);
-            return;
-        }
-        if (descriptor instanceof ItemIdRenderDescriptor itemId) {
-            BuiltInRegistries.ITEM.getOptional(itemId.itemId())
+        switch (descriptor) {
+            case EmptyRenderDescriptor ignored -> {}
+            case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
+            case ItemIdRenderDescriptor(ResourceLocation id) -> BuiltInRegistries.ITEM.getOptional(id)
                 .ifPresent(item -> renderGhostItem(graphics, new ItemStack(item), rect.x(), rect.y()));
-            return;
+            case ItemRenderDescriptor(ItemStack stack) -> renderGhostItem(graphics, stack, rect.x(), rect.y());
+            case FluidRenderDescriptor(FluidStack stack) -> renderGhostFluid(graphics, stack, rect);
+            default -> throw new IllegalArgumentException(
+                "Unsupported render descriptor: " + descriptor.getClass().getName());
         }
-        if (descriptor instanceof ItemRenderDescriptor item) {
-            renderGhostItem(graphics, item.stack(), rect.x(), rect.y());
-            return;
-        }
-        if (descriptor instanceof FluidRenderDescriptor fluid) {
-            renderGhostFluid(graphics, fluid.stack(), rect);
-            return;
-        }
-        throw new IllegalArgumentException("Unsupported render descriptor: " + descriptor.getClass().getName());
     }
 
     public static void fill(GuiGraphics graphics, Rect rect, int color) {

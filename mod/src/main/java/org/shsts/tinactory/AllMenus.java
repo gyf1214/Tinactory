@@ -67,7 +67,7 @@ public final class AllMenus {
     public static final IPacketType<SyncPackets.DoublePacket> DOUBLE_SYNC;
     public static final IPacketType<SyncPackets.LongPacket> LONG_SYNC;
     public static final IPacketType<SyncPackets.UnitPacket> UNIT_SYNC;
-    public static final IPacketType<FluidSyncPacket> FLUID_SYNC;
+    public static final IPacketType<FluidSyncPacket> FLUID_STACK_SYNC;
     public static final IPacketType<ChestItemSyncPacket> CHEST_ITEM_SYNC;
     public static final IPacketType<LogisticWorkerSyncPacket> LOGISTIC_WORKER_SYNC;
     public static final IPacketType<MEStorageInterfaceSyncPacket> ME_STORAGE_INTERFACE_SYNC;
@@ -117,7 +117,7 @@ public final class AllMenus {
         DOUBLE_SYNC = REGISTRATE.menuSyncPacket("sync/double", SyncPackets.DoublePacket::new);
         LONG_SYNC = REGISTRATE.menuSyncPacket("sync/long", SyncPackets.LongPacket::new);
         UNIT_SYNC = REGISTRATE.menuSyncPacket("sync/unit", () -> SyncPackets.UnitPacket.INSTANCE);
-        FLUID_SYNC = REGISTRATE.menuSyncPacket("sync/fluid", FluidSyncPacket::new);
+        FLUID_STACK_SYNC = REGISTRATE.menuSyncPacket("sync/fluid", FluidSyncPacket::new);
         CHEST_ITEM_SYNC = REGISTRATE.menuSyncPacket("sync/chest_item", ChestItemSyncPacket::new);
         LOGISTIC_WORKER_SYNC = REGISTRATE.menuSyncPacket("sync/logistic_worker", LogisticWorkerSyncPacket::new);
         ME_STORAGE_INTERFACE_SYNC = REGISTRATE.menuSyncPacket("sync/me_storage_interface",
