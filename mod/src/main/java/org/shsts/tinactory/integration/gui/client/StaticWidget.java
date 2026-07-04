@@ -21,6 +21,6 @@ public class StaticWidget extends MenuWidget {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.blit(graphics, texture, requireRect());
+        RenderUtil.blit(graphics, texture, rect());
     }
 }

@@ -51,13 +51,13 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect());
 
             var registries = MEStorageDetectorScreen.this.menu.world().registryAccess();
             var targetItem = MEStorageDetector.targetItem(registries, config);
             var targetFluid = MEStorageDetector.targetFluid(registries, config);
 
-            var rect1 = rect.offset(1, 1).enlarge(-2, -2);
+            var rect1 = rect().offset(1, 1).enlarge(-2, -2);
             if (!targetItem.isEmpty()) {
                 RenderUtil.renderItem(graphics, targetItem, rect1.x(), rect1.y());
             } else if (!targetFluid.isEmpty()) {

@@ -79,7 +79,7 @@ public class FluidSlot extends MenuWidget {
     }
 
     protected void renderSlot(GuiGraphics graphics, int mouseX, int mouseY) {
-        var rect = requireRect();
+        var rect = rect();
         RenderUtil.renderFluidWithDecoration(graphics, getFluidStack(), rect);
         if (isHovered(mouseX, mouseY)) {
             RenderUtil.renderSlotHover(graphics, rect);

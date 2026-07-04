@@ -43,7 +43,7 @@ public abstract class SwitchButton extends Button {
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         var texRect = getValue() ? enableTexY : disableTexY;
-        RenderUtil.blit(graphics, texture, rect, 0, texRect);
+        RenderUtil.blit(graphics, texture, rect(), 0, texRect);
     }
 
     @Override

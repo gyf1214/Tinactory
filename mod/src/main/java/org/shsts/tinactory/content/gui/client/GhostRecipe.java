@@ -41,8 +41,8 @@ public class GhostRecipe extends MenuWidget {
             if (slotType == SlotType.NONE) {
                 continue;
             }
-            var x = slot.x() + rect.x() + 1;
-            var y = slot.y() + rect.y() + 1;
+            var x = slot.x() + rect().x() + 1;
+            var y = slot.y() + rect().y() + 1;
             renderIngredient(graphics, ingredient.val(), x, y);
         }
     }

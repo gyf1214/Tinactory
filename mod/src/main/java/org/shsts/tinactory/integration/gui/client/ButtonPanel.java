@@ -27,25 +27,25 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return buttonTooltip(itemIndex(), mouseX - rect.x(), mouseY - rect.y());
+            return buttonTooltip(itemIndex(), mouseX - rect().x(), mouseY - rect().y());
         }
 
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            var rect = requireRect();
+            var rect = rect();
             renderButton(graphics, mouseX - rect.x(), mouseY - rect.y(), partialTick,
                 rect, itemIndex(), isHovered(mouseX, mouseY));
         }
 
         @Override
         protected boolean canClick(int button, double mouseX, double mouseY) {
-            return canClickButton(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
+            return canClickButton(itemIndex(), mouseX - rect().x(), mouseY - rect().y(), button);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             playButtonSound();
-            onSelect(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
+            onSelect(itemIndex(), mouseX - rect().x(), mouseY - rect().y(), button);
         }
 
         public int itemIndex() {

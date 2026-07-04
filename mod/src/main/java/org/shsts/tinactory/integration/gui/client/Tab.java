@@ -46,7 +46,7 @@ public class Tab extends Panel {
 
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            var rect = requireRect();
+            var rect = rect();
             var tx = index == 0 ? 0 : BUTTON_WIDTH;
             var ty = index == currentTab ? BUTTON_HEIGHT : 0;
             RenderUtil.blit(graphics, BUTTON_TEX, rect, tx, ty);

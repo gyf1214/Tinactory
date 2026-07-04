@@ -42,7 +42,7 @@ public class ProgressBar extends MenuWidget {
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         var progress = MathUtil.clamp(menu.getSyncPacket(syncName, DOUBLE_SYNC)
             .map(SyncPackets.DoublePacket::getData).orElse(0d), 0d, 1d);
-        var rect = requireRect();
+        var rect = rect();
         var h = rect.height();
 
         if (direction == Direction.HORIZONTAL) {

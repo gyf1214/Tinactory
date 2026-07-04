@@ -62,7 +62,7 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
             var fluid = getFluidStack();
             var filter = getFilterFluid();
             if (fluid.isEmpty() && !filter.isEmpty()) {
-                RenderUtil.renderGhostFluid(graphics, filter, rect);
+                RenderUtil.renderGhostFluid(graphics, filter, rect());
             }
             super.renderSlot(graphics, mouseX, mouseY);
         }

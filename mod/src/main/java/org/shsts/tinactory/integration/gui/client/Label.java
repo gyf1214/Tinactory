@@ -128,7 +128,7 @@ public class Label extends MenuWidget {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        var rect = requireRect();
+        var rect = rect();
         int x = rect.inX(horizontalAlign.value) - (int) (cacheWidth * horizontalAlign.value);
         int y = rect.inY(verticalAlign.value) - (int) (cacheHeight * verticalAlign.value);
         if (formattedLines.isEmpty()) {

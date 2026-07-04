@@ -46,9 +46,9 @@ public class StoragePriorityButton extends Button {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.blit(graphics, Texture.SWITCH_BUTTON, rect);
+        RenderUtil.blit(graphics, Texture.SWITCH_BUTTON, rect());
         var x = (getValue() + 1) * SLOT_SIZE;
-        RenderUtil.blit(graphics, Texture.PRIORITY_OVERLAY, rect, x, 0);
+        RenderUtil.blit(graphics, Texture.PRIORITY_OVERLAY, rect(), x, 0);
     }
 
     @Override

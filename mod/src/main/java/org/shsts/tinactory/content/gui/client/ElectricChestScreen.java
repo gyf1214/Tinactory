@@ -48,13 +48,13 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
             var stack = getStack();
             if (stack.isEmpty()) {
                 getFilter().ifPresent(stack1 ->
-                    RenderUtil.renderGhostItem(graphics, stack1, rect.x(), rect.y()));
+                    RenderUtil.renderGhostItem(graphics, stack1, rect().x(), rect().y()));
             } else {
-                RenderUtil.renderItemWithDecoration(graphics, stack, rect.x(), rect.y());
+                RenderUtil.renderItemWithDecoration(graphics, stack, rect().x(), rect().y());
             }
 
             if (isHovered(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(graphics, rect);
+                RenderUtil.renderSlotHover(graphics, rect());
             }
         }
 

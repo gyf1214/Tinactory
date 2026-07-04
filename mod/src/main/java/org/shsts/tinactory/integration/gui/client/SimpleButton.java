@@ -36,7 +36,7 @@ public abstract class SimpleButton extends Button {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        var rect = requireRect();
+        var rect = rect();
         if (isHovered(mouseX, mouseY)) {
             RenderUtil.blit(graphics, texture, rect, hoverX, hoverY);
         } else {

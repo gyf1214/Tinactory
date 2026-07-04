@@ -26,7 +26,7 @@ public class StretchImage extends MenuWidget {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        render(graphics, texture, requireRect(), texRect, border);
+        render(graphics, texture, rect(), texRect, border);
     }
 
     public static void render(GuiGraphics graphics, Texture texture, Rect rect, Rect texRect, int border) {

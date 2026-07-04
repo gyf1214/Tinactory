@@ -40,7 +40,7 @@ public class VanillaButton extends Button {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        var rect = requireRect();
+        var rect = rect();
         int y;
         y = disabled ? 66 - BUTTON_HEIGHT : (isHovered(mouseX, mouseY) ? 66 + BUTTON_HEIGHT : 66);
         var w = rect.width() / 2;

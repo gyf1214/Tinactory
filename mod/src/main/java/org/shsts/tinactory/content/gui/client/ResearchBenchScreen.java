@@ -37,7 +37,7 @@ public class ResearchBenchScreen extends MachineScreen {
             if (tech == null) {
                 return;
             }
-            TechPanel.renderTechButton(graphics, rect, team.get(), tech, false);
+            TechPanel.renderTechButton(graphics, rect(), team.get(), tech, false);
         }
 
         @Override
@@ -56,7 +56,7 @@ public class ResearchBenchScreen extends MachineScreen {
 
     public ResearchBenchScreen(ProcessingMenu menu, Component title) {
         super(menu, title);
-        var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
+        var rect = layout.images.getFirst().rect().offset(layout.getXOffset(), 0);
         rootPanel.addChild(rect, new TechButton(menu));
     }
 

@@ -16,14 +16,12 @@ import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventListener, NarratableEntry {
-
     protected final MenuBase menu;
     @Nullable
     protected Rect rect;
@@ -47,9 +45,9 @@ public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventLi
         }
     }
 
-    protected Rect requireRect() {
-        assert rect != null : "Widget rect must be assigned before geometry reads";
-        return Objects.requireNonNull(rect, "Widget rect must be assigned before geometry reads");
+    protected Rect rect() {
+        assert rect != null;
+        return rect;
     }
 
     public boolean isActive() {
@@ -61,7 +59,7 @@ public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventLi
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (active) {
-            requireRect();
+            rect();
             doRender(graphics, mouseX, mouseY, partialTick);
         }
     }
@@ -73,17 +71,17 @@ public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventLi
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return active && canHover() && requireRect().in(mouseX, mouseY);
+        return active && canHover() && rect().in(mouseX, mouseY);
     }
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return active && requireRect().in(mouseX, mouseY);
+        return active && rect().in(mouseX, mouseY);
     }
 
     @Override
     public ScreenRectangle getRectangle() {
-        var rect = requireRect();
+        var rect = rect();
         return new ScreenRectangle(rect.x(), rect.y(), rect.width(), rect.height());
     }
 
@@ -123,7 +121,7 @@ public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventLi
     }
 
     protected boolean isClicking(double mouseX, double mouseY, int button) {
-        return active && requireRect().in(mouseX, mouseY) && canClick(button, mouseX, mouseY);
+        return active && rect().in(mouseX, mouseY) && canClick(button, mouseX, mouseY);
     }
 
     @Override

@@ -80,7 +80,7 @@ public class TechPanel extends Panel {
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (technology != null) {
-                renderTechButton(graphics, rect, technology, renderPressed);
+                renderTechButton(graphics, rect(), technology, renderPressed);
             }
         }
 
@@ -140,8 +140,8 @@ public class TechPanel extends Panel {
 
             var i = 0;
             for (var depend : depends) {
-                var x = rect.endX() - (i + 1) * TECH_SIZE;
-                var y = rect.y();
+                var x = rect().endX() - (i + 1) * TECH_SIZE;
+                var y = rect().y();
                 renderTechButton(graphics, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
                 i++;
             }
@@ -152,7 +152,7 @@ public class TechPanel extends Panel {
                 return Optional.empty();
             }
             var depends = selectedTech.getDepends();
-            var index = (int) Math.floor((rect.endX() - mouseX) / TECH_SIZE);
+            var index = (int) Math.floor((rect().endX() - mouseX) / TECH_SIZE);
 
             return index >= 0 && index < depends.size() ? Optional.of(depends.get(index)) : Optional.empty();
         }
@@ -182,8 +182,8 @@ public class TechPanel extends Panel {
                 return;
             }
 
-            var progress = team.getTechProgress(selectedTech) * rect.width() / selectedTech.getMaxProgress();
-            RenderUtil.fill(graphics, rect.resize((int) progress, rect.height()), PROGRESS_COLOR);
+            var progress = team.getTechProgress(selectedTech) * rect().width() / selectedTech.getMaxProgress();
+            RenderUtil.fill(graphics, rect().resize((int) progress, rect().height()), PROGRESS_COLOR);
         }
 
         @Override
@@ -351,14 +351,12 @@ public class TechPanel extends Panel {
     }
 
     public static Optional<ITechnology> getHoveredTech(IViewAdapter component, double mouseX) {
-        if (component instanceof TechButton button) {
-            return Optional.ofNullable(button.technology);
-        } else if (component instanceof RequiredTechButtons buttons) {
-            return buttons.getSelectedTech(mouseX);
-        } else if (component instanceof ButtonPanel.ItemButton itemButton &&
-            itemButton.parent() instanceof TechButtonPanel buttonPanel) {
-            return Optional.of(buttonPanel.getTech(itemButton.itemIndex()));
-        }
-        return Optional.empty();
+        return switch (component) {
+            case TechButton button -> Optional.ofNullable(button.technology);
+            case RequiredTechButtons buttons -> buttons.getSelectedTech(mouseX);
+            case ButtonPanel.ItemButton itemButton when itemButton.parent() instanceof TechButtonPanel buttonPanel ->
+                Optional.of(buttonPanel.getTech(itemButton.itemIndex()));
+            default -> Optional.empty();
+        };
     }
 }
