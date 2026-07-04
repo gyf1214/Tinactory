@@ -132,7 +132,7 @@ public final class Models {
                 .texture("layer0", extend(base, Integer.toString(i)));
             model.override()
                 .model(override)
-                .predicate(BatteryItem.ITEM_PROPERTY, (float) (i - 1) / 8f);
+                .predicate(modLoc(BatteryItem.ITEM_PROPERTY), (float) (i - 1) / 8f);
         }
     }
 

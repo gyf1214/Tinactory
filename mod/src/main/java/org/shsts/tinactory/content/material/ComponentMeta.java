@@ -7,6 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import org.shsts.tinactory.content.logistics.MENetworkBridge;
@@ -121,7 +122,11 @@ public class ComponentMeta extends MetaConsumer {
             var v = Voltage.fromName(entry.getKey());
             var capacity = GsonHelper.convertToInt(entry.getValue(), "items");
             var id = "network/" + v.id + "/" + name;
-            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity)).register();
+            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity))
+                .creativeTab(CreativeModeTabs.SEARCH, BatteryItem::fullItem)
+                .itemProperty(BatteryItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
+                    BatteryItem.normalizedPower(stack))
+                .register();
             components.put(v, item);
         }
         COMPONENTS.put(name, components);

@@ -299,7 +299,7 @@ public final class TinactoryGameTest {
         helper.setBlock(batteryBoxPos, batteryBoxState);
         var battery = batteryItem(voltage);
         var batteryStack = new ItemStack(battery);
-        battery.setPowerLevel(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         var batteryMachine = MACHINE.get(batteryBoxEntity);
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
@@ -378,7 +378,7 @@ public final class TinactoryGameTest {
 
         var battery = batteryItem(Voltage.HV);
         var batteryStack = new ItemStack(battery);
-        battery.setPowerLevel(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
         useWithTeamMockPlayer(helper, batteryBoxPos);
@@ -407,7 +407,7 @@ public final class TinactoryGameTest {
                 ", batteryPower=" + batteryPower;
             if (electric.getWorkFactor() <= 0d || electric.getWorkFactor() >= 1d) {
                 helper.fail("HV buffer through transformer should partially power oversized EV consumers: " +
-                    factorReport,
+                        factorReport,
                     evCableStartPos.south());
             }
             if (electric.getBufferFactor() >= 0d) {
