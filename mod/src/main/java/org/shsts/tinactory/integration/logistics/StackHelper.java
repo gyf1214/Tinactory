@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -48,8 +49,7 @@ public final class StackHelper {
 
     public static final Codec<IStackKey> KEY_CODEC = Codec.STRING.dispatch(
         StackHelper::keyCodecName,
-        StackHelper::keyCodec
-    );
+        StackHelper::keyCodec);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
@@ -270,7 +270,7 @@ public final class StackHelper {
         };
     }
 
-    private static Codec<? extends IStackKey> keyCodec(String name) {
+    private static MapCodec<? extends IStackKey> keyCodec(String name) {
         return switch (name) {
             case "item" -> ItemPortAdapter.KEY_CODEC;
             case "fluid" -> FluidPortAdapter.KEY_CODEC;

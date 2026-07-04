@@ -1,10 +1,12 @@
 package org.shsts.tinactory.integration.logistics;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -17,7 +19,6 @@ import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -61,11 +62,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     @Override
     public ItemStack stackOf(IStackKey key, long amount) {
         var typed = (ItemKey) key;
-        var stack = new ItemStack(typed.item(), Math.toIntExact(amount));
-        if (typed.nbt() != null) {
-            stack.setTag(typed.nbt().copy());
-        }
-        return stack;
+        return new ItemStack(Holder.direct(typed.item()), Math.toIntExact(amount), typed.components());
     }
 
     @Override
@@ -83,45 +80,17 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.itemTooltip(stack));
     }
 
-    private static final class ItemKey implements IStackKey {
-        private final Item item;
-        @Nullable
-        private final CompoundTag nbt;
-
-        private ItemKey(Item item, Optional<CompoundTag> nbt) {
-            this(item, nbt.orElse(null));
-        }
-
-        private ItemKey(Item item, @Nullable CompoundTag nbt) {
-            this.item = item;
-            this.nbt = nbt == null || nbt.isEmpty() ? null : nbt;
-        }
-
+    private record ItemKey(Item item, DataComponentPatch components) implements IStackKey {
         private static ItemKey of(ItemStack stack) {
-            return new ItemKey(stack.getItem(), stack.getTag());
-        }
-
-        private Item item() {
-            return item;
+            return new ItemKey(stack.getItem(), stack.getComponentsPatch());
         }
 
         private ResourceLocation id() {
-            var id = item.getRegistryName();
-            assert id != null;
-            return id;
+            return BuiltInRegistries.ITEM.getKey(item);
         }
 
-        @Nullable
-        private CompoundTag nbt() {
-            return nbt;
-        }
-
-        private String nbtString() {
-            return nbt != null ? nbt.toString() : "";
-        }
-
-        private Optional<CompoundTag> nbtOptional() {
-            return Optional.ofNullable(nbt);
+        private String componentsString() {
+            return components.toString();
         }
 
         @Override
@@ -146,30 +115,13 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             if (byId != 0) {
                 return byId;
             }
-            return nbtString().compareTo(typed.nbtString());
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return this == other ||
-                (other instanceof ItemKey key && item.equals(key.item) && Objects.equals(nbt, key.nbt));
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(item, nbt);
-        }
-
-        @Override
-        public String toString() {
-            var id = id().toString();
-            return nbt == null ? id : id + nbt;
+            return componentsString().compareTo(typed.componentsString());
         }
     }
 
-    public static final Codec<? extends IStackKey> KEY_CODEC =
-        RecordCodecBuilder.<ItemKey>create(instance -> instance.group(
-            ForgeRegistries.ITEMS.getCodec().fieldOf("id").forGetter(ItemKey::item),
-            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(ItemKey::nbtOptional)
+    public static final MapCodec<? extends IStackKey> KEY_CODEC =
+        RecordCodecBuilder.<ItemKey>mapCodec(instance -> instance.group(
+            BuiltInRegistries.ITEM.byNameCodec().fieldOf("id").forGetter(ItemKey::item),
+            DataComponentPatch.CODEC.fieldOf("components").forGetter(ItemKey::components)
         ).apply(instance, ItemKey::new));
 }
