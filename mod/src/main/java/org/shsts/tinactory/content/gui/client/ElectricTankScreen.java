@@ -1,8 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -57,13 +57,13 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         }
 
         @Override
-        protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
+        protected void renderSlot(GuiGraphics graphics, int mouseX, int mouseY) {
             var fluid = getFluidStack();
             var filter = getFilterFluid();
             if (fluid.isEmpty() && !filter.isEmpty()) {
-                RenderUtil.renderGhostFluid(poseStack, filter, rect, getBlitOffset());
+                RenderUtil.renderGhostFluid(graphics, filter, rect);
             }
-            super.renderSlot(poseStack, mouseX, mouseY);
+            super.renderSlot(graphics, mouseX, mouseY);
         }
     }
 

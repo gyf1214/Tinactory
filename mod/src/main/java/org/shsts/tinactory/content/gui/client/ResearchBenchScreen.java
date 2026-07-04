@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -31,13 +31,13 @@ public class ResearchBenchScreen extends MachineScreen {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             var team = TechManagers.localTeam();
             tech = team.flatMap(ITeamProfile::getTargetTech).orElse(null);
             if (tech == null) {
                 return;
             }
-            TechPanel.renderTechButton(poseStack, getBlitOffset(), rect, team.get(), tech, false);
+            TechPanel.renderTechButton(graphics, rect, team.get(), tech, false);
         }
 
         @Override

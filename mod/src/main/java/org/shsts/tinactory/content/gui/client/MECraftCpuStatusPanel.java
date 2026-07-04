@@ -53,7 +53,7 @@ public class MECraftCpuStatusPanel extends Panel {
             var entry = cpus.get(index);
             var status = entry.status();
             ret.add(entry.name());
-            ret.add(tr("cpu.state." + status.state().id).withStyle(ChatFormatting.GRAY));
+            ret.add(tr("cpu.state." + status.state().id).copy().withStyle(ChatFormatting.GRAY));
             if (!status.targets().isEmpty()) {
                 var target = status.targets().get(0);
                 ret.add(tr("cpu.target", target.key().name(), ClientUtil.getNumberString(target.amount())));
@@ -61,13 +61,13 @@ public class MECraftCpuStatusPanel extends Panel {
             if (status.state().busy()) {
                 ret.add(tr("cpu.steps",
                     NUMBER_FORMAT.format(status.completedSteps()),
-                    NUMBER_FORMAT.format(status.totalSteps())).withStyle(ChatFormatting.GRAY));
+                    NUMBER_FORMAT.format(status.totalSteps())).copy().withStyle(ChatFormatting.GRAY));
             }
             ret.add(tr("memory",
                 ClientUtil.getBytesString(status.memoryUsage()),
-                ClientUtil.getBytesString(status.memoryLimit())).withStyle(ChatFormatting.GRAY));
+                ClientUtil.getBytesString(status.memoryLimit())).copy().withStyle(ChatFormatting.GRAY));
             if (status.error() != ExecutionError.NONE) {
-                ret.add(tr("cpu.error." + status.error().id).withStyle(ChatFormatting.GRAY));
+                ret.add(tr("cpu.error." + status.error().id).copy().withStyle(ChatFormatting.GRAY));
             }
 
             return Optional.of(ret);

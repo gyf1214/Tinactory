@@ -1,8 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -50,9 +50,8 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var z = getBlitOffset();
-            RenderUtil.blit(poseStack, SLOT_BACKGROUND, z, rect);
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
 
             var registries = MEStorageDetectorScreen.this.menu.world().registryAccess();
             var targetItem = MEStorageDetector.targetItem(registries, config);
@@ -60,13 +59,13 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
             if (!targetItem.isEmpty()) {
-                RenderUtil.renderItem(targetItem, rect1.x(), rect1.y());
+                RenderUtil.renderItem(graphics, targetItem, rect1.x(), rect1.y());
             } else if (!targetFluid.isEmpty()) {
-                RenderUtil.renderFluid(poseStack, targetFluid, rect1, z);
+                RenderUtil.renderFluid(graphics, targetFluid, rect1);
             }
 
             if (isHovered(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, rect1);
+                RenderUtil.renderSlotHover(graphics, rect1);
             }
         }
 

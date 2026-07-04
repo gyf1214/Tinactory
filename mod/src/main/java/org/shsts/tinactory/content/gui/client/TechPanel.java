@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
@@ -78,9 +78,9 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (technology != null) {
-                renderTechButton(poseStack, getBlitOffset(), rect, technology, renderPressed);
+                renderTechButton(graphics, rect, technology, renderPressed);
             }
         }
 
@@ -113,9 +113,9 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            renderTechButton(poseStack, getBlitOffset(), rect, getTech(index), true);
+            renderTechButton(graphics, rect, getTech(index), true);
         }
 
         @Override
@@ -135,15 +135,14 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             var depends = selectedTech == null ? List.<ITechnology>of() : selectedTech.getDepends();
-            var z = getBlitOffset();
 
             var i = 0;
             for (var depend : depends) {
                 var x = rect.endX() - (i + 1) * TECH_SIZE;
                 var y = rect.y();
-                renderTechButton(poseStack, z, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
+                renderTechButton(graphics, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
                 i++;
             }
         }
@@ -178,13 +177,13 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (selectedTech == null || team == null) {
                 return;
             }
 
             var progress = team.getTechProgress(selectedTech) * rect.width() / selectedTech.getMaxProgress();
-            RenderUtil.fill(poseStack, rect.resize((int) progress, rect.height()), PROGRESS_COLOR);
+            RenderUtil.fill(graphics, rect.resize((int) progress, rect.height()), PROGRESS_COLOR);
         }
 
         @Override
@@ -247,7 +246,7 @@ public class TechPanel extends Panel {
         addGroup(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
-    public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,
+    public static void renderTechButton(GuiGraphics graphics, Rect rect, @Nullable ITeamProfile team,
         ITechnology technology, boolean pressed) {
         int color;
         if (team == null) {
@@ -265,19 +264,18 @@ public class TechPanel extends Panel {
         if (pressed) {
             texRect = texRect.offset(0, th);
         }
-        StretchImage.render(poseStack, SWITCH_BUTTON, z, color, rect, texRect, 1);
+        StretchImage.render(graphics, SWITCH_BUTTON, color, rect, texRect, 1);
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-        RenderUtil.renderDescriptor(poseStack, technology.getDisplay(), new Rect(x, y, 16, 16), z);
+        RenderUtil.renderDescriptor(graphics, technology.getDisplay(), new Rect(x, y, 16, 16));
     }
 
-    private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
-        boolean renderPressed) {
+    private void renderTechButton(GuiGraphics graphics, Rect rect, ITechnology technology, boolean renderPressed) {
         if (team == null) {
             return;
         }
-        renderTechButton(poseStack, z, rect, team, technology, renderPressed && technology == selectedTech);
+        renderTechButton(graphics, rect, team, technology, renderPressed && technology == selectedTech);
     }
 
     private Optional<List<Component>> techTooltip(ITechnology technology) {
@@ -292,8 +290,8 @@ public class TechPanel extends Panel {
     private void startResearch() {
         if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
             var loc = selectedTech.loc().toString();
-            var command = "/" + TinactoryKeys.ID + " setTargetTech " + loc;
-            player.chat(command);
+            var command = TinactoryKeys.ID + " setTargetTech " + loc;
+            player.connection.sendCommand(command);
         }
     }
 

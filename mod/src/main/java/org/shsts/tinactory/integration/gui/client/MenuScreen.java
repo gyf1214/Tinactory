@@ -48,7 +48,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (slot.isActive()) {
-                RenderUtil.blit(graphics, texture, requireRect());
+                super.doRender(graphics, mouseX, mouseY, partialTick);
             }
         }
     }

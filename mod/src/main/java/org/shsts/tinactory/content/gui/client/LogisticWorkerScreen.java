@@ -2,10 +2,12 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -33,7 +35,6 @@ import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -110,10 +111,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             var config = getConfig(index);
-            var z = getBlitOffset();
 
             var from = config.from().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
             var to = config.to().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
@@ -127,33 +127,33 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             var toRect = rect.offsetLike(TO_RECT);
             var filterRect = rect.offsetLike(FILTER_RECT);
 
-            StretchImage.render(poseStack, BACKGROUND_TEX, z, rect, BG_TEX_RECT, 2);
-            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, toRect, isTo ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack,
-                ALLOW_ARROW_BUTTON, z, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
-            RenderUtil.renderItem(from, fromRect.x() + 2, fromRect.y() + 2);
-            RenderUtil.renderItem(to, toRect.x() + 2, toRect.y() + 2);
+            StretchImage.render(graphics, BACKGROUND_TEX, rect, BG_TEX_RECT, 2);
+            RenderUtil.blit(graphics, RECIPE_BUTTON, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(graphics, RECIPE_BUTTON, toRect, isTo ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(graphics,
+                ALLOW_ARROW_BUTTON, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
+            RenderUtil.renderItem(graphics, from, fromRect.x() + 2, fromRect.y() + 2);
+            RenderUtil.renderItem(graphics, to, toRect.x() + 2, toRect.y() + 2);
 
             switch (filterType) {
-                case ITEM -> RenderUtil.renderItem(config.itemFilter(), filterRect.x(), filterRect.y());
-                case FLUID -> RenderUtil.renderFluid(poseStack, config.fluidFilter(), filterRect, z);
+                case ITEM -> RenderUtil.renderItem(graphics, config.itemFilter(), filterRect.x(), filterRect.y());
+                case FLUID -> RenderUtil.renderFluid(graphics, config.fluidFilter(), filterRect);
                 case TAG -> {
                     if (tagFilterItems == null || config.tagFilter() != tagFilter) {
-                        var tags = ForgeRegistries.ITEMS.tags();
-                        assert tags != null;
                         tagFilter = config.tagFilter();
-                        tagFilterItems = tags.getTag(tagFilter).stream()
-                            .map(ItemStack::new)
-                            .toList();
+                        tagFilterItems = BuiltInRegistries.ITEM.getTag(tagFilter)
+                            .map(tag -> tag.stream()
+                                .map(holder -> new ItemStack(holder.value()))
+                                .toList())
+                            .orElse(List.of());
                     }
                     ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
-                        RenderUtil.renderItem(stack, filterRect.x(), filterRect.y()));
+                        RenderUtil.renderItem(graphics, stack, filterRect.x(), filterRect.y()));
                 }
             }
 
             if (FILTER_RECT.in(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, filterRect);
+                RenderUtil.renderSlotHover(graphics, filterRect);
             }
         }
 
@@ -206,14 +206,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     if (button == 1) {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-                            var tags = ForgeRegistries.ITEMS.tags();
-                            assert tags != null;
-                            var tagList = tags.getReverseTag(config.itemFilter().getItem())
-                                .map($ -> $.getTagKeys()
-                                    .sorted(Comparator.comparing(TagKey::location,
-                                        ResourceLocation::compareNamespaced))
-                                    .toList())
-                                .orElse(Collections.emptyList());
+                            var tagList = BuiltInRegistries.ITEM.wrapAsHolder(config.itemFilter().getItem()).tags()
+                                .sorted(Comparator.comparing(TagKey::location,
+                                    ResourceLocation::compareNamespaced))
+                                .toList();
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;
                                 config.setFilter(tagSelectList.get(0));
@@ -309,15 +305,15 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             getPort(index).ifPresent(port -> {
                 var bgW = SWITCH_BUTTON.width();
                 var bgH = SWITCH_BUTTON.height() / 2;
                 var bg = new Rect(0, isSelected(port) ? bgH : 0, bgW, bgH);
-                StretchImage.render(poseStack, SWITCH_BUTTON, getBlitOffset(), rect, bg, 3);
+                StretchImage.render(graphics, SWITCH_BUTTON, rect, bg, 3);
 
-                RenderUtil.renderText(poseStack, port.portName(),
+                RenderUtil.renderText(graphics, port.portName(),
                     rect.x() + SPACING, rect.y() + PORT_PADDING_TEXT,
                     PORT_TEXT_COLOR);
             });

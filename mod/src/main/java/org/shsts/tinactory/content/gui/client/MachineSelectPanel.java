@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -73,12 +73,12 @@ public class MachineSelectPanel extends ButtonPanel {
     }
 
     @Override
-    protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+    protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
         float partialTick, Rect rect, int index, boolean isHovering) {
         var machine = machineList.get(index);
-        RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect,
+        RenderUtil.blit(graphics, RECIPE_BUTTON, rect,
             machine.id.equals(selected) ? 21 : 0, 0);
-        RenderUtil.renderItem(machine.icon, rect.x() + 2, rect.y() + 2);
+        RenderUtil.renderItem(graphics, machine.icon, rect.x() + 2, rect.y() + 2);
     }
 
     @Override

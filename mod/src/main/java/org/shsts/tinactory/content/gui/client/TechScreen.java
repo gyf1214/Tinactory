@@ -149,8 +149,8 @@ public class TechScreen extends MenuScreen<TechMenu> {
     private void onWelcomePressed() {
         if (menu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
-            var command = "/" + TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
-            player.chat(command);
+            var command = TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
+            player.connection.sendCommand(command);
         }
     }
 }

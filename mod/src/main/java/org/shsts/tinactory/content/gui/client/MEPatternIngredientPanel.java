@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -70,13 +70,13 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect);
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
             key().ifPresent(key -> RenderUtil.renderDescriptor(
-                poseStack, key.display(), rect1, getBlitOffset()));
+                graphics, key.display(), rect1));
             if (isHovered(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, rect1);
+                RenderUtil.renderSlotHover(graphics, rect1);
             }
         }
 
