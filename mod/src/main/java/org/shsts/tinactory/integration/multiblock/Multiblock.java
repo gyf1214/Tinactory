@@ -308,7 +308,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     public static <P> Function<IBlockEntityTypeBuilder<P>, Builder<P>> builder(
-        BiFunction<BlockEntity, Multiblock.Builder<P>, Multiblock> factory) {
+        BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
         return $ -> new Builder<>($, factory);
     }
 

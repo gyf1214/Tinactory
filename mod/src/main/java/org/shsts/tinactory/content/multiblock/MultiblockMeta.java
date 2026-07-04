@@ -392,6 +392,7 @@ public class MultiblockMeta extends MachineMeta {
                 .maxConnectors(GsonHelper.getAsInt(jo1, "maxConnectors"))
                 .maxDoors(GsonHelper.getAsInt(jo1, "maxDoors"))
                 .build()
+                .build()
                 .end()
                 .block()
                 .properties(MACHINE_PROPERTY)
