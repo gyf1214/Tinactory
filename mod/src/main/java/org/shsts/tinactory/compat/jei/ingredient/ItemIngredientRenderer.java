@@ -21,9 +21,7 @@ import java.util.List;
 public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
     public void render(GuiGraphics graphics, ItemStack ingredient) {
-        var poseStack1 = RenderUtil.applyToModelViewStack(graphics);
-        RenderUtil.renderFakeItemWithDecoration(ingredient, 0, 0);
-        RenderUtil.popModelViewStack(poseStack1);
+        RenderUtil.renderFakeItemWithDecoration(graphics, ingredient, 0, 0);
     }
 
     @Override

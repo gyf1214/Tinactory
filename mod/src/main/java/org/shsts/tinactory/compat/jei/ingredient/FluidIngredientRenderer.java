@@ -19,7 +19,7 @@ public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> 
     @Override
     public void render(GuiGraphics graphics, FluidStack ingredient) {
         var rect = new Rect(0, 0, 16, 16);
-        RenderUtil.renderFluidWithDecoration(graphics, ingredient, rect, 0);
+        RenderUtil.renderFluidWithDecoration(graphics, ingredient, rect);
     }
 
     @Override

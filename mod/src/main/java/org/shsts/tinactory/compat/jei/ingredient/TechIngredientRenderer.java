@@ -30,7 +30,7 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechIngredien
             return;
         }
         var team = TechManagers.localTeam().orElse(null);
-        TechPanel.renderTechButton(graphics, 0, RECT, team, tech.get(), false);
+        TechPanel.renderTechButton(graphics, RECT, team, tech.get(), false);
     }
 
     @Override

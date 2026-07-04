@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -50,6 +51,11 @@ public final class ClientUtil {
     }
 
     public static void playSound(SoundEvent sound) {
+        var soundManager = Minecraft.getInstance().getSoundManager();
+        soundManager.play(SimpleSoundInstance.forUI(sound, 1f));
+    }
+
+    public static void playSound(Holder<SoundEvent> sound) {
         var soundManager = Minecraft.getInstance().getSoundManager();
         soundManager.play(SimpleSoundInstance.forUI(sound, 1f));
     }
