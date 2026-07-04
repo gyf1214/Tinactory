@@ -2,13 +2,11 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
@@ -22,6 +20,7 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance.hasItems;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
@@ -46,20 +45,10 @@ public final class AllRecipes {
         MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.class)
             .serializer(ProcessingHelper.MARKER_CODEC)
             .register();
-
     }
 
-    public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
-    }
-
-    public static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
-    }
-
-    private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
-        return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
-            MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> hasTag(TagKey<Item> tag) {
+        return hasItems(ItemPredicate.Builder.item().of(tag).build());
     }
 
     public static void putTypeInfo(IRecipeType<?> recipeType, Layout layout,

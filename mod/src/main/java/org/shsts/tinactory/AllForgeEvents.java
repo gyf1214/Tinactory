@@ -17,8 +17,6 @@ import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
-import java.util.Random;
-
 import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 
 @ParametersAreNonnullByDefault
@@ -37,7 +35,7 @@ public final class AllForgeEvents {
                 return;
             }
             PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
-                world.getChunkSource().getGenerator(), new Random(), spawn);
+                world.getChunkSource().getGenerator(), world.random, spawn);
             event.getSettings().setSpawn(spawn, 0f);
             event.setCanceled(true);
         }
@@ -45,7 +43,7 @@ public final class AllForgeEvents {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             TechManagers.server().onPlayerJoin(serverPlayer);
         }
     }

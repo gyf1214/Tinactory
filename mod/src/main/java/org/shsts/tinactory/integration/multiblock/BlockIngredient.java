@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.multiblock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
@@ -72,8 +73,8 @@ public final class BlockIngredient {
     public record TagValue(TagKey<Block> tag) implements Value {
         @Override
         public void expand(Consumer<Block> consumer) {
-            for (var block : ForgeRegistries.BLOCKS.tags().getTag(tag)) {
-                consumer.accept(block);
+            for (var block : BuiltInRegistries.BLOCK.getTagOrEmpty(tag)) {
+                consumer.accept(block.value());
             }
         }
     }

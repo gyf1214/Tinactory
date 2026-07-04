@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -53,7 +54,7 @@ public class Lithography extends Multiblock {
     public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
         var tag = super.serializeOnUpdate(provider);
         if (lensBlock != null) {
-            tag.putString("lensBlock", lensBlock.getRegistryName().toString());
+            tag.putString("lensBlock", BuiltInRegistries.BLOCK.getKey(lensBlock).toString());
         }
         return tag;
     }

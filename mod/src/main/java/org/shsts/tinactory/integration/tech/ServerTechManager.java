@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -24,11 +25,8 @@ import org.shsts.tinactory.integration.util.ServerUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -46,20 +44,21 @@ public class ServerTechManager extends TechManager implements IServerTechManager
         private static final String PREFIX = "technologies";
         private static final String SUFFIX = ".json";
 
-        private static Collection<ResourceLocation> listResources(ResourceManager manager) {
-            return manager.listResources(PREFIX, file -> file.endsWith(SUFFIX));
+        private static Map<ResourceLocation, Resource> listResources(ResourceManager manager) {
+            return manager.listResources(PREFIX, file -> file.getPath().endsWith(SUFFIX));
         }
 
-        private Optional<Technology> loadResource(ResourceManager manager, ResourceLocation loc) {
+        private Optional<Technology> loadResource(ResourceLocation loc, Resource resource) {
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
             var loc1 = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), path1);
-            try (var resource = manager.getResource(loc)) {
-                var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
-                var jo = CodecHelper.jsonFromReader(new BufferedReader(is));
-                var ret = CodecHelper.parseJson(Technology.CODEC, jo);
-                ret.setLoc(loc1);
-                return Optional.of(ret);
+            try {
+                try (var ir = resource.openAsReader()) {
+                    var jo = CodecHelper.jsonFromReader(ir);
+                    var ret = CodecHelper.parseJson(Technology.CODEC, jo);
+                    ret.setLoc(loc1);
+                    return Optional.of(ret);
+                }
             } catch (IOException | RuntimeException ex) {
                 LOGGER.warn("Decode resource {} failed", loc, ex);
             }
@@ -73,8 +72,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
             LOGGER.debug("tech manager reload resources");
             return stage.wait(Unit.INSTANCE)
-                .thenApplyAsync(unused -> listResources(manager).stream()
-                    .flatMap(loc -> loadResource(manager, loc).stream())
+                .thenApplyAsync(unused -> listResources(manager).entrySet().stream()
+                    .flatMap(entry -> loadResource(entry.getKey(), entry.getValue()).stream())
                     .toList(), backgroundExecutor)
                 .thenAcceptAsync(techs -> {
                     technologies.clear();

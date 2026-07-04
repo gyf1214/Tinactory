@@ -9,7 +9,6 @@ import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
-import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.DigitalCellData;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
@@ -69,8 +68,8 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
         var key = adapter.keyOf(value);
         var current = data.entries().getOrDefault(key, 0L);
         var amount = adapter.amount(value);
-        var limit = insertLimit(key, current);
-        var inserted = Math.min((long) amount, limit);
+        var limit = insertLimit(current);
+        var inserted = Math.min(amount, limit);
         if (inserted <= 0L) {
             return value;
         }
@@ -108,7 +107,7 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
             return adapter.empty();
         }
         var entry = data.entries().entrySet().iterator().next();
-        var extracted = Math.min(entry.getValue(), (long) limit);
+        var extracted = Math.min(entry.getValue(), limit);
         if (!simulate) {
             write(data.withEntry(entry.getKey(), entry.getValue() - extracted));
         }
@@ -120,8 +119,7 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
         if (!acceptOutput()) {
             return 0;
         }
-        var amount = data().entries().getOrDefault(adapter.keyOf(value), 0L);
-        return amount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) amount;
+        return data().entries().getOrDefault(adapter.keyOf(value), 0L).intValue();
     }
 
     @Override
@@ -143,7 +141,7 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
         }
         var key = adapter.keyOf(value);
         var current = data().entries().getOrDefault(key, 0L);
-        return insertLimit(key, current) > 0L;
+        return insertLimit(current) > 0L;
     }
 
     @Override
@@ -156,7 +154,7 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
         return type;
     }
 
-    private long insertLimit(IStackKey key, long current) {
+    private long insertLimit(long current) {
         var remaining = bytesLimit - bytesUsed();
         if (remaining <= 0L) {
             return 0L;

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance.hasItems
 import net.minecraft.data.recipes.RecipeBuilder
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.data.recipes.ShapelessRecipeBuilder
@@ -10,7 +11,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
-import org.shsts.tinactory.AllRecipes.has
+import org.shsts.tinactory.AllRecipes.hasTag
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 
 class VanillaRecipeFactory(private val replace: Boolean) {
@@ -39,7 +40,7 @@ class VanillaRecipeFactory(private val replace: Boolean) {
             ShapelessRecipeBuilder
                 .shapeless(to, toAmount)
                 .requires(Ingredient.of(from), fromAmount)
-                .unlockedBy(criteria, has(from))
+                .unlockedBy(criteria, hasTag(from))
                 .also(block)
         }
     }
@@ -48,7 +49,7 @@ class VanillaRecipeFactory(private val replace: Boolean) {
         build(suffix) {
             SimpleCookingRecipeBuilder
                 .smelting(Ingredient.of(from), to, 0f, ticks)
-                .unlockedBy("has_ingredient", has(from))
+                .unlockedBy("has_ingredient", hasTag(from))
         }
     }
 
@@ -60,11 +61,11 @@ class VanillaRecipeFactory(private val replace: Boolean) {
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, item: ItemLike) {
-        unlockedBy(name, has(item))
+        unlockedBy(name, hasItems(item))
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, tag: TagKey<Item>) {
-        unlockedBy(name, has(tag))
+        unlockedBy(name, hasTag(tag))
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, mat: String, sub: String) {
