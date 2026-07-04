@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -96,15 +96,14 @@ public class BridgeBlock extends SubnetBlock implements EntityBlock {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
-        InteractionHand hand, BlockHitResult hitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+        Player player, InteractionHand hand, BlockHitResult hitResult) {
         var be = getBlockEntity(world, pos);
         if (be.isEmpty()) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        var args = new AllEvents.OnUseArg(player, hand, hitResult);
+        var args = new AllEvents.OnUseArg(player, stack);
         return CapabilityProvider.invokeReturn(be.get(), BLOCK_USE, args);
     }
 

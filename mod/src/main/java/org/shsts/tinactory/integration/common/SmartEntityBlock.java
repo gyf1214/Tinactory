@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -85,20 +86,20 @@ public class SmartEntityBlock extends Block implements EntityBlock {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
-        InteractionHand hand, BlockHitResult hitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+        Player player, InteractionHand hand, BlockHitResult hitResult) {
         var be = getBlockEntity(world, pos);
         if (be.isEmpty()) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
-        var args = new AllEvents.OnUseArg(player, hand, hitResult);
-        var result = CapabilityProvider.invokeReturn(be.get(), BLOCK_USE, args);
-        if (result != InteractionResult.PASS) {
-            return result;
-        }
+        var args = new AllEvents.OnUseArg(player, stack);
+        return CapabilityProvider.invokeReturn(be.get(), BLOCK_USE, args);
+    }
 
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player,
+        BlockHitResult hitResult) {
         if (menu == null) {
             return InteractionResult.PASS;
         }

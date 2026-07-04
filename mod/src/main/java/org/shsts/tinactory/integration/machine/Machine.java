@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -180,7 +180,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<ItemInteractionResult> result) {
         var player = arg.player();
         // TODO: unfortunately client does not know whether the player can interact with this machine,
         //       so on client we simply pass.
@@ -193,19 +193,16 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
 
         if (!canPlayerInteract(player)) {
-            result.set(InteractionResult.FAIL);
+            result.set(ItemInteractionResult.FAIL);
             return;
         }
 
-        var item = player.getItemInHand(arg.hand());
+        var item = arg.stack();
         if (item.is(Items.NAME_TAG) && item.has(DataComponents.CUSTOM_NAME)) {
             setName(item.getHoverName());
             item.shrink(1);
-            result.set(InteractionResult.sidedSuccess(player.level().isClientSide));
-            return;
+            result.set(ItemInteractionResult.sidedSuccess(player.level().isClientSide));
         }
-
-        result.set(InteractionResult.PASS);
     }
 
     private void onServerLoad(Level world) {
