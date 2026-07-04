@@ -53,7 +53,7 @@ public class MultiblockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
 
             var random = world.getRandom();
             var seed = blockState.getSeed(pos);
-            // in litematica, the schematic is rendered in a virtual world, which does not work with forge
+            // in litematica, the schematic is rendered in a virtual world, which does not work with NeoForge
             // ModelData. We don't use ModelData anyway but might need a way make sure this works in the future.
             var modelData = ModelData.EMPTY;
             // use translucent for best compatibility
