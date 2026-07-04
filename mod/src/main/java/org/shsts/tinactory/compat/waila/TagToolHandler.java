@@ -3,6 +3,7 @@ package org.shsts.tinactory.compat.waila;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,25 +15,25 @@ import snownee.jade.addon.harvest.ToolHandler;
 
 import java.util.List;
 
-import static org.shsts.tinactory.integration.tool.ToolItem.HIDE_BAR;
+import static org.shsts.tinactory.AllDataComponents.HIDE_BAR;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TagToolHandler implements ToolHandler {
-    private final String name;
+    private final ResourceLocation uid;
     private final TagKey<Block> tag;
     private final IEntry<Item> item;
 
     public TagToolHandler(String name, TagKey<Block> tag, IEntry<Item> item) {
-        this.name = name;
+        this.uid = modLoc("harvest_tool/" + name);
         this.tag = tag;
         this.item = item;
     }
 
     private ItemStack getItem() {
         var ret = new ItemStack(item.get());
-        var tag = ret.getOrCreateTag();
-        tag.putBoolean(HIDE_BAR, true);
+        ret.set(HIDE_BAR, true);
         return ret;
     }
 
@@ -50,7 +51,7 @@ public class TagToolHandler implements ToolHandler {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public ResourceLocation getUid() {
+        return uid;
     }
 }

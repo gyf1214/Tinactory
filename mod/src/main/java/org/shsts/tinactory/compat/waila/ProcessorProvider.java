@@ -1,18 +1,12 @@
 package org.shsts.tinactory.compat.waila;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.IServerDataProvider;
-import mcp.mobius.waila.api.config.IPluginConfig;
-import mcp.mobius.waila.api.ui.IElement;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -29,6 +23,10 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.IElement;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -52,8 +50,7 @@ import static org.shsts.tinactory.integration.util.ClientUtil.PERCENTAGE_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessorProvider extends ProviderBase implements IComponentProvider,
-    IServerDataProvider<BlockEntity> {
+public class ProcessorProvider extends ProviderBase implements IServerDataProvider<BlockAccessor> {
     public static final ProcessorProvider INSTANCE = new ProcessorProvider();
 
     private static final int PROGRESS_COLOR = 0xFF00B1B4;
@@ -167,8 +164,12 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
     }
 
     @Override
-    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
-        BlockEntity blockEntity, boolean showDetails) {
+    public void appendServerData(CompoundTag tag, BlockAccessor accessor) {
+        var blockEntity = accessor.getBlockEntity();
+        if (blockEntity == null) {
+            return;
+        }
+
         var cap = getProcessor(blockEntity);
         if (cap.isEmpty()) {
             return;
@@ -221,5 +222,10 @@ public class ProcessorProvider extends ProviderBase implements IComponentProvide
             tag.putDouble("tinactoryFusionEnergy", fusion.startupEnergy());
             tag.putDouble("tinactoryFusionCapacity", fusion.startupCapacity());
         }
+    }
+
+    @Override
+    public ResourceLocation getUid() {
+        return Waila.PROCESSOR;
     }
 }

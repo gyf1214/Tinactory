@@ -1,24 +1,24 @@
 package org.shsts.tinactory.compat.waila;
 
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IComponentProvider;
-import mcp.mobius.waila.api.ITooltip;
-import mcp.mobius.waila.api.config.IPluginConfig;
-import mcp.mobius.waila.api.ui.IElement;
-import mcp.mobius.waila.api.ui.IElementHelper;
-import mcp.mobius.waila.api.ui.IProgressStyle;
-import mcp.mobius.waila.impl.ui.ProgressStyle;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.util.I18n;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.BoxStyle;
+import snownee.jade.api.ui.IElement;
+import snownee.jade.api.ui.IElementHelper;
+import snownee.jade.api.ui.ProgressStyle;
 
 import java.util.List;
 
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
-public abstract class ProviderBase implements IComponentProvider {
+public abstract class ProviderBase implements IBlockComponentProvider {
     private static final int PROGRESS_TEXT_COLOR = 0xFFFFFFFF;
 
     private final ResourceLocation elementTag;
@@ -31,7 +31,7 @@ public abstract class ProviderBase implements IComponentProvider {
         this.elementTag = elementTag;
     }
 
-    protected static TranslatableComponent tr(String id, Object... args) {
+    protected static MutableComponent tr(String id, Object... args) {
         return I18n.tr("tinactory.tooltip." + id, args);
     }
 
@@ -59,20 +59,18 @@ public abstract class ProviderBase implements IComponentProvider {
         hasSpace = false;
     }
 
-    private IProgressStyle progressStyle(int color) {
-        var ret = (ProgressStyle) helper.progressStyle().color(color).textColor(PROGRESS_TEXT_COLOR);
-        ret.shadow = true;
-        return ret;
+    private ProgressStyle progressStyle(int color) {
+        return helper.progressStyle().color(color).textColor(PROGRESS_TEXT_COLOR);
     }
 
     protected void addProgress(float val, Component text, int color) {
-        add(helper.progress(val, text, progressStyle(color), helper.borderStyle()));
+        add(helper.progress(val, text, progressStyle(color), BoxStyle.getNestedBox(), true));
     }
 
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         this.tooltip = tooltip;
-        this.helper = tooltip.getElementHelper();
+        this.helper = IElementHelper.get();
         hasSpace = false;
         doAppendTooltip(accessor.getServerData(), accessor, config);
     }
