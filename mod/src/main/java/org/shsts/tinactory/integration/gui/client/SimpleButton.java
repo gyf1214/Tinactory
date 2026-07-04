@@ -1,9 +1,9 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -35,11 +35,12 @@ public abstract class SimpleButton extends Button {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var rect = requireRect();
         if (isHovered(mouseX, mouseY)) {
-            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, hoverX, hoverY);
+            RenderUtil.blit(graphics, texture, rect, hoverX, hoverY);
         } else {
-            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, normalX, normalY);
+            RenderUtil.blit(graphics, texture, rect, normalX, normalY);
         }
     }
 }

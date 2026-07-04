@@ -1,8 +1,8 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.neoforged.api.distmarker.Dist;
@@ -31,8 +31,9 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            renderButton(poseStack, mouseX - rect.x(), mouseY - rect.y(), partialTick,
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            var rect = requireRect();
+            renderButton(graphics, mouseX - rect.x(), mouseY - rect.y(), partialTick,
                 rect, itemIndex(), isHovered(mouseX, mouseY));
         }
 
@@ -68,7 +69,7 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
     /**
      * mouseX and mouseY are relative to the button rect
      */
-    protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+    protected abstract void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
         float partialTick, Rect rect, int index, boolean isHovering);
 
     protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {

@@ -1,8 +1,8 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
@@ -20,7 +20,7 @@ public class StaticWidget extends MenuWidget {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect);
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        RenderUtil.blit(graphics, texture, requireRect());
     }
 }

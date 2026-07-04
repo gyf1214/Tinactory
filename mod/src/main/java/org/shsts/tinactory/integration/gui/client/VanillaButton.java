@@ -1,10 +1,10 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -39,17 +39,17 @@ public class VanillaButton extends Button {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var rect = requireRect();
         int y;
         y = disabled ? 66 - BUTTON_HEIGHT : (isHovered(mouseX, mouseY) ? 66 + BUTTON_HEIGHT : 66);
         var w = rect.width() / 2;
         var rect1 = new Rect(rect.x(), rect.y(), w, rect.height());
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1, 0, y);
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1.offset(w, 0), 200 - w, y);
+        RenderUtil.blit(graphics, texture, rect1, 0, y);
+        RenderUtil.blit(graphics, texture, rect1.offset(w, 0), 200 - w, y);
 
-        font.drawShadow(poseStack, label, rect.x() + w - (float) textWidth / 2,
-            rect.y() + (float) (rect.height() - font.lineHeight) / 2,
-            RenderUtil.WHITE);
+        graphics.drawString(font, label, rect.x() + w - textWidth / 2,
+            rect.y() + (rect.height() - font.lineHeight) / 2, RenderUtil.WHITE, true);
     }
 
     @Override

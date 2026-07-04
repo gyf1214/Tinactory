@@ -48,7 +48,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
         @Override
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (slot.isActive()) {
-                RenderUtil.blit(graphics.pose(), texture, 0, rect);
+                RenderUtil.blit(graphics, texture, requireRect());
             }
         }
     }
@@ -106,7 +106,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
         var tex = BACKGROUND;
         var rect = new Rect(leftPos, topPos, imageWidth, imageHeight);
         var texRect = new Rect(0, 0, tex.width(), tex.height());
-        StretchImage.render(graphics.pose(), tex, 0, rect, texRect, MARGIN_VERTICAL);
+        StretchImage.render(graphics, tex, rect, texRect, MARGIN_VERTICAL);
     }
 
     @Override

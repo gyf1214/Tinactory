@@ -1,9 +1,9 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.api.distmarker.Dist;
@@ -45,13 +45,13 @@ public class Tab extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            var rect = requireRect();
             var tx = index == 0 ? 0 : BUTTON_WIDTH;
             var ty = index == currentTab ? BUTTON_HEIGHT : 0;
-            var z = getBlitOffset();
-            RenderUtil.blit(poseStack, BUTTON_TEX, z, rect, tx, ty);
+            RenderUtil.blit(graphics, BUTTON_TEX, rect, tx, ty);
             if (!icon.isEmpty()) {
-                RenderUtil.renderItem(icon, rect.x() + ICON_X_OFFSET, rect.y() + ICON_Y_OFFSET);
+                RenderUtil.renderItem(graphics, icon, rect.x() + ICON_X_OFFSET, rect.y() + ICON_Y_OFFSET);
             }
         }
 

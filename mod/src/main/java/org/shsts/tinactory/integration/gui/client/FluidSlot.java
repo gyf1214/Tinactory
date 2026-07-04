@@ -1,9 +1,9 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.neoforged.api.distmarker.Dist;
@@ -77,15 +77,16 @@ public class FluidSlot extends MenuWidget {
         menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
     }
 
-    protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
-        RenderUtil.renderFluidWithDecoration(poseStack, getFluidStack(), rect, getBlitOffset());
+    protected void renderSlot(GuiGraphics graphics, int mouseX, int mouseY) {
+        var rect = requireRect();
+        RenderUtil.renderFluidWithDecoration(graphics, getFluidStack(), rect);
         if (isHovered(mouseX, mouseY)) {
-            RenderUtil.renderSlotHover(poseStack, rect);
+            RenderUtil.renderSlotHover(graphics, rect);
         }
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        renderSlot(poseStack, mouseX, mouseY);
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        renderSlot(graphics, mouseX, mouseY);
     }
 }
