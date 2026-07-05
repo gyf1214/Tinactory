@@ -182,7 +182,7 @@ public class MachineMeta extends MetaConsumer {
             return MachineMeta.parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
         }
 
-        private <R extends ProcessingRecipe> IRecipeType<R> processingRecipe(Class<R> clazz, MapCodec<R> codec) {
+        private <R extends ProcessingRecipe> IRecipeType<R> recipeType(Class<R> clazz, MapCodec<R> codec) {
             return REGISTRATE.recipeType(recipeTypeId, clazz)
                 .serializer(codec)
                 .register();
@@ -190,34 +190,17 @@ public class MachineMeta extends MetaConsumer {
 
         protected void parseRecipeType() {
             recipeType = switch (recipeTypeStr) {
-                case "default" -> processingRecipe(ProcessingRecipe.class, ProcessingHelper.PROCESSING_CODEC);
-                case "display_input" -> processingRecipe(DisplayInputRecipe.class,
-                    DisplayInputRecipe.codec(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC));
-                case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.class)
-                    .serializer(GeneratorRecipe.CODEC)
-                    .register();
-                case "distillation" -> processingRecipe(DistillationRecipe.class, DistillationRecipe.CODEC);
-                case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.class)
-                    .serializer(ProcessingHelper.RESEARCH_CODEC)
-                    .register();
-                case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.class)
-                    .serializer(ProcessingHelper.ASSEMBLY_CODEC)
-                    .register();
-                case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.class)
-                    .serializer(CleanRecipe.CODEC)
-                    .register();
-                case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe.class)
-                    .serializer(EngravingRecipe.CODEC)
-                    .register();
-                case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.class)
-                    .serializer(OreAnalyzerRecipe.CODEC)
-                    .register();
-                case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.class)
-                    .serializer(ChemicalReactorRecipe.CODEC)
-                    .register();
-                case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.class)
-                    .serializer(BlastFurnaceRecipe.CODEC)
-                    .register();
+                case "default" -> recipeType(ProcessingRecipe.class, ProcessingHelper.PROCESSING_CODEC);
+                case "display_input" -> recipeType(DisplayInputRecipe.class, ProcessingHelper.DISPLAY_INPUT_CODEC);
+                case "generator" -> recipeType(GeneratorRecipe.class, GeneratorRecipe.CODEC);
+                case "distillation" -> recipeType(DistillationRecipe.class, DistillationRecipe.CODEC);
+                case "research" -> recipeType(ResearchRecipe.class, ProcessingHelper.RESEARCH_CODEC);
+                case "assembly" -> recipeType(AssemblyRecipe.class, ProcessingHelper.ASSEMBLY_CODEC);
+                case "clean" -> recipeType(CleanRecipe.class, CleanRecipe.CODEC);
+                case "engraving" -> recipeType(EngravingRecipe.class, EngravingRecipe.CODEC);
+                case "ore_analyzer" -> recipeType(OreAnalyzerRecipe.class, OreAnalyzerRecipe.CODEC);
+                case "chemical_reactor" -> recipeType(ChemicalReactorRecipe.class, ChemicalReactorRecipe.CODEC);
+                case "blast_furnace" -> recipeType(BlastFurnaceRecipe.class, BlastFurnaceRecipe.CODEC);
                 case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
             };

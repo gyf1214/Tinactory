@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -30,10 +31,8 @@ public class TagIngredient extends ItemsIngredient {
         return CODEC_NAME;
     }
 
-    public static Codec<TagIngredient> codec() {
-        return RecordCodecBuilder.create(instance -> instance.group(
-            TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(TagIngredient::tag),
-            Codec.INT.fieldOf("amount").forGetter($ -> $.amount)
-        ).apply(instance, TagIngredient::new));
-    }
+    public static final MapCodec<TagIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(TagIngredient::tag),
+        Codec.INT.fieldOf("amount").forGetter($ -> $.amount)
+    ).apply(instance, TagIngredient::new));
 }

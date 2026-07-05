@@ -8,7 +8,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.List;
@@ -18,14 +17,12 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class GeneratorRecipe extends DisplayInputRecipe {
     public static final MapCodec<GeneratorRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ProcessingRecipe.inputCodec(ProcessingHelper.INGREDIENT_CODEC).listOf().fieldOf("inputs")
-            .forGetter($ -> $.inputs),
-        ProcessingRecipe.outputCodec(ProcessingHelper.RESULT_CODEC).listOf().optionalFieldOf("outputs", List.of())
-            .forGetter($ -> $.outputs),
+        ProcessingHelper.INPUT_CODEC.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+        ProcessingHelper.OUTPUT_CODEC.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
         Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
         Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
         Codec.LONG.fieldOf("power").forGetter($ -> $.power),
-        Codec.BOOL.optionalFieldOf("exactVoltage", false).forGetter($ -> $.exactVoltage)
+        Codec.BOOL.fieldOf("exactVoltage").forGetter($ -> $.exactVoltage)
     ).apply(instance, GeneratorRecipe::new));
 
     // this is used to distinguish generator recipes that can be overclocked
@@ -60,5 +57,4 @@ public class GeneratorRecipe extends DisplayInputRecipe {
         }
         return super.matchElectric(electric);
     }
-
 }

@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -54,12 +53,10 @@ public class ResearchRecipe extends ProcessingRecipe {
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
     }
 
-    public static MapCodec<ResearchRecipe> codec(Codec<IProcessingIngredient> ingredientCodec,
-        Codec<IProcessingResult> resultCodec) {
+    public static MapCodec<ResearchRecipe> codec(Codec<Input> inputCodec, Codec<Output> outputCodec) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ProcessingRecipe.inputCodec(ingredientCodec).listOf().fieldOf("inputs").forGetter($ -> $.inputs),
-            ProcessingRecipe.outputCodec(resultCodec).listOf().optionalFieldOf("outputs", List.of())
-                .forGetter($ -> $.outputs),
+            inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
             Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
             Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
             Codec.LONG.fieldOf("power").forGetter($ -> $.power),

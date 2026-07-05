@@ -7,7 +7,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
 import java.util.List;
@@ -16,14 +15,12 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class OreAnalyzerRecipe extends AssemblyRecipe {
     public static final MapCodec<OreAnalyzerRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ProcessingRecipe.inputCodec(ProcessingHelper.INGREDIENT_CODEC).listOf().fieldOf("inputs")
-            .forGetter($ -> $.inputs),
-        ProcessingRecipe.outputCodec(ProcessingHelper.RESULT_CODEC).listOf().fieldOf("outputs")
-            .forGetter($ -> $.outputs),
+        ProcessingHelper.INPUT_CODEC.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+        ProcessingHelper.OUTPUT_CODEC.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
         Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
         Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
         Codec.LONG.fieldOf("power").forGetter($ -> $.power),
-        ResourceLocation.CODEC.listOf().optionalFieldOf("required_tech", List.of()).forGetter($ -> $.requiredTech),
+        ResourceLocation.CODEC.listOf().fieldOf("required_tech").forGetter($ -> $.requiredTech),
         Codec.DOUBLE.fieldOf("rate").forGetter($ -> $.rate)
     ).apply(instance, OreAnalyzerRecipe::new));
 
@@ -35,5 +32,4 @@ public class OreAnalyzerRecipe extends AssemblyRecipe {
         this.rate = rate;
         assert rate > 0d;
     }
-
 }

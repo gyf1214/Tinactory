@@ -16,10 +16,8 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceRecipe extends ProcessingRecipe {
     public static final MapCodec<BlastFurnaceRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ProcessingRecipe.inputCodec(ProcessingHelper.INGREDIENT_CODEC).listOf().fieldOf("inputs")
-            .forGetter($ -> $.inputs),
-        ProcessingRecipe.outputCodec(ProcessingHelper.RESULT_CODEC).listOf().fieldOf("outputs")
-            .forGetter($ -> $.outputs),
+        ProcessingHelper.INPUT_CODEC.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+        ProcessingHelper.OUTPUT_CODEC.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
         Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
         Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
         Codec.LONG.fieldOf("power").forGetter($ -> $.power),
@@ -40,5 +38,4 @@ public class BlastFurnaceRecipe extends ProcessingRecipe {
         return super.canCraft(machine) && machineTemp.isPresent() &&
             temperature <= machineTemp.getAsInt();
     }
-
 }

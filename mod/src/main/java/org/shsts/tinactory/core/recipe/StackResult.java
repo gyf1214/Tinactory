@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -97,9 +98,9 @@ public class StackResult<T> implements IProcessingResult, IProcessingDisplay {
         return adapter.tooltip(stack);
     }
 
-    public static <T> Codec<StackResult<T>> codec(String codecName, PortType type,
+    public static <T> MapCodec<StackResult<T>> codec(String codecName, PortType type,
         Codec<T> stackCodec, IStackAdapter<T> adapter) {
-        return RecordCodecBuilder.create(instance -> instance.group(
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.DOUBLE.fieldOf("rate").forGetter(StackResult::rate),
             stackCodec.fieldOf("stack").forGetter(StackResult::stack)
         ).apply(instance, (rate, stack) -> new StackResult<>(codecName, type, rate, stack, adapter)));

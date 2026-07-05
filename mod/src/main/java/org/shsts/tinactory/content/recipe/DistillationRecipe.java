@@ -9,7 +9,6 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
@@ -19,15 +18,11 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DistillationRecipe extends DisplayInputRecipe {
-    public static final MapCodec<DistillationRecipe> CODEC =
-        ProcessingHelper.PROCESSING_CODEC.xmap(DistillationRecipe::new, $ -> $);
+    public static final MapCodec<DistillationRecipe> CODEC = codec(
+        ProcessingHelper.INPUT_CODEC, ProcessingHelper.OUTPUT_CODEC, DistillationRecipe::new);
 
     public DistillationRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
         super(inputs, outputs, workTicks, voltage, power);
-    }
-
-    private DistillationRecipe(ProcessingRecipe recipe) {
-        this(recipe.inputs, recipe.outputs, recipe.workTicks, recipe.voltage, recipe.power);
     }
 
     private int getSlots(IMachine machine) {

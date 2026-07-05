@@ -79,15 +79,13 @@ public class CleanRecipe extends ProcessingRecipe {
 
     protected static <R extends CleanRecipe> MapCodec<R> codec(Factory<R> factory) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ProcessingRecipe.inputCodec(ProcessingHelper.INGREDIENT_CODEC).listOf().fieldOf("inputs")
-                .forGetter($ -> $.inputs),
-            ProcessingRecipe.outputCodec(ProcessingHelper.RESULT_CODEC).listOf().fieldOf("outputs")
-                .forGetter($ -> $.outputs),
+            ProcessingHelper.INPUT_CODEC.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            ProcessingHelper.OUTPUT_CODEC.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
             Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
             Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
             Codec.LONG.fieldOf("power").forGetter($ -> $.power),
-            Codec.DOUBLE.optionalFieldOf("min_cleanness", 0d).forGetter($ -> $.minCleanness),
-            Codec.DOUBLE.optionalFieldOf("max_cleanness", 0d).forGetter($ -> $.maxCleanness)
+            Codec.DOUBLE.fieldOf("min_cleanness").forGetter($ -> $.minCleanness),
+            Codec.DOUBLE.fieldOf("max_cleanness").forGetter($ -> $.maxCleanness)
         ).apply(instance, factory::create));
     }
 }

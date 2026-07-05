@@ -12,7 +12,6 @@ import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.util.I18n;
@@ -35,25 +34,25 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public final List<Input> markerOutputs;
 
-    public MarkerRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+    public MarkerRecipe(List<Input> inputs, List<Output> outputs,
         ResourceLocation baseTypeId, String prefix, boolean requireMultiblock,
         Optional<IProcessingIngredient> displayIngredient, Optional<ResourceLocation> displayTex,
         List<Input> markerOutputs) {
-        super(inputs, outputs, workTicks, voltage, power);
+        super(inputs, outputs, 0L, 0L, 0L);
         this.baseTypeId = baseTypeId;
         this.prefix = prefix;
         this.requireMultiblock = requireMultiblock;
         this.displayIngredient = displayIngredient.orElse(null);
         this.displayTex = displayTex.map($ -> new Texture($, 16, 16)).orElse(null);
-        this.markerOutputs = List.copyOf(markerOutputs);
+        this.markerOutputs = markerOutputs;
     }
 
     public Optional<IProcessingIngredient> displayIngredient() {
         return Optional.ofNullable(displayIngredient);
     }
 
-    public Optional<Texture> displayTexture() {
-        return Optional.ofNullable(displayTex);
+    public Optional<ResourceLocation> displayTexLoc() {
+        return displayTex == null ? Optional.empty() : Optional.of(displayTex.loc());
     }
 
     @Override
@@ -101,23 +100,16 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     public static MapCodec<MarkerRecipe> codec(Codec<IProcessingIngredient> ingredientCodec,
-        Codec<IProcessingResult> resultCodec) {
+        Codec<Input> inputCodec, Codec<Output> outputCodec) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ProcessingRecipe.inputCodec(ingredientCodec).listOf().optionalFieldOf("inputs", List.of())
-                .forGetter($ -> $.inputs),
-            ProcessingRecipe.outputCodec(resultCodec).listOf().optionalFieldOf("outputs", List.of())
-                .forGetter($ -> $.outputs),
-            Codec.LONG.optionalFieldOf("work_ticks", 1L).forGetter($ -> $.workTicks),
-            Codec.LONG.optionalFieldOf("voltage", 0L).forGetter($ -> $.voltage),
-            Codec.LONG.optionalFieldOf("power", 1L).forGetter($ -> $.power),
+            inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
             ResourceLocation.CODEC.fieldOf("base_type").forGetter($ -> $.baseTypeId),
-            Codec.STRING.optionalFieldOf("prefix", "").forGetter($ -> $.prefix),
-            Codec.BOOL.optionalFieldOf("require_multiblock", false).forGetter($ -> $.requireMultiblock),
-            ingredientCodec.optionalFieldOf("display").forGetter($ -> Optional.ofNullable($.displayIngredient)),
-            ResourceLocation.CODEC.optionalFieldOf("display_texture")
-                .forGetter($ -> $.displayTex == null ? Optional.empty() : Optional.of($.displayTex.loc())),
-            ProcessingRecipe.inputCodec(ingredientCodec).listOf().optionalFieldOf("marker_outputs", List.of())
-                .forGetter($ -> $.markerOutputs)
+            Codec.STRING.fieldOf("prefix").forGetter($ -> $.prefix),
+            Codec.BOOL.fieldOf("require_multiblock").forGetter($ -> $.requireMultiblock),
+            ingredientCodec.optionalFieldOf("display").forGetter(MarkerRecipe::displayIngredient),
+            ResourceLocation.CODEC.optionalFieldOf("display_texture").forGetter(MarkerRecipe::displayTexLoc),
+            inputCodec.listOf().fieldOf("marker_outputs").forGetter($ -> $.markerOutputs)
         ).apply(instance, MarkerRecipe::new));
     }
 }

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -77,12 +78,11 @@ public class StackIngredient<T> implements IProcessingIngredient, IProcessingDis
         return adapter.tooltip(stack);
     }
 
-    public static <T> Codec<StackIngredient<T>> codec(String codecName, PortType type,
+    public static <T> MapCodec<StackIngredient<T>> codec(String codecName, PortType type,
         Codec<T> stackCodec, IStackAdapter<T> adapter) {
-        return stackCodec.xmap(
+        return stackCodec.fieldOf("stack").xmap(
             stack -> new StackIngredient<>(codecName, type, stack, adapter),
-            StackIngredient::stack
-        );
+            StackIngredient::stack);
     }
 
     @Override

@@ -62,13 +62,11 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     protected ProcessingRecipe(@Nullable ResourceLocation loc, List<Input> inputs, List<Output> outputs,
         long workTicks, long voltage, long power) {
         this.loc = loc;
-        this.inputs = List.copyOf(inputs);
-        this.outputs = List.copyOf(outputs);
+        this.inputs = inputs;
+        this.outputs = outputs;
         this.workTicks = workTicks;
         this.voltage = voltage;
         this.power = power;
-        assert power > 0;
-        assert workTicks > 0;
     }
 
     protected Optional<IProcessingIngredient> consumeInput(IContainer container, Input input,
@@ -219,11 +217,11 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         ).apply(instance, Output::new));
     }
 
-    public static <R extends ProcessingRecipe> MapCodec<R> codec(Codec<IProcessingIngredient> ingredientCodec,
-        Codec<IProcessingResult> resultCodec, Factory<R> factory) {
+    public static <R extends ProcessingRecipe> MapCodec<R> codec(Codec<Input> inputCodec,
+        Codec<Output> outputCodec, Factory<R> factory) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
-            inputCodec(ingredientCodec).listOf().fieldOf("inputs").forGetter($ -> $.inputs),
-            outputCodec(resultCodec).listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
             Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
             Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
             Codec.LONG.fieldOf("power").forGetter($ -> $.power)
