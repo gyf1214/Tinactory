@@ -15,7 +15,7 @@ import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
@@ -231,7 +231,7 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void jobSnapshotShouldPersistAndRestoreMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -250,7 +250,7 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void oldJobSnapshotShouldRestoreZeroMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -472,7 +472,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternNbtCodec codec) {
+        public void restore(CompoundTag tag, PatternCodec codec) {
             active = true;
         }
 
@@ -508,7 +508,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternNbtCodec codec) {
+        public CompoundTag serialize(PatternCodec codec) {
             return new CompoundTag();
         }
     }

@@ -7,7 +7,7 @@ import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
@@ -145,7 +145,7 @@ class AutocraftJobServiceTest {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(target), testPlan());
         var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
@@ -195,7 +195,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternNbtCodec codec) {
+        public void restore(CompoundTag tag, PatternCodec codec) {
             restoreCalled = true;
         }
 
@@ -239,7 +239,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternNbtCodec codec) {
+        public CompoundTag serialize(PatternCodec codec) {
             return new CompoundTag();
         }
 

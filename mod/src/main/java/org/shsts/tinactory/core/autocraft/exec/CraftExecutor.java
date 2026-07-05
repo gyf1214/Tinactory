@@ -14,7 +14,7 @@ import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
@@ -79,7 +79,7 @@ public final class CraftExecutor implements ICraftExecutor {
     }
 
     @Override
-    public void restore(CompoundTag tag, PatternNbtCodec codec) {
+    public void restore(CompoundTag tag, PatternCodec codec) {
         restore(deserialize(tag, codec));
     }
 
@@ -145,7 +145,7 @@ public final class CraftExecutor implements ICraftExecutor {
     }
 
     @Override
-    public CompoundTag serialize(PatternNbtCodec codec) {
+    public CompoundTag serialize(PatternCodec codec) {
         return serialize(snapshot(), codec);
     }
 
@@ -368,7 +368,7 @@ public final class CraftExecutor implements ICraftExecutor {
             }
         }
         if (!activeRuntimes.isEmpty()) {
-            var reason = activeRuntimes.get(0).blockReason();
+            var reason = activeRuntimes.getFirst().blockReason();
             block(reason == null ? ExecutionError.NONE : reason);
         }
     }
@@ -451,7 +451,7 @@ public final class CraftExecutor implements ICraftExecutor {
         }
     }
 
-    private static CompoundTag serialize(ExecutorSnapshot snapshot, PatternNbtCodec codec) {
+    private static CompoundTag serialize(ExecutorSnapshot snapshot, PatternCodec codec) {
         var tag = new CompoundTag();
         tag.putString("state", snapshot.state().name());
         tag.putString("phase", snapshot.phase().name());
@@ -487,7 +487,7 @@ public final class CraftExecutor implements ICraftExecutor {
         return tag;
     }
 
-    private static ExecutorSnapshot deserialize(CompoundTag tag, PatternNbtCodec codec) {
+    private static ExecutorSnapshot deserialize(CompoundTag tag, PatternCodec codec) {
         var plan = deserializePlan(tag.getCompound("plan"), codec);
         var activeRuntimeTags = tag.getList("activeRuntimes", TAG_COMPOUND);
         var activeRuntimes = new ArrayList<StepRuntime.Snapshot>();
@@ -527,7 +527,7 @@ public final class CraftExecutor implements ICraftExecutor {
         return tag.contains("stateAfterFlush") ? JobState.valueOf(tag.getString("stateAfterFlush")) : null;
     }
 
-    private static CompoundTag serializePlan(CraftPlan plan, PatternNbtCodec codec) {
+    private static CompoundTag serializePlan(CraftPlan plan, PatternCodec codec) {
         var tag = new CompoundTag();
         var steps = new ListTag();
         for (var step : plan.steps()) {
@@ -541,7 +541,7 @@ public final class CraftExecutor implements ICraftExecutor {
         return tag;
     }
 
-    private static CraftPlan deserializePlan(CompoundTag tag, PatternNbtCodec codec) {
+    private static CraftPlan deserializePlan(CompoundTag tag, PatternCodec codec) {
         var steps = tag.getList("steps", TAG_COMPOUND);
         var out = new ArrayList<CraftStep>(steps.size());
         for (var i = 0; i < steps.size(); i++) {
@@ -564,7 +564,7 @@ public final class CraftExecutor implements ICraftExecutor {
         return ExecutionError.valueOf(tag.getString("value"));
     }
 
-    private static ListTag serializeKeyedAmounts(Map<IStackKey, Long> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeKeyedAmounts(Map<IStackKey, Long> amounts, PatternCodec codec) {
         var out = new ListTag();
         for (var entry : amounts.entrySet()) {
             out.add(codec.encodeAmount(entry.getKey(), entry.getValue()));
@@ -572,7 +572,7 @@ public final class CraftExecutor implements ICraftExecutor {
         return out;
     }
 
-    private static Map<IStackKey, Long> deserializeKeyedAmounts(ListTag tags, PatternNbtCodec codec) {
+    private static Map<IStackKey, Long> deserializeKeyedAmounts(ListTag tags, PatternCodec codec) {
         var out = new LinkedHashMap<IStackKey, Long>();
         for (var i = 0; i < tags.size(); i++) {
             var amount = codec.decodeAmount(tags.getCompound(i));

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellData;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
@@ -49,7 +49,7 @@ class PatternCellDataTest {
         var first = pattern("first");
         var second = pattern("second");
         var data = PatternCellData.of(Map.of(first.patternUuid(), first, second.patternUuid(), second));
-        var patternCodec = new PatternNbtCodec(
+        var patternCodec = new PatternCodec(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             TestStackKey.CODEC).patternCodec();
         var codec = PatternCellData.codec(patternCodec);

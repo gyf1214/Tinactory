@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -21,17 +21,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class PatternNbtCodecTest {
+class PatternCodecTest {
     private static final UUID TEST_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final UUID SLOT_UUID = UUID.fromString("22222222-2222-2222-2222-222222222222");
     private static final UUID TARGET_UUID = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
     @Test
     void codecShouldRoundTripPattern() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             TEST_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
@@ -55,7 +54,7 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRejectUnknownConstraintType() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
         tag.putUUID("patternUuid", TEST_UUID);
         tag.put("inputs", new ListTag());
@@ -79,7 +78,7 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRejectOldPatternIdNbt() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
         tag.putString("patternId", "tinactory:bad");
         tag.put("inputs", new ListTag());
@@ -98,7 +97,7 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             SLOT_UUID,
             List.of(
@@ -120,7 +119,7 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripTargetRecipeConstraintWithCpuRegistry() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var targetRecipe = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
         var pattern = new CraftPattern(
             TARGET_UUID,
@@ -135,7 +134,7 @@ class PatternNbtCodecTest {
 
     @Test
     void codecShouldRoundTripCraftAmountWithOverloads() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var expected = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
 
         var fromAmount = codec.encodeAmount(expected);
@@ -148,7 +147,7 @@ class PatternNbtCodecTest {
 
     @Test
     void craftPatternCodecShouldRoundTripPattern() {
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             TEST_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:copper_ingot", ""), 2L)),

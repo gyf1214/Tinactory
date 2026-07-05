@@ -1,7 +1,7 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -12,9 +12,8 @@ import org.shsts.tinactory.core.electric.Voltage;
 @MethodsReturnNonnullByDefault
 public record VoltageConstraint(int tier) implements IMachineConstraint {
     public static final String TYPE_ID = "tinactory:voltage";
-    public static final Codec<VoltageConstraint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.INT.fieldOf("voltageTier").forGetter(VoltageConstraint::tier)
-    ).apply(instance, VoltageConstraint::new));
+    public static final MapCodec<VoltageConstraint> CODEC = Codec.INT.fieldOf("voltageTier")
+        .xmap(VoltageConstraint::new, VoltageConstraint::tier);
 
     public VoltageConstraint {
         if (tier < 0) {

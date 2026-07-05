@@ -28,6 +28,7 @@ import org.shsts.tinactory.api.logistics.PortDirection;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -125,5 +126,15 @@ public final class CodecHelper {
     public static <T> List<T> parseListFromBuf(RegistryFriendlyByteBuf buf,
         StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
         return buf.readList(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
+    }
+
+    public static <T> void encodeOptionalToBuf(RegistryFriendlyByteBuf buf,
+        Optional<T> sth, StreamEncoder<RegistryFriendlyByteBuf, T> encoder) {
+        buf.writeOptional(sth, (buf1, sth1) -> encoder.encode((RegistryFriendlyByteBuf) buf1, sth1));
+    }
+
+    public static <T> Optional<T> parseOptionalFromBuf(RegistryFriendlyByteBuf buf,
+        StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
+        return buf.readOptional(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
     }
 }

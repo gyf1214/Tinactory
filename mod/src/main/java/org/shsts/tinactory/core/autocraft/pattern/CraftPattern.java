@@ -1,7 +1,10 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.UUIDUtil;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
 
 import java.util.List;
@@ -25,5 +28,15 @@ public record CraftPattern(
 
     public CraftPattern withUuid(UUID uuid) {
         return new CraftPattern(uuid, inputs, outputs, constraints);
+    }
+
+    public static Codec<CraftPattern> codec(Codec<CraftAmount> amountCodec,
+        Codec<IMachineConstraint> constraintCodec) {
+        return RecordCodecBuilder.create(instance -> instance.group(
+            UUIDUtil.CODEC.fieldOf("patternUuid").forGetter(CraftPattern::patternUuid),
+            amountCodec.listOf().fieldOf("inputs").forGetter(CraftPattern::inputs),
+            amountCodec.listOf().fieldOf("outputs").forGetter(CraftPattern::outputs),
+            constraintCodec.listOf().fieldOf("constraints").forGetter(CraftPattern::constraints)
+        ).apply(instance, CraftPattern::new));
     }
 }

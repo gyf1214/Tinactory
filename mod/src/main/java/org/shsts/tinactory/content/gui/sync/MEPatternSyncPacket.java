@@ -4,22 +4,17 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.shsts.tinactory.integration.autocraft.PatternHelper.PATTERN_CODECS;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternSyncPacket implements IPacket {
-    private static final PatternNbtCodec CODEC = new PatternNbtCodec(
-        MachineConstraintHelper.CODEC,
-        StackHelper.KEY_CODEC);
-
     private final List<CraftPattern> patterns = new ArrayList<>();
 
     public MEPatternSyncPacket() {}
@@ -34,14 +29,12 @@ public class MEPatternSyncPacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        CodecHelper.encodeCollectionToBuf(buf, patterns, (buf1, pattern) ->
-            buf1.writeNbt(CODEC.encodePattern(pattern)));
+        CodecHelper.encodeCollectionToBuf(buf, patterns, PATTERN_CODECS::encodePatternToBuf);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         patterns.clear();
-        patterns.addAll(CodecHelper.parseListFromBuf(buf, buf1 ->
-            CODEC.decodePattern(CodecHelper.readRequiredNbt(buf1, "pattern"))));
+        patterns.addAll(CodecHelper.parseListFromBuf(buf, PATTERN_CODECS::decodePatternFromBuf));
     }
 }

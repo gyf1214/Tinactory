@@ -7,7 +7,7 @@ import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class AutocraftJobService implements IAutocraftService {
         return memoryLimit;
     }
 
-    public Optional<CompoundTag> serializeRunningSnapshot(PatternNbtCodec codec) {
+    public Optional<CompoundTag> serializeRunningSnapshot(PatternCodec codec) {
         if (!isBusy()) {
             return Optional.empty();
         }
@@ -77,7 +77,7 @@ public class AutocraftJobService implements IAutocraftService {
         return Optional.of(tag);
     }
 
-    public void restoreRunningSnapshot(CompoundTag tag, PatternNbtCodec codec) {
+    public void restoreRunningSnapshot(CompoundTag tag, PatternCodec codec) {
         if (!currentTargets.isEmpty() || executor.isBusy()) {
             return;
         }
@@ -142,7 +142,7 @@ public class AutocraftJobService implements IAutocraftService {
         return true;
     }
 
-    private static ListTag serializeAmounts(List<CraftAmount> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeAmounts(List<CraftAmount> amounts, PatternCodec codec) {
         var out = new ListTag();
         for (var amount : amounts) {
             out.add(codec.encodeAmount(amount));
@@ -150,12 +150,11 @@ public class AutocraftJobService implements IAutocraftService {
         return out;
     }
 
-    private static List<CraftAmount> deserializeAmounts(ListTag amounts, PatternNbtCodec codec) {
+    private static List<CraftAmount> deserializeAmounts(ListTag amounts, PatternCodec codec) {
         var out = new ArrayList<CraftAmount>(amounts.size());
         for (var i = 0; i < amounts.size(); i++) {
             out.add(codec.decodeAmount(amounts.getCompound(i)));
         }
         return out;
     }
-
 }

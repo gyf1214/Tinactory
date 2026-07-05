@@ -1,6 +1,7 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -16,7 +17,7 @@ public record PortConstraint(PortDirection direction, int index, int port)
     implements IMachineConstraint {
     public static final String TYPE_ID = "tinactory:port";
 
-    public static final Codec<PortConstraint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<PortConstraint> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         CodecHelper.PORT_DIRECTION_CODEC.fieldOf("direction").forGetter(PortConstraint::direction),
         Codec.INT.fieldOf("index").forGetter(PortConstraint::index),
         Codec.INT.fieldOf("port").forGetter(PortConstraint::port)

@@ -9,10 +9,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
-import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellData;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.logistics.DigitalCellData;
+import org.shsts.tinactory.integration.autocraft.PatternHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
@@ -24,9 +23,10 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 public final class AllDataComponents {
     private static final IEntryHandler<DataComponentType<?>> DATA_COMPONENT_TYPES =
         REGISTRATE.getHandler(Registries.DATA_COMPONENT_TYPE, BuiltInRegistries.DATA_COMPONENT_TYPE);
-    private static final Codec<DigitalCellData> DIGITAL_CELL_CODEC = DigitalCellData.codec(StackHelper.KEY_CODEC);
+    private static final Codec<DigitalCellData> DIGITAL_CELL_CODEC =
+        DigitalCellData.codec(StackHelper.KEY_CODEC);
     private static final Codec<PatternCellData> PATTERN_CELL_CODEC =
-        PatternCellData.codec(new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC).patternCodec());
+        PatternCellData.codec(PatternHelper.PATTERN_CODEC);
 
     public static final IEntry<DataComponentType<SimpleFluidContent>> FLUID_CELL_CONTENT =
         component("fluid_cell_content", SimpleFluidContent.CODEC, SimpleFluidContent.STREAM_CODEC);

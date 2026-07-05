@@ -12,7 +12,7 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
@@ -38,7 +38,7 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldResumeFromRunningSnapshot() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         var first = new AutocraftJobService(executor());
         first.submitPrepared(List.of(target), plan);
@@ -60,7 +60,7 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
@@ -86,7 +86,7 @@ class AutocraftCpuPersistenceTest {
         var summary = new PlanSummary(Map.of(key, new PlanSummary.Entry(0L, 0L, 2L)));
         var plan = new CraftPlan(List.of(step), summary, 123L);
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
+        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(key, 1)), plan);
         service.tick();
