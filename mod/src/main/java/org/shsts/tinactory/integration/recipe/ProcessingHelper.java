@@ -83,7 +83,7 @@ public final class ProcessingHelper {
         DISPLAY_INPUT_CODEC = ProcessingRecipe.codec(INPUT_CODEC, OUTPUT_CODEC, DisplayInputRecipe::new);
         ASSEMBLY_CODEC = AssemblyRecipe.assemblyCodec(INPUT_CODEC, OUTPUT_CODEC, AssemblyRecipe::new);
         MARKER_CODEC = MarkerRecipe.codec(INGREDIENT_CODEC, INPUT_CODEC, OUTPUT_CODEC);
-        RESEARCH_CODEC = ResearchRecipe.codec(INPUT_CODEC, OUTPUT_CODEC);
+        RESEARCH_CODEC = ResearchRecipe.codec(INPUT_CODEC);
     }
 
     private ProcessingHelper() {}

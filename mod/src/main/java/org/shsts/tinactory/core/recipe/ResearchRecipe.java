@@ -23,9 +23,9 @@ public class ResearchRecipe extends ProcessingRecipe {
     public final ResourceLocation target;
     public final long progress;
 
-    public ResearchRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+    public ResearchRecipe(List<Input> inputs, long workTicks, long voltage, long power,
         ResourceLocation target, long progress) {
-        super(inputs, outputs, workTicks, voltage, power);
+        super(inputs, List.of(), workTicks, voltage, power);
         this.target = target;
         this.progress = progress;
     }
@@ -53,10 +53,9 @@ public class ResearchRecipe extends ProcessingRecipe {
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
     }
 
-    public static MapCodec<ResearchRecipe> codec(Codec<Input> inputCodec, Codec<Output> outputCodec) {
+    public static MapCodec<ResearchRecipe> codec(Codec<Input> inputCodec) {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
             inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
-            outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
             Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
             Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
             Codec.LONG.fieldOf("power").forGetter($ -> $.power),
