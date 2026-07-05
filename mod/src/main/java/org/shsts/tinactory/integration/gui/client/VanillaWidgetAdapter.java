@@ -27,6 +27,12 @@ public class VanillaWidgetAdapter<T extends GuiEventListener & Renderable & Narr
     }
 
     @Override
+    public Rect rect() {
+        var rect1 = widget.getRectangle();
+        return new Rect(rect1.left(), rect1.top(), rect1.width(), rect1.height());
+    }
+
+    @Override
     public void setActive(boolean active) {
         if (widget instanceof AbstractWidget abstractWidget) {
             abstractWidget.active = active;

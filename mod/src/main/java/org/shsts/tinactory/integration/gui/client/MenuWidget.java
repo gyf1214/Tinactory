@@ -45,7 +45,7 @@ public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventLi
         }
     }
 
-    protected Rect rect() {
+    public Rect rect() {
         assert rect != null;
         return rect;
     }

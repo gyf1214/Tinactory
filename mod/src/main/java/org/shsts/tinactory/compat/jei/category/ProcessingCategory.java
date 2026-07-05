@@ -119,7 +119,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     }
 
     @Override
-    protected void drawExtra(R recipe, ICategoryDrawHelper helper,
+    protected void drawExtra(ResourceLocation loc, R recipe, ICategoryDrawHelper helper,
         IRecipeSlotsView slotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         helper.drawProgressBar(graphics, (int) recipe.workTicks);
         var y = layout.rect.endY() + SLOT_SIZE / 2;
@@ -135,7 +135,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     }
 
     @Override
-    protected void setRecipe(R recipe, IIngredientBuilder builder) {
+    protected void setRecipe(ResourceLocation loc, R recipe, IIngredientBuilder builder) {
         var inputs = layout.getProcessingInputs(recipe);
         var outputs = layout.getProcessingOutputs(recipe);
 
@@ -148,10 +148,10 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
     }
 
     @Override
-    protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {
+    protected void extraLayout(ResourceLocation loc, R recipe, IRecipeLayoutBuilder builder) {
         // register as OUTPUT so you can use the shortcut R to see it.
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-            .addIngredient(RecipeMarker.TYPE, new RecipeMarker(recipe.loc()));
+            .addIngredient(RecipeMarker.TYPE, new RecipeMarker(loc));
     }
 
     protected void addTechIngredient(IRecipeLayoutBuilder builder, RecipeIngredientRole role,

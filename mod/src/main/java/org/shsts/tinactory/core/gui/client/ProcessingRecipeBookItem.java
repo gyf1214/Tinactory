@@ -43,7 +43,7 @@ public record ProcessingRecipeBookItem(IEntry<? extends ProcessingRecipe> entry)
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return recipe().tooltip();
+        return recipe().tooltip(loc());
     }
 
     @Override

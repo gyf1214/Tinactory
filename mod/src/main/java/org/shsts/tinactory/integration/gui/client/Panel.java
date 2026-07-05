@@ -71,6 +71,12 @@ public class Panel implements IViewAdapter, IViewGroup {
         postLayout();
     }
 
+    @Override
+    public Rect rect() {
+        assert rect != null;
+        return rect;
+    }
+
     protected void postLayout() {
         if (refreshPending && isActive()) {
             refresh();

@@ -3,7 +3,6 @@ package org.shsts.tinactory.core.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -46,8 +44,6 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
         R create(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power);
     }
 
-    @Nullable
-    protected final ResourceLocation loc;
     public final List<Input> inputs;
     public final List<Output> outputs;
 
@@ -55,13 +51,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
     public final long voltage;
     public final long power;
 
-    public ProcessingRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
-        this(null, inputs, outputs, workTicks, voltage, power);
-    }
-
-    protected ProcessingRecipe(@Nullable ResourceLocation loc, List<Input> inputs, List<Output> outputs,
+    public ProcessingRecipe(List<Input> inputs, List<Output> outputs,
         long workTicks, long voltage, long power) {
-        this.loc = loc;
         this.inputs = inputs;
         this.outputs = outputs;
         this.workTicks = workTicks;
@@ -172,7 +163,7 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             .orElse(EmptyRenderDescriptor.INSTANCE);
     }
 
-    public Optional<List<Component>> tooltip() {
+    public Optional<List<Component>> tooltip(ResourceLocation loc) {
         return getDisplayObject()
             .filter(IProcessingDisplay.class::isInstance)
             .map(IProcessingDisplay.class::cast)
@@ -190,17 +181,8 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
             .map(Input::ingredient);
     }
 
-    public ResourceLocation loc() {
-        return Objects.requireNonNull(loc);
-    }
-
     public static String getDescriptionId(ResourceLocation loc) {
         return loc.getNamespace() + ".recipe." + loc.getPath().replace('/', '.');
-    }
-
-    @Override
-    public String toString() {
-        return loc == null ? getClass().getSimpleName() : getClass().getSimpleName() + "[" + loc + "]";
     }
 
     public static Codec<Input> inputCodec(Codec<IProcessingIngredient> ingredientCodec) {

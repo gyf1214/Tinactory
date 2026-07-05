@@ -160,14 +160,14 @@ public class JEI implements IModPlugin {
             }
         }
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
-            RecipeTypes.SMELTING.getRecipeClass(), MEPatternTransferHandler::fromSmelting,
+            RecipeTypes.SMELTING, MEPatternTransferHandler::fromSmelting,
             registration.getTransferHelper()), RecipeTypes.SMELTING);
     }
 
     private static <R extends ProcessingRecipe> void addProcessingTransferHandler(
         IRecipeTransferRegistration registration, ProcessingCategory<R> category) {
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
-            category.jeiRecipeType().getRecipeClass(),
+            category.jeiRecipeType(),
             recipe -> MEPatternTransferHandler.fromProcessing(recipe, category.recipeTypeId()),
             registration.getTransferHelper()), category.jeiRecipeType());
     }

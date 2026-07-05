@@ -5,6 +5,7 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Layout;
@@ -47,8 +48,8 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
     }
 
     @Override
-    protected void extraLayout(ResearchRecipe recipe, IRecipeLayoutBuilder builder) {
-        super.extraLayout(recipe, builder);
+    protected void extraLayout(ResourceLocation loc, ResearchRecipe recipe, IRecipeLayoutBuilder builder) {
+        super.extraLayout(loc, recipe, builder);
         var rect = layout.images.getFirst().rect();
         addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe.target);
         var requiredTech = TechManagers.client().techByKey(recipe.target)

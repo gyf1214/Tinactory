@@ -85,8 +85,8 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
 
     @Override
     protected void updateDynamicChildren() {
-        var width = rect.width() + offset.width();
-        var height = rect.height() + offset.height();
+        var width = rect().width() + offset.width();
+        var height = rect().height() + offset.height();
 
         columnCount = itemWidth <= 0 ? 1 : Math.max(1, width / itemWidth);
         rowCount = itemHeight <= 0 ? 1 : Math.max(1, (height + verticalSpacing) / (itemHeight + verticalSpacing));
@@ -107,7 +107,7 @@ public class GridViewGroup<T extends IViewNode> extends ViewGroup {
             slot.setActive(active);
         }
         while (slots.size() > slotCount) {
-            var slot = slots.remove(slots.size() - 1);
+            var slot = slots.removeLast();
             removeChild(slot);
         }
         for (var i = 0; i < slots.size(); i++) {

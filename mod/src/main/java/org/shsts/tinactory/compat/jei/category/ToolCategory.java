@@ -5,6 +5,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -31,7 +32,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe> {
     }
 
     @Override
-    protected void setRecipe(ToolRecipe recipe, IIngredientBuilder builder) {
+    protected void setRecipe(ResourceLocation loc, ToolRecipe recipe, IIngredientBuilder builder) {
         var shaped = recipe.shapedRecipe;
         var slots = layout.slots;
 
@@ -51,7 +52,7 @@ public class ToolCategory extends RecipeCategory<ToolRecipe> {
     }
 
     @Override
-    protected void extraLayout(ToolRecipe recipe, IRecipeLayoutBuilder builder) {
+    protected void extraLayout(ResourceLocation loc, ToolRecipe recipe, IRecipeLayoutBuilder builder) {
         var k = 0;
         for (var toolIngredient : recipe.toolIngredients) {
             var slot = layout.slots.get(1 + k);

@@ -2,10 +2,8 @@ package org.shsts.tinactory.content.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -26,20 +24,12 @@ public class ToolRecipe implements IRecipe<Workbench> {
         Ingredient.CODEC.listOf().fieldOf("tools").forGetter($ -> $.toolIngredients)
     ).apply(instance, ToolRecipe::new));
 
-    @Nullable
-    private final ResourceLocation loc;
     public final ShapedRecipe shapedRecipe;
     public final List<Ingredient> toolIngredients;
 
-    public ToolRecipe(ResourceLocation loc, ShapedRecipe shapedRecipe,
-        List<Ingredient> toolIngredients) {
-        this.loc = loc;
+    public ToolRecipe(ShapedRecipe shapedRecipe, List<Ingredient> toolIngredients) {
         this.shapedRecipe = shapedRecipe;
         this.toolIngredients = toolIngredients;
-    }
-
-    public ToolRecipe(ShapedRecipe shapedRecipe, List<Ingredient> toolIngredients) {
-        this(null, shapedRecipe, toolIngredients);
     }
 
     private boolean matchTools(IItemHandler toolStorage) {
@@ -73,11 +63,6 @@ public class ToolRecipe implements IRecipe<Workbench> {
         return shapedRecipe.getRemainingItems(container.getCraftingInput());
     }
 
-    public ResourceLocation loc() {
-        assert loc != null;
-        return loc;
-    }
-
     public void doDamage(IItemHandlerModifiable toolStorage) {
         var damages = new int[toolStorage.getSlots()];
         Arrays.fill(damages, 0);
@@ -102,10 +87,4 @@ public class ToolRecipe implements IRecipe<Workbench> {
             toolStorage.setStackInSlot(i, stack1);
         }
     }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[" + loc + "]";
-    }
-
 }

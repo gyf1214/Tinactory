@@ -67,8 +67,8 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public Optional<List<Component>> tooltip() {
-        return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc()))));
+    public Optional<List<Component>> tooltip(ResourceLocation loc) {
+        return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))));
     }
 
     @Override

@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
@@ -32,8 +33,8 @@ public class AssemblyCategory<R extends AssemblyRecipe> extends ProcessingCatego
     }
 
     @Override
-    protected void extraLayout(R recipe, IRecipeLayoutBuilder builder) {
-        super.extraLayout(recipe, builder);
+    protected void extraLayout(ResourceLocation loc, R recipe, IRecipeLayoutBuilder builder) {
+        super.extraLayout(loc, recipe, builder);
         addRequiredTech(builder, recipe.requiredTech);
     }
 }

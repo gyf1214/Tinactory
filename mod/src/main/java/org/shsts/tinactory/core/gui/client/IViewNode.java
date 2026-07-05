@@ -12,5 +12,7 @@ import org.shsts.tinactory.core.gui.Rect;
 public interface IViewNode {
     void setRect(Rect rect);
 
+    Rect rect();
+
     void setActive(boolean active);
 }

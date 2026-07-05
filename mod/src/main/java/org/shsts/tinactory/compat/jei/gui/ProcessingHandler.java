@@ -3,23 +3,24 @@ package org.shsts.tinactory.compat.jei.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
+import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.runtime.IRecipesGui;
+import mezz.jei.library.ingredients.TypedIngredient;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.content.gui.client.MachineRecipeBook;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
-import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -27,15 +28,10 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingHandler extends MenuScreenHandler<ProcessingScreen> {
-    private Object getRecipeBookIngredient(IRecipeBookItem item) {
-        return new RecipeMarker(item.loc());
-    }
-
     @Override
-    protected @Nullable Object getIngredientHovered(IViewAdapter hovered, double mouseX, double mouseY) {
+    protected Optional<ITypedIngredient<?>> getIngredientHovered(IViewAdapter hovered, double mouseX, double mouseY) {
         return MachineRecipeBook.getHoveredRecipe(hovered)
-            .map(this::getRecipeBookIngredient)
-            .orElse(null);
+            .map(item -> TypedIngredient.createUnvalidated(RecipeMarker.TYPE, new RecipeMarker(item.loc())));
     }
 
     @Override

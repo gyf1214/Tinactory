@@ -2,6 +2,7 @@ package org.shsts.tinactory.compat.jei.category;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -17,7 +18,7 @@ public class DistillationCategory extends ProcessingCategory<ProcessingRecipe> {
     }
 
     @Override
-    protected void setRecipe(ProcessingRecipe recipe, IIngredientBuilder builder) {
+    protected void setRecipe(ResourceLocation loc, ProcessingRecipe recipe, IIngredientBuilder builder) {
         var inputs = layout.getProcessingInputs(recipe);
         for (var input : inputs) {
             addIngredient(builder, input.slot(), input.val());
