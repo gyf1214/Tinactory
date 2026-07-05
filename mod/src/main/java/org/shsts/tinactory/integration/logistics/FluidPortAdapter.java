@@ -8,7 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
@@ -85,14 +84,6 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
             return new FluidKey(stack.getFluid(), stack.getComponentsPatch());
         }
 
-        private ResourceLocation id() {
-            return BuiltInRegistries.FLUID.getKey(fluid);
-        }
-
-        private String componentString() {
-            return components.toString();
-        }
-
         @Override
         public PortType type() {
             return PortType.FLUID;
@@ -101,21 +92,6 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         @Override
         public IStackAdapter<?> adapter() {
             return StackHelper.FLUID_ADAPTER;
-        }
-
-        @Override
-        public int compareTo(IStackKey other) {
-            if (type() != other.type()) {
-                return Integer.compare(type().ordinal(), other.type().ordinal());
-            }
-            if (!(other instanceof FluidKey typed)) {
-                throw new IllegalArgumentException("Expected fluid key for FLUID type comparison");
-            }
-            var byId = id().compareTo(typed.id());
-            if (byId != 0) {
-                return byId;
-            }
-            return componentString().compareTo(typed.componentString());
         }
     }
 

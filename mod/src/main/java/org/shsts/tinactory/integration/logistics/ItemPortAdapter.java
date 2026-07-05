@@ -8,7 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
@@ -85,14 +84,6 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
             return new ItemKey(stack.getItem(), stack.getComponentsPatch());
         }
 
-        private ResourceLocation id() {
-            return BuiltInRegistries.ITEM.getKey(item);
-        }
-
-        private String componentsString() {
-            return components.toString();
-        }
-
         @Override
         public PortType type() {
             return PortType.ITEM;
@@ -101,21 +92,6 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         @Override
         public IStackAdapter<?> adapter() {
             return StackHelper.ITEM_ADAPTER;
-        }
-
-        @Override
-        public int compareTo(IStackKey other) {
-            if (type() != other.type()) {
-                return Integer.compare(type().ordinal(), other.type().ordinal());
-            }
-            if (!(other instanceof ItemKey typed)) {
-                throw new IllegalArgumentException("Expected item key for ITEM type comparison");
-            }
-            var byId = id().compareTo(typed.id());
-            if (byId != 0) {
-                return byId;
-            }
-            return componentsString().compareTo(typed.componentsString());
         }
     }
 

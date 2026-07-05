@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface IStackKey extends Comparable<IStackKey> {
+public interface IStackKey {
     PortType type();
 
     IStackAdapter<?> adapter();

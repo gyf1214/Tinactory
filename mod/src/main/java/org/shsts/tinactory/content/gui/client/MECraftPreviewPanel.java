@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -147,7 +148,7 @@ public class MECraftPreviewPanel extends Panel {
         previewMemoryUsage = previewReady ? packet.memoryUsage() : 0L;
         summary.clear();
         packet.summary().entries().entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
+            .sorted(Map.Entry.comparingByKey(PatternRegistryCache.KEY_DISPLAY_ORDER))
             .forEach(summary::add);
         selectedCpu = null;
         cpuButton.setLabel(defaultCpuLabel);
