@@ -86,10 +86,10 @@ public final class TechQuestIntegration {
         }
         var tech = technology.get();
         var technologyLoc = tech.loc();
-        task.maxProgress = tech.getMaxProgress();
-        task.checkTimer = 20;
-        task.enableButton = false;
-        task.check = (data, player) -> checkTechnologyTask(data, player, technologyLoc);
+        task.setMaxProgress(tech.getMaxProgress());
+        task.setCheckTimer(20);
+        task.setEnableButton(false);
+        task.setCheck((data, player) -> checkTechnologyTask(data, player, technologyLoc));
         tasksByTechnology.computeIfAbsent(technologyLoc, unused -> new ArrayList<>())
             .add(new TechnologyTaskBinding(technologyLoc, task));
         return EventResult.pass();
@@ -97,7 +97,8 @@ public final class TechQuestIntegration {
 
     private void checkTechnologyTask(CustomTask.Data data, ServerPlayer player, ResourceLocation technology) {
         TechManagers.server().teamByPlayer(player)
-            .ifPresent(team -> setTaskProgressIfChanged(data.teamData, data.task, team.getTechProgress(technology)));
+            .ifPresent(team -> setTaskProgressIfChanged(
+                data.teamData(), data.task(), team.getTechProgress(technology)));
     }
 
     private void onTinactoryTechProgressChanged(ITeamProfile team) {
@@ -110,10 +111,14 @@ public final class TechQuestIntegration {
         if (player.isEmpty()) {
             return;
         }
-        var teamData = ServerQuestFile.INSTANCE.getData(player.get());
+        var teamData = ServerQuestFile.INSTANCE.getTeamData(player.get());
+        if (teamData.isEmpty()) {
+            return;
+        }
         for (var bindings : tasksByTechnology.values()) {
             for (var binding : bindings) {
-                setTaskProgressIfChanged(teamData, binding.task(), team.getTechProgress(binding.technology()));
+                setTaskProgressIfChanged(teamData.get(), binding.task(),
+                    team.getTechProgress(binding.technology()));
             }
         }
     }
