@@ -3,21 +3,26 @@ package org.shsts.tinactory.integration.logistics;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.util.DataComponentUtil;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -51,6 +56,14 @@ public final class StackHelper {
         StackHelper::keyCodecName,
         StackHelper::keyCodec);
 
+    public static final Codec<ItemStack> ITEM_STACK_NO_LIMIT_CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            ItemStack.ITEM_NON_AIR_CODEC.fieldOf("id").forGetter(ItemStack::getItemHolder),
+            ExtraCodecs.POSITIVE_INT.fieldOf("count").orElse(1).forGetter(ItemStack::getCount),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                .forGetter(ItemStack::getComponentsPatch)
+        ).apply(instance, ItemStack::new));
+
     public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
 
@@ -58,21 +71,15 @@ public final class StackHelper {
      * Use this if the itemStack can have more than 99 items.
      */
     public static CompoundTag serializeItemStack(HolderLookup.Provider provider, ItemStack stack) {
-        var tag = new CompoundTag();
-        stack.save(provider, tag);
-        tag.putInt("CountInt", stack.getCount());
-        return tag;
+        return (CompoundTag) DataComponentUtil.wrapEncodingExceptions(stack, ITEM_STACK_NO_LIMIT_CODEC, provider);
     }
 
     /**
      * Use this if the itemStack can have more than 99 items.
      */
     public static ItemStack deserializeItemStack(HolderLookup.Provider provider, CompoundTag tag) {
-        var stack = ItemStack.parseOptional(provider, tag);
-        if (!stack.isEmpty() && tag.contains("CountInt", Tag.TAG_INT)) {
-            stack.setCount(tag.getInt("CountInt"));
-        }
-        return stack;
+        return ITEM_STACK_NO_LIMIT_CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag)
+            .getOrThrow();
     }
 
     public static CompoundTag serializeItemHandler(HolderLookup.Provider provider, IItemHandler itemHandler) {
@@ -150,15 +157,6 @@ public final class StackHelper {
         var ret = stack.copy();
         ret.setAmount(amount);
         return ret;
-    }
-
-    public static Optional<ItemStack> hasItem(IPort<ItemStack> port, Predicate<ItemStack> ingredient) {
-        for (var stack : port.getAllStorages()) {
-            if (ingredient.test(stack)) {
-                return Optional.of(stack);
-            }
-        }
-        return Optional.empty();
     }
 
     /**
