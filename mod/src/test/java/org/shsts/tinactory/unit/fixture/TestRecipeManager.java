@@ -1,7 +1,6 @@
 package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -17,8 +16,8 @@ public final class TestRecipeManager implements IRecipeManager {
     private final Map<ResourceLocation, IEntry<? extends IRecipe<?>>> byLoc = new HashMap<>();
     private final Map<ResourceLocation, List<IEntry<? extends IRecipe<?>>>> byType = new HashMap<>();
 
-    public <R extends ProcessingRecipe> TestRecipeManager add(IRecipeType<R> recipeType, R recipe) {
-        return add(recipeType, recipe.loc(), recipe);
+    public <R extends IRecipe<?>> TestRecipeManager add(IRecipeType<R> recipeType, IEntry<R> recipe) {
+        return add(recipeType, recipe.loc(), recipe.get());
     }
 
     public <R extends IRecipe<?>> TestRecipeManager add(IRecipeType<R> recipeType, ResourceLocation loc, R recipe) {
@@ -34,7 +33,6 @@ public final class TestRecipeManager implements IRecipeManager {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <C, R extends IRecipe<C>> List<IEntry<R>> getRecipesFor(IRecipeType<R> recipeType, C context) {
         return getAllRecipesFor(recipeType).stream()
             .filter($ -> $.get().matches(context))
@@ -63,12 +61,5 @@ public final class TestRecipeManager implements IRecipeManager {
     @Override
     public Optional<IEntry<? extends IRecipe<?>>> byLoc(ResourceLocation loc) {
         return Optional.ofNullable(byLoc.get(loc));
-    }
-
-    public record TestEntry<R>(ResourceLocation loc, R value) implements IEntry<R> {
-        @Override
-        public R get() {
-            return value;
-        }
     }
 }

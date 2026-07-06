@@ -1,8 +1,10 @@
 package org.shsts.tinactory.unit.machine;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
@@ -19,17 +21,14 @@ import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
-import org.shsts.tinactory.unit.fixture.TestProcessingObject;
-import org.shsts.tinactory.unit.fixture.TestRecipeManager.TestEntry;
+import org.shsts.tinactory.unit.fixture.TestProcessingHelper;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -40,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class ProcessingRuntimeTest {
     private static final ResourceLocation PROCESSING_TYPE = modLoc("test_processing");
@@ -114,7 +114,7 @@ class ProcessingRuntimeTest {
         var original = runtime(machine, originalProcessor);
         original.onPreWork();
         original.onWorkTick(1d);
-        var saved = original.serializeNBT();
+        var saved = original.serializeNBT(TEST_REGISTRY);
 
         var restoredProcessor = new TestRecipeProcessor()
             .recipe(RECIPE_ID)
@@ -122,7 +122,7 @@ class ProcessingRuntimeTest {
             .progressPerTick(4)
             .maxProgress(12);
         var restored = runtime(machine, restoredProcessor);
-        restored.deserializeNBT(saved);
+        restored.deserializeNBT(TEST_REGISTRY, saved);
         restored.onPreWork();
 
         assertTrue(restoredProcessor.continued());
@@ -274,11 +274,11 @@ class ProcessingRuntimeTest {
     void shouldTreatEmptySerializationTagAsIdleState() {
         var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
 
-        runtime.deserializeNBT(new CompoundTag());
+        runtime.deserializeNBT(TEST_REGISTRY, new CompoundTag());
 
         assertEquals(0L, runtime.progressTicks());
         assertTrue(runtime.getAllInfo().isEmpty());
-        assertTrue(runtime.serializeNBT().isEmpty());
+        assertTrue(runtime.serializeNBT(TEST_REGISTRY).isEmpty());
     }
 
     private static final class RuntimeBuilder {
@@ -316,7 +316,7 @@ class ProcessingRuntimeTest {
             var properties = new ProcessingRuntime.Properties(
                 processors, autoRecipe, machineSupplier,
                 () -> false, onUpdate, onReportObject,
-                TestProcessingObject.INFO_CODEC);
+                TestProcessingHelper.INFO_CODEC);
             return new ProcessingRuntime(properties);
         }
     }
@@ -420,8 +420,13 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Optional<IEntry<ResourceLocation>> byLoc(ResourceLocation loc) {
-            return recipe.filter(loc::equals).map($ -> new TestEntry<>($, $));
+        public Optional<ResourceLocation> byLoc(ResourceLocation loc) {
+            return recipe.filter(loc::equals);
+        }
+
+        @Override
+        public ResourceLocation toLoc(ResourceLocation recipe) {
+            return recipe;
         }
 
         @Override
@@ -440,13 +445,13 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public Optional<IEntry<ResourceLocation>> newRecipe(IMachine machine) {
-            return recipe.map($ -> new TestEntry<>($, $));
+        public Optional<ResourceLocation> newRecipe(IMachine machine) {
+            return recipe;
         }
 
         @Override
-        public Optional<IEntry<ResourceLocation>> newRecipe(IMachine machine, ResourceLocation target) {
-            return recipe.filter(target::equals).map($ -> new TestEntry<>($, $));
+        public Optional<ResourceLocation> newRecipe(IMachine machine, ResourceLocation target) {
+            return recipe.filter(target::equals);
         }
 
         @Override
@@ -467,7 +472,7 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public void onWorkDone(ResourceLocation recipe, IMachine machine, Random random,
+        public void onWorkDone(ResourceLocation recipe, IMachine machine, RandomSource random,
             Consumer<IProcessingResult> callback) {
             results.forEach(result -> {
                 doneResults.add(result);
@@ -506,13 +511,12 @@ class ProcessingRuntimeTest {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             return new CompoundTag();
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
-        }
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
     }
 
     private record Report(PortDirection direction, IProcessingObject object) {

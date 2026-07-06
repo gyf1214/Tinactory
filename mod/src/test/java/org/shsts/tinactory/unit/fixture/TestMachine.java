@@ -1,10 +1,12 @@
 package org.shsts.tinactory.unit.fixture;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,14 +33,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
 public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
     private final TestMachineConfig config = new TestMachineConfig();
-    private final Random random = new Random(31L);
+    private final RandomSource random = RandomSource.create(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
     private Optional<TestTeamProfile> owner = Optional.empty();
@@ -166,7 +167,7 @@ public final class TestMachine implements IMachine {
     }
 
     @Override
-    public Random random() {
+    public RandomSource random() {
         return random;
     }
 
@@ -246,13 +247,17 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public Optional<Tag> getTag(String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             return new CompoundTag();
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
-        }
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
     }
 
     private record TestProcessor(Set<ResourceLocation> recipeTypes) implements IMachineProcessor {

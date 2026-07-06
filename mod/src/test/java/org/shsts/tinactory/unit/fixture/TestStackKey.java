@@ -28,7 +28,7 @@ public record TestStackKey(PortType type, String id, String nbt) implements ISta
     private static DataResult<TestStackKey> decode(String encoded) {
         var parts = encoded.split("\\|", 3);
         if (parts.length != 3) {
-            return DataResult.error("Invalid test key encoding: " + encoded);
+            return DataResult.error(() -> "Invalid test key encoding: " + encoded);
         }
         var type = switch (parts[0]) {
             case "item" -> PortType.ITEM;
@@ -36,7 +36,7 @@ public record TestStackKey(PortType type, String id, String nbt) implements ISta
             default -> null;
         };
         if (type == null) {
-            return DataResult.error("Invalid test key type: " + parts[0]);
+            return DataResult.error(() -> "Invalid test key type: " + parts[0]);
         }
         return DataResult.success(new TestStackKey(type, parts[1], parts[2]));
     }
@@ -53,22 +53,6 @@ public record TestStackKey(PortType type, String id, String nbt) implements ISta
     @Override
     public IStackAdapter<?> adapter() {
         return TestStack.ADAPTER;
-    }
-
-    @Override
-    public int compareTo(IStackKey other) {
-        if (!(other instanceof TestStackKey typed)) {
-            throw new IllegalArgumentException("Expected TestIngredientKey");
-        }
-        var byType = Integer.compare(type.ordinal(), typed.type.ordinal());
-        if (byType != 0) {
-            return byType;
-        }
-        var byId = id.compareTo(typed.id);
-        if (byId != 0) {
-            return byId;
-        }
-        return nbt.compareTo(typed.nbt);
     }
 
     @Override

@@ -1,12 +1,12 @@
 package org.shsts.tinactory.unit.recipe;
 
+import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
-import java.util.Random;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +32,7 @@ class StackResultTest {
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 1d,
             TestStack.item("ingot", 3), TestStack.ADAPTER);
 
-        var inserted = result.insertPort(port, 2, new Random(1L), false);
+        var inserted = result.insertPort(port, 2, RandomSource.create(), false);
 
         assertTrue(inserted.isPresent());
         assertEquals(new TestStack(PortType.ITEM, "ingot", "", 6),
@@ -46,7 +46,7 @@ class StackResultTest {
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 0d,
             TestStack.item("ingot", 3), TestStack.ADAPTER);
 
-        var inserted = result.insertPort(port, 4, new Random(1L), false);
+        var inserted = result.insertPort(port, 4, RandomSource.create(), false);
 
         assertTrue(inserted.isEmpty());
         assertEquals(TestStack.item("ingot", 1), port.storedStack());

@@ -1,5 +1,8 @@
 package org.shsts.tinactory.unit.util;
 
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.I18n;
@@ -8,6 +11,7 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
@@ -18,8 +22,9 @@ class I18nTest {
 
         var component = I18n.tr("tinactory.unit.i18n.example", "value", 2);
 
-        assertEquals("tinactory.unit.i18n.example", component.getKey());
-        assertArrayEquals(new Object[]{"value", 2}, component.getArgs());
+        assertSame(TranslatableContents.TYPE, component.getContents().type());
+        assertEquals("tinactory.unit.i18n.example", key(component));
+        assertArrayEquals(new Object[]{"value", 2}, args(component));
         assertMinecraftStillNotBootstrapped();
     }
 
@@ -29,9 +34,18 @@ class I18nTest {
 
         var component = I18n.tr(modLoc("gui/path/example"), "arg");
 
-        assertEquals("tinactory.gui.path.example", component.getKey());
-        assertArrayEquals(new Object[]{"arg"}, component.getArgs());
+        assertSame(TranslatableContents.TYPE, component.getContents().type());
+        assertEquals("tinactory.gui.path.example", key(component));
+        assertArrayEquals(new Object[]{"arg"}, args(component));
         assertMinecraftStillNotBootstrapped();
+    }
+
+    private static String key(MutableComponent component) {
+        return ((TranslatableContents) component.getContents()).getKey();
+    }
+
+    private static Object[] args(MutableComponent component) {
+        return ((TranslatableContents) component.getContents()).getArgs();
     }
 
     @Test
@@ -40,7 +54,8 @@ class I18nTest {
 
         var component = I18n.raw("value=%s count=%d", "test", 3);
 
-        assertEquals("value=test count=3", component.getText());
+        assertSame(PlainTextContents.TYPE, component.getContents().type());
+        assertEquals("value=test count=3", ((PlainTextContents) component.getContents()).text());
         assertMinecraftStillNotBootstrapped();
     }
 

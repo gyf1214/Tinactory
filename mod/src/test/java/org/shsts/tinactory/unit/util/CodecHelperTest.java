@@ -49,7 +49,7 @@ class CodecHelperTest {
     }
 
     @Test
-    void componentCodecRoundTripsTextAndThrowsOnInvalidJson() {
+    void componentCodecRoundTripsText() {
         var component = Component.literal("core util");
         var encoded = CodecHelper.encodeComponent(component);
 

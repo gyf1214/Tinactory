@@ -1,6 +1,8 @@
 package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -13,12 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 public final class TestIngredient extends TestProcessingObject implements IProcessingIngredient, IProcessingDisplay {
-    public static final Codec<TestIngredient> CODEC = Codec.STRING.xmap(
-        value -> {
-            var parts = value.split(":");
-            return new TestIngredient(parts[0], Integer.parseInt(parts[1]));
-        },
-        value -> value.key() + ":" + value.amount());
+    public static final MapCodec<TestIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Codec.STRING.fieldOf("key").forGetter(TestProcessingObject::key),
+        Codec.INT.fieldOf("amount").forGetter(TestProcessingObject::amount)
+    ).apply(instance, TestIngredient::new));
 
     private final IRenderDescriptor descriptor;
     private final List<Component> tooltip;
