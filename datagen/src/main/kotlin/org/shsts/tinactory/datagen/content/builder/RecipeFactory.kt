@@ -45,7 +45,7 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
             classDefaults(this)
             userDefaults()
             block()
-            block()
+            build()
         }
     }
 

@@ -152,7 +152,6 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         return loc;
     }
 
-    @SuppressWarnings("unchecked")
     private void onRegister(IDataHandler<TechProvider> handler) {
         var dataGen = handler.dataGen();
         handler.addCallback(p -> p.addTech(this));
@@ -167,7 +166,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
 
             var type = REGISTRATE.<ResearchRecipe>getRecipeType("research_bench");
             var factory = DATA_GEN.recipeFactory(type, ResearchRecipeBuilder::new);
-            var builder = factory.recipe(loc);
+            var builder = factory.recipe(RegistryHelper.INSTANCE.recipeLoc(type, loc));
             builder.target(loc);
             builder.input(input, 1, 0);
             builder.voltage(voltage);
