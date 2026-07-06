@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.content.Models.BLOCK_WHITE_TEX;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
-import static org.shsts.tinactory.datagen.content.Models.WHITE_TEX;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
 import static org.shsts.tinactory.integration.network.CableBlock.PIPE_RADIUS;
@@ -43,12 +43,12 @@ public final class CableModel {
     private static final String ITEM_MODEL = "item/network/cable";
     private static final String ITEM_WIRE_MODEL = "item/material/wire";
     private static final String ITEM_PIPE_MODEL = "item/material/pipe";
-    private static final String TEX_PREFIX = "blocks/cable/";
+    private static final String TEX_PREFIX = "block/cable/";
     private static final ResourceLocation INSULATION_OPEN_TEX = gregtech(TEX_PREFIX + "insulation_1");
     private static final ResourceLocation INSULATION_TEX = gregtech(TEX_PREFIX + "insulation_5");
     private static final ResourceLocation WIRE_TEX = gregtech(TEX_PREFIX + "wire");
-    private static final ResourceLocation PIPE_SIDE_TEX = gregtech("blocks/pipe/pipe_side");
-    private static final ResourceLocation PIPE_IN_TEX = gregtech("blocks/pipe/pipe_normal_in");
+    private static final ResourceLocation PIPE_SIDE_TEX = gregtech("block/pipe/pipe_side");
+    private static final ResourceLocation PIPE_IN_TEX = gregtech("block/pipe/pipe_normal_in");
 
     private static BlockModelBuilder genOpenEnd(BlockModelProvider prov, String id, int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
@@ -115,12 +115,12 @@ public final class CableModel {
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
         genOpenEnd(ctx.provider(), OPEN_WIRE_MODEL, WIRE_RADIUS, false)
-            .texture("base", WHITE_TEX)
+            .texture("base", BLOCK_WHITE_TEX)
             .texture("wire", WIRE_TEX);
         genClosedEnd(ctx.provider(), CLOSED_MODEL, RADIUS)
             .texture("base", INSULATION_TEX);
         genClosedEnd(ctx.provider(), CLOSED_WIRE_MODEL, WIRE_RADIUS)
-            .texture("base", WHITE_TEX);
+            .texture("base", BLOCK_WHITE_TEX);
     }
 
     public static void genItemModels(IDataContext<ItemModelProvider> ctx) {

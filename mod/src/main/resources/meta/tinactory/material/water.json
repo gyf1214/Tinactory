@@ -8,7 +8,7 @@
     },
     "gas": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.steam",
+      "texture": "gregtech:block/fluids/fluid.steam",
       "textureColor": "0xFFFFFFFF",
       "displayColor": "0xFFFFFFFF"
     }

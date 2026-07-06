@@ -4,7 +4,7 @@
     "type": "CTM",
     "layer": "CUTOUT",
     "textures": [
-      "tinactory:blocks/multiblock/glass/quartz_glass_a_ctm"
+      "tinactory:block/multiblock/glass/quartz_glass_a_ctm"
     ],
     "extra": {
       "connect_inside": true

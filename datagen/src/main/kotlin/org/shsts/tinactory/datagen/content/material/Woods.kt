@@ -170,8 +170,8 @@ object Woods {
             block(RUBBER_LOG) {
                 blockState { ctx ->
                     ctx.provider().axisBlock(ctx.`object`(),
-                        gregtech("blocks/wood/rubber/log_rubber_side"),
-                        gregtech("blocks/wood/rubber/log_rubber_top"))
+                        gregtech("block/wood/rubber/log_rubber_side"),
+                        gregtech("block/wood/rubber/log_rubber_top"))
                 }
                 tag(listOf(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN))
                 itemTag(listOf(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN))
@@ -189,9 +189,9 @@ object Woods {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cross(
-                        ctx.id(), gregtech("blocks/wood/rubber/sapling_rubber")))
+                        ctx.id(), gregtech("block/wood/rubber/sapling_rubber")))
                 }
-                itemModel(Models.basicItem(gregtech("blocks/wood/rubber/sapling_rubber")))
+                itemModel(Models.basicItem(gregtech("block/wood/rubber/sapling_rubber")))
                 tag(BlockTags.SAPLINGS)
                 itemTag(ItemTags.SAPLINGS)
             }

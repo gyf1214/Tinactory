@@ -116,7 +116,7 @@ object Markers {
             baseType("extruder")
             prefix("material/$sub")
             input(AllTags.EXTRUDER_INPUT, port = 0)
-            display(gregtech("items/metaitems/shape.extruder.$shape"))
+            display(gregtech("item/metaitems/shape.extruder.$shape"))
         }
     }
 
@@ -125,9 +125,9 @@ object Markers {
             baseType("fluid_solidifier")
             prefix("material/$sub")
             if (fromMod) {
-                display(modLoc("items/metaitems/shape.mold.$shape"))
+                display(modLoc("item/metaitems/shape.mold.$shape"))
             } else {
-                display(gregtech("items/metaitems/shape.mold.$shape"))
+                display(gregtech("item/metaitems/shape.mold.$shape"))
             }
         }
     }

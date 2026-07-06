@@ -57,8 +57,9 @@ public final class Models {
         Direction.NORTH, "front",
         Direction.WEST, "left",
         Direction.EAST, "right");
-    public static final ResourceLocation VOID_TEX = modLoc("void");
-    public static final ResourceLocation WHITE_TEX = modLoc("white");
+    public static final ResourceLocation BLOCK_VOID_TEX = modLoc("block/void");
+    public static final ResourceLocation BLOCK_WHITE_TEX = modLoc("block/white");
+    public static final ResourceLocation ITEM_VOID_TEX = modLoc("item/void");
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -103,21 +104,21 @@ public final class Models {
         return ctx -> {
             var provider = ctx.provider().withExistingParent(ctx.id(), "item/generated");
             for (var i = 0; i < layers.length; i++) {
-                provider.texture("layer" + i, gregtech("items/" + layers[i]));
+                provider.texture("layer" + i, gregtech("item/" + layers[i]));
             }
         };
     }
 
     public static <U extends Item> void componentItem(
         IEntryDataContext<U, ItemModelProvider> ctx) {
-        var tex = "items/metaitems/" + name(ctx.id(), -1).replace('_', '.') + "." + name(ctx.id(), -2);
+        var tex = "item/metaitems/" + name(ctx.id(), -1).replace('_', '.') + "." + name(ctx.id(), -2);
         ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", gregtech(tex));
     }
 
     public static <U extends Item> void simpleItem(
         IEntryDataContext<U, ItemModelProvider> ctx) {
-        var tex = "items/metaitems/" + name(ctx.id(), -1);
+        var tex = "item/metaitems/" + name(ctx.id(), -1);
         ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", gregtech(tex));
     }
@@ -125,7 +126,7 @@ public final class Models {
     public static <U extends BatteryItem> void batteryItem(
         IEntryDataContext<U, ItemModelProvider> ctx) {
         var voltage = ctx.object().voltage;
-        var base = gregtech("items/metaitems/battery.re." + voltage.id + ".lithium");
+        var base = gregtech("item/metaitems/battery.re." + voltage.id + ".lithium");
         var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", extend(base, "1"));
         for (var i = 2; i <= 8; i++) {
@@ -159,7 +160,7 @@ public final class Models {
                 .withExistingParent(ctx.id(), "block/cube")
                 .texture("particle", "#north");
             for (var entry : DIR_TEX_KEYS.entrySet()) {
-                var faceTex = extend(gregtech("blocks/" + tex), entry.getValue());
+                var faceTex = extend(gregtech("block/" + tex), entry.getValue());
                 model.texture(entry.getKey().getName(), faceTex);
             }
             ctx.provider().horizontalBlock(ctx.object(), model);
@@ -177,7 +178,7 @@ public final class Models {
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeColumn(
         String side, String end) {
-        return cubeColumn(gregtech("blocks/" + side), gregtech("blocks/" + end));
+        return cubeColumn(gregtech("block/" + side), gregtech("block/" + end));
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeColumn(
@@ -188,8 +189,8 @@ public final class Models {
     public static BlockModelBuilder cubeCasingModel(BlockModelProvider models, String id,
         String casing, String overlay) {
         var baseModel = modLoc(CASING_MODEL);
-        var casingTex = gregtech("blocks/" + casing);
-        var overlayTex = gregtech("blocks/" + overlay);
+        var casingTex = gregtech("block/" + casing);
+        var overlayTex = gregtech("block/" + overlay);
         return applyCasing(models.withExistingParent(id, baseModel), casingTex, models.existingFileHelper)
             .texture("front_overlay", overlayTex)
             .texture("back_overlay", overlayTex)
@@ -211,7 +212,7 @@ public final class Models {
         return ctx -> {
             var model = ctx.provider().models()
                 .withExistingParent(ctx.id(), modLoc("block/cube_tint"))
-                .texture("all", gregtech("blocks/" + tex));
+                .texture("all", gregtech("block/" + tex));
             ctx.provider().simpleBlock(ctx.object(), model);
         };
     }
@@ -224,7 +225,7 @@ public final class Models {
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlock(
         String tex) {
-        return ctx -> solidBlock(ctx, gregtech("blocks/" + tex));
+        return ctx -> solidBlock(ctx, gregtech("block/" + tex));
     }
 
     public static void cableBlock(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx) {
@@ -279,7 +280,7 @@ public final class Models {
             var id = ctx.id() + "_" + i;
             var id1 = id + "_active";
             var casingModel = modLoc(CASING_MODEL);
-            var casingTex = gregtech("blocks/" + casing);
+            var casingTex = gregtech("block/" + casing);
 
             idles[i] = applyCasing(models.withExistingParent(id, casingModel), casingTex, existingHelper)
                 .texture("front_overlay", extend(idle, Integer.toString(i)));

@@ -41,10 +41,10 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
+import static org.shsts.tinactory.datagen.content.Models.BLOCK_VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.DIR_TEX_KEYS;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
-import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.rotateModel;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
@@ -54,7 +54,7 @@ import static org.shsts.tinactory.datagen.content.Models.yRotation;
 public class MachineModel {
     public static final String CASING_MODEL = "block/machine/casing";
     public static final String IO_MODEL = "block/machine/io";
-    public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
+    public static final ResourceLocation PRIMITIVE_TEX = gregtech("block/casings/wood_wall");
     public static final String IO_TEX = "overlay/machine/overlay_energy_in_multi";
     public static final String IO_OUT_TEX = "overlay/machine/overlay_energy_out_multi";
     public static final String ME_BUS = "overlay/appeng/me_output_bus";
@@ -297,7 +297,7 @@ public class MachineModel {
         }
 
         private static ResourceLocation tex(String val) {
-            return gregtech("blocks/" + val);
+            return gregtech("block/" + val);
         }
 
         public Builder<P> casing(ResourceLocation val) {
@@ -381,7 +381,7 @@ public class MachineModel {
             })
             .end();
         for (var texKey : DIR_TEX_KEYS.values()) {
-            model.texture(texKey + "_overlay", VOID_TEX);
+            model.texture(texKey + "_overlay", BLOCK_VOID_TEX);
         }
     }
 
@@ -399,6 +399,6 @@ public class MachineModel {
         if (voltage == Voltage.PRIMITIVE) {
             return PRIMITIVE_TEX;
         }
-        return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase(Locale.ROOT));
+        return gregtech("block/casings/voltage/" + voltage.name().toLowerCase(Locale.ROOT));
     }
 }

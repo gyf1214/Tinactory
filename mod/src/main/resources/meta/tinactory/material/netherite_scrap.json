@@ -4,13 +4,13 @@
   "fluids": {
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/liquid",
+      "texture": "gregtech:block/material_sets/dull/liquid",
       "textureColor": "0xFF4B4042",
       "displayColor": "0xFF4B4042"
     },
     "slurry": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "texture": "gregtech:block/material_sets/fluid/liquid",
       "textureColor": "0xFF5A443B",
       "displayColor": "0xFF5A443B"
     }

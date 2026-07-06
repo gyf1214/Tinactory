@@ -81,7 +81,7 @@ object Multiblocks {
                 block(entry) {
                     blockState { ctx ->
                         val existingHelper = ctx.provider().models().existingFileHelper
-                        val texLoc = gregtech("blocks/$tex")
+                        val texLoc = gregtech("block/$tex")
                         if (existingHelper.exists(texLoc, Models.TEXTURE_TYPE)) {
                             solidBlock(ctx, texLoc)
                         }
@@ -90,12 +90,12 @@ object Multiblocks {
             }
 
             block("multiblock/solid/insulated_battery") {
-                blockState { ctx -> solidBlock(ctx, ic2("blocks/wiring/storage/mfe_bottomtop")) }
+                blockState { ctx -> solidBlock(ctx, ic2("block/wiring/storage/mfe_bottomtop")) }
                 noDrop()
             }
 
             block("multiblock/solid/reinforced_alloy") {
-                blockState { ctx -> solidBlock(ctx, ic2("blocks/generator/reactor/reactor_vessel")) }
+                blockState { ctx -> solidBlock(ctx, ic2("block/generator/reactor/reactor_vessel")) }
                 noDrop()
             }
 
@@ -119,13 +119,13 @@ object Multiblocks {
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cubeTop(
                         ctx.id(),
-                        gregtech("blocks/casings/solid/machine_casing_solid_steel"),
+                        gregtech("block/casings/solid/machine_casing_solid_steel"),
                         mcLoc("block/farmland_moist")))
                 }
             }
 
             misc("clear_glass") {
-                blockState { ctx -> solidBlock(ctx, modLoc("blocks/multiblock/glass/quartz_glass_a")) }
+                blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a")) }
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS_BLOCKS)
             }
@@ -151,7 +151,7 @@ object Multiblocks {
             misc("launch_site_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
-                    val tex = gregtech("blocks/foam/reinforced_stone")
+                    val tex = gregtech("block/foam/reinforced_stone")
                     provider.simpleBlock(ctx.`object`(), provider.models().slab(
                         ctx.id(), tex, tex, tex))
                 }
@@ -224,8 +224,8 @@ object Multiblocks {
             misc("turbine_blade") {
                 blockState { ctx ->
                     turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
-                        modLoc("blocks/multiblock/large_turbine/idle"),
-                        modLoc("blocks/multiblock/large_turbine/spin"))
+                        modLoc("block/multiblock/large_turbine/idle"),
+                        modLoc("block/multiblock/large_turbine/spin"))
                 }
                 itemModel(Models::turbineItem)
             }
@@ -242,8 +242,8 @@ object Multiblocks {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     val models = provider.models()
-                    val casing = gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")
-                    val overlay = gregtech("blocks/casings/firebox/machine_casing_firebox_tungstensteel")
+                    val casing = gregtech("block/casings/solid/machine_casing_robust_tungstensteel")
+                    val overlay = gregtech("block/casings/firebox/machine_casing_firebox_tungstensteel")
                     val working = suffix(overlay, "_active")
                     val baseModel = models.cubeColumn(ctx.id(), overlay, casing)
                     val workingModel = models.cubeColumn(ctx.id() + "_active", working, casing)
@@ -257,8 +257,8 @@ object Multiblocks {
             }
 
             misc("nuclear_chamber") {
-                blockState(cubeColumn(ic2("blocks/generator/reactor/reactor_chamber_sides"),
-                    ic2("blocks/generator/reactor/reactor_chamber_top")))
+                blockState(cubeColumn(ic2("block/generator/reactor/reactor_chamber_sides"),
+                    ic2("block/generator/reactor/reactor_chamber_top")))
             }
 
             misc("fusion_casing") {
@@ -796,14 +796,14 @@ object Multiblocks {
                     }
                 }
             }
-            multiblock("power_substation", ic2("blocks/wiring/storage/mfe_bottomtop"),
-                gregtech("blocks/multiblock/power_substation"))
+            multiblock("power_substation", ic2("block/wiring/storage/mfe_bottomtop"),
+                gregtech("block/multiblock/power_substation"))
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
-            multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"),
-                modLoc("blocks/multiblock/nuclear_reactor"))
+            multiblock("nuclear_reactor", ic2("block/generator/reactor/reactor_vessel"),
+                modLoc("block/multiblock/nuclear_reactor"))
             multiblock("assembly_line", "solid_steel", "blast_furnace")
-            multiblock("fusion_reactor", gregtech("blocks/casings/fusion/machine_casing_fusion"),
-                gregtech("blocks/multiblock/fusion_reactor"))
+            multiblock("fusion_reactor", gregtech("block/casings/fusion/machine_casing_fusion"),
+                gregtech("block/multiblock/fusion_reactor"))
         }
     }
 
@@ -824,8 +824,8 @@ object Multiblocks {
 
     private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name,
         block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
-        multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"),
-            gregtech("blocks/multiblock/$overlay"), block)
+        multiblock(name, gregtech("block/casings/solid/machine_casing_$casing"),
+            gregtech("block/multiblock/$overlay"), block)
     }
 
     private fun machineRecipes() {

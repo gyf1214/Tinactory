@@ -6,7 +6,7 @@
   "fluids": {
     "slurry": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "texture": "gregtech:block/material_sets/fluid/liquid",
       "textureColor": "0xFFAF6F40",
       "displayColor": "0xFFAF6F40"
     }

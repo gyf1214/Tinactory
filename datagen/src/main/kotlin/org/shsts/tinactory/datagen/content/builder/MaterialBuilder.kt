@@ -28,7 +28,7 @@ import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.Models
-import org.shsts.tinactory.datagen.content.Models.VOID_TEX
+import org.shsts.tinactory.datagen.content.Models.ITEM_VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemKey
@@ -103,8 +103,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     private fun <U : Item> toolModel(ctx: IEntryDataContext<U, ItemModelProvider>, sub: String) {
         val category = sub.substring("tool/".length)
-        val handle = TOOL_HANDLE_TEX[category]?.let { gregtech("items/tools/$it") } ?: VOID_TEX
-        val head = gregtech("items/tools/$category")
+        val handle = TOOL_HANDLE_TEX[category]?.let { gregtech("item/tools/$it") } ?: ITEM_VOID_TEX
+        val head = gregtech("item/tools/$category")
         basicItem(ctx, handle, head)
     }
 
@@ -119,9 +119,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             when (sub) {
                 "wire" -> model(Models::wireItem)
                 "pipe" -> model(Models::pipeItem)
-                "raw" -> model { basicItem(it, modLoc("items/material/raw")) }
-                "raw_fluid" -> model { basicItem(it, modLoc("items/material/raw_fluid")) }
-                "seed" -> model { basicItem(it, ae2("items/crystal_seed_nether")) }
+                "raw" -> model { basicItem(it, modLoc("item/material/raw")) }
+                "raw_fluid" -> model { basicItem(it, modLoc("item/material/raw_fluid")) }
+                "seed" -> model { basicItem(it, ae2("item/crystal_seed_nether")) }
                 else -> model { icon.itemModel(it, sub) }
             }
         }

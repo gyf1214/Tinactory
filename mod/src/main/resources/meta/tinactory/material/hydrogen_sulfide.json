@@ -4,7 +4,7 @@
   "fluids": {
     "gas": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.hydrogen_sulfide",
+      "texture": "gregtech:block/fluids/fluid.hydrogen_sulfide",
       "textureColor": "0xFFFFFFFF"
     }
   },

@@ -4,7 +4,7 @@
   "fluids": {
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.titanium_tetrachloride",
+      "texture": "gregtech:block/fluids/fluid.titanium_tetrachloride",
       "textureColor": "0xFFFFFFFF"
     }
   },

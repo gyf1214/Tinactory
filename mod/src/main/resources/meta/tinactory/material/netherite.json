@@ -6,13 +6,13 @@
   "fluids": {
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/liquid",
+      "texture": "gregtech:block/material_sets/dull/liquid",
       "textureColor": "0xFF4B4042",
       "displayColor": "0xFF4B4042"
     },
     "plasma": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/plasma",
+      "texture": "gregtech:block/material_sets/dull/plasma",
       "textureColor": "0xFF474447",
       "displayColor": "0xFF474447"
     }

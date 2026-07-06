@@ -195,7 +195,7 @@ object Technologies {
 
             COLD_WORKING = tech("cold_working") {
                 maxProgress(40)
-                displayTexture(gregtech("items/metaitems/shape.extruder.rotor"))
+                displayTexture(gregtech("item/metaitems/shape.extruder.rotor"))
             }
 
             ELECTROLYZING = tech("electrolyzing") {

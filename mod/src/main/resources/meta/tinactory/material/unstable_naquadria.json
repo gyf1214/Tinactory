@@ -6,11 +6,11 @@
   "fluids": {
     "plasma": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/plasma"
+      "texture": "gregtech:block/material_sets/dull/plasma"
     },
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:blocks/material_sets/dull/liquid"
+      "texture": "gregtech:block/material_sets/dull/liquid"
     }
   },
   "aliases": {

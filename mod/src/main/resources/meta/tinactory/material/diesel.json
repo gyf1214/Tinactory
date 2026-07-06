@@ -4,7 +4,7 @@
   "fluids": {
     "fluid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.diesel",
+      "texture": "gregtech:block/fluids/fluid.diesel",
       "textureColor": "0xFFFFFFFF"
     }
   },

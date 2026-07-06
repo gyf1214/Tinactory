@@ -97,31 +97,31 @@ object Components {
             }
 
             component("mixed_metal_ingot") {
-                model(basicItem(ic2("items/resource/ingot/alloy")))
+                model(basicItem(ic2("item/resource/ingot/alloy")))
             }
 
             component("advanced_alloy") {
-                model(basicItem(ic2("items/crafting/alloy")))
+                model(basicItem(ic2("item/crafting/alloy")))
             }
 
             component("annihilation_core") {
-                model(basicItem(ae2("items/material_annihilation_core")))
+                model(basicItem(ae2("item/material_annihilation_core")))
             }
 
             component("formation_core") {
-                model(basicItem(ae2("items/material_formation_core")))
+                model(basicItem(ae2("item/material_formation_core")))
             }
 
             component("silicon_print") {
-                model(basicItem(ae2("items/material_silicon_print")))
+                model(basicItem(ae2("item/material_silicon_print")))
             }
 
             component("logic_processor") {
-                model(basicItem(ae2("items/material_logic_processor")))
+                model(basicItem(ae2("item/material_logic_processor")))
             }
 
             component("calculation_processor") {
-                model(basicItem(ae2("items/material_calculation_processor")))
+                model(basicItem(ae2("item/material_calculation_processor")))
             }
 
             component("carbon_fiber") {
@@ -158,7 +158,7 @@ object Components {
 
             component("raw_rhodium_plated_palladium") {
                 model(basicItem(ResourceLocation.fromNamespaceAndPath(
-                    "gregtech4", "items/iridium_alloy_ingot")))
+                    "gregtech4", "item/iridium_alloy_ingot")))
             }
 
             component("energy_crystal") {
@@ -184,52 +184,52 @@ object Components {
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {
-                    model(basicItem(ae2("items/material_cell${k}_part")))
+                    model(basicItem(ae2("item/material_cell${k}_part")))
                 }
                 item(entry.item) {
-                    model(basicItem(ae2("items/storage_cell_${k}")))
+                    model(basicItem(ae2("item/storage_cell_${k}")))
                     tag(AllTags.ITEM_STORAGE_CELL)
                 }
                 item(entry.fluid) {
-                    model(basicItem(ae2("items/fluid_storage_cell_${k}")))
+                    model(basicItem(ae2("item/fluid_storage_cell_${k}")))
                     tag(AllTags.FLUID_STORAGE_CELL)
                 }
                 item(entry.pattern) {
-                    model(basicItem(ae2("items/storage_cell_${k}")))
+                    model(basicItem(ae2("item/storage_cell_${k}")))
                     tag(AllTags.PATTERN_STORAGE_CELL)
                 }
             }
 
             component("empty_nuclear_rod") {
-                model(basicItem(ic2("items/crafting/fuel_rod")))
+                model(basicItem(ic2("item/crafting/fuel_rod")))
             }
 
             component("uranium_fuel_rod") {
-                model(basicItem(ic2("items/reactor/fuel_rod/uranium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/uranium")))
                 tag(AllTags.NUCLEAR_ITEM)
             }
 
             component("enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("items/reactor/fuel_rod/uranium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/uranium")))
                 tag(AllTags.NUCLEAR_ITEM)
             }
 
             component("depleted_enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("items/reactor/fuel_rod/tritium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
 
             component("moderator_rod") {
-                model(basicItem(ic2("items/reactor/heat_exchanger")))
+                model(basicItem(ic2("item/reactor/heat_exchanger")))
                 tag(AllTags.NUCLEAR_ITEM)
             }
 
             component("control_rod") {
-                model(basicItem(ic2("items/reactor/advanced_heat_vent")))
+                model(basicItem(ic2("item/reactor/advanced_heat_vent")))
                 tag(AllTags.NUCLEAR_ITEM)
             }
 
             component("nuclear_waste_rod") {
-                model(basicItem(ic2("items/reactor/fuel_rod/tritium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
         }
     }

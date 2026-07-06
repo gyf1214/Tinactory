@@ -22,9 +22,9 @@ import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record IconSet(String subfolder, @Nullable IconSet parent) {
-    private static final ResourceLocation ITEM_LOC = gregtech("items/material_sets");
-    private static final ResourceLocation BLOCK_LOC = gregtech("blocks/material_sets");
-    private static final ResourceLocation MAGNETIC_LOC = gregtech("items/material_sets/magnetic/magnetic_overlay");
+    private static final ResourceLocation ITEM_LOC = gregtech("item/material_sets");
+    private static final ResourceLocation BLOCK_LOC = gregtech("block/material_sets");
+    private static final ResourceLocation MAGNETIC_LOC = gregtech("item/material_sets/magnetic/magnetic_overlay");
 
     public static final IconSet DULL = new IconSet();
     public static final IconSet ROUGH = new IconSet("rough");
