@@ -6,15 +6,17 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
+import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
+import org.shsts.tinactory.datagen.content.RegistryHelper.recipeLoc
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 
 open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
-    recipeType: IRecipeType<R>,
+    val recipeType: IRecipeType<R>,
     builderFactory: (IRecipeFactory<R, B>) -> B,
     private val defaults: B.() -> Unit = {}) {
     private val factory = DATA_GEN.recipeFactory(recipeType, builderFactory)
@@ -37,22 +39,18 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
         builder.defaultFluidSub = this@RecipeFactory.defaultFluidSub
     }
 
-    private fun build(inner: B, block: B.() -> Unit) {
-        inner.apply {
+    fun recipe(loc: ResourceLocation, block: B.() -> Unit) {
+        factory.recipe(recipeLoc(recipeType, loc)).apply {
             defaults()
             classDefaults(this)
             userDefaults()
             block()
-            build()
+            block()
         }
     }
 
-    fun recipe(loc: ResourceLocation, block: B.() -> Unit) {
-        build(factory.recipe(loc), block)
-    }
-
     fun recipe(id: String, block: B.() -> Unit) {
-        build(factory.recipe(id), block)
+        recipe(modLoc(id), block)
     }
 
     fun recipe(mat: MaterialSet, sub: String = defaultSub(mat),

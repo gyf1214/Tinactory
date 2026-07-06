@@ -15,6 +15,7 @@ import org.shsts.tinactory.content.recipe.ToolRecipe
 import org.shsts.tinactory.core.builder.Builder
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
+import org.shsts.tinactory.datagen.content.RegistryHelper.recipeLoc
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import java.util.function.Supplier
 
@@ -22,7 +23,7 @@ class ToolRecipeFactory {
     private val factory = DATA_GEN.recipeFactory(TOOL_CRAFTING, ::ToolRecipeBuilder)
 
     fun recipe(loc: ResourceLocation, block: ToolRecipeBuilder.() -> Unit) {
-        factory.recipe(loc).apply {
+        factory.recipe(recipeLoc(TOOL_CRAFTING, loc)).apply {
             block()
             build()
         }

@@ -4,8 +4,9 @@ import net.neoforged.neoforge.fluids.FluidStack
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.BOILER
 import org.shsts.tinactory.content.recipe.BoilerRecipe
-import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.core.builder.Builder
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
+import org.shsts.tinactory.datagen.content.RegistryHelper.recipeLoc
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 
 class BoilerRecipeFactory {
@@ -13,7 +14,7 @@ class BoilerRecipeFactory {
 
     fun recipe(name: String, block: BoilerRecipeBuilder.() -> Unit) {
         val mat = getMaterial(name)
-        factory.recipe(mat.fluidLoc("liquid"))
+        factory.recipe(recipeLoc(BOILER, mat.fluidLoc("liquid")))
             .input(FluidStack(mat.fluid("liquid").get(), 1))
             .output(FluidStack(mat.fluid("gas").get(), 1))
             .apply(block)
