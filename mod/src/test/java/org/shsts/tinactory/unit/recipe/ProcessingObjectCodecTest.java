@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
@@ -26,12 +26,13 @@ import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class ProcessingObjectCodecTest {
     @Test
     void shouldRoundTripProcessingRecipeWithInjectedCodecs() {
         var type = new TestRecipeType<>("test_processing_recipe", InjectedRecipe.Builder::new);
-        var loc = new ResourceLocation("tinactory", "codec_processing_recipe");
+        var loc = modLoc("codec_processing_recipe");
         var serializer = new ProcessingRecipe.Serializer<InjectedRecipe, InjectedRecipe.Builder>(
             TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
         var recipe = type.getBuilder(loc)
@@ -58,12 +59,12 @@ class ProcessingObjectCodecTest {
     @Test
     void shouldRoundTripResearchRecipeWithInjectedIngredientCodec() {
         var type = new TestRecipeType<>("test_research_recipe", ResearchRecipe.Builder::new);
-        var loc = new ResourceLocation("tinactory", "codec_research_recipe");
+        var loc = modLoc("codec_research_recipe");
         var serializer = new ResearchRecipe.Serializer(TEST_INGREDIENT_CODEC);
         var recipe = type.getBuilder(loc)
             .input(new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
                 TestStack.item("scan", 1), TestStack.ADAPTER))
-            .target(new ResourceLocation("tinactory", "research_target"))
+            .target(modLoc("research_target"))
             .progress(7)
             .workTicks(50)
             .voltage(32)
@@ -82,8 +83,8 @@ class ProcessingObjectCodecTest {
     @Test
     void shouldRoundTripMarkerRecipeWithBaseTypeId() {
         var type = new TestRecipeType<>("test_marker_recipe", MarkerRecipe.Builder::new);
-        var baseTypeId = new ResourceLocation("tinactory", "test_marker_base");
-        var loc = new ResourceLocation("tinactory", "codec_marker_recipe");
+        var baseTypeId = modLoc("test_marker_base");
+        var loc = modLoc("codec_marker_recipe");
         var serializer = new MarkerRecipe.Serializer(TEST_INGREDIENT_CODEC, TEST_RESULT_CODEC);
         var display = new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
             TestStack.item("ore", 1), TestStack.ADAPTER);
@@ -147,7 +148,7 @@ class ProcessingObjectCodecTest {
         private final BiFunction<IRecipeType<B>, ResourceLocation, B> builderFactory;
 
         private TestRecipeType(String path, BiFunction<IRecipeType<B>, ResourceLocation, B> builderFactory) {
-            this.loc = new ResourceLocation("tinactory", path);
+            this.loc = modLoc(path);
             this.builderFactory = builderFactory;
         }
 
@@ -185,7 +186,7 @@ class ProcessingObjectCodecTest {
     private record TestLoc(String id) implements ILoc {
         @Override
         public ResourceLocation loc() {
-            return new ResourceLocation("tinactory", id);
+            return modLoc(id);
         }
     }
 }

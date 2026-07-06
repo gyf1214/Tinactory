@@ -18,12 +18,13 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class TechnologyTest {
     @Test
     void resolveKeepsOnlyKnownDependencies() {
-        var knownLoc = new ResourceLocation("tinactory", "known");
-        var ignoredLoc = new ResourceLocation("tinactory", "ignored");
+        var knownLoc = modLoc("known");
+        var ignoredLoc = modLoc("ignored");
         var known = technology("tinactory:known", List.of(), 1);
         var technology = technology("tinactory:target", List.of(knownLoc, ignoredLoc), 3);
 
@@ -43,8 +44,8 @@ class TechnologyTest {
 
     @Test
     void codecRoundTripsDisplayIdsAndPrefersItemDescriptor() {
-        var displayItem = new ResourceLocation("tinactory", "display_item");
-        var displayTexture = new ResourceLocation("tinactory", "textures/gui/technology/display");
+        var displayItem = modLoc("display_item");
+        var displayTexture = modLoc("textures/gui/technology/display");
         var json = new JsonObject();
         json.addProperty("max_progress", 42L);
         json.add("modifiers", new JsonObject());
@@ -62,7 +63,7 @@ class TechnologyTest {
 
     @Test
     void getDisplayUsesTextureDescriptorWhenNoDisplayItemExists() {
-        var displayTexture = new ResourceLocation("tinactory", "textures/gui/technology/texture_only");
+        var displayTexture = modLoc("textures/gui/technology/texture_only");
         var technology = new Technology(List.of(), 20L, Map.of(), Optional.empty(), Optional.of(displayTexture), 1);
 
         assertEquals(new TextureRenderDescriptor(new Texture(displayTexture, 16, 16)), technology.getDisplay());
@@ -77,7 +78,7 @@ class TechnologyTest {
 
     @Test
     void staticDescriptionAndDetailsIdsShouldFollowConventions() {
-        var loc = new ResourceLocation("tinactory", "multiblock/large_turbine");
+        var loc = modLoc("multiblock/large_turbine");
 
         assertEquals("tinactory.technology.multiblock.large_turbine", Technology.getDescriptionId(loc));
         assertEquals("tinactory.technology.multiblock.large_turbine.details", Technology.getDetailsId(loc));

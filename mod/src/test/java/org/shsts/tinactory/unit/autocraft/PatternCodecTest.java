@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.autocraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -22,6 +21,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class PatternCodecTest {
     private static final UUID TEST_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -36,7 +36,7 @@ class PatternCodecTest {
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
             List.of(new CraftAmount(TestStackKey.fluid("minecraft:water", ""), 250)),
             List.of(
-                new RecipeTypeConstraint(new ResourceLocation("tinactory", "mixer")),
+                new RecipeTypeConstraint(modLoc("mixer")),
                 new VoltageConstraint(2),
                 new TestMachineConstraint("v1")));
 
@@ -120,7 +120,7 @@ class PatternCodecTest {
     @Test
     void codecShouldRoundTripTargetRecipeConstraintWithCpuRegistry() {
         var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
-        var targetRecipe = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var targetRecipe = new TargetRecipeConstraint(modLoc("assembler/circuit"));
         var pattern = new CraftPattern(
             TARGET_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)),

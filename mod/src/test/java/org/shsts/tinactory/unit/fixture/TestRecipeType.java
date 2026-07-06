@@ -6,12 +6,14 @@ import net.minecraft.world.item.crafting.RecipeType;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 public final class TestRecipeType<R extends IRecipe<?>> implements IRecipeType<R> {
     private final ResourceLocation loc;
     private final Class<R> recipeClass;
 
     public TestRecipeType(String path, Class<R> recipeClass) {
-        this.loc = new ResourceLocation("tinactory", path);
+        this.loc = modLoc(path);
         this.recipeClass = recipeClass;
     }
 

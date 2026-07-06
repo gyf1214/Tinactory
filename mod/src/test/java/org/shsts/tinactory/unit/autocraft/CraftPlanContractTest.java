@@ -1,7 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -26,6 +25,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class CraftPlanContractTest {
     @Test
@@ -131,7 +131,7 @@ class CraftPlanContractTest {
 
     @Test
     void machineConstraintCodecShouldPreserveTargetRecipeConstraint() {
-        var constraint = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var constraint = new TargetRecipeConstraint(modLoc("assembler/circuit"));
         var decoded = CodecHelper.parseTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
@@ -141,7 +141,7 @@ class CraftPlanContractTest {
 
     @Test
     void machineConstraintCodecShouldPreserveRecipeTypeConstraint() {
-        var constraint = new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler"));
+        var constraint = new RecipeTypeConstraint(modLoc("assembler"));
         var decoded = CodecHelper.parseTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
@@ -163,7 +163,7 @@ class CraftPlanContractTest {
     void machineConstraintCodecShouldEncodeStructuredTargetRecipeConstraintPayload() {
         var encoded = (CompoundTag) CodecHelper.encodeTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit")));
+            new TargetRecipeConstraint(modLoc("assembler/circuit")));
 
         assertEquals(TargetRecipeConstraint.TYPE_ID, encoded.getString("type"));
         assertEquals("tinactory:assembler/circuit", encoded.getString("recipeId"));
@@ -173,7 +173,7 @@ class CraftPlanContractTest {
     void machineConstraintCodecShouldEncodeStructuredRecipeTypeAndVoltagePayloads() {
         var recipeType = (CompoundTag) CodecHelper.encodeTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler")));
+            new RecipeTypeConstraint(modLoc("assembler")));
         var voltage = (CompoundTag) CodecHelper.encodeTag(
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             new VoltageConstraint(3));

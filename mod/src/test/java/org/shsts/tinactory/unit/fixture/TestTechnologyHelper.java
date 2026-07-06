@@ -39,7 +39,7 @@ public final class TestTechnologyHelper {
         Optional<ResourceLocation> displayTexture, int rank) {
 
         var technology = new Technology(depends, maxProgress, modifiers, displayItem, displayTexture, rank);
-        technology.setLoc(new ResourceLocation(loc));
+        technology.setLoc(ResourceLocation.parse(loc));
         return technology;
     }
 }

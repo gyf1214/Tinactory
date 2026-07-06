@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.network;
 
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.network.SchedulingSorter;
@@ -75,8 +74,7 @@ class SchedulingSorterTest {
         assertTrue(sorted.indexOf(left) < sorted.indexOf(right));
     }
 
-    private static final class SchedulingFixture extends ForgeRegistryEntry<IScheduling>
-        implements IScheduling {
+    private static final class SchedulingFixture implements IScheduling {
         private final String id;
         private final List<Dependency> dependencies = new ArrayList<>();
 

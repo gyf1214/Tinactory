@@ -39,10 +39,11 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class ProcessingRuntimeTest {
-    private static final ResourceLocation PROCESSING_TYPE = new ResourceLocation("tinactory", "test_processing");
-    private static final ResourceLocation RECIPE_ID = new ResourceLocation("tinactory", "runtime_recipe");
+    private static final ResourceLocation PROCESSING_TYPE = modLoc("test_processing");
+    private static final ResourceLocation RECIPE_ID = modLoc("runtime_recipe");
 
     @Test
     void shouldAggregateRecipeBookItemsAcrossProcessors() {
@@ -258,7 +259,7 @@ class ProcessingRuntimeTest {
         var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
 
         assertTrue(runtime.supportsRecipeType(PROCESSING_TYPE));
-        assertFalse(runtime.supportsRecipeType(new ResourceLocation("tinactory", "other_processing")));
+        assertFalse(runtime.supportsRecipeType(modLoc("other_processing")));
     }
 
     @Test
@@ -266,7 +267,7 @@ class ProcessingRuntimeTest {
         var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
 
         assertTrue(runtime.allowTargetRecipe(RECIPE_ID));
-        assertFalse(runtime.allowTargetRecipe(new ResourceLocation("tinactory", "other_recipe")));
+        assertFalse(runtime.allowTargetRecipe(modLoc("other_recipe")));
     }
 
     @Test
@@ -358,7 +359,7 @@ class ProcessingRuntimeTest {
         }
 
         private TestRecipeProcessor recipeBookItem(String path) {
-            recipeBookItems.add(new TestRecipeBookItem(new ResourceLocation("tinactory", path)));
+            recipeBookItems.add(new TestRecipeBookItem(modLoc(path)));
             return this;
         }
 

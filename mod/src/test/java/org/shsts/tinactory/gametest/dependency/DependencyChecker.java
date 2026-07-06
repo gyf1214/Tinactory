@@ -1,7 +1,8 @@
 package org.shsts.tinactory.gametest.dependency;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -386,7 +387,7 @@ public final class DependencyChecker {
 
     private void addMultiblockBridgeMethods() {
         for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
-            var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
+            var multiblockId = modLoc(entry.getKey());
             var set = entry.getValue();
             var requirements = new ArrayList<IDependencyNode>();
             stackNode(new ItemStack(set.block().get())).ifPresent(requirements::add);
@@ -478,7 +479,7 @@ public final class DependencyChecker {
 
     private void addCleanroomBridgeMethods() {
         for (var entry : AllMultiblocks.CLEANROOM_PROPERTIES.entrySet()) {
-            var multiblock = new MultiblockNode(new ResourceLocation(TinactoryKeys.ID, entry.getKey()));
+            var multiblock = new MultiblockNode(modLoc(entry.getKey()));
             for (var voltage : Voltage.values()) {
                 if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
                     continue;
@@ -502,14 +503,14 @@ public final class DependencyChecker {
     }
 
     private void addNuclearReactorBridgeMethods() {
-        for (var item : ForgeRegistries.ITEMS) {
+        for (var item : BuiltInRegistries.ITEM) {
             if (item instanceof NuclearRod nuclearRod) {
                 var requirements = new ArrayList<IDependencyNode>();
                 stackNode(new ItemStack(item)).ifPresent(requirements::add);
                 requirements.add(new MultiblockNode(NUCLEAR_REACTOR));
                 var outputs = new ArrayList<IDependencyNode>();
                 stackNode(nuclearRod.getDepleted()).ifPresent(outputs::add);
-                var itemId = ForgeRegistries.ITEMS.getKey(item);
+                var itemId = BuiltInRegistries.ITEM.getKey(item);
                 addMethodIfUseful("nuclear_reactor/deplete/" + itemId, requirements, outputs,
                     "nuclear reactor depletion bridge");
             }
@@ -534,7 +535,7 @@ public final class DependencyChecker {
     private Collection<LithographyLensBlock> lithographyLensBlocks() {
         if (lithographyLensBlocks == null) {
             var ret = new ArrayList<LithographyLensBlock>();
-            for (var block : ForgeRegistries.BLOCKS) {
+            for (var block : BuiltInRegistries.BLOCK) {
                 if (block instanceof LensBlock lensBlock) {
                     stackNode(new ItemStack(block))
                         .ifPresent(node -> ret.add(new LithographyLensBlock(node, lensBlock.getLens())));
@@ -556,11 +557,11 @@ public final class DependencyChecker {
     }
 
     private void addItemTagBridgeMethods(TagNode tagNode) {
-        var tag = TagKey.create(Registry.ITEM_REGISTRY, tagNode.tagId());
-        for (var item : ForgeRegistries.ITEMS.tags().getTag(tag)) {
+        var tag = TagKey.create(Registries.ITEM, tagNode.tagId());
+        for (var item : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
             var requirements = new ArrayList<IDependencyNode>();
-            stackNode(new ItemStack(item)).ifPresent(requirements::add);
-            addMethodIfUseful("tag/" + tagNode.id() + "/" + ForgeRegistries.ITEMS.getKey(item),
+            stackNode(new ItemStack(item.value())).ifPresent(requirements::add);
+            addMethodIfUseful("tag/" + tagNode.id() + "/" + BuiltInRegistries.ITEM.getKey(item.value()),
                 requirements, List.of(tagNode), "item tag bridge");
         }
     }
@@ -601,8 +602,8 @@ public final class DependencyChecker {
     }
 
     private void addTinactoryItemTargets(Collection<IDependencyNode> targets) {
-        for (var item : ForgeRegistries.ITEMS) {
-            var key = ForgeRegistries.ITEMS.getKey(item);
+        for (var item : BuiltInRegistries.ITEM) {
+            var key = BuiltInRegistries.ITEM.getKey(item);
             if (key != null && key.getNamespace().equals(TinactoryKeys.ID)) {
                 stackNode(new ItemStack(item)).ifPresent(targets::add);
             }
@@ -626,7 +627,7 @@ public final class DependencyChecker {
 
     private void addMultiblockTargets(Collection<IDependencyNode> targets) {
         for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
-            var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
+            var multiblockId = modLoc(entry.getKey());
             targets.add(new MultiblockNode(multiblockId));
         }
     }
@@ -735,12 +736,14 @@ public final class DependencyChecker {
         if (json.isJsonObject()) {
             var object = json.getAsJsonObject();
             if (object.has("tag")) {
-                return Optional.of(new TagNode(PortType.ITEM, new ResourceLocation(object.get("tag").getAsString())));
+                return Optional.of(new TagNode(PortType.ITEM,
+                    ResourceLocation.parse(object.get("tag").getAsString())));
             }
             if (object.has("item")) {
-                var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("item").getAsString()));
-                if (item != null) {
-                    return stackNode(new ItemStack(item)).map(node -> node);
+                var item = BuiltInRegistries.ITEM.getOptional(
+                    ResourceLocation.parse(object.get("item").getAsString()));
+                if (item.isPresent()) {
+                    return stackNode(new ItemStack(item.get())).map(node -> node);
                 }
             }
         }
@@ -819,8 +822,8 @@ public final class DependencyChecker {
     }
 
     private Optional<StackNode> itemNode(ResourceLocation loc) {
-        var item = ForgeRegistries.ITEMS.getValue(loc);
-        return item == null ? Optional.empty() : stackNode(new ItemStack(item));
+        return BuiltInRegistries.ITEM.getOptional(loc)
+            .flatMap(item -> stackNode(new ItemStack(item)));
     }
 
     private Optional<StackNode> stackNode(ItemStack stack) {

@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.util;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.I18n;
@@ -10,6 +9,7 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class I18nTest {
     @Test
@@ -27,7 +27,7 @@ class I18nTest {
     void trFromResourceLocationConvertsSlashesToDotsWithoutBootstrappingMinecraft() {
         assertMinecraftStillNotBootstrapped();
 
-        var component = I18n.tr(new ResourceLocation("tinactory", "gui/path/example"), "arg");
+        var component = I18n.tr(modLoc("gui/path/example"), "arg");
 
         assertEquals("tinactory.gui.path.example", component.getKey());
         assertArrayEquals(new Object[]{"arg"}, component.getArgs());

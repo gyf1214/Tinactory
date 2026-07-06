@@ -13,14 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class TechInitPacketTest {
     @Test
     void roundTripsTechnologiesWithUnifiedDisplayAndCompatibleCodecFields() {
         var dependency = technology("tinactory:dependency", List.of(), Optional.empty(), Optional.empty(), 1);
         var technology = technology("tinactory:target", List.of(dependency.loc()),
-            Optional.of(new ResourceLocation("tinactory", "display_item")),
-            Optional.of(new ResourceLocation("tinactory", "textures/gui/technology/target")), 2);
+            Optional.of(modLoc("display_item")),
+            Optional.of(modLoc("textures/gui/technology/target")), 2);
         var packet = new TechInitPacket(List.of(dependency, technology));
         var buf = TestBufferHelper.buf();
 
@@ -32,7 +33,7 @@ class TechInitPacketTest {
         assertEquals(2, decodedTechs.size());
         assertEquals(dependency.loc(), decodedTechs.get(0).loc());
         assertEquals(technology.loc(), decodedTechs.get(1).loc());
-        assertEquals(new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display_item")),
+        assertEquals(new ItemIdRenderDescriptor(modLoc("display_item")),
             decodedTechs.get(1).getDisplay());
 
         var encoded = CodecHelper.encodeJson(Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();

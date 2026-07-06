@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.tech;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.unit.fixture.TestBufferHelper;
@@ -10,13 +9,14 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class TechUpdatePacketTest {
     @Test
     void roundTripsProgressUpdateWithoutTarget() {
         var packet = TechUpdatePacket.progress(Map.of(
-            new ResourceLocation("tinactory", "alpha"), 3L,
-            new ResourceLocation("tinactory", "beta"), 7L));
+            modLoc("alpha"), 3L,
+            modLoc("beta"), 7L));
         var buf = TestBufferHelper.buf();
 
         packet.serializeToBuf(buf);
@@ -30,7 +30,7 @@ class TechUpdatePacketTest {
 
     @Test
     void roundTripsFullUpdateWithTarget() {
-        var target = new ResourceLocation("tinactory", "target");
+        var target = modLoc("target");
         var packet = TechUpdatePacket.full(Map.of(target, 11L), target);
         var buf = TestBufferHelper.buf();
 

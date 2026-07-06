@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class ProcessingRecipeTest {
     @Test
@@ -97,9 +98,9 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldDisplayPrimaryOutputBeforeInputFallback() {
-        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
+        var outputDescriptor = new ItemIdRenderDescriptor(modLoc("display/output"));
         var outputTooltip = List.<Component>of(I18n.raw("output tooltip"));
-        var inputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/input"));
+        var inputDescriptor = new ItemIdRenderDescriptor(modLoc("display/input"));
         var inputTooltip = List.<Component>of(I18n.raw("input tooltip"));
         var recipe = recipeBuilder()
             .input(4, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))
@@ -112,11 +113,11 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldFallbackToPrimaryInputWhenRecipeHasNoOutputs() {
-        var earlierDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/earlier"));
+        var earlierDescriptor = new ItemIdRenderDescriptor(modLoc("display/earlier"));
         var earlierTooltip = List.<Component>of(I18n.raw("earlier tooltip"));
         var recipe = outputlessRecipeBuilder()
             .input(4, new TestIngredient("ore", 1,
-                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/later")),
+                new ItemIdRenderDescriptor(modLoc("display/later")),
                 List.<Component>of(I18n.raw("later tooltip"))))
             .input(1, new TestIngredient("dust", 1, earlierDescriptor, earlierTooltip))
             .buildObject();
@@ -135,12 +136,12 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldUseFirstInputForDisplayInputRecipePresentation() {
-        var firstDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/first"));
+        var firstDescriptor = new ItemIdRenderDescriptor(modLoc("display/first"));
         var firstTooltip = List.<Component>of(I18n.raw("first tooltip"));
         var recipe = displayInputBuilder()
             .input(7, new TestIngredient("ore", 1, firstDescriptor, firstTooltip))
             .input(1, new TestIngredient("dust", 1,
-                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/second")),
+                new ItemIdRenderDescriptor(modLoc("display/second")),
                 List.<Component>of(I18n.raw("second tooltip"))))
             .output(0, new TestResult("plate", 1))
             .buildObject();
@@ -151,7 +152,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldUseMarkerDisplayIngredientDescriptorAndRecipeTooltip() {
-        var displayDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/marker"));
+        var displayDescriptor = new ItemIdRenderDescriptor(modLoc("display/marker"));
         var recipe = markerBuilder()
             .display(new TestIngredient("display", 1, displayDescriptor,
                 List.<Component>of(I18n.raw("ignored display tooltip"))))
@@ -165,7 +166,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldUseMarkerTextureDescriptorAndRecipeTooltip() {
-        var textureLoc = new ResourceLocation("tinactory", "gui/marker");
+        var textureLoc = modLoc("gui/marker");
         var recipe = markerBuilder()
             .display(textureLoc)
             .output(0, new TestIngredient("marker_output", 1))
@@ -178,7 +179,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldFallbackMarkerDescriptorToRepresentativeObjectButKeepRecipeTooltip() {
-        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
+        var outputDescriptor = new ItemIdRenderDescriptor(modLoc("display/output"));
         var recipe = markerBuilder()
             .output(0, new TestResult("marker_output", 1, outputDescriptor,
                 List.<Component>of(I18n.raw("ignored output tooltip"))))
@@ -257,7 +258,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldRejectAssemblyRecipeWhenRequiredTechIsMissing() {
-        var tech = new ResourceLocation("tinactory", "assembler");
+        var tech = modLoc("assembler");
         var recipe = assemblyBuilder()
             .requireTech(tech)
             .buildObject();
@@ -269,7 +270,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldAcceptAssemblyRecipeWhenRequiredTechIsFinished() {
-        var tech = new ResourceLocation("tinactory", "assembler");
+        var tech = modLoc("assembler");
         var recipe = assemblyBuilder()
             .requireTech(tech)
             .buildObject();
@@ -281,8 +282,8 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldRequireActiveMatchingResearchTarget() {
-        var target = new ResourceLocation("tinactory", "research_target");
-        var other = new ResourceLocation("tinactory", "other_research");
+        var target = modLoc("research_target");
+        var other = modLoc("other_research");
         var recipe = researchBuilder(target)
             .buildObject();
         var missingTargetMachine = new TestMachine(new TestContainer());
@@ -299,7 +300,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldCheckResearchCapacityForParallelProgress() {
-        var target = new ResourceLocation("tinactory", "research_target");
+        var target = modLoc("research_target");
         var recipe = researchBuilder(target)
             .progress(4L)
             .buildObject();
@@ -314,7 +315,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldAdvanceServerSideTechProgressWhenResearchOutputsAreInserted() {
-        var target = new ResourceLocation("tinactory", "research_target");
+        var target = modLoc("research_target");
         var recipe = researchBuilder(target)
             .progress(4L)
             .buildObject();
@@ -348,8 +349,8 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldMatchMarkerBaseTypeAndPrefixByLocation() {
-        var baseType = new ResourceLocation("tinactory", "base_type");
-        var otherType = new ResourceLocation("tinactory", "other_type");
+        var baseType = modLoc("base_type");
+        var otherType = modLoc("other_type");
         var recipe = markerBuilder()
             .baseType(baseType)
             .prefix("ore")
@@ -357,45 +358,45 @@ class ProcessingRecipeTest {
 
         assertTrue(recipe.matchesType(baseType));
         assertFalse(recipe.matchesType(otherType));
-        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore")));
-        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore/copper")));
-        assertFalse(recipe.matches(() -> new ResourceLocation("tinactory", "dust/copper")));
+        assertTrue(recipe.matches(() -> modLoc("ore")));
+        assertTrue(recipe.matches(() -> modLoc("ore/copper")));
+        assertFalse(recipe.matches(() -> modLoc("dust/copper")));
     }
 
     private static TestRecipe.Builder recipeBuilder() {
-        return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_recipe"));
+        return new TestRecipe.Builder(modLoc("test_recipe"));
     }
 
     private static AssemblyRecipe.Builder assemblyBuilder() {
-        return new AssemblyRecipe.Builder(null, new ResourceLocation("tinactory", "test_assembly"))
+        return new AssemblyRecipe.Builder(null, modLoc("test_assembly"))
             .output(0, new TestResult("assembly", 1))
             .workTicks(20L)
             .power(8L);
     }
 
     private static ResearchRecipe.Builder researchBuilder(ResourceLocation target) {
-        return new ResearchRecipe.Builder(null, new ResourceLocation("tinactory", "test_research"))
+        return new ResearchRecipe.Builder(null, modLoc("test_research"))
             .target(target)
             .workTicks(20L)
             .power(8L);
     }
 
     private static MarkerRecipe.Builder markerBuilder() {
-        return new MarkerRecipe.Builder(null, new ResourceLocation("tinactory", "test_marker"))
-            .baseType(new ResourceLocation("tinactory", "test_base"))
+        return new MarkerRecipe.Builder(null, modLoc("test_marker"))
+            .baseType(modLoc("test_base"))
             .workTicks(20L)
             .power(8L);
     }
 
     private static TestRecipe.Builder outputlessRecipeBuilder() {
-        return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_outputless")) {
+        return new TestRecipe.Builder(modLoc("test_outputless")) {
             @Override
             protected void validate() {}
         };
     }
 
     private static DisplayInputRecipe.Builder displayInputBuilder() {
-        return DisplayInputRecipe.builder(null, new ResourceLocation("tinactory", "test_display_input"))
+        return DisplayInputRecipe.builder(null, modLoc("test_display_input"))
             .workTicks(20L)
             .power(8L);
     }

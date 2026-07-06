@@ -7,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -60,7 +59,7 @@ final class NetworkRuntimeFixtures {
         }
     }
 
-    static final class SchedulingFixture extends ForgeRegistryEntry<IScheduling> implements IScheduling {
+    static final class SchedulingFixture implements IScheduling {
         private final String id;
         private final List<Dependency> dependencies = new ArrayList<>();
 
@@ -87,8 +86,7 @@ final class NetworkRuntimeFixtures {
         private record Dependency(IScheduling left, IScheduling right) {}
     }
 
-    static final class ComponentTypeFixture extends ForgeRegistryEntry<IComponentType<?>>
-        implements IComponentType<ComponentFixture> {
+    static final class ComponentTypeFixture implements IComponentType<ComponentFixture> {
         private final ComponentFixture component;
 
         ComponentTypeFixture(ComponentFixture component) {

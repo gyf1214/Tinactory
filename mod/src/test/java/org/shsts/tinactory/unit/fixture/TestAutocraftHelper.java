@@ -16,7 +16,7 @@ public final class TestAutocraftHelper {
 
     public static List<IMachineConstraint> constraints(String recipeTypeId, int voltageTier) {
         return List.of(
-            new RecipeTypeConstraint(new ResourceLocation(recipeTypeId)),
+            new RecipeTypeConstraint(ResourceLocation.parse(recipeTypeId)),
             new VoltageConstraint(voltageTier));
     }
 

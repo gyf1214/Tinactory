@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.api.logistics.PortDirection.INPUT;
 import static org.shsts.tinactory.api.logistics.PortDirection.OUTPUT;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class ProcessingMachineTest {
     private static final int INPUT_PORT = 0;
@@ -37,7 +38,7 @@ class ProcessingMachineTest {
 
     @Test
     void shouldUseScaledPreviewForGenericResultsWhenBuildingOutputInfo() {
-        var recipe = new TestRecipe.Builder(RECIPE_TYPE, new ResourceLocation("tinactory", "test_recipe"))
+        var recipe = new TestRecipe.Builder(RECIPE_TYPE, modLoc("test_recipe"))
             .output(2, new TestResult("dust", 2))
             .workTicks(20)
             .power(8)
@@ -130,7 +131,7 @@ class ProcessingMachineTest {
         var machine = new TestMachine(new TestContainer().port(INPUT_PORT, INPUT, input));
         var processor = new TestProcessingMachine();
 
-        processor.setTargetRecipe(new ResourceLocation("tinactory", "missing"), machine);
+        processor.setTargetRecipe(modLoc("missing"), machine);
 
         assertTrue(input.acceptInput(TestStack.item("ore", 1)));
     }
@@ -225,7 +226,7 @@ class ProcessingMachineTest {
     }
 
     private static TestRecipe recipe(String path, long voltage) {
-        return new TestRecipe.Builder(RECIPE_TYPE, new ResourceLocation("tinactory", path))
+        return new TestRecipe.Builder(RECIPE_TYPE, modLoc(path))
             .input(INPUT_PORT, new TestIngredient("ore", 1))
             .output(OUTPUT_PORT, new TestResult("dust", 1))
             .workTicks(20)
@@ -235,7 +236,7 @@ class ProcessingMachineTest {
     }
 
     private static MarkerRecipe marker(String path, long voltage) {
-        return new MarkerRecipe.Builder(MARKER_TYPE, new ResourceLocation("tinactory", path))
+        return new MarkerRecipe.Builder(MARKER_TYPE, modLoc(path))
             .baseType(RECIPE_TYPE.loc())
             .prefix("ore")
             .workTicks(20)

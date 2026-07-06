@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.gui;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
@@ -15,12 +14,13 @@ import org.shsts.tinactory.unit.fixture.TestResult;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class LayoutTest {
     @Test
     void shouldComputeBoundsOffsetPortsAndRecipeSlotMappings() {
-        var imageTexture = new Texture(new ResourceLocation("tinactory", "gui/layout_image"), 20, 10);
-        var progressTexture = new Texture(new ResourceLocation("tinactory", "gui/layout_progress"), 8, 80);
+        var imageTexture = new Texture(modLoc("gui/layout_image"), 20, 10);
+        var progressTexture = new Texture(modLoc("gui/layout_progress"), 8, 80);
         var layout = Layout.builder()
             .port(SlotType.ITEM_INPUT)
             .slot(10, 20)
@@ -49,7 +49,7 @@ class LayoutTest {
             new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT),
             new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT)), layout.portSlots.get(2));
 
-        var recipe = new ProcessingRecipe.Builder(null, new ResourceLocation("tinactory", "layout_recipe"))
+        var recipe = new ProcessingRecipe.Builder(null, modLoc("layout_recipe"))
             .input(0, new TestIngredient("ore", 1))
             .input(0, new TestIngredient("dust", 2))
             .input(1, new TestIngredient("catalyst", 1))
@@ -76,8 +76,8 @@ class LayoutTest {
 
         var marker = new MarkerRecipe.Builder(
             new TestRecipeType<>("layout_marker_type", MarkerRecipe.class),
-            new ResourceLocation("tinactory", "layout_marker"))
-            .baseType(new ResourceLocation("tinactory", "layout_base"))
+            modLoc("layout_marker"))
+            .baseType(modLoc("layout_base"))
             .output(2, new TestIngredient("marker_plate", 1))
             .output(2, new TestIngredient("marker_gear", 3))
             .workTicks(20)
