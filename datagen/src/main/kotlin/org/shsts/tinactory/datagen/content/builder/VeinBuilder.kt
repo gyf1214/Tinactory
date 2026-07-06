@@ -1,17 +1,14 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import org.shsts.tinactory.AllMaterials.getMaterial
-import org.shsts.tinactory.Tinactory.REGISTRATE
-import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
 import org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE
 import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE
 import org.shsts.tinactory.datagen.content.Technologies.TECHS
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreAnalyzer
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.material.OreVariant
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 class VeinBuilder(private val id: String, private val rank: Int, private val rate: Double) {
     var primitive = false
@@ -81,27 +78,18 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             }
         }
 
-        val builder = run {
-            val recipeType = REGISTRATE.getRecipeType("ore_analyzer") as IRecipeType<OreAnalyzerRecipe>
-            val builder = DATA_GEN.recipeFactory(recipeType, ::OreAnalyzerRecipeBuilder).recipe(id1).apply {
-                rate(this@VeinBuilder.rate)
-            }
-            builder.apply {
-                simpleDefaults()
-                amperage = 0.125
-                workTicks(128)
-            }
-        }
-
-        builder.apply(block)
-        if (primitive) {
-            builder.voltage(Voltage.PRIMITIVE)
-        } else {
-            builder.voltage(variant1.voltage)
-            builder.extra {
-                requireTech(tech)
+        oreAnalyzer {
+            recipe(id1) {
+                block()
+                if (primitive) {
+                    voltage(Voltage.PRIMITIVE)
+                } else {
+                    voltage(variant1.voltage)
+                    extra {
+                        requireTech(tech)
+                    }
+                }
             }
         }
-        builder.build()
     }
 }

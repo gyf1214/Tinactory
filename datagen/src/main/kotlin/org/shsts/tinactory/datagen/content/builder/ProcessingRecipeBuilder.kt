@@ -11,7 +11,6 @@ import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe
 import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
-import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.builder.Builder
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
@@ -21,24 +20,21 @@ import org.shsts.tinactory.integration.recipe.ProcessingHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 
-open class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
-    parent: IRecipeFactory<R, B>,
-    private val factory: (List<ProcessingRecipe.Input>, List<ProcessingRecipe.Output>, Long, Long, Long) -> R
+abstract class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
+    parent: IRecipeFactory<R, B>
 ) : Builder<R, IRecipeFactory<R, B>, B>(parent) {
-    var voltage: Voltage? = null
-    var amperage: Double? = null
+    protected val inputs = mutableListOf<ProcessingRecipe.Input>()
+    protected val outputs = mutableListOf<ProcessingRecipe.Output>()
     var defaultInputItem: Int? = null
     var defaultInputFluid: Int? = null
     var defaultOutputItem: Int? = null
     var defaultOutputFluid: Int? = null
     var defaultItemSub: String? = null
     var defaultFluidSub = "fluid"
-    var requirePower = true
-    val inputs = mutableListOf<ProcessingRecipe.Input>()
-    val outputs = mutableListOf<ProcessingRecipe.Output>()
-    protected var workTicks = 0L
-    protected var voltageValue = 0L
-    protected var power = 0L
+    protected var workTicks: Long? = null
+    protected var voltage: Voltage? = null
+    var amperage: Double? = null
+    protected var power: Long? = null
 
     fun fullDefaults() {
         defaultInputItem = 0
@@ -124,7 +120,6 @@ open class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBui
 
     fun voltage(value: Voltage) {
         voltage = value
-        voltageValue = value.value
     }
 
     private fun power(voltage: Voltage?, amperage: Double?): Long? {
@@ -136,46 +131,51 @@ open class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBui
         }
     }
 
-    override fun createObject(): R {
-        return factory(inputs.toList(), outputs.toList(), workTicks, voltageValue, power)
+    protected open fun validate() {
+        check(workTicks!! > 0)
+        checkNotNull(voltage)
+        check(voltage == Voltage.PRIMITIVE || power!! > 0)
     }
 
-    override fun build(): IRecipeFactory<R, B> {
-        val calculatedPower = power(voltage, amperage)
-        if (requirePower || calculatedPower != null) {
-            power = calculatedPower!!
+    override fun buildObject(): R {
+        if (power == null) {
+            power = power(voltage, amperage)
         }
-        return super.build()
+        validate()
+        return super.buildObject()
     }
 }
 
 class SimpleProcessingBuilder(parent: IRecipeFactory<ProcessingRecipe, SimpleProcessingBuilder>) :
-    ProcessingRecipeBuilder<ProcessingRecipe, SimpleProcessingBuilder>(parent, ::ProcessingRecipe)
+    ProcessingRecipeBuilder<ProcessingRecipe, SimpleProcessingBuilder>(parent) {
+    override fun createObject(): ProcessingRecipe {
+        return ProcessingRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!)
+    }
+}
 
 class CleanRecipeBuilder(parent: IRecipeFactory<CleanRecipe, CleanRecipeBuilder>) :
-    ProcessingRecipeBuilder<CleanRecipe, CleanRecipeBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power ->
-            CleanRecipe(inputs, outputs, workTicks, voltage, power, 0.0, 0.0)
-        }) {
-    private var minCleanness = 0.0
-    private var maxCleanness = 0.0
+    ProcessingRecipeBuilder<CleanRecipe, CleanRecipeBuilder>(parent) {
+    private var minCleanness: Double? = null
+    private var maxCleanness: Double? = null
 
     fun requireCleanness(min: Double, max: Double) {
         minCleanness = min
         maxCleanness = max
     }
 
+    override fun validate() {
+        super.validate()
+        check(minCleanness!! <= maxCleanness!!)
+    }
+
     override fun createObject(): CleanRecipe {
-        return CleanRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            minCleanness, maxCleanness)
+        return CleanRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!,
+            minCleanness!!, maxCleanness!!)
     }
 }
 
 class GeneratorRecipeBuilder(parent: IRecipeFactory<GeneratorRecipe, GeneratorRecipeBuilder>) :
-    ProcessingRecipeBuilder<GeneratorRecipe, GeneratorRecipeBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power ->
-            GeneratorRecipe(inputs, outputs, workTicks, voltage, power, false)
-        }) {
+    ProcessingRecipeBuilder<GeneratorRecipe, GeneratorRecipeBuilder>(parent) {
     private var exactVoltage = false
 
     fun exactVoltage(value: Boolean) {
@@ -183,50 +183,30 @@ class GeneratorRecipeBuilder(parent: IRecipeFactory<GeneratorRecipe, GeneratorRe
     }
 
     override fun createObject(): GeneratorRecipe {
-        return GeneratorRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            exactVoltage)
+        return GeneratorRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!, exactVoltage)
     }
 }
 
 class BlastFurnaceBuilder(parent: IRecipeFactory<BlastFurnaceRecipe, BlastFurnaceBuilder>) :
-    ProcessingRecipeBuilder<BlastFurnaceRecipe, BlastFurnaceBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power ->
-            BlastFurnaceRecipe(inputs, outputs, workTicks, voltage, power, 0)
-        }) {
-    private var temperature = 0
+    ProcessingRecipeBuilder<BlastFurnaceRecipe, BlastFurnaceBuilder>(parent) {
+    private var temperature: Int? = null
 
     fun temperature(value: Int) {
         temperature = value
     }
 
+    override fun validate() {
+        super.validate()
+        checkNotNull(temperature)
+    }
+
     override fun createObject(): BlastFurnaceRecipe {
-        return BlastFurnaceRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            temperature)
-    }
-}
-
-class OreAnalyzerRecipeBuilder(parent: IRecipeFactory<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>) :
-    AssemblyRecipeBuilder<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power, requiredTech ->
-            OreAnalyzerRecipe(inputs, outputs, workTicks, voltage, power, requiredTech, 0.0)
-        }) {
-    private var rate = 0.0
-
-    fun rate(value: Double) {
-        rate = value
-    }
-
-    override fun createObject(): OreAnalyzerRecipe {
-        return OreAnalyzerRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            requiredTech.toList(), rate)
+        return BlastFurnaceRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!, temperature!!)
     }
 }
 
 class ResearchRecipeBuilder(parent: IRecipeFactory<ResearchRecipe, ResearchRecipeBuilder>) :
-    ProcessingRecipeBuilder<ResearchRecipe, ResearchRecipeBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power ->
-            ResearchRecipe(inputs, outputs, workTicks, voltage, power, ResourceLocation("tinactory", "missing"), 1)
-        }) {
+    ProcessingRecipeBuilder<ResearchRecipe, ResearchRecipeBuilder>(parent) {
     private var target: ResourceLocation? = null
     private var progress = 1L
 
@@ -238,8 +218,13 @@ class ResearchRecipeBuilder(parent: IRecipeFactory<ResearchRecipe, ResearchRecip
         progress = value
     }
 
+    override fun validate() {
+        super.validate()
+        checkNotNull(target)
+        check(progress > 0L)
+    }
+
     override fun createObject(): ResearchRecipe {
-        return ResearchRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            checkNotNull(target) { "Missing research target" }, progress)
+        return ResearchRecipe(inputs, workTicks!!, voltage!!.value, power!!, target!!, progress)
     }
 }

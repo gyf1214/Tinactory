@@ -157,7 +157,8 @@ object Components {
             }
 
             component("raw_rhodium_plated_palladium") {
-                model(basicItem(ResourceLocation("gregtech4", "items/iridium_alloy_ingot")))
+                model(basicItem(ResourceLocation.fromNamespaceAndPath(
+                    "gregtech4", "items/iridium_alloy_ingot")))
             }
 
             component("energy_crystal") {
@@ -330,7 +331,7 @@ object Components {
                 }
                 item(entry) {
                     model(basicItem("$texKey/base", "$texKey/overlay"))
-                    tag(AllTags.item(ResourceLocation("itemfilters", "check_nbt")))
+                    tag(AllTags.item(ResourceLocation.fromNamespaceAndPath("itemfilters", "check_nbt")))
                 }
             }
         }

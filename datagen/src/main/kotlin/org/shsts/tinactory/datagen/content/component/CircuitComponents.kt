@@ -15,9 +15,9 @@ import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Circuits.getCircuit
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
@@ -629,7 +629,7 @@ object CircuitComponents {
                 for (i in level..<WAFER_RAW_LIST.size) {
                     val j = i - level
                     val rawWafer = WAFER_RAW_LIST.item(i)
-                    val rawId = name(rawWafer.asItem().registryName!!.path, -1)
+                    val rawId = name(itemLoc(rawWafer.asItem()).path, -1)
                     output(wafer, 1 shl j, suffix = "_from_$rawId") {
                         input(rawWafer)
                         voltage(Voltage.fromRank(voltage.rank + j))
@@ -823,7 +823,7 @@ object CircuitComponents {
             val solder = (1 shl (level - 1)) / 2.0
             input("soldering_alloy", amount = solder)
             voltage(voltage ?: voltage1)
-            workTicks(workTicks ?: 200L * level)
+            workTicks(workTicks ?: (200L * level))
         }
     }
 

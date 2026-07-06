@@ -4,8 +4,8 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
-import net.minecraftforge.client.model.generators.ConfiguredModel
-import net.minecraftforge.common.Tags
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel
+import net.neoforged.neoforge.common.Tags
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS
@@ -37,7 +37,6 @@ import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
-import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
@@ -128,7 +127,7 @@ object Multiblocks {
             misc("clear_glass") {
                 blockState { ctx -> solidBlock(ctx, modLoc("blocks/multiblock/glass/quartz_glass_a")) }
                 tag(CLEANROOM_WALL)
-                tag(Tags.Blocks.GLASS)
+                tag(Tags.Blocks.GLASS_BLOCKS)
             }
 
             misc("hardened_glass") {
@@ -280,7 +279,7 @@ object Multiblocks {
         dataGen {
             tag(BlockTags.DOORS, CLEANROOM_DOOR)
             tag(GLASS_CASING, CLEANROOM_WALL)
-            tag(GLASS_CASING, Tags.Blocks.GLASS)
+            tag(GLASS_CASING, Tags.Blocks.GLASS_BLOCKS)
         }
     }
 
@@ -765,9 +764,8 @@ object Multiblocks {
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
-            multiblock("multi_smelter", "heatproof", "blast_furnace")
-            dataGen {
-                tag(itemEntry("multiblock/multi_smelter"), ELECTRIC_FURNACE)
+            multiblock("multi_smelter", "heatproof", "blast_furnace") {
+                itemTag(ELECTRIC_FURNACE)
             }
             multiblock("metal_former", "frost_proof", "blast_furnace")
             multiblock("ore_processing_unit", "solid_steel", "blast_furnace")
@@ -809,7 +807,8 @@ object Multiblocks {
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation) {
+    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation,
+        block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
         val set = getMultiblock(name)
         block(set.block) {
             machineModel {
@@ -819,12 +818,14 @@ object Multiblocks {
             for (type in set.types) {
                 itemTag(machine(type))
             }
+            block()
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
+    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name,
+        block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
         multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"),
-            gregtech("blocks/multiblock/$overlay"))
+            gregtech("blocks/multiblock/$overlay"), block)
     }
 
     private fun machineRecipes() {

@@ -3,7 +3,7 @@ package org.shsts.tinactory.datagen.content.material
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
-import net.minecraftforge.common.Tags
+import net.neoforged.neoforge.common.Tags
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies

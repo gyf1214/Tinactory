@@ -7,10 +7,10 @@ import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.recipe.AssemblyRecipe
 import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.recipe.ResearchRecipe
+import org.shsts.tinycorelib.api.recipe.IRecipe
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 typealias ProcessingRecipeFactoryBase<R, B> = RecipeFactory<R, B>
@@ -36,37 +36,33 @@ object RecipeFactories {
         BoilerRecipeFactory().apply(block)
     }
 
+    @Suppress("UNCHECKED_CAST")
+    private fun <R : IRecipe<*>> recipeType(name: String): IRecipeType<R> {
+        return REGISTRATE.getRecipeType(name) as IRecipeType<R>
+    }
+
     private fun processing(name: String, defaults: SimpleProcessingBuilder.() -> Unit):
         RecipeFactory<ProcessingRecipe, SimpleProcessingBuilder> {
-        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<ProcessingRecipe>
-        return RecipeFactory(recipeType, ::SimpleProcessingBuilder, defaults)
+        return RecipeFactory(recipeType(name), ::SimpleProcessingBuilder, defaults)
     }
 
     private fun clean(name: String, defaults: CleanRecipeBuilder.() -> Unit):
         CleanRecipeFactory {
-        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<CleanRecipe>
-        return RecipeFactory(recipeType, ::CleanRecipeBuilder, defaults)
+        return RecipeFactory(recipeType(name), ::CleanRecipeBuilder, defaults)
     }
 
     private fun generator(name: String, defaults: GeneratorRecipeBuilder.() -> Unit):
         GeneratorRecipeFactory {
-        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<GeneratorRecipe>
-        return RecipeFactory(recipeType, ::GeneratorRecipeBuilder, defaults)
+        return RecipeFactory(recipeType(name), ::GeneratorRecipeBuilder, defaults)
     }
-
-    private fun simpleProcessing(name: String,
-        defaults: SimpleProcessingBuilder.() -> Unit) =
-        processing(name, defaults)
 
     private fun assembly(name: String, defaults: SimpleAssemblyRecipeBuilder.() -> Unit):
         AssemblyRecipeFactory {
-        val recipeType = REGISTRATE.getRecipeType(name) as IRecipeType<AssemblyRecipe>
-        return AssemblyRecipeFactory(recipeType, defaults)
+        return AssemblyRecipeFactory(recipeType(name), defaults)
     }
 
     fun rocket(block: ResearchRecipeFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType("rocket") as IRecipeType<ResearchRecipe>
-        RecipeFactory(recipeType, ::ResearchRecipeBuilder) {
+        RecipeFactory(recipeType("rocket"), ::ResearchRecipeBuilder) {
             defaultInputItem = 0
             defaultInputFluid = 1
             amperage = 0.125
@@ -83,6 +79,14 @@ object RecipeFactories {
         }.block()
     }
 
+    fun oreAnalyzer(block: OreAnalyzerRecipeFactory.() -> Unit) {
+        RecipeFactory(recipeType("ore_analyzer"), ::OreAnalyzerRecipeBuilder) {
+            simpleDefaults()
+            amperage = 0.125
+            workTicks(128)
+        }.block()
+    }
+
     fun laserEngraver(block: CleanRecipeFactory.() -> Unit) {
         clean("laser_engraver") {
             defaultInputItem = 0
@@ -92,7 +96,7 @@ object RecipeFactories {
     }
 
     fun circuitAssembler(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("circuit_assembler") {
+        processing("circuit_assembler") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -119,7 +123,7 @@ object RecipeFactories {
     }
 
     fun macerator(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("macerator") {
+        processing("macerator") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 0.25
@@ -127,7 +131,7 @@ object RecipeFactories {
     }
 
     fun oreWasher(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("ore_washer") {
+        processing("ore_washer") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -136,14 +140,14 @@ object RecipeFactories {
     }
 
     fun centrifuge(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("centrifuge") {
+        processing("centrifuge") {
             fullDefaults()
             amperage = 0.5
         }.block()
     }
 
     fun thermalCentrifuge(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("thermal_centrifuge") {
+        processing("thermal_centrifuge") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 1.0
@@ -152,14 +156,14 @@ object RecipeFactories {
     }
 
     fun sifter(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("sifter") {
+        processing("sifter") {
             simpleDefaults()
             amperage = 0.25
         }.block()
     }
 
     fun alloySmelter(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("alloy_smelter") {
+        processing("alloy_smelter") {
             defaultInputItem = 0
             defaultOutputItem = 2
             defaultOutputFluid = 3
@@ -171,7 +175,7 @@ object RecipeFactories {
     }
 
     fun mixer(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("mixer") {
+        processing("mixer") {
             fullDefaults()
             amperage = 0.5
         }.apply {
@@ -181,7 +185,7 @@ object RecipeFactories {
     }
 
     fun polarizer(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("polarizer") {
+        processing("polarizer") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 0.25
@@ -189,21 +193,21 @@ object RecipeFactories {
     }
 
     fun wiremill(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("wiremill") {
+        processing("wiremill") {
             simpleDefaults()
             amperage = 0.25
         }.block()
     }
 
     fun bender(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("bender") {
+        processing("bender") {
             simpleDefaults()
             amperage = 0.25
         }.block()
     }
 
     fun lathe(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("lathe") {
+        processing("lathe") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 0.375
@@ -211,7 +215,7 @@ object RecipeFactories {
     }
 
     fun cutter(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("cutter") {
+        processing("cutter") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -220,14 +224,14 @@ object RecipeFactories {
     }
 
     fun extruder(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("extruder") {
+        processing("extruder") {
             simpleDefaults()
             amperage = 0.625
         }.block()
     }
 
     fun extractor(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("extractor") {
+        processing("extractor") {
             defaultInputItem = 0
             defaultOutputItem = 2
             defaultOutputFluid = 3
@@ -236,7 +240,7 @@ object RecipeFactories {
     }
 
     fun fluidSolidifier(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("fluid_solidifier") {
+        processing("fluid_solidifier") {
             defaultInputFluid = 1
             defaultOutputItem = 2
             amperage = 0.25
@@ -244,7 +248,7 @@ object RecipeFactories {
     }
 
     fun electrolyzer(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("electrolyzer") {
+        processing("electrolyzer") {
             fullDefaults()
             amperage = 0.75
         }.apply {
@@ -254,8 +258,7 @@ object RecipeFactories {
     }
 
     fun chemicalReactor(block: ChemicalRecipeFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType("chemical_reactor") as IRecipeType<ChemicalReactorRecipe>
-        RecipeFactory(recipeType, ::ChemicalRecipeBuilder) {
+        RecipeFactory(recipeType("chemical_reactor"), ::ChemicalRecipeBuilder) {
             fullDefaults()
             amperage = 0.375
         }.apply {
@@ -265,7 +268,7 @@ object RecipeFactories {
     }
 
     fun arcFurnace(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("arc_furnace") {
+        processing("arc_furnace") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 2
@@ -299,8 +302,7 @@ object RecipeFactories {
     }
 
     fun blastFurnace(block: BlastFurnaceRecipeFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType("blast_furnace") as IRecipeType<BlastFurnaceRecipe>
-        RecipeFactory(recipeType, ::BlastFurnaceBuilder) {
+        RecipeFactory(recipeType("blast_furnace"), ::BlastFurnaceBuilder) {
             fullDefaults()
             amperage = 4.0
         }.apply {
@@ -310,14 +312,14 @@ object RecipeFactories {
     }
 
     fun vacuumFreezer(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("vacuum_freezer") {
+        processing("vacuum_freezer") {
             fullDefaults()
             amperage = 1.5
         }.block()
     }
 
     fun distillation(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("distillation") {
+        processing("distillation") {
             defaultInputFluid = 0
             defaultOutputFluid = 1
             defaultOutputItem = 2
@@ -329,7 +331,7 @@ object RecipeFactories {
     }
 
     fun autofarm(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("autofarm") {
+        processing("autofarm") {
             defaultInputItem = 0
             defaultInputFluid = 1
             defaultOutputItem = 3
@@ -338,7 +340,7 @@ object RecipeFactories {
     }
 
     fun pyrolyseOven(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("pyrolyse_oven") {
+        processing("pyrolyse_oven") {
             fullDefaults()
             amperage = 2.0
         }.apply {
@@ -348,7 +350,7 @@ object RecipeFactories {
     }
 
     fun implosionCompressor(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("implosion_compressor") {
+        processing("implosion_compressor") {
             defaultInputItem = 0
             defaultOutputItem = 2
             amperage = 0.125
@@ -366,7 +368,7 @@ object RecipeFactories {
     }
 
     fun oilCracking(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("oil_cracking") {
+        processing("oil_cracking") {
             defaultInputFluid = 0
             defaultOutputFluid = 2
             amperage = 2.5
@@ -374,7 +376,7 @@ object RecipeFactories {
     }
 
     fun fusionReactor(block: ProcessingRecipeFactory.() -> Unit) {
-        simpleProcessing("fusion_reactor") {
+        processing("fusion_reactor") {
             defaultInputFluid = 0
             defaultOutputFluid = 1
             amperage = 0.75
@@ -382,7 +384,6 @@ object RecipeFactories {
     }
 
     fun marker(block: MarkerFactory.() -> Unit) {
-        val recipeType = REGISTRATE.getRecipeType("marker") as IRecipeType<MarkerRecipe>
-        RecipeFactory(recipeType, ::MarkerBuilder).block()
+        RecipeFactory(recipeType("marker"), ::MarkerBuilder).block()
     }
 }

@@ -1,6 +1,8 @@
 package org.shsts.tinactory.datagen.content
 
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.Item
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
 import org.shsts.tinactory.AllRegistries.BLOCKS
 import org.shsts.tinactory.AllRegistries.ITEMS
@@ -14,4 +16,8 @@ object RegistryHelper {
     fun getItem(id: String) = itemEntry(id).get()!!
 
     fun vanillaItem(id: String) = ITEMS.getEntry<Item>(mcLoc(id)).get()!!
+
+    fun itemLoc(item: ItemLike) = BuiltInRegistries.ITEM.getKey(item.asItem())
+
+    fun itemKey(item: ItemLike) = BuiltInRegistries.ITEM.getResourceKey(item.asItem()).orElseThrow()
 }

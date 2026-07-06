@@ -14,6 +14,7 @@ import org.shsts.tinactory.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.recipe.ToolRecipe
 import org.shsts.tinactory.core.builder.Builder
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import java.util.function.Supplier
 
@@ -28,8 +29,8 @@ class ToolRecipeFactory {
     }
 
     fun result(item: ItemLike, amount: Int = 1, block: ToolRecipeBuilder.() -> Unit) {
-        recipe(item.asItem().registryName!!) {
-            result({ item }, amount)
+        recipe(itemLoc(item)) {
+            result(item, amount)
             block()
         }
     }
@@ -37,7 +38,7 @@ class ToolRecipeFactory {
     fun result(name: String, sub: String, amount: Int = 1, block: ToolRecipeBuilder.() -> Unit) {
         val mat = getMaterial(name)
         recipe(mat.loc(sub)) {
-            result(mat.entry(sub), amount)
+            result(mat.item(sub), amount)
             block()
         }
     }
@@ -71,13 +72,7 @@ class ToolRecipeBuilder(parent: IRecipeFactory<ToolRecipe, ToolRecipeBuilder>) :
     private val keys = mutableMapOf<Char, Supplier<Ingredient>>()
     private val tools = mutableListOf<Supplier<Ingredient>>()
 
-    fun result(result: Supplier<out ItemLike>, count: Int): ToolRecipeBuilder {
-        this.result = result
-        this.count = count
-        return this
-    }
-
-    fun result(result: Item, count: Int): ToolRecipeBuilder {
+    fun result(result: ItemLike, count: Int): ToolRecipeBuilder {
         this.result = Supplier { result }
         this.count = count
         return this
@@ -110,7 +105,7 @@ class ToolRecipeBuilder(parent: IRecipeFactory<ToolRecipe, ToolRecipeBuilder>) :
 
     fun toolTag(vararg toolTags: TagKey<Item>): ToolRecipeBuilder {
         for (tag in toolTags) {
-            tool(Supplier { Ingredient.of(tag) })
+            tool { Ingredient.of(tag) }
         }
         return this
     }

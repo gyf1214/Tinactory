@@ -6,29 +6,22 @@ import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.content.electric.Circuits.CHIP
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.AssemblyRecipe
-import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.content.recovery.RecoveryInput
 import org.shsts.tinactory.datagen.content.recovery.RecoveryItemInput
 import org.shsts.tinactory.datagen.content.recovery.RecoveryMaterialInput
 import org.shsts.tinactory.datagen.content.recovery.RecoveryOutput
-import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipe
-import org.shsts.tinactory.datagen.content.recovery.RecoveryRecipeKey
 import org.shsts.tinactory.datagen.content.recovery.RecoveryRegistry
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import kotlin.math.max
 
-open class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuilder<R, B>>(
-    parent: IRecipeFactory<R, B>,
-    private val assemblyFactory: (
-        List<ProcessingRecipe.Input>, List<ProcessingRecipe.Output>, Long, Long, Long,
-        List<ResourceLocation>) -> R
-) : ProcessingRecipeBuilder<R, B>(parent, { inputs, outputs, workTicks, voltage, power ->
-    assemblyFactory(inputs, outputs, workTicks, voltage, power, listOf())
-}) {
+abstract class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuilder<R, B>>(
+    parent: IRecipeFactory<R, B>) : ProcessingRecipeBuilder<R, B>(parent) {
+    var recordRecovery: Boolean = false
     var componentVoltage: Voltage? = null
     var autoCable = false
     private var components = 0
@@ -80,35 +73,55 @@ open class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuilder<R
     }
 
     override fun recordMaterialInput(mat: MaterialSet, sub: String, amount: Number) {
-        recoveryInputs += RecoveryMaterialInput(mat, sub, amount.toDouble())
+        if (recordRecovery) {
+            recoveryInputs += RecoveryMaterialInput(mat, sub, amount.toDouble())
+        }
     }
 
     override fun recordItemInput(item: ItemLike, amount: Int) {
-        recoveryInputs += RecoveryItemInput(item, amount.toDouble())
+        if (recordRecovery) {
+            recoveryInputs += RecoveryItemInput(item, amount.toDouble())
+        }
     }
 
     override fun recordItemOutput(item: ItemLike, amount: Int) {
-        recoveryOutputs += RecoveryOutput(item, amount, voltage)
+        if (recordRecovery) {
+            recoveryOutputs += RecoveryOutput(item, amount, voltage)
+        }
     }
 
-    override fun createObject(): R {
-        return assemblyFactory(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            requiredTech.toList())
-    }
-
-    override fun build(): IRecipeFactory<R, B> {
+    override fun buildObject(): R {
         if (autoCable) {
             component("cable", amount = max(2, components * 2))
         }
         if (recoveryInputs.isNotEmpty() && recoveryOutputs.size == 1) {
-            RecoveryRegistry.record(RecoveryRecipe(
-                RecoveryRecipeKey(ResourceLocation("tinactory", "deferred_recipe_id")),
-                recoveryOutputs.single(),
-                recoveryInputs.toList()))
+            RecoveryRegistry.record(recoveryOutputs.single(), recoveryInputs)
         }
-        return super.build()
+        return super.buildObject()
     }
 }
 
 class SimpleAssemblyRecipeBuilder(parent: IRecipeFactory<AssemblyRecipe, SimpleAssemblyRecipeBuilder>) :
-    AssemblyRecipeBuilder<AssemblyRecipe, SimpleAssemblyRecipeBuilder>(parent, ::AssemblyRecipe)
+    AssemblyRecipeBuilder<AssemblyRecipe, SimpleAssemblyRecipeBuilder>(parent) {
+    override fun createObject(): AssemblyRecipe {
+        return AssemblyRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!, requiredTech)
+    }
+}
+
+class OreAnalyzerRecipeBuilder(parent: IRecipeFactory<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>) :
+    AssemblyRecipeBuilder<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>(parent) {
+    private var rate: Double? = null
+
+    fun rate(value: Double) {
+        rate = value
+    }
+
+    override fun validate() {
+        super.validate()
+        check(rate!! > 0)
+    }
+
+    override fun createObject(): OreAnalyzerRecipe {
+        return OreAnalyzerRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!, requiredTech, rate!!)
+    }
+}

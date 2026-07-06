@@ -8,6 +8,7 @@ import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
@@ -73,7 +74,7 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
 
     fun input(item: ItemLike, amount: Int = 1,
         suffix: String = "", block: B.() -> Unit = {}) {
-        recipe(suffix(item.asItem().registryName!!, suffix)) {
+        recipe(suffix(itemLoc(item), suffix)) {
             input(item, amount)
             block()
         }
@@ -94,7 +95,7 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
 
     fun output(item: ItemLike, amount: Int = 1, suffix: String = "",
         rate: Double = 1.0, block: B.() -> Unit = {}) {
-        recipe(suffix(item.asItem().registryName!!, suffix)) {
+        recipe(suffix(itemLoc(item), suffix)) {
             output(item, amount, rate = rate)
             block()
         }

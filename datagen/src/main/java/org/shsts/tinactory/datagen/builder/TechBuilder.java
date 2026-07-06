@@ -5,24 +5,25 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.datagen.content.RegistryHelper;
+import org.shsts.tinactory.datagen.content.builder.ResearchRecipeBuilder;
 import org.shsts.tinactory.datagen.provider.TechProvider;
-import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllItems.getComponent;
@@ -84,7 +85,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
     }
 
     public TechBuilder<P> displayItem(Supplier<? extends ItemLike> item) {
-        displayItem = () -> BuiltInRegistries.ITEM.getKey(item.get().asItem());
+        displayItem = () -> RegistryHelper.INSTANCE.itemLoc(item.get());
         return this;
     }
 
@@ -152,6 +153,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         return loc;
     }
 
+    @SuppressWarnings("unchecked")
     private void onRegister(IDataHandler<TechProvider> handler) {
         var dataGen = handler.dataGen();
         handler.addCallback(p -> p.addTech(this));
@@ -163,14 +165,15 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
         if (!noResearch) {
             assert voltage != null;
             var input = getComponent("research_equipment").get(voltage).get();
-            var type = REGISTRATE.<ResearchRecipe.Builder>getRecipeType("research_bench");
-            type.recipe(DATA_GEN, loc)
-                .target(loc)
-                .input(ProcessingHelper.itemIngredient(new ItemStack(input, 1)))
-                .voltage(voltage.value)
-                .power((long) (0.25 * voltage.value))
-                .workTicks(200)
-                .build();
+
+            var type = (IRecipeType<ResearchRecipe>) REGISTRATE.getRecipeType("research_bench");
+            var factory = DATA_GEN.recipeFactory(type, ResearchRecipeBuilder::new);
+            var builder = factory.recipe(loc);
+            builder.target(loc);
+            builder.input(input, 1, Objects.requireNonNull(builder.getDefaultInputItem()));
+            builder.voltage(voltage);
+            builder.workTicks(200);
+            builder.build();
         }
     }
 

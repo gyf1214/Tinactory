@@ -17,6 +17,7 @@ class AssemblyRecipeFactory(
     override fun classDefaults(builder: SimpleAssemblyRecipeBuilder) {
         super.classDefaults(builder)
         builder.componentVoltage = componentVoltage
+        builder.recordRecovery = true
     }
 
     fun component(name: String, voltage: Voltage = this.componentVoltage!!,

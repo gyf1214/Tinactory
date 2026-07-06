@@ -10,7 +10,9 @@ import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
 import org.shsts.tinactory.api.recipe.IProcessingIngredient
+import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.MarkerRecipe
+import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.recipe.ProcessingHelper
@@ -19,20 +21,14 @@ import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import java.util.Optional
 
 class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
-    ProcessingRecipeBuilder<MarkerRecipe, MarkerBuilder>(
-        parent, { inputs, outputs, workTicks, voltage, power ->
-            MarkerRecipe(inputs, outputs, workTicks, voltage, power, modLoc("processing"),
-                "", false, Optional.empty(), Optional.empty(), listOf())
-        }) {
+    ProcessingRecipeBuilder<MarkerRecipe, MarkerBuilder>(parent) {
     private var baseType: String? = null
-    private var baseTypeId = modLoc("processing")
+    private var baseTypeId: ResourceLocation? = null
     private var prefix = ""
     private var requireMultiblock = false
-    private var displayIngredient: Optional<IProcessingIngredient> = Optional.empty()
-    private var displayTex: Optional<ResourceLocation> = Optional.empty()
-    private val markerOutputs = mutableListOf<MarkerRecipe.Input>()
-
-    init { requirePower = false }
+    private var displayIngredient: IProcessingIngredient? = null
+    private var displayTex: ResourceLocation? = null
+    private val markerOutputs = mutableListOf<ProcessingRecipe.Input>()
 
     fun baseType(id: String) {
         baseType = id
@@ -40,7 +36,7 @@ class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
     }
 
     fun baseType(type: RecipeType<*>) {
-        baseTypeId = checkNotNull(BuiltInRegistries.RECIPE_TYPE.getKey(type)) { type.toString() }
+        baseTypeId = checkNotNull(BuiltInRegistries.RECIPE_TYPE.getKey(type))
     }
 
     fun prefix(value: String) {
@@ -61,26 +57,26 @@ class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
     }
 
     fun display(value: ItemLike) {
-        displayIngredient = Optional.of(ProcessingHelper.itemIngredient(ItemStack(value)))
-        displayTex = Optional.empty()
+        displayIngredient = ProcessingHelper.itemIngredient(ItemStack(value))
+        displayTex = null
     }
 
     fun display(tag: TagKey<Item>) {
-        displayIngredient = Optional.of(TagIngredient(tag, 1))
-        displayTex = Optional.empty()
+        displayIngredient = TagIngredient(tag, 1)
+        displayTex = null
     }
 
     fun display(tex: ResourceLocation) {
-        displayTex = Optional.of(tex)
-        displayIngredient = Optional.empty()
+        displayTex = tex
+        displayIngredient = null
     }
 
     override fun output(item: ItemLike, amount: Int, port: Int, rate: Double) {
-        markerOutputs += MarkerRecipe.Input(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
+        markerOutputs += ProcessingRecipe.Input(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
     }
 
     override fun output(fluid: Fluid, amount: Int, port: Int, rate: Double) {
-        markerOutputs += MarkerRecipe.Input(port, ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)))
+        markerOutputs += ProcessingRecipe.Input(port, ProcessingHelper.fluidIngredient(FluidStack(fluid, amount)))
     }
 
     fun output(fluid: Fluid, port: Int) {
@@ -88,7 +84,7 @@ class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
     }
 
     fun output(tag: TagKey<Item>, port: Int) {
-        markerOutputs += MarkerRecipe.Input(port, TagIngredient(tag, 1))
+        markerOutputs += ProcessingRecipe.Input(port, TagIngredient(tag, 1))
     }
 
     override fun output(mat: MaterialSet, sub: String, amount: Number, port: Int?, rate: Double) {
@@ -101,8 +97,21 @@ class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
     }
 
     override fun createObject(): MarkerRecipe {
-        return MarkerRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            baseTypeId, prefix, requireMultiblock, displayIngredient, displayTex,
-            markerOutputs.toList())
+        return MarkerRecipe(inputs, outputs, voltage!!.value,
+            baseTypeId!!, prefix, requireMultiblock,
+            Optional.ofNullable(displayIngredient),
+            Optional.ofNullable(displayTex),
+            markerOutputs)
+    }
+
+    override fun validate() {
+        checkNotNull(baseTypeId)
+    }
+
+    override fun buildObject(): MarkerRecipe {
+        if (voltage == null) {
+            voltage = Voltage.PRIMITIVE
+        }
+        return super.buildObject()
     }
 }

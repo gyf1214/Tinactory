@@ -6,11 +6,7 @@ import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 
 class ChemicalRecipeBuilder(parent: IRecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder>) :
-    AssemblyRecipeBuilder<ChemicalReactorRecipe, ChemicalRecipeBuilder>(
-        parent,
-        { inputs, outputs, workTicks, voltage, power, requiredTech ->
-            ChemicalReactorRecipe(inputs, outputs, workTicks, voltage, power, requiredTech, false)
-        }) {
+    AssemblyRecipeBuilder<ChemicalReactorRecipe, ChemicalRecipeBuilder>(parent) {
     companion object {
         private val LOGGER = LogUtils.getLogger()
     }
@@ -49,15 +45,15 @@ class ChemicalRecipeBuilder(parent: IRecipeFactory<ChemicalReactorRecipe, Chemic
     }
 
     override fun createObject(): ChemicalReactorRecipe {
-        return ChemicalReactorRecipe(inputs.toList(), outputs.toList(), workTicks, voltageValue, power,
-            requiredTech.toList(), requireMultiblock)
+        return ChemicalReactorRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!,
+            requiredTech, requireMultiblock)
     }
 
-    override fun build(): IRecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder> {
+    override fun buildObject(): ChemicalReactorRecipe {
         if (!requireMultiBlockSet && needMultiblock()) {
             LOGGER.trace("chemical reactor recipe needs multiblock")
             requireMultiblock = true
         }
-        return super.build()
+        return super.buildObject()
     }
 }
