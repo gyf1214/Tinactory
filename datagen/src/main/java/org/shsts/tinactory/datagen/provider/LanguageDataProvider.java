@@ -2,13 +2,10 @@ package org.shsts.tinactory.datagen.provider;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.HashCache;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.shsts.tinactory.datagen.content.language.LanguageProcessor;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
-
-import java.io.IOException;
 
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 
@@ -21,7 +18,7 @@ public class LanguageDataProvider extends LanguageProvider {
 
     public LanguageDataProvider(IDataGen dataGen, GatherDataEvent event,
         String locale, LanguageProcessor processor) {
-        super(event.getGenerator(), dataGen.modid(), locale);
+        super(event.getGenerator().getPackOutput(), dataGen.modid(), locale);
         this.modid = dataGen.modid();
         this.locale = locale;
         this.processor = processor;
@@ -29,13 +26,9 @@ public class LanguageDataProvider extends LanguageProvider {
     }
 
     @Override
-    protected void addTranslations() {}
-
-    @Override
-    public void run(HashCache cache) throws IOException {
+    protected void addTranslations() {
         var trackedKeys = DATA_GEN.getTrackedLang();
         processor.process(trackedKeys, this, $ -> DATA_GEN.processLang(locale, $));
-        super.run(cache);
     }
 
     @Override

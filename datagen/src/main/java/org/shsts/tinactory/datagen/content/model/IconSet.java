@@ -5,10 +5,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.ModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ModelProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Optional;
@@ -63,12 +63,12 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     }
 
     public <U extends Item, P extends ItemModelProvider> void itemModel(
-        IEntryDataContext<Item, U, P> ctx, String sub) {
+        IEntryDataContext<U, P> ctx, String sub) {
         this.<U, P>itemModel(sub).accept(ctx);
     }
 
-    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item,
-        U, P>> itemModel(String sub) {
+    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<U, P>> itemModel(
+        String sub) {
         return ctx -> {
             var helper = ctx.provider().existingFileHelper;
 

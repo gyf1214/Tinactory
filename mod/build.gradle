@@ -66,12 +66,12 @@ dependencies {
     implementation "dev.architectury:architectury-neoforge:${architectury_version}"
     implementation "dev.ftb.mods:ftb-library-neoforge:${ftb_library_version}"
     implementation "dev.ftb.mods:ftb-quests-neoforge:${ftb_quests_version}"
-    runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
 
     // runtime dependencies
     // CTM
     runtimeOnly "curse.maven:ctm-267602:${ctm_id}"
     // FTB Quests
+    runtimeOnly "dev.ftb.mods:ftb-teams-neoforge:${ftb_teams_version}"
     runtimeOnly "dev.ftb.mods:ftb-filter-system-neoforge:${ftb_filter_system_version}"
 
     // unit test dependencies

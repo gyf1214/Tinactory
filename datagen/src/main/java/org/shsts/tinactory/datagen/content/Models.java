@@ -4,18 +4,19 @@ import com.google.common.collect.ImmutableMap;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.multiblock.TurbineBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -82,12 +83,12 @@ public final class Models {
             .build();
     }
 
-    public static <U extends Item> void basicItem(IEntryDataContext<Item, U, ItemModelProvider> ctx,
+    public static <U extends Item> void basicItem(IEntryDataContext<U, ItemModelProvider> ctx,
         ResourceLocation... layers) {
         Models.<U>basicItem(layers).accept(ctx);
     }
 
-    public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
+    public static <U extends Item> Consumer<IEntryDataContext<U, ItemModelProvider>> basicItem(
         ResourceLocation... layers) {
         return ctx -> {
             var provider = ctx.provider().withExistingParent(ctx.id(), "item/generated");
@@ -97,7 +98,7 @@ public final class Models {
         };
     }
 
-    public static <U extends Item> Consumer<IEntryDataContext<Item, U, ItemModelProvider>> basicItem(
+    public static <U extends Item> Consumer<IEntryDataContext<U, ItemModelProvider>> basicItem(
         String... layers) {
         return ctx -> {
             var provider = ctx.provider().withExistingParent(ctx.id(), "item/generated");
@@ -108,21 +109,21 @@ public final class Models {
     }
 
     public static <U extends Item> void componentItem(
-        IEntryDataContext<Item, U, ItemModelProvider> ctx) {
+        IEntryDataContext<U, ItemModelProvider> ctx) {
         var tex = "items/metaitems/" + name(ctx.id(), -1).replace('_', '.') + "." + name(ctx.id(), -2);
         ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", gregtech(tex));
     }
 
     public static <U extends Item> void simpleItem(
-        IEntryDataContext<Item, U, ItemModelProvider> ctx) {
+        IEntryDataContext<U, ItemModelProvider> ctx) {
         var tex = "items/metaitems/" + name(ctx.id(), -1);
         ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", gregtech(tex));
     }
 
     public static <U extends BatteryItem> void batteryItem(
-        IEntryDataContext<Item, U, ItemModelProvider> ctx) {
+        IEntryDataContext<U, ItemModelProvider> ctx) {
         var voltage = ctx.object().voltage;
         var base = gregtech("items/metaitems/battery.re." + voltage.id + ".lithium");
         var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")
@@ -136,25 +137,23 @@ public final class Models {
         }
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> oreBlock(OreVariant variant) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> oreBlock(
+        OreVariant variant) {
         return ctx -> {
             var models = ctx.provider().models();
-            var loc = variant.baseBlock.getRegistryName();
-            assert loc != null;
+            var loc = BuiltInRegistries.BLOCK.getKey(variant.baseBlock);
             var baseModel = new ConfiguredModel(models.getExistingFile(prepend(loc, "block")));
             var overlay = new ConfiguredModel(models.getExistingFile(modLoc("block/material/ore_overlay")));
             ctx.provider().simpleBlock(ctx.object(), baseModel, overlay);
         };
     }
 
-    public static <U extends Block> void oreBlock(IEntryDataContext<Block,
-        U, BlockStateProvider> ctx, OreVariant variant) {
+    public static <U extends Block> void oreBlock(IEntryDataContext<U, BlockStateProvider> ctx,
+        OreVariant variant) {
         Models.<U>oreBlock(variant).accept(ctx);
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeBlock(String tex) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeBlock(String tex) {
         return ctx -> {
             var model = ctx.provider().models()
                 .withExistingParent(ctx.id(), "block/cube")
@@ -167,8 +166,8 @@ public final class Models {
         };
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeColumn(ResourceLocation side, ResourceLocation end) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeColumn(
+        ResourceLocation side, ResourceLocation end) {
         return ctx -> {
             var provider = ctx.provider();
             provider.simpleBlock(ctx.object(), provider.models().cubeColumn(
@@ -176,13 +175,13 @@ public final class Models {
         };
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeColumn(String side, String end) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeColumn(
+        String side, String end) {
         return cubeColumn(gregtech("blocks/" + side), gregtech("blocks/" + end));
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeColumn(String tex) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeColumn(
+        String tex) {
         return cubeColumn(tex + "/side", tex + "/top");
     }
 
@@ -198,8 +197,8 @@ public final class Models {
             .texture("right_overlay", overlayTex);
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeCasing(String casing, String overlay) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeCasing(
+        String casing, String overlay) {
         return ctx -> {
             var provider = ctx.provider();
             provider.simpleBlock(ctx.object(), cubeCasingModel(
@@ -207,8 +206,8 @@ public final class Models {
         };
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> cubeTint(String tex) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeTint(
+        String tex) {
         return ctx -> {
             var model = ctx.provider().models()
                 .withExistingParent(ctx.id(), modLoc("block/cube_tint"))
@@ -217,25 +216,23 @@ public final class Models {
         };
     }
 
-    public static <U extends Block> void solidBlock(IEntryDataContext<Block,
-        U, BlockStateProvider> ctx, ResourceLocation tex) {
+    public static <U extends Block> void solidBlock(IEntryDataContext<U, BlockStateProvider> ctx,
+        ResourceLocation tex) {
         var model = ctx.provider().models().cubeAll(ctx.id(), tex);
         ctx.provider().simpleBlock(ctx.object(), model);
     }
 
-    public static <U extends Block> Consumer<IEntryDataContext<Block,
-        U, BlockStateProvider>> solidBlock(String tex) {
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlock(
+        String tex) {
         return ctx -> solidBlock(ctx, gregtech("blocks/" + tex));
     }
 
-    public static void cableBlock(IEntryDataContext<Block,
-        ? extends CableBlock, BlockStateProvider> ctx) {
+    public static void cableBlock(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx) {
         var voltage = ctx.object().voltage;
         CableModel.blockState(ctx, voltage == Voltage.ULV);
     }
 
-    public static void cableItem(IEntryDataContext<Item,
-        BlockItem, ItemModelProvider> ctx) {
+    public static void cableItem(IEntryDataContext<BlockItem, ItemModelProvider> ctx) {
         var voltage = ((CableBlock) ctx.object().getBlock()).voltage;
         if (voltage == Voltage.ULV) {
             CableModel.ulvCable(ctx);
@@ -244,16 +241,16 @@ public final class Models {
         }
     }
 
-    public static void wireItem(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void wireItem(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         CableModel.wire(ctx);
     }
 
-    public static void pipeItem(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public static void pipeItem(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         CableModel.pipe(ctx);
     }
 
-    public static void multiblockInterface(
-        IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx, String ioTex) {
+    public static void multiblockInterface(IEntryDataContext<? extends Block, BlockStateProvider> ctx,
+        String ioTex) {
         var models = ctx.provider().models();
         var model = MachineModel.builder()
             .overlay(ioTex).ioTex(ioTex)
@@ -270,8 +267,7 @@ public final class Models {
             });
     }
 
-    public static void turbineBlock(
-        IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx,
+    public static void turbineBlock(IEntryDataContext<? extends Block, BlockStateProvider> ctx,
         String casing, ResourceLocation idle, ResourceLocation spin) {
         var prov = ctx.provider();
         var models = prov.models();
@@ -300,14 +296,14 @@ public final class Models {
             });
     }
 
-    public static void turbineItem(IEntryDataContext<Item, BlockItem, ItemModelProvider> ctx) {
+    public static void turbineItem(IEntryDataContext<BlockItem, ItemModelProvider> ctx) {
         var id = ctx.id();
-        var blockModel = new ResourceLocation(ctx.modid(), "block/" + id + "_" + CENTER_BLADE);
+        var blockModel = ResourceLocation.fromNamespaceAndPath(ctx.modid(),
+            "block/" + id + "_" + CENTER_BLADE);
         ctx.provider().withExistingParent(id, blockModel);
     }
 
-    public static <U extends Item> Consumer<IEntryDataContext<Item,
-        U, ItemModelProvider>> machineItem(
+    public static <U extends Item> Consumer<IEntryDataContext<U, ItemModelProvider>> machineItem(
         Voltage voltage, String overlay) {
         var model = MachineModel.builder()
             .casing(voltage)

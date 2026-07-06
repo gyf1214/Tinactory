@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
@@ -57,12 +58,12 @@ public class LitematicaMeta extends MetaConsumer {
         }
 
         private BlockState parseDefine(String str) {
-            var block = BLOCKS.getEntry(new ResourceLocation(str));
+            var block = BLOCKS.getEntry(ResourceLocation.parse(str));
             return block.get().defaultBlockState();
         }
 
         private static final Map<ResourceLocation, ResourceLocation> TAG_MAP = Map.of(
-            new ResourceLocation("forge", "glass"), mcLoc("glass"),
+            ResourceLocation.fromNamespaceAndPath("forge", "glass"), mcLoc("glass"),
             modLoc("multiblock/coil"), modLoc("multiblock/coil/cupronickel"),
             modLoc("multiblock/power"), modLoc("multiblock/misc/power_block/hv"),
             modLoc("multiblock/glass_casing"), modLoc("multiblock/misc/hardened_glass"),
@@ -87,12 +88,12 @@ public class LitematicaMeta extends MetaConsumer {
                 }
                 case "tag_or_interface" -> {
                     interfaceCh.add(ch);
-                    var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
+                    var tag = ResourceLocation.parse(GsonHelper.getAsString(jo, "tag"));
                     assert TAG_MAP.containsKey(tag) : tag;
                     return BLOCKS.getEntry(TAG_MAP.get(tag)).get().defaultBlockState();
                 }
                 case "tag", "tag_with_same_block", "tag_or_block" -> {
-                    var tag = new ResourceLocation(GsonHelper.getAsString(jo, "tag"));
+                    var tag = ResourceLocation.parse(GsonHelper.getAsString(jo, "tag"));
                     assert TAG_MAP.containsKey(tag) : tag;
                     return BLOCKS.getEntry(TAG_MAP.get(tag)).get().defaultBlockState();
                 }
@@ -106,8 +107,7 @@ public class LitematicaMeta extends MetaConsumer {
 
         private CompoundTag serializeBlockState(BlockState blockState) {
             var ret = new CompoundTag();
-            var loc = blockState.getBlock().getRegistryName();
-            assert loc != null;
+            var loc = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
             ret.putString("Name", loc.toString());
             if (blockState.getProperties().isEmpty()) {
                 return ret;

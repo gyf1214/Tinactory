@@ -5,12 +5,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.datagen.api.context.IDataContext;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
@@ -137,8 +136,8 @@ public final class CableModel {
             .texture("wire", PIPE_IN_TEX);
     }
 
-    public static void blockState(IEntryDataContext<Block,
-        ? extends CableBlock, BlockStateProvider> ctx, boolean wire) {
+    public static void blockState(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx,
+        boolean wire) {
         var prov = ctx.provider();
         var models = prov.models();
         var multipart = prov.getMultipartBuilder(ctx.object());
@@ -163,25 +162,21 @@ public final class CableModel {
         }
     }
 
-    public static void cable(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void cable(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_MODEL));
     }
 
-    public static void wire(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void wire(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_WIRE_MODEL));
     }
 
-    public static void ulvCable(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void ulvCable(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         genItem(ctx.provider(), ctx.id(), WIRE_RADIUS, false)
             .texture("base", WIRE_TEX)
             .texture("wire", "#base");
     }
 
-    public static void pipe(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void pipe(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_PIPE_MODEL));
     }
 }

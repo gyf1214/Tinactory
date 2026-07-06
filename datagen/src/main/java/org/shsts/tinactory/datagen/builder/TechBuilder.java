@@ -5,10 +5,11 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.core.builder.Builder;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
@@ -83,7 +84,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
     }
 
     public TechBuilder<P> displayItem(Supplier<? extends ItemLike> item) {
-        displayItem = () -> item.get().asItem().getRegistryName();
+        displayItem = () -> BuiltInRegistries.ITEM.getKey(item.get().asItem());
         return this;
     }
 
