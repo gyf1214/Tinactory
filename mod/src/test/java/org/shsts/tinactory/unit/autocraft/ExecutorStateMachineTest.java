@@ -15,12 +15,10 @@ import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.exec.ExecutorSnapshot;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
 import org.shsts.tinactory.unit.fixture.TestMachineAllocator;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
@@ -33,6 +31,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
 
 class ExecutorStateMachineTest {
     @Test
@@ -558,13 +557,12 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
         executor.runCycle(64, 64);
         executor.runCycle(64, 64);
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
-        var snapshot = executor.serialize(codec);
+        var snapshot = executor.serialize(PATTERN_CODECS);
 
         inventory.rejectInsertKeys.clear();
         var restored = new CraftExecutor(inventory, new SequenceAllocator(List.of(
             new RouteLease(Map.of(), Map.of(gear, 1L), true))), IJobEvents.NO_OP);
-        restored.restore(snapshot, codec);
+        restored.restore(snapshot, PATTERN_CODECS);
         restored.runCycle(64, 64);
 
         assertEquals(JobState.IDLE, restored.snapshot().state());

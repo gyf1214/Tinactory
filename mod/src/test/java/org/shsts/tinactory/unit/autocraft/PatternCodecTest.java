@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.pattern.PortConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.RecipeTypeConstraint;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -20,8 +19,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODEC;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
 
 class PatternCodecTest {
     private static final UUID TEST_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -30,7 +32,6 @@ class PatternCodecTest {
 
     @Test
     void codecShouldRoundTripPattern() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             TEST_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{x:1b}"), 2)),
@@ -40,8 +41,8 @@ class PatternCodecTest {
                 new VoltageConstraint(2),
                 new TestMachineConstraint("v1")));
 
-        var tag = codec.encodePattern(pattern);
-        var decoded = codec.decodePattern(tag);
+        var tag = (CompoundTag) PATTERN_CODECS.encodePattern(pattern);
+        var decoded = PATTERN_CODECS.decodePattern(tag);
 
         assertFalse(tag.contains("machineRequirement"));
         assertFalse(tag.contains("recipeTypeId"));
@@ -54,7 +55,6 @@ class PatternCodecTest {
 
     @Test
     void codecShouldRejectUnknownConstraintType() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
         tag.putUUID("patternUuid", TEST_UUID);
         tag.put("inputs", new ListTag());
@@ -73,12 +73,11 @@ class PatternCodecTest {
         constraints.add(constraint);
         tag.put("constraints", constraints);
 
-        assertThrows(RuntimeException.class, () -> codec.decodePattern(tag));
+        assertThrows(RuntimeException.class, () -> PATTERN_CODECS.decodePattern(tag));
     }
 
     @Test
     void codecShouldRejectOldPatternIdNbt() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var tag = new CompoundTag();
         tag.putString("patternId", "tinactory:bad");
         tag.put("inputs", new ListTag());
@@ -92,12 +91,11 @@ class PatternCodecTest {
         tag.put("outputs", outputs);
         tag.put("constraints", new ListTag());
 
-        assertThrows(IllegalArgumentException.class, () -> codec.decodePattern(tag));
+        assertThrows(IllegalArgumentException.class, () -> PATTERN_CODECS.decodePattern(tag));
     }
 
     @Test
     void codecShouldRoundTripSlotScopedPortConstraintsWithCpuRegistry() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             SLOT_UUID,
             List.of(
@@ -112,14 +110,13 @@ class PatternCodecTest {
                 new PortConstraint(PortDirection.OUTPUT, 0, 5),
                 new PortConstraint(PortDirection.OUTPUT, 1, 1)));
 
-        var decoded = codec.decodePattern(codec.encodePattern(pattern));
+        var decoded = PATTERN_CODECS.decodePattern(PATTERN_CODECS.encodePattern(pattern));
 
         assertEquals(pattern, decoded);
     }
 
     @Test
     void codecShouldRoundTripTargetRecipeConstraintWithCpuRegistry() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var targetRecipe = new TargetRecipeConstraint(modLoc("assembler/circuit"));
         var pattern = new CraftPattern(
             TARGET_UUID,
@@ -127,34 +124,33 @@ class PatternCodecTest {
             List.of(new CraftAmount(TestStackKey.item("tinactory:circuit", ""), 1)),
             List.of(targetRecipe));
 
-        var decoded = codec.decodePattern(codec.encodePattern(pattern));
+        var decoded = PATTERN_CODECS.decodePattern(PATTERN_CODECS.encodePattern(pattern));
 
         assertEquals(pattern, decoded);
     }
 
     @Test
     void codecShouldRoundTripCraftAmountWithOverloads() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var expected = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
 
-        var fromAmount = codec.encodeAmount(expected);
-        var fromKeyAndAmount = codec.encodeAmount(expected.key(), expected.amount());
+        var fromAmount = PATTERN_CODECS.encodeAmount(expected);
+        var fromKeyAndAmount = PATTERN_CODECS.encodeAmount(expected.key(), expected.amount());
 
-        assertEquals(expected, codec.decodeAmount(fromAmount));
-        assertEquals(expected, codec.decodeAmount(fromKeyAndAmount));
+        assertEquals(expected, PATTERN_CODECS.decodeAmount(fromAmount));
+        assertEquals(expected, PATTERN_CODECS.decodeAmount(fromKeyAndAmount));
         assertEquals(fromAmount, fromKeyAndAmount);
     }
 
     @Test
     void craftPatternCodecShouldRoundTripPattern() {
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var pattern = new CraftPattern(
             TEST_UUID,
             List.of(new CraftAmount(TestStackKey.item("minecraft:copper_ingot", ""), 2L)),
             List.of(new CraftAmount(TestStackKey.item("minecraft:copper_block", ""), 1L)),
             List.of(new TestMachineConstraint("codec")));
 
-        var decoded = CodecHelper.parseTag(codec.patternCodec(), CodecHelper.encodeTag(codec.patternCodec(), pattern));
+        var tag = CodecHelper.encodeTag(PATTERN_CODEC, pattern);
+        var decoded = CodecHelper.parseTag(PATTERN_CODEC, tag);
 
         assertEquals(pattern, decoded);
     }

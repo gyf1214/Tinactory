@@ -13,7 +13,6 @@ import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
@@ -22,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
 
 class AutocraftJobServiceTest {
     @Test
@@ -145,13 +145,12 @@ class AutocraftJobServiceTest {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
-        var codec = new PatternCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(target), testPlan());
-        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
         var restoredExecutor = new TestExecutor(JobState.IDLE);
         service = new AutocraftJobService(restoredExecutor);
-        service.restoreRunningSnapshot(persisted, codec);
+        service.restoreRunningSnapshot(persisted, PATTERN_CODECS);
 
         assertTrue(restoredExecutor.restoreCalled);
         assertTrue(service.isBusy());

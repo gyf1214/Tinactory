@@ -4,10 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCellData;
-import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
@@ -17,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODEC;
 
 class PatternCellDataTest {
     @Test
@@ -49,10 +48,7 @@ class PatternCellDataTest {
         var first = pattern("first");
         var second = pattern("second");
         var data = PatternCellData.of(Map.of(first.patternUuid(), first, second.patternUuid(), second));
-        var patternCodec = new PatternCodec(
-            TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            TestStackKey.CODEC).patternCodec();
-        var codec = PatternCellData.codec(patternCodec);
+        var codec = PatternCellData.codec(PATTERN_CODEC);
 
         var decoded = CodecHelper.parseTag(codec, CodecHelper.encodeTag(codec, data));
 
