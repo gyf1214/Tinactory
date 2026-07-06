@@ -66,7 +66,7 @@ class LayoutTest {
             layout.getProcessingOutputs(recipe));
 
         var marker = new MarkerRecipe(
-            List.of(), List.of(), modLoc("layout_base"), "", false, Optional.empty(), Optional.empty(),
+            List.of(), List.of(), 0, modLoc("layout_base"), "", false, Optional.empty(), Optional.empty(),
             List.of(input(2, "marker_plate", 1), input(2, "marker_gear", 3)));
 
         assertEquals(

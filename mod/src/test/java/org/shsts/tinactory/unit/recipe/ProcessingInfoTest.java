@@ -18,10 +18,14 @@ class ProcessingInfoTest {
 
         var tag = CodecHelper.encodeTag(INFO_CODEC, info);
         var roundTrip = CodecHelper.parseTag(INFO_CODEC, tag);
+        var tag1 = (CompoundTag) tag;
+        var tag2 = tag1.getCompound("object");
 
         assertEquals(info, roundTrip);
-        assertEquals(2, ((CompoundTag) tag).getInt("port"));
-        assertEquals("ore:3", ((CompoundTag) ((CompoundTag) tag).get("ingredient")).getString("value"));
+        assertEquals(2, tag1.getInt("port"));
+        assertEquals("test_ingredient", tag2.getString("type"));
+        assertEquals("ore", tag2.getString("key"));
+        assertEquals(3, tag2.getInt("amount"));
     }
 
     @Test
@@ -30,10 +34,14 @@ class ProcessingInfoTest {
 
         var tag = CodecHelper.encodeTag(INFO_CODEC, info);
         var roundTrip = CodecHelper.parseTag(INFO_CODEC, tag);
+        var tag1 = (CompoundTag) tag;
+        var tag2 = tag1.getCompound("object");
 
         assertEquals(info, roundTrip);
-        assertEquals(4, ((CompoundTag) tag).getInt("port"));
-        assertEquals("dust:5", ((CompoundTag) ((CompoundTag) tag).get("result")).getString("value"));
+        assertEquals(4, tag1.getInt("port"));
+        assertEquals("test_result", tag2.getString("type"));
+        assertEquals("dust", tag2.getString("key"));
+        assertEquals(5, tag2.getInt("amount"));
     }
 
     @Test

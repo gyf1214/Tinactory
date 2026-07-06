@@ -34,11 +34,11 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public final List<Input> markerOutputs;
 
-    public MarkerRecipe(List<Input> inputs, List<Output> outputs,
+    public MarkerRecipe(List<Input> inputs, List<Output> outputs, long voltage,
         ResourceLocation baseTypeId, String prefix, boolean requireMultiblock,
         Optional<IProcessingIngredient> displayIngredient, Optional<ResourceLocation> displayTex,
         List<Input> markerOutputs) {
-        super(inputs, outputs, 0L, 0L, 0L);
+        super(inputs, outputs, 0L, voltage, 0L);
         this.baseTypeId = baseTypeId;
         this.prefix = prefix;
         this.requireMultiblock = requireMultiblock;
@@ -104,6 +104,7 @@ public class MarkerRecipe extends ProcessingRecipe {
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
             inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
             outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
             ResourceLocation.CODEC.fieldOf("base_type").forGetter($ -> $.baseTypeId),
             Codec.STRING.fieldOf("prefix").forGetter($ -> $.prefix),
             Codec.BOOL.fieldOf("require_multiblock").forGetter($ -> $.requireMultiblock),

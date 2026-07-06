@@ -91,7 +91,7 @@ class PatternCodecTest {
         tag.put("outputs", outputs);
         tag.put("constraints", new ListTag());
 
-        assertThrows(IllegalArgumentException.class, () -> PATTERN_CODECS.decodePattern(tag));
+        assertThrows(IllegalStateException.class, () -> PATTERN_CODECS.decodePattern(tag));
     }
 
     @Test

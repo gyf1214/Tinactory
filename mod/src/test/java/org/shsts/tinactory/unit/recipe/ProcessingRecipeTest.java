@@ -184,15 +184,16 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldFallbackMarkerDescriptorToRepresentativeObjectButKeepRecipeTooltip() {
-        var outputDescriptor = new ItemIdRenderDescriptor(modLoc("display/output"));
-        var outputTooltip = List.<Component>of(I18n.raw("ignored output tooltip"));
+        var inputDescriptor = new ItemIdRenderDescriptor(modLoc("display/input"));
+        var inputTooltip = List.<Component>of(I18n.raw("ignored input tooltip"));
         var loc = modLoc("test_marker_no_display");
 
-        var recipe = markerRecipe(
-            new ProcessingRecipe.Input(0, new TestIngredient("marker_output", 1, outputDescriptor, outputTooltip)),
-            Optional.empty(), Optional.empty());
+        var recipe = new MarkerRecipe(
+            List.of(new ProcessingRecipe.Input(0, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))),
+            List.of(), 0, modLoc("test_base"), "",
+            false, Optional.empty(), Optional.empty(), List.of());
 
-        assertEquals(outputDescriptor, recipe.display());
+        assertEquals(inputDescriptor, recipe.display());
         assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))),
             recipe.tooltip(loc).orElseThrow());
     }
@@ -322,7 +323,7 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldOnlyAcceptMultiblockMachineWhenMarkerRequiresMultiblock() {
-        var recipe = new MarkerRecipe(List.of(), List.of(), modLoc("test_base"), "",
+        var recipe = new MarkerRecipe(List.of(), List.of(), 0, modLoc("test_base"), "",
             true, Optional.empty(), Optional.empty(), List.of());
 
         assertFalse(recipe.canCraft(new TestMachine(new TestContainer())));
@@ -333,7 +334,7 @@ class ProcessingRecipeTest {
     void shouldMatchMarkerBaseTypeAndPrefixByLocation() {
         var baseType = modLoc("base_type");
         var otherType = modLoc("other_type");
-        var recipe = new MarkerRecipe(List.of(), List.of(), baseType, "ore",
+        var recipe = new MarkerRecipe(List.of(), List.of(), 0, baseType, "ore",
             true, Optional.empty(), Optional.empty(), List.of());
 
         assertTrue(recipe.matchesType(baseType));
@@ -350,7 +351,7 @@ class ProcessingRecipeTest {
 
     private static MarkerRecipe markerRecipe(ProcessingRecipe.Input output,
         Optional<IProcessingIngredient> display, Optional<ResourceLocation> tex) {
-        return new MarkerRecipe(List.of(), List.of(), modLoc("test_base"), "",
+        return new MarkerRecipe(List.of(), List.of(), 0, modLoc("test_base"), "",
             false, display, tex, List.of(output));
     }
 

@@ -16,6 +16,7 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
@@ -108,6 +109,7 @@ class AutocraftTerminalServiceExecuteTest {
                 id -> Optional.of(jobService)));
         var preview = service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
 
+        assertNotNull(preview.plan());
         assertEquals(75L, preview.plan().memoryUsage());
         assertTrue(service.execute(cpu));
         assertEquals(75L, jobService.getJob().orElseThrow().memoryUsage());
@@ -316,7 +318,7 @@ class AutocraftTerminalServiceExecuteTest {
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)
                     .distinct()
-                    .sorted()
+                    .sorted(PatternRegistryCache.KEY_DISPLAY_ORDER)
                     .toList();
             }
 

@@ -63,7 +63,7 @@ class ProcessingObjectCodecTest {
         var display = new TestIngredient("ore", 1);
 
         var recipe = new MarkerRecipe(
-            List.of(), List.of(), baseTypeId, "test_marker_base/ores",
+            List.of(), List.of(), 0, baseTypeId, "test_marker_base/ores",
             true, Optional.of(display), Optional.empty(),
             List.of(input(1, "dust", 2)));
 

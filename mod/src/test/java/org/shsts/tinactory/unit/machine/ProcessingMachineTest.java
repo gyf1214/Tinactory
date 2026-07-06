@@ -233,7 +233,7 @@ class ProcessingMachineTest {
 
     private static IEntry<MarkerRecipe> marker(String path, long voltage) {
         return new TestEntry<>(modLoc(path), new MarkerRecipe(
-            List.of(), List.of(), RECIPE_TYPE.loc(), "ore",
+            List.of(), List.of(), voltage, RECIPE_TYPE.loc(), "ore",
             false, Optional.empty(), Optional.empty(), List.of()));
     }
 
