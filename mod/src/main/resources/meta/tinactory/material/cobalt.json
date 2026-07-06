@@ -1,7 +1,7 @@
 {
   "color": "0xFF5050FA",
   "tools": {
-    "tier": "minecraft:iron",
+    "tier": "iron",
     "durability": 400,
     "items": [
       "file",

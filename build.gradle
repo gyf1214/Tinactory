@@ -63,6 +63,10 @@ subprojects {
             }
         }
         maven {
+            name = 'Kotlin for Forge'
+            url = 'https://thedarkcolour.github.io/KotlinForForge/'
+        }
+        maven {
             name = 'shsts'
             url = 'https://www.shsts.org/m2'
         }

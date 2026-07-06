@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllItems.getComponent;
@@ -31,6 +30,7 @@ import static org.shsts.tinactory.Tinactory.REGISTRATE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 
+// TODO: convert this class to kotlin
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> implements ILoc {
@@ -170,8 +170,9 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
             var factory = DATA_GEN.recipeFactory(type, ResearchRecipeBuilder::new);
             var builder = factory.recipe(loc);
             builder.target(loc);
-            builder.input(input, 1, Objects.requireNonNull(builder.getDefaultInputItem()));
+            builder.input(input, 1, 0);
             builder.voltage(voltage);
+            builder.setAmperage(0.125);
             builder.workTicks(200);
             builder.build();
         }

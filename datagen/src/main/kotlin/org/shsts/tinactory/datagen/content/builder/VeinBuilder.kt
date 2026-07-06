@@ -81,6 +81,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         oreAnalyzer {
             recipe(id1) {
                 block()
+                rate(rate)
                 if (primitive) {
                     voltage(Voltage.PRIMITIVE)
                 } else {

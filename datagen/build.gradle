@@ -41,13 +41,10 @@ dependencies {
     runtimeOnly "org.shsts.tinycorelib:core:${minecraft_version}-${tinycorelib_version}"
     runtimeOnly "org.shsts.tinycorelib:datagen:${minecraft_version}-${tinycorelib_version}"
 
-    compileOnly project(':mod')
-    runtimeOnly project(':mod')
+    implementation project(':mod')
 
     // kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25") {
-        exclude group: "org.jetbrains", module: "annotations"
-    }
+    implementation "thedarkcolour:kotlinforforge-neoforge:${kff_version}"
 
     // extra resources
     implementation rootProject.files("libs/tinactory_extra_resources_${extra_resources_version}.zip")

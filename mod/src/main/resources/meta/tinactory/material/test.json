@@ -1,7 +1,7 @@
 {
   "color": "0xFFFFFFFF",
   "tools": {
-    "tier": "minecraft:netherite",
+    "tier": "netherite",
     "durability": 12800000,
     "items": [
       "file",
