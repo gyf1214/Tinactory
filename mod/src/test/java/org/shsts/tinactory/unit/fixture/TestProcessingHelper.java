@@ -50,7 +50,7 @@ public final class TestProcessingHelper {
     }
 
     public static ProcessingRecipe.Output outputStack(int port, String key, int amount) {
-        return new ProcessingRecipe.Output(port, new StackResult<>("test_stack_ingredient",
+        return new ProcessingRecipe.Output(port, new StackResult<>("test_stack_result",
             PortType.ITEM, 1d, TestStack.item(key, amount), TestStack.ADAPTER));
     }
 }

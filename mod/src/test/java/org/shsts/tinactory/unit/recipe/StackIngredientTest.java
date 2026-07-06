@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.recipe;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.StackIngredient;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
@@ -14,6 +15,19 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StackIngredientTest {
+    @Test
+    void codecShouldRoundTripExactStackIngredient() {
+        var codec = StackIngredient.codec("test_stack_ingredient", PortType.ITEM,
+            TestStack.CODEC, TestStack.ADAPTER);
+        var ingredient = new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
+            TestStack.item("ore", 2), TestStack.ADAPTER);
+
+        var roundTrip = CodecHelper.parseJson(codec.decoder(),
+            CodecHelper.encodeJson(codec.encoder(), ingredient));
+
+        assertEquals(ingredient, roundTrip);
+    }
+
     @Test
     void shouldConsumeScaledExactStackFromMatchingPort() {
         var port = new TestPort(PortType.ITEM, TestStack.item("ore", 8), 16);

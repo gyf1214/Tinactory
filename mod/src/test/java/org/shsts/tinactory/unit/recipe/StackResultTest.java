@@ -4,6 +4,7 @@ import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.StackResult;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
@@ -15,6 +16,19 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StackResultTest {
+    @Test
+    void codecShouldRoundTripExactStackResult() {
+        var codec = StackResult.codec("test_stack_result", PortType.ITEM,
+            TestStack.CODEC, TestStack.ADAPTER);
+        var result = new StackResult<>("test_stack_result", PortType.ITEM, 0.75d,
+            TestStack.item("ingot", 3), TestStack.ADAPTER);
+
+        var roundTrip = CodecHelper.parseJson(codec.decoder(),
+            CodecHelper.encodeJson(codec.encoder(), result));
+
+        assertEquals(result, roundTrip);
+    }
+
     @Test
     void shouldCreateDeterministicScaledPreview() {
         var result = new StackResult<>("test_stack_result", PortType.FLUID, 0.25d,

@@ -345,7 +345,7 @@ class ProcessingRecipeTest {
 
     private static TestRecipe testRecipe(List<ProcessingRecipe.Input> inputs,
         List<ProcessingRecipe.Output> outputs) {
-        return new TestRecipe(inputs, outputs, 20, 1, 8);
+        return new TestRecipe(inputs, outputs, 20, 0, 8);
     }
 
     private static MarkerRecipe markerRecipe(ProcessingRecipe.Input output,
@@ -356,10 +356,10 @@ class ProcessingRecipeTest {
 
     private static AssemblyRecipe assemblyRecipe(List<ResourceLocation> techs) {
         return new AssemblyRecipe(List.of(), List.of(output(0, "assembly", 1)),
-            20, 1, 8, techs);
+            20, 0, 8, techs);
     }
 
     private static ResearchRecipe researchRecipe(ResourceLocation target, long progress) {
-        return new ResearchRecipe(List.of(), 20, 1, 8, target, progress);
+        return new ResearchRecipe(List.of(), 20, 0, 8, target, progress);
     }
 }
