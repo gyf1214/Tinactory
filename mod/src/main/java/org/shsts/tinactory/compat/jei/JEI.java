@@ -1,5 +1,6 @@
 package org.shsts.tinactory.compat.jei;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -63,18 +64,25 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = modLoc("jei");
 
-    private final ToolCategory toolCategory;
+    @Nullable
+    private ToolCategory toolCategory = null;
     private final List<RecipeCategory<?>> categories;
 
     public JEI() {
         this.categories = new ArrayList<>();
+    }
 
-        this.toolCategory = new ToolCategory();
-        categories.add(toolCategory);
+    @Override
+    public ResourceLocation getPluginUid() {
+        return LOC;
+    }
 
-        for (var type : PROCESSING_TYPES.values()) {
-            addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
-        }
+    @Override
+    public void registerIngredients(IModIngredientRegistration registration) {
+        registration.register(TechIngredient.TYPE, Collections.emptyList(),
+            TechIngredient.HELPER, IngredientRenderers.empty(), TechIngredient.CODEC);
+        registration.register(RecipeMarker.TYPE, Collections.emptyList(),
+            RecipeMarker.HELPER, IngredientRenderers.empty(), RecipeMarker.CODEC);
     }
 
     @SuppressWarnings("unchecked")
@@ -106,20 +114,13 @@ public class JEI implements IModPlugin {
     }
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return LOC;
-    }
-
-    @Override
-    public void registerIngredients(IModIngredientRegistration registration) {
-        registration.register(TechIngredient.TYPE, Collections.emptyList(),
-            TechIngredient.HELPER, IngredientRenderers.empty(), TechIngredient.CODEC);
-        registration.register(RecipeMarker.TYPE, Collections.emptyList(),
-            RecipeMarker.HELPER, IngredientRenderers.empty(), RecipeMarker.CODEC);
-    }
-
-    @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        categories.clear();
+        toolCategory = new ToolCategory();
+        categories.add(toolCategory);
+        for (var type : PROCESSING_TYPES.values()) {
+            addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
+        }
         for (var category : categories) {
             category.registerCategory(registration);
         }
@@ -149,6 +150,7 @@ public class JEI implements IModPlugin {
         registration.addGuiContainerHandler(TechScreen.class, new TechMenuHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());
+        assert toolCategory != null;
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }
 
