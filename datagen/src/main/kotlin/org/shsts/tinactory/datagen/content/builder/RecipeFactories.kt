@@ -36,9 +36,8 @@ object RecipeFactories {
         BoilerRecipeFactory().apply(block)
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun <R : IRecipe<*>> recipeType(name: String): IRecipeType<R> {
-        return REGISTRATE.getRecipeType(name) as IRecipeType<R>
+        return REGISTRATE.getRecipeType(name)
     }
 
     private fun processing(name: String, defaults: SimpleProcessingBuilder.() -> Unit):

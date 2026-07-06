@@ -5,31 +5,43 @@ apply plugin: 'jacoco'
 apply plugin: 'org.shsts.checksource'
 
 neoForge {
+    mods {
+        tinactory {
+            sourceSet sourceSets.main
+        }
+        tinactory_test {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.test
+        }
+    }
+
     runs {
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             systemProperty 'forge.logging.console.level', 'debug'
             jvmArgument '-ea'
+            disableIdeRun()
         }
 
         create('client') {
             client()
             gameDirectory = rootProject.file('run/client')
-            ideName = "${rootProject.name}.${project.name}.main"
             sourceSet = sourceSets.main
+            loadedMods.set([mods.tinactory])
         }
 
         create('server') {
             server()
             gameDirectory = rootProject.file('run/server')
-            ideName = "${rootProject.name}.${project.name}.main"
             sourceSet = sourceSets.main
+            loadedMods.set([mods.tinactory])
         }
 
         create('gameTestServer') {
             type = 'gameTestServer'
             gameDirectory = rootProject.file('run/gameTestServer')
             sourceSet = sourceSets.test
+            loadedMods.set([mods.tinactory_test])
 
             systemProperty 'tinactory.dependencyChecker.reportFile',
                 layout.buildDirectory.file('reports/dependencyChecker/unreachable-targets.txt').get().asFile.absolutePath
@@ -37,13 +49,6 @@ neoForge {
                 providers.gradleProperty('tinactory.dependencyChecker.verbose')
                     .orElse(providers.systemProperty('tinactory.dependencyChecker.verbose'))
                     .orElse('false').get()
-            ideName = "${rootProject.name}.${project.name}.test"
-        }
-    }
-
-    mods {
-        tinactory {
-            sourceSet sourceSets.main
         }
     }
 

@@ -21,6 +21,7 @@ import org.shsts.tinycorelib.api.registrate.entry.ICapability;
 import org.shsts.tinycorelib.api.registrate.entry.IItemCapability;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinycorelib.api.CoreLibKeys.EVENT_MANAGER_LOC;
 
 public final class AllCapabilities {
     public static final ICapability<IItemHandler> ITEM_HANDLER;
@@ -48,9 +49,9 @@ public final class AllCapabilities {
     public static final IItemCapability<IFluidHandlerItem> FLUID_HANDLER_ITEM;
 
     static {
-        ITEM_HANDLER = REGISTRATE.capability(Capabilities.ItemHandler.BLOCK);
-        FLUID_HANDLER = REGISTRATE.capability(Capabilities.FluidHandler.BLOCK);
-        EVENT_MANAGER = REGISTRATE.capability("event_manager", IEventManager.class);
+        ITEM_HANDLER = REGISTRATE.getCapability(Capabilities.ItemHandler.BLOCK);
+        FLUID_HANDLER = REGISTRATE.getCapability(Capabilities.FluidHandler.BLOCK);
+        EVENT_MANAGER = REGISTRATE.getCapability(EVENT_MANAGER_LOC, IEventManager.class);
 
         PROCESSOR = REGISTRATE.capability("processor", IProcessor.class);
         CONTAINER = REGISTRATE.capability("container", IContainer.class);
@@ -70,7 +71,7 @@ public final class AllCapabilities {
         FLUID_PORT_ITEM = REGISTRATE.itemCapability("fluid_port", IFluidPort.class);
         BYTES_PROVIDER_ITEM = REGISTRATE.itemCapability("bytes_provider", IBytesProvider.class);
         PATTERN_CELL_ITEM = REGISTRATE.itemCapability("pattern_cell", IPatternCellPort.class);
-        FLUID_HANDLER_ITEM = REGISTRATE.itemCapability(Capabilities.FluidHandler.ITEM);
+        FLUID_HANDLER_ITEM = REGISTRATE.getItemCapability(Capabilities.FluidHandler.ITEM);
     }
 
     public static void init() {}

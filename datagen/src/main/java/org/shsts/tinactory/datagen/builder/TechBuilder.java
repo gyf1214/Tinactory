@@ -16,7 +16,6 @@ import org.shsts.tinactory.datagen.content.RegistryHelper;
 import org.shsts.tinactory.datagen.content.builder.ResearchRecipeBuilder;
 import org.shsts.tinactory.datagen.provider.TechProvider;
 import org.shsts.tinycorelib.api.core.ILoc;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
 import java.util.ArrayList;
@@ -166,7 +165,7 @@ public class TechBuilder<P> extends Builder<JsonObject, P, TechBuilder<P>> imple
             assert voltage != null;
             var input = getComponent("research_equipment").get(voltage).get();
 
-            var type = (IRecipeType<ResearchRecipe>) REGISTRATE.getRecipeType("research_bench");
+            var type = REGISTRATE.<ResearchRecipe>getRecipeType("research_bench");
             var factory = DATA_GEN.recipeFactory(type, ResearchRecipeBuilder::new);
             var builder = factory.recipe(loc);
             builder.target(loc);
