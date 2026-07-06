@@ -8,13 +8,15 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
-import org.shsts.tinactory.unit.fixture.TestRecipeType;
 import org.shsts.tinactory.unit.fixture.TestResult;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.input;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.output;
 
 class LayoutTest {
     @Test
@@ -49,46 +51,44 @@ class LayoutTest {
             new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT),
             new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT)), layout.portSlots.get(2));
 
-        var recipe = new ProcessingRecipe.Builder(null, modLoc("layout_recipe"))
-            .input(0, new TestIngredient("ore", 1))
-            .input(0, new TestIngredient("dust", 2))
-            .input(1, new TestIngredient("catalyst", 1))
-            .output(2, new TestResult("plate", 1))
-            .output(2, new TestResult("gear", 1))
-            .workTicks(20)
-            .power(8)
-            .buildObject();
+        var recipe = new ProcessingRecipe(
+            List.of(input(0, "ore", 1), input(0, "dust", 2), input(1, "catalyst", 1)),
+            List.of(output(2, "plate", 1), output(2, "gear", 1)),
+            20, 0, 8);
 
-        assertEquals(List.of(
-            new Layout.SlotWith<>(
-                new Layout.SlotInfo(0, 10, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("ore", 1)),
-            new Layout.SlotWith<>(
-                new Layout.SlotInfo(1, 28, 20, 0, SlotType.ITEM_INPUT), new TestIngredient("dust", 2)),
-            new Layout.SlotWith<>(
-                new Layout.SlotInfo(2, 10, 50, 1, SlotType.ITEM_INPUT), new TestIngredient("catalyst", 1))),
+        assertEquals(
+            List.of(inputSlot(0, 10, 20, 0, "ore", 1),
+                inputSlot(1, 28, 20, 0, "dust", 2),
+                inputSlot(2, 10, 50, 1, "catalyst", 1)),
             layout.getProcessingInputs(recipe));
-        assertEquals(List.of(
-            new Layout.SlotWith<>(
-                new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("plate", 1)),
-            new Layout.SlotWith<>(
-                new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT), new TestResult("gear", 1))),
+        assertEquals(
+            List.of(outputSlot(3, 90, 20, 2, "plate", 1), outputSlot(4, 108, 20, 2, "gear", 1)),
             layout.getProcessingOutputs(recipe));
 
-        var marker = new MarkerRecipe.Builder(
-            new TestRecipeType<>("layout_marker_type", MarkerRecipe.class),
-            modLoc("layout_marker"))
-            .baseType(modLoc("layout_base"))
-            .output(2, new TestIngredient("marker_plate", 1))
-            .output(2, new TestIngredient("marker_gear", 3))
-            .workTicks(20)
-            .power(8)
-            .buildObject();
+        var marker = new MarkerRecipe(
+            List.of(), List.of(), modLoc("layout_base"), "", false, Optional.empty(), Optional.empty(),
+            List.of(input(2, "marker_plate", 1), input(2, "marker_gear", 3)));
 
-        assertEquals(List.of(
-            new Layout.SlotWith<>(new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT),
-                new TestIngredient("marker_plate", 1)),
-            new Layout.SlotWith<>(new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT),
-                new TestIngredient("marker_gear", 3))),
+        assertEquals(
+            List.of(markerOutput(3, 90, 20, 2, "marker_plate", 1), markerOutput(4, 108, 20, 2, "marker_gear", 3)),
             layout.getProcessingOutputs(marker));
+    }
+
+    private static Layout.SlotWith<TestIngredient> inputSlot(int index, int x, int y, int port,
+        String key, int amount) {
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_INPUT),
+            new TestIngredient(key, amount));
+    }
+
+    private static Layout.SlotWith<TestResult> outputSlot(int index, int x, int y, int port,
+        String key, int amount) {
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT),
+            new TestResult(key, amount));
+    }
+
+    private static Layout.SlotWith<TestIngredient> markerOutput(int index, int x, int y, int port,
+        String key, int amount) {
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT),
+            new TestIngredient(key, amount));
     }
 }
