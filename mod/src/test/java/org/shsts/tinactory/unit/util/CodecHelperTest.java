@@ -1,13 +1,13 @@
 package org.shsts.tinactory.unit.util;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.unit.fixture.TestBufferHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -15,7 +15,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CodecHelperTest {
     @Test
@@ -51,10 +50,10 @@ class CodecHelperTest {
     @Test
     void componentCodecRoundTripsText() {
         var component = Component.literal("core util");
-        var encoded = CodecHelper.encodeComponent(component);
+        var buf = TestBufferHelper.buf();
+        CodecHelper.encodeComponentToBuf(buf, component);
 
-        assertEquals(component, CodecHelper.parseComponent(encoded));
-        assertThrows(JsonParseException.class, () -> CodecHelper.parseComponent("{not valid json"));
+        assertEquals(component, CodecHelper.parseComponentFromBuf(buf));
     }
 
     @Test

@@ -11,6 +11,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class MachineConfigTest {
     @Test
@@ -42,7 +43,7 @@ class MachineConfigTest {
             .get());
 
         child.putString("value", "mutated");
-        var serialized = config.serializeNBT();
+        var serialized = config.serializeNBT(TEST_REGISTRY);
         serialized.getCompound("child").putString("value", "serialized-mutation");
 
         assertEquals("original", config.getCompound("child").orElseThrow().getString("value"));
@@ -54,7 +55,7 @@ class MachineConfigTest {
         var source = new CompoundTag();
         source.putString("name", "before");
 
-        config.deserializeNBT(source);
+        config.deserializeNBT(TEST_REGISTRY, source);
         source.putString("name", "after");
 
         assertEquals(Optional.of("before"), config.getString("name"));

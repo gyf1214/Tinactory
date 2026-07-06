@@ -55,7 +55,7 @@ class GridViewGroupTest {
         assertEquals(1, group.getSlotCount());
         var children = new ArrayList<IViewNode>();
         group.forEachChild(children::add);
-        assertEquals(List.of(created.get(0)), children);
+        assertEquals(List.of(created.getFirst()), children);
     }
 
     private static class RecordingNode implements IViewNode {
@@ -65,6 +65,11 @@ class GridViewGroupTest {
         @Override
         public void setRect(Rect rect) {
             this.rect = rect;
+        }
+
+        @Override
+        public Rect rect() {
+            return rect;
         }
 
         @Override
