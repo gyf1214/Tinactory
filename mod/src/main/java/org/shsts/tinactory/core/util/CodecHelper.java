@@ -11,6 +11,7 @@ import com.mojang.serialization.JsonOps;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -39,24 +40,18 @@ public final class CodecHelper {
     public static final Codec<PortDirection> PORT_DIRECTION_CODEC =
         StringRepresentable.fromEnum(PortDirection::values);
 
-    public static JsonObject jsonFromStr(String s) {
-        return GSON.fromJson(s, JsonObject.class);
-    }
-
     public static JsonObject jsonFromReader(Reader s) {
         return GSON.fromJson(s, JsonObject.class);
     }
 
-    public static String jsonToStr(JsonElement je) {
-        return GSON.toJson(je);
+    public static <P> P parseJson(HolderLookup.Provider provider, Decoder<P> decoder, JsonElement je) {
+        var ops = provider.createSerializationContext(JsonOps.INSTANCE);
+        return decoder.parse(ops, je).getOrThrow();
     }
 
-    public static <P> P parseJson(Decoder<P> decoder, JsonElement je) {
-        return decoder.parse(JsonOps.INSTANCE, je).getOrThrow();
-    }
-
-    public static <P> JsonElement encodeJson(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(JsonOps.INSTANCE, sth).getOrThrow();
+    public static <P> JsonElement encodeJson(HolderLookup.Provider provider, Encoder<P> encoder, P sth) {
+        var ops = provider.createSerializationContext(JsonOps.INSTANCE);
+        return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
     public static <P> P parseTag(Decoder<P> decoder, Tag tag) {
@@ -126,6 +121,11 @@ public final class CodecHelper {
     public static <T> List<T> parseListFromBuf(RegistryFriendlyByteBuf buf,
         StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
         return buf.readList(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
+    }
+
+    public static void parseWithCountFromBuf(RegistryFriendlyByteBuf buf,
+        Consumer<RegistryFriendlyByteBuf> cons) {
+        buf.readWithCount(buf1 -> cons.accept((RegistryFriendlyByteBuf) buf1));
     }
 
     public static <T> void encodeOptionalToBuf(RegistryFriendlyByteBuf buf,

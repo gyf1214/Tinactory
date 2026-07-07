@@ -19,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class TechnologyTest {
     @Test
@@ -46,15 +47,15 @@ class TechnologyTest {
     void codecRoundTripsDisplayIdsAndPrefersItemDescriptor() {
         var displayItem = modLoc("display_item");
         var displayTexture = modLoc("textures/gui/technology/display");
-        var json = new JsonObject();
-        json.addProperty("max_progress", 42L);
-        json.add("modifiers", new JsonObject());
-        json.addProperty("display_item", displayItem.toString());
-        json.addProperty("display_texture", displayTexture.toString());
-        json.addProperty("rank", 9);
+        var jo = new JsonObject();
+        jo.addProperty("max_progress", 42L);
+        jo.add("modifiers", new JsonObject());
+        jo.addProperty("display_item", displayItem.toString());
+        jo.addProperty("display_texture", displayTexture.toString());
+        jo.addProperty("rank", 9);
 
-        var decoded = CodecHelper.parseJson(Technology.CODEC, json);
-        var encoded = CodecHelper.encodeJson(Technology.CODEC, decoded).getAsJsonObject();
+        var decoded = CodecHelper.parseJson(TEST_REGISTRY, Technology.CODEC, jo);
+        var encoded = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decoded).getAsJsonObject();
 
         assertEquals(new ItemIdRenderDescriptor(displayItem), decoded.getDisplay());
         assertEquals(displayItem.toString(), encoded.get("display_item").getAsString());

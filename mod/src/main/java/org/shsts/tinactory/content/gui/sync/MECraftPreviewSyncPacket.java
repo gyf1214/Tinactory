@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.plan.PlanError;
@@ -86,9 +85,10 @@ public class MECraftPreviewSyncPacket implements IPacket {
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(state);
         buf.writeLong(memoryUsage);
-        buf.writeNbt(error == null ? null : serializeError(error));
+
+        CodecHelper.encodeOptionalToBuf(buf, Optional.ofNullable(error), MECraftPreviewSyncPacket::serializeError);
         CodecHelper.encodeCollectionToBuf(buf, summary.entries().entrySet(), (buf1, entry) -> {
-            buf1.writeNbt(encodeIngredientKey(entry.getKey()));
+            StackHelper.KEY_STREAM_CODEC.encode(buf1, entry.getKey());
             buf1.writeLong(entry.getValue().existingAmount());
             buf1.writeLong(entry.getValue().consumedFromInventory());
             buf1.writeLong(entry.getValue().craftedAmount());
@@ -99,41 +99,25 @@ public class MECraftPreviewSyncPacket implements IPacket {
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         state = buf.readEnum(PreviewState.class);
         memoryUsage = buf.readLong();
-        error = deserializeError(buf.readNbt());
+        error = CodecHelper.parseOptionalFromBuf(buf, MECraftPreviewSyncPacket::deserializeError).orElse(null);
+
         var entries = new LinkedHashMap<IStackKey, PlanSummary.Entry>();
-        buf.readWithCount(buf1 -> {
-            var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "summary key"));
-            var summaryEntry = new PlanSummary.Entry(buf1.readLong(), buf1.readLong(), buf1.readLong());
-            entries.put(key, summaryEntry);
+        CodecHelper.parseWithCountFromBuf(buf, buf1 -> {
+            var key = StackHelper.KEY_STREAM_CODEC.decode(buf1);
+            var entry = new PlanSummary.Entry(buf1.readLong(), buf1.readLong(), buf1.readLong());
+            entries.put(key, entry);
         });
         summary = new PlanSummary(entries);
     }
 
-    private static CompoundTag serializeError(PlanError error) {
-        var tag = new CompoundTag();
-        tag.putString("code", error.code().name());
-        tag.put("targetKey", encodeIngredientKey(error.targetKey()));
-        return tag;
+    private static void serializeError(RegistryFriendlyByteBuf buf, PlanError error) {
+        buf.writeEnum(error.code());
+        StackHelper.KEY_STREAM_CODEC.encode(buf, error.targetKey());
     }
 
-    @Nullable
-    private static PlanError deserializeError(@Nullable CompoundTag tag) {
-        if (tag == null) {
-            return null;
-        }
-        return new PlanError(
-            PlanError.Code.valueOf(tag.getString("code")),
-            decodeIngredientKey(tag.getCompound("targetKey")));
-    }
-
-    private static CompoundTag encodeIngredientKey(IStackKey key) {
-        var tag = new CompoundTag();
-        tag.put("value", CodecHelper.encodeTag(StackHelper.KEY_CODEC, key));
-        return tag;
-    }
-
-    private static IStackKey decodeIngredientKey(CompoundTag tag) {
-        return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
+    private static PlanError deserializeError(RegistryFriendlyByteBuf buf) {
+        return new PlanError(buf.readEnum(PlanError.Code.class),
+            StackHelper.KEY_STREAM_CODEC.decode(buf));
     }
 
     public enum PreviewState {

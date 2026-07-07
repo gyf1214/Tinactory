@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class StackResultTest {
     @Test
@@ -23,8 +24,8 @@ class StackResultTest {
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 0.75d,
             TestStack.item("ingot", 3), TestStack.ADAPTER);
 
-        var roundTrip = CodecHelper.parseJson(codec.decoder(),
-            CodecHelper.encodeJson(codec.encoder(), result));
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), result);
+        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
 
         assertEquals(result, roundTrip);
     }

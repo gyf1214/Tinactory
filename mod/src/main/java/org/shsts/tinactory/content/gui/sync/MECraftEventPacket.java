@@ -3,13 +3,13 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -75,8 +75,7 @@ public class MECraftEventPacket implements IPacket {
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(action);
-        buf.writeNbt(target == null ? null :
-            (CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, target));
+        CodecHelper.encodeOptionalToBuf(buf, Optional.ofNullable(target), StackHelper.KEY_STREAM_CODEC);
         buf.writeLong(quantity);
         buf.writeBoolean(cpuId != null);
         if (cpuId != null) {
@@ -87,8 +86,7 @@ public class MECraftEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
-        var targetTag = buf.readNbt();
-        target = targetTag == null ? null : CodecHelper.parseTag(StackHelper.KEY_CODEC, targetTag);
+        target = CodecHelper.parseOptionalFromBuf(buf, StackHelper.KEY_STREAM_CODEC).orElse(null);
         quantity = buf.readLong();
         cpuId = buf.readBoolean() ? buf.readUUID() : null;
     }

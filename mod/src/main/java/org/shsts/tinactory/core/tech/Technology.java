@@ -5,7 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.tech.ITechManager;
@@ -48,7 +51,7 @@ public class Technology implements ITechnology {
         this.displayTexture = displayTexture.orElse(null);
         this.display = this.displayItem != null ? new ItemIdRenderDescriptor(this.displayItem) :
             this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
-            EmptyRenderDescriptor.INSTANCE;
+                EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
     }
 
@@ -148,4 +151,7 @@ public class Technology implements ITechnology {
             .forGetter(tech -> Optional.ofNullable(tech.displayTexture)),
         Codec.INT.fieldOf("rank").forGetter(tech -> tech.rank)
     ).apply(instance, Technology::new));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, Technology> STREAM_CODEC =
+        ByteBufCodecs.fromCodecWithRegistries(CODEC);
 }

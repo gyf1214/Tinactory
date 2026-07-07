@@ -2,7 +2,6 @@ package org.shsts.tinactory.core.tech;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -24,27 +23,21 @@ public class TechInitPacket implements IPacket {
         return techs;
     }
 
-    private static Technology techFromBuf(FriendlyByteBuf buf) {
-        var loc = buf.readResourceLocation();
-        var jo = CodecHelper.jsonFromStr(buf.readUtf());
-        var tech = CodecHelper.parseJson(Technology.CODEC, jo);
-        tech.setLoc(loc);
-        return tech;
-    }
-
-    private static void techToBuf(FriendlyByteBuf buf, Technology tech) {
-        buf.writeResourceLocation(tech.loc());
-        var je = CodecHelper.encodeJson(Technology.CODEC, tech);
-        buf.writeUtf(CodecHelper.jsonToStr(je));
-    }
-
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        CodecHelper.encodeCollectionToBuf(buf, techs, TechInitPacket::techToBuf);
+        CodecHelper.encodeCollectionToBuf(buf, techs, (buf1, tech) -> {
+            buf1.writeResourceLocation(tech.loc());
+            Technology.STREAM_CODEC.encode(buf1, tech);
+        });
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        techs = CodecHelper.parseListFromBuf(buf, TechInitPacket::techFromBuf);
+        techs = CodecHelper.parseListFromBuf(buf, buf1 -> {
+            var loc = buf1.readResourceLocation();
+            var tech = Technology.STREAM_CODEC.decode(buf1);
+            tech.setLoc(loc);
+            return tech;
+        });
     }
 }

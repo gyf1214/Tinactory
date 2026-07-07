@@ -13,6 +13,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.resource.ContextAwareReloadListener;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
@@ -40,7 +41,7 @@ import static org.shsts.tinactory.integration.tech.TechManagers.TECH_UPDATE;
 public class ServerTechManager extends TechManager implements IServerTechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private class ReloadListener implements PreparableReloadListener {
+    private class ReloadListener extends ContextAwareReloadListener {
         private static final String PREFIX = "technologies";
         private static final String SUFFIX = ".json";
 
@@ -55,7 +56,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
             try {
                 try (var ir = resource.openAsReader()) {
                     var jo = CodecHelper.jsonFromReader(ir);
-                    var ret = CodecHelper.parseJson(Technology.CODEC, jo);
+                    var ret = CodecHelper.parseJson(getRegistryLookup(), Technology.CODEC, jo);
                     ret.setLoc(loc1);
                     return Optional.of(ret);
                 }

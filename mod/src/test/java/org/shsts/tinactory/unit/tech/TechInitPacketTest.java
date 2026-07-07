@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class TechInitPacketTest {
     @Test
@@ -36,9 +37,9 @@ class TechInitPacketTest {
         assertEquals(new ItemIdRenderDescriptor(modLoc("display_item")),
             decodedTechs.get(1).getDisplay());
 
-        var encoded = CodecHelper.encodeJson(Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();
-        assertEquals("tinactory:display_item", encoded.get("display_item").getAsString());
-        assertEquals("tinactory:textures/gui/technology/target", encoded.get("display_texture").getAsString());
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();
+        assertEquals("tinactory:display_item", jo.get("display_item").getAsString());
+        assertEquals("tinactory:textures/gui/technology/target", jo.get("display_texture").getAsString());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends,

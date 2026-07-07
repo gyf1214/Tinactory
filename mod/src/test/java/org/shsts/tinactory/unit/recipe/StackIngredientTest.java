@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class StackIngredientTest {
     @Test
@@ -22,8 +23,8 @@ class StackIngredientTest {
         var ingredient = new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
             TestStack.item("ore", 2), TestStack.ADAPTER);
 
-        var roundTrip = CodecHelper.parseJson(codec.decoder(),
-            CodecHelper.encodeJson(codec.encoder(), ingredient));
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), ingredient);
+        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
 
         assertEquals(ingredient, roundTrip);
     }
