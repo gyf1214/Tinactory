@@ -114,9 +114,8 @@ build.dependsOn apiJar, sourcesJar
 
 test {
     useJUnitPlatform()
-    workingDir rootProject.file('run/unitTest')
-    doFirst {
-        workingDir.mkdirs()
+    jacoco {
+        includes = ['org.shsts.tinactory.api.*', 'org.shsts.tinactory.core.*']
     }
 }
 
@@ -136,9 +135,12 @@ jacocoTestReport {
         html.required = true
         csv.required = true
     }
-    classDirectories.setFrom(files(
-        fileTree(dir: "$buildDir/classes/java/main", include: ['org/shsts/tinactory/core/**'])
-    ))
+    classDirectories.setFrom(
+        sourceSets.main.output.asFileTree.matching {
+            include 'org/shsts/tinactory/api/**'
+            include 'org/shsts/tinactory/core/**'
+        }
+    )
 }
 
 publishing {
