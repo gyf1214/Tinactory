@@ -16,7 +16,6 @@ import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
@@ -48,7 +47,6 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final Voltage voltage;
     private IMachine machine;
     private final WrapperItemHandler items;
-    private final IMenuItemHandler menuItemHandler;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -59,7 +57,6 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             items.setFilter(i, this::allowItem);
         }
-        this.menuItemHandler = () -> items;
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
@@ -185,7 +182,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         builder.attach(ELECTRIC_MACHINE, this);
         builder.attach(PROCESSOR, this);
         builder.attach(LAYOUT_PROVIDER, this);
-        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(MENU_ITEM_HANDLER, items);
     }
 
     @Override

@@ -308,7 +308,7 @@ public final class TinactoryGameTest {
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
             .set(DISCHARGE_KEY, true)
             .get());
-        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithTeamMockPlayer(helper, consumerPos);
 
         helper.runAfterDelay(24, () -> {
@@ -383,7 +383,7 @@ public final class TinactoryGameTest {
         var batteryStack = new ItemStack(battery);
         battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
-        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithTeamMockPlayer(helper, batteryBoxPos);
 
         helper.runAfterDelay(80, () -> {

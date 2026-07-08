@@ -24,7 +24,6 @@ import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
@@ -168,8 +167,6 @@ public class Workbench extends CapabilityProvider implements
     @Nullable
     private Object currentRecipe = null;
 
-    private final IMenuItemHandler menuItemHandler;
-
     private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
@@ -183,8 +180,6 @@ public class Workbench extends CapabilityProvider implements
         this.itemView = new WrapperItemHandler(
             new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
-
-        this.menuItemHandler = () -> itemView;
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
@@ -290,10 +285,6 @@ public class Workbench extends CapabilityProvider implements
         onUpdate();
     }
 
-    public CraftingContainer getCraftingContainer() {
-        return craftingStack;
-    }
-
     public CraftingInput getCraftingInput() {
         return craftingStack.asCraftInput();
     }
@@ -310,7 +301,7 @@ public class Workbench extends CapabilityProvider implements
 
     @Override
     public void attachCapability(ICapabilityBuilder builder) {
-        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(MENU_ITEM_HANDLER, itemView);
     }
 
     @Override

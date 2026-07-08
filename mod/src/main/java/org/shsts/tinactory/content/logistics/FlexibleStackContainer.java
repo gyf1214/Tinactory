@@ -18,7 +18,6 @@ import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.CombinedFluidTank;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperFluidTank;
@@ -57,7 +56,6 @@ public class FlexibleStackContainer extends CapabilityProvider
     private final CombinedFluidTank combinedFluids;
     private final List<ContainerPort> ports = new ArrayList<>();
     private final IItemHandler itemHandler;
-    private final IMenuItemHandler menuItemHandler;
     private final IFluidHandler fluidHandler;
     private final IFluidTanksHandler menuFluidHandler;
 
@@ -78,7 +76,7 @@ public class FlexibleStackContainer extends CapabilityProvider
         this.internalFluids = new WrapperFluidTank[maxFluidSlots];
         this.menuFluids = new WrapperFluidTank[maxFluidSlots];
         this.externalFluids = new WrapperFluidTank[maxFluidSlots];
-        var fluidSize = CONFIG.fluidSlotSize.get();
+        var fluidSize = (int) CONFIG.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);
@@ -93,7 +91,6 @@ public class FlexibleStackContainer extends CapabilityProvider
         var combinedExternalFluids = new CombinedFluidTank(externalFluids);
 
         this.itemHandler = externalItems;
-        this.menuItemHandler = () -> menuItems;
         this.fluidHandler = combinedExternalFluids;
         this.menuFluidHandler = combinedMenuFluids;
     }
@@ -108,8 +105,8 @@ public class FlexibleStackContainer extends CapabilityProvider
             return ContainerPort.EMPTY;
         }
 
-        var minSlot = slots.get(0).index();
-        var maxSlot = slots.get(slots.size() - 1).index() + 1;
+        var minSlot = slots.getFirst().index();
+        var maxSlot = slots.getLast().index() + 1;
         assert minSlot >= 0 && maxSlot <= menuItems.getSlots() && minSlot < maxSlot;
         if (type == SlotType.ITEM_INPUT) {
             for (var i = minSlot; i < maxSlot; i++) {
@@ -231,7 +228,7 @@ public class FlexibleStackContainer extends CapabilityProvider
         builder.attach(LAYOUT_PROVIDER, this);
         builder.attach(CONTAINER, this);
         builder.attach(ITEM_HANDLER, itemHandler);
-        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(MENU_ITEM_HANDLER, menuItems);
         builder.attach(FLUID_HANDLER, fluidHandler);
         builder.attach(MENU_FLUID_HANDLER, menuFluidHandler);
     }

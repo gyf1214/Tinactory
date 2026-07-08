@@ -23,7 +23,6 @@ import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
@@ -73,7 +72,6 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private final WrapperItemHandler storages;
     private final CombinedPort<ItemStack> combinedItems;
     private final CombinedPort<FluidStack> combinedFluids;
-    private final IMenuItemHandler menuItemHandler;
     private final IElectricMachine electric;
 
     private IMachine machine;
@@ -88,7 +86,6 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             storages.setFilter(i, this::allowItem);
         }
-        this.menuItemHandler = () -> storages;
         storages.onUpdate(this::onStorageChange);
 
         this.combinedItems = StoragePorts.combinedItem();
@@ -239,7 +236,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     public void attachCapability(ICapabilityBuilder builder) {
         builder.attach(LAYOUT_PROVIDER, this);
         builder.attach(BYTES_PROVIDER, this);
-        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(MENU_ITEM_HANDLER, storages);
         builder.attach(ELECTRIC_MACHINE, electric);
     }
 

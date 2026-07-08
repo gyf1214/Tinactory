@@ -19,7 +19,6 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.CombinedFluidTank;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperFluidTank;
@@ -55,7 +54,7 @@ public class StackProcessingContainer extends CapabilityProvider
     private final CombinedFluidTank combinedFluids;
     private final List<ContainerPort> ports;
     private final IItemHandler externalItems;
-    private final IMenuItemHandler menuItemHandler;
+    private final WrapperItemHandler menuItems;
     private final IFluidHandler externalFluids;
     private final IFluidTanksHandler menuFluidHandler;
 
@@ -75,7 +74,7 @@ public class StackProcessingContainer extends CapabilityProvider
         }
 
         this.internalItems = new WrapperItemHandler(itemSlots);
-        var menuItems = new WrapperItemHandler(internalItems);
+        this.menuItems = new WrapperItemHandler(internalItems);
         var externalItems = new WrapperItemHandler(internalItems);
         var allInternalFluids = new WrapperFluidTank[fluidSlots];
         var allMenuFluids = new WrapperFluidTank[fluidSlots];
@@ -149,7 +148,6 @@ public class StackProcessingContainer extends CapabilityProvider
         var combinedExternalFluids = new CombinedFluidTank(allExternalFluids);
 
         this.externalItems = externalItems;
-        this.menuItemHandler = () -> menuItems;
         this.externalFluids = combinedExternalFluids;
         this.menuFluidHandler = combinedMenuFluids;
     }
@@ -203,7 +201,7 @@ public class StackProcessingContainer extends CapabilityProvider
         builder.attach(LAYOUT_PROVIDER, this);
         builder.attach(CONTAINER, this);
         builder.attach(ITEM_HANDLER, externalItems);
-        builder.attach(MENU_ITEM_HANDLER, menuItemHandler);
+        builder.attach(MENU_ITEM_HANDLER, menuItems);
         builder.attach(FLUID_HANDLER, externalFluids);
         builder.attach(MENU_FLUID_HANDLER, menuFluidHandler);
     }
