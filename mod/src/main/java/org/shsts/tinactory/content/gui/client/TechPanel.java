@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
@@ -313,7 +314,7 @@ public class TechPanel extends Panel {
         assert team != null;
         var xa = team.canResearch(a) ? 0 : (team.isTechFinished(a) ? 2 : 1);
         var xb = team.canResearch(b) ? 0 : (team.isTechFinished(b) ? 2 : 1);
-        return xa == xb ? a.compareTo(b) : (xa < xb ? -1 : 1);
+        return xa == xb ? Technology.DISPLAY_ORDER.compare(a, b) : (xa < xb ? -1 : 1);
     }
 
     @Override

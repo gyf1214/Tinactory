@@ -35,11 +35,11 @@ class TechnologyTest {
     }
 
     @Test
-    void compareToUsesRankWithoutChangingIdentityEquality() {
+    void displayOrderUsesRankWithoutChangingIdentityEquality() {
         var first = technology("tinactory:first", List.of(), 7);
         var second = technology("tinactory:second", List.of(), 7);
 
-        assertEquals(0, first.compareTo(second));
+        assertEquals(0, Technology.DISPLAY_ORDER.compare(first, second));
         assertNotEquals(first, second);
     }
 

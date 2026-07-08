@@ -21,6 +21,7 @@ import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -102,14 +103,6 @@ public class Technology implements ITechnology {
         return I18n.tr(getDetailsId(loc()));
     }
 
-    /**
-     * Only compares rank, does not imply equal.
-     */
-    @Override
-    public int compareTo(ITechnology o) {
-        return Integer.compare(rank, ((Technology) o).rank);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -154,4 +147,7 @@ public class Technology implements ITechnology {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Technology> STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(CODEC);
+
+    public static final Comparator<ITechnology> DISPLAY_ORDER =
+        Comparator.comparingInt($ -> ((Technology) $).rank);
 }

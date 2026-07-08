@@ -11,7 +11,7 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public interface ITechnology extends Comparable<ITechnology>, ILoc {
+public interface ITechnology extends ILoc {
     List<ITechnology> getDepends();
 
     Map<String, Integer> getModifiers();

@@ -448,10 +448,5 @@ public final class TestMachine implements IMachine {
         public Component getDetails() {
             return Component.empty();
         }
-
-        @Override
-        public int compareTo(ITechnology other) {
-            return loc.compareTo(other.loc());
-        }
     }
 }
