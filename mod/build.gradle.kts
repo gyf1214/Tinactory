@@ -56,6 +56,7 @@ neoForge {
     unitTest {
         enable()
         testedMod = mods["tinactory_test"]
+        loadedMods = listOf(mods["tinactory_test"])
     }
 }
 
@@ -98,8 +99,8 @@ sourceSets.main {
 }
 
 tasks.test {
-    jacoco {
-        setIncludes(listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*"))
+    configure<JacocoTaskExtension> {
+        includes = listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*")
     }
 }
 
@@ -114,7 +115,7 @@ tasks.jacocoTestReport {
         sourceSets.main.get().output.asFileTree.matching {
             include("org/shsts/tinactory/api/**")
             include("org/shsts/tinactory/core/**")
-        },
+        }
     )
 }
 
