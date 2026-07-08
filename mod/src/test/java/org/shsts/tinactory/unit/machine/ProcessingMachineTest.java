@@ -5,7 +5,6 @@ import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.unit.fixture.TestContainer;
-import org.shsts.tinactory.unit.fixture.TestEntry;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestRecipe;
@@ -27,9 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.api.logistics.PortDirection.INPUT;
 import static org.shsts.tinactory.api.logistics.PortDirection.OUTPUT;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createEntry;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.input;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.output;
-import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
 
 class ProcessingMachineTest {
     private static final int INPUT_PORT = 0;
@@ -225,14 +225,14 @@ class ProcessingMachineTest {
     }
 
     private static IEntry<TestRecipe> recipe(String path, long voltage) {
-        return new TestEntry<>(modLoc(path), new TestRecipe(
+        return createEntry(modLoc(path), new TestRecipe(
             List.of(input(INPUT_PORT, "ore", 1)),
             List.of(output(OUTPUT_PORT, "dust", 1)),
             20, voltage, 8));
     }
 
     private static IEntry<MarkerRecipe> marker(String path, long voltage) {
-        return new TestEntry<>(modLoc(path), new MarkerRecipe(
+        return createEntry(modLoc(path), new MarkerRecipe(
             List.of(), List.of(), voltage, RECIPE_TYPE.loc(), "ore",
             false, Optional.empty(), Optional.empty(), List.of()));
     }

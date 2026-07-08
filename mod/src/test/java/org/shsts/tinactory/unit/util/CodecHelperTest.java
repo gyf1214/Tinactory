@@ -7,7 +7,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class CodecHelperTest {
     @Test
@@ -48,7 +48,7 @@ class CodecHelperTest {
     @Test
     void componentCodecRoundTripsText() {
         var component = Component.literal("core util");
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
         CodecHelper.encodeComponentToBuf(buf, component);
 
         assertEquals(component, CodecHelper.parseComponentFromBuf(buf));

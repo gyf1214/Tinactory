@@ -2,7 +2,7 @@ package org.shsts.tinactory.unit.gui.sync;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,7 +10,7 @@ class SyncPacketsTest {
     @Test
     void roundTripsDoublePacket() {
         var packet = SyncPackets.doublePacket(3.75D);
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new SyncPackets.DoublePacket();
@@ -23,7 +23,7 @@ class SyncPacketsTest {
     @Test
     void roundTripsLongPacket() {
         var packet = SyncPackets.longPacket(123456789L);
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new SyncPackets.LongPacket();
@@ -32,5 +32,4 @@ class SyncPacketsTest {
         assertEquals(packet, decoded);
         assertEquals(123456789L, decoded.getData());
     }
-
 }

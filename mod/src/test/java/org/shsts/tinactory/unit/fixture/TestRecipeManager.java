@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createEntry;
+
 public final class TestRecipeManager implements IRecipeManager {
     private final Map<ResourceLocation, IEntry<? extends IRecipe<?>>> byLoc = new HashMap<>();
     private final Map<ResourceLocation, List<IEntry<? extends IRecipe<?>>>> byType = new HashMap<>();
@@ -21,7 +23,7 @@ public final class TestRecipeManager implements IRecipeManager {
     }
 
     public <R extends IRecipe<?>> TestRecipeManager add(IRecipeType<R> recipeType, ResourceLocation loc, R recipe) {
-        var entry = new TestEntry<>(loc, recipe);
+        var entry = createEntry(loc, recipe);
         byLoc.put(loc, entry);
         byType.computeIfAbsent(recipeType.loc(), $ -> new ArrayList<>()).add(entry);
         return this;

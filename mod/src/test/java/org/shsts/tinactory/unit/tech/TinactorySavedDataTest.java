@@ -11,7 +11,7 @@ import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class TinactorySavedDataTest {
     @Test

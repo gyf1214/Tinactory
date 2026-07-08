@@ -11,7 +11,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class MachineConfigTest {
     @Test

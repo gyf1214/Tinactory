@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.gui.sync;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,7 +32,7 @@ class SetMachineConfigPacketTest {
             .reset("obsolete")
             .reset("legacy")
             .get();
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new SetMachineConfigPacket();

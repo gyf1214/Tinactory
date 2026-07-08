@@ -6,7 +6,7 @@ import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestRegistry.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class TechInitPacketTest {
     @Test
@@ -24,7 +24,7 @@ class TechInitPacketTest {
             Optional.of(modLoc("display_item")),
             Optional.of(modLoc("textures/gui/technology/target")), 2);
         var packet = new TechInitPacket(List.of(dependency, technology));
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new TechInitPacket();
