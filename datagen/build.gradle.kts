@@ -8,70 +8,59 @@ plugins {
 
 evaluationDependsOn(":mod")
 
-base {
-    archivesName = "tinactory_datagen"
-}
+val extraResources = "libs/tinactory_extra_resources_${property("extra_resources_version")}.zip"
 
 neoForge {
-    runs {
-        create("data") {
-            data()
-            systemProperty("forge.logging.markers", "REGISTRIES")
-            systemProperty("forge.logging.console.level", "debug")
-            jvmArgument("-ea")
+    mods {
+        create("tinactory") {
+            sourceSet(project(":mod").sourceSets.main.get())
+        }
 
-            ideName = "${rootProject.name}.${project.name}.main"
-            gameDirectory = rootProject.file("run/data")
-            sourceSet = sourceSets.main.get()
-            programArguments.addAll(
-                "--mod",
-                "tinactory_datagen",
-                "--all",
-                "--output",
-                rootProject.project(":mod").file("src/generated/resources/").absolutePath,
-            )
-            programArguments.addAll("--existing", rootProject.project(":mod").file("src/main/resources/").absolutePath)
-            programArguments.addAll("--existing", file("src/main/resources/").absolutePath)
-            programArguments.addAll(
-                "--existing",
-                rootProject.file("libs/tinactory_extra_resources_${property("extra_resources_version")}.zip").absolutePath,
-            )
+        create("tinactory_datagen") {
+            sourceSet(sourceSets.main.get())
         }
     }
 
-    mods {
-        create("tinactory") {
-            sourceSet(project(":mod").extensions.getByType<SourceSetContainer>().named("main").get())
-        }
-        create("tinactory_datagen") {
-            sourceSet(sourceSets.main.get())
+    runs {
+        create("data") {
+            data()
+            gameDirectory = rootProject.file("run/data")
+
+            programArguments.addAll(
+                "--mod", "tinactory_datagen",
+                "--all",
+                "--output", rootProject.project(":mod").file("src/generated/resources/").absolutePath,
+                "--existing", rootProject.project(":mod").file("src/main/resources/").absolutePath,
+                "--existing", file("src/main/resources/").absolutePath,
+                "--existing", rootProject.file(extraResources).absolutePath,
+            )
         }
     }
 }
 
 dependencies {
-    compileOnly("org.shsts.tinycorelib:core:${property("minecraft_version")}-${property("tinycorelib_version")}:api")
-    compileOnly("org.shsts.tinycorelib:datagen:${property("minecraft_version")}-${property("tinycorelib_version")}:api")
-    runtimeOnly("org.shsts.tinycorelib:core:${property("minecraft_version")}-${property("tinycorelib_version")}")
-    runtimeOnly("org.shsts.tinycorelib:datagen:${property("minecraft_version")}-${property("tinycorelib_version")}")
+    val tinycorelibVersion = "${property("minecraft_version")}-${property("tinycorelib_version")}"
 
+    compileOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}:api")
+    compileOnly("org.shsts.tinycorelib:datagen:${tinycorelibVersion}:api")
+    runtimeOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}")
+    runtimeOnly("org.shsts.tinycorelib:datagen:${tinycorelibVersion}")
+
+    implementation(rootProject.files(extraResources))
     implementation(project(":mod"))
 
     implementation("thedarkcolour:kotlinforforge-neoforge:${property("kff_version")}")
-    implementation(rootProject.files("libs/tinactory_extra_resources_${property("extra_resources_version")}.zip"))
-
     implementation("dev.architectury:architectury-neoforge:${property("architectury_version")}")
     implementation("dev.ftb.mods:ftb-library-neoforge:${property("ftb_library_version")}")
-    runtimeOnly("dev.ftb.mods:ftb-filter-system-neoforge:${property("ftb_filter_system_version")}")
+}
+
+checkSource {
+    topPackage("org.shsts.tinactory.datagen")
+    includeKotlin()
 }
 
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
-}
-
-checkSource {
-    topPackage("org.shsts.tinactory")
-    includeKotlin()
 }
 
 tasks.register<JavaExec>("extractQuestLanguage") {

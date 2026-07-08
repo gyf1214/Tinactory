@@ -14,6 +14,7 @@ neoForge {
         create("tinactory") {
             sourceSet(sourceSets.main.get())
         }
+
         create("tinactory_test") {
             sourceSet(sourceSets.main.get())
             sourceSet(sourceSets.test.get())
@@ -21,36 +22,27 @@ neoForge {
     }
 
     runs {
-        configureEach {
-            systemProperty("forge.logging.markers", "REGISTRIES")
-            systemProperty("forge.logging.console.level", "debug")
-            jvmArgument("-ea")
-            disableIdeRun()
-        }
-
         create("client") {
             client()
             gameDirectory = rootProject.file("run/client")
-            sourceSet = sourceSets.main.get()
             loadedMods.set(listOf(mods["tinactory"]))
         }
 
         create("server") {
             server()
             gameDirectory = rootProject.file("run/server")
-            sourceSet = sourceSets.main.get()
             loadedMods.set(listOf(mods["tinactory"]))
         }
 
         create("gameTestServer") {
             type = "gameTestServer"
             gameDirectory = rootProject.file("run/gameTestServer")
-            sourceSet = sourceSets.test.get()
             loadedMods.set(listOf(mods["tinactory_test"]))
 
             systemProperty(
                 "tinactory.dependencyChecker.reportFile",
-                layout.buildDirectory.file("reports/dependencyChecker/unreachable-targets.txt").get().asFile.absolutePath,
+                layout.buildDirectory.file("reports/dependencyChecker/unreachable-targets.txt")
+                    .get().asFile.absolutePath,
             )
             systemProperty(
                 "tinactory.dependencyChecker.verbose",
@@ -63,13 +55,15 @@ neoForge {
 
     unitTest {
         enable()
-        testedMod = mods["tinactory"]
+        testedMod = mods["tinactory_test"]
     }
 }
 
 dependencies {
-    compileOnly("org.shsts.tinycorelib:core:${property("minecraft_version")}-${property("tinycorelib_version")}:api")
-    runtimeOnly("org.shsts.tinycorelib:core:${property("minecraft_version")}-${property("tinycorelib_version")}")
+    val tinycorelibVersion = "${property("minecraft_version")}-${property("tinycorelib_version")}"
+
+    compileOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}:api")
+    runtimeOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}")
 
     implementation("mezz.jei:jei-${property("minecraft_version")}-neoforge:${property("jei_version")}")
     implementation("curse.maven:jade-324717:${property("jade_id")}")
@@ -81,10 +75,19 @@ dependencies {
     runtimeOnly("dev.ftb.mods:ftb-teams-neoforge:${property("ftb_teams_version")}")
     runtimeOnly("dev.ftb.mods:ftb-filter-system-neoforge:${property("ftb_filter_system_version")}")
 
+    testCompileOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}:api")
     testImplementation(platform("org.junit:junit-bom:5.12.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testCompileOnly("org.shsts.tinycorelib:core:${property("minecraft_version")}-${property("tinycorelib_version")}:api")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+checkSource {
+    topPackage("org.shsts.tinactory")
+    banImport("api", "core", "integration", "content", "compat")
+    banImport("core", "integration", "content", "compat")
+    banImport("integration", "content", "compat")
+    banImport("unit", "integration", "content")
+    includeTest()
 }
 
 sourceSets.main {
@@ -92,6 +95,27 @@ sourceSets.main {
         srcDir("src/generated/resources")
         exclude(".cache/")
     }
+}
+
+tasks.test {
+    jacoco {
+        setIncludes(listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*"))
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = true
+    }
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            include("org/shsts/tinactory/api/**")
+            include("org/shsts/tinactory/core/**")
+        },
+    )
 }
 
 configurations {
@@ -110,36 +134,6 @@ artifacts {
 
 tasks.build {
     dependsOn(apiJar)
-}
-
-tasks.test {
-    jacoco {
-        setIncludes(listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*"))
-    }
-}
-
-checkSource {
-    topPackage("org.shsts.tinactory")
-    banImport("api", "core", "integration", "content", "compat")
-    banImport("core", "integration", "content", "compat")
-    banImport("integration", "content", "compat")
-    banImport("unit", "integration", "content")
-    includeTest()
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required = true
-        html.required = true
-        csv.required = true
-    }
-    classDirectories.setFrom(
-        sourceSets.main.get().output.asFileTree.matching {
-            include("org/shsts/tinactory/api/**")
-            include("org/shsts/tinactory/core/**")
-        },
-    )
 }
 
 publishing {

@@ -18,21 +18,21 @@ side = "BOTH"
 [[dependencies.tinactory_datagen]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21.1,1.22)"
+versionRange = "[1.21.1]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.tinactory_datagen]]
 modId = "tinycorelib"
 type = "required"
-versionRange = "[1.21.1-0.0.3.2,)"
+versionRange = "[${tinycorelib_version},)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.tinactory_datagen]]
 modId = "tinydatagen"
 type = "required"
-versionRange = "[1.21.1-0.0.3.2,)"
+versionRange = "[${tinycorelib_version},)"
 ordering = "NONE"
 side = "BOTH"
 

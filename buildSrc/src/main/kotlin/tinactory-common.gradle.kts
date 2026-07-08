@@ -1,7 +1,4 @@
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
-import org.gradle.language.jvm.tasks.ProcessResources
 
 plugins {
     checkstyle
@@ -11,11 +8,54 @@ plugins {
     `maven-publish`
 }
 
+repositories {
+    mavenCentral()
+    maven {
+        name = "shsts"
+        url = uri("https://www.shsts.org/m2")
+    }
+    maven {
+        name = "Jared's maven"
+        url = uri("https://maven.blamejared.com/")
+    }
+    maven {
+        name = "FTB"
+        url = uri("https://maven.ftb.dev/releases")
+    }
+    maven {
+        name = "Architectury"
+        url = uri("https://maven.architectury.dev")
+    }
+    maven {
+        url = uri("https://cursemaven.com")
+        content {
+            includeGroup("curse.maven")
+        }
+    }
+    maven {
+        name = "Kotlin for Forge"
+        url = uri("https://thedarkcolour.github.io/KotlinForForge/")
+    }
+}
+
 group = "org.shsts.tinactory"
 version = "${property("minecraft_version")}-${property("mod_version")}"
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+neoForge {
+    version = property("neo_version").toString()
+    parchment {
+        minecraftVersion = property("minecraft_version").toString()
+        mappingsVersion = property("parchment_version").toString()
+    }
+
+    runs {
+        configureEach {
+            systemProperty("forge.logging.markers", "REGISTRIES")
+            systemProperty("forge.logging.console.level", "debug")
+            jvmArgument("-ea")
+            disableIdeRun()
+        }
+    }
 }
 
 checkstyle {
@@ -26,12 +66,8 @@ tasks.withType<Checkstyle>().configureEach {
     classpath = files()
 }
 
-neoForge {
-    version = property("neo_version").toString()
-    parchment {
-        minecraftVersion = property("minecraft_version").toString()
-        mappingsVersion = property("parchment_version").toString()
-    }
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -45,6 +81,7 @@ tasks.withType<Test>().configureEach {
 
 val modMetadataProperties = mapOf(
     "mod_version" to version,
+    "tinycorelib_version" to "${property("minecraft_version")}-${property("tinycorelib_version")}"
 )
 
 val generateModMetadata by tasks.registering(ProcessResources::class) {
