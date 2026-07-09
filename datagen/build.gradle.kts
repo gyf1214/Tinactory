@@ -63,28 +63,14 @@ tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }
 
-tasks.register<JavaExec>("extractQuestLanguage") {
-    group = "tinactory"
-    description = "Extract FTB Quests chapter text into language metadata."
-    classpath = sourceSets.main.get().runtimeClasspath
-    mainClass = "org.shsts.tinactory.datagen.quest.QuestLanguageExtractor"
-    workingDir = rootProject.file("run/questLanguage")
-    systemProperty("tinactory.projectRoot", rootProject.projectDir.absolutePath)
-    doFirst {
-        workingDir.mkdirs()
-    }
-    args("extract")
-}
-
 tasks.register<JavaExec>("checkQuestLanguage") {
     group = "verification"
-    description = "Check FTB Quests chapter text language metadata synchronization."
+    description = "Check FTB Quests native translation tables."
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass = "org.shsts.tinactory.datagen.quest.QuestLanguageExtractor"
+    mainClass = "org.shsts.tinactory.datagen.quest.QuestTranslationChecker"
     workingDir = rootProject.file("run/questLanguage")
     systemProperty("tinactory.projectRoot", rootProject.projectDir.absolutePath)
     doFirst {
         workingDir.mkdirs()
     }
-    args("check")
 }
