@@ -74,3 +74,7 @@ tasks.register<JavaExec>("checkQuestLanguage") {
         workingDir.mkdirs()
     }
 }
+
+tasks.named("check") {
+    dependsOn("checkQuestLanguage")
+}
