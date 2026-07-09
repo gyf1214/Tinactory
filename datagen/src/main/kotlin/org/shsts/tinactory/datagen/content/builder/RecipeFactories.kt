@@ -15,7 +15,6 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
 typealias ProcessingRecipeFactoryBase<R, B> = RecipeFactory<R, B>
 typealias ProcessingRecipeFactory = RecipeFactory<ProcessingRecipe, SimpleProcessingBuilder>
-typealias ResearchRecipeFactory = RecipeFactory<ResearchRecipe, ResearchRecipeBuilder>
 typealias CleanRecipeFactory = RecipeFactory<CleanRecipe, CleanRecipeBuilder>
 typealias GeneratorRecipeFactory = RecipeFactory<GeneratorRecipe, GeneratorRecipeBuilder>
 typealias BlastFurnaceRecipeFactory = RecipeFactory<BlastFurnaceRecipe, BlastFurnaceBuilder>
@@ -60,8 +59,16 @@ object RecipeFactories {
         return AssemblyRecipeFactory(recipeType(name), defaults)
     }
 
+    fun research(block: ResearchRecipeFactory.() -> Unit) {
+        ResearchRecipeFactory(recipeType("research_bench")) {
+            defaultInputItem = 0
+            amperage = 0.125
+            workTicks(200)
+        }.block()
+    }
+
     fun rocket(block: ResearchRecipeFactory.() -> Unit) {
-        RecipeFactory(recipeType("rocket"), ::ResearchRecipeBuilder) {
+        ResearchRecipeFactory(recipeType("rocket")) {
             defaultInputItem = 0
             defaultInputFluid = 1
             amperage = 0.125

@@ -20,7 +20,6 @@ import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -134,8 +133,7 @@ public class Technology implements ITechnology {
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        ResourceLocation.CODEC.listOf().optionalFieldOf("depends", Collections.emptyList())
-            .forGetter(tech -> tech.dependIds),
+        ResourceLocation.CODEC.listOf().fieldOf("depends").forGetter(tech -> tech.dependIds),
         Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
         Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
         ResourceLocation.CODEC.optionalFieldOf("display_item")

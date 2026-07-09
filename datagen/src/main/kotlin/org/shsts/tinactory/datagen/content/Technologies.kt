@@ -493,8 +493,9 @@ object Technologies {
                 TechBuilder.factory(handler, parent, loc)
             }.run {
                 rank(rank++)
-                if (base != null) {
-                    depends(base)
+                val base1 = base
+                if (base1 != null) {
+                    depends(base1)
                 }
                 researchVoltage(voltage)
                 block()

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.tech;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
@@ -48,6 +50,7 @@ class TechnologyTest {
         var displayItem = modLoc("display_item");
         var displayTexture = modLoc("textures/gui/technology/display");
         var jo = new JsonObject();
+        jo.add("depends", new JsonArray());
         jo.addProperty("max_progress", 42L);
         jo.add("modifiers", new JsonObject());
         jo.addProperty("display_item", displayItem.toString());
@@ -60,6 +63,17 @@ class TechnologyTest {
         assertEquals(new ItemIdRenderDescriptor(displayItem), decoded.getDisplay());
         assertEquals(displayItem.toString(), encoded.get("display_item").getAsString());
         assertEquals(displayTexture.toString(), encoded.get("display_texture").getAsString());
+    }
+
+    @Test
+    void codecRequiresDependsField() {
+        var jo = new JsonObject();
+        jo.addProperty("max_progress", 42L);
+        jo.add("modifiers", new JsonObject());
+        jo.addProperty("rank", 9);
+
+        assertThrows(IllegalStateException.class,
+            () -> CodecHelper.parseJson(TEST_REGISTRY, Technology.CODEC, jo));
     }
 
     @Test

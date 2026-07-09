@@ -3,7 +3,7 @@ package org.shsts.tinactory.datagen.content.builder
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.builder.TechBuilder
-import org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE
+import org.shsts.tinactory.datagen.builder.TechBuilder.Companion.RANK_PER_VOLTAGE
 import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE
 import org.shsts.tinactory.datagen.content.Technologies.TECHS
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreAnalyzer

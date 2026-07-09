@@ -1,6 +1,5 @@
 package org.shsts.tinactory.datagen.content.builder
 
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -14,7 +13,6 @@ import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.core.builder.Builder
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
-import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.recipe.ProcessingHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
@@ -202,29 +200,5 @@ class BlastFurnaceBuilder(parent: IRecipeFactory<BlastFurnaceRecipe, BlastFurnac
 
     override fun createObject(): BlastFurnaceRecipe {
         return BlastFurnaceRecipe(inputs, outputs, workTicks!!, voltage!!.value, power!!, temperature!!)
-    }
-}
-
-class ResearchRecipeBuilder(parent: IRecipeFactory<ResearchRecipe, ResearchRecipeBuilder>) :
-    ProcessingRecipeBuilder<ResearchRecipe, ResearchRecipeBuilder>(parent) {
-    private var target: ResourceLocation? = null
-    private var progress = 1L
-
-    fun target(value: ResourceLocation) {
-        target = value
-    }
-
-    fun progress(value: Long) {
-        progress = value
-    }
-
-    override fun validate() {
-        super.validate()
-        checkNotNull(target)
-        check(progress > 0L)
-    }
-
-    override fun createObject(): ResearchRecipe {
-        return ResearchRecipe(inputs, workTicks!!, voltage!!.value, power!!, target!!, progress)
     }
 }

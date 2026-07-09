@@ -1,6 +1,5 @@
 package org.shsts.tinactory.datagen.content.component
 
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.getComponent
@@ -29,8 +28,6 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
-import org.shsts.tinactory.datagen.content.builder.ResearchRecipeBuilder
-import org.shsts.tinactory.datagen.content.builder.ResearchRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
 import org.shsts.tinactory.datagen.content.component.CircuitComponents.chip
@@ -460,14 +457,14 @@ object MiscComponents {
 
     private fun rockets() {
         rocket {
-            rocket(Technologies.ROCKET_T1) {
+            target(Technologies.ROCKET_T1) {
                 input(AllTags.circuit(Voltage.EV))
                 input(getComponent("electric_pump").item(Voltage.HV), 4)
                 misc("advanced_alloy", 16)
                 input("cetane_boosted_diesel")
                 voltage(Voltage.HV)
             }
-            rocket(Technologies.ROCKET_T2) {
+            target(Technologies.ROCKET_T2) {
                 input(AllTags.circuit(Voltage.IV))
                 input(STORAGE_CELLS[0].component.get(), 2)
                 input(getComponent("electric_pump").item(Voltage.IV), 4)
@@ -477,14 +474,6 @@ object MiscComponents {
                 input("rocket_fuel")
                 voltage(Voltage.EV)
             }
-        }
-    }
-
-    private fun ResearchRecipeFactory.rocket(
-        loc: ResourceLocation, block: ResearchRecipeBuilder.() -> Unit) {
-        recipe(loc) {
-            target(loc)
-            block()
         }
     }
 
