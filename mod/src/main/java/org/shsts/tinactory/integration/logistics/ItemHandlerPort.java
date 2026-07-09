@@ -137,7 +137,7 @@ public class ItemHandlerPort implements IPort<ItemStack>, IPortFilter<ItemStack>
     }
 
     @Override
-    public int getStorageAmount(ItemStack item) {
+    public long getStorageAmount(ItemStack item) {
         if (item.isEmpty() || !acceptOutput()) {
             return 0;
         }

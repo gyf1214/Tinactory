@@ -28,6 +28,12 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
         return getInt(key).orElse(defaultValue);
     }
 
+    Optional<Long> getLong(String key);
+
+    default long getLong(String key, long defaultValue) {
+        return getLong(key).orElse(defaultValue);
+    }
+
     Optional<String> getString(String key);
 
     default Optional<ResourceLocation> getLoc(String key) {

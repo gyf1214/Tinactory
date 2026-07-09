@@ -29,7 +29,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
 
     private ItemStack targetItem = ItemStack.EMPTY;
     private FluidStack targetFluid = FluidStack.EMPTY;
-    private int targetAmount = 0;
+    private long targetAmount = 0L;
     private int signal = 0;
 
     public MEStorageDetector(BlockEntity blockEntity, double power) {
@@ -61,12 +61,12 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
         var config = machine.config();
         targetItem = targetItem(world.registryAccess(), config);
         targetFluid = targetFluid(world.registryAccess(), config);
-        targetAmount = config.getInt(TARGET_AMOUNT_KEY, 0);
+        targetAmount = config.getLong(TARGET_AMOUNT_KEY, 0L);
 
         updateSignal();
     }
 
-    private int toSignal(int amount) {
+    private int toSignal(long amount) {
         if (targetAmount <= 0) {
             return amount > 0 ? 15 : 0;
         }

@@ -130,18 +130,18 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
     }
 
     private void resetEditText() {
-        var amount = config.getInt(TARGET_AMOUNT_KEY, 0);
-        targetAmountEdit.setValue(Integer.toString(amount));
+        var amount = config.getLong(TARGET_AMOUNT_KEY, 0L);
+        targetAmountEdit.setValue(Long.toString(amount));
     }
 
     private void onEditChange(String str) {
-        var val = -1;
+        var val = -1L;
         try {
-            val = Integer.parseInt(str);
+            val = Long.parseLong(str);
         } catch (NumberFormatException ignored) {
         }
-        var oldVal = config.getInt(TARGET_AMOUNT_KEY, 0);
-        if (val >= 0 && val != oldVal) {
+        var oldVal = config.getLong(TARGET_AMOUNT_KEY, 0L);
+        if (val >= 0L && val != oldVal) {
             menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder()
                 .set(TARGET_AMOUNT_KEY, val));
         }

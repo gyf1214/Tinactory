@@ -225,8 +225,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         this.inputTypeReserveBytes = properties.inputTypeReserveBytes;
         this.inputTypeReserveSlots = properties.inputTypeReserveSlots;
         this.outputReserveBytes = properties.outputReserveBytes;
-        var reservedBytes = saturatedAdd(saturatedMultiply(inputTypeReserveBytes, inputTypeReserveSlots),
-            outputReserveBytes);
+        var reservedBytes = inputTypeReserveBytes * inputTypeReserveSlots + outputReserveBytes;
         if (reservedBytes > bytesLimit) {
             throw new IllegalArgumentException("Digital Interface reserve bytes exceed total capacity: " +
                 reservedBytes + " > " + bytesLimit);
@@ -422,23 +421,6 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     private static int consumeLimitFor(long availableBytes, int offset, int bytes) {
         var limit = Math.max(0L, (availableBytes - offset) / bytes);
         return limit > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) limit;
-    }
-
-    private static long saturatedMultiply(long left, long right) {
-        if (left == 0L || right == 0L) {
-            return 0L;
-        }
-        if (left > Long.MAX_VALUE / right) {
-            return Long.MAX_VALUE;
-        }
-        return left * right;
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        if (Long.MAX_VALUE - left < right) {
-            return Long.MAX_VALUE;
-        }
-        return left + right;
     }
 
     @Override

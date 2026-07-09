@@ -89,6 +89,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
         }
 
         @Override
+        public Optional<Long> getLong(String key) {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<String> getString(String key) {
             return Optional.empty();
         }

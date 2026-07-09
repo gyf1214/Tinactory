@@ -93,16 +93,9 @@ public final class DigitalCellData {
     private static long totalAmount(Map<IStackKey, Long> entries) {
         var ret = 0L;
         for (var amount : entries.values()) {
-            ret = saturatedAdd(ret, amount);
+            ret += amount;
         }
         return ret;
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        if (right > 0L && left > Long.MAX_VALUE - right) {
-            return Long.MAX_VALUE;
-        }
-        return left + right;
     }
 
     @Override

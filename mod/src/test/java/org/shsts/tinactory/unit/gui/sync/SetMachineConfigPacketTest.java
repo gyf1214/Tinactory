@@ -27,6 +27,7 @@ class SetMachineConfigPacketTest {
         var packet = SetMachineConfigPacket.builder()
             .set("enabled", true)
             .set("speed", 12)
+            .set("capacity", 3000000000L)
             .set("name", "washer")
             .set("nested", nested)
             .reset("obsolete")
@@ -42,6 +43,7 @@ class SetMachineConfigPacketTest {
         assertEquals(packet.getResets(), decoded.getResets());
         assertTrue(decoded.getSets().getBoolean("enabled"));
         assertEquals(12, decoded.getSets().getInt("speed"));
+        assertEquals(3000000000L, decoded.getSets().getLong("capacity"));
         assertEquals("washer", decoded.getSets().getString("name"));
         assertEquals("value", decoded.getSets().getCompound("nested").getString("child"));
         assertEquals(2, decoded.getResets().size());

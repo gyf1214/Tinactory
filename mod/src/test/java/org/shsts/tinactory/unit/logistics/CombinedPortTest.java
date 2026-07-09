@@ -154,6 +154,17 @@ class CombinedPortTest {
         assertEquals(1, second.stored());
     }
 
+    @Test
+    void getStorageAmountShouldAggregateBeyondIntegerMaxValue() {
+        var combined = new TestCombinedPort(List.of(
+            new AmountPort(Integer.MAX_VALUE),
+            new AmountPort(1)));
+
+        var amount = combined.getStorageAmount(new TestStack("iron", 1));
+
+        assertEquals((long) Integer.MAX_VALUE + 1L, amount);
+    }
+
     private static final class IncompatibleExtractPort implements IPort<TestStack> {
         private boolean called;
 
@@ -184,8 +195,50 @@ class CombinedPortTest {
         }
 
         @Override
-        public int getStorageAmount(TestStack stack) {
+        public long getStorageAmount(TestStack stack) {
             return 0;
+        }
+
+        @Override
+        public Collection<TestStack> getAllStorages() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return true;
+        }
+    }
+
+    private record AmountPort(int amount) implements IPort<TestStack> {
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
+        @Override
+        public boolean acceptInput(TestStack stack) {
+            return false;
+        }
+
+        @Override
+        public TestStack insert(TestStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Override
+        public TestStack extract(TestStack stack, boolean simulate) {
+            return TestStack.ADAPTER.empty();
+        }
+
+        @Override
+        public TestStack extract(int limit, boolean simulate) {
+            return TestStack.ADAPTER.empty();
+        }
+
+        @Override
+        public long getStorageAmount(TestStack stack) {
+            return amount;
         }
 
         @Override

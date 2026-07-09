@@ -102,7 +102,7 @@ public final class TestPort extends PortNotifier implements IPort<TestStack>, IP
     }
 
     @Override
-    public int getStorageAmount(TestStack stack) {
+    public long getStorageAmount(TestStack stack) {
         return type == stack.type() && Objects.equals(id, stack.id()) && Objects.equals(nbt, stack.nbt()) ?
             storedAmount : 0;
     }

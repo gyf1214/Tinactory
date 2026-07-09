@@ -31,6 +31,11 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
+    public Optional<Long> getLong(String key) {
+        return tag.contains(key, Tag.TAG_LONG) ? Optional.of(tag.getLong(key)) : Optional.empty();
+    }
+
+    @Override
     public Optional<String> getString(String key) {
         return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) :
             Optional.empty();

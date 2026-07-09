@@ -115,8 +115,8 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
         return composes.get(0).extract(limit, simulate);
     }
 
-    public int getStorageAmount(T stack) {
-        return composes.stream().mapToInt($ -> $.getStorageAmount(stack)).sum();
+    public long getStorageAmount(T stack) {
+        return composes.stream().mapToLong($ -> $.getStorageAmount(stack)).sum();
     }
 
     public Collection<T> getAllStorages() {

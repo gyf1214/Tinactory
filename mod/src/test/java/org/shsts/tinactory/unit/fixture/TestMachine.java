@@ -237,6 +237,11 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public Optional<Long> getLong(String key) {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<String> getString(String key) {
             return Optional.ofNullable(strings.get(key));
         }

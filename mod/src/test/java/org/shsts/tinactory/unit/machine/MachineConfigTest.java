@@ -69,6 +69,7 @@ class MachineConfigTest {
         config.apply(SetMachineConfigPacket.builder()
             .set("enabled", true)
             .set("limit", 42)
+            .set("capacity", 3000000000L)
             .set("name", "machine")
             .set("child", child)
             .get());
@@ -76,6 +77,7 @@ class MachineConfigTest {
         assertTrue(config.contains("enabled", Tag.TAG_BYTE));
         assertEquals(Optional.of(true), config.getBoolean("enabled"));
         assertEquals(Optional.of(42), config.getInt("limit"));
+        assertEquals(Optional.of(3000000000L), config.getLong("capacity"));
         assertEquals(Optional.of("machine"), config.getString("name"));
         assertEquals(3, config.getCompound("child").orElseThrow().getInt("nested"));
         assertFalse(config.getBoolean("missing").isPresent());

@@ -32,7 +32,7 @@ public final class PatternCellPort implements IPatternCellPort {
 
     @Override
     public long bytesUsed() {
-        return saturatedMultiply(data().patternCount(), bytesPerPattern);
+        return data().patternCount() * bytesPerPattern;
     }
 
     @Override
@@ -76,13 +76,4 @@ public final class PatternCellPort implements IPatternCellPort {
         }
     }
 
-    private static long saturatedMultiply(long left, long right) {
-        if (left == 0L || right == 0L) {
-            return 0L;
-        }
-        if (left > Long.MAX_VALUE / right) {
-            return Long.MAX_VALUE;
-        }
-        return left * right;
-    }
 }

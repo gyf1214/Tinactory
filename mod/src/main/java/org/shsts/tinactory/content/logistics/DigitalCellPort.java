@@ -54,9 +54,7 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
     @Override
     public long bytesUsed() {
         var data = data();
-        return saturatedAdd(
-            saturatedMultiply(data.keyCount(), bytesPerType),
-            saturatedMultiply(data.totalAmount(), bytesPerUnit));
+        return (long) data.keyCount() * bytesPerType + data.totalAmount() * bytesPerUnit;
     }
 
     @Override
@@ -115,11 +113,11 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
     }
 
     @Override
-    public int getStorageAmount(T value) {
+    public long getStorageAmount(T value) {
         if (!acceptOutput()) {
-            return 0;
+            return 0L;
         }
-        return data().entries().getOrDefault(adapter.keyOf(value), 0L).intValue();
+        return data().entries().getOrDefault(adapter.keyOf(value), 0L);
     }
 
     @Override
@@ -178,23 +176,6 @@ public class DigitalCellPort<T> implements IPort<T>, IBytesProvider {
         } else {
             stack.set(componentType.get(), data);
         }
-    }
-
-    private static long saturatedMultiply(long left, long right) {
-        if (left == 0L || right == 0L) {
-            return 0L;
-        }
-        if (left > Long.MAX_VALUE / right) {
-            return Long.MAX_VALUE;
-        }
-        return left * right;
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        if (right > 0L && left > Long.MAX_VALUE - right) {
-            return Long.MAX_VALUE;
-        }
-        return left + right;
     }
 
     public static final class Item extends DigitalCellPort<ItemStack> implements IItemPort {

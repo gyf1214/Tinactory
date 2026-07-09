@@ -47,7 +47,7 @@ public interface IPort<T> {
 
     T extract(int limit, boolean simulate);
 
-    int getStorageAmount(T stack);
+    long getStorageAmount(T stack);
 
     Collection<T> getAllStorages();
 
@@ -83,7 +83,7 @@ public interface IPort<T> {
         }
 
         @Override
-        public int getStorageAmount(Object stack) {
+        public long getStorageAmount(Object stack) {
             return 0;
         }
 

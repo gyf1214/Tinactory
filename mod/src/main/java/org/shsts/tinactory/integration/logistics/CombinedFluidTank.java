@@ -146,7 +146,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
     }
 
     @Override
-    public int getStorageAmount(FluidStack fluid) {
+    public long getStorageAmount(FluidStack fluid) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return 0;
         }
