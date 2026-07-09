@@ -48,15 +48,15 @@ public final class QuestLanguageExtractor {
         "min_width", "can_repeat", "invisible", "invisible_until_tasks", "ignore_reward_blocking",
         "progression_mode", "hide_details_until_startable", "id", "tasks", "rewards");
     private static final List<String> TASK_ORDER = List.of("id", "type", "title", "icon", "tags", "disable_toast",
-        "item", "count", "consume_items", "only_from_crafting", "match_nbt", "weak_nbt_match", "task_screen_only");
+        "item", "count", "consume_items", "only_from_crafting", "match_components", "task_screen_only");
     private static final List<String> REWARD_ORDER = List.of("id", "type", "title", "icon", "tags", "team_reward",
         "auto", "exclude_from_claim_all", "ignore_reward_blocking", "item", "count", "random_bonus", "only_one");
-    private static final List<String> ITEM_STACK_ORDER = List.of("id", "Count", "tag");
+    private static final List<String> ITEM_STACK_ORDER = List.of("id", "count", "components", "Count", "tag");
     private static final Set<String> BOOLEAN_FIELDS = Set.of("default_hide_dependency_lines", "always_invisible",
         "hide_quest_details_until_startable", "disable_toast", "hide_dependency_lines", "hide",
         "hide_text_until_complete", "optional", "can_repeat", "invisible", "ignore_reward_blocking",
-        "hide_details_until_startable", "consume_items", "only_from_crafting", "match_nbt", "weak_nbt_match",
-        "task_screen_only", "team_reward", "exclude_from_claim_all", "only_one");
+        "hide_details_until_startable", "consume_items", "only_from_crafting", "task_screen_only", "team_reward",
+        "exclude_from_claim_all", "only_one");
 
     private final boolean write;
     private final JsonObject zhCn;
@@ -326,7 +326,8 @@ public final class QuestLanguageExtractor {
                 return orderCompound(compound, TASK_ORDER);
             } else if (key.equals("rewards")) {
                 return orderCompound(compound, REWARD_ORDER);
-            } else if (compound.contains("id", Tag.TAG_STRING) && compound.contains("Count", Tag.TAG_BYTE)) {
+            } else if (compound.contains("id", Tag.TAG_STRING) &&
+                (compound.contains("Count", Tag.TAG_BYTE) || compound.contains("count", Tag.TAG_INT))) {
                 return orderCompound(compound, ITEM_STACK_ORDER);
             }
             return orderCompound(compound, List.of());

@@ -75,6 +75,9 @@ dependencies {
     runtimeOnly("curse.maven:ctm-267602:${property("ctm_id")}")
     runtimeOnly("dev.ftb.mods:ftb-teams-neoforge:${property("ftb_teams_version")}")
     runtimeOnly("dev.ftb.mods:ftb-filter-system-neoforge:${property("ftb_filter_system_version")}")
+    runtimeOnly("dev.ftb.mods:ftb-xmod-compat-neoforge:${property("ftb_xmod_compat_version")}") {
+        isTransitive = false
+    }
 
     testCompileOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}:api")
     testImplementation(platform("org.junit:junit-bom:5.12.0"))

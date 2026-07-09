@@ -331,7 +331,6 @@ object Components {
                 }
                 item(entry) {
                     model(basicItem("$texKey/base", "$texKey/overlay"))
-                    tag(AllTags.item(ResourceLocation.fromNamespaceAndPath("itemfilters", "check_nbt")))
                 }
             }
         }

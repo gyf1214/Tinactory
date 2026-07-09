@@ -195,7 +195,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 			]
 		}
@@ -242,7 +242,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -317,7 +317,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -382,7 +382,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 				{
 					id: "6D06B8C0A5E75172"
@@ -397,7 +397,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 			]
 		}
@@ -426,7 +426,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -462,7 +462,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 				{
 					id: "0A6DB073CB709457"
@@ -733,7 +733,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -760,7 +760,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -787,7 +787,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -850,10 +850,10 @@
 				id: "6B23623D91F637BA"
 				type: "item"
 				item: {
-					id: "itemfilters:tag"
-					Count: 1b
-					tag: {
-						value: "tinactory:circuit/iv"
+					id: "ftbfiltersystem:smart_filter"
+					count: 1
+					components: {
+						"ftbfiltersystem:filter": "ftbfiltersystem:item_tag(tinactory:circuit/iv)"
 					}
 				}
 			}]

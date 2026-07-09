@@ -96,7 +96,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -216,7 +216,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
@@ -419,7 +419,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 				{
 					id: "06FE00000000011D"
@@ -451,7 +451,7 @@
 							}
 						}
 					}
-					match_nbt: true
+					match_components: "fuzzy"
 				}
 				{
 					id: "06FE00000000011F"
@@ -529,7 +529,7 @@
 						}
 					}
 				}
-				match_nbt: true
+				match_components: "fuzzy"
 			}]
 		}
 		{
