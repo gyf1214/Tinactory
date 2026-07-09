@@ -8,7 +8,7 @@
 
 - Use `./gradlew runData` to generate resources for `mod`.
 - Before `runData`, ensure `libs/tinactory_extra_resources_{version}.zip` exists (current:
-  `libs/tinactory_extra_resources_v2.zip`).
+  `libs/tinactory_extra_resources_v3.zip`).
 - Run `runData` once before testing/packaging, or whenever `datagen` changes.
 
 ## Unit Test
