@@ -19,7 +19,7 @@ class TeamProfileTest {
     @Test
     void progressClampsAndCompletionModifierAppliesOnlyOnce() {
         var tech = technology("tinactory:progress", List.of(), 10L, Map.of("speed", 2), 1);
-        var manager = new TestTechManager(tech);
+        var manager = new TestTechManager(Map.of(loc("progress"), tech));
         var profile = new TeamProfile(manager, "alpha");
 
         profile.setTechProgress(tech, 15L);
@@ -32,8 +32,9 @@ class TeamProfileTest {
     @Test
     void availabilityAndCanResearchFollowDependencyAndProgressRules() {
         var dependency = technology("tinactory:dependency", List.of(), 5L, Map.of(), 1);
-        var target = technology("tinactory:target", List.of(dependency.loc()), 10L, Map.of(), 2);
-        var profile = new TeamProfile(new TestTechManager(dependency, target), "alpha");
+        var target = technology("tinactory:target", List.of(loc("dependency")), 10L, Map.of(), 2);
+        var profile = new TeamProfile(new TestTechManager(Map.of(loc("dependency"), dependency, loc("target"), target)),
+            "alpha");
 
         assertFalse(profile.isTechAvailable(target));
 
@@ -49,7 +50,7 @@ class TeamProfileTest {
     @Test
     void targetTechCanBeSetAndReset() {
         var tech = technology("tinactory:target", List.of(), 10L, Map.of(), 1);
-        var profile = new TeamProfile(new TestTechManager(tech), "alpha");
+        var profile = new TeamProfile(new TestTechManager(Map.of(loc("target"), tech)), "alpha");
 
         profile.setTargetTech(tech);
         assertSame(tech, profile.getTargetTech().orElseThrow());
@@ -61,5 +62,9 @@ class TeamProfileTest {
     private static Technology technology(String loc, List<ResourceLocation> depends,
         long maxProgress, Map<String, Integer> modifiers, int rank) {
         return TestTechnologyHelper.technology(loc, depends, maxProgress, modifiers, rank);
+    }
+
+    private static ResourceLocation loc(String path) {
+        return TestTechnologyHelper.loc("tinactory:" + path);
     }
 }

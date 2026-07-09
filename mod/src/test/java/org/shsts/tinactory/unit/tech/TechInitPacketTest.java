@@ -9,6 +9,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,24 +21,30 @@ class TechInitPacketTest {
     @Test
     void roundTripsTechnologiesWithUnifiedDisplayAndCompatibleCodecFields() {
         var dependency = technology("tinactory:dependency", List.of(), Optional.empty(), Optional.empty(), 1);
-        var technology = technology("tinactory:target", List.of(dependency.loc()),
+        var dependencyLoc = modLoc("dependency");
+        var technology = technology("tinactory:target", List.of(dependencyLoc),
             Optional.of(modLoc("display_item")),
             Optional.of(modLoc("textures/gui/technology/target")), 2);
-        var packet = new TechInitPacket(List.of(dependency, technology));
+        var technologyLoc = modLoc("target");
+        var technologies = new LinkedHashMap<ResourceLocation, Technology>();
+        technologies.put(dependencyLoc, dependency);
+        technologies.put(technologyLoc, technology);
+        var packet = TechInitPacket.fromMap(technologies);
         var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new TechInitPacket();
         decoded.deserializeFromBuf(buf);
 
-        var decodedTechs = decoded.getTechs().stream().toList();
+        var decodedTechs = decoded.entries().stream().toList();
         assertEquals(2, decodedTechs.size());
-        assertEquals(dependency.loc(), decodedTechs.get(0).loc());
-        assertEquals(technology.loc(), decodedTechs.get(1).loc());
+        assertEquals(dependencyLoc, decodedTechs.get(0).loc());
+        assertEquals(technologyLoc, decodedTechs.get(1).loc());
         assertEquals(new ItemIdRenderDescriptor(modLoc("display_item")),
-            decodedTechs.get(1).getDisplay());
+            decodedTechs.get(1).technology().getDisplay());
 
-        var jo = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decodedTechs.get(1).technology())
+            .getAsJsonObject();
         assertEquals("tinactory:display_item", jo.get("display_item").getAsString());
         assertEquals("tinactory:textures/gui/technology/target", jo.get("display_texture").getAsString());
     }

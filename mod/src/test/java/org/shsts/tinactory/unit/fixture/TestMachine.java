@@ -374,13 +374,28 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public long getTechProgress(ITechnology tech) {
+            return getTechProgress(techKey(tech));
+        }
+
+        @Override
         public boolean isTechFinished(ResourceLocation tech) {
             return finished.contains(tech);
         }
 
         @Override
+        public boolean isTechFinished(ITechnology tech) {
+            return isTechFinished(techKey(tech));
+        }
+
+        @Override
         public boolean isTechAvailable(ResourceLocation tech) {
             return available.contains(tech);
+        }
+
+        @Override
+        public boolean isTechAvailable(ITechnology tech) {
+            return isTechAvailable(techKey(tech));
         }
 
         @Override
@@ -392,8 +407,23 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public boolean canResearch(ITechnology tech) {
+            return canResearch(techKey(tech));
+        }
+
+        @Override
+        public boolean canResearch(ITechnology tech, long value) {
+            return canResearch(techKey(tech), value);
+        }
+
+        @Override
         public Optional<ITechnology> getTargetTech() {
             return target.map(tech -> tech);
+        }
+
+        @Override
+        public Optional<ResourceLocation> getTargetTechKey() {
+            return target.map(TestTechnology::loc);
         }
 
         @Override
@@ -403,7 +433,7 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void advanceTechProgress(ITechnology tech, long value) {
-            advanceTechProgress(tech.loc(), value);
+            advanceTechProgress(techKey(tech), value);
         }
 
         @Override
@@ -413,13 +443,21 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void setTargetTech(ITechnology tech) {
-            target = Optional.of(new TestTechnology(tech.loc(), tech.getMaxProgress()));
-            available(tech.loc());
+            var loc = techKey(tech);
+            target = Optional.of(new TestTechnology(loc, tech.getMaxProgress()));
+            available(loc);
         }
 
         @Override
         public void resetTargetTech() {
             target = Optional.empty();
+        }
+
+        private static ResourceLocation techKey(ITechnology tech) {
+            if (tech instanceof TestTechnology testTechnology) {
+                return testTechnology.loc();
+            }
+            throw new IllegalArgumentException("Unknown test technology " + tech);
         }
     }
 
@@ -444,14 +482,5 @@ public final class TestMachine implements IMachine {
             return EmptyRenderDescriptor.INSTANCE;
         }
 
-        @Override
-        public Component getDescription() {
-            return Component.empty();
-        }
-
-        @Override
-        public Component getDetails() {
-            return Component.empty();
-        }
     }
 }

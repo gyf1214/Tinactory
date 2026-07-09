@@ -33,8 +33,8 @@ public class ResearchRecipe extends ProcessingRecipe {
     @Override
     protected boolean matchTeam(Optional<ITeamProfile> team) {
         return team.filter($ -> $.canResearch(target))
-            .flatMap(ITeamProfile::getTargetTech)
-            .filter(tech -> tech.loc().equals(target))
+            .flatMap(ITeamProfile::getTargetTechKey)
+            .filter(target::equals)
             .isPresent();
     }
 

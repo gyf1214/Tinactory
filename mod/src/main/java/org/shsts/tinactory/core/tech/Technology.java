@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -17,20 +16,16 @@ import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Technology implements ITechnology {
-    @Nullable
-    private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
     private final List<ITechnology> depends = new ArrayList<>();
     private final Map<String, Integer> modifiers;
@@ -53,16 +48,6 @@ public class Technology implements ITechnology {
             this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
                 EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
-    }
-
-    @Override
-    public ResourceLocation loc() {
-        assert loc != null;
-        return loc;
-    }
-
-    public void setLoc(ResourceLocation loc) {
-        this.loc = loc;
     }
 
     public void resolve(ITechManager manager) {
@@ -90,46 +75,6 @@ public class Technology implements ITechnology {
     @Override
     public IRenderDescriptor getDisplay() {
         return display;
-    }
-
-    @Override
-    public Component getDescription() {
-        return I18n.tr(getDescriptionId(loc()));
-    }
-
-    @Override
-    public Component getDetails() {
-        return I18n.tr(getDetailsId(loc()));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Technology that = (Technology) o;
-        return Objects.equals(loc, that.loc);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(loc);
-    }
-
-    @Override
-    public String toString() {
-        return "Technology[" + loc + "]";
-    }
-
-    public static String getDescriptionId(ResourceLocation loc) {
-        return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
-    }
-
-    public static String getDetailsId(ResourceLocation loc) {
-        return getDescriptionId(loc) + ".details";
     }
 
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(

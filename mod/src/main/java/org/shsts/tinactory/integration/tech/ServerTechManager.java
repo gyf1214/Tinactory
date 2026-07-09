@@ -49,7 +49,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
             return manager.listResources(PREFIX, file -> file.getPath().endsWith(SUFFIX));
         }
 
-        private Optional<Technology> loadResource(ResourceLocation loc, Resource resource) {
+        private Optional<Map.Entry<ResourceLocation, Technology>> loadResource(ResourceLocation loc,
+            Resource resource) {
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
             var loc1 = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), path1);
@@ -57,8 +58,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
                 try (var ir = resource.openAsReader()) {
                     var jo = CodecHelper.jsonFromReader(ir);
                     var ret = CodecHelper.parseJson(getRegistryLookup(), Technology.CODEC, jo);
-                    ret.setLoc(loc1);
-                    return Optional.of(ret);
+                    return Optional.of(Map.entry(loc1, ret));
                 }
             } catch (IOException | RuntimeException ex) {
                 LOGGER.warn("Decode resource {} failed", loc, ex);
@@ -77,10 +77,10 @@ public class ServerTechManager extends TechManager implements IServerTechManager
                     .flatMap(entry -> loadResource(entry.getKey(), entry.getValue()).stream())
                     .toList(), backgroundExecutor)
                 .thenAcceptAsync(techs -> {
-                    technologies.clear();
-                    techs.forEach(tech -> technologies.put(tech.loc(), tech));
+                    unload();
+                    techs.forEach(entry -> putTech(entry.getKey(), entry.getValue()));
                     LOGGER.debug("reload {} techs", technologies.size());
-                    techs.forEach(tech -> tech.resolve(ServerTechManager.this));
+                    techs.forEach(entry -> entry.getValue().resolve(ServerTechManager.this));
                 }, backgroundExecutor);
         }
     }
@@ -162,7 +162,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     public void onPlayerJoin(ServerPlayer player) {
-        CORE.sendToPlayer(player, TECH_INIT, new TechInitPacket(technologies.values()));
+        CORE.sendToPlayer(player, TECH_INIT, TechInitPacket.fromMap(technologies));
         syncTeam(player);
     }
 }

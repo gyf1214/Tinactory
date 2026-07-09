@@ -7,13 +7,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
-
-import java.util.Collections;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -53,8 +50,10 @@ public class ResearchCategory extends ProcessingCategory<ResearchRecipe> {
         var rect = layout.images.getFirst().rect();
         addTechIngredient(builder, RecipeIngredientRole.OUTPUT, rect.x(), rect.y(), recipe.target);
         var requiredTech = TechManagers.client().techByKey(recipe.target)
-            .map(tech -> tech.getDepends().stream().map(ITechnology::loc).toList())
-            .orElse(Collections.emptyList());
+            .stream()
+            .flatMap(tech -> tech.getDepends().stream())
+            .flatMap(tech -> TechManagers.client().key(tech).stream())
+            .toList();
         addRequiredTech(builder, requiredTech);
     }
 }

@@ -50,7 +50,8 @@ public class ResearchBenchScreen extends MachineScreen {
             if (tech == null) {
                 return Optional.empty();
             }
-            return Optional.of(List.of(tech.getDescription()));
+            return TechManagers.client().key(tech)
+                .map(loc -> List.of(Component.translatable(ITechnology.getDescriptionId(loc))));
         }
     }
 

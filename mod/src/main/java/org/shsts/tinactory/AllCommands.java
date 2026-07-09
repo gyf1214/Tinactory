@@ -23,6 +23,7 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinactory.integration.util.ServerUtil;
@@ -153,7 +154,7 @@ public final class AllCommands {
 
         team.setTargetTech(tech);
         player.sendSystemMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
-            tech.getDescription()));
+            I18n.tr(ITechnology.getDescriptionId(techName))));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -185,7 +186,7 @@ public final class AllCommands {
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTechProgress(tech, progress);
-        var msg = "Set tech %s process of %s to %d".formatted(tech.loc(), team.getName(), progress);
+        var msg = "Set tech %s process of %s to %d".formatted(techName, team.getName(), progress);
         player.sendSystemMessage(Component.literal(msg));
         return Command.SINGLE_SUCCESS;
     }

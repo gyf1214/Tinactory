@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Map;
@@ -32,26 +31,17 @@ public class TechUpdatePacket implements IPacket {
         return new TechUpdatePacket(progress, false, null);
     }
 
-    public static TechUpdatePacket progress(ITechnology tech, long progress) {
-        return progress(Map.of(tech.loc(), progress));
+    public static TechUpdatePacket progress(ResourceLocation tech, long progress) {
+        return progress(Map.of(tech, progress));
     }
 
     public static TechUpdatePacket target(@Nullable ResourceLocation tech) {
         return new TechUpdatePacket(Map.of(), true, tech);
     }
 
-    public static TechUpdatePacket target(@Nullable ITechnology tech) {
-        return target(tech == null ? null : tech.loc());
-    }
-
     public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
         @Nullable ResourceLocation targetTech) {
         return new TechUpdatePacket(progress, true, targetTech);
-    }
-
-    public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
-        @Nullable ITechnology targetTech) {
-        return full(progress, targetTech == null ? null : targetTech.loc());
     }
 
     public Map<ResourceLocation, Long> getProgress() {

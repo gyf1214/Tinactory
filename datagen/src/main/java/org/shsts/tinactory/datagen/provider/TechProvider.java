@@ -32,7 +32,7 @@ public class TechProvider implements DataProvider {
     private final PackOutput.PathProvider pathProvider;
     private final ExistingFileHelper existingFileHelper;
     private final CompletableFuture<HolderLookup.Provider> lookupProvider;
-    private final List<TechBuilder<?>> techs = new ArrayList<>();
+    private final List<Entry> techs = new ArrayList<>();
 
     public TechProvider(IDataGen dataGen,
         IDataHandler<TechProvider> handler, GatherDataEvent event) {
@@ -44,9 +44,9 @@ public class TechProvider implements DataProvider {
         this.lookupProvider = event.getLookupProvider();
     }
 
-    public void addTech(TechBuilder<?> builder) {
-        existingFileHelper.trackGenerated(builder.loc(), RESOURCE_TYPE);
-        techs.add(builder);
+    public void addTech(ResourceLocation loc, TechBuilder<?> builder) {
+        existingFileHelper.trackGenerated(loc, RESOURCE_TYPE);
+        techs.add(new Entry(loc, builder));
     }
 
     private Path getPath(ResourceLocation loc) {
@@ -57,10 +57,10 @@ public class TechProvider implements DataProvider {
     public CompletableFuture<?> run(CachedOutput output) {
         return lookupProvider.thenCompose(registries -> {
             handler.register(this);
-            var futures = techs.stream().map(tech -> {
-                tech.validate(existingFileHelper);
-                var jo = CodecHelper.encodeJson(registries, Technology.CODEC, tech.buildObject());
-                return DataProvider.saveStable(output, jo, getPath(tech.loc()));
+            var futures = techs.stream().map(entry -> {
+                entry.builder().validate(existingFileHelper);
+                var jo = CodecHelper.encodeJson(registries, Technology.CODEC, entry.builder().buildObject());
+                return DataProvider.saveStable(output, jo, getPath(entry.loc()));
             }).toArray(CompletableFuture[]::new);
             return CompletableFuture.allOf(futures);
         });
@@ -70,4 +70,6 @@ public class TechProvider implements DataProvider {
     public String getName() {
         return "Technologies: " + modid;
     }
+
+    private record Entry(ResourceLocation loc, TechBuilder<?> builder) {}
 }

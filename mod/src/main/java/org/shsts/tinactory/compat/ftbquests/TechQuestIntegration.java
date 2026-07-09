@@ -11,13 +11,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.integration.tech.TechHelper;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,15 +49,15 @@ public final class TechQuestIntegration {
         return technology.getNamespace() + "_" + technology.getPath().replace('/', '_');
     }
 
-    private static Optional<ITechnology> findTechnology(Set<String> tags,
-        Collection<? extends ITechnology> technologies) {
-        ITechnology match = null;
-        for (var technology : technologies) {
-            if (tags.contains(technologyTag(technology.loc()))) {
+    private static Optional<ResourceLocation> findTechnology(Set<String> tags, ITechManager manager) {
+        ResourceLocation match = null;
+        for (var technology : manager.allTechs()) {
+            var loc = manager.key(technology).orElseThrow();
+            if (tags.contains(technologyTag(loc))) {
                 if (match != null) {
                     return Optional.empty();
                 }
-                match = technology;
+                match = loc;
             }
         }
         return Optional.ofNullable(match);
@@ -78,14 +77,14 @@ public final class TechQuestIntegration {
         if (!tags.contains(MARKER_TAG)) {
             return EventResult.pass();
         }
-        var technology = findTechnology(tags, TechManagers.server().allTechs());
+        var technology = findTechnology(tags, TechManagers.server());
         if (technology.isEmpty()) {
             LOGGER.warn("Unable to wire FTB custom task {}: missing, unknown, or ambiguous Tinactory technology tag",
                 task.getCodeString());
             return EventResult.pass();
         }
-        var tech = technology.get();
-        var technologyLoc = tech.loc();
+        var technologyLoc = technology.get();
+        var tech = TechManagers.server().techByKey(technologyLoc).orElseThrow();
         task.setMaxProgress(tech.getMaxProgress());
         task.setCheckTimer(20);
         task.setEnableButton(false);

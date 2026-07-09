@@ -273,7 +273,8 @@ public final class DependencyChecker {
             TechManagers.server().techByKey(researchRecipe.target)
                 .stream()
                 .flatMap(technology -> technology.getDepends().stream())
-                .map(technology -> new TechnologyNode(technology.loc()))
+                .flatMap(technology -> TechManagers.server().key(technology).stream())
+                .map(TechnologyNode::new)
                 .forEach(requirements::add);
         }
         if (recipe instanceof BlastFurnaceRecipe blastFurnaceRecipe && blastFurnaceRecipe.temperature > 0) {
@@ -596,7 +597,8 @@ public final class DependencyChecker {
         addMultiblockTargets(ret);
         ret.add(new VoltageNode(MAX_PROGRESS_VOLTAGE));
         TechManagers.server().allTechs().stream()
-            .map(technology -> new TechnologyNode(technology.loc()))
+            .flatMap(technology -> TechManagers.server().key(technology).stream())
+            .map(TechnologyNode::new)
             .forEach(ret::add);
         return ret;
     }

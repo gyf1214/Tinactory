@@ -8,6 +8,7 @@ import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
+import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.Optional;
 
@@ -19,8 +20,9 @@ public class TechMenuHandler extends MenuScreenHandler<TechScreen> {
         double mouseX, double mouseY) {
         if (TechPanel.isHoveringTech(hovered)) {
             return TechPanel.getHoveredTech(hovered, mouseX)
+                .flatMap(tech -> TechManagers.client().key(tech))
                 .map(tech -> TypedIngredient.createUnvalidated(
-                    TechIngredient.TYPE, new TechIngredient(tech.loc())));
+                    TechIngredient.TYPE, new TechIngredient(tech)));
         }
         return Optional.empty();
     }

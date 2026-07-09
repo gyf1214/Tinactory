@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.ItemLike
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 import org.shsts.tinactory.AllItems.getComponent
+import org.shsts.tinactory.api.tech.ITechnology
 import org.shsts.tinactory.core.builder.Builder
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.tech.Technology
@@ -11,13 +12,11 @@ import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.research
 import org.shsts.tinactory.datagen.provider.TechProvider
-import org.shsts.tinycorelib.api.core.ILoc
 import org.shsts.tinycorelib.datagen.api.IDataHandler
 import java.util.Optional
 import java.util.function.Supplier
 
-class TechBuilder<P>(parent: P, private val loc: ResourceLocation) :
-    Builder<Technology, P, TechBuilder<P>>(parent), ILoc {
+class TechBuilder<P>(parent: P) : Builder<Technology, P, TechBuilder<P>>(parent) {
     private val depends = mutableListOf<ResourceLocation>()
     private val modifiers = mutableMapOf<String, Int>()
     private var maxProgress = 0L
@@ -26,6 +25,7 @@ class TechBuilder<P>(parent: P, private val loc: ResourceLocation) :
     private var displayTexture: ResourceLocation? = null
     private var voltage: Voltage? = null
     private var noResearch = false
+    private var registerAction: (() -> ResourceLocation)? = null
 
     fun depends(vararg loc: ResourceLocation) {
         depends += loc
@@ -88,15 +88,11 @@ class TechBuilder<P>(parent: P, private val loc: ResourceLocation) :
         }
     }
 
-    override fun loc(): ResourceLocation {
-        return loc
-    }
-
-    private fun onRegister(handler: IDataHandler<TechProvider>) {
+    private fun onRegister(handler: IDataHandler<TechProvider>, loc: ResourceLocation) {
         val dataGen = handler.dataGen()
-        handler.addCallback { it.addTech(this) }
-        val description = Technology.getDescriptionId(loc)
-        val details = Technology.getDetailsId(loc)
+        handler.addCallback { it.addTech(loc, this) }
+        val description = ITechnology.getDescriptionId(loc)
+        val details = ITechnology.getDetailsId(loc)
         dataGen.trackLang(description)
         dataGen.trackLang(details)
 
@@ -115,15 +111,16 @@ class TechBuilder<P>(parent: P, private val loc: ResourceLocation) :
 
     fun register(): ResourceLocation {
         build()
-        return loc
+        return checkNotNull(registerAction).invoke()
     }
 
     companion object {
         const val RANK_PER_VOLTAGE = 1000
 
         fun <P> factory(handler: IDataHandler<TechProvider>, parent: P, loc: ResourceLocation): TechBuilder<P> {
-            val builder = TechBuilder(parent, loc)
-            return builder.onBuild { builder.onRegister(handler) }
+            val builder = TechBuilder(parent)
+            builder.registerAction = { loc }
+            return builder.onBuild { builder.onRegister(handler, loc) }
         }
     }
 }

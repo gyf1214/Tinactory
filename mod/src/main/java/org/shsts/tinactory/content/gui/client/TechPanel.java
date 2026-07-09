@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
@@ -280,7 +281,8 @@ public class TechPanel extends Panel {
     }
 
     private Optional<List<Component>> techTooltip(ITechnology technology) {
-        return Optional.of(List.of(technology.getDescription()));
+        return techManager.key(technology)
+            .map(loc -> List.of(I18n.tr(ITechnology.getDescriptionId(loc))));
     }
 
     private void onSelect(ITechnology technology) {
@@ -290,9 +292,10 @@ public class TechPanel extends Panel {
 
     private void startResearch() {
         if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
-            var loc = selectedTech.loc().toString();
-            var command = TinactoryKeys.ID + " setTargetTech " + loc;
-            player.connection.sendCommand(command);
+            techManager.key(selectedTech).ifPresent(loc -> {
+                var command = TinactoryKeys.ID + " setTargetTech " + loc;
+                player.connection.sendCommand(command);
+            });
         }
     }
 
@@ -304,8 +307,9 @@ public class TechPanel extends Panel {
         selectedTechPanel.setActive(selectedTech != null);
 
         if (selectedTech != null) {
-            selectedTechLabel.setLine(0, selectedTech.getDescription());
-            selectedTechDetailsLabel.setMultiline(selectedTech.getDetails());
+            var loc = techManager.key(selectedTech).orElseThrow();
+            selectedTechLabel.setLine(0, I18n.tr(ITechnology.getDescriptionId(loc)));
+            selectedTechDetailsLabel.setMultiline(I18n.tr(ITechnology.getDetailsId(loc)));
             startResearchButton.setActive(team.canResearch(selectedTech));
         }
     }

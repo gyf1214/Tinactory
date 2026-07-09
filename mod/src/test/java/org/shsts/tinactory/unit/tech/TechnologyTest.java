@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
@@ -31,7 +32,7 @@ class TechnologyTest {
         var known = technology("tinactory:known", List.of(), 1);
         var technology = technology("tinactory:target", List.of(knownLoc, ignoredLoc), 3);
 
-        technology.resolve(new TestTechManager(known));
+        technology.resolve(new TestTechManager(Map.of(knownLoc, known)));
 
         assertEquals(List.of(known), technology.getDepends());
     }
@@ -95,8 +96,8 @@ class TechnologyTest {
     void staticDescriptionAndDetailsIdsShouldFollowConventions() {
         var loc = modLoc("multiblock/large_turbine");
 
-        assertEquals("tinactory.technology.multiblock.large_turbine", Technology.getDescriptionId(loc));
-        assertEquals("tinactory.technology.multiblock.large_turbine.details", Technology.getDetailsId(loc));
+        assertEquals("tinactory.technology.multiblock.large_turbine", ITechnology.getDescriptionId(loc));
+        assertEquals("tinactory.technology.multiblock.large_turbine.details", ITechnology.getDetailsId(loc));
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends, int rank) {
