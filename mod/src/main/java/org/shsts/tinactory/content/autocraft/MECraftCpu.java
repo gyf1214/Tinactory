@@ -98,7 +98,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         var snapshot = pendingSnapshot;
-        var provider = machine.world().registryAccess();
+        var provider = machine.registryAccess();
         if (service != null) {
             snapshot = service.serializeRunningSnapshot(provider, PATTERN_CODECS).orElse(snapshot);
         }

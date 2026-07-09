@@ -96,7 +96,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {
         var machine = MACHINE.get(blockEntity);
-        var provider = machine.world().registryAccess();
+        var provider = machine.registryAccess();
         return machine.config().getCompound(PREFIX + index)
             .map($ -> LogisticWorkerConfig.fromTag(provider, $));
     }

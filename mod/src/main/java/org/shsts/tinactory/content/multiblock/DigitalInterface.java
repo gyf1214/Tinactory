@@ -207,8 +207,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         }
 
         private void recomputeBytesUsed() {
-            var tag = serializeNBT(world().registryAccess());
-            deserializeNBT(world().registryAccess(), tag);
+            var tag = serializeNBT(registryAccess());
+            deserializeNBT(registryAccess(), tag);
         }
     }
 

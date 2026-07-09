@@ -258,14 +258,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
-        var defaultName = I18n.name(blockEntity.getBlockState().getBlock());
-        var world = blockEntity.getLevel();
-        if (world == null) {
-            return defaultName;
-        }
         return config.getTag("name")
-            .map($ -> CodecHelper.parseTag(world.registryAccess(), ComponentSerialization.CODEC, $))
-            .orElse(defaultName);
+            .map($ -> CodecHelper.parseTag(registryAccess(), ComponentSerialization.CODEC, $))
+            .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 
     @Override

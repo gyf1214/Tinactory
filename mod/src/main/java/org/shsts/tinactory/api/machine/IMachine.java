@@ -3,6 +3,7 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -60,6 +61,10 @@ public interface IMachine {
 
     default RandomSource random() {
         return world().random;
+    }
+
+    default RegistryAccess registryAccess() {
+        return world().registryAccess();
     }
 
     Optional<BlockState> workBlock();
