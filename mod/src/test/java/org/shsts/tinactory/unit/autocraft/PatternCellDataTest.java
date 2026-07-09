@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODEC;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class PatternCellDataTest {
     @Test
@@ -50,7 +51,7 @@ class PatternCellDataTest {
         var data = PatternCellData.of(Map.of(first.patternUuid(), first, second.patternUuid(), second));
         var codec = PatternCellData.codec(PATTERN_CODEC);
 
-        var decoded = CodecHelper.parseTag(codec, CodecHelper.encodeTag(codec, data));
+        var decoded = CodecHelper.parseTag(TEST_REGISTRY, codec, CodecHelper.encodeTag(TEST_REGISTRY, codec, data));
 
         assertEquals(data, decoded);
         assertEquals(data.hashCode(), decoded.hashCode());

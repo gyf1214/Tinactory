@@ -9,6 +9,7 @@ import org.shsts.tinactory.unit.fixture.TestResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.INFO_CODEC;
 
 class ProcessingInfoTest {
@@ -16,8 +17,8 @@ class ProcessingInfoTest {
     void shouldRoundTripIngredientInfoThroughInjectedCodec() {
         var info = new ProcessingInfo(2, new TestIngredient("ore", 3));
 
-        var tag = CodecHelper.encodeTag(INFO_CODEC, info);
-        var roundTrip = CodecHelper.parseTag(INFO_CODEC, tag);
+        var tag = CodecHelper.encodeTag(TEST_REGISTRY, INFO_CODEC, info);
+        var roundTrip = CodecHelper.parseTag(TEST_REGISTRY, INFO_CODEC, tag);
         var tag1 = (CompoundTag) tag;
         var tag2 = tag1.getCompound("object");
 
@@ -32,8 +33,8 @@ class ProcessingInfoTest {
     void shouldRoundTripResultInfoThroughInjectedCodec() {
         var info = new ProcessingInfo(4, new TestResult("dust", 5));
 
-        var tag = CodecHelper.encodeTag(INFO_CODEC, info);
-        var roundTrip = CodecHelper.parseTag(INFO_CODEC, tag);
+        var tag = CodecHelper.encodeTag(TEST_REGISTRY, INFO_CODEC, info);
+        var roundTrip = CodecHelper.parseTag(TEST_REGISTRY, INFO_CODEC, tag);
         var tag1 = (CompoundTag) tag;
         var tag2 = tag1.getCompound("object");
 
@@ -49,6 +50,6 @@ class ProcessingInfoTest {
         var tag = new CompoundTag();
         tag.putInt("port", 1);
 
-        assertThrows(RuntimeException.class, () -> CodecHelper.parseTag(INFO_CODEC, tag));
+        assertThrows(RuntimeException.class, () -> CodecHelper.parseTag(TEST_REGISTRY, INFO_CODEC, tag));
     }
 }

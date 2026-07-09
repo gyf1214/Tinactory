@@ -98,8 +98,9 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         var snapshot = pendingSnapshot;
+        var provider = machine.world().registryAccess();
         if (service != null) {
-            snapshot = service.serializeRunningSnapshot(PATTERN_CODECS).orElse(snapshot);
+            snapshot = service.serializeRunningSnapshot(provider, PATTERN_CODECS).orElse(snapshot);
         }
         service = AutocraftServiceBootstrap.create(
             logistics,
@@ -112,7 +113,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             memoryLimit,
             parallelism);
         if (snapshot != null) {
-            service.restoreRunningSnapshot(snapshot, PATTERN_CODECS);
+            service.restoreRunningSnapshot(provider, snapshot, PATTERN_CODECS);
             pendingSnapshot = null;
         }
         autocraft.registerCpu(machine, service);
@@ -143,7 +144,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         var snapshot = service == null ? pendingSnapshot :
-            service.serializeRunningSnapshot(PATTERN_CODECS).orElse(null);
+            service.serializeRunningSnapshot(provider, PATTERN_CODECS).orElse(null);
         if (snapshot != null) {
             tag.put(SNAPSHOT_KEY, snapshot);
         }

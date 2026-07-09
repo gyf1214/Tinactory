@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class ExecutorStateMachineTest {
     @Test
@@ -557,12 +558,12 @@ class ExecutorStateMachineTest {
         executor.start(new CraftPlan(List.of(firstStep, secondStep)));
         executor.runCycle(64, 64);
         executor.runCycle(64, 64);
-        var snapshot = executor.serialize(PATTERN_CODECS);
+        var snapshot = executor.serialize(TEST_REGISTRY, PATTERN_CODECS);
 
         inventory.rejectInsertKeys.clear();
         var restored = new CraftExecutor(inventory, new SequenceAllocator(List.of(
             new RouteLease(Map.of(), Map.of(gear, 1L), true))), IJobEvents.NO_OP);
-        restored.restore(snapshot, PATTERN_CODECS);
+        restored.restore(TEST_REGISTRY, snapshot, PATTERN_CODECS);
         restored.runCycle(64, 64);
 
         assertEquals(JobState.IDLE, restored.snapshot().state());

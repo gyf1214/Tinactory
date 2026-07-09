@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftCpuPersistenceTest {
     @Test
@@ -41,10 +42,10 @@ class AutocraftCpuPersistenceTest {
         var first = new AutocraftJobService(executor());
         first.submitPrepared(List.of(target), plan);
         first.tick();
-        var snapshot = first.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var snapshot = first.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
 
         var restored = new AutocraftJobService(executor());
-        restored.restoreRunningSnapshot(snapshot, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, snapshot, PATTERN_CODECS);
         assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().state());
         assertEquals(List.of(target), restored.getJob().orElseThrow().targets());
 
@@ -61,7 +62,7 @@ class AutocraftCpuPersistenceTest {
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
-        var snapshot = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var snapshot = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
 
         assertTrue(snapshot.contains("execution"));
         assertFalse(snapshot.contains("plan"));
@@ -86,11 +87,11 @@ class AutocraftCpuPersistenceTest {
 
         service.submitPrepared(List.of(new CraftAmount(key, 1)), plan);
         service.tick();
-        var serialized = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var serialized = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restored = new AutocraftJobService(executor());
-        restored.restoreRunningSnapshot(serialized, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, serialized, PATTERN_CODECS);
 
-        var restoredSerialized = restored.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var restoredSerialized = restored.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restoredStep = restoredSerialized.getCompound("execution")
             .getCompound("plan")
             .getList("steps", TAG_COMPOUND)

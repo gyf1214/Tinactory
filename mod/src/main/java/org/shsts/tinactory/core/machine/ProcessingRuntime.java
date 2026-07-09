@@ -430,14 +430,14 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", currentRecipe.processor().serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
-                info -> encodeTag(processingInfoCodec, info)));
+                info -> encodeTag(provider, processingInfoCodec, info)));
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
             tag.put("processorData", processors.get(processorIndex).serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
-                info -> encodeTag(processingInfoCodec, info)));
+                info -> encodeTag(provider, processingInfoCodec, info)));
         }
         return tag;
     }
@@ -454,7 +454,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             // TODO: backward compatibility of old save data before ProcessingObject changes
             try {
                 parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
-                    value -> parseTag(processingInfoCodec, value), infoList::add);
+                    value -> parseTag(provider, processingInfoCodec, value), infoList::add);
             } catch (RuntimeException e) {
                 LOGGER.warn("skip processor info data", e);
             }

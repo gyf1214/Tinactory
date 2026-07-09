@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODEC;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class PatternCodecTest {
     private static final UUID TEST_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -41,8 +42,8 @@ class PatternCodecTest {
                 new VoltageConstraint(2),
                 new TestMachineConstraint("v1")));
 
-        var tag = (CompoundTag) PATTERN_CODECS.encodePattern(pattern);
-        var decoded = PATTERN_CODECS.decodePattern(tag);
+        var tag = (CompoundTag) PATTERN_CODECS.encodePattern(TEST_REGISTRY, pattern);
+        var decoded = PATTERN_CODECS.decodePattern(TEST_REGISTRY, tag);
 
         assertFalse(tag.contains("machineRequirement"));
         assertFalse(tag.contains("recipeTypeId"));
@@ -61,6 +62,7 @@ class PatternCodecTest {
         var outputs = new ListTag();
         var out = new CompoundTag();
         out.put("key", CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestStackKey.CODEC,
             TestStackKey.item("minecraft:iron_ingot", "")));
         out.putLong("amount", 1);
@@ -73,7 +75,7 @@ class PatternCodecTest {
         constraints.add(constraint);
         tag.put("constraints", constraints);
 
-        assertThrows(RuntimeException.class, () -> PATTERN_CODECS.decodePattern(tag));
+        assertThrows(RuntimeException.class, () -> PATTERN_CODECS.decodePattern(TEST_REGISTRY, tag));
     }
 
     @Test
@@ -84,6 +86,7 @@ class PatternCodecTest {
         var outputs = new ListTag();
         var out = new CompoundTag();
         out.put("key", CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestStackKey.CODEC,
             TestStackKey.item("minecraft:iron_ingot", "")));
         out.putLong("amount", 1);
@@ -91,7 +94,7 @@ class PatternCodecTest {
         tag.put("outputs", outputs);
         tag.put("constraints", new ListTag());
 
-        assertThrows(IllegalStateException.class, () -> PATTERN_CODECS.decodePattern(tag));
+        assertThrows(IllegalStateException.class, () -> PATTERN_CODECS.decodePattern(TEST_REGISTRY, tag));
     }
 
     @Test
@@ -110,7 +113,8 @@ class PatternCodecTest {
                 new PortConstraint(PortDirection.OUTPUT, 0, 5),
                 new PortConstraint(PortDirection.OUTPUT, 1, 1)));
 
-        var decoded = PATTERN_CODECS.decodePattern(PATTERN_CODECS.encodePattern(pattern));
+        var decoded = PATTERN_CODECS.decodePattern(TEST_REGISTRY,
+            PATTERN_CODECS.encodePattern(TEST_REGISTRY, pattern));
 
         assertEquals(pattern, decoded);
     }
@@ -124,7 +128,8 @@ class PatternCodecTest {
             List.of(new CraftAmount(TestStackKey.item("tinactory:circuit", ""), 1)),
             List.of(targetRecipe));
 
-        var decoded = PATTERN_CODECS.decodePattern(PATTERN_CODECS.encodePattern(pattern));
+        var decoded = PATTERN_CODECS.decodePattern(TEST_REGISTRY,
+            PATTERN_CODECS.encodePattern(TEST_REGISTRY, pattern));
 
         assertEquals(pattern, decoded);
     }
@@ -133,11 +138,11 @@ class PatternCodecTest {
     void codecShouldRoundTripCraftAmountWithOverloads() {
         var expected = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", "{foo:1b}"), 17L);
 
-        var fromAmount = PATTERN_CODECS.encodeAmount(expected);
-        var fromKeyAndAmount = PATTERN_CODECS.encodeAmount(expected.key(), expected.amount());
+        var fromAmount = PATTERN_CODECS.encodeAmount(TEST_REGISTRY, expected);
+        var fromKeyAndAmount = PATTERN_CODECS.encodeAmount(TEST_REGISTRY, expected.key(), expected.amount());
 
-        assertEquals(expected, PATTERN_CODECS.decodeAmount(fromAmount));
-        assertEquals(expected, PATTERN_CODECS.decodeAmount(fromKeyAndAmount));
+        assertEquals(expected, PATTERN_CODECS.decodeAmount(TEST_REGISTRY, fromAmount));
+        assertEquals(expected, PATTERN_CODECS.decodeAmount(TEST_REGISTRY, fromKeyAndAmount));
         assertEquals(fromAmount, fromKeyAndAmount);
     }
 
@@ -149,8 +154,8 @@ class PatternCodecTest {
             List.of(new CraftAmount(TestStackKey.item("minecraft:copper_block", ""), 1L)),
             List.of(new TestMachineConstraint("codec")));
 
-        var tag = CodecHelper.encodeTag(PATTERN_CODEC, pattern);
-        var decoded = CodecHelper.parseTag(PATTERN_CODEC, tag);
+        var tag = CodecHelper.encodeTag(TEST_REGISTRY, PATTERN_CODEC, pattern);
+        var decoded = CodecHelper.parseTag(TEST_REGISTRY, PATTERN_CODEC, tag);
 
         assertEquals(pattern, decoded);
     }

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -42,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftTerminalServiceExecuteTest {
     @Test
@@ -242,9 +244,9 @@ class AutocraftTerminalServiceExecuteTest {
             PlanSummary.empty(),
             256L));
 
-        var persisted = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(persisted, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(256L, persisted.getLong("memoryUsage"));
         assertEquals(256L, restored.getJob().orElseThrow().memoryUsage());
@@ -259,11 +261,11 @@ class AutocraftTerminalServiceExecuteTest {
             target,
             PlanSummary.empty(),
             256L));
-        var persisted = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         persisted.remove("memoryUsage");
 
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(persisted, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(0L, restored.getJob().orElseThrow().memoryUsage());
     }
@@ -475,7 +477,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternCodec codec) {
+        public void restore(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
             active = true;
         }
 
@@ -511,7 +513,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternCodec codec) {
+        public CompoundTag serialize(HolderLookup.Provider provider, PatternCodec codec) {
             return new CompoundTag();
         }
     }

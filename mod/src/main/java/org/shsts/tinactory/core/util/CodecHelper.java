@@ -54,12 +54,14 @@ public final class CodecHelper {
         return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
-    public static <P> P parseTag(Decoder<P> decoder, Tag tag) {
-        return decoder.parse(NbtOps.INSTANCE, tag).getOrThrow();
+    public static <P> P parseTag(HolderLookup.Provider provider, Decoder<P> decoder, Tag tag) {
+        var ops = provider.createSerializationContext(NbtOps.INSTANCE);
+        return decoder.parse(ops, tag).getOrThrow();
     }
 
-    public static <P> Tag encodeTag(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow();
+    public static <P> Tag encodeTag(HolderLookup.Provider provider, Encoder<P> encoder, P sth) {
+        var ops = provider.createSerializationContext(NbtOps.INSTANCE);
+        return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
     public static CompoundTag readRequiredNbt(FriendlyByteBuf buf, String name) {

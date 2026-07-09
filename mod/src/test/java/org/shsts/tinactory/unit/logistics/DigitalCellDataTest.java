@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class DigitalCellDataTest {
     @Test
@@ -49,7 +50,7 @@ class DigitalCellDataTest {
         var data = DigitalCellData.of(Map.of(iron, 3L, water, 4000L));
         var codec = DigitalCellData.codec(TestStackKey.CODEC);
 
-        var decoded = CodecHelper.parseTag(codec, CodecHelper.encodeTag(codec, data));
+        var decoded = CodecHelper.parseTag(TEST_REGISTRY, codec, CodecHelper.encodeTag(TEST_REGISTRY, codec, data));
 
         assertEquals(data, decoded);
         assertEquals(data.hashCode(), decoded.hashCode());

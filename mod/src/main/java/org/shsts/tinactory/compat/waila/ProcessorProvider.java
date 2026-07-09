@@ -124,12 +124,13 @@ public class ProcessorProvider extends ProviderBase implements IServerDataProvid
         newSpace();
 
         if (config.get(RECIPE)) {
+            var provider = accessor.getLevel().registryAccess();
             if (tag.contains("tinactoryInputs", Tag.TAG_LIST)) {
                 var listTag = tag.getList("tinactoryInputs", Tag.TAG_COMPOUND);
                 var line = new ArrayList<IElement>();
                 line.add(helper.text(tr("inputs")));
                 for (var tag1 : listTag) {
-                    var input = CodecHelper.parseTag(ProcessingHelper.INGREDIENT_CODEC, tag1);
+                    var input = CodecHelper.parseTag(provider, ProcessingHelper.INGREDIENT_CODEC, tag1);
                     appendElement(line, input, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
@@ -142,7 +143,7 @@ public class ProcessorProvider extends ProviderBase implements IServerDataProvid
                 var line = new ArrayList<IElement>();
                 line.add(helper.text(tr("outputs")));
                 for (var tag1 : listTag) {
-                    var output = CodecHelper.parseTag(ProcessingHelper.RESULT_CODEC, tag1);
+                    var output = CodecHelper.parseTag(provider, ProcessingHelper.RESULT_CODEC, tag1);
                     appendElement(line, output, this::itemElement, this::fluidElement);
                 }
                 if (line.size() > 1) {
@@ -178,13 +179,14 @@ public class ProcessorProvider extends ProviderBase implements IServerDataProvid
         var processor = cap.get();
 
         if (processor instanceof IMachineProcessor machine) {
+            var provider = accessor.getLevel().registryAccess();
             var inputs = new ListTag();
             var outputs = new ListTag();
             for (var info : machine.getAllInfo()) {
                 if (info instanceof IProcessingIngredient ingredient) {
-                    inputs.add(CodecHelper.encodeTag(ProcessingHelper.INGREDIENT_CODEC, ingredient));
+                    inputs.add(CodecHelper.encodeTag(provider, ProcessingHelper.INGREDIENT_CODEC, ingredient));
                 } else if (info instanceof IProcessingResult result) {
-                    outputs.add(CodecHelper.encodeTag(ProcessingHelper.RESULT_CODEC, result));
+                    outputs.add(CodecHelper.encodeTag(provider, ProcessingHelper.RESULT_CODEC, result));
                 }
             }
             tag.put("tinactoryInputs", inputs);

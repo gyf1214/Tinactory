@@ -141,8 +141,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    private void setName(Component name) {
-        var tag = CodecHelper.encodeTag(ComponentSerialization.CODEC, name);
+    private void setName(Level world, Component name) {
+        var tag = CodecHelper.encodeTag(world.registryAccess(), ComponentSerialization.CODEC, name);
         setConfig(SetMachineConfigPacket.builder().set("name", tag).get());
     }
 
@@ -173,7 +173,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
         var item = arg.stack();
         if (item.has(DataComponents.CUSTOM_NAME)) {
-            setName(item.getHoverName());
+            setName(arg.world(), item.getHoverName());
         }
         if (arg.placer() instanceof Player player) {
             setPlayerTeam(arg.world(), player);
@@ -199,7 +199,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
         var item = arg.stack();
         if (item.is(Items.NAME_TAG) && item.has(DataComponents.CUSTOM_NAME)) {
-            setName(item.getHoverName());
+            setName(player.level(), item.getHoverName());
             item.shrink(1);
             result.set(ItemInteractionResult.sidedSuccess(player.level().isClientSide));
         }
@@ -258,9 +258,14 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
+        var defaultName = I18n.name(blockEntity.getBlockState().getBlock());
+        var world = blockEntity.getLevel();
+        if (world == null) {
+            return defaultName;
+        }
         return config.getTag("name")
-            .map($ -> CodecHelper.parseTag(ComponentSerialization.CODEC, $))
-            .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
+            .map($ -> CodecHelper.parseTag(world.registryAccess(), ComponentSerialization.CODEC, $))
+            .orElse(defaultName);
     }
 
     @Override

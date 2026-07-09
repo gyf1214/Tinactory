@@ -28,10 +28,10 @@ class CodecHelperTest {
     @Test
     void codecHelpersRoundTripJsonAndNbtValues() {
         var encodedJson = CodecHelper.encodeJson(TEST_REGISTRY, Codec.INT, 17);
-        var encodedTag = CodecHelper.encodeTag(Codec.INT, 23);
+        var encodedTag = CodecHelper.encodeTag(TEST_REGISTRY, Codec.INT, 23);
 
         assertEquals(17, CodecHelper.parseJson(TEST_REGISTRY, Codec.INT, encodedJson));
-        assertEquals(23, CodecHelper.parseTag(Codec.INT, encodedTag));
+        assertEquals(23, CodecHelper.parseTag(TEST_REGISTRY, Codec.INT, encodedTag));
     }
 
     @Test

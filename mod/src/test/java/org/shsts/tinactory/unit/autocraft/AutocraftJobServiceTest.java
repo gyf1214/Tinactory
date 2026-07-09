@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftJobServiceTest {
     @Test
@@ -147,10 +149,10 @@ class AutocraftJobServiceTest {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
         service.submitPrepared(List.of(target), testPlan());
-        var persisted = service.serializeRunningSnapshot(PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restoredExecutor = new TestExecutor(JobState.IDLE);
         service = new AutocraftJobService(restoredExecutor);
-        service.restoreRunningSnapshot(persisted, PATTERN_CODECS);
+        service.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertTrue(restoredExecutor.restoreCalled);
         assertTrue(service.isBusy());
@@ -194,7 +196,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternCodec codec) {
+        public void restore(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
             restoreCalled = true;
         }
 
@@ -238,7 +240,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternCodec codec) {
+        public CompoundTag serialize(HolderLookup.Provider provider, PatternCodec codec) {
             return new CompoundTag();
         }
 
