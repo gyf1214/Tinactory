@@ -4,9 +4,10 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,8 +17,6 @@ import org.shsts.tinactory.integration.multiblock.Multiblock;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import static org.shsts.tinactory.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -54,7 +53,12 @@ public class Lithography extends Multiblock {
     public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
         var tag = super.serializeOnUpdate(provider);
         if (lensBlock != null) {
-            tag.putString("lensBlock", BuiltInRegistries.BLOCK.getKey(lensBlock).toString());
+            provider.lookup(Registries.BLOCK)
+                .flatMap(registry -> registry.listElements()
+                    .filter($ -> $.value() == lensBlock)
+                    .map($ -> $.key().location())
+                    .findFirst())
+                .ifPresent(loc -> tag.putString("lensBlock", loc.toString()));
         }
         return tag;
     }
@@ -64,10 +68,13 @@ public class Lithography extends Multiblock {
         lensBlock = null;
         if (tag.contains("lensBlock", Tag.TAG_STRING)) {
             var loc = ResourceLocation.parse(tag.getString("lensBlock"));
-            var block = BLOCKS.getEntry(loc).get();
-            if (block instanceof LensBlock lensBlock1) {
-                lensBlock = lensBlock1;
-            }
+            var key = ResourceKey.create(Registries.BLOCK, loc);
+            provider.lookup(Registries.BLOCK)
+                .flatMap(registry -> registry.get(key))
+                .map($ -> $.value())
+                .filter($ -> $ instanceof LensBlock)
+                .map($ -> (LensBlock) $)
+                .ifPresent($ -> lensBlock = $);
         }
         super.deserializeOnUpdate(provider, tag);
     }
