@@ -1,6 +1,7 @@
 package org.shsts.tinactory.gametest.dependency;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -100,12 +101,14 @@ public final class DependencyChecker {
     private static final int ACCEPTED_UNREACHABLE_NODES = 8;
 
     private final ServerLevel world;
+    private final RegistryAccess registryAccess;
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
     private List<LithographyLensBlock> lithographyLensBlocks = null;
 
     public DependencyChecker(ServerLevel world) {
         this.world = world;
+        this.registryAccess = world.registryAccess();
     }
 
     private void addMethod(DependencyMethod method) {
@@ -308,7 +311,7 @@ public final class DependencyChecker {
         ingredientNode(recipe.getIngredients().getFirst(), loc, 0).ifPresent(requirements::add);
         requirements.add(new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.getResultItem(world.registryAccess())).ifPresent(outputs::add);
+        stackNode(recipe.getResultItem(registryAccess)).ifPresent(outputs::add);
         addMethodIfUseful(loc + "#smelting", requirements, outputs, "smelting recipe " + loc);
     }
 
@@ -324,7 +327,7 @@ public final class DependencyChecker {
             }
         }
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.getResultItem(world.registryAccess())).ifPresent(outputs::add);
+        stackNode(recipe.getResultItem(registryAccess)).ifPresent(outputs::add);
         addMethodIfUseful(loc + "#crafting", requirements, outputs, "crafting recipe " + loc);
     }
 
@@ -345,7 +348,7 @@ public final class DependencyChecker {
             inputIndex++;
         }
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.shapedRecipe.getResultItem(world.registryAccess())).ifPresent(outputs::add);
+        stackNode(recipe.shapedRecipe.getResultItem(registryAccess)).ifPresent(outputs::add);
         addMethodIfUseful(recipeId + "#tool_crafting", requirements, outputs,
             "tool crafting recipe " + recipeId);
     }
@@ -771,9 +774,9 @@ public final class DependencyChecker {
         return Optional.of(node);
     }
 
-    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient, ResourceLocation multiblockId,
-        int inputIndex) {
-        var candidates = ingredient.expand().stream()
+    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient,
+        ResourceLocation multiblockId, int inputIndex) {
+        var candidates = ingredient.expand(registryAccess).stream()
             .map(ItemStack::new)
             .filter(stack -> !stack.isEmpty())
             .toList();

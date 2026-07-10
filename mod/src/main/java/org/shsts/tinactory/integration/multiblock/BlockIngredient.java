@@ -2,20 +2,25 @@ package org.shsts.tinactory.integration.multiblock;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BlockIngredient {
+public final class BlockIngredient implements Predicate<BlockState> {
     private final List<Value> values;
     private List<Block> expanded = null;
 
@@ -43,39 +48,52 @@ public final class BlockIngredient {
         return new BlockIngredient(values);
     }
 
-    public List<Value> values() {
-        return values;
+    @Override
+    public boolean test(BlockState blockState) {
+        return values.stream().anyMatch($ -> $.test(blockState));
     }
 
-    public List<Block> expand() {
+    public List<Block> expand(HolderLookup.Provider provider) {
         if (expanded != null) {
             return expanded;
         }
         var ret = new LinkedHashSet<Block>();
         for (var value : values) {
-            value.expand(ret::add);
+            value.expand(provider, ret::add);
         }
         expanded = List.copyOf(ret);
         return expanded;
     }
 
-    public interface Value {
-        void expand(Consumer<Block> consumer);
+    public interface Value extends Predicate<BlockState> {
+        void expand(HolderLookup.Provider provider, Consumer<Block> consumer);
     }
 
     public record BlockValue(Supplier<? extends Block> block) implements Value {
         @Override
-        public void expand(Consumer<Block> consumer) {
+        public boolean test(BlockState blockState) {
+            return blockState.is(block.get());
+        }
+
+        @Override
+        public void expand(HolderLookup.Provider provider, Consumer<Block> consumer) {
             consumer.accept(block.get());
         }
     }
 
     public record TagValue(TagKey<Block> tag) implements Value {
         @Override
-        public void expand(Consumer<Block> consumer) {
-            for (var block : BuiltInRegistries.BLOCK.getTagOrEmpty(tag)) {
-                consumer.accept(block.value());
-            }
+        public boolean test(BlockState blockState) {
+            return blockState.is(tag);
+        }
+
+        @Override
+        public void expand(HolderLookup.Provider provider, Consumer<Block> consumer) {
+            provider.lookup(Registries.BLOCK)
+                .flatMap($ -> $.get(tag))
+                .stream().flatMap(HolderSet.ListBacked::stream)
+                .map(Holder::value)
+                .forEach(consumer);
         }
     }
 }

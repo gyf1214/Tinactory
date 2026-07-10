@@ -3,9 +3,9 @@ package org.shsts.tinactory.content.multiblock;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.AllTags;
-import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
@@ -41,11 +40,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
@@ -155,43 +151,29 @@ public class MultiblockMeta extends MachineMeta {
             }
         }
 
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> blockStateCheck(
-            Predicate<BlockState> pred) {
-            return (ctx, pos) -> {
-                var block = ctx.getBlock(pos);
-                if (block.isEmpty() || !pred.test(block.get())) {
-                    ctx.setFailed();
-                }
-            };
-        }
-
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> block(
-            Supplier<? extends Block> block, boolean allowInterface) {
-            return (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
+        private static <P> Transformer<MultiblockSpec.Builder<BlockState, P>> ingredient(
+            char ch, Consumer<BlockIngredient> cons, BlockIngredient ingredient,
+            @Nullable String key, boolean allowInterface) {
+            cons.accept(ingredient);
+            return $ -> $.check(ch, (ctx, pos) -> {
                 if (allowInterface && MultiblockSpec.checkInterface(ctx, pos)) {
                     return;
                 }
-                if (block1.isEmpty() || !block1.get().is(block.get())) {
-                    ctx.setFailed();
-                }
-            };
-        }
-
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> tagWithSameBlock(String key,
-            TagKey<Block> tag) {
-            return (ctx, pos) -> {
                 var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !block1.get().is(tag)) {
+                if (block1.isEmpty() || !ingredient.test(block1.get())) {
                     ctx.setFailed();
-                } else if (ctx.hasProperty(key)) {
-                    if (!block1.get().is((Block) ctx.getProperty(key))) {
-                        ctx.setFailed();
-                    }
-                } else {
-                    ctx.setProperty(key, block1.get().getBlock());
+                    return;
                 }
-            };
+                if (key != null) {
+                    if (ctx.hasProperty(key)) {
+                        if (!block1.get().is((Block) ctx.getProperty(key))) {
+                            ctx.setFailed();
+                        }
+                    } else {
+                        ctx.setProperty(key, block1.get().getBlock());
+                    }
+                }
+            });
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je,
@@ -245,15 +227,18 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseDefine(Character ch, JsonElement je,
-            Consumer<BlockIngredient> ingredientConsumer) {
+            Consumer<BlockIngredient> cons) {
             if (je.isJsonPrimitive() && je.getAsJsonPrimitive().isString()) {
                 var s = je.getAsString();
                 if (s.equals("air")) {
-                    return $ -> $.check(ch, blockStateCheck(BlockState::isAir));
+                    return $ -> $.check(ch, (ctx, pos) -> {
+                        if (ctx.getBlock(pos).filter(BlockState::isAir).isEmpty()) {
+                            ctx.setFailed();
+                        }
+                    });
                 } else {
                     var block = BLOCKS.getEntry(ResourceLocation.parse(s));
-                    ingredientConsumer.accept(BlockIngredient.of(block));
-                    return $ -> $.check(ch, block(block, false));
+                    return ingredient(ch, cons, BlockIngredient.of(block), null, false);
                 }
             }
 
@@ -262,38 +247,26 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
-                    ingredientConsumer.accept(BlockIngredient.of(block));
-                    return $ -> $.check(ch, block(block, true));
+                    return ingredient(ch, cons, BlockIngredient.of(block), null, true);
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, blockStateCheck(blockState -> blockState.is(tag)));
+                    return ingredient(ch, cons, BlockIngredient.of(tag), null, false);
                 }
                 case "tag_or_interface" -> {
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, (ctx, pos) -> {
-                        var block = ctx.getBlock(pos);
-                        if (MultiblockSpec.checkInterface(ctx, pos)) {
-                            return;
-                        }
-                        if (block.isEmpty() || !block.get().is(tag)) {
-                            ctx.setFailed();
-                        }
-                    });
+                    return ingredient(ch, cons, BlockIngredient.of(tag), null, true);
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, tagWithSameBlock(key, tag));
+                    return ingredient(ch, cons, BlockIngredient.of(tag), key, false);
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(new BlockValue(block), new TagValue(tag)));
-                    return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
+                    return ingredient(ch, cons, BlockIngredient.of(new BlockValue(block), new TagValue(tag)),
+                        null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
