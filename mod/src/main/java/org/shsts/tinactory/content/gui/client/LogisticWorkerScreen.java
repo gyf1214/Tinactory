@@ -7,6 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -143,10 +144,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                         tagFilter = config.tagFilter();
                         tagFilterItems = provider.lookup(Registries.ITEM)
                             .flatMap(items -> items.get(tagFilter))
-                            .map(tag -> tag.stream()
-                                .map(holder -> new ItemStack(holder.value()))
-                                .toList())
-                            .orElse(List.of());
+                            .stream().flatMap(HolderSet.ListBacked::stream)
+                            .map($ -> new ItemStack($.value()))
+                            .toList();
                     }
                     ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
                         RenderUtil.renderItem(graphics, stack, filterRect.x(), filterRect.y()));
@@ -207,17 +207,13 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     if (button == 1) {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-                            var tagList = config.itemFilter().getItemHolder().unwrapKey()
-                                .flatMap(key -> provider.lookup(Registries.ITEM)
-                                    .flatMap(items -> items.get(key))
-                                    .map(holder -> holder.tags()
-                                        .sorted(Comparator.comparing(TagKey::location,
-                                            ResourceLocation::compareNamespaced))
-                                        .toList()))
-                                .orElse(List.of());
+                            var tagList = config.itemFilter().getItemHolder().tags()
+                                .sorted(Comparator.comparing(TagKey::location,
+                                    ResourceLocation::compareNamespaced))
+                                .toList();
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;
-                                config.setFilter(tagSelectList.get(0));
+                                config.setFilter(tagSelectList.getFirst());
                                 nextSelectTag = tagList.size() == 1 ? 0 : 1;
                                 tagSet = true;
                             }
