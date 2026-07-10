@@ -2,6 +2,7 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import org.shsts.tinactory.content.material.MiscMeta;
@@ -36,15 +37,18 @@ public final class AllMultiblocks {
 
         // misc
         REGISTRATE.block("multiblock/misc/autofarm_base", Block::new)
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.sound(SoundType.GRAVEL))
             .register();
 
         REGISTRATE.block("multiblock/misc/launch_site_base", HalfBlock::new)
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(MiscMeta.CASING_PROPERTY)
             .register();
 
         REGISTRATE.block("multiblock/misc/turbine_blade", TurbineBlock::new)
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(MiscMeta.CASING_PROPERTY)
             .register();
     }

@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -245,6 +246,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(this::sound)
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties($ -> $.strength(2f).sound(SoundType.WOOD))
                 .end()
                 .buildObject();
@@ -282,6 +284,7 @@ public class MachineMeta extends MetaConsumer {
             return BlockEntityBuilder.builder(machineId(v), MachineBlocks.processing(v))
                 .transform(MachineSet::baseMachine)
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
                 .end();
         }
@@ -306,6 +309,7 @@ public class MachineMeta extends MetaConsumer {
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
                 .end();
         }
@@ -356,6 +360,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(BatteryBox.factory(layout))
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> i == 0 ? v.color : 0xFFFFFFFF)
                 .end()
                 .buildObject();
@@ -385,6 +390,9 @@ public class MachineMeta extends MetaConsumer {
                 .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, ITEM_HANDLER)
                 .transform(ElectricChest.factory(layout, slotSize, power))
                 .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                .end()
                 .buildObject();
         }
 
@@ -404,6 +412,9 @@ public class MachineMeta extends MetaConsumer {
                 .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, FLUID_HANDLER,
                     MENU_FLUID_HANDLER)
                 .transform(ElectricTank.factory(layout, slotSize, power))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
         }
@@ -430,6 +441,9 @@ public class MachineMeta extends MetaConsumer {
                 .blockEntity()
                 .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(LogisticWorker.factory(properties))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
         }

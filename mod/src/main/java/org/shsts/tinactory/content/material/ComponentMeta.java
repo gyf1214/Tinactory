@@ -109,6 +109,7 @@ public class ComponentMeta extends MetaConsumer {
             if (tint >= 0) {
                 builder.tint(() -> () -> ($, i) -> i == tint ? v.color : 0xFFFFFFFF);
             }
+            builder.creativeTab(CreativeModeTabs.INGREDIENTS);
             var item = builder.register();
             components.put(v, item);
         }
@@ -123,7 +124,8 @@ public class ComponentMeta extends MetaConsumer {
             var capacity = GsonHelper.convertToInt(entry.getValue(), "items");
             var id = "network/" + v.id + "/" + name;
             var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity))
-                .creativeTab(CreativeModeTabs.SEARCH, BatteryItem::fullItem)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, BatteryItem::fullItem)
                 .itemProperty(BatteryItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
                     BatteryItem.normalizedPower(stack))
                 .register();
@@ -145,6 +147,7 @@ public class ComponentMeta extends MetaConsumer {
 
             var block = REGISTRATE.block(id, CableBlock.cable(v, resistance, mat, bare))
                 .properties($ -> $.strength(2f).sound(bare ? SoundType.METAL : SoundType.WOOL))
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .transform(CableBlock.tint(mat.color, bare))
                 .register();
             components.put(v, block);
@@ -160,6 +163,7 @@ public class ComponentMeta extends MetaConsumer {
             var v1 = Voltage.fromRank(v.rank + voltageOffset);
             var block = REGISTRATE.block(id, SubnetBlock.factory(v, v1))
                 .properties(MACHINE_PROPERTY)
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> switch (i) {
                     case 0 -> v.color;
                     case 1 -> v1.color;
@@ -185,6 +189,9 @@ public class ComponentMeta extends MetaConsumer {
                 .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(MENetworkBridge.factory(power))
                 .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                .end()
                 .buildObject();
             components.put(v, block);
         }
@@ -202,6 +209,7 @@ public class ComponentMeta extends MetaConsumer {
             var id = "tool/" + name + "/" + mat.name;
 
             var item = REGISTRATE.item(id, CellItem.factory(capacity))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .capability(FLUID_HANDLER_ITEM)
                 .tint(() -> () -> CellItem::getTint)
                 .register();

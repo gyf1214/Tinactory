@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -23,7 +24,9 @@ public class CircuitComponent {
         this.name = name;
         this.items = new HashMap<>();
         for (var tier : CircuitComponentTier.values()) {
-            var item = REGISTRATE.item(tier.getName(name)).register();
+            var item = REGISTRATE.item(tier.getName(name))
+                .creativeTab(CreativeModeTabs.INGREDIENTS)
+                .register();
             items.put(tier, item);
         }
     }

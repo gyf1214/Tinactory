@@ -8,6 +8,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -102,6 +103,7 @@ public class MiscMeta extends MetaConsumer {
         var mapColor = parseMapColor(jo);
         var builder = REGISTRATE.block(id, Block::new)
             .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY);
         return builder.register();
     }
@@ -120,6 +122,7 @@ public class MiscMeta extends MetaConsumer {
         var mapColor = parseMapColor(jo);
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
             .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.put(name, block);
@@ -135,6 +138,7 @@ public class MiscMeta extends MetaConsumer {
     private void glass(String id) {
         REGISTRATE.block(id, TransparentBlock::new)
             .transform(MiscMeta::glass)
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .register();
     }
 
@@ -150,6 +154,7 @@ public class MiscMeta extends MetaConsumer {
 
         REGISTRATE.block(id, LensBlock.factory(lens))
             .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -160,6 +165,7 @@ public class MiscMeta extends MetaConsumer {
         var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
             .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -168,6 +174,7 @@ public class MiscMeta extends MetaConsumer {
         var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, FixedBlock::new)
             .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
     }
@@ -178,13 +185,16 @@ public class MiscMeta extends MetaConsumer {
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
             .properties($ -> $.mapColor(mapColor).requiresCorrectToolForDrops().strength(5f, 6f))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .tint(tint)
             .blockItem((block, properties) -> new BlockItem(block, properties) {
                 @Override
                 public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
                     return burnTime;
                 }
-            }).end()
+            })
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
+            .end()
             .register();
     }
 
@@ -193,11 +203,13 @@ public class MiscMeta extends MetaConsumer {
         if (jo.has("tint")) {
             builder.tint(parseColor(jo, "tint"));
         }
+        builder.creativeTab(CreativeModeTabs.INGREDIENTS);
         builder.register();
     }
 
     private void nuclearRod(String id, JsonObject jo) {
         REGISTRATE.item(id, prop -> new NuclearRod(prop, NuclearRod.Properties.fromJson(jo)))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .register();
     }
 
@@ -209,6 +221,9 @@ public class MiscMeta extends MetaConsumer {
             .blockEntity()
             .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEStorageInterface.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -228,6 +243,9 @@ public class MiscMeta extends MetaConsumer {
             .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, BYTES_PROVIDER, MENU_ITEM_HANDLER)
             .transform(MEDrive.factory(layout, power))
             .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            .end()
             .build();
     }
 
@@ -237,17 +255,22 @@ public class MiscMeta extends MetaConsumer {
         var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
         var bytes = GsonHelper.getAsLong(jo, "bytes");
 
-        var component = REGISTRATE.item(componentPrefix + "/" + name).register();
+        var component = REGISTRATE.item(componentPrefix + "/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register();
         var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
                 MEStorageCell.itemCell(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .capability(ITEM_PORT_ITEM, BYTES_PROVIDER_ITEM)
             .register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
                 MEStorageCell.fluidCell(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .capability(FLUID_PORT_ITEM, BYTES_PROVIDER_ITEM)
             .register();
         var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
                 MEPatternCell.factory(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .capability(PATTERN_CELL_ITEM)
             .register();
 
@@ -278,6 +301,9 @@ public class MiscMeta extends MetaConsumer {
             .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftCpu.factory(config))
             .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            .end()
             .build();
     }
 
@@ -290,6 +316,9 @@ public class MiscMeta extends MetaConsumer {
             .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftTerminal.factory(power))
             .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            .end()
             .build();
     }
 
@@ -301,6 +330,9 @@ public class MiscMeta extends MetaConsumer {
             .blockEntity()
             .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEPatternTerminal.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -322,7 +354,11 @@ public class MiscMeta extends MetaConsumer {
             var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo, "sound"));
             builder.transform(MachineSound.factory(SOUND_EVENTS.getEntry(soundId)));
         }
-        builder.end().build();
+        builder.end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            .end()
+            .build();
     }
 
     private void meSignalController(String id, JsonObject jo) {
@@ -333,6 +369,9 @@ public class MiscMeta extends MetaConsumer {
             .blockEntity()
             .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MESignalController.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -345,6 +384,9 @@ public class MiscMeta extends MetaConsumer {
             .blockEntity()
             .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MEStorageDetector.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }

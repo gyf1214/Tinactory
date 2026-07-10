@@ -9,6 +9,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -368,6 +369,7 @@ public class MultiblockMeta extends MachineMeta {
                 .build()
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
                 .end()
                 .buildObject();
@@ -406,6 +408,7 @@ public class MultiblockMeta extends MachineMeta {
                 .build()
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
                 .properties(BlockBehaviour.Properties::requiresCorrectToolForDrops)
                 .end()

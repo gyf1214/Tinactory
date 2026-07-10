@@ -2,6 +2,7 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.SoundType;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Workbench;
@@ -31,6 +32,7 @@ public final class AllBlockEntities {
             .transform(Workbench::factory)
             .end()
             .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .properties($ -> $.strength(2f).sound(SoundType.WOOD))
             .end()
             .buildObject();

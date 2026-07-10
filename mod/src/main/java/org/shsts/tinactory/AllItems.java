@@ -3,6 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
@@ -44,6 +45,7 @@ public final class AllItems {
         RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
             .properties(p -> p.mapColor(Blocks.OAK_LOG.defaultMapColor())
                 .strength(2f).sound(SoundType.WOOD))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .register();
 
         RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
@@ -53,6 +55,7 @@ public final class AllItems {
                 .isValidSpawn(AllItems::never)
                 .isSuffocating(AllItems::never)
                 .isViewBlocking(AllItems::never))
+            .creativeTab(CreativeModeTabs.NATURAL_BLOCKS)
             .tint(0xFF55FF55)
             .register();
 
@@ -61,6 +64,7 @@ public final class AllItems {
             .properties(p -> p.mapColor(Blocks.OAK_SAPLING.defaultMapColor())
                 .noCollission().randomTicks()
                 .instabreak().sound(SoundType.GRASS))
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .register();
     }
 
