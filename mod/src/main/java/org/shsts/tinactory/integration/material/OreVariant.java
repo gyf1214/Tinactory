@@ -2,8 +2,6 @@ package org.shsts.tinactory.integration.material;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
@@ -58,10 +56,6 @@ public enum OreVariant implements StringRepresentable {
 
     public static OreVariant fromName(String name) {
         return valueOf(name.toUpperCase(Locale.ROOT));
-    }
-
-    public ResourceLocation getLoc() {
-        return BuiltInRegistries.ITEM.getKey(baseItem);
     }
 
     @Override

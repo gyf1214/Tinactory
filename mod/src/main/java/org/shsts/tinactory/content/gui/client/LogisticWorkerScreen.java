@@ -7,7 +7,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -141,7 +141,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 case TAG -> {
                     if (tagFilterItems == null || config.tagFilter() != tagFilter) {
                         tagFilter = config.tagFilter();
-                        tagFilterItems = BuiltInRegistries.ITEM.getTag(tagFilter)
+                        tagFilterItems = provider.lookup(Registries.ITEM)
+                            .flatMap(items -> items.get(tagFilter))
                             .map(tag -> tag.stream()
                                 .map(holder -> new ItemStack(holder.value()))
                                 .toList())
@@ -206,10 +207,14 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     if (button == 1) {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-                            var tagList = BuiltInRegistries.ITEM.wrapAsHolder(config.itemFilter().getItem()).tags()
-                                .sorted(Comparator.comparing(TagKey::location,
-                                    ResourceLocation::compareNamespaced))
-                                .toList();
+                            var tagList = config.itemFilter().getItemHolder().unwrapKey()
+                                .flatMap(key -> provider.lookup(Registries.ITEM)
+                                    .flatMap(items -> items.get(key))
+                                    .map(holder -> holder.tags()
+                                        .sorted(Comparator.comparing(TagKey::location,
+                                            ResourceLocation::compareNamespaced))
+                                        .toList()))
+                                .orElse(List.of());
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;
                                 config.setFilter(tagSelectList.get(0));

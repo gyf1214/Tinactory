@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -31,10 +30,9 @@ import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 public class LogisticWorkerMenu extends InventoryMenu {
     public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
     public static final String SLOT_SYNC = "info";
-
     public static final Comparator<IMachine> MACHINE_COMPARATOR =
         Comparator.<IMachine>comparingLong($ -> $.electric().map(IElectricMachine::getVoltage).orElse(0L))
-            .thenComparing($ -> BuiltInRegistries.BLOCK.getKey($.blockEntity().getBlockState().getBlock()))
+            .thenComparing($ -> $.icon().getItemHolder().getKey().location())
             .thenComparing($ -> $.title().getString());
 
     public final IMachine machine;

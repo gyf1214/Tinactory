@@ -3,8 +3,9 @@ package org.shsts.tinactory.content.gui.client;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -134,7 +135,8 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
         items.clear();
         items.addAll(itemsMap.values());
-        items.sort(Comparator.comparing($ -> BuiltInRegistries.ITEM.getKey($.getItem())));
+        items.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.ITEM, $.getItem()),
+            ResourceLocation::compareNamespaced));
 
         var fluidsMap = new HashMap<IStackKey, FluidStack>();
         for (var newFluid : packet.fluids()) {
@@ -147,7 +149,8 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
         fluids.clear();
         fluids.addAll(fluidsMap.values());
-        fluids.sort(Comparator.comparing($ -> BuiltInRegistries.FLUID.getKey($.getFluid())));
+        fluids.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.FLUID, $.getFluid()),
+            ResourceLocation::compareNamespaced));
 
         panel.refresh();
     }

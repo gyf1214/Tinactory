@@ -10,9 +10,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -74,6 +77,15 @@ public final class ClientUtil {
         var world = Minecraft.getInstance().level;
         assert world != null;
         return world.registryAccess();
+    }
+
+    public static <T> ResourceLocation getRegistryKey(ResourceKey<? extends Registry<T>> registryKey, T value) {
+        return registryAccess().registryOrThrow(registryKey).getKey(value);
+    }
+
+    public static <T> Optional<T> getRegistryObject(ResourceKey<? extends Registry<T>> registryKey,
+        ResourceLocation loc) {
+        return registryAccess().registryOrThrow(registryKey).getOptional(loc);
     }
 
     public static List<Component> itemTooltip(ItemStack stack) {

@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -203,7 +203,7 @@ public final class RenderUtil {
         switch (descriptor) {
             case EmptyRenderDescriptor ignored -> {}
             case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
-            case ItemIdRenderDescriptor(ResourceLocation id) -> BuiltInRegistries.ITEM.getOptional(id)
+            case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
                 .ifPresent(item -> renderItem(graphics, new ItemStack(item), rect.x(), rect.y()));
             case ItemRenderDescriptor(ItemStack stack) -> renderItem(graphics, stack, rect.x(), rect.y());
             case FluidRenderDescriptor(FluidStack stack) -> renderFluid(graphics, stack, rect.x(), rect.y());
@@ -216,7 +216,7 @@ public final class RenderUtil {
         switch (descriptor) {
             case EmptyRenderDescriptor ignored -> {}
             case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
-            case ItemIdRenderDescriptor(ResourceLocation id) -> BuiltInRegistries.ITEM.getOptional(id)
+            case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
                 .ifPresent(item -> renderGhostItem(graphics, new ItemStack(item), rect.x(), rect.y()));
             case ItemRenderDescriptor(ItemStack stack) -> renderGhostItem(graphics, stack, rect.x(), rect.y());
             case FluidRenderDescriptor(FluidStack stack) -> renderGhostFluid(graphics, stack, rect);
