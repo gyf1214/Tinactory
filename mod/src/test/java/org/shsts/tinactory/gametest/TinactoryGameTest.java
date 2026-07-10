@@ -56,13 +56,12 @@ public final class TinactoryGameTest {
         }
     }
 
-    // TODO: find a way to implement default template
-    @GameTest(template = "empty_1x1x1")
+    @GameTest
     public static void testSucceed(GameTestHelper helper) {
         helper.succeed();
     }
 
-    @GameTest(template = "empty_1x1x1")
+    @GameTest
     public static void testDependency(GameTestHelper helper) {
         if (DependencyChecker.runRuntimeCheck(helper.getLevel())) {
             helper.succeed();
@@ -71,7 +70,7 @@ public final class TinactoryGameTest {
         }
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 40)
+    @GameTest(timeoutTicks = 40)
     public static void testMockPlayerUseCreatesMachineNetwork(GameTestHelper helper) {
         var machinePos = new BlockPos(1, 1, 1);
         helper.setBlock(machinePos, machineState(Direction.EAST));
@@ -86,7 +85,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 40)
+    @GameTest(timeoutTicks = 40)
     public static void testNetworkConnectivity(GameTestHelper helper) {
         var machinePos = new BlockPos(1, 1, 1);
         var cablePos = machinePos.east();
@@ -138,7 +137,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 40)
+    @GameTest(timeoutTicks = 40)
     public static void testNetworkBridgeDoesNotCreateRootNetwork(GameTestHelper helper) {
         var bridgePos = new BlockPos(1, 1, 1);
         helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
@@ -155,7 +154,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 80)
+    @GameTest(timeoutTicks = 80)
     public static void testNetworkBridgeSplitsElectricAndLogisticsSubnets(GameTestHelper helper) {
         var parentMachinePos = new BlockPos(1, 1, 1);
         var parentCablePos = parentMachinePos.east();
@@ -209,7 +208,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 80)
+    @GameTest(timeoutTicks = 80)
     public static void testNetworkBridgeExposesParentStorageToChildWorkerAsBridgePort(GameTestHelper helper) {
         var parentStoragePos = new BlockPos(1, 1, 1);
         var parentCablePos = parentStoragePos.east();
@@ -245,7 +244,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 80)
+    @GameTest(timeoutTicks = 80)
     public static void testNetworkBridgePortsAreExcludedFromStorageAggregation(GameTestHelper helper) {
         var parentWorkerPos = new BlockPos(1, 1, 1);
         var parentCablePos = parentWorkerPos.east();
@@ -284,7 +283,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1", timeoutTicks = 80)
+    @GameTest(timeoutTicks = 80)
     public static void testBatteryBoxPowersElectricConsumer(GameTestHelper helper) {
         var voltage = Voltage.MV;
         var consumerPos = new BlockPos(0, 1, 1);
@@ -334,7 +333,7 @@ public final class TinactoryGameTest {
         });
     }
 
-    @GameTest(template = "empty_1x1x1")
+    @GameTest
     public static void testDigitalInterfaceReserveBuffers(GameTestHelper helper) {
         var interfacePos = new BlockPos(1, 1, 1);
         helper.setBlock(interfacePos, machineState("multiblock/digital_interface", Voltage.EV, Direction.NORTH));

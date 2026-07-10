@@ -50,6 +50,7 @@ neoForge {
                     .orElse(providers.systemProperty("tinactory.dependencyChecker.verbose"))
                     .orElse("false").get(),
             )
+            systemProperty("tinycorelib.gameTest.defaultTemplate", "empty_8x5x5")
         }
     }
 
