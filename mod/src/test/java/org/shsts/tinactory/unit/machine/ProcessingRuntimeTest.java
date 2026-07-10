@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.machine;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -37,6 +38,7 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
@@ -279,6 +281,19 @@ class ProcessingRuntimeTest {
         assertEquals(0L, runtime.progressTicks());
         assertTrue(runtime.getAllInfo().isEmpty());
         assertTrue(runtime.serializeNBT(TEST_REGISTRY).isEmpty());
+    }
+
+    @Test
+    void shouldRejectMalformedProcessorInfoDuringDeserialization() {
+        var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
+        var tag = new CompoundTag();
+        tag.putString("currentRecipe", RECIPE_ID.toString());
+        tag.put("processorData", new CompoundTag());
+        var processorInfo = new ListTag();
+        processorInfo.add(new CompoundTag());
+        tag.put("processorInfo", processorInfo);
+
+        assertThrows(RuntimeException.class, () -> runtime.deserializeNBT(TEST_REGISTRY, tag));
     }
 
     private static final class RuntimeBuilder {

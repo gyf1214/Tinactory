@@ -2,7 +2,6 @@ package org.shsts.tinactory.core.machine;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -23,7 +22,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,8 +41,6 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcessor, INBTSerializable<CompoundTag> {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static final String VOID_KEY = "void";
     public static final boolean VOID_DEFAULT = false;
 
@@ -451,13 +447,8 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             processorIndex = tag.getInt("processorIndex");
             workProgress = tag.getLong("workProgress");
             processors.get(processorIndex).deserializeNBT(provider, tag.getCompound("processorData"));
-            // TODO: backward compatibility of old save data before ProcessingObject changes
-            try {
-                parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
-                    value -> parseTag(provider, processingInfoCodec, value), infoList::add);
-            } catch (RuntimeException e) {
-                LOGGER.warn("skip processor info data", e);
-            }
+            parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
+                value -> parseTag(provider, processingInfoCodec, value), infoList::add);
             buildInfoMap();
         } else {
             currentRecipeLoc = null;
