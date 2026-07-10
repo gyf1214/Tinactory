@@ -489,9 +489,7 @@ object Technologies {
             tech(id, block).also { base = it }
 
         fun tech(id: String, block: TechBuilder<*>.() -> Unit) =
-            TECHS.builder(Unit, id) { handler, parent, loc ->
-                TechBuilder.factory(handler, parent, loc)
-            }.run {
+            TECHS.builder(Unit, id, TechBuilder.Companion::factory).run {
                 rank(rank++)
                 val base1 = base
                 if (base1 != null) {
@@ -499,7 +497,7 @@ object Technologies {
                 }
                 researchVoltage(voltage)
                 block()
-                register()
+                build()
             }
 
         fun TechBuilder<*>.displayMaterial(name: String, sub: String) {

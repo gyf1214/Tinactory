@@ -61,9 +61,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         val tech = if (baseOre || primitive) {
             baseTech
         } else {
-            TECHS.builder("ore/$id1") { handler, parent, loc ->
-                TechBuilder.factory(handler, parent, loc)
-            }.run {
+            TECHS.builder("ore/$id1", TechBuilder.Companion::factory).run {
                 maxProgress(30)
                 val mat = ores[0]
                 if (mat.hasItem("raw")) {
@@ -74,7 +72,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                 depends(baseTech)
                 researchVoltage(variant1.voltage)
                 rank(rank + 1 + VEIN_TECH_RANK)
-                register()
+                build()
             }
         }
 

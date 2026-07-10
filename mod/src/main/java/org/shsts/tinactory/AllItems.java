@@ -21,14 +21,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllItems {
-    public static final Map<String, Map<Voltage, ? extends Supplier<? extends ItemLike>>> COMPONENTS;
+    public static final Map<String, Map<Voltage, ? extends IEntry<? extends ItemLike>>> COMPONENTS;
 
     public static final List<MEStorageCellSet> STORAGE_CELLS;
 
@@ -67,7 +66,7 @@ public final class AllItems {
 
     public static void init() {}
 
-    public static Map<Voltage, ? extends Supplier<? extends ItemLike>> getComponent(String name) {
+    public static Map<Voltage, ? extends IEntry<? extends ItemLike>> getComponent(String name) {
         return COMPONENTS.get(name);
     }
 

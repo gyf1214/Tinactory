@@ -11,21 +11,21 @@ import org.shsts.tinactory.core.tech.Technology
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.research
+import org.shsts.tinactory.datagen.content.component.item
 import org.shsts.tinactory.datagen.provider.TechProvider
+import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.IDataHandler
 import java.util.Optional
-import java.util.function.Supplier
 
 class TechBuilder<P>(parent: P) : Builder<Technology, P, TechBuilder<P>>(parent) {
     private val depends = mutableListOf<ResourceLocation>()
     private val modifiers = mutableMapOf<String, Int>()
     private var maxProgress = 0L
     private var rank = 0
-    private var displayItem: (() -> ResourceLocation)? = null
+    private var displayItem: ResourceLocation? = null
     private var displayTexture: ResourceLocation? = null
     private var voltage: Voltage? = null
     private var noResearch = false
-    private var registerAction: (() -> ResourceLocation)? = null
 
     fun depends(vararg loc: ResourceLocation) {
         depends += loc
@@ -36,19 +36,19 @@ class TechBuilder<P>(parent: P) : Builder<Technology, P, TechBuilder<P>>(parent)
     }
 
     fun displayItem(loc: ResourceLocation) {
-        displayItem = { loc }
+        displayItem = loc
     }
 
     fun displayItem(id: String) {
-        displayItem = { modLoc(id) }
+        displayItem = modLoc(id)
     }
 
     fun displayItem(item: ItemLike) {
-        displayItem = { RegistryHelper.itemLoc(item) }
+        displayItem = RegistryHelper.itemLoc(item)
     }
 
-    fun displayItem(item: Supplier<out ItemLike>) {
-        displayItem = { RegistryHelper.itemLoc(item.get()) }
+    fun displayItem(item: IEntry<out ItemLike>) {
+        displayItem = item.loc()
     }
 
     fun displayTexture(value: ResourceLocation) {
@@ -72,15 +72,15 @@ class TechBuilder<P>(parent: P) : Builder<Technology, P, TechBuilder<P>>(parent)
     }
 
     override fun createObject(): Technology {
-        check(maxProgress > 0)
-        val voltage1 = checkNotNull(voltage)
         return Technology(depends.toList(), maxProgress, modifiers.toMap(),
-            Optional.ofNullable(displayItem?.invoke()),
+            Optional.ofNullable(displayItem),
             Optional.ofNullable(displayTexture),
-            rank + RANK_PER_VOLTAGE * voltage1.rank)
+            rank + RANK_PER_VOLTAGE * voltage!!.rank)
     }
 
     fun validate(existingFileHelper: ExistingFileHelper) {
+        check(maxProgress > 0)
+        checkNotNull(voltage)
         for (loc in depends) {
             check(existingFileHelper.exists(loc, TechProvider.RESOURCE_TYPE)) {
                 "Technology at $loc does not exist"
@@ -97,29 +97,21 @@ class TechBuilder<P>(parent: P) : Builder<Technology, P, TechBuilder<P>>(parent)
         dataGen.trackLang(details)
 
         if (!noResearch) {
-            val voltage1 = checkNotNull(voltage)
-            val input = checkNotNull(getComponent("research_equipment")[voltage1]).get()
-
             research {
                 target(loc) {
-                    input(input)
-                    voltage(voltage1)
+                    input(getComponent("research_equipment").item(voltage!!))
+                    voltage(voltage!!)
                 }
             }
         }
     }
 
-    fun register(): ResourceLocation {
-        build()
-        return checkNotNull(registerAction).invoke()
-    }
-
     companion object {
         const val RANK_PER_VOLTAGE = 1000
 
-        fun <P> factory(handler: IDataHandler<TechProvider>, parent: P, loc: ResourceLocation): TechBuilder<P> {
-            val builder = TechBuilder(parent)
-            builder.registerAction = { loc }
+        fun factory(handler: IDataHandler<TechProvider>, parent: Any, loc: ResourceLocation):
+            TechBuilder<ResourceLocation> {
+            val builder = TechBuilder(loc)
             return builder.onBuild { builder.onRegister(handler, loc) }
         }
     }
