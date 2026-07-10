@@ -94,10 +94,13 @@ abstract class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuild
         if (autoCable) {
             component("cable", amount = max(2, components * 2))
         }
-        if (recoveryInputs.isNotEmpty() && recoveryOutputs.size == 1) {
-            RecoveryRegistry.record(recoveryOutputs.single(), recoveryInputs)
-        }
         return super.buildObject()
+    }
+
+    fun recordRecovery(loc: ResourceLocation) {
+        if (recoveryInputs.isNotEmpty() && recoveryOutputs.size == 1) {
+            RecoveryRegistry.record(loc, recoveryOutputs.single(), recoveryInputs)
+        }
     }
 }
 

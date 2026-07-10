@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.recovery
 
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.integration.material.MaterialSet
@@ -23,6 +24,6 @@ data class RecoveryItemInput(
     override val amount: Double) : RecoveryInput
 
 data class RecoveryRecipe(
-    val key: Int,
+    val key: ResourceLocation,
     val output: RecoveryOutput,
     val inputs: List<RecoveryInput>)

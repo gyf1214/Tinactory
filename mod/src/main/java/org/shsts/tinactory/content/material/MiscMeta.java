@@ -185,7 +185,6 @@ public class MiscMeta extends MetaConsumer {
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
             .properties($ -> $.mapColor(mapColor).requiresCorrectToolForDrops().strength(5f, 6f))
-            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .tint(tint)
             .blockItem((block, properties) -> new BlockItem(block, properties) {
                 @Override

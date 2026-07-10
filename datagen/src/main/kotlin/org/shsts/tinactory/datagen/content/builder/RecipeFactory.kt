@@ -39,12 +39,16 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
         builder.defaultFluidSub = this@RecipeFactory.defaultFluidSub
     }
 
+    protected open fun onBuild(loc: ResourceLocation, builder: B) {}
+
     fun recipe(loc: ResourceLocation, block: B.() -> Unit) {
-        factory.recipe(recipeLoc(recipeType, loc)).apply {
+        val recipeId = recipeLoc(recipeType, loc)
+        factory.recipe(recipeId).apply {
             defaults()
             classDefaults(this)
             userDefaults()
             block()
+            onBuild(recipeId, this)
             build()
         }
     }

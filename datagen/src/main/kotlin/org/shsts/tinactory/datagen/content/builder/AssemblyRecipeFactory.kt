@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.resources.ResourceLocation
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.core.electric.Voltage
@@ -18,6 +19,10 @@ class AssemblyRecipeFactory(
         super.classDefaults(builder)
         builder.componentVoltage = componentVoltage
         builder.recordRecovery = true
+    }
+
+    override fun onBuild(loc: ResourceLocation, builder: SimpleAssemblyRecipeBuilder) {
+        builder.onBuild { builder.recordRecovery(loc) }
     }
 
     fun component(name: String, voltage: Voltage = this.componentVoltage!!,

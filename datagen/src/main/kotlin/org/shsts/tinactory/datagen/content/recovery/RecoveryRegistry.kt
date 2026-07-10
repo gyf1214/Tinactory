@@ -28,13 +28,9 @@ object RecoveryRegistry {
     private val recipesByItem = mutableMapOf<ResourceLocation, MutableList<RecoveryRecipe>>()
     private val selectedRecipeByItem = mutableMapOf<ResourceLocation, RecoveryRecipe?>()
     private val compositionByItem = mutableMapOf<ResourceLocation, RecoveryComposition>()
-    private val compositionByRecipe = mutableMapOf<Int, RecoveryComposition>()
+    private val compositionByRecipe = mutableMapOf<ResourceLocation, RecoveryComposition>()
     private val visitingItems = mutableSetOf<ResourceLocation>()
-    private val visitingRecipes = mutableSetOf<Int>()
-
-    // TODO: the key to represent recipe identity, ideally we want the original assembly recipe loc,
-    //       but that is no longer available
-    private var index = 0
+    private val visitingRecipes = mutableSetOf<ResourceLocation>()
 
     fun configure(
         targetSub: String,
@@ -58,8 +54,8 @@ object RecoveryRegistry {
         clearResolved()
     }
 
-    fun record(output: RecoveryOutput, inputs: List<RecoveryInput>) {
-        val recipe = RecoveryRecipe(index++, output, inputs)
+    fun record(key: ResourceLocation, output: RecoveryOutput, inputs: List<RecoveryInput>) {
+        val recipe = RecoveryRecipe(key, output, inputs.toList())
         val loc = itemLoc(output.item)
         recipesByItem.getOrPut(loc) { mutableListOf() }.add(recipe)
     }
@@ -142,7 +138,7 @@ object RecoveryRegistry {
         val selected = nonEmpty.minWith(compareBy<Pair<RecoveryRecipe, RecoveryComposition>> {
             it.second.topMaterials(1).first().second
         }.thenBy {
-            it.first.key
+            it.first.key.toString()
         }).first
         if (nonEmpty.size > 1) {
             val discarded = nonEmpty.map { it.first }.filter { it != selected }
