@@ -179,7 +179,7 @@ object Woods {
                 dropOnState({ resin }, RubberLogBlock.HAS_RUBBER, true)
             }
             block(RUBBER_LEAVES) {
-                blockState(Models.cubeTint("wood/rubber/leaves_rubber"))
+                blockState(Models.cubeTint("wood/rubber/leaves_rubber", Models.CUTOUT_RENDER_TYPE))
                 tag(BlockTags.LEAVES)
                 itemTag(ItemTags.LEAVES)
                 dropSelfOnTool(TOOL_SHEARS)
@@ -189,7 +189,8 @@ object Woods {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cross(
-                        ctx.id(), gregtech("block/wood/rubber/sapling_rubber")))
+                        ctx.id(), gregtech("block/wood/rubber/sapling_rubber"))
+                        .renderType(Models.CUTOUT_RENDER_TYPE))
                 }
                 itemModel(Models.basicItem(gregtech("block/wood/rubber/sapling_rubber")))
                 tag(BlockTags.SAPLINGS)

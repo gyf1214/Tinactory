@@ -125,13 +125,14 @@ object Multiblocks {
             }
 
             misc("clear_glass") {
-                blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a")) }
+                blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a"),
+                    Models.TRANSLUCENT_RENDER_TYPE) }
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS_BLOCKS)
             }
 
             misc("hardened_glass") {
-                blockState(solidBlock("casings/transparent/tempered_glass"))
+                blockState(solidBlock("casings/transparent/tempered_glass", Models.TRANSLUCENT_RENDER_TYPE))
                 tag(GLASS_CASING)
             }
 
@@ -267,7 +268,7 @@ object Multiblocks {
             }
 
             misc("fusion_glass") {
-                blockState(solidBlock("casings/transparent/fusion_glass"))
+                blockState(solidBlock("casings/transparent/fusion_glass", Models.TRANSLUCENT_RENDER_TYPE))
                 tag(FUSION_SHELL)
             }
 

@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content;
 
 import com.google.common.collect.ImmutableMap;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
@@ -60,6 +61,8 @@ public final class Models {
     public static final ResourceLocation BLOCK_VOID_TEX = modLoc("block/void");
     public static final ResourceLocation BLOCK_WHITE_TEX = modLoc("block/white");
     public static final ResourceLocation ITEM_VOID_TEX = modLoc("item/void");
+    public static final ResourceLocation CUTOUT_RENDER_TYPE = mcLoc("cutout");
+    public static final ResourceLocation TRANSLUCENT_RENDER_TYPE = mcLoc("translucent");
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -209,23 +212,44 @@ public final class Models {
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeTint(
         String tex) {
+        return cubeTint(tex, null);
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeTint(
+        String tex, @Nullable ResourceLocation renderType) {
         return ctx -> {
             var model = ctx.provider().models()
                 .withExistingParent(ctx.id(), modLoc("block/cube_tint"))
                 .texture("all", gregtech("block/" + tex));
+            if (renderType != null) {
+                model.renderType(renderType);
+            }
             ctx.provider().simpleBlock(ctx.object(), model);
         };
     }
 
     public static <U extends Block> void solidBlock(IEntryDataContext<U, BlockStateProvider> ctx,
         ResourceLocation tex) {
+        solidBlock(ctx, tex, null);
+    }
+
+    public static <U extends Block> void solidBlock(IEntryDataContext<U, BlockStateProvider> ctx,
+        ResourceLocation tex, @Nullable ResourceLocation renderType) {
         var model = ctx.provider().models().cubeAll(ctx.id(), tex);
+        if (renderType != null) {
+            model.renderType(renderType);
+        }
         ctx.provider().simpleBlock(ctx.object(), model);
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlock(
         String tex) {
         return ctx -> solidBlock(ctx, gregtech("block/" + tex));
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlock(
+        String tex, ResourceLocation renderType) {
+        return ctx -> solidBlock(ctx, gregtech("block/" + tex), renderType);
     }
 
     public static void cableBlock(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx) {
@@ -283,8 +307,10 @@ public final class Models {
             var casingTex = gregtech("block/" + casing);
 
             idles[i] = applyCasing(models.withExistingParent(id, casingModel), casingTex, existingHelper)
+                .renderType(TRANSLUCENT_RENDER_TYPE)
                 .texture("front_overlay", extend(idle, Integer.toString(i)));
             spins[i] = applyCasing(models.withExistingParent(id1, casingModel), casingTex, existingHelper)
+                .renderType(TRANSLUCENT_RENDER_TYPE)
                 .texture("front_overlay", extend(spin, Integer.toString(i)));
         }
 
@@ -327,6 +353,6 @@ public final class Models {
             .itemModel(CableModel::genItemModels)
             .blockModel(MachineModel::genBlockModels)
             .blockModel(ctx -> IconSet.DULL.blockOverlay(ctx.provider(),
-                "material/ore", "ore"));
+                "material/ore", "ore").renderType(TRANSLUCENT_RENDER_TYPE));
     }
 }

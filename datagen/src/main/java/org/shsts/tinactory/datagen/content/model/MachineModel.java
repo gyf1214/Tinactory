@@ -45,6 +45,7 @@ import static org.shsts.tinactory.datagen.content.Models.BLOCK_VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.DIR_TEX_KEYS;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
+import static org.shsts.tinactory.datagen.content.Models.TRANSLUCENT_RENDER_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.rotateModel;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
@@ -363,6 +364,7 @@ public class MachineModel {
 
     private static void genCasingModel(IDataContext<BlockModelProvider> ctx) {
         var model = ctx.provider().withExistingParent(CASING_MODEL, mcLoc("block/block"))
+            .renderType(TRANSLUCENT_RENDER_TYPE)
             .texture("particle", "#side")
             .element().from(0, 0, 0).to(16, 16, 16)
             .allFaces((d, f) -> f.cullface(d).texture(switch (d) {
@@ -387,6 +389,7 @@ public class MachineModel {
 
     private static void genIOModel(IDataContext<BlockModelProvider> ctx) {
         ctx.provider().withExistingParent(IO_MODEL, mcLoc("block/block"))
+            .renderType(TRANSLUCENT_RENDER_TYPE)
             .element().from(0, 0, 0).to(16, 16, 16)
             .face(FRONT_FACING)
             .cullface(FRONT_FACING)
