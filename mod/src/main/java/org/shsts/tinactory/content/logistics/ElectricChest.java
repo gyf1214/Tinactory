@@ -157,7 +157,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     protected void onMachineConfig() {
-        machine.network().ifPresent(network -> registerPort(network, externalPort));
+        machine().network().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override

@@ -25,7 +25,6 @@ import java.util.Collection;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -68,8 +67,15 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         fluid.setComposes(fluids);
     }
 
+    protected IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private void onUpdateLogistics(LogisticComponent logistics) {
-        combinePorts(logistics.getStoragePorts(machine), combinedItem, combinedFluid);
+        combinePorts(logistics.getStoragePorts(machine()), combinedItem, combinedFluid);
     }
 
     protected void onConnect(INetwork network) {
@@ -96,7 +102,6 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     }
 
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 

@@ -31,8 +31,8 @@ public class MEStorageInterface extends MEStorageAccess {
         super.onConnect(network);
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.registerPort(machine, 0, combinedItem);
-        logistics.registerPort(machine, 1, combinedFluid);
+        logistics.registerPort(machine(), 0, combinedItem);
+        logistics.registerPort(machine(), 1, combinedFluid);
     }
 
     public Collection<ItemStack> getAllItems() {

@@ -58,7 +58,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
         if (world == null || world.isClientSide) {
             return;
         }
-        var config = machine.config();
+        var config = machine().config();
         targetItem = targetItem(world.registryAccess(), config);
         targetFluid = targetFluid(world.registryAccess(), config);
         targetAmount = config.getLong(TARGET_AMOUNT_KEY, 0L);
@@ -86,7 +86,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     private void updateSignal() {
         var oldSignal = signal;
         signal = recalculateSignal();
-        var world = machine.world();
+        var world = machine().world();
         if (!world.isClientSide && signal != oldSignal) {
             SignalMachineBlock.updateSignal(world, blockEntity);
         }

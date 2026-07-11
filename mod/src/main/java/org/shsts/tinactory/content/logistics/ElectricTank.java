@@ -100,7 +100,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
 
     @Override
     protected void onMachineConfig() {
-        machine.network().ifPresent(network -> registerPort(network, port));
+        machine().network().ifPresent(network -> registerPort(network, port));
     }
 
     @Override

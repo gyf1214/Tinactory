@@ -44,10 +44,8 @@ import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
@@ -146,6 +144,20 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         return new ByteStats(bytesUsed, bytesCapacity);
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
+    private IMachineConfig machineConfig() {
+        if (machineConfig == null) {
+            machineConfig = machine().config();
+        }
+        return machineConfig;
+    }
+
     private int updateSignal() {
         var totalBytes = bytesUsed();
         var totalCapacity = bytesCapacity();
@@ -154,11 +166,11 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
-        logistics.unregisterPort(machine, 0);
-        logistics.unregisterPort(machine, 1);
-        logistics.registerStoragePort(machine, 0, combinedItems, priority);
-        logistics.registerStoragePort(machine, 1, combinedFluids, priority);
+        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        logistics.unregisterPort(machine(), 0);
+        logistics.unregisterPort(machine(), 1);
+        logistics.registerStoragePort(machine(), 0, combinedItems, priority);
+        logistics.registerStoragePort(machine(), 1, combinedFluids, priority);
     }
 
     private void onConnect(INetwork network) {
@@ -166,7 +178,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         registerPatternCells(network);
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        signal.registerRead(machine(), AMOUNT_SIGNAL, () -> amountSignal);
         amountSignal = updateSignal();
     }
 
@@ -195,15 +207,15 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);
         if (machine != null) {
-            machine.network().ifPresent(this::registerPatternCells);
+            machine().network().ifPresent(this::registerPatternCells);
         }
         onContainerChange();
     }
 
     private void registerPatternCells(INetwork network) {
         var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
-        patternRepository.removeCellPorts(machine.uuid());
-        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        patternRepository.removeCellPorts(machine().uuid());
+        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
         for (var i = 0; i < storages.getSlots(); i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {
@@ -211,20 +223,15 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             }
             var slotIndex = i;
             PATTERN_CELL_ITEM.tryGet(stack).ifPresent(port ->
-                patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
+                patternRepository.addCellPort(machine().uuid(), priority, slotIndex, port));
         }
     }
 
     private void onMachineConfig() {
-        machine.network().ifPresent(network -> {
+        machine().network().ifPresent(network -> {
             registerPort(network);
             registerPatternCells(network);
         });
-    }
-
-    private void onLoad() {
-        machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config();
     }
 
     @Override
@@ -242,8 +249,6 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->

@@ -22,7 +22,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.MEStorageAccess.combinePorts;
@@ -62,6 +61,13 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         combinePorts(logistics.getStoragePorts(childSubnet), childItem, childFluid);
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
 
@@ -71,16 +77,15 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
             return;
         }
 
-        logistics.registerPort(machine, 0, parentItem, childSubnet);
-        logistics.registerPort(machine, 1, parentFluid, childSubnet);
-        logistics.registerPort(machine, 2, childItem, parentSubnet);
-        logistics.registerPort(machine, 3, childFluid, parentSubnet);
+        logistics.registerPort(machine(), 0, parentItem, childSubnet);
+        logistics.registerPort(machine(), 1, parentFluid, childSubnet);
+        logistics.registerPort(machine(), 2, childItem, parentSubnet);
+        logistics.registerPort(machine(), 3, childFluid, parentSubnet);
         logistics.onUpdate(() -> onUpdateLogistics(logistics, parentSubnet, childSubnet));
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 

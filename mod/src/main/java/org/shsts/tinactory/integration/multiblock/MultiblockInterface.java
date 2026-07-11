@@ -36,11 +36,9 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -74,6 +72,13 @@ public class MultiblockInterface extends Machine {
         this.voltage = getBlockVoltage(be);
     }
 
+    protected IFlexibleContainer flexibleContainer() {
+        if (container == null) {
+            container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
+        }
+        return container;
+    }
+
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
         return builder.container(ID, MultiblockInterface::new);
@@ -104,7 +109,7 @@ public class MultiblockInterface extends Machine {
     public void setContainerLayout(Layout val) {
         if (layout != val) {
             LOGGER.debug("{}: set container layout={}", this, val);
-            container.setLayout(val);
+            flexibleContainer().setLayout(val);
             layout = val;
             if (multiblock != null) {
                 multiblock.onContainerReady();
@@ -114,7 +119,7 @@ public class MultiblockInterface extends Machine {
 
     public void resetContainerLayout() {
         LOGGER.debug("{}: reset container layout", this);
-        container.resetLayout();
+        flexibleContainer().resetLayout();
         layout = null;
     }
 
@@ -156,10 +161,6 @@ public class MultiblockInterface extends Machine {
         electricMachine = null;
         resetContainerLayout();
         onMultiblockUpdate();
-    }
-
-    protected void onLoad() {
-        container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
     }
 
     private void onContainerChange() {
@@ -240,8 +241,6 @@ public class MultiblockInterface extends Machine {
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
         eventManager.subscribe(CONNECT.get(), this::onConnect);
@@ -271,7 +270,7 @@ public class MultiblockInterface extends Machine {
 
     @Override
     public Optional<IContainer> container() {
-        return Optional.of(container);
+        return Optional.of(flexibleContainer());
     }
 
     @Override

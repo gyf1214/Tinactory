@@ -309,8 +309,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    protected void onLoad() {
-        container = this;
+    protected IFlexibleContainer flexibleContainer() {
+        return this;
     }
 
     private long sharedCapacity() {

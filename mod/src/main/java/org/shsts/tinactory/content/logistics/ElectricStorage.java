@@ -19,9 +19,7 @@ import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
@@ -57,29 +55,38 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
             getBlockVoltage(blockEntity).value, power));
     }
 
+    protected IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
+    protected IMachineConfig machineConfig() {
+        if (machineConfig == null) {
+            machineConfig = machine().config();
+        }
+        return machineConfig;
+    }
+
     public boolean isUnlocked() {
-        return machineConfig.getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
+        return machineConfig().getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
     }
 
     public boolean isVoid() {
-        return machineConfig.getBoolean(VOID_KEY, VOID_DEFAULT);
+        return machineConfig().getBoolean(VOID_KEY, VOID_DEFAULT);
     }
 
     protected void registerPort(INetwork network, IPort<?> port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.unregisterPort(machine, 0);
-        logistics.registerStoragePort(machine, 0, port,
-            machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
+        logistics.unregisterPort(machine(), 0);
+        logistics.registerStoragePort(machine(), 0, port,
+            machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 
     protected void onSlotChange() {
         blockEntity.setChanged();
         amountSignal = updateSignal();
-    }
-
-    private void onLoad() {
-        machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config();
     }
 
     protected abstract void onMachineConfig();
@@ -90,7 +97,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         onMachineConfig();
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        signal.registerRead(machine(), AMOUNT_SIGNAL, () -> amountSignal);
         amountSignal = updateSignal();
     }
 
@@ -101,8 +108,6 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }

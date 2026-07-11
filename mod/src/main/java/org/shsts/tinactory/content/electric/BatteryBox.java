@@ -30,7 +30,6 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -68,8 +67,15 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
             batteryItem.voltage == voltage;
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private boolean isDischarge() {
-        return machine.config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+        return machine().config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
     }
 
     @Override
@@ -81,7 +87,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         if (isDischarge()) {
             factor = -1;
         } else {
-            factor = machine.network().orElseThrow()
+            factor = machine().network().orElseThrow()
                 .getComponent(ELECTRIC_COMPONENT.get())
                 .getBufferFactor();
         }
@@ -172,7 +178,6 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
             StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), items));
     }
