@@ -111,7 +111,7 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
 
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(font, title, titleLabelX, titleLabelY, RenderUtil.TEXT_COLOR);
+        graphics.drawString(font, title, titleLabelX, titleLabelY, RenderUtil.TEXT_COLOR, false);
     }
 
     public void renderTooltip(GuiGraphics graphics, List<Component> tooltip, Optional<TooltipComponent> component,

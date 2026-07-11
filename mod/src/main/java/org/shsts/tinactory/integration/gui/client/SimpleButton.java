@@ -15,14 +15,22 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 @MethodsReturnNonnullByDefault
 public abstract class SimpleButton extends Button {
     protected final Texture texture;
+    protected final Texture hoverTexture;
     protected final int normalX, normalY;
     protected final int hoverX, hoverY;
 
     public SimpleButton(MenuBase menu, Texture texture,
         @Nullable Component tooltip, int normalX, int normalY,
         int hoverX, int hoverY) {
+        this(menu, texture, texture, tooltip, normalX, normalY, hoverX, hoverY);
+    }
+
+    public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
+        @Nullable Component tooltip, int normalX, int normalY,
+        int hoverX, int hoverY) {
         super(menu, tooltip);
         this.texture = texture;
+        this.hoverTexture = hoverTexture;
         this.normalX = normalX;
         this.normalY = normalY;
         this.hoverX = hoverX;
@@ -34,11 +42,16 @@ public abstract class SimpleButton extends Button {
         this(menu, texture, tooltip, 0, 0, hoverX, hoverY);
     }
 
+    public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
+        @Nullable Component tooltip, int hoverX, int hoverY) {
+        this(menu, texture, hoverTexture, tooltip, 0, 0, hoverX, hoverY);
+    }
+
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         var rect = rect();
         if (isHovered(mouseX, mouseY)) {
-            RenderUtil.blit(graphics, texture, rect, hoverX, hoverY);
+            RenderUtil.blit(graphics, hoverTexture, rect, hoverX, hoverY);
         } else {
             RenderUtil.blit(graphics, texture, rect, normalX, normalY);
         }

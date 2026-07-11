@@ -22,7 +22,7 @@ public class VanillaWidgetAdapter<T extends GuiEventListener & Renderable & Narr
     @Override
     public void setRect(Rect rect) {
         if (widget instanceof AbstractWidget abstractWidget) {
-            abstractWidget.setRectangle(rect.x(), rect.y(), rect.width(), rect.height());
+            abstractWidget.setRectangle(rect.width(), rect.height(), rect.x(), rect.y());
         }
     }
 

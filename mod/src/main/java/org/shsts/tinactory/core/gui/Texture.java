@@ -24,8 +24,12 @@ public record Texture(ResourceLocation loc, int width, int height) {
         gregtech("gui/widget/toggle_button_background"), 18, 36);
     public static final Texture GREGTECH_LOGO = new Texture(
         gregtech("gui/icon/gregtech_logo"), 17, 17);
-    public static final Texture VANILLA_WIDGETS = new Texture(
-        mcLoc("gui/widgets"), 256, 256);
+    public static final Texture VANILLA_BUTTON = new Texture(
+        mcLoc("gui/sprites/widget/button"), 200, 20);
+    public static final Texture VANILLA_BUTTON_HOVERED = new Texture(
+        mcLoc("gui/sprites/widget/button_highlighted"), 200, 20);
+    public static final Texture VANILLA_BUTTON_DISABLED = new Texture(
+        mcLoc("gui/sprites/widget/button_disabled"), 200, 20);
 
     public static final Texture PROGRESS_BURN = new Texture(
         gregtech("gui/progress_bar/progress_bar_boiler_fuel_steel"), 18, 36);
@@ -39,7 +43,17 @@ public record Texture(ResourceLocation loc, int width, int height) {
     public static final Texture RECIPE_BOOK_BG = new Texture(
         mcLoc("gui/recipe_book"), 256, 256);
     public static final Texture RECIPE_BOOK_BUTTON = new Texture(
-        mcLoc("gui/recipe_button"), 256, 256);
+        mcLoc("gui/sprites/recipe_book/button"), 20, 18);
+    public static final Texture RECIPE_BOOK_BUTTON_HOVERED = new Texture(
+        mcLoc("gui/sprites/recipe_book/button_highlighted"), 20, 18);
+    public static final Texture PAGE_BACKWARD = new Texture(
+        mcLoc("gui/sprites/recipe_book/page_backward"), 12, 17);
+    public static final Texture PAGE_BACKWARD_HOVERED = new Texture(
+        mcLoc("gui/sprites/recipe_book/page_backward_highlighted"), 12, 17);
+    public static final Texture PAGE_FORWARD = new Texture(
+        mcLoc("gui/sprites/recipe_book/page_forward"), 12, 17);
+    public static final Texture PAGE_FORWARD_HOVERED = new Texture(
+        mcLoc("gui/sprites/recipe_book/page_forward_highlighted"), 12, 17);
     public static final Texture DISABLE_BUTTON = new Texture(
         modLoc("gui/disable_recipe"), 16, 16);
     public static final Texture RECIPE_BUTTON = new Texture(

@@ -230,7 +230,7 @@ public final class RenderUtil {
     }
 
     public static void renderText(GuiGraphics graphics, Component text, int x, int y, int color) {
-        graphics.drawString(ClientUtil.getFont(), text, x, y, color);
+        graphics.drawString(ClientUtil.getFont(), text, x, y, color, false);
     }
 
     public static void renderText(GuiGraphics graphics, Component text, int x, int y, int color, float scale) {
@@ -238,12 +238,12 @@ public final class RenderUtil {
         poseStack.pushPose();
         poseStack.translate(x, y, 0d);
         poseStack.scale(scale, scale, 1f);
-        graphics.drawString(ClientUtil.getFont(), text, 0, 0, color);
+        graphics.drawString(ClientUtil.getFont(), text, 0, 0, color, false);
         poseStack.popPose();
     }
 
     public static void renderText(GuiGraphics graphics, FormattedCharSequence text, int x, int y, int color) {
-        graphics.drawString(ClientUtil.getFont(), text, x, y, color);
+        graphics.drawString(ClientUtil.getFont(), text, x, y, color, false);
     }
 
     public static void renderText(GuiGraphics graphics, FormattedCharSequence text, int x, int y, int color,
@@ -252,7 +252,7 @@ public final class RenderUtil {
         poseStack.pushPose();
         poseStack.translate(x, y, 0d);
         poseStack.scale(scale, scale, 1f);
-        graphics.drawString(ClientUtil.getFont(), text, 0, 0, color);
+        graphics.drawString(ClientUtil.getFont(), text, 0, 0, color, false);
         poseStack.popPose();
     }
 

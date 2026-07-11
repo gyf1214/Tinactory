@@ -43,6 +43,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON_HOVERED;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
@@ -223,8 +224,8 @@ public class MachineRecipeBook extends Panel {
 
     public static void addButton(MenuBase menu, Panel parent, MachineRecipeBook recipeBook,
         RectD anchor, int x, int y, Runnable extraCallback) {
-        var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON,
-            I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
+        var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON, RECIPE_BOOK_BUTTON_HOVERED,
+            I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);
