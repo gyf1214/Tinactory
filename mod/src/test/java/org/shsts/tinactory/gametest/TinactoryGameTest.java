@@ -10,8 +10,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -80,6 +82,39 @@ public final class TinactoryGameTest {
             var absoluteMachinePos = helper.absolutePos(machinePos);
             if (manager.getNetworkAtPos(absoluteMachinePos).isEmpty()) {
                 helper.fail("Mock player use did not create a ticking machine network", machinePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 40)
+    public static void testPlacedMachineKeepsNetworkThroughLoadAndFirstUse(GameTestHelper helper) {
+        var machinePos = new BlockPos(1, 1, 1);
+        var floorPos = machinePos.below();
+        helper.setBlock(floorPos, Blocks.STONE);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var scoreboard = helper.getLevel().getScoreboard();
+        var team = scoreboard.getPlayerTeam(TEAM_NAME);
+        assert team != null;
+        scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
+        var machineStack = new ItemStack(machineState(Direction.EAST).getBlock());
+        player.setItemInHand(InteractionHand.MAIN_HAND, machineStack);
+        var absoluteFloorPos = helper.absolutePos(floorPos);
+        machineStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absoluteFloorPos), Direction.UP, absoluteFloorPos, false)));
+        var machine = MACHINE.get(helper.getBlockEntity(machinePos));
+        var placementNetwork = machine.network().orElseThrow();
+
+        helper.runAfterDelay(4, () -> {
+            if (machine.owner().isEmpty()) {
+                helper.fail("Machine lost its team during server load", machinePos);
+            }
+            if (machine.network().orElseThrow() != placementNetwork) {
+                helper.fail("Machine replaced its placement network during server load", machinePos);
+            }
+            useWithTeamMockPlayer(helper, machinePos);
+            if (machine.network().orElseThrow() != placementNetwork) {
+                helper.fail("Machine replaced its placement network during first use", machinePos);
             }
             helper.succeed();
         });

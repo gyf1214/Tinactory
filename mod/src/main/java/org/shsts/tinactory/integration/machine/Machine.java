@@ -151,6 +151,10 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
      */
     private void createNetwork(Level world) {
         if (activeNetwork && team != null) {
+            if (network != null) {
+                LOGGER.warn("{} already has network {}, invalidating before replacement", blockEntity, network);
+                network.invalidate();
+            }
             network = new Network(world, uuid, blockEntity.getBlockPos(), team);
         }
     }
@@ -206,9 +210,13 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     private void onServerLoad(Level world) {
-        team = teamName == null ? null : TechManagers.server().teamByName(teamName).orElse(null);
-        teamName = null;
-        createNetwork(world);
+        if (teamName != null) {
+            team = TechManagers.server().teamByName(teamName).orElse(null);
+            teamName = null;
+        }
+        if (network == null) {
+            createNetwork(world);
+        }
     }
 
     private void onServerTick(Level world) {
