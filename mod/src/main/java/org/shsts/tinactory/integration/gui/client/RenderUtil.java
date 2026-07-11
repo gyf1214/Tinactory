@@ -67,8 +67,8 @@ public final class RenderUtil {
 
     public static void blit(GuiGraphics graphics, Texture tex, int color, Rect dstRect, Rect srcRect) {
         setColor(graphics, color);
-        graphics.blit(tex.loc(), dstRect.x(), dstRect.y(), srcRect.x(), srcRect.y(),
-            dstRect.width(), dstRect.height(), tex.width(), tex.height());
+        graphics.blit(tex.loc(), dstRect.x(), dstRect.y(), dstRect.width(), dstRect.height(),
+            srcRect.x(), srcRect.y(), srcRect.width(), srcRect.height(), tex.width(), tex.height());
         graphics.setColor(1f, 1f, 1f, 1f);
     }
 
