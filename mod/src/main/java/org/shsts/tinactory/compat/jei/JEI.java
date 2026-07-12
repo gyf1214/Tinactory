@@ -12,8 +12,11 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -33,6 +36,7 @@ import org.shsts.tinactory.compat.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchHandler;
+import org.shsts.tinactory.compat.jei.ingredient.BatterySubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
@@ -47,6 +51,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
+import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
@@ -75,6 +80,16 @@ public class JEI implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
         return LOC;
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        ClientUtil.registryAccess().registry(Registries.ITEM)
+            .flatMap($ -> $.getTag(AllTags.BATTERY))
+            .stream()
+            .flatMap(HolderSet.ListBacked::stream)
+            .forEach($ -> registration.registerSubtypeInterpreter($.value(),
+                BatterySubtypeInterpreter.INSTANCE));
     }
 
     @Override

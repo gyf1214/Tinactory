@@ -28,6 +28,7 @@ import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.machineItem
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
 import org.shsts.tinactory.datagen.content.builder.ItemDataFactory
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
@@ -74,6 +75,7 @@ object Components {
                 item(entry) {
                     model(Models::batteryItem)
                     tag(AllTags.battery(v))
+                    dataGen { tag(AllTags.battery(v), AllTags.BATTERY) }
                 }
             }
 
