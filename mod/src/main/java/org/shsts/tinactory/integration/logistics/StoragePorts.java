@@ -18,6 +18,7 @@ import org.shsts.tinactory.core.logistics.IDigitalProvider;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
@@ -35,7 +36,11 @@ public final class StoragePorts {
     }
 
     public static CombinedPort<ItemStack> combinedItem() {
-        return new ItemCombinedPort();
+        return combinedItem(true);
+    }
+
+    public static CombinedPort<ItemStack> combinedItem(boolean delegateChildUpdates) {
+        return new ItemCombinedPort(delegateChildUpdates);
     }
 
     @SafeVarargs
@@ -44,11 +49,20 @@ public final class StoragePorts {
     }
 
     public static CombinedPort<ItemStack> combinedItem(Collection<IPort<ItemStack>> composes) {
-        return new ItemCombinedPort(composes);
+        return combinedItem(composes, true);
+    }
+
+    public static CombinedPort<ItemStack> combinedItem(Collection<IPort<ItemStack>> composes,
+        boolean delegateChildUpdates) {
+        return new ItemCombinedPort(composes, delegateChildUpdates);
     }
 
     public static CombinedPort<FluidStack> combinedFluid() {
-        return new FluidCombinedPort();
+        return combinedFluid(true);
+    }
+
+    public static CombinedPort<FluidStack> combinedFluid(boolean delegateChildUpdates) {
+        return new FluidCombinedPort(delegateChildUpdates);
     }
 
     @SafeVarargs
@@ -57,7 +71,12 @@ public final class StoragePorts {
     }
 
     public static CombinedPort<FluidStack> combinedFluid(Collection<IPort<FluidStack>> composes) {
-        return new FluidCombinedPort(composes);
+        return combinedFluid(composes, true);
+    }
+
+    public static CombinedPort<FluidStack> combinedFluid(Collection<IPort<FluidStack>> composes,
+        boolean delegateChildUpdates) {
+        return new FluidCombinedPort(composes, delegateChildUpdates);
     }
 
     public static class ItemStorage extends DigitalStorage<ItemStack>
@@ -117,22 +136,22 @@ public final class StoragePorts {
     }
 
     private static class ItemCombinedPort extends CombinedPort<ItemStack> implements IItemPort {
-        private ItemCombinedPort() {
-            super(StackHelper.ITEM_ADAPTER);
+        private ItemCombinedPort(boolean delegateChildUpdates) {
+            super(StackHelper.ITEM_ADAPTER, List.of(), delegateChildUpdates);
         }
 
-        private ItemCombinedPort(Collection<IPort<ItemStack>> composes) {
-            super(StackHelper.ITEM_ADAPTER, composes);
+        private ItemCombinedPort(Collection<IPort<ItemStack>> composes, boolean delegateChildUpdates) {
+            super(StackHelper.ITEM_ADAPTER, composes, delegateChildUpdates);
         }
     }
 
     private static class FluidCombinedPort extends CombinedPort<FluidStack> implements IFluidPort {
-        private FluidCombinedPort() {
-            super(StackHelper.FLUID_ADAPTER);
+        private FluidCombinedPort(boolean delegateChildUpdates) {
+            super(StackHelper.FLUID_ADAPTER, List.of(), delegateChildUpdates);
         }
 
-        private FluidCombinedPort(Collection<IPort<FluidStack>> composes) {
-            super(StackHelper.FLUID_ADAPTER, composes);
+        private FluidCombinedPort(Collection<IPort<FluidStack>> composes, boolean delegateChildUpdates) {
+            super(StackHelper.FLUID_ADAPTER, composes, delegateChildUpdates);
         }
     }
 }

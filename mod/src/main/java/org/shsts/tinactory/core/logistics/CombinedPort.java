@@ -22,6 +22,7 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private final IStackAdapter<T> stackAdapter;
+    private final boolean delegateChildUpdates;
     private final Set<Runnable> updateListeners = new HashSet<>();
     protected final List<IPort<T>> composes = new ArrayList<>();
     protected final Runnable combinedListener = this::invokeUpdate;
@@ -29,7 +30,12 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
     public boolean allowOutput = true;
 
     public CombinedPort(IStackAdapter<T> stackAdapter, Collection<IPort<T>> composes) {
+        this(stackAdapter, composes, true);
+    }
+
+    public CombinedPort(IStackAdapter<T> stackAdapter, Collection<IPort<T>> composes, boolean delegateChildUpdates) {
         this.stackAdapter = stackAdapter;
+        this.delegateChildUpdates = delegateChildUpdates;
         addComposes(composes);
     }
 
@@ -40,17 +46,21 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
     private void addComposes(Collection<IPort<T>> values) {
         composes.clear();
         composes.addAll(values);
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.onUpdate(combinedListener);
+        if (delegateChildUpdates) {
+            for (var compose : composes) {
+                if (compose instanceof IPortNotifier notifier) {
+                    notifier.onUpdate(combinedListener);
+                }
             }
         }
     }
 
     public void setComposes(Collection<IPort<T>> values) {
-        for (var compose : composes) {
-            if (compose instanceof IPortNotifier notifier) {
-                notifier.unregisterListener(combinedListener);
+        if (delegateChildUpdates) {
+            for (var compose : composes) {
+                if (compose instanceof IPortNotifier notifier) {
+                    notifier.unregisterListener(combinedListener);
+                }
             }
         }
         addComposes(values);
@@ -75,6 +85,10 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
                 break;
             }
             stack1 = compose.insert(stack1, simulate);
+        }
+        if (!simulate && !stackAdapter.isEmpty(stack) &&
+            stackAdapter.amount(stack1) < stackAdapter.amount(stack)) {
+            invokeUpdateIfOperationOwned();
         }
         return stack1;
     }
@@ -105,6 +119,9 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
                     stackAdapter.amount(stack1) - stackAdapter.amount(extracted));
             }
         }
+        if (!simulate && !stackAdapter.isEmpty(ret)) {
+            invokeUpdateIfOperationOwned();
+        }
         return ret;
     }
 
@@ -112,7 +129,11 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
         if (!allowOutput || limit <= 0 || composes.isEmpty()) {
             return stackAdapter.empty();
         }
-        return composes.get(0).extract(limit, simulate);
+        var ret = composes.get(0).extract(limit, simulate);
+        if (!simulate && !stackAdapter.isEmpty(ret)) {
+            invokeUpdateIfOperationOwned();
+        }
+        return ret;
     }
 
     public long getStorageAmount(T stack) {
@@ -154,6 +175,12 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
     protected void invokeUpdate() {
         for (var cb : updateListeners) {
             cb.run();
+        }
+    }
+
+    private void invokeUpdateIfOperationOwned() {
+        if (!delegateChildUpdates) {
+            invokeUpdate();
         }
     }
 }

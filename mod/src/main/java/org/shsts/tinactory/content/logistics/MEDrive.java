@@ -86,10 +86,10 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         }
         storages.onUpdate(this::onStorageChange);
 
-        this.combinedItems = StoragePorts.combinedItem();
+        this.combinedItems = StoragePorts.combinedItem(false);
         combinedItems.onUpdate(this::onContainerChange);
 
-        this.combinedFluids = StoragePorts.combinedFluid();
+        this.combinedFluids = StoragePorts.combinedFluid(false);
         combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);

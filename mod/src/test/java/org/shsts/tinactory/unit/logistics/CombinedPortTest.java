@@ -17,7 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CombinedPortTest {
     private static class TestCombinedPort extends CombinedPort<TestStack> {
         public TestCombinedPort(Collection<IPort<TestStack>> composes) {
-            super(TestStack.ADAPTER, composes);
+            this(composes, true);
+        }
+
+        public TestCombinedPort(Collection<IPort<TestStack>> composes, boolean delegateChildUpdates) {
+            super(TestStack.ADAPTER, composes, delegateChildUpdates);
         }
 
         @Override
@@ -118,6 +122,49 @@ class CombinedPortTest {
         second.extract(new TestStack("iron", 1), false);
 
         assertEquals(3, updates.get());
+    }
+
+    @Test
+    void operationOwnedModeShouldNotifyOnceForSuccessfulOperations() {
+        var port = new TestPort("iron", 10, 3);
+        var combined = new TestCombinedPort(List.of(port), false);
+        var updates = new AtomicInteger();
+        combined.onUpdate(updates::incrementAndGet);
+
+        combined.insert(new TestStack("iron", 2), false);
+        combined.extract(new TestStack("iron", 1), false);
+        combined.extract(1, false);
+
+        assertEquals(3, updates.get());
+    }
+
+    @Test
+    void operationOwnedModeShouldNotNotifyForSimulationOrNoOp() {
+        var port = new TestPort("iron", 10, 3);
+        var combined = new TestCombinedPort(List.of(port), false);
+        var updates = new AtomicInteger();
+        combined.onUpdate(updates::incrementAndGet);
+
+        combined.insert(new TestStack("gold", 1), false);
+        combined.insert(new TestStack("iron", 1), true);
+        combined.extract(new TestStack("gold", 1), false);
+        combined.extract(new TestStack("iron", 1), true);
+        combined.extract(0, false);
+        combined.extract(1, false);
+
+        assertEquals(1, updates.get());
+    }
+
+    @Test
+    void operationOwnedModeShouldNotForwardChildNotifications() {
+        var port = new TestPort("iron", 10, 0);
+        var combined = new TestCombinedPort(List.of(port), false);
+        var updates = new AtomicInteger();
+        combined.onUpdate(updates::incrementAndGet);
+
+        combined.insert(new TestStack("iron", 1), false);
+
+        assertEquals(1, updates.get());
     }
 
     @Test
