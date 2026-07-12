@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
@@ -80,7 +81,7 @@ public final class ClientUtil {
     }
 
     public static <T> ResourceLocation getRegistryKey(ResourceKey<? extends Registry<T>> registryKey, T value) {
-        return registryAccess().registryOrThrow(registryKey).getKey(value);
+        return Objects.requireNonNull(registryAccess().registryOrThrow(registryKey).getKey(value));
     }
 
     public static <T> Optional<T> getRegistryObject(ResourceKey<? extends Registry<T>> registryKey,
