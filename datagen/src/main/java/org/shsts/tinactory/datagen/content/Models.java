@@ -307,10 +307,10 @@ public final class Models {
             var casingTex = gregtech("block/" + casing);
 
             idles[i] = applyCasing(models.withExistingParent(id, casingModel), casingTex, existingHelper)
-                .renderType(TRANSLUCENT_RENDER_TYPE)
+                .renderType(CUTOUT_RENDER_TYPE)
                 .texture("front_overlay", extend(idle, Integer.toString(i)));
             spins[i] = applyCasing(models.withExistingParent(id1, casingModel), casingTex, existingHelper)
-                .renderType(TRANSLUCENT_RENDER_TYPE)
+                .renderType(CUTOUT_RENDER_TYPE)
                 .texture("front_overlay", extend(spin, Integer.toString(i)));
         }
 
@@ -353,6 +353,6 @@ public final class Models {
             .itemModel(CableModel::genItemModels)
             .blockModel(MachineModel::genBlockModels)
             .blockModel(ctx -> IconSet.DULL.blockOverlay(ctx.provider(),
-                "material/ore", "ore").renderType(TRANSLUCENT_RENDER_TYPE));
+                "material/ore", "ore").renderType(CUTOUT_RENDER_TYPE));
     }
 }

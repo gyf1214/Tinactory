@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.datagen.content.Models.BLOCK_WHITE_TEX;
+import static org.shsts.tinactory.datagen.content.Models.CUTOUT_RENDER_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
-import static org.shsts.tinactory.datagen.content.Models.TRANSLUCENT_RENDER_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
 import static org.shsts.tinactory.integration.network.CableBlock.PIPE_RADIUS;
@@ -112,25 +112,25 @@ public final class CableModel {
 
     public static void genBlockModels(IDataContext<BlockModelProvider> ctx) {
         genOpenEnd(ctx.provider(), OPEN_MODEL, RADIUS, true)
-            .renderType(TRANSLUCENT_RENDER_TYPE)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
         genOpenEnd(ctx.provider(), OPEN_WIRE_MODEL, WIRE_RADIUS, false)
-            .renderType(TRANSLUCENT_RENDER_TYPE)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", BLOCK_WHITE_TEX)
             .texture("wire", WIRE_TEX);
         genClosedEnd(ctx.provider(), CLOSED_MODEL, RADIUS)
-            .renderType(TRANSLUCENT_RENDER_TYPE)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX);
         genClosedEnd(ctx.provider(), CLOSED_WIRE_MODEL, WIRE_RADIUS)
-            .renderType(TRANSLUCENT_RENDER_TYPE)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", BLOCK_WHITE_TEX);
     }
 
     public static void genItemModels(IDataContext<ItemModelProvider> ctx) {
         genItem(ctx.provider(), ITEM_MODEL, RADIUS, true)
-            .renderType(TRANSLUCENT_RENDER_TYPE)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);

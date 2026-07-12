@@ -126,7 +126,7 @@ object Multiblocks {
 
             misc("clear_glass") {
                 blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a"),
-                    Models.TRANSLUCENT_RENDER_TYPE) }
+                    Models.CUTOUT_RENDER_TYPE) }
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS_BLOCKS)
             }
@@ -268,7 +268,7 @@ object Multiblocks {
             }
 
             misc("fusion_glass") {
-                blockState(solidBlock("casings/transparent/fusion_glass", Models.TRANSLUCENT_RENDER_TYPE))
+                blockState(solidBlock("casings/transparent/fusion_glass", Models.CUTOUT_RENDER_TYPE))
                 tag(FUSION_SHELL)
             }
 
