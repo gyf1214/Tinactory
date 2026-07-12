@@ -1,6 +1,8 @@
 package org.shsts.tinactory;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +29,8 @@ import java.util.function.Supplier;
 import static org.shsts.tinactory.Tinactory.CORE;
 
 @OnlyIn(Dist.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public final class AllClientEvents {
     @SubscribeEvent
     public static void onDrawHighlight(RenderHighlightEvent.Block event) {

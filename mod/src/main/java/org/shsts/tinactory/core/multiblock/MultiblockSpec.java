@@ -191,7 +191,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
             return new LayerBuilder<>(this)
                 .onCreateObject(l -> {
                     layers.add(l);
-                    var w = l.rows.get(0).length();
+                    var w = l.rows.getFirst().length();
                     var d = l.rows.size();
                     if (width == 0) {
                         width = w;

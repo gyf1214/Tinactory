@@ -29,18 +29,10 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
     public boolean allowInput = true;
     public boolean allowOutput = true;
 
-    public CombinedPort(IStackAdapter<T> stackAdapter, Collection<IPort<T>> composes) {
-        this(stackAdapter, composes, true);
-    }
-
     public CombinedPort(IStackAdapter<T> stackAdapter, Collection<IPort<T>> composes, boolean delegateChildUpdates) {
         this.stackAdapter = stackAdapter;
         this.delegateChildUpdates = delegateChildUpdates;
         addComposes(composes);
-    }
-
-    public CombinedPort(IStackAdapter<T> stackAdapter) {
-        this(stackAdapter, List.of());
     }
 
     private void addComposes(Collection<IPort<T>> values) {
@@ -129,7 +121,7 @@ public abstract class CombinedPort<T> implements IPort<T>, IPortFilter<T>, IPort
         if (!allowOutput || limit <= 0 || composes.isEmpty()) {
             return stackAdapter.empty();
         }
-        var ret = composes.get(0).extract(limit, simulate);
+        var ret = composes.getFirst().extract(limit, simulate);
         if (!simulate && !stackAdapter.isEmpty(ret)) {
             invokeUpdateIfOperationOwned();
         }

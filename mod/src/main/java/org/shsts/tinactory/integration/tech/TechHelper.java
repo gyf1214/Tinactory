@@ -15,7 +15,7 @@ public final class TechHelper {
     private TechHelper() {}
 
     public static Optional<PlayerTeam> playerTeam(Player player) {
-        return Optional.ofNullable((PlayerTeam) player.getTeam());
+        return Optional.ofNullable(player.getTeam());
     }
 
     public static Optional<PlayerTeam> scoreboardTeam(String name) {

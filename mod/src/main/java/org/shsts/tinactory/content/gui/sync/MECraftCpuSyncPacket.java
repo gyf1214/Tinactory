@@ -39,12 +39,12 @@ public class MECraftCpuSyncPacket implements IPacket {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof CpuInfo other)) {
+            if (!(obj instanceof CpuInfo(CpuStatusEntry status1, Component name1, ItemStack icon1))) {
                 return false;
             }
-            return status.equals(other.status) &&
-                name.equals(other.name) &&
-                ItemStack.matches(icon, other.icon);
+            return status.equals(status1) &&
+                name.equals(name1) &&
+                ItemStack.matches(icon, icon1);
         }
 
         @Override

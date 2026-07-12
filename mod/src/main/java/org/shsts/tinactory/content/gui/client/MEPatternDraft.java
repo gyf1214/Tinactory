@@ -152,9 +152,9 @@ public final class MEPatternDraft {
             ret.add(MEPatternIngredientDraft.from(amount));
         }
         for (var constraint : constraints) {
-            if (constraint instanceof PortConstraint port && port.direction() == direction &&
-                port.index() < ret.size()) {
-                ret.get(port.index()).setPort(port.port());
+            if (constraint instanceof PortConstraint(PortDirection direction1, int index, int port1) &&
+                direction1 == direction && index < ret.size()) {
+                ret.get(index).setPort(port1);
             }
         }
         return ret;

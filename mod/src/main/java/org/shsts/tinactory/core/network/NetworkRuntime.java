@@ -47,9 +47,8 @@ public final class NetworkRuntime {
         assert !components.containsKey(type);
         var component = type.create(host);
         components.put(type, component);
-        component.buildSchedulings((scheduling, ticker) -> {
-            componentSchedulings.put(scheduling, tickerActionFactory.apply(ticker));
-        });
+        component.buildSchedulings((scheduling, ticker) ->
+            componentSchedulings.put(scheduling, tickerActionFactory.apply(ticker)));
     }
 
     public <T extends INetworkComponent> T getComponent(IComponentType<T> type) {
@@ -95,9 +94,8 @@ public final class NetworkRuntime {
             component.onPostConnect();
         }
         for (var machine : machines) {
-            machine.buildSchedulings((scheduling, ticker) -> {
-                machineSchedulings.put(scheduling, tickerActionFactory.apply(ticker));
-            });
+            machine.buildSchedulings((scheduling, ticker) ->
+                machineSchedulings.put(scheduling, tickerActionFactory.apply(ticker)));
         }
     }
 

@@ -167,7 +167,7 @@ public class Network implements INetwork {
 
     private void doConnect() {
         var connectDelay = CONFIG.networkConnectDelay.get();
-        var maxConnects = CONFIG.networkMaxConnectsPerTick.get();
+        var maxConnects = (int) CONFIG.networkMaxConnectsPerTick.get();
         if (delayTicks < connectDelay) {
             delayTicks++;
             return;

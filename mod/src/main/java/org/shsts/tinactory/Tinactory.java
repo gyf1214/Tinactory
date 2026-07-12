@@ -1,7 +1,6 @@
 package org.shsts.tinactory;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.bus.api.IEventBus;
@@ -31,8 +30,6 @@ public class Tinactory {
     public static IRegistrate REGISTRATE;
 
     private final IEventBus modEventBus;
-    @Nullable
-    private TechQuestIntegration techQuestIntegration = null;
 
     public Tinactory(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
@@ -69,7 +66,7 @@ public class Tinactory {
 
             TechManagers.init();
             if (ModList.get().isLoaded("ftbquests")) {
-                techQuestIntegration = new TechQuestIntegration();
+                new TechQuestIntegration().register();
             }
             AllWorldGens.init();
 

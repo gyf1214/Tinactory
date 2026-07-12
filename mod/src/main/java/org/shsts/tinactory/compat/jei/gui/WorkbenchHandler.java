@@ -18,7 +18,7 @@ public final class WorkbenchHandler {
     public static void addWorkbenchClickArea(IGuiHandlerRegistration registration,
         ToolCategory category) {
         var layout = AllLayouts.WORKBENCH;
-        var rect = layout.images.get(0).rect();
+        var rect = layout.images.getFirst().rect();
         var x = rect.x() + layout.getXOffset() + MARGIN_X;
         var y = rect.y() + MARGIN_TOP;
 

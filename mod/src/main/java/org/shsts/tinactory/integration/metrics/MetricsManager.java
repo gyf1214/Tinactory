@@ -49,14 +49,16 @@ public class MetricsManager {
     }
 
     public static void reportProcessingObject(String action, IMachine machine, IProcessingObject object) {
-        if (object instanceof StackIngredient<?> ingredient && ingredient.type() == PortType.ITEM) {
-            reportItem("item_" + action, machine, (ItemStack) ingredient.stack());
-        } else if (object instanceof StackIngredient<?> ingredient && ingredient.type() == PortType.FLUID) {
-            reportFluid("fluid_" + action, machine, (FluidStack) ingredient.stack());
-        } else if (object instanceof StackResult<?> result && result.type() == PortType.ITEM) {
-            reportItem("item_" + action, machine, (ItemStack) result.stack());
-        } else if (object instanceof StackResult<?> result && result.type() == PortType.FLUID) {
-            reportFluid("fluid_" + action, machine, (FluidStack) result.stack());
+        switch (object) {
+            case StackIngredient<?> ingredient when ingredient.type() == PortType.ITEM ->
+                reportItem("item_" + action, machine, (ItemStack) ingredient.stack());
+            case StackIngredient<?> ingredient when ingredient.type() == PortType.FLUID ->
+                reportFluid("fluid_" + action, machine, (FluidStack) ingredient.stack());
+            case StackResult<?> result when result.type() == PortType.ITEM ->
+                reportItem("item_" + action, machine, (ItemStack) result.stack());
+            case StackResult<?> result when result.type() == PortType.FLUID ->
+                reportFluid("fluid_" + action, machine, (FluidStack) result.stack());
+            default -> {}
         }
     }
 }

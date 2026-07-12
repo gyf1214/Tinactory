@@ -1,9 +1,13 @@
 package org.shsts.tinactory.api.logistics;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.StringRepresentable;
 
 import java.util.Locale;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public enum PortDirection implements StringRepresentable {
     NONE, OUTPUT, INPUT;
 

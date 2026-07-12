@@ -23,7 +23,6 @@ import java.util.List;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @WailaPlugin
-@SuppressWarnings("UnstableApiUsage")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Waila implements IWailaPlugin {

@@ -66,7 +66,7 @@ public final class LogisticsMachineAllocator implements IMachineAllocator {
             if (ports.isEmpty()) {
                 continue;
             }
-            var machine = ports.get(0).machine();
+            var machine = ports.getFirst().machine();
             var voltage = MachineBlock.getBlockVoltage(machine.blockEntity());
             if (constraints.stream().anyMatch(constraint -> !constraint.matches(machine, voltage))) {
                 continue;

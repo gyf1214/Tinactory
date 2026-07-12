@@ -154,7 +154,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public void resetTargetTech() {
         targetTech = null;
-        broadcastUpdate(TechUpdatePacket.target((ResourceLocation) null));
+        broadcastUpdate(TechUpdatePacket.target(null));
     }
 
     public void applyTargetTechUpdate(@Nullable ITechnology tech) {

@@ -7,6 +7,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
@@ -81,7 +83,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
     }
 
     private void appendTargetLine(CompoundTag tag, BlockAccessor accessor) {
-        var key = decodeKey(accessor, tag.get(TARGET_KEY));
+        var key = decodeKey(accessor, tag.getCompound(TARGET_KEY));
         if (key.isEmpty()) {
             return;
         }
@@ -94,10 +96,10 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
 
     private void appendTargetIcon(List<IElement> line, IStackKey key) {
         var display = key.display();
-        if (display instanceof ItemRenderDescriptor item) {
-            Waila.addItemIcon(line, helper, item.stack());
-        } else if (display instanceof FluidRenderDescriptor fluid) {
-            Waila.addFluidIcon(line, helper, fluid.stack());
+        if (display instanceof ItemRenderDescriptor(ItemStack stack)) {
+            Waila.addItemIcon(line, helper, stack);
+        } else if (display instanceof FluidRenderDescriptor(FluidStack stack)) {
+            Waila.addFluidIcon(line, helper, stack);
         }
     }
 
@@ -127,7 +129,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         var status = cpu.get().status();
         tag.putString(STATE_KEY, status.state().name());
         if (!status.targets().isEmpty()) {
-            var target = status.targets().get(0);
+            var target = status.targets().getFirst();
             tag.put(TARGET_KEY, accessor.encodeAsNbt(StackHelper.KEY_STREAM_CODEC, target.key()));
             tag.putLong(TARGET_AMOUNT_KEY, target.amount());
         }

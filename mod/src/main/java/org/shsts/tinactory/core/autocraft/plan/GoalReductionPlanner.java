@@ -212,17 +212,17 @@ public final class GoalReductionPlanner implements ICraftPlanner {
     private void rollbackCandidate(PlanningSession session, SearchFrame frame) {
         session.ledger.reset(frame.ledgerSnapshot);
         while (session.steps.size() > frame.stepCountSnapshot) {
-            session.steps.remove(session.steps.size() - 1);
+            session.steps.removeLast();
         }
         session.nextStepId = frame.stepIdSnapshot;
     }
 
     private SearchFrame peekFrame(PlanningSession session) {
-        return session.searchStack.get(session.searchStack.size() - 1);
+        return session.searchStack.getLast();
     }
 
     private void popSuccess(PlanningSession session) {
-        session.searchStack.remove(session.searchStack.size() - 1);
+        session.searchStack.removeLast();
         if (session.searchStack.isEmpty()) {
             session.nextTargetIndex++;
         }
@@ -233,7 +233,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
     }
 
     private void popFailure(PlanningSession session, PlanError error, PlanSummary summary) {
-        session.searchStack.remove(session.searchStack.size() - 1);
+        session.searchStack.removeLast();
         if (session.searchStack.isEmpty()) {
             session.result = PlanResult.failed(error, summary);
             return;
@@ -245,7 +245,7 @@ public final class GoalReductionPlanner implements ICraftPlanner {
 
     @Nullable
     private static PlanError detectCycle(List<SearchFrame> stack) {
-        var current = stack.get(stack.size() - 1);
+        var current = stack.getLast();
         for (var i = 0; i < stack.size() - 1; i++) {
             if (stack.get(i).key.equals(current.key)) {
                 return PlanError.cycleDetected(current.key);

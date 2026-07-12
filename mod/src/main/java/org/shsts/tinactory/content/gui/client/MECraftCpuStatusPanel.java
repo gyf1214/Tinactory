@@ -55,7 +55,7 @@ public class MECraftCpuStatusPanel extends Panel {
             ret.add(entry.name());
             ret.add(tr("cpu.state." + status.state().id).copy().withStyle(ChatFormatting.GRAY));
             if (!status.targets().isEmpty()) {
-                var target = status.targets().get(0);
+                var target = status.targets().getFirst();
                 ret.add(tr("cpu.target", target.key().name(), ClientUtil.getNumberString(target.amount())));
             }
             if (status.state().busy()) {

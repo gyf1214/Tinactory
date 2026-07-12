@@ -36,7 +36,7 @@ public final class TechQuestIntegration {
     private ServerQuestFile activeQuestFile = null;
     private final Map<ResourceLocation, List<TechnologyTaskBinding>> tasksByTechnology = new HashMap<>();
 
-    public TechQuestIntegration() {
+    public void register() {
         CustomTaskEvent.EVENT.register(this::onCustomTask);
         TechManagers.server().onProgressChange(this::onTinactoryTechProgressChanged);
     }

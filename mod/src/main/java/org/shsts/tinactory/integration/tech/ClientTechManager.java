@@ -36,7 +36,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
 
     @Nullable
     private ClientTeamProfile getLocalTeam() {
-        var team = (PlayerTeam) ClientUtil.getPlayer().getTeam();
+        var team = ClientUtil.getPlayer().getTeam();
         var curTeam = localTeam == null ? null : localTeam.playerTeam;
         if (team != curTeam) {
             localTeam = team == null ? null : new ClientTeamProfile(this, team);

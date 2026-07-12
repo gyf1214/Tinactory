@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -71,7 +72,7 @@ public class Lithography extends Multiblock {
             var key = ResourceKey.create(Registries.BLOCK, loc);
             provider.lookup(Registries.BLOCK)
                 .flatMap(registry -> registry.get(key))
-                .map($ -> $.value())
+                .map(Holder.Reference::value)
                 .filter($ -> $ instanceof LensBlock)
                 .map($ -> (LensBlock) $)
                 .ifPresent($ -> lensBlock = $);

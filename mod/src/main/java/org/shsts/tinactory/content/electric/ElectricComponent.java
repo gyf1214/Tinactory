@@ -133,7 +133,7 @@ public class ElectricComponent extends NetworkComponent {
         for (var sub : solveOrder) {
             sub.solve(wFactor, bFactor, isBGen);
         }
-        var root = solveOrder.get(solveOrder.size() - 1);
+        var root = solveOrder.getLast();
         return MathUtil.compare(root.pGen) == 0;
     }
 

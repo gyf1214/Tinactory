@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.tech;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;
@@ -58,20 +59,19 @@ public class TechUpdatePacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
-        buf.writeMap(progress, (buf1, loc) -> buf1.writeResourceLocation(loc),
-            (buf1, value) -> buf1.writeLong(value));
+        buf.writeMap(progress, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeLong);
         buf.writeBoolean(updateTarget);
         if (updateTarget) {
-            buf.writeOptional(Optional.ofNullable(targetTech), (buf1, loc) -> buf1.writeResourceLocation(loc));
+            buf.writeOptional(Optional.ofNullable(targetTech), FriendlyByteBuf::writeResourceLocation);
         }
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
-        progress = buf.readMap(buf1 -> buf1.readResourceLocation(), buf1 -> buf1.readLong());
+        progress = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readLong);
         updateTarget = buf.readBoolean();
         if (updateTarget) {
-            targetTech = buf.readOptional(buf1 -> buf1.readResourceLocation()).orElse(null);
+            targetTech = buf.readOptional(FriendlyByteBuf::readResourceLocation).orElse(null);
         }
     }
 }

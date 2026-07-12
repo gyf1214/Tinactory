@@ -55,7 +55,7 @@ public class Layout {
             if (portSlot.isEmpty()) {
                 ports.add(new PortInfo(0, SlotType.NONE));
             } else {
-                ports.add(new PortInfo(portSlot.size(), portSlot.get(0).type));
+                ports.add(new PortInfo(portSlot.size(), portSlot.getFirst().type));
             }
         }
         this.images = images;

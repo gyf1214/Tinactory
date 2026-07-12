@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.UnknownNullability;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -28,7 +27,7 @@ public class BlastFurnaceCategory extends ProcessingCategory<BlastFurnaceRecipe>
     }
 
     @Override
-    protected int drawExtraText(BlastFurnaceRecipe recipe, int y, @UnknownNullability GuiGraphics graphics) {
+    protected int drawExtraText(BlastFurnaceRecipe recipe, int y, GuiGraphics graphics) {
         var text = tr("temperature", NUMBER_FORMAT.format(recipe.temperature));
         return drawTextLine(graphics, text, y);
     }

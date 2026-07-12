@@ -58,7 +58,7 @@ public class MEPatternBrowserPanel extends Panel {
                 RenderUtil.renderItem(graphics, new ItemStack(Items.BARRIER), rect1.x(), rect1.y());
                 return;
             }
-            var display = pattern.outputs().get(0).key().display();
+            var display = pattern.outputs().getFirst().key().display();
             RenderUtil.renderDescriptor(graphics, display, rect1);
         }
 
@@ -110,7 +110,7 @@ public class MEPatternBrowserPanel extends Panel {
         if (ingredients.isEmpty()) {
             return tr("empty");
         }
-        var ret = ingredientTooltip(ingredients.get(0));
+        var ret = ingredientTooltip(ingredients.getFirst());
         for (var i = 1; i < ingredients.size(); i++) {
             if (i >= MAX_DISPLAY_INGREDIENT) {
                 ret = tr("ingredients", ret, tr("ellipsis"));

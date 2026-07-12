@@ -57,7 +57,7 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
     }
 
     private void onServerTick(Level world) {
-        var workSpeed = CONFIG.primitiveWorkSpeed.get();
+        var workSpeed = (double) CONFIG.primitiveWorkSpeed.get();
         var processor = PROCESSOR.get(blockEntity);
         processor.onPreWork();
         processor.onWorkTick(workSpeed);

@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.UnknownNullability;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
@@ -28,7 +27,7 @@ public class CleanCategory extends ProcessingCategory<CleanRecipe> {
     }
 
     @Override
-    protected int drawExtraText(CleanRecipe recipe, int y, @UnknownNullability GuiGraphics graphics) {
+    protected int drawExtraText(CleanRecipe recipe, int y, GuiGraphics graphics) {
         var text = tr("cleanness", PERCENTAGE_FORMAT.format(recipe.minCleanness),
             PERCENTAGE_FORMAT.format(recipe.maxCleanness));
         return drawTextLine(graphics, text, y);
