@@ -25,6 +25,7 @@ import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
@@ -58,6 +59,7 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
+import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.integration.gui.InventoryMenu.INVENTORY_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
@@ -79,6 +81,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private boolean selectedFrom;
 
     private class ConfigPanel extends ButtonPanel {
+        private static final Texture BACKGROUND = new Texture(
+            mcLoc("gui/sprites/container/enchanting_table/enchantment_slot_disabled"), 108, 19);
         private static final Rect FROM_RECT = new Rect(1, 1, BUTTON_SIZE, BUTTON_SIZE);
         private static final Rect TO_RECT = new Rect(BUTTON_SIZE * 2 + 2, 1, BUTTON_SIZE, BUTTON_SIZE);
         private static final Rect VALID_RECT = new Rect(BUTTON_SIZE + 2, 1, 20, 20);
@@ -123,7 +127,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             var toRect = rect.offsetLike(TO_RECT);
             var filterRect = rect.offsetLike(FILTER_RECT);
 
-            // TODO: replace the 1.18.2 enchanting-table strip removed in 1.21.1 with tag-filter panel art.
+            StretchImage.render(graphics, BACKGROUND, rect, 1);
             RenderUtil.blit(graphics, RECIPE_BUTTON, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(graphics, RECIPE_BUTTON, toRect, isTo ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(graphics,

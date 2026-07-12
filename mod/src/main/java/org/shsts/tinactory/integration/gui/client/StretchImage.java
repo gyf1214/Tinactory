@@ -29,6 +29,11 @@ public class StretchImage extends MenuWidget {
         render(graphics, texture, rect(), texRect, border);
     }
 
+    public static void render(GuiGraphics graphics, Texture texture, Rect rect, int border) {
+        var texRect = new Rect(0, 0, texture.width(), texture.height());
+        render(graphics, texture, RenderUtil.WHITE, rect, texRect, border);
+    }
+
     public static void render(GuiGraphics graphics, Texture texture, Rect rect, Rect texRect, int border) {
         render(graphics, texture, RenderUtil.WHITE, rect, texRect, border);
     }
