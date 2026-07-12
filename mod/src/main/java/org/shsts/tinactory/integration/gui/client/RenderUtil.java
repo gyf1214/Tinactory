@@ -73,9 +73,9 @@ public final class RenderUtil {
     }
 
     public static void blitAtlas(GuiGraphics graphics, TextureAtlasSprite sprite, int color, Rect dstRect) {
-        setColor(graphics, color);
-        graphics.blit(dstRect.x(), dstRect.y(), dstRect.width(), dstRect.height(), 0, sprite);
-        graphics.setColor(1f, 1f, 1f, 1f);
+        graphics.blit(dstRect.x(), dstRect.y(), 0, dstRect.width(), dstRect.height(), sprite,
+            colorComponent(color, 16), colorComponent(color, 8),
+            colorComponent(color, 0), colorComponent(color, 24));
     }
 
     public static int mixColor(int color1, int color2) {
@@ -126,7 +126,7 @@ public final class RenderUtil {
             var font = ClientUtil.getFont();
             var x = rect.endX() + 1 - font.width(s);
             var y = rect.endY() + 2 - font.lineHeight;
-            graphics.drawString(font, s, x, y, 0xFFFFFFFF, true);
+            graphics.drawString(font, s, x, y, WHITE, true);
         }
     }
 
@@ -149,7 +149,7 @@ public final class RenderUtil {
     private static void renderBlockQuad(BakedQuad quad, BlockColors blockColors, BlockState blockState,
         PoseStack.Pose pose, VertexConsumer vertexConsumer, int packedLight, int packedOverlay) {
         var color = quad.isTinted() ? blockColors.getColor(blockState, null, null, quad.getTintIndex()) :
-            0xFFFFFFFF;
+            WHITE;
         var r = (float) (color >> 16 & 255) / 255.0F;
         var g = (float) (color >> 8 & 255) / 255.0F;
         var b = (float) (color & 255) / 255.0F;
@@ -196,7 +196,7 @@ public final class RenderUtil {
 
     public static void renderGhostItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
         graphics.renderItem(stack, x, y);
-        RenderUtil.fill(graphics, new Rect(x, y, 16, 16), 0xAA8B8B8B);
+        graphics.fill(RenderType.guiGhostRecipeOverlay(), x, y, x + 16, y + 16, 0xAA8B8B8B);
     }
 
     public static void renderDescriptor(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
