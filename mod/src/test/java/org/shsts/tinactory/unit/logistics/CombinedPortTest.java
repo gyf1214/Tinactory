@@ -156,15 +156,15 @@ class CombinedPortTest {
     }
 
     @Test
-    void operationOwnedModeShouldNotForwardChildNotifications() {
-        var port = new TestPort("iron", 10, 0);
+    void operationOwnedModeShouldNotForwardDirectChildNotifications() {
+        var port = new TestPort("iron", 10, 1);
         var combined = new TestCombinedPort(List.of(port), false);
         var updates = new AtomicInteger();
         combined.onUpdate(updates::incrementAndGet);
 
-        combined.insert(new TestStack("iron", 1), false);
+        port.extract(new TestStack("iron", 1), false);
 
-        assertEquals(1, updates.get());
+        assertEquals(0, updates.get());
     }
 
     @Test
