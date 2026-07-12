@@ -9,6 +9,7 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.theme.IThemeHelper;
 import snownee.jade.api.ui.BoxStyle;
 import snownee.jade.api.ui.IElement;
 import snownee.jade.api.ui.IElementHelper;
@@ -19,8 +20,6 @@ import java.util.List;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 public abstract class ProviderBase implements IBlockComponentProvider {
-    private static final int PROGRESS_TEXT_COLOR = 0xFFFFFFFF;
-
     private final ResourceLocation elementTag;
 
     private boolean hasSpace;
@@ -60,7 +59,7 @@ public abstract class ProviderBase implements IBlockComponentProvider {
     }
 
     private ProgressStyle progressStyle(int color) {
-        return helper.progressStyle().color(color).textColor(PROGRESS_TEXT_COLOR);
+        return helper.progressStyle().color(color).textColor(IThemeHelper.get().getNormalColor());
     }
 
     protected void addProgress(float val, Component text, int color) {

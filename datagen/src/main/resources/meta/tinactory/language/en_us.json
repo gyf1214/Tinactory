@@ -390,8 +390,6 @@
     "tinactory.gui.autocraftTerminal.title": "Autocraft Terminal",
     "generator.tinactory.void": "Void",
     "key.tinactory.open_tech": "Technology Screen",
-    "config.jade.plugin_tinactory.container": "Container",
-    "config.jade.plugin_tinactory.hide_empty_tank": "Hide Empty Tank",
     "config.jade.plugin_tinactory.bytes": "Bytes",
     "config.jade.plugin_tinactory.heat": "Heat",
     "config.jade.plugin_tinactory.power": "Power",

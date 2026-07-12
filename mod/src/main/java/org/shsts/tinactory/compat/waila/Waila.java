@@ -27,12 +27,10 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Waila implements IWailaPlugin {
-    public static final ResourceLocation CONTAINER = modLoc("container");
     public static final ResourceLocation PROCESSOR = modLoc("processor");
     public static final ResourceLocation ELECTRIC = modLoc("electric");
     public static final ResourceLocation MULTIBLOCK = modLoc("multiblock");
     public static final ResourceLocation ME_CRAFT_CPU = modLoc("me_craft_cpu");
-    public static final ResourceLocation HIDE_EMPTY_TANK = modLoc("hide_empty_tank");
     public static final ResourceLocation BYTES = modLoc("bytes");
     public static final ResourceLocation HEAT = modLoc("heat");
     public static final ResourceLocation POWER = modLoc("power");
@@ -53,8 +51,6 @@ public class Waila implements IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
-        registration.addConfig(HIDE_EMPTY_TANK, true);
-        registration.addConfig(BYTES, true);
         registration.addConfig(HEAT, true);
         registration.addConfig(POWER, true);
         registration.addConfig(CLEANNESS, true);
