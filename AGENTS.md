@@ -10,6 +10,8 @@
 - Before `runData`, ensure `libs/tinactory_extra_resources_{version}.zip` exists (current:
   `libs/tinactory_extra_resources_v3.zip`).
 - Run `runData` once before testing/packaging, or whenever `datagen` changes.
+- NeoForge's merged JAR is generated at `mod/build/moddev/artifacts/neoforge-{version}-merged.jar` and its source JAR
+  at `mod/build/moddev/artifacts/neoforge-{version}-sources.jar`.
 
 ## Unit Test
 
@@ -22,9 +24,9 @@
 
 ## Format Validation
 
-- Before committing any code changes, run `./gradlew :mod:checkSource checkstyleMain checkstyleTest` as the required
+- Before committing any code changes, run `./gradlew checkSource checkstyleMain checkstyleTest` as the required
   format validation task.
-- `checkSource` result is in `mod/build/reports/checkSource`
+- `checkSource` results are in `mod/build/reports/checkSource` and `datagen/build/reports/checkSource`
 
 ## Integration Test
 
@@ -52,6 +54,8 @@
 - Keep simple methods, lambdas, and classes on one line when possible.
 - Always use braces for `if`, `for`, `while`, and `do-while`.
 - Interface names must start with `I`.
+- Do not use package-private classes or methods except in test source; always declare their visibility explicitly.
+- Use `protected` only to permit subclass access, not merely to allow access from the same package.
 - Annotate top-level classes/interfaces/records/enums with `@ParametersAreNonnullByDefault` and
   `@MethodsReturnNonnullByDefault`; no need to annotate inner classes/interfaces/enums/records. Use `@Nullable` for
   nullable fields/overrides.

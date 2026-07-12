@@ -1,10 +1,10 @@
 # Tinactory
 
-A minecraft mod that ports gregtech to 1.18.2 and more.
+A minecraft mod that ports gregtech to 1.21.1 and more.
 
 ## Requirements
 
-- JDK 17
+- JDK 21
 
 ## Setup
 
@@ -19,8 +19,8 @@ A minecraft mod that ports gregtech to 1.18.2 and more.
 
 ## Code Structure
 
-- **mod**: Main java classes and resources of the mod, including game tests
-- **datagen**: java and kotlin classes fo data generator. Those classes will not be packaged into the final
+- **mod**: Main Java classes and resources of the mod, including game tests
+- **datagen**: Java and Kotlin classes for the data generator. Those classes will not be packaged into the final
   mod.
 
 ### TinyCoreLib
@@ -31,6 +31,7 @@ See: <https://github.com/gyf1214/TinyCoreLib>.
 
 ### Code Style
 
-Run gradle task `checkstyle` to check style.
+Run `./gradlew checkSource` to check source structure, including package layout and forbidden imports between project
+layers. Run `./gradlew checkstyleMain checkstyleTest` to check code style.
 
-An Idea IntelliJ code style setting can be downloaded here: <https://www.shsts.org/m2/codestyle.xml>.
+An IntelliJ code style setting can be downloaded here: <https://www.shsts.org/m2/codestyle.xml>.
