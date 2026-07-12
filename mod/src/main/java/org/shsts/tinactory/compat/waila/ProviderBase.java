@@ -59,11 +59,14 @@ public abstract class ProviderBase implements IBlockComponentProvider {
     }
 
     private ProgressStyle progressStyle(int color) {
-        return helper.progressStyle().color(color).textColor(IThemeHelper.get().theme().text.colors().info());
+        return helper.progressStyle().color(color);
     }
 
     protected void addProgress(float val, Component text, int color) {
-        add(helper.progress(val, text, progressStyle(color), BoxStyle.getNestedBox(), true));
+        // For some reason in Jade progress bar, textColor = -1 (White) will fall back to normal color.
+        // We need to use component decoration
+        var text1 = IThemeHelper.get().info(text);
+        add(helper.progress(val, text1, progressStyle(color), BoxStyle.getNestedBox(), true));
     }
 
     @Override
