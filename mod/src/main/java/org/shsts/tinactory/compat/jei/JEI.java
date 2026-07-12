@@ -15,7 +15,6 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -47,6 +46,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
+import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -83,10 +83,11 @@ public class JEI implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        BuiltInRegistries.ITEM.getTag(AllTags.BATTERY).stream()
-            .flatMap(HolderSet.ListBacked::stream)
-            .forEach($ -> registration.registerSubtypeInterpreter($.value(),
-                BatterySubtypeInterpreter.INSTANCE));
+        for (var item : BuiltInRegistries.ITEM) {
+            if (item instanceof BatteryItem) {
+                registration.registerSubtypeInterpreter(item, BatterySubtypeInterpreter.INSTANCE);
+            }
+        }
     }
 
     @Override
