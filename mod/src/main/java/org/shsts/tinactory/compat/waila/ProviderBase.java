@@ -9,7 +9,6 @@ import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.theme.IThemeHelper;
 import snownee.jade.api.ui.BoxStyle;
 import snownee.jade.api.ui.IElement;
 import snownee.jade.api.ui.IElementHelper;
@@ -59,7 +58,7 @@ public abstract class ProviderBase implements IBlockComponentProvider {
     }
 
     private ProgressStyle progressStyle(int color) {
-        return helper.progressStyle().color(color).textColor(IThemeHelper.get().getNormalColor());
+        return helper.progressStyle().color(color);
     }
 
     protected void addProgress(float val, Component text, int color) {
