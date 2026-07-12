@@ -1,16 +1,13 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -21,11 +18,11 @@ import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.CombinedFluidTank;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperFluidTank;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -58,10 +55,9 @@ public class FlexibleStackContainer extends CapabilityProvider
     private final WrapperFluidTank[] externalFluids;
     private final CombinedFluidTank combinedFluids;
     private final List<ContainerPort> ports = new ArrayList<>();
-    private final LazyOptional<IItemHandler> itemHandlerCap;
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
-    private final LazyOptional<IFluidHandler> fluidHandlerCap;
-    private final LazyOptional<IFluidTanksHandler> menuFluidHandlerCap;
+    private final IItemHandler itemHandler;
+    private final IFluidHandler fluidHandler;
+    private final IFluidTanksHandler menuFluidHandler;
 
     private Layout layout = Layout.EMPTY;
 
@@ -80,7 +76,7 @@ public class FlexibleStackContainer extends CapabilityProvider
         this.internalFluids = new WrapperFluidTank[maxFluidSlots];
         this.menuFluids = new WrapperFluidTank[maxFluidSlots];
         this.externalFluids = new WrapperFluidTank[maxFluidSlots];
-        var fluidSize = CONFIG.fluidSlotSize.get();
+        var fluidSize = (int) CONFIG.fluidSlotSize.get();
         for (var i = 0; i < maxFluidSlots; i++) {
             internalFluids[i] = new WrapperFluidTank(fluidSize);
             internalFluids[i].onUpdate(this::onUpdate);
@@ -94,15 +90,14 @@ public class FlexibleStackContainer extends CapabilityProvider
         var combinedMenuFluids = new CombinedFluidTank(menuFluids);
         var combinedExternalFluids = new CombinedFluidTank(externalFluids);
 
-        this.itemHandlerCap = LazyOptional.of(() -> externalItems);
-        this.menuItemHandlerCap = IMenuItemHandler.cap(menuItems);
-        this.fluidHandlerCap = LazyOptional.of(() -> combinedExternalFluids);
-        this.menuFluidHandlerCap = LazyOptional.of(() -> combinedMenuFluids);
+        this.itemHandler = externalItems;
+        this.fluidHandler = combinedExternalFluids;
+        this.menuFluidHandler = combinedMenuFluids;
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, be -> new FlexibleStackContainer(be, 16, 8));
+        return builder.container(ID, be -> new FlexibleStackContainer(be, 16, 8));
     }
 
     private ContainerPort createItemPort(SlotType type, List<Layout.SlotInfo> slots) {
@@ -110,8 +105,8 @@ public class FlexibleStackContainer extends CapabilityProvider
             return ContainerPort.EMPTY;
         }
 
-        var minSlot = slots.get(0).index();
-        var maxSlot = slots.get(slots.size() - 1).index() + 1;
+        var minSlot = slots.getFirst().index();
+        var maxSlot = slots.getLast().index() + 1;
         assert minSlot >= 0 && maxSlot <= menuItems.getSlots() && minSlot < maxSlot;
         if (type == SlotType.ITEM_INPUT) {
             for (var i = minSlot; i < maxSlot; i++) {
@@ -229,32 +224,26 @@ public class FlexibleStackContainer extends CapabilityProvider
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get() || cap == CONTAINER.get()) {
-            return myself();
-        } else if (cap == ITEM_HANDLER.get()) {
-            return itemHandlerCap.cast();
-        } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        } else if (cap == FLUID_HANDLER.get()) {
-            return fluidHandlerCap.cast();
-        } else if (cap == MENU_FLUID_HANDLER.get()) {
-            return menuFluidHandlerCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(CONTAINER, this);
+        builder.attach(ITEM_HANDLER, itemHandler);
+        builder.attach(MENU_ITEM_HANDLER, menuItems);
+        builder.attach(FLUID_HANDLER, fluidHandler);
+        builder.attach(MENU_FLUID_HANDLER, menuFluidHandler);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("stack", StackHelper.serializeItemHandler(internalItems));
-        tag.put("fluid", combinedFluids.serializeNBT());
+        tag.put("stack", StackHelper.serializeItemHandler(provider, internalItems));
+        tag.put("fluid", combinedFluids.serializeNBT(provider));
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("stack"));
-        combinedFluids.deserializeNBT(tag.getCompound("fluid"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("stack"));
+        combinedFluids.deserializeNBT(provider, tag.getCompound("fluid"));
     }
 }

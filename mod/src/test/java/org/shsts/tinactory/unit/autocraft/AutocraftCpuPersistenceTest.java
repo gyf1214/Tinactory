@@ -12,13 +12,11 @@ import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.exec.CraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.HashMap;
@@ -32,21 +30,22 @@ import static net.minecraft.nbt.Tag.TAG_COMPOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftCpuPersistenceTest {
     @Test
     void serviceShouldResumeFromRunningSnapshot() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         var first = new AutocraftJobService(executor());
         first.submitPrepared(List.of(target), plan);
         first.tick();
-        var snapshot = first.serializeRunningSnapshot(codec).orElseThrow();
+        var snapshot = first.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
 
         var restored = new AutocraftJobService(executor());
-        restored.restoreRunningSnapshot(snapshot, codec);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, snapshot, PATTERN_CODECS);
         assertEquals(JobState.RUNNING, restored.getJob().orElseThrow().state());
         assertEquals(List.of(target), restored.getJob().orElseThrow().targets());
 
@@ -60,11 +59,10 @@ class AutocraftCpuPersistenceTest {
     void serviceShouldSerializeExecutionSnapshotWithoutSeparatePlanOrRuntimeFields() {
         var plan = new CraftPlan(List.of(step("s1"), step("s2")));
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1)), plan);
         service.tick();
-        var snapshot = service.serializeRunningSnapshot(codec).orElseThrow();
+        var snapshot = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
 
         assertTrue(snapshot.contains("execution"));
         assertFalse(snapshot.contains("plan"));
@@ -86,15 +84,14 @@ class AutocraftCpuPersistenceTest {
         var summary = new PlanSummary(Map.of(key, new PlanSummary.Entry(0L, 0L, 2L)));
         var plan = new CraftPlan(List.of(step), summary, 123L);
         var service = new AutocraftJobService(executor());
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(new CraftAmount(key, 1)), plan);
         service.tick();
-        var serialized = service.serializeRunningSnapshot(codec).orElseThrow();
+        var serialized = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restored = new AutocraftJobService(executor());
-        restored.restoreRunningSnapshot(serialized, codec);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, serialized, PATTERN_CODECS);
 
-        var restoredSerialized = restored.serializeRunningSnapshot(codec).orElseThrow();
+        var restoredSerialized = restored.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restoredStep = restoredSerialized.getCompound("execution")
             .getCompound("plan")
             .getList("steps", TAG_COMPOUND)

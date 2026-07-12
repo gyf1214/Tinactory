@@ -1,32 +1,24 @@
 package org.shsts.tinactory.content.tool;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.client.IItemRenderProperties;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
-import java.util.function.Consumer;
 
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.AllDataComponents.BATTERY;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BatteryItem extends Item {
-    public static final ResourceLocation ITEM_PROPERTY = modLoc("battery_level");
+    public static final String ITEM_PROPERTY = "battery_level";
 
     public final Voltage voltage;
     public final long capacity;
@@ -37,59 +29,53 @@ public class BatteryItem extends Item {
         this.capacity = capacity;
     }
 
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        ItemProperties.register(this, ITEM_PROPERTY, (stack, $1, $2, $3) ->
-            (float) getPower(stack) / capacity);
-    }
-
     public long getPower(ItemStack stack) {
-        if (stack.getTag() == null) {
-            return 0L;
-        }
-        return MathUtil.clamp(stack.getTag().getLong("power"), 0, capacity);
+        return Math.clamp(stack.getOrDefault(BATTERY, 0L), 0L, capacity);
     }
 
-    public void setPowerLevel(ItemStack stack, long value) {
-        var tag = stack.getOrCreateTag();
-        tag.putLong("power", value);
+    public float getNormalizedPower(ItemStack stack) {
+        return (float) getPower(stack) / (float) capacity;
+    }
+
+    public static float normalizedPower(ItemStack stack) {
+        return ((BatteryItem) stack.getItem()).getNormalizedPower(stack);
+    }
+
+    public ItemStack fullItem() {
+        var ret = new ItemStack(this);
+        ret.set(BATTERY, capacity);
+        return ret;
+    }
+
+    public void setPower(ItemStack stack, long value) {
+        var val1 = Math.clamp(value, 0, capacity);
+        stack.set(BATTERY, val1);
     }
 
     public void charge(ItemStack stack, long delta) {
         var value = MathUtil.clamp(getPower(stack) + delta, 0L, capacity);
-        setPowerLevel(stack, value);
+        setPower(stack, value);
     }
 
     @Override
-    public boolean isBarVisible(ItemStack pStack) {
+    public boolean isBarVisible(ItemStack stack) {
         return true;
     }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return (int) Math.round(13f * (double) getPower(stack) / (double) capacity);
+        return Math.round(13f * getNormalizedPower(stack));
     }
 
     @Override
-    public int getBarColor(ItemStack pStack) {
+    public int getBarColor(ItemStack stack) {
         return 0xFF55FF55;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
-        TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         addTooltip(tooltip, "battery", NUMBER_FORMAT.format(getPower(stack)),
             NUMBER_FORMAT.format(capacity), voltage.displayName());
-    }
-
-    @Override
-    public void fillItemCategory(CreativeModeTab category, NonNullList<ItemStack> list) {
-        if (!allowdedIn(category)) {
-            return;
-        }
-        list.add(new ItemStack(this));
-        var stack1 = new ItemStack(this);
-        setPowerLevel(stack1, capacity);
-        list.add(stack1);
     }
 }

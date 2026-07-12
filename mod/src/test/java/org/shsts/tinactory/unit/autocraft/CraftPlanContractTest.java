@@ -1,7 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -26,6 +25,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class CraftPlanContractTest {
     @Test
@@ -95,8 +96,10 @@ class CraftPlanContractTest {
     @Test
     void machineConstraintCodecShouldRoundTripByTypeId() {
         var decoded = CodecHelper.parseTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             CodecHelper.encodeTag(
+                TEST_REGISTRY,
                 TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
                 new TestMachineConstraint("payload")));
         assertEquals("payload", ((TestMachineConstraint) decoded).value());
@@ -105,21 +108,23 @@ class CraftPlanContractTest {
         unknown.putString("type", "test:unknown");
         unknown.putString("value", "x");
         assertThrows(RuntimeException.class,
-            () -> CodecHelper.parseTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, unknown));
+            () -> CodecHelper.parseTag(TEST_REGISTRY, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, unknown));
     }
 
     @Test
     void machineConstraintCodecShouldPreserveSlotScopedPortConstraints() {
         var inputConstraint = new PortConstraint(PortDirection.INPUT, 1, 4);
         var inputOutputDecoded = CodecHelper.parseTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, inputConstraint));
+            CodecHelper.encodeTag(TEST_REGISTRY, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, inputConstraint));
         assertEquals(inputConstraint, inputOutputDecoded);
     }
 
     @Test
     void machineConstraintCodecShouldEncodeStructuredPortConstraintPayload() {
         var encoded = (CompoundTag) CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             new PortConstraint(PortDirection.INPUT, 1, 4));
 
@@ -131,20 +136,22 @@ class CraftPlanContractTest {
 
     @Test
     void machineConstraintCodecShouldPreserveTargetRecipeConstraint() {
-        var constraint = new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit"));
+        var constraint = new TargetRecipeConstraint(modLoc("assembler/circuit"));
         var decoded = CodecHelper.parseTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+            CodecHelper.encodeTag(TEST_REGISTRY, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
 
         assertEquals(constraint, decoded);
     }
 
     @Test
     void machineConstraintCodecShouldPreserveRecipeTypeConstraint() {
-        var constraint = new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler"));
+        var constraint = new RecipeTypeConstraint(modLoc("assembler"));
         var decoded = CodecHelper.parseTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+            CodecHelper.encodeTag(TEST_REGISTRY, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
 
         assertEquals(constraint, decoded);
     }
@@ -153,8 +160,9 @@ class CraftPlanContractTest {
     void machineConstraintCodecShouldPreserveVoltageConstraint() {
         var constraint = new VoltageConstraint(3);
         var decoded = CodecHelper.parseTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            CodecHelper.encodeTag(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
+            CodecHelper.encodeTag(TEST_REGISTRY, TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, constraint));
 
         assertEquals(constraint, decoded);
     }
@@ -162,8 +170,9 @@ class CraftPlanContractTest {
     @Test
     void machineConstraintCodecShouldEncodeStructuredTargetRecipeConstraintPayload() {
         var encoded = (CompoundTag) CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            new TargetRecipeConstraint(new ResourceLocation("tinactory", "assembler/circuit")));
+            new TargetRecipeConstraint(modLoc("assembler/circuit")));
 
         assertEquals(TargetRecipeConstraint.TYPE_ID, encoded.getString("type"));
         assertEquals("tinactory:assembler/circuit", encoded.getString("recipeId"));
@@ -172,9 +181,11 @@ class CraftPlanContractTest {
     @Test
     void machineConstraintCodecShouldEncodeStructuredRecipeTypeAndVoltagePayloads() {
         var recipeType = (CompoundTag) CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
-            new RecipeTypeConstraint(new ResourceLocation("tinactory", "assembler")));
+            new RecipeTypeConstraint(modLoc("assembler")));
         var voltage = (CompoundTag) CodecHelper.encodeTag(
+            TEST_REGISTRY,
             TestMachineConstraint.MACHINE_CONSTRAINT_CODEC,
             new VoltageConstraint(3));
 

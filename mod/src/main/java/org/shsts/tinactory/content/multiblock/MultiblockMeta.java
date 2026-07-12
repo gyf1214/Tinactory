@@ -3,19 +3,18 @@ package org.shsts.tinactory.content.multiblock;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllTags;
-import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
@@ -42,12 +41,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllMultiblocks.CLEANROOM_PROPERTIES;
 import static org.shsts.tinactory.AllMultiblocks.LITHOGRAPHY_CLEANNESS_FACTORS;
 import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
@@ -63,12 +61,12 @@ public class MultiblockMeta extends MachineMeta {
     }
 
     private static IEntry<Block> getBlock(JsonObject jo, String member) {
-        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, member));
         return BLOCKS.getEntry(loc);
     }
 
     private static TagKey<Block> getBlockTag(JsonObject jo, String member) {
-        var loc = new ResourceLocation(GsonHelper.getAsString(jo, member));
+        var loc = ResourceLocation.parse(GsonHelper.getAsString(jo, member));
         return AllTags.block(loc);
     }
 
@@ -145,7 +143,7 @@ public class MultiblockMeta extends MachineMeta {
         @Override
         protected void parseRecipeType() {
             if (recipeTypeStr.contains(":")) {
-                recipeType = REGISTRATE.getRecipeType(new ResourceLocation(recipeTypeStr));
+                recipeType = REGISTRATE.getRecipeType(ResourceLocation.parse(recipeTypeStr));
             } else {
                 super.parseRecipeType();
             }
@@ -154,43 +152,29 @@ public class MultiblockMeta extends MachineMeta {
             }
         }
 
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> blockStateCheck(
-            Predicate<BlockState> pred) {
-            return (ctx, pos) -> {
-                var block = ctx.getBlock(pos);
-                if (block.isEmpty() || !pred.test(block.get())) {
-                    ctx.setFailed();
-                }
-            };
-        }
-
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> block(
-            Supplier<? extends Block> block, boolean allowInterface) {
-            return (ctx, pos) -> {
-                var block1 = ctx.getBlock(pos);
+        private static <P> Transformer<MultiblockSpec.Builder<BlockState, P>> ingredient(
+            char ch, Consumer<BlockIngredient> cons, BlockIngredient ingredient,
+            @Nullable String key, boolean allowInterface) {
+            cons.accept(ingredient);
+            return $ -> $.check(ch, (ctx, pos) -> {
                 if (allowInterface && MultiblockSpec.checkInterface(ctx, pos)) {
                     return;
                 }
-                if (block1.isEmpty() || !block1.get().is(block.get())) {
-                    ctx.setFailed();
-                }
-            };
-        }
-
-        private static BiConsumer<IMultiblockCheckCtx<BlockState>, BlockPos> tagWithSameBlock(String key,
-            TagKey<Block> tag) {
-            return (ctx, pos) -> {
                 var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !block1.get().is(tag)) {
+                if (block1.isEmpty() || !ingredient.test(block1.get())) {
                     ctx.setFailed();
-                } else if (ctx.hasProperty(key)) {
-                    if (!block1.get().is((Block) ctx.getProperty(key))) {
-                        ctx.setFailed();
-                    }
-                } else {
-                    ctx.setProperty(key, block1.get().getBlock());
+                    return;
                 }
-            };
+                if (key != null) {
+                    if (ctx.hasProperty(key)) {
+                        if (!block1.get().is((Block) ctx.getProperty(key))) {
+                            ctx.setFailed();
+                        }
+                    } else {
+                        ctx.setProperty(key, block1.get().getBlock());
+                    }
+                }
+            });
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je,
@@ -244,15 +228,18 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseDefine(Character ch, JsonElement je,
-            Consumer<BlockIngredient> ingredientConsumer) {
+            Consumer<BlockIngredient> cons) {
             if (je.isJsonPrimitive() && je.getAsJsonPrimitive().isString()) {
                 var s = je.getAsString();
                 if (s.equals("air")) {
-                    return $ -> $.check(ch, blockStateCheck(BlockState::isAir));
+                    return $ -> $.check(ch, (ctx, pos) -> {
+                        if (ctx.getBlock(pos).filter(BlockState::isAir).isEmpty()) {
+                            ctx.setFailed();
+                        }
+                    });
                 } else {
-                    var block = BLOCKS.getEntry(new ResourceLocation(s));
-                    ingredientConsumer.accept(BlockIngredient.of(block));
-                    return $ -> $.check(ch, block(block, false));
+                    var block = BLOCKS.getEntry(ResourceLocation.parse(s));
+                    return ingredient(ch, cons, BlockIngredient.of(block), null, false);
                 }
             }
 
@@ -261,38 +248,26 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
-                    ingredientConsumer.accept(BlockIngredient.of(block));
-                    return $ -> $.check(ch, block(block, true));
+                    return ingredient(ch, cons, BlockIngredient.of(block), null, true);
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, blockStateCheck(blockState -> blockState.is(tag)));
+                    return ingredient(ch, cons, BlockIngredient.of(tag), null, false);
                 }
                 case "tag_or_interface" -> {
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, (ctx, pos) -> {
-                        var block = ctx.getBlock(pos);
-                        if (MultiblockSpec.checkInterface(ctx, pos)) {
-                            return;
-                        }
-                        if (block.isEmpty() || !block.get().is(tag)) {
-                            ctx.setFailed();
-                        }
-                    });
+                    return ingredient(ch, cons, BlockIngredient.of(tag), null, true);
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
-                    ingredientConsumer.accept(BlockIngredient.of(tag));
-                    return $ -> $.check(ch, tagWithSameBlock(key, tag));
+                    return ingredient(ch, cons, BlockIngredient.of(tag), key, false);
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    ingredientConsumer.accept(BlockIngredient.of(new BlockValue(block), new TagValue(tag)));
-                    return $ -> $.checkBlock(ch, blockState -> blockState.is(block.get()) || blockState.is(tag));
+                    return ingredient(ch, cons, BlockIngredient.of(new BlockValue(block), new TagValue(tag)),
+                        null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
@@ -375,6 +350,7 @@ public class MultiblockMeta extends MachineMeta {
 
             return BlockEntityBuilder.builder("multiblock/" + id, FixedMachineBlock::new)
                 .blockEntity()
+                .capability(PROCESSOR, ELECTRIC_MACHINE)
                 .transform(this::sound)
                 .child(Multiblock.builder((be, $) -> new Cleanroom(be, $, properties)))
                 .layout(layout)
@@ -393,9 +369,8 @@ public class MultiblockMeta extends MachineMeta {
                 .build()
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
                 .end()
                 .buildObject();
         }
@@ -424,6 +399,7 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = BlockEntityBuilder.builder("multiblock/" + id, PrimitiveBlock::new)
                 .blockEntity()
+                .capability(PROCESSOR, ELECTRIC_MACHINE)
                 .transform(this::sound)
                 .child(this::multiblock)
                 .transform(machineType.equals("distillation") ? $ -> $ : $ -> $.layout(layout))
@@ -432,10 +408,9 @@ public class MultiblockMeta extends MachineMeta {
                 .build()
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
                 .properties(BlockBehaviour.Properties::requiresCorrectToolForDrops)
-                .translucent()
                 .end()
                 .buildObject();
 

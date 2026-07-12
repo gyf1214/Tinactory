@@ -3,38 +3,40 @@ package org.shsts.tinactory.integration.gui.client;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.GridViewGroup;
 import org.shsts.tinactory.core.gui.client.IViewNode;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.core.gui.Texture.PAGE_BACKWARD;
+import static org.shsts.tinactory.core.gui.Texture.PAGE_BACKWARD_HOVERED;
+import static org.shsts.tinactory.core.gui.Texture.PAGE_FORWARD;
+import static org.shsts.tinactory.core.gui.Texture.PAGE_FORWARD_HOVERED;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class GridViewPanel<T extends IViewNode> extends Panel {
     private static final int PAGE_WIDTH = 12;
-    private static final int PAGE_HEIGHT = 18;
+    private static final int PAGE_HEIGHT = 17;
     private static final int PAGE_MARGIN = 12;
-    public static final Rect PAGE_PANEL_OFFSET = Rect.corners(0, 0, 0, -PAGE_HEIGHT - SPACING);
+    public static final Rect PAGE_PANEL_OFFSET = Rect.corners(0, 0, 0, -PAGE_HEIGHT - SPACING - 1);
     private static final RectD PAGE_ANCHOR = new RectD(0.5, 1d, 0d, 0d);
     private static final Rect PAGE_OFFSET = Rect.corners(0, -PAGE_HEIGHT, PAGE_WIDTH, 0);
     private static final Rect PAGE_OFFSET_LEFT = PAGE_OFFSET.offset(-PAGE_MARGIN - PAGE_WIDTH, 0);
     private static final Rect PAGE_OFFSET_RIGHT = PAGE_OFFSET.offset(PAGE_MARGIN, 0);
 
     private class PageButton extends SimpleButton {
-        private static final int TEX_Y = 208;
-
         private final int pageChange;
 
-        private PageButton(int texX, int pageChange) {
-            super(GridViewPanel.this.menu, RECIPE_BOOK_BG, null, texX, TEX_Y, texX, TEX_Y + PAGE_HEIGHT);
+        private PageButton(Texture texture, Texture hoverTexture, int pageChange) {
+            super(GridViewPanel.this.menu, texture, hoverTexture, null, 0, 0);
             this.pageChange = pageChange;
         }
 
@@ -58,8 +60,8 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
     private GridViewPanel(MenuScreen<?> screen, GridViewGroup<T> gridViewGroup) {
         super(screen, gridViewGroup);
         this.gridViewGroup = gridViewGroup;
-        this.leftPageButton = new PageButton(15, -1);
-        this.rightPageButton = new PageButton(1, 1);
+        this.leftPageButton = new PageButton(PAGE_BACKWARD, PAGE_BACKWARD_HOVERED, -1);
+        this.rightPageButton = new PageButton(PAGE_FORWARD, PAGE_FORWARD_HOVERED, 1);
 
         gridViewGroup.setSlotFactory(this::createSlot);
 

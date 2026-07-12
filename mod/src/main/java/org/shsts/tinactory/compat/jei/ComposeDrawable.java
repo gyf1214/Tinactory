@@ -1,9 +1,9 @@
 package org.shsts.tinactory.compat.jei;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +40,9 @@ public class ComposeDrawable implements IDrawable {
     }
 
     @Override
-    public void draw(PoseStack poseStack, int xOffset, int yOffset) {
+    public void draw(GuiGraphics graphics, int xOffset, int yOffset) {
         for (var component : components) {
-            component.drawable.draw(poseStack, xOffset + component.xOffset, yOffset + component.yOffset);
+            component.drawable.draw(graphics, xOffset + component.xOffset, yOffset + component.yOffset);
         }
     }
 

@@ -2,15 +2,16 @@ package org.shsts.tinactory.core.machine;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraft.util.RandomSource;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -21,7 +22,6 @@ import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -42,8 +41,6 @@ import static org.shsts.tinactory.core.util.CodecHelper.parseTag;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcessor, INBTSerializable<CompoundTag> {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static final String VOID_KEY = "void";
     public static final boolean VOID_DEFAULT = false;
 
@@ -88,7 +85,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             return processor.onWorkProgress(recipe, partial);
         }
 
-        public void onWorkDone(IMachine machine, Random random,
+        public void onWorkDone(IMachine machine, RandomSource random,
             BiConsumer<PortDirection, IProcessingObject> onReportObject) {
             processor.onWorkDone(recipe, machine, random,
                 result -> onReportObject.accept(PortDirection.OUTPUT, result));
@@ -421,42 +418,37 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         if (currentRecipe != null) {
             tag.putString("currentRecipe", currentRecipe.loc().toString());
             tag.putInt("processorIndex", currentRecipe.index());
             tag.putLong("workProgress", workProgress);
-            tag.put("processorData", currentRecipe.processor().serializeNBT());
+            tag.put("processorData", currentRecipe.processor().serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
-                info -> encodeTag(processingInfoCodec, info)));
+                info -> encodeTag(provider, processingInfoCodec, info)));
         } else if (currentRecipeLoc != null) {
             tag.putString("currentRecipe", currentRecipeLoc.toString());
             tag.putInt("processorIndex", processorIndex);
             tag.putLong("workProgress", workProgress);
-            tag.put("processorData", processors.get(processorIndex).serializeNBT());
+            tag.put("processorData", processors.get(processorIndex).serializeNBT(provider));
             tag.put("processorInfo", encodeList(infoList,
-                info -> encodeTag(processingInfoCodec, info)));
+                info -> encodeTag(provider, processingInfoCodec, info)));
         }
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         currentRecipe = null;
         infoList.clear();
         if (tag.contains("currentRecipe", Tag.TAG_STRING)) {
-            currentRecipeLoc = new ResourceLocation(tag.getString("currentRecipe"));
+            currentRecipeLoc = ResourceLocation.parse(tag.getString("currentRecipe"));
             processorIndex = tag.getInt("processorIndex");
             workProgress = tag.getLong("workProgress");
-            processors.get(processorIndex).deserializeNBT(tag.getCompound("processorData"));
-            // TODO: backward compatibility of old save data before ProcessingObject changes
-            try {
-                parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
-                    value -> parseTag(processingInfoCodec, value), infoList::add);
-            } catch (RuntimeException e) {
-                LOGGER.warn("skip processor info data", e);
-            }
+            processors.get(processorIndex).deserializeNBT(provider, tag.getCompound("processorData"));
+            parseList(tag.getList("processorInfo", Tag.TAG_COMPOUND),
+                value -> parseTag(provider, processingInfoCodec, value), infoList::add);
             buildInfoMap();
         } else {
             currentRecipeLoc = null;

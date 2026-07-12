@@ -2,8 +2,7 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -29,18 +28,14 @@ public class MECraftRequestSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(requestables,
-            (buf1, entry) ->
-                buf1.writeNbt((CompoundTag) CodecHelper.encodeTag(StackHelper.KEY_CODEC, entry)));
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        CodecHelper.encodeCollectionToBuf(buf, requestables, StackHelper.KEY_STREAM_CODEC);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         requestables.clear();
-        requestables.addAll(
-            buf.readList(buf1 -> CodecHelper.parseTag(StackHelper.KEY_CODEC,
-                CodecHelper.readRequiredNbt(buf1, "requestable key"))));
+        requestables.addAll(CodecHelper.parseListFromBuf(buf, StackHelper.KEY_STREAM_CODEC));
     }
 
     @Override

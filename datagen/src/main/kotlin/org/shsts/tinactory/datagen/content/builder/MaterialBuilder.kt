@@ -8,8 +8,8 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
-import net.minecraftforge.client.model.generators.ItemModelProvider
-import net.minecraftforge.common.Tags
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider
+import net.neoforged.neoforge.common.Tags
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.TOOL_FILE
@@ -28,9 +28,10 @@ import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.gregtech
 import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.datagen.content.Models
-import org.shsts.tinactory.datagen.content.Models.VOID_TEX
+import org.shsts.tinactory.datagen.content.Models.ITEM_VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemKey
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
@@ -100,10 +101,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     private var hasProcess = false
     private var hasOreProcess = false
 
-    private fun <U : Item> toolModel(ctx: IEntryDataContext<Item, U, ItemModelProvider>, sub: String) {
+    private fun <U : Item> toolModel(ctx: IEntryDataContext<U, ItemModelProvider>, sub: String) {
         val category = sub.substring("tool/".length)
-        val handle = TOOL_HANDLE_TEX[category]?.let { gregtech("items/tools/$it") } ?: VOID_TEX
-        val head = gregtech("items/tools/$category")
+        val handle = TOOL_HANDLE_TEX[category]?.let { gregtech("item/tools/$it") } ?: ITEM_VOID_TEX
+        val head = gregtech("item/tools/$category")
         basicItem(ctx, handle, head)
     }
 
@@ -118,9 +119,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             when (sub) {
                 "wire" -> model(Models::wireItem)
                 "pipe" -> model(Models::pipeItem)
-                "raw" -> model { basicItem(it, modLoc("items/material/raw")) }
-                "raw_fluid" -> model { basicItem(it, modLoc("items/material/raw_fluid")) }
-                "seed" -> model { basicItem(it, ae2("items/crystal_seed_nether")) }
+                "raw" -> model { basicItem(it, modLoc("item/material/raw")) }
+                "raw_fluid" -> model { basicItem(it, modLoc("item/material/raw_fluid")) }
+                "seed" -> model { basicItem(it, ae2("item/crystal_seed_nether")) }
                 else -> model { icon.itemModel(it, sub) }
             }
         }
@@ -144,7 +145,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         val entry = material.entry(sub)
         if (material.isExisting(sub)) {
             // simple add tag for existing item
-            dataGen { tag(entry, tag) }
+            dataGen { tag(itemKey(entry.get()), tag) }
         } else {
             // build item data for new item
             newItem(sub, tag, entry as IEntry<out Item>)
@@ -153,15 +154,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     private fun buildOre() {
         val variant = material.oreVariant()
-        val tierTag = variant.mineTier.tag!!
+        val tierTag = variant.mineTag
         blockData(material.blockEntry("ore") as IEntry<out Block>) {
             blockState { oreBlock(it, variant) }
             tag(BlockTags.MINEABLE_WITH_PICKAXE)
             tag(tierTag)
             if (material.hasItem("raw")) {
-                drop(material.entry("raw"))
+                drop(material.item("raw"))
             } else {
-                drop(material.entry("raw_fluid"))
+                drop(material.item("raw_fluid"))
             }
         }
     }
@@ -260,11 +261,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         private fun valid(result: String, vararg inputs: String) = material.hasItem(result) &&
             inputs.all { material.hasItem(it) && material.loc(it) != material.loc(result) }
 
-        private fun <B : ProcessingRecipe.BuilderBase<*, B>, RB : ProcessingRecipeBuilder<B>>
-            RecipeFactory<B, RB>.process(result: String, input: String,
+        private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>
+            RecipeFactory<R, B>.process(result: String, input: String,
             workTicks: Long, amount: Int = 1, inputAmount: Int = 1, suffix: String = "",
             voltage: Voltage = this@ProcessBuilder.voltage,
-            block: RB.() -> Unit = {}) {
+            block: B.() -> Unit = {}) {
             if (!valid(result, input)) {
                 return
             }
@@ -530,12 +531,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         smelt("dust_tiny", material, "nugget")
     }
 
-    inner class ComposeBuilder<B : ProcessingRecipe.BuilderBase<*, B>>(
-        private val factory: ProcessingRecipeFactoryBase<B>,
+    inner class ComposeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
+        private val factory: ProcessingRecipeFactoryBase<R, B>,
         private val sub: String, private val suffix: String,
         private val voltage: Voltage, private val workTicks: Long,
         private val decompose: Boolean) {
-        private var _builder: ProcessingRecipeBuilder<B>? = null
+        private var _builder: B? = null
         private val builder get() = _builder!!
         private var inAmount = 0f
         private var outAmount: Float? = null
@@ -561,7 +562,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             builder.extra(block)
         }
 
-        fun build(block: ComposeBuilder<B>.() -> Unit) {
+        fun build(block: ComposeBuilder<R, B>.() -> Unit) {
             factory.recipe(material, sub, suffix) {
                 _builder = this
                 block()
@@ -577,14 +578,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeFactoryBase<B>.compose(
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> ProcessingRecipeFactoryBase<R, B>.compose(
         sub: String, voltage: Voltage, workTicks: Long, decompose: Boolean,
-        suffix: String = "", block: ComposeBuilder<B>.() -> Unit) {
+        suffix: String = "", block: ComposeBuilder<R, B>.() -> Unit) {
         ComposeBuilder(this, sub, suffix, voltage, workTicks, decompose).build(block)
     }
 
     fun centrifuge(voltage: Voltage,
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         centrifuge {
             defaultItemSub = "dust"
             compose("dust", voltage, 60, true, block = block)
@@ -592,7 +593,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun mix(voltage: Voltage,
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         mixer {
             compose("dust", voltage, 20, false, block = block)
         }
@@ -600,33 +601,33 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun fluidMix(voltage: Voltage, sub: String = "fluid",
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         mixer {
             compose(sub, voltage, 20, false, block = block)
         }
     }
 
     fun alloyOnly(voltage: Voltage, sub: String = "ingot",
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         alloySmelter {
             compose(sub, voltage, 40, false, block = block)
         }
     }
 
     fun alloy(voltage: Voltage,
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         alloyOnly(voltage, block = block)
         val v1 = if (voltage.rank < Voltage.LV.rank) Voltage.LV else voltage
         mix(v1, block)
     }
 
     fun fluidAlloy(voltage: Voltage,
-        block: ComposeBuilder<ProcessingRecipe.Builder>.() -> Unit) {
+        block: ComposeBuilder<ProcessingRecipe, SimpleProcessingBuilder>.() -> Unit) {
         alloyOnly(voltage, "fluid", block)
     }
 
     fun blast(voltage: Voltage, temperature: Int, workTicks: Long, from: MaterialSet = material,
-        block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit = {}) {
+        block: ComposeBuilder<BlastFurnaceRecipe, BlastFurnaceBuilder>.() -> Unit = {}) {
         val sub: String
         if (material.hasItem("ingot_hot")) {
             sub = "ingot_hot"
@@ -654,7 +655,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     fun blast(voltage: Voltage, temperature: Int, workTicks: Long, from: String,
-        block: ComposeBuilder<BlastFurnaceRecipe.Builder>.() -> Unit = {}) {
+        block: ComposeBuilder<BlastFurnaceRecipe, BlastFurnaceBuilder>.() -> Unit = {}) {
         blast(voltage, temperature, workTicks, getMaterial(from), block)
     }
 

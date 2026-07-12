@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricChestMenu;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.core.gui.Rect;
@@ -44,17 +44,17 @@ public class ElectricChestScreen extends ElectricStorageScreen<ElectricChestMenu
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             var stack = getStack();
             if (stack.isEmpty()) {
                 getFilter().ifPresent(stack1 ->
-                    RenderUtil.renderGhostItem(poseStack, stack1, rect.x(), rect.y()));
+                    RenderUtil.renderGhostItem(graphics, stack1, rect().x(), rect().y()));
             } else {
-                RenderUtil.renderItemWithDecoration(stack, rect.x(), rect.y());
+                RenderUtil.renderItemWithDecoration(graphics, stack, rect().x(), rect().y());
             }
 
             if (isHovered(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, rect);
+                RenderUtil.renderSlotHover(graphics, rect());
             }
         }
 

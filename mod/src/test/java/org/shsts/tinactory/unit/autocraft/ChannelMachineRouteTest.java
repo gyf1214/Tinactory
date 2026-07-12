@@ -79,7 +79,7 @@ class ChannelMachineRouteTest {
         }
 
         @Override
-        public int getStorageAmount(TestStack stack) {
+        public long getStorageAmount(TestStack stack) {
             return 0;
         }
 

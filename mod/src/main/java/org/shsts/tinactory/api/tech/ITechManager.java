@@ -1,5 +1,7 @@
 package org.shsts.tinactory.api.tech;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -7,8 +9,12 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public interface ITechManager {
     Optional<? extends ITechnology> techByKey(ResourceLocation loc);
+
+    Optional<ResourceLocation> key(ITechnology technology);
 
     Collection<? extends ITechnology> allTechs();
 

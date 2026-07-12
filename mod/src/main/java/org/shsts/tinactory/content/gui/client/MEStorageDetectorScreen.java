@@ -1,14 +1,15 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
 import org.shsts.tinactory.content.logistics.MEStorageDetector;
@@ -40,6 +41,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
     private static final int SLOT_Y_OFFSET = SLOT_SIZE / 2;
     private static final int EDIT_Y_OFFSET = SLOT_Y_OFFSET + (SLOT_SIZE - EDIT_HEIGHT) / 2;
 
+    private final HolderLookup.Provider provider;
     private final IMachineConfig config;
 
     private class MarkerSlot extends MenuWidget {
@@ -48,22 +50,22 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            var z = getBlitOffset();
-            RenderUtil.blit(poseStack, SLOT_BACKGROUND, z, rect);
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect());
 
-            var targetItem = MEStorageDetector.targetItem(config);
-            var targetFluid = MEStorageDetector.targetFluid(config);
+            var registries = MEStorageDetectorScreen.this.menu.world().registryAccess();
+            var targetItem = MEStorageDetector.targetItem(registries, config);
+            var targetFluid = MEStorageDetector.targetFluid(registries, config);
 
-            var rect1 = rect.offset(1, 1).enlarge(-2, -2);
+            var rect1 = rect().offset(1, 1).enlarge(-2, -2);
             if (!targetItem.isEmpty()) {
-                RenderUtil.renderItem(targetItem, rect1.x(), rect1.y());
+                RenderUtil.renderItem(graphics, targetItem, rect1.x(), rect1.y());
             } else if (!targetFluid.isEmpty()) {
-                RenderUtil.renderFluid(poseStack, targetFluid, rect1, z);
+                RenderUtil.renderFluid(graphics, targetFluid, rect1);
             }
 
             if (isHovered(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, rect1);
+                RenderUtil.renderSlotHover(graphics, rect1);
             }
         }
 
@@ -93,11 +95,11 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
                     FluidStack.EMPTY;
                 if (fluid.isEmpty()) {
                     packet
-                        .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).serializeNBT())
+                        .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).save(provider))
                         .reset(TARGET_FLUID_KEY);
                 } else {
                     packet
-                        .set(TARGET_FLUID_KEY, StackHelper.serializeFluidStack(fluid))
+                        .set(TARGET_FLUID_KEY, fluid.save(provider))
                         .reset(TARGET_ITEM_KEY);
                 }
             }
@@ -110,6 +112,7 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
     public MEStorageDetectorScreen(MEStorageDetectorMenu menu, Component title) {
         super(menu, title);
+        this.provider = menu.world().registryAccess();
         this.config = menu.machine.config();
 
         var slot = new MarkerSlot();
@@ -127,18 +130,18 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
     }
 
     private void resetEditText() {
-        var amount = config.getInt(TARGET_AMOUNT_KEY, 0);
-        targetAmountEdit.setValue(Integer.toString(amount));
+        var amount = config.getLong(TARGET_AMOUNT_KEY, 0L);
+        targetAmountEdit.setValue(Long.toString(amount));
     }
 
     private void onEditChange(String str) {
-        var val = -1;
+        var val = -1L;
         try {
-            val = Integer.parseInt(str);
+            val = Long.parseLong(str);
         } catch (NumberFormatException ignored) {
         }
-        var oldVal = config.getInt(TARGET_AMOUNT_KEY, 0);
-        if (val >= 0 && val != oldVal) {
+        var oldVal = config.getLong(TARGET_AMOUNT_KEY, 0L);
+        if (val >= 0L && val != oldVal) {
             menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder()
                 .set(TARGET_AMOUNT_KEY, val));
         }

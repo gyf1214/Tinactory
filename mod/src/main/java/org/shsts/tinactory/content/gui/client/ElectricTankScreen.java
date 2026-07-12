@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.content.gui.ElectricTankMenu;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -20,6 +20,7 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 import java.util.List;
 import java.util.Optional;
 
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.content.gui.ElectricTankMenu.FILTER_SYNC;
 import static org.shsts.tinactory.core.gui.Texture.FLUID_SLOT_BG;
 import static org.shsts.tinactory.integration.gui.LayoutMenu.FLUID_SYNC;
@@ -37,7 +38,7 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         }
 
         private FluidStack getFilterFluid() {
-            return menu.getSyncPacket(filterName, FluidSyncPacket.class)
+            return menu.getSyncPacket(filterName, FLUID_STACK_SYNC)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         }
 
@@ -57,13 +58,13 @@ public class ElectricTankScreen extends ElectricStorageScreen<ElectricTankMenu> 
         }
 
         @Override
-        protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
+        protected void renderSlot(GuiGraphics graphics, int mouseX, int mouseY) {
             var fluid = getFluidStack();
             var filter = getFilterFluid();
             if (fluid.isEmpty() && !filter.isEmpty()) {
-                RenderUtil.renderGhostFluid(poseStack, filter, rect, getBlitOffset());
+                RenderUtil.renderGhostFluid(graphics, filter, rect());
             }
-            super.renderSlot(poseStack, mouseX, mouseY);
+            super.renderSlot(graphics, mouseX, mouseY);
         }
     }
 

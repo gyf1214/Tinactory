@@ -1,9 +1,8 @@
 package org.shsts.tinactory.unit.util;
 
+import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.MathUtil;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,10 +37,10 @@ class MathUtilTest {
 
     @Test
     void sampleBinomialHandlesDirectPoissonNormalAndHighProbabilityBranchesDeterministically() {
-        assertEquals(3, MathUtil.sampleBinomial(5, 0.5d, new Random(1L)));
-        assertEquals(2, MathUtil.sampleBinomial(100, 0.01d, new Random(2L)));
-        assertEquals(39, MathUtil.sampleBinomial(50, 0.8d, new Random(3L)));
-        assertEquals(98, MathUtil.sampleBinomial(100, 0.95d, new Random(4L)));
-        assertEquals(99, MathUtil.sampleBinomial(100, 0.99d, new Random(5L)));
+        assertEquals(3, MathUtil.sampleBinomial(5, 0.5d, RandomSource.create(1L)));
+        assertEquals(2, MathUtil.sampleBinomial(100, 0.01d, RandomSource.create(2L)));
+        assertEquals(39, MathUtil.sampleBinomial(50, 0.8d, RandomSource.create(3L)));
+        assertEquals(98, MathUtil.sampleBinomial(100, 0.95d, RandomSource.create(4L)));
+        assertEquals(99, MathUtil.sampleBinomial(100, 0.99d, RandomSource.create(5L)));
     }
 }

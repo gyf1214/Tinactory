@@ -1,29 +1,23 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
-import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,22 +34,25 @@ public class MarkerRecipe extends ProcessingRecipe {
 
     public final List<Input> markerOutputs;
 
-    protected MarkerRecipe(Builder builder) {
-        super(builder);
-        this.baseTypeId = builder.getBaseTypeId();
-        this.prefix = builder.prefix;
-        this.requireMultiblock = builder.requireMultiblock;
-        this.displayIngredient = builder.displayIngredient;
-        this.displayTex = builder.displayTex != null ? new Texture(builder.displayTex, 16, 16) : null;
-        this.markerOutputs = builder.markerOutputs;
+    public MarkerRecipe(List<Input> inputs, List<Output> outputs, long voltage,
+        ResourceLocation baseTypeId, String prefix, boolean requireMultiblock,
+        Optional<IProcessingIngredient> displayIngredient, Optional<ResourceLocation> displayTex,
+        List<Input> markerOutputs) {
+        super(inputs, outputs, 0L, voltage, 0L);
+        this.baseTypeId = baseTypeId;
+        this.prefix = prefix;
+        this.requireMultiblock = requireMultiblock;
+        this.displayIngredient = displayIngredient.orElse(null);
+        this.displayTex = displayTex.map($ -> new Texture($, 16, 16)).orElse(null);
+        this.markerOutputs = markerOutputs;
     }
 
     public Optional<IProcessingIngredient> displayIngredient() {
         return Optional.ofNullable(displayIngredient);
     }
 
-    public Optional<Texture> displayTexture() {
-        return Optional.ofNullable(displayTex);
+    public Optional<ResourceLocation> displayTexLoc() {
+        return displayTex == null ? Optional.empty() : Optional.of(displayTex.loc());
     }
 
     @Override
@@ -70,8 +67,8 @@ public class MarkerRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public Optional<List<Component>> tooltip() {
-        return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc()))));
+    public Optional<List<Component>> tooltip(ResourceLocation loc) {
+        return Optional.of(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))));
     }
 
     @Override
@@ -102,116 +99,18 @@ public class MarkerRecipe extends ProcessingRecipe {
         }
     }
 
-    public static class Builder extends BuilderBase<MarkerRecipe, Builder> {
-        @Nullable
-        private ResourceLocation baseTypeId;
-        private String prefix = "";
-        private boolean requireMultiblock = false;
-        @Nullable
-        private IProcessingIngredient displayIngredient = null;
-        @Nullable
-        private ResourceLocation displayTex = null;
-        private final List<Input> markerOutputs = new ArrayList<>();
-
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder baseType(ResourceLocation value) {
-            baseTypeId = value;
-            return this;
-        }
-
-        public Builder prefix(String value) {
-            prefix = value;
-            return this;
-        }
-
-        public Builder requireMultiblock(boolean value) {
-            requireMultiblock = value;
-            return this;
-        }
-
-        public Builder display(IProcessingIngredient value) {
-            this.displayIngredient = value;
-            this.displayTex = null;
-            return this;
-        }
-
-        public Builder display(ResourceLocation tex) {
-            this.displayTex = tex;
-            this.displayIngredient = null;
-            return this;
-        }
-
-        public Builder output(int port, IProcessingIngredient ingredient) {
-            markerOutputs.add(new Input(port, ingredient));
-            return this;
-        }
-
-        protected ResourceLocation getBaseTypeId() {
-            assert baseTypeId != null;
-            return baseTypeId;
-        }
-
-        @Override
-        protected void validate() {
-            assert baseTypeId != null : loc;
-        }
-
-        @Override
-        protected MarkerRecipe createObject() {
-            return new MarkerRecipe(this);
-        }
-    }
-
-    public static class Serializer extends ProcessingRecipe.Serializer<MarkerRecipe, Builder> {
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
-            super(ingredientCodec, resultCodec);
-        }
-
-        @Override
-        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
-            var builder = super.buildFromJson(type, loc, jo)
-                .baseType(new ResourceLocation(GsonHelper.getAsString(jo, "base_type")))
-                .prefix(GsonHelper.getAsString(jo, "prefix", ""))
-                .requireMultiblock(GsonHelper.getAsBoolean(jo, "require_multiblock", false));
-            if (jo.has("display")) {
-                if (jo.get("display").isJsonObject()) {
-                    builder.display(CodecHelper.parseJson(
-                        ingredientCodec(), GsonHelper.getAsJsonObject(jo, "display")));
-                } else {
-                    builder.display(new ResourceLocation(GsonHelper.getAsString(jo, "display")));
-                }
-            }
-            Streams.stream(GsonHelper.getAsJsonArray(jo, "marker_outputs"))
-                .map(JsonElement::getAsJsonObject)
-                .forEach(je -> builder.output(
-                    GsonHelper.getAsInt(je, "port"),
-                    CodecHelper.parseJson(ingredientCodec(), GsonHelper.getAsJsonObject(je, "result"))));
-            return builder;
-        }
-
-        @Override
-        public void toJson(JsonObject jo, MarkerRecipe recipe) {
-            super.toJson(jo, recipe);
-            jo.addProperty("base_type", recipe.baseTypeId.toString());
-            jo.addProperty("prefix", recipe.prefix);
-            jo.addProperty("require_multiblock", recipe.requireMultiblock);
-            if (recipe.displayTex != null) {
-                jo.addProperty("display", recipe.displayTex.loc().toString());
-            } else if (recipe.displayIngredient != null) {
-                jo.add("display", CodecHelper.encodeJson(ingredientCodec(), recipe.displayIngredient));
-            }
-            var markerOutputs = new JsonArray();
-            recipe.markerOutputs.stream()
-                .map(output -> {
-                    var je = new JsonObject();
-                    je.addProperty("port", output.port());
-                    je.add("result", CodecHelper.encodeJson(ingredientCodec(), output.ingredient()));
-                    return je;
-                }).forEach(markerOutputs::add);
-            jo.add("marker_outputs", markerOutputs);
-        }
+    public static MapCodec<MarkerRecipe> codec(Codec<IProcessingIngredient> ingredientCodec,
+        Codec<Input> inputCodec, Codec<Output> outputCodec) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            outputCodec.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+            ResourceLocation.CODEC.fieldOf("base_type").forGetter($ -> $.baseTypeId),
+            Codec.STRING.fieldOf("prefix").forGetter($ -> $.prefix),
+            Codec.BOOL.fieldOf("require_multiblock").forGetter($ -> $.requireMultiblock),
+            ingredientCodec.optionalFieldOf("display").forGetter(MarkerRecipe::displayIngredient),
+            ResourceLocation.CODEC.optionalFieldOf("display_texture").forGetter(MarkerRecipe::displayTexLoc),
+            inputCodec.listOf().fieldOf("marker_outputs").forGetter($ -> $.markerOutputs)
+        ).apply(instance, MarkerRecipe::new));
     }
 }

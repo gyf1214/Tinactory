@@ -4,18 +4,18 @@
   "fluids": {
     "dilute": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/material_sets/fluid/liquid",
+      "texture": "gregtech:block/material_sets/fluid/liquid",
       "textureColor": "0xFFC07820",
       "displayColor": "0xFFC07820"
     },
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.sulfuric_acid",
+      "texture": "gregtech:block/fluids/fluid.sulfuric_acid",
       "textureColor": "0xFFFFFFFF"
     },
     "gas": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/material_sets/dull/gas",
+      "texture": "gregtech:block/material_sets/dull/gas",
       "textureColor": "0xFFA0A014",
       "displayColor": "0xFFA0A014"
     }

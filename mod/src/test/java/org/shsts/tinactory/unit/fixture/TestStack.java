@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+
 public record TestStack(PortType type, String id, String nbt, int amount) {
     public static final Codec<TestStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.STRING.xmap(PortType::valueOf, PortType::name).fieldOf("type").forGetter(TestStack::type),

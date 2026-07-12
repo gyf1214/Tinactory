@@ -3,13 +3,14 @@ package org.shsts.tinactory.integration.logistics;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.IFluidTank;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
@@ -22,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static net.neoforged.neoforge.fluids.FluidStack.isSameFluidSameComponents;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -66,7 +69,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
             if (stack.isEmpty()) {
                 return stack;
             }
-            if (!tank.getFluid().isEmpty() && tank.getFluid().isFluidEqual(stack)) {
+            if (!tank.getFluid().isEmpty() && isSameFluidSameComponents(tank.getFluid(), stack)) {
                 stack.shrink(tank.fill(stack, action));
             }
         }
@@ -93,11 +96,11 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
             if (amount <= 0) {
                 break;
             }
-            if (tank.getFluid().isFluidEqual(fluid)) {
+            if (isSameFluidSameComponents(tank.getFluid(), fluid)) {
                 var stack1 = tank.drain(amount, action);
                 if (stack.isEmpty()) {
                     stack = stack1;
-                } else if (stack.isFluidEqual(stack1)) {
+                } else if (isSameFluidSameComponents(stack, stack1)) {
                     stack.grow(stack1.getAmount());
                 } else {
                     // don't know what to do actually, can only destroy the extracted fluid
@@ -143,14 +146,14 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
     }
 
     @Override
-    public int getStorageAmount(FluidStack fluid) {
+    public long getStorageAmount(FluidStack fluid) {
         if (fluid.isEmpty() || !acceptOutput()) {
             return 0;
         }
         var ret = 0;
         for (var tank : tanks) {
             var stack = tank.getFluid();
-            if (stack.isFluidEqual(fluid)) {
+            if (isSameFluidSameComponents(stack, fluid)) {
                 ret += stack.getAmount();
             }
         }
@@ -226,13 +229,13 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var size = tanks.length;
         var tankTags = new ListTag();
         for (var i = 0; i < size; i++) {
             var tank = tanks[i];
             if (!tank.getFluid().isEmpty()) {
-                var fluidTag = tank.serializeNBT();
+                var fluidTag = tank.serializeNBT(provider);
                 fluidTag.putInt("Tank", i);
                 tankTags.add(fluidTag);
             }
@@ -244,7 +247,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         for (var tank : tanks) {
             tank.setFluid(FluidStack.EMPTY);
         }
@@ -253,7 +256,7 @@ public class CombinedFluidTank implements IFluidTanksHandler, IPort<FluidStack>,
             var tankTag = listTag.getCompound(i);
             var index = tankTag.getInt("Tank");
             if (index >= 0 && index < tanks.length) {
-                tanks[index].deserializeNBT(tankTag);
+                tanks[index].deserializeNBT(provider, tankTag);
             }
         }
     }

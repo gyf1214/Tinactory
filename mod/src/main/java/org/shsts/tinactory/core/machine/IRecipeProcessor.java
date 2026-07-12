@@ -4,7 +4,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraft.util.RandomSource;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
@@ -14,15 +15,12 @@ import org.shsts.tinycorelib.api.core.DistLazy;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     ResourceLocation recipeTypeId();
-
-    Class<T> baseClass();
 
     Optional<T> byLoc(ResourceLocation loc);
 
@@ -58,7 +56,7 @@ public interface IRecipeProcessor<T> extends INBTSerializable<CompoundTag> {
     /**
      * Result is for returning actual result.
      */
-    void onWorkDone(T recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback);
+    void onWorkDone(T recipe, IMachine machine, RandomSource random, Consumer<IProcessingResult> callback);
 
     long maxWorkProgress(T recipe);
 

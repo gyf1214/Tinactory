@@ -1,8 +1,8 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -50,12 +50,12 @@ public class MECraftRequestPanel extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             if (index == selected) {
-                RenderUtil.blit(poseStack, RECIPE_BUTTON, getBlitOffset(), rect, 22, 1);
+                RenderUtil.blit(graphics, RECIPE_BUTTON, rect, 22, 1);
             } else {
-                RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect);
+                RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
             }
             if (index >= requestables.size()) {
                 return;
@@ -63,7 +63,7 @@ public class MECraftRequestPanel extends Panel {
             var requestable = requestables.get(index);
             var display = requestable.display();
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
-            RenderUtil.renderDescriptor(poseStack, display, rect1, getBlitOffset());
+            RenderUtil.renderDescriptor(graphics, display, rect1);
         }
 
         @Override

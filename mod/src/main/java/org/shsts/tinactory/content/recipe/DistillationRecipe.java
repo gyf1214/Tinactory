@@ -1,25 +1,28 @@
 package org.shsts.tinactory.content.recipe;
 
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 
-import java.util.Random;
+import java.util.List;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DistillationRecipe extends DisplayInputRecipe {
-    private DistillationRecipe(BuilderBase<?, ?> builder) {
-        super(builder);
+    public static final MapCodec<DistillationRecipe> CODEC = codec(
+        ProcessingHelper.INPUT_CODEC, ProcessingHelper.OUTPUT_CODEC, DistillationRecipe::new);
+
+    public DistillationRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power) {
+        super(inputs, outputs, workTicks, voltage, power);
     }
 
     private int getSlots(IMachine machine) {
@@ -34,28 +37,19 @@ public class DistillationRecipe extends DisplayInputRecipe {
 
     @Override
     protected boolean matchOutputs(IMachine machine, IContainer container,
-        int parallel, Random random) {
+        int parallel, RandomSource random) {
         var slots = getSlots(machine);
         return outputs.stream().limit(slots)
             .allMatch(output -> canInsertOutput(container, output, parallel, random));
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         var container = machine.container().orElseThrow();
         var slots = Math.min(outputs.size(), getSlots(machine));
         for (var i = 0; i < slots; i++) {
             insertOutput(container, outputs.get(i), parallel, random, false).ifPresent(callback);
         }
-    }
-
-    public static Builder builder(IRecipeType<Builder> parent, ResourceLocation loc) {
-        return new Builder(parent, loc) {
-            @Override
-            protected ProcessingRecipe createObject() {
-                return new DistillationRecipe(this);
-            }
-        };
     }
 }

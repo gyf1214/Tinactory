@@ -1,12 +1,13 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -45,9 +46,9 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (slot.isActive()) {
-                super.doRender(poseStack, mouseX, mouseY, partialTick);
+                super.doRender(graphics, mouseX, mouseY, partialTick);
             }
         }
     }
@@ -101,16 +102,21 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
     }
 
     @Override
-    protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         var tex = BACKGROUND;
         var rect = new Rect(leftPos, topPos, imageWidth, imageHeight);
         var texRect = new Rect(0, 0, tex.width(), tex.height());
-        StretchImage.render(poseStack, tex, 0, rect, texRect, MARGIN_VERTICAL);
+        StretchImage.render(graphics, tex, rect, texRect, MARGIN_VERTICAL);
     }
 
     @Override
-    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
-        font.draw(poseStack, title, (float) titleLabelX, (float) titleLabelY, RenderUtil.TEXT_COLOR);
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics.drawString(font, title, titleLabelX, titleLabelY, RenderUtil.TEXT_COLOR, false);
+    }
+
+    public void renderTooltip(GuiGraphics graphics, List<Component> tooltip, Optional<TooltipComponent> component,
+        int mouseX, int mouseY) {
+        graphics.renderTooltip(font, tooltip, component, mouseX, mouseY);
     }
 
     public Optional<IViewAdapter> getHovered(int mouseX, int mouseY) {
@@ -123,13 +129,13 @@ public class MenuScreen<M extends MenuBase> extends MenuScreenBase<M> {
     }
 
     @Override
-    protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
-        super.renderTooltip(poseStack, mouseX, mouseY);
+    protected void renderTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
+        super.renderTooltip(graphics, mouseX, mouseY);
         if (menu.getCarried().isEmpty() && hoveredSlot != null && hoveredSlot.hasItem()) {
             return;
         }
 
         getHovered(mouseX, mouseY).ifPresent(hoverable ->
-            hoverable.renderTooltip(this, poseStack, mouseX, mouseY));
+            hoverable.renderTooltip(this, graphics, mouseX, mouseY));
     }
 }

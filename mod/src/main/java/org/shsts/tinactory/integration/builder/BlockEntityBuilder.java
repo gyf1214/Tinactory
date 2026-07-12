@@ -73,7 +73,7 @@ public class BlockEntityBuilder<U extends Block & EntityBlock, P>
     }
 
     public BlockEntityBuilder<U, P> translucent() {
-        return block().translucent().end();
+        return self();
     }
 
     @Override

@@ -1,13 +1,12 @@
 package org.shsts.tinactory.content.electric;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
@@ -42,11 +41,11 @@ public final class Circuits {
         var voltage = getVoltage(tier, level);
         var item = REGISTRATE.item("circuit/" + id, (properties) -> (Item) new Item(properties) {
             @Override
-            public void appendHoverText(ItemStack stack, @Nullable Level world,
-                List<Component> tooltip, TooltipFlag isAdvanced) {
+            public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+                TooltipFlag flag) {
                 addTooltip(tooltip, "circuit", voltage.displayName());
             }
-        }).register();
+        }).creativeTab(CreativeModeTabs.INGREDIENTS).register();
         CIRCUIT.put(id, new Circuit(tier, level, item));
     }
 
@@ -71,26 +70,38 @@ public final class Circuits {
     }
 
     public static void newWafer(String name) {
-        var boule = REGISTRATE.item("boule/" + name).register();
+        var boule = REGISTRATE.item("boule/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register();
         BOULE_LIST.add(boule);
         BOULE.put(name, boule);
-        var wafer = REGISTRATE.item("wafer_raw/" + name).register();
+        var wafer = REGISTRATE.item("wafer_raw/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register();
         WAFER_RAW_LIST.add(wafer);
         WAFER_RAW.put(name, wafer);
     }
 
     public static void newChip(String name) {
-        WAFER.put(name, REGISTRATE.item("wafer/" + name).register());
-        CHIP.put(name, REGISTRATE.item("chip/" + name).register());
+        WAFER.put(name, REGISTRATE.item("wafer/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register());
+        CHIP.put(name, REGISTRATE.item("chip/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register());
     }
 
     public static void buildBoards() {
         for (var tier : CircuitTier.values()) {
-            var board = REGISTRATE.item("board/" + tier.board).register();
+            var board = REGISTRATE.item("board/" + tier.board)
+                .creativeTab(CreativeModeTabs.INGREDIENTS)
+                .register();
             BOARD.put(tier, board);
         }
         for (var tier : CircuitTier.values()) {
-            var circuitBoard = REGISTRATE.item("circuit_board/" + tier.circuitBoard).register();
+            var circuitBoard = REGISTRATE.item("circuit_board/" + tier.circuitBoard)
+                .creativeTab(CreativeModeTabs.INGREDIENTS)
+                .register();
             CIRCUIT_BOARD.put(tier, circuitBoard);
         }
     }

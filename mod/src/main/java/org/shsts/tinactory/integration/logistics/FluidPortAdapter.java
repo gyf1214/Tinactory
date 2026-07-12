@@ -1,16 +1,15 @@
 package org.shsts.tinactory.integration.logistics;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -19,7 +18,6 @@ import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -52,7 +50,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
     @Override
     public boolean canStack(FluidStack left, FluidStack right) {
-        return left.isFluidEqual(right);
+        return FluidStack.isSameFluidSameComponents(left, right);
     }
 
     @Override
@@ -63,11 +61,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
     @Override
     public FluidStack stackOf(IStackKey key, long amount) {
         var typed = (FluidKey) key;
-        var stack = new FluidStack(typed.fluid(), Math.toIntExact(amount));
-        if (typed.nbt() != null) {
-            stack.setTag(typed.nbt().copy());
-        }
-        return stack;
+        return new FluidStack(Holder.direct(typed.fluid()), Math.toIntExact(amount), typed.components());
     }
 
     @Override
@@ -77,7 +71,7 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
 
     @Override
     public Component name(FluidStack stack) {
-        return stack.getDisplayName();
+        return stack.getHoverName();
     }
 
     @Override
@@ -85,45 +79,9 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.fluidTooltip(stack, false));
     }
 
-    private static final class FluidKey implements IStackKey {
-        private final Fluid fluid;
-        @Nullable
-        private final CompoundTag nbt;
-
-        private FluidKey(Fluid fluid, Optional<CompoundTag> nbt) {
-            this(fluid, nbt.orElse(null));
-        }
-
-        private FluidKey(Fluid fluid, @Nullable CompoundTag nbt) {
-            this.fluid = fluid;
-            this.nbt = nbt == null || nbt.isEmpty() ? null : nbt;
-        }
-
+    private record FluidKey(Fluid fluid, DataComponentPatch components) implements IStackKey {
         private static FluidKey of(FluidStack stack) {
-            return new FluidKey(stack.getFluid(), stack.getTag());
-        }
-
-        private Fluid fluid() {
-            return fluid;
-        }
-
-        private ResourceLocation id() {
-            var id = fluid.getRegistryName();
-            assert id != null;
-            return id;
-        }
-
-        @Nullable
-        private CompoundTag nbt() {
-            return nbt;
-        }
-
-        private String nbtString() {
-            return nbt != null ? nbt.toString() : "";
-        }
-
-        private Optional<CompoundTag> nbtOptional() {
-            return Optional.ofNullable(nbt);
+            return new FluidKey(stack.getFluid(), stack.getComponentsPatch());
         }
 
         @Override
@@ -135,44 +93,11 @@ public final class FluidPortAdapter implements IStackAdapter<FluidStack> {
         public IStackAdapter<?> adapter() {
             return StackHelper.FLUID_ADAPTER;
         }
-
-        @Override
-        public int compareTo(IStackKey other) {
-            if (type() != other.type()) {
-                return Integer.compare(type().ordinal(), other.type().ordinal());
-            }
-            if (!(other instanceof FluidKey typed)) {
-                throw new IllegalArgumentException("Expected fluid key for FLUID type comparison");
-            }
-            var byId = id().compareTo(typed.id());
-            if (byId != 0) {
-                return byId;
-            }
-            return nbtString().compareTo(typed.nbtString());
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            return this == other || (other instanceof FluidKey key &&
-                fluid.equals(key.fluid) &&
-                Objects.equals(nbt, key.nbt));
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(fluid, nbt);
-        }
-
-        @Override
-        public String toString() {
-            var id = id().toString();
-            return nbt == null ? id : id + nbt;
-        }
     }
 
-    public static final Codec<? extends IStackKey> KEY_CODEC =
-        RecordCodecBuilder.<FluidKey>create(instance -> instance.group(
-            ForgeRegistries.FLUIDS.getCodec().fieldOf("id").forGetter(FluidKey::fluid),
-            CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidKey::nbtOptional)
+    public static final MapCodec<? extends IStackKey> KEY_CODEC =
+        RecordCodecBuilder.<FluidKey>mapCodec(instance -> instance.group(
+            BuiltInRegistries.FLUID.byNameCodec().fieldOf("id").forGetter(FluidKey::fluid),
+            DataComponentPatch.CODEC.fieldOf("components").forGetter(FluidKey::components)
         ).apply(instance, FluidKey::new));
 }

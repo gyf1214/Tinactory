@@ -1,20 +1,19 @@
 package org.shsts.tinactory.unit.machine;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
-import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.unit.fixture.TestContainer;
-import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
+import org.shsts.tinactory.unit.fixture.TestRecipe;
 import org.shsts.tinactory.unit.fixture.TestRecipeManager;
 import org.shsts.tinactory.unit.fixture.TestRecipeType;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestStack;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
+import org.shsts.tinycorelib.api.core.ILoc;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,22 +25,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.api.logistics.PortDirection.INPUT;
 import static org.shsts.tinactory.api.logistics.PortDirection.OUTPUT;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createEntry;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.input;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.output;
 
 class ProcessingMachineTest {
     private static final int INPUT_PORT = 0;
     private static final int OUTPUT_PORT = 1;
-    private static final TestRecipeType<TestRecipe.Builder> RECIPE_TYPE =
-        new TestRecipeType<>("test_machine", TestRecipe.class, TestRecipe.Builder::new);
-    private static final TestRecipeType<MarkerRecipe.Builder> MARKER_TYPE =
-        new TestRecipeType<>("marker", MarkerRecipe.class, MarkerRecipe.Builder::new);
+    private static final TestRecipeType<TestRecipe> RECIPE_TYPE =
+        new TestRecipeType<>("test_machine", TestRecipe.class);
+    private static final TestRecipeType<MarkerRecipe> MARKER_TYPE =
+        new TestRecipeType<>("marker", MarkerRecipe.class);
 
     @Test
     void shouldUseScaledPreviewForGenericResultsWhenBuildingOutputInfo() {
-        var recipe = new TestRecipe.Builder(RECIPE_TYPE, new ResourceLocation("tinactory", "test_recipe"))
-            .output(2, new TestResult("dust", 2))
-            .workTicks(20)
-            .power(8)
-            .buildObject();
+        var recipe = new TestRecipe(List.of(), List.of(output(2, "dust", 2)), 20, 1, 8);
         var info = new ArrayList<ProcessingInfo>();
 
         new TestProcessingMachine().addOutputInfoForTest(recipe, 3, info::add);
@@ -62,7 +62,7 @@ class ProcessingMachineTest {
 
         var items = processor.recipeBookItems(machine).getValue();
 
-        assertEquals(List.of(alpha.loc(), beta.loc(), marker.loc()), items.stream().map($ -> $.loc()).toList());
+        assertEquals(List.of(alpha.loc(), beta.loc(), marker.loc()), items.stream().map(ILoc::loc).toList());
         assertFalse(items.get(0).isMarker());
         assertFalse(items.get(1).isMarker());
         assertTrue(items.get(2).isMarker());
@@ -95,12 +95,12 @@ class ProcessingMachineTest {
 
         var recipe = processor.newRecipe(machine, target.loc()).orElseThrow();
         processor.onWorkBegin(recipe, machine, 1, $ -> {});
-        var saved = processor.serializeNBT();
+        var saved = processor.serializeNBT(TEST_REGISTRY);
 
         var restored = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
-        restored.deserializeNBT(saved);
+        restored.deserializeNBT(TEST_REGISTRY, saved);
         restored.onWorkContinue(recipe, machine);
-        var restoredTag = restored.serializeNBT();
+        var restoredTag = restored.serializeNBT(TEST_REGISTRY);
 
         assertEquals(target.loc().toString(), saved.getString("filterRecipe"));
         assertEquals(target.loc().toString(), restoredTag.getString("filterRecipe"));
@@ -120,8 +120,8 @@ class ProcessingMachineTest {
             .add(RECIPE_TYPE, other));
 
         assertEquals(Optional.of(matching.loc()),
-            processor.newRecipe(machine, marker.loc()).map(ProcessingRecipe::loc));
-        assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map(ProcessingRecipe::loc));
+            processor.newRecipe(machine, marker.loc()).map(ILoc::loc));
+        assertEquals(Optional.of(other.loc()), processor.newRecipe(machine, other.loc()).map(ILoc::loc));
     }
 
     @Test
@@ -130,7 +130,7 @@ class ProcessingMachineTest {
         var machine = new TestMachine(new TestContainer().port(INPUT_PORT, INPUT, input));
         var processor = new TestProcessingMachine();
 
-        processor.setTargetRecipe(new ResourceLocation("tinactory", "missing"), machine);
+        processor.setTargetRecipe(modLoc("missing"), machine);
 
         assertTrue(input.acceptInput(TestStack.item("ore", 1)));
     }
@@ -161,7 +161,7 @@ class ProcessingMachineTest {
 
         var resolved = processor.newRecipe(machine, marker.loc());
 
-        assertEquals(Optional.of(matching.loc()), resolved.map(ProcessingRecipe::loc));
+        assertEquals(Optional.of(matching.loc()), resolved.map(ILoc::loc));
         assertTrue(output.acceptInput(TestStack.item("dust", 1)));
     }
 
@@ -186,8 +186,8 @@ class ProcessingMachineTest {
         var recipe = recipe("parallel", 0);
         var processor = new TestProcessingMachine();
 
-        assertEquals(1, processor.calculateParallelForTest(recipe, machine, 1));
-        assertEquals(3, processor.calculateParallelForTest(recipe, machine, 4));
+        assertEquals(1, processor.calculateParallelForTest(recipe.get(), machine, 1));
+        assertEquals(3, processor.calculateParallelForTest(recipe.get(), machine, 4));
     }
 
     @Test
@@ -197,11 +197,11 @@ class ProcessingMachineTest {
         var overclockedMachine = new TestMachine(new TestContainer()).electricVoltage(128);
         var processor = new TestProcessingMachine();
 
-        processor.calculateFactorsForTest(recipe, lowVoltageMachine, 1);
+        processor.calculateFactorsForTest(recipe.get(), lowVoltageMachine, 1);
         assertEquals(ProcessingMachine.PROGRESS_PER_TICK, processor.onWorkProgress(recipe, 1d));
         assertEquals(8d, processor.powerCons(recipe));
 
-        processor.calculateFactorsForTest(recipe, overclockedMachine, 1);
+        processor.calculateFactorsForTest(recipe.get(), overclockedMachine, 1);
         assertEquals(ProcessingMachine.PROGRESS_PER_TICK * 4L, processor.onWorkProgress(recipe, 1d));
         assertEquals(128d, processor.powerCons(recipe));
     }
@@ -215,33 +215,26 @@ class ProcessingMachineTest {
         var original = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
         var recipe = original.newRecipe(machine, target.loc()).orElseThrow();
         original.onWorkBegin(recipe, machine, 1, $ -> {});
-        var saved = original.serializeNBT();
+        var saved = original.serializeNBT(TEST_REGISTRY);
 
         var restored = new TestProcessingMachine(new TestRecipeManager());
-        restored.deserializeNBT(saved);
+        restored.deserializeNBT(TEST_REGISTRY, saved);
         restored.onWorkContinue(recipe, machine);
 
-        assertFalse(restored.serializeNBT().contains("filterRecipe"));
+        assertFalse(restored.serializeNBT(TEST_REGISTRY).contains("filterRecipe"));
     }
 
-    private static TestRecipe recipe(String path, long voltage) {
-        return new TestRecipe.Builder(RECIPE_TYPE, new ResourceLocation("tinactory", path))
-            .input(INPUT_PORT, new TestIngredient("ore", 1))
-            .output(OUTPUT_PORT, new TestResult("dust", 1))
-            .workTicks(20)
-            .voltage(voltage)
-            .power(8)
-            .buildObject();
+    private static IEntry<TestRecipe> recipe(String path, long voltage) {
+        return createEntry(modLoc(path), new TestRecipe(
+            List.of(input(INPUT_PORT, "ore", 1)),
+            List.of(output(OUTPUT_PORT, "dust", 1)),
+            20, voltage, 8));
     }
 
-    private static MarkerRecipe marker(String path, long voltage) {
-        return new MarkerRecipe.Builder(MARKER_TYPE, new ResourceLocation("tinactory", path))
-            .baseType(RECIPE_TYPE.loc())
-            .prefix("ore")
-            .workTicks(20)
-            .voltage(voltage)
-            .power(8)
-            .buildObject();
+    private static IEntry<MarkerRecipe> marker(String path, long voltage) {
+        return createEntry(modLoc(path), new MarkerRecipe(
+            List.of(), List.of(), voltage, RECIPE_TYPE.loc(), "ore",
+            false, Optional.empty(), Optional.empty(), List.of()));
     }
 
     private static final class TestProcessingMachine extends ProcessingMachine<TestRecipe> {
@@ -263,23 +256,6 @@ class ProcessingMachineTest {
 
         private void calculateFactorsForTest(TestRecipe recipe, TestMachine machine, int parallel) {
             calculateFactors(recipe, machine, parallel);
-        }
-    }
-
-    private static final class TestRecipe extends ProcessingRecipe {
-        private TestRecipe(Builder builder) {
-            super(builder);
-        }
-
-        private static final class Builder extends BuilderBase<TestRecipe, Builder> {
-            private Builder(IRecipeType<Builder> type, ResourceLocation loc) {
-                super(type, loc);
-            }
-
-            @Override
-            protected TestRecipe createObject() {
-                return new TestRecipe(this);
-            }
         }
     }
 }

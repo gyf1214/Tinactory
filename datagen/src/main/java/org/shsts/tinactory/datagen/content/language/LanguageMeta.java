@@ -50,7 +50,6 @@ public class LanguageMeta extends MetaConsumer {
         parse(jo, "words", processor::word);
         parse(jo, "patterns", processor::pattern);
         parseExtra(jo, "extras", processor, extras);
-        parseExtra(jo, "quests", processor, extras);
 
         initDelayed(() -> {
             for (var extra : extras) {

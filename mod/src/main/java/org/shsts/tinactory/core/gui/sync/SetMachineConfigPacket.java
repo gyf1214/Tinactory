@@ -3,7 +3,9 @@ package org.shsts.tinactory.core.gui.sync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -34,15 +36,15 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeNbt(sets);
-        buf.writeCollection(resets, FriendlyByteBuf::writeUtf);
+        CodecHelper.encodeCollectionToBuf(buf, resets, FriendlyByteBuf::writeUtf);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         sets = CodecHelper.readRequiredNbt(buf, "machine config sets");
-        resets = buf.readCollection(ArrayList::new, FriendlyByteBuf::readUtf);
+        resets = CodecHelper.parseListFromBuf(buf, FriendlyByteBuf::readUtf);
     }
 
     public static class Builder implements ISetMachineConfigPacket.Builder {
@@ -68,13 +70,19 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
         }
 
         @Override
+        public ISetMachineConfigPacket.Builder set(String key, long val) {
+            sets.putLong(key, val);
+            return this;
+        }
+
+        @Override
         public ISetMachineConfigPacket.Builder set(String key, String value) {
             sets.putString(key, value);
             return this;
         }
 
         @Override
-        public ISetMachineConfigPacket.Builder set(String key, CompoundTag tag) {
+        public ISetMachineConfigPacket.Builder set(String key, Tag tag) {
             sets.put(key, tag);
             return this;
         }

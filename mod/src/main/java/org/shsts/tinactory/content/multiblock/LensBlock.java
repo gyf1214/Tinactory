@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
@@ -42,8 +41,8 @@ public class LensBlock extends Block {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-        List<Component> tooltip, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         addTooltip(tooltip, "lens");
         var lens = getLens();
         for (var len : lens) {

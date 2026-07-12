@@ -3,8 +3,9 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import java.util.Optional;
 
@@ -27,11 +28,19 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
         return getInt(key).orElse(defaultValue);
     }
 
+    Optional<Long> getLong(String key);
+
+    default long getLong(String key, long defaultValue) {
+        return getLong(key).orElse(defaultValue);
+    }
+
     Optional<String> getString(String key);
 
     default Optional<ResourceLocation> getLoc(String key) {
-        return getString(key).map(ResourceLocation::new);
+        return getString(key).map(ResourceLocation::parse);
     }
+
+    Optional<Tag> getTag(String key);
 
     Optional<CompoundTag> getCompound(String key);
 }

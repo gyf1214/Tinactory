@@ -1,6 +1,8 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance.hasItems
 import net.minecraft.data.recipes.RecipeBuilder
+import net.minecraft.data.recipes.RecipeCategory
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.data.recipes.ShapelessRecipeBuilder
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder
@@ -8,17 +10,22 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllMaterials.getMaterial
-import org.shsts.tinactory.AllRecipes.has
+import org.shsts.tinactory.AllRecipes.hasTag
+import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
+import org.shsts.tinactory.datagen.content.RegistryHelper.recipeLoc
 
 class VanillaRecipeFactory(private val replace: Boolean) {
-    private fun build(suffix: String = "", block: () -> RecipeBuilder) {
+    private fun build(type: RecipeType<*>, item: ItemLike, suffix: String = "", block: () -> RecipeBuilder) {
+        val loc = suffix(itemLoc(item), suffix)
         if (replace) {
-            DATA_GEN.replaceVanillaRecipe(block)
+            DATA_GEN.vanillaRecipe(loc, block)
         } else {
-            DATA_GEN.vanillaRecipe(block, suffix)
+            DATA_GEN.vanillaRecipe(recipeLoc(type.toString(), loc), block)
         }
     }
 
@@ -33,38 +40,41 @@ class VanillaRecipeFactory(private val replace: Boolean) {
     }
 
     fun shapeless(from: TagKey<Item>, to: ItemLike, fromAmount: Int = 1, toAmount: Int = 1,
-        suffix: String = "", criteria: String = "has_ingredient",
+        suffix: String = "", category: RecipeCategory = RecipeCategory.MISC,
+        criteria: String = "has_ingredient",
         block: ShapelessRecipeBuilder.() -> Unit = {}) {
-        build(suffix) {
+        build(RecipeType.CRAFTING, to, suffix) {
             ShapelessRecipeBuilder
-                .shapeless(to, toAmount)
+                .shapeless(category, to, toAmount)
                 .requires(Ingredient.of(from), fromAmount)
-                .unlockedBy(criteria, has(from))
+                .unlockedBy(criteria, hasTag(from))
                 .also(block)
         }
     }
 
-    fun smelting(from: TagKey<Item>, to: ItemLike, ticks: Int, suffix: String = "") {
-        build(suffix) {
+    fun smelting(from: TagKey<Item>, to: ItemLike, ticks: Int, suffix: String = "",
+        category: RecipeCategory = RecipeCategory.MISC) {
+        build(RecipeType.SMELTING, to, suffix) {
             SimpleCookingRecipeBuilder
-                .smelting(Ingredient.of(from), to, 0f, ticks)
-                .unlockedBy("has_ingredient", has(from))
+                .smelting(Ingredient.of(from), category, to, 0f, ticks)
+                .unlockedBy("has_ingredient", hasTag(from))
         }
     }
 
     fun shaped(output: ItemLike, amount: Int = 1, suffix: String = "",
+        category: RecipeCategory = RecipeCategory.MISC,
         block: ShapedRecipeBuilder.() -> Unit) {
-        build(suffix) {
-            ShapedRecipeBuilder.shaped(output, amount).apply(block)
+        build(RecipeType.CRAFTING, output, suffix) {
+            ShapedRecipeBuilder.shaped(category, output, amount).apply(block)
         }
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, item: ItemLike) {
-        unlockedBy(name, has(item))
+        unlockedBy(name, hasItems(item))
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, tag: TagKey<Item>) {
-        unlockedBy(name, has(tag))
+        unlockedBy(name, hasTag(tag))
     }
 
     fun ShapedRecipeBuilder.unlockedBy(name: String, mat: String, sub: String) {

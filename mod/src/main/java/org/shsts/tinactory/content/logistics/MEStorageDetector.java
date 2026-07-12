@@ -1,19 +1,17 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.network.SignalMachineBlock;
 import org.shsts.tinactory.core.logistics.ISignalMachine;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -31,7 +29,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
 
     private ItemStack targetItem = ItemStack.EMPTY;
     private FluidStack targetFluid = FluidStack.EMPTY;
-    private int targetAmount = 0;
+    private long targetAmount = 0L;
     private int signal = 0;
 
     public MEStorageDetector(BlockEntity blockEntity, double power) {
@@ -40,18 +38,18 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MEStorageDetector(be, power));
+        return $ -> $.container(ID, be -> new MEStorageDetector(be, power));
     }
 
-    public static ItemStack targetItem(IMachineConfig config) {
+    public static ItemStack targetItem(HolderLookup.Provider provider, IMachineConfig config) {
         return config.getCompound(TARGET_ITEM_KEY)
-            .map(ItemStack::of)
+            .map($ -> ItemStack.parseOptional(provider, $))
             .orElse(ItemStack.EMPTY);
     }
 
-    public static FluidStack targetFluid(IMachineConfig config) {
+    public static FluidStack targetFluid(HolderLookup.Provider provider, IMachineConfig config) {
         return config.getCompound(TARGET_FLUID_KEY)
-            .map(FluidStack::loadFluidStackFromNBT)
+            .map($ -> FluidStack.parseOptional(provider, $))
             .orElse(FluidStack.EMPTY);
     }
 
@@ -60,15 +58,15 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
         if (world == null || world.isClientSide) {
             return;
         }
-        var config = machine.config();
-        targetItem = targetItem(config);
-        targetFluid = targetFluid(config);
-        targetAmount = config.getInt(TARGET_AMOUNT_KEY, 0);
+        var config = machine().config();
+        targetItem = targetItem(world.registryAccess(), config);
+        targetFluid = targetFluid(world.registryAccess(), config);
+        targetAmount = config.getLong(TARGET_AMOUNT_KEY, 0L);
 
         updateSignal();
     }
 
-    private int toSignal(int amount) {
+    private int toSignal(long amount) {
         if (targetAmount <= 0) {
             return amount > 0 ? 15 : 0;
         }
@@ -88,7 +86,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     private void updateSignal() {
         var oldSignal = signal;
         signal = recalculateSignal();
-        var world = machine.world();
+        var world = machine().world();
         if (!world.isClientSide && signal != oldSignal) {
             SignalMachineBlock.updateSignal(world, blockEntity);
         }
@@ -112,10 +110,8 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == SIGNAL_MACHINE.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(SIGNAL_MACHINE, this);
     }
 }

@@ -1,14 +1,14 @@
 package org.shsts.tinactory.compat.jei.ingredient;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.content.gui.client.TechPanel;
 import org.shsts.tinactory.core.gui.Rect;
-import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
@@ -24,18 +24,18 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechIngredien
     private TechIngredientRenderer() {}
 
     @Override
-    public void render(PoseStack poseStack, TechIngredient ingredient) {
+    public void render(GuiGraphics graphics, TechIngredient ingredient) {
         var tech = TechManagers.client().techByKey(ingredient.loc());
         if (tech.isEmpty()) {
             return;
         }
         var team = TechManagers.localTeam().orElse(null);
-        TechPanel.renderTechButton(poseStack, 0, RECT, team, tech.get(), false);
+        TechPanel.renderTechButton(graphics, RECT, team, tech.get(), false);
     }
 
     @Override
     public List<Component> getTooltip(TechIngredient ingredient, TooltipFlag tooltipFlag) {
-        return List.of(I18n.tr(Technology.getDescriptionId(ingredient.loc())));
+        return List.of(I18n.tr(ITechnology.getDescriptionId(ingredient.loc())));
     }
 
     @Override

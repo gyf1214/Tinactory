@@ -2,7 +2,7 @@ package org.shsts.tinactory.core.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
@@ -20,12 +20,12 @@ public final class SyncPackets {
         }
 
         @Override
-        public void serializeToBuf(FriendlyByteBuf buf) {
+        public void serializeToBuf(RegistryFriendlyByteBuf buf) {
             buf.writeDouble(data);
         }
 
         @Override
-        public void deserializeFromBuf(FriendlyByteBuf buf) {
+        public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
             data = buf.readDouble();
         }
 
@@ -64,12 +64,12 @@ public final class SyncPackets {
         }
 
         @Override
-        public void serializeToBuf(FriendlyByteBuf buf) {
+        public void serializeToBuf(RegistryFriendlyByteBuf buf) {
             buf.writeLong(data);
         }
 
         @Override
-        public void deserializeFromBuf(FriendlyByteBuf buf) {
+        public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
             data = buf.readLong();
         }
 
@@ -102,9 +102,9 @@ public final class SyncPackets {
         INSTANCE;
 
         @Override
-        public void serializeToBuf(FriendlyByteBuf buf) {}
+        public void serializeToBuf(RegistryFriendlyByteBuf buf) {}
 
         @Override
-        public void deserializeFromBuf(FriendlyByteBuf buf) {}
+        public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {}
     }
 }

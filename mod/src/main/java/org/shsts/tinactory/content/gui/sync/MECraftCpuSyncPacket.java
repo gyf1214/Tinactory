@@ -2,11 +2,9 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
@@ -23,18 +21,17 @@ import java.util.Objects;
 @MethodsReturnNonnullByDefault
 public class MECraftCpuSyncPacket implements IPacket {
     public record CpuInfo(CpuStatusEntry status, Component name, ItemStack icon) {
-        private static void serialize(FriendlyByteBuf buf, CpuInfo info) {
+        private static void serialize(RegistryFriendlyByteBuf buf, CpuInfo info) {
             serializeStatus(buf, info.status);
-            buf.writeUtf(CodecHelper.encodeComponent(info.name));
-            var jo = CodecHelper.encodeJson(ItemStack.CODEC, info.icon);
-            buf.writeUtf(CodecHelper.jsonToStr(jo));
+            CodecHelper.encodeComponentToBuf(buf, info.name);
+            StackHelper.serializeStackToBuf(buf, info.icon);
         }
 
-        private static CpuInfo deserialize(FriendlyByteBuf buf) {
+        private static CpuInfo deserialize(RegistryFriendlyByteBuf buf) {
             return new CpuInfo(
                 deserializeStatus(buf),
-                CodecHelper.parseComponent(buf.readUtf()),
-                CodecHelper.parseJson(ItemStack.CODEC, CodecHelper.jsonFromStr(buf.readUtf())));
+                CodecHelper.parseComponentFromBuf(buf),
+                StackHelper.deserializeStackFromBuf(buf));
         }
 
         @Override
@@ -46,14 +43,14 @@ public class MECraftCpuSyncPacket implements IPacket {
                 return false;
             }
             return status.equals(other.status) &&
-                CodecHelper.encodeComponent(name).equals(CodecHelper.encodeComponent(other.name)) &&
+                name.equals(other.name) &&
                 ItemStack.matches(icon, other.icon);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(status, CodecHelper.encodeComponent(name),
-                icon.getItem(), icon.getCount(), icon.getTag());
+            return Objects.hash(status, name,
+                ItemStack.hashItemAndComponents(icon), icon.getCount());
         }
     }
 
@@ -70,14 +67,14 @@ public class MECraftCpuSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(entries, CpuInfo::serialize);
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        CodecHelper.encodeCollectionToBuf(buf, entries, CpuInfo::serialize);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         entries.clear();
-        entries.addAll(buf.readList(CpuInfo::deserialize));
+        entries.addAll(CodecHelper.parseListFromBuf(buf, CpuInfo::deserialize));
     }
 
     @Override
@@ -96,11 +93,11 @@ public class MECraftCpuSyncPacket implements IPacket {
         return Objects.hash(entries);
     }
 
-    private static void serializeStatus(FriendlyByteBuf buf, CpuStatusEntry entry) {
+    private static void serializeStatus(RegistryFriendlyByteBuf buf, CpuStatusEntry entry) {
         buf.writeUUID(entry.cpuId());
         buf.writeEnum(entry.state());
-        buf.writeCollection(entry.targets(), (buf1, amount) -> {
-            buf1.writeNbt(encodeIngredientKey(amount.key()));
+        CodecHelper.encodeCollectionToBuf(buf, entry.targets(), (buf1, amount) -> {
+            StackHelper.KEY_STREAM_CODEC.encode(buf1, amount.key());
             buf1.writeLong(amount.amount());
         });
         buf.writeInt(entry.completedSteps());
@@ -110,29 +107,17 @@ public class MECraftCpuSyncPacket implements IPacket {
         buf.writeLong(entry.memoryUsage());
     }
 
-    private static CpuStatusEntry deserializeStatus(FriendlyByteBuf buf) {
+    private static CpuStatusEntry deserializeStatus(RegistryFriendlyByteBuf buf) {
         return new CpuStatusEntry(
             buf.readUUID(),
             buf.readEnum(JobState.class),
-            buf.readList(buf1 -> {
-                var key = decodeIngredientKey(CodecHelper.readRequiredNbt(buf1, "craft target key"));
-                var amount = buf1.readLong();
-                return new CraftAmount(key, amount);
-            }),
+            CodecHelper.parseListFromBuf(buf, buf1 -> new CraftAmount(
+                StackHelper.KEY_STREAM_CODEC.decode(buf1),
+                buf1.readLong())),
             buf.readInt(),
             buf.readInt(),
             buf.readEnum(ExecutionError.class),
             buf.readLong(),
             buf.readLong());
-    }
-
-    private static CompoundTag encodeIngredientKey(IStackKey key) {
-        var tag = new CompoundTag();
-        tag.put("value", CodecHelper.encodeTag(StackHelper.KEY_CODEC, key));
-        return tag;
-    }
-
-    private static IStackKey decodeIngredientKey(CompoundTag tag) {
-        return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
     }
 }

@@ -23,7 +23,9 @@ public class SoundMeta extends MetaConsumer {
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         for (var je : GsonHelper.getAsJsonArray(jo, "sounds")) {
             var key = GsonHelper.convertToString(je, "sounds");
-            REGISTRATE.registryEntry(SOUND_EVENTS, key, () -> new SoundEvent(modLoc(key)));
+            REGISTRATE.trackLang("subtitles.tinactory." + key.replace('/', '.'));
+            REGISTRATE.registryEntry(SOUND_EVENTS, key, () ->
+                SoundEvent.createVariableRangeEvent(modLoc(key)));
         }
     }
 }

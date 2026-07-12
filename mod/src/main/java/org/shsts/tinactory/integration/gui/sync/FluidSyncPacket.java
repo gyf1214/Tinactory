@@ -2,8 +2,9 @@ package org.shsts.tinactory.integration.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fluids.FluidStack;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.Objects;
@@ -20,13 +21,13 @@ public class FluidSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
-        fluidStack.writeToPacket(buf);
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        StackHelper.serializeFluidStackToBuf(buf, fluidStack);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
-        fluidStack = FluidStack.readFromPacket(buf);
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
+        fluidStack = StackHelper.deserializeFluidStackFromBuf(buf);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class FluidSyncPacket implements IPacket {
         if (!(o instanceof FluidSyncPacket that)) {
             return false;
         }
-        return fluidStack.isFluidStackIdentical(that.fluidStack);
+        return FluidStack.matches(fluidStack, that.fluidStack);
     }
 
     @Override

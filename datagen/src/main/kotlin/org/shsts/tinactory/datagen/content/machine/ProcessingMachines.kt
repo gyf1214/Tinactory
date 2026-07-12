@@ -4,10 +4,10 @@ import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.component.MiscComponents.misc
 import org.shsts.tinactory.datagen.content.machine.Machines.ADVANCED_MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -75,7 +75,7 @@ object ProcessingMachines {
         }
     }
 
-    private fun AssemblyRecipeBuilder.storage(amount: Int = 1) {
+    private fun SimpleAssemblyRecipeBuilder.storage(amount: Int = 1) {
         input(STORAGE_CELLS[(componentVoltage!!.rank - 5) / 2].component.get(), amount)
     }
 

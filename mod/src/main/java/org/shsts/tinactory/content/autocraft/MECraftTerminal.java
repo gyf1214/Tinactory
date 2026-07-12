@@ -26,7 +26,7 @@ public class MECraftTerminal extends MEStorageAccess {
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MECraftTerminal(be, power));
+        return $ -> $.container(ID, be -> new MECraftTerminal(be, power));
     }
 
     @Override

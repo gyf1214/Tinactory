@@ -9,8 +9,13 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -18,13 +23,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.core.util.I18n;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
@@ -53,19 +59,44 @@ public final class ClientUtil {
         soundManager.play(SimpleSoundInstance.forUI(sound, 1f));
     }
 
+    public static void playSound(Holder<SoundEvent> sound) {
+        var soundManager = Minecraft.getInstance().getSoundManager();
+        soundManager.play(SimpleSoundInstance.forUI(sound, 1f));
+    }
+
     public static LocalPlayer getPlayer() {
         var player = Minecraft.getInstance().player;
         assert player != null;
         return player;
     }
 
+    private static Item.TooltipContext tooltipContext() {
+        return Item.TooltipContext.of(Minecraft.getInstance().level);
+    }
+
+    public static RegistryAccess registryAccess() {
+        var world = Minecraft.getInstance().level;
+        assert world != null;
+        return world.registryAccess();
+    }
+
+    public static <T> ResourceLocation getRegistryKey(ResourceKey<? extends Registry<T>> registryKey, T value) {
+        return Objects.requireNonNull(registryAccess().registryOrThrow(registryKey).getKey(value));
+    }
+
+    public static <T> Optional<T> getRegistryObject(ResourceKey<? extends Registry<T>> registryKey,
+        ResourceLocation loc) {
+        return registryAccess().registryOrThrow(registryKey).getOptional(loc);
+    }
+
     public static List<Component> itemTooltip(ItemStack stack) {
-        return stack.getTooltipLines(getPlayer(), Minecraft.getInstance().options.advancedItemTooltips ?
-            TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        return stack.getTooltipLines(tooltipContext(), getPlayer(),
+            Minecraft.getInstance().options.advancedItemTooltips ?
+                TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
     }
 
     public static List<Component> itemTooltip(ItemStack stack, TooltipFlag tooltipFlag) {
-        return stack.getTooltipLines(getPlayer(), tooltipFlag);
+        return stack.getTooltipLines(tooltipContext(), getPlayer(), tooltipFlag);
     }
 
     public static List<Component> tagTooltip(TagKey<Item> tag) {
@@ -123,7 +154,7 @@ public final class ClientUtil {
     }
 
     public static MutableComponent fluidName(FluidStack stack) {
-        return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : (MutableComponent) stack.getDisplayName();
+        return stack.isEmpty() ? I18n.tr("tinactory.gui.emptyFluid") : stack.getHoverName().copy();
     }
 
     public static MutableComponent fluidAmount(int amount) {
@@ -136,8 +167,8 @@ public final class ClientUtil {
 
     public static List<Component> fluidTooltip(FluidStack stack, boolean showAmount) {
         var line1 = fluidName(stack);
-        return showAmount ? List.of(line1, fluidAmount(stack)
-                                           .withStyle(ChatFormatting.GRAY)) : List.of(line1);
+        return showAmount ? List.of(line1, fluidAmount(stack).withStyle(ChatFormatting.GRAY)) :
+            List.of(line1);
     }
 
     public static void addTooltip(List<Component> tooltip, MutableComponent line) {

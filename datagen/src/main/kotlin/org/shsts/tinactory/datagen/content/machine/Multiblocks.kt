@@ -4,8 +4,8 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
-import net.minecraftforge.client.model.generators.ConfiguredModel
-import net.minecraftforge.common.Tags
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel
+import net.neoforged.neoforge.common.Tags
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS
 import org.shsts.tinactory.AllMultiblocks.SOLID_CASINGS
@@ -37,9 +37,7 @@ import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
-import org.shsts.tinactory.datagen.content.RegistryHelper.itemEntry
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.BlockDataFactory
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -50,6 +48,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
 import org.shsts.tinactory.datagen.content.machine.Machines.machineModel
 import org.shsts.tinactory.datagen.content.model.MachineModel.IO_TEX
@@ -82,7 +81,7 @@ object Multiblocks {
                 block(entry) {
                     blockState { ctx ->
                         val existingHelper = ctx.provider().models().existingFileHelper
-                        val texLoc = gregtech("blocks/$tex")
+                        val texLoc = gregtech("block/$tex")
                         if (existingHelper.exists(texLoc, Models.TEXTURE_TYPE)) {
                             solidBlock(ctx, texLoc)
                         }
@@ -91,12 +90,12 @@ object Multiblocks {
             }
 
             block("multiblock/solid/insulated_battery") {
-                blockState { ctx -> solidBlock(ctx, ic2("blocks/wiring/storage/mfe_bottomtop")) }
+                blockState { ctx -> solidBlock(ctx, ic2("block/wiring/storage/mfe_bottomtop")) }
                 noDrop()
             }
 
             block("multiblock/solid/reinforced_alloy") {
-                blockState { ctx -> solidBlock(ctx, ic2("blocks/generator/reactor/reactor_vessel")) }
+                blockState { ctx -> solidBlock(ctx, ic2("block/generator/reactor/reactor_vessel")) }
                 noDrop()
             }
 
@@ -120,19 +119,20 @@ object Multiblocks {
                     val provider = ctx.provider()
                     provider.simpleBlock(ctx.`object`(), provider.models().cubeTop(
                         ctx.id(),
-                        gregtech("blocks/casings/solid/machine_casing_solid_steel"),
+                        gregtech("block/casings/solid/machine_casing_solid_steel"),
                         mcLoc("block/farmland_moist")))
                 }
             }
 
             misc("clear_glass") {
-                blockState { ctx -> solidBlock(ctx, modLoc("blocks/multiblock/glass/quartz_glass_a")) }
+                blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a"),
+                    Models.CUTOUT_RENDER_TYPE) }
                 tag(CLEANROOM_WALL)
-                tag(Tags.Blocks.GLASS)
+                tag(Tags.Blocks.GLASS_BLOCKS)
             }
 
             misc("hardened_glass") {
-                blockState(solidBlock("casings/transparent/tempered_glass"))
+                blockState(solidBlock("casings/transparent/tempered_glass", Models.TRANSLUCENT_RENDER_TYPE))
                 tag(GLASS_CASING)
             }
 
@@ -152,7 +152,7 @@ object Multiblocks {
             misc("launch_site_base") {
                 blockState { ctx ->
                     val provider = ctx.provider()
-                    val tex = gregtech("blocks/foam/reinforced_stone")
+                    val tex = gregtech("block/foam/reinforced_stone")
                     provider.simpleBlock(ctx.`object`(), provider.models().slab(
                         ctx.id(), tex, tex, tex))
                 }
@@ -225,8 +225,8 @@ object Multiblocks {
             misc("turbine_blade") {
                 blockState { ctx ->
                     turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
-                        modLoc("blocks/multiblock/large_turbine/idle"),
-                        modLoc("blocks/multiblock/large_turbine/spin"))
+                        modLoc("block/multiblock/large_turbine/idle"),
+                        modLoc("block/multiblock/large_turbine/spin"))
                 }
                 itemModel(Models::turbineItem)
             }
@@ -243,8 +243,8 @@ object Multiblocks {
                 blockState { ctx ->
                     val provider = ctx.provider()
                     val models = provider.models()
-                    val casing = gregtech("blocks/casings/solid/machine_casing_robust_tungstensteel")
-                    val overlay = gregtech("blocks/casings/firebox/machine_casing_firebox_tungstensteel")
+                    val casing = gregtech("block/casings/solid/machine_casing_robust_tungstensteel")
+                    val overlay = gregtech("block/casings/firebox/machine_casing_firebox_tungstensteel")
                     val working = suffix(overlay, "_active")
                     val baseModel = models.cubeColumn(ctx.id(), overlay, casing)
                     val workingModel = models.cubeColumn(ctx.id() + "_active", working, casing)
@@ -258,8 +258,8 @@ object Multiblocks {
             }
 
             misc("nuclear_chamber") {
-                blockState(cubeColumn(ic2("blocks/generator/reactor/reactor_chamber_sides"),
-                    ic2("blocks/generator/reactor/reactor_chamber_top")))
+                blockState(cubeColumn(ic2("block/generator/reactor/reactor_chamber_sides"),
+                    ic2("block/generator/reactor/reactor_chamber_top")))
             }
 
             misc("fusion_casing") {
@@ -268,7 +268,7 @@ object Multiblocks {
             }
 
             misc("fusion_glass") {
-                blockState(solidBlock("casings/transparent/fusion_glass"))
+                blockState(solidBlock("casings/transparent/fusion_glass", Models.CUTOUT_RENDER_TYPE))
                 tag(FUSION_SHELL)
             }
 
@@ -280,7 +280,7 @@ object Multiblocks {
         dataGen {
             tag(BlockTags.DOORS, CLEANROOM_DOOR)
             tag(GLASS_CASING, CLEANROOM_WALL)
-            tag(GLASS_CASING, Tags.Blocks.GLASS)
+            tag(GLASS_CASING, Tags.Blocks.GLASS_BLOCKS)
         }
     }
 
@@ -665,7 +665,7 @@ object Multiblocks {
 
     private fun AssemblyRecipeFactory.powerBlock(v: Voltage,
         component: String? = null, amount: Int = 1,
-        block: AssemblyRecipeBuilder.() -> Unit = {}) {
+        block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         componentVoltage = v
         misc("power_block/${v.id}") {
             input("aluminium", "stick", 2)
@@ -680,21 +680,20 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.solid(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun AssemblyRecipeFactory.solid(name: String, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
         output(SOLID_CASINGS.getValue(name).get(), block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.solid(name: String) {
+    private fun ProcessingRecipeBuilder<*, *>.solid(name: String) {
         input(SOLID_CASINGS.getValue(name).get())
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>,
-        RB : ProcessingRecipeBuilder<B>> RecipeFactory<B, RB>.misc(
-        name: String, amount: Int = 1, suffix: String = "", block: RB.() -> Unit) {
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.misc(
+        name: String, amount: Int = 1, suffix: String = "", block: B.() -> Unit) {
         output(getItem("multiblock/misc/$name"), amount, suffix = suffix, block = block)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.misc(
+    private fun ProcessingRecipeBuilder<*, *>.misc(
         name: String, amount: Int = 1) {
         input(getItem("multiblock/misc/$name"), amount)
     }
@@ -766,9 +765,8 @@ object Multiblocks {
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
-            multiblock("multi_smelter", "heatproof", "blast_furnace")
-            dataGen {
-                tag(itemEntry("multiblock/multi_smelter"), ELECTRIC_FURNACE)
+            multiblock("multi_smelter", "heatproof", "blast_furnace") {
+                itemTag(ELECTRIC_FURNACE)
             }
             multiblock("metal_former", "frost_proof", "blast_furnace")
             multiblock("ore_processing_unit", "solid_steel", "blast_furnace")
@@ -799,18 +797,19 @@ object Multiblocks {
                     }
                 }
             }
-            multiblock("power_substation", ic2("blocks/wiring/storage/mfe_bottomtop"),
-                gregtech("blocks/multiblock/power_substation"))
+            multiblock("power_substation", ic2("block/wiring/storage/mfe_bottomtop"),
+                gregtech("block/multiblock/power_substation"))
             multiblock("large_boiler", "robust_tungstensteel", "blast_furnace")
-            multiblock("nuclear_reactor", ic2("blocks/generator/reactor/reactor_vessel"),
-                modLoc("blocks/multiblock/nuclear_reactor"))
+            multiblock("nuclear_reactor", ic2("block/generator/reactor/reactor_vessel"),
+                modLoc("block/multiblock/nuclear_reactor"))
             multiblock("assembly_line", "solid_steel", "blast_furnace")
-            multiblock("fusion_reactor", gregtech("blocks/casings/fusion/machine_casing_fusion"),
-                gregtech("blocks/multiblock/fusion_reactor"))
+            multiblock("fusion_reactor", gregtech("block/casings/fusion/machine_casing_fusion"),
+                gregtech("block/multiblock/fusion_reactor"))
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation) {
+    private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation,
+        block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
         val set = getMultiblock(name)
         block(set.block) {
             machineModel {
@@ -820,12 +819,14 @@ object Multiblocks {
             for (type in set.types) {
                 itemTag(machine(type))
             }
+            block()
         }
     }
 
-    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name) {
-        multiblock(name, gregtech("blocks/casings/solid/machine_casing_$casing"),
-            gregtech("blocks/multiblock/$overlay"))
+    private fun BlockDataFactory.multiblock(name: String, casing: String, overlay: String = name,
+        block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
+        multiblock(name, gregtech("block/casings/solid/machine_casing_$casing"),
+            gregtech("block/multiblock/$overlay"), block)
     }
 
     private fun machineRecipes() {
@@ -1190,7 +1191,7 @@ object Multiblocks {
         }
     }
 
-    private fun AssemblyRecipeFactory.multiblock(name: String, block: AssemblyRecipeBuilder.() -> Unit) {
+    private fun AssemblyRecipeFactory.multiblock(name: String, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
         output(getMultiblock(name).block.get(), block = block)
     }
 }

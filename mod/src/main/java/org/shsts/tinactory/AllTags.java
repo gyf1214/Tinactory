@@ -2,7 +2,7 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -52,13 +52,14 @@ public final class AllTags {
     public static final TagKey<Item> FLUID_STORAGE_CELL = extend(STORAGE_CELL, "fluid");
     public static final TagKey<Item> PATTERN_STORAGE_CELL = extend(STORAGE_CELL, "pattern");
     public static final TagKey<Item> NUCLEAR_ITEM = modItem("nuclear");
+    public static final TagKey<Item> BATTERY = modItem("battery");
 
     public static <T> TagKey<T> extend(TagKey<T> tag, String suffix) {
         return TagKey.create(tag.registry(), LocHelper.extend(tag.location(), suffix));
     }
 
     public static TagKey<Item> item(ResourceLocation loc) {
-        return TagKey.create(Registry.ITEM_REGISTRY, loc);
+        return TagKey.create(Registries.ITEM, loc);
     }
 
     private static TagKey<Item> modItem(String id) {
@@ -66,7 +67,7 @@ public final class AllTags {
     }
 
     public static TagKey<Block> block(ResourceLocation loc) {
-        return TagKey.create(Registry.BLOCK_REGISTRY, loc);
+        return TagKey.create(Registries.BLOCK, loc);
     }
 
     public static TagKey<Block> modBlock(String id) {
@@ -82,7 +83,7 @@ public final class AllTags {
     }
 
     public static TagKey<Item> battery(Voltage v) {
-        return modItem("battery/" + v.id);
+        return extend(BATTERY, v.id);
     }
 
     public static TagKey<Item> circuitComponent(String component, CircuitComponentTier tier) {

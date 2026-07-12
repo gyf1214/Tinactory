@@ -4,19 +4,18 @@ import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import org.shsts.tinactory.content.multiblock.INuclearCell;
 import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
 
+import static org.shsts.tinactory.AllDataComponents.REACTIONS;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.integration.util.ClientUtil.DOUBLE_FORMAT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
@@ -40,7 +39,7 @@ public class NuclearRod extends Item implements INuclearItem {
                 GsonHelper.getAsDouble(jo, "heatFast", 0d),
                 GsonHelper.getAsBoolean(jo, "reactionOut", false),
                 GsonHelper.getAsDouble(jo, "maxReactions", 0d),
-                new ResourceLocation(GsonHelper.getAsString(jo, "depletedItem", "minecraft:air")));
+                ResourceLocation.parse(GsonHelper.getAsString(jo, "depletedItem", "minecraft:air")));
         }
     }
 
@@ -56,10 +55,7 @@ public class NuclearRod extends Item implements INuclearItem {
     }
 
     private long getReactions(ItemStack stack) {
-        if (stack.getTag() == null) {
-            return 0L;
-        }
-        return MathUtil.clamp(stack.getTag().getLong("reactions"), 0, maxReactions);
+        return MathUtil.clamp(stack.getOrDefault(REACTIONS, 0L), 0, maxReactions);
     }
 
     @Override
@@ -78,8 +74,8 @@ public class NuclearRod extends Item implements INuclearItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip,
-        TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         if (maxReactions > 0) {
             var remaining = (double) (maxReactions - getReactions(stack)) / REACTION_SCALE;
             addTooltip(tooltip, "fuelRod", DOUBLE_FORMAT.format(remaining));
@@ -87,14 +83,7 @@ public class NuclearRod extends Item implements INuclearItem {
     }
 
     private void react(ItemStack stack, long reacts) {
-        var tag = stack.getTag();
-        if (tag == null) {
-            var tag1 = new CompoundTag();
-            tag1.putLong("reactions", reacts);
-            stack.setTag(tag1);
-        } else {
-            tag.putLong("reactions", reacts + tag.getLong("reactions"));
-        }
+        stack.update(REACTIONS, 0L, $ -> $ + reacts);
     }
 
     public ItemStack getDepleted() {

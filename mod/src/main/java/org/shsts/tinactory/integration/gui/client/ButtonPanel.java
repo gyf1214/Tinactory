@@ -1,12 +1,12 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -27,24 +27,25 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
 
         @Override
         public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
-            return buttonTooltip(itemIndex(), mouseX - rect.x(), mouseY - rect.y());
+            return buttonTooltip(itemIndex(), mouseX - rect().x(), mouseY - rect().y());
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            renderButton(poseStack, mouseX - rect.x(), mouseY - rect.y(), partialTick,
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            var rect = rect();
+            renderButton(graphics, mouseX - rect.x(), mouseY - rect.y(), partialTick,
                 rect, itemIndex(), isHovered(mouseX, mouseY));
         }
 
         @Override
         protected boolean canClick(int button, double mouseX, double mouseY) {
-            return canClickButton(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
+            return canClickButton(itemIndex(), mouseX - rect().x(), mouseY - rect().y(), button);
         }
 
         @Override
         public void onMouseClicked(double mouseX, double mouseY, int button) {
             playButtonSound();
-            onSelect(itemIndex(), mouseX - rect.x(), mouseY - rect.y(), button);
+            onSelect(itemIndex(), mouseX - rect().x(), mouseY - rect().y(), button);
         }
 
         public int itemIndex() {
@@ -68,7 +69,7 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
     /**
      * mouseX and mouseY are relative to the button rect
      */
-    protected abstract void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+    protected abstract void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
         float partialTick, Rect rect, int index, boolean isHovering);
 
     protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {

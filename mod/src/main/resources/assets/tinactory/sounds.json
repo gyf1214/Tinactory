@@ -1,7 +1,6 @@
 {
   "tick.forge_hammer": {
-    "subtitle": "Hammer smashes",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.forge_hammer",
     "sounds": [
       {
         "name": "gregtech:forge_hammer",
@@ -10,8 +9,7 @@
     ]
   },
   "tick.macerator": {
-    "subtitle": "Items macerating",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.macerator",
     "sounds": [
       {
         "name": "gregtech:macerator",
@@ -20,8 +18,7 @@
     ]
   },
   "tick.chemical_reactor": {
-    "subtitle": "Chemicals reacting",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.chemical_reactor",
     "sounds": [
       {
         "name": "gregtech:chemical",
@@ -30,8 +27,7 @@
     ]
   },
   "tick.assembler": {
-    "subtitle": "Items assembling",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.assembler",
     "sounds": [
       {
         "name": "gregtech:assembler",
@@ -40,8 +36,7 @@
     ]
   },
   "tick.centrifuge": {
-    "subtitle": "Items separating",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.centrifuge",
     "sounds": [
       {
         "name": "gregtech:centrifuge",
@@ -50,8 +45,7 @@
     ]
   },
   "tick.compressor": {
-    "subtitle": "Items compressing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.compressor",
     "sounds": [
       {
         "name": "gregtech:compressor",
@@ -60,8 +54,7 @@
     ]
   },
   "tick.electrolyzer": {
-    "subtitle": "Elements electrolyzing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.electrolyzer",
     "sounds": [
       {
         "name": "gregtech:electrolyzer",
@@ -70,8 +63,7 @@
     ]
   },
   "tick.mixer": {
-    "subtitle": "Dusts mixing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.mixer",
     "sounds": [
       {
         "name": "gregtech:mixer",
@@ -80,8 +72,7 @@
     ]
   },
   "tick.replicator": {
-    "subtitle": "Items replicating",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.replicator",
     "sounds": [
       {
         "name": "gregtech:replicator",
@@ -90,8 +81,7 @@
     ]
   },
   "tick.arc": {
-    "subtitle": "Electricity arcing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.arc",
     "sounds": [
       {
         "name": "gregtech:hum",
@@ -100,8 +90,7 @@
     ]
   },
   "tick.boiler": {
-    "subtitle": "Liquid boiling",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.boiler",
     "sounds": [
       {
         "name": "gregtech:boiling",
@@ -110,8 +99,7 @@
     ]
   },
   "tick.furnace": {
-    "subtitle": "Furnace smelting",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.furnace",
     "sounds": [
       {
         "name": "gregtech:heating",
@@ -120,8 +108,7 @@
     ]
   },
   "tick.cooling": {
-    "subtitle": "Ingot cooling",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.cooling",
     "sounds": [
       {
         "name": "gregtech:cooling",
@@ -130,8 +117,7 @@
     ]
   },
   "tick.fire": {
-    "subtitle": "Fire burning",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.fire",
     "sounds": [
       {
         "name": "gregtech:fire",
@@ -140,8 +126,7 @@
     ]
   },
   "tick.bath": {
-    "subtitle": "Items bathing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.bath",
     "sounds": [
       {
         "name": "gregtech:bath",
@@ -150,8 +135,7 @@
     ]
   },
   "tick.motor": {
-    "subtitle": "Motor turning",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.motor",
     "sounds": [
       {
         "name": "gregtech:motor",
@@ -160,8 +144,7 @@
     ]
   },
   "tick.cut": {
-    "subtitle": "Blocks cutting",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.cut",
     "sounds": [
       {
         "name": "gregtech:cut",
@@ -170,8 +153,7 @@
     ]
   },
   "tick.turbine": {
-    "subtitle": "Turbine spinning",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.turbine",
     "sounds": [
       {
         "name": "gregtech:turbine",
@@ -180,8 +162,7 @@
     ]
   },
   "tick.combustion": {
-    "subtitle": "Fuel combusting",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.combustion",
     "sounds": [
       {
         "name": "gregtech:combustion",
@@ -190,8 +171,7 @@
     ]
   },
   "tick.miner": {
-    "subtitle": "Miner drilling",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.miner",
     "sounds": [
       {
         "name": "gregtech:miner",
@@ -200,7 +180,7 @@
     ]
   },
   "tick.science": {
-    "category": "block",
+    "subtitle": "subtitles.tinactory.tick.science",
     "sounds": [
       {
         "name": "gregtech:science",
@@ -209,8 +189,7 @@
     ]
   },
   "use.wrench": {
-    "subtitle": "Wrench turns",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.wrench",
     "sounds": [
       {
         "name": "gregtech:wrench",
@@ -219,8 +198,7 @@
     ]
   },
   "use.soft_hammer": {
-    "subtitle": "Block smacked",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.soft_hammer",
     "sounds": [
       {
         "name": "gregtech:soft_hammer",
@@ -229,8 +207,7 @@
     ]
   },
   "use.drill": {
-    "subtitle": "Blocks drilled",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.drill",
     "sounds": [
       {
         "name": "gregtech:drill",
@@ -239,8 +216,7 @@
     ]
   },
   "use.plunger": {
-    "subtitle": "Fluid evacuated",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.plunger",
     "sounds": [
       {
         "name": "gregtech:plunger",
@@ -249,8 +225,7 @@
     ]
   },
   "use.file": {
-    "subtitle": "Ingot filed",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.file",
     "sounds": [
       {
         "name": "gregtech:file",
@@ -259,8 +234,7 @@
     ]
   },
   "use.saw": {
-    "subtitle": "Wood sawing",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.saw",
     "sounds": [
       {
         "name": "gregtech:saw",
@@ -269,8 +243,7 @@
     ]
   },
   "use.screwdriver": {
-    "subtitle": "Screws turning",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.screwdriver",
     "sounds": [
       {
         "name": "gregtech:screwdriver",
@@ -279,8 +252,7 @@
     ]
   },
   "use.chainsaw": {
-    "subtitle": "Chainsaw growls",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.chainsaw",
     "sounds": [
       {
         "name": "gregtech:chainsaw",
@@ -289,8 +261,7 @@
     ]
   },
   "use.wirecutter": {
-    "subtitle": "Wires snip",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.wirecutter",
     "sounds": [
       {
         "name": "gregtech:wirecutter",
@@ -299,8 +270,7 @@
     ]
   },
   "use.spray_can": {
-    "subtitle": "Paint sprays",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.spray_can",
     "sounds": [
       {
         "name": "gregtech:spray_can",
@@ -309,8 +279,7 @@
     ]
   },
   "use.tricorder": {
-    "subtitle": "Beep beep",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.tricorder",
     "sounds": [
       {
         "name": "gregtech:tricorder",
@@ -319,8 +288,7 @@
     ]
   },
   "use.mortar": {
-    "subtitle": "Grinding",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.use.mortar",
     "sounds": [
       {
         "name": "gregtech:mortar",
@@ -329,8 +297,7 @@
     ]
   },
   "record.sus": {
-    "subtitle": "Sus",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.record.sus",
     "sounds": [
       {
         "name": "gregtech:sus",
@@ -339,8 +306,7 @@
     ]
   },
   "entity.portal_opening": {
-    "subtitle": "Portal opens",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.entity.portal_opening",
     "sounds": [
       {
         "name": "gregtech:portal_opening",
@@ -349,8 +315,7 @@
     ]
   },
   "entity.portal_closing": {
-    "subtitle": "Portal closes",
-    "category": "block",
+    "subtitle": "subtitles.tinactory.entity.portal_closing",
     "sounds": [
       {
         "name": "gregtech:portal_closing",

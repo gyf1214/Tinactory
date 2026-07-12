@@ -1,18 +1,17 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import org.shsts.tinactory.core.gui.Rect;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class VanillaWidgetAdapter<T extends GuiComponent & Widget & GuiEventListener & NarratableEntry>
+public class VanillaWidgetAdapter<T extends GuiEventListener & Renderable & NarratableEntry>
     implements IViewAdapter {
     private final T widget;
 
@@ -23,11 +22,14 @@ public class VanillaWidgetAdapter<T extends GuiComponent & Widget & GuiEventList
     @Override
     public void setRect(Rect rect) {
         if (widget instanceof AbstractWidget abstractWidget) {
-            abstractWidget.x = rect.x();
-            abstractWidget.y = rect.y();
-            abstractWidget.setWidth(rect.width());
-            abstractWidget.setHeight(rect.height());
+            abstractWidget.setRectangle(rect.width(), rect.height(), rect.x(), rect.y());
         }
+    }
+
+    @Override
+    public Rect rect() {
+        var rect1 = widget.getRectangle();
+        return new Rect(rect1.left(), rect1.top(), rect1.width(), rect1.height());
     }
 
     @Override
@@ -54,6 +56,6 @@ public class VanillaWidgetAdapter<T extends GuiComponent & Widget & GuiEventList
     }
 
     @Override
-    public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack,
+    public void renderTooltip(MenuScreen<?> screen, GuiGraphics graphics,
         int mouseX, int mouseY) {}
 }

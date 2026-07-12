@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.tech;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -30,22 +31,22 @@ public class TinactorySavedData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         var teamsTag = new ListTag();
         teams.values().stream()
-            .map(TeamProfile::serializeNBT)
+            .map($ -> $.serializeNBT(provider))
             .forEach(teamsTag::add);
         tag.put("teams", teamsTag);
         tag.putInt("nextId", nextId);
         return tag;
     }
 
-    private void load(CompoundTag tag) {
+    private void load(CompoundTag tag, HolderLookup.Provider provider) {
         teams.clear();
         for (var rawTag : tag.getList("teams", Tag.TAG_COMPOUND)) {
             var teamTag = (CompoundTag) rawTag;
             var team = new TeamProfile(techManager, teamTag.getString("name"));
-            team.deserializeNBT(teamTag);
+            team.deserializeNBT(provider, teamTag);
             teams.put(team.getName(), team);
         }
         nextId = tag.getInt("nextId");
@@ -71,9 +72,10 @@ public class TinactorySavedData extends SavedData {
         super.setDirty();
     }
 
-    public static TinactorySavedData fromTag(CompoundTag tag, ITechManager techManager) {
+    public static TinactorySavedData fromTag(CompoundTag tag, HolderLookup.Provider provider,
+        ITechManager techManager) {
         var data = new TinactorySavedData(techManager);
-        data.load(tag);
+        data.load(tag, provider);
         return data;
     }
 }

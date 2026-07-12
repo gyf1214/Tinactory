@@ -2,9 +2,10 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -32,14 +33,14 @@ public class MEStorageInterfaceSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(items, StackHelper::serializeStackToBuf);
-        buf.writeCollection(fluids, (buf1, stack) -> stack.writeToPacket(buf1));
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        CodecHelper.encodeCollectionToBuf(buf, items, StackHelper::serializeStackToBuf);
+        CodecHelper.encodeCollectionToBuf(buf, fluids, StackHelper::serializeFluidStackToBuf);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
-        items = buf.readList(StackHelper::deserializeStackFromBuf);
-        fluids = buf.readList(FluidStack::readFromPacket);
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
+        items = CodecHelper.parseListFromBuf(buf, StackHelper::deserializeStackFromBuf);
+        fluids = CodecHelper.parseListFromBuf(buf, StackHelper::deserializeFluidStackFromBuf);
     }
 }

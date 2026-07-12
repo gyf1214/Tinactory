@@ -195,7 +195,7 @@ object Technologies {
 
             COLD_WORKING = tech("cold_working") {
                 maxProgress(40)
-                displayTexture(gregtech("items/metaitems/shape.extruder.rotor"))
+                displayTexture(gregtech("item/metaitems/shape.extruder.rotor"))
             }
 
             ELECTROLYZING = tech("electrolyzing") {
@@ -489,16 +489,15 @@ object Technologies {
             tech(id, block).also { base = it }
 
         fun tech(id: String, block: TechBuilder<*>.() -> Unit) =
-            TECHS.builder(Unit, id) { handler, parent, loc ->
-                TechBuilder.factory(handler, parent, loc)
-            }.run {
+            TECHS.builder(Unit, id, TechBuilder.Companion::factory).run {
                 rank(rank++)
-                if (base != null) {
-                    depends(base)
+                val base1 = base
+                if (base1 != null) {
+                    depends(base1)
                 }
                 researchVoltage(voltage)
                 block()
-                register()
+                build()
             }
 
         fun TechBuilder<*>.displayMaterial(name: String, sub: String) {

@@ -3,12 +3,9 @@ package org.shsts.tinactory.content.logistics;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -18,6 +15,7 @@ import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
@@ -27,7 +25,6 @@ import java.util.Collection;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -70,8 +67,15 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
         fluid.setComposes(fluids);
     }
 
+    protected IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private void onUpdateLogistics(LogisticComponent logistics) {
-        combinePorts(logistics.getStoragePorts(machine), combinedItem, combinedFluid);
+        combinePorts(logistics.getStoragePorts(machine()), combinedItem, combinedFluid);
     }
 
     protected void onConnect(INetwork network) {
@@ -98,19 +102,13 @@ public abstract class MEStorageAccess extends CapabilityProvider implements IEve
     }
 
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get()) {
-            if (electric == null) {
-                return LazyOptional.empty();
-            }
-            var electric1 = electric;
-            return LazyOptional.of(() -> electric1).cast();
+    public void attachCapability(ICapabilityBuilder builder) {
+        if (electric != null) {
+            builder.attach(ELECTRIC_MACHINE, electric);
         }
-        return LazyOptional.empty();
     }
 }

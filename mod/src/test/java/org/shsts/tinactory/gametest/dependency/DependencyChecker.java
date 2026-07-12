@@ -1,7 +1,9 @@
 package org.shsts.tinactory.gametest.dependency;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
@@ -10,11 +12,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMaterials;
@@ -48,6 +50,7 @@ import org.shsts.tinactory.integration.recipe.TagIngredient;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
@@ -97,9 +100,16 @@ public final class DependencyChecker {
     // includes later wetware-board, advanced-SMD, Neutronium, and ZPM targets.
     private static final int ACCEPTED_UNREACHABLE_NODES = 8;
 
+    private final ServerLevel world;
+    private final RegistryAccess registryAccess;
     private final List<DependencyMethod> methods = new ArrayList<>();
     private final Map<IDependencyNode, Set<DependencyMethod>> methodsByOutput = new HashMap<>();
     private List<LithographyLensBlock> lithographyLensBlocks = null;
+
+    public DependencyChecker(ServerLevel world) {
+        this.world = world;
+        this.registryAccess = world.registryAccess();
+    }
 
     private void addMethod(DependencyMethod method) {
         methods.add(method);
@@ -109,17 +119,17 @@ public final class DependencyChecker {
     }
 
     public static boolean runRuntimeCheck(ServerLevel world) {
-        var checker = new DependencyChecker();
-        checker.extractRuntimeMethods(world);
+        var checker = new DependencyChecker(world);
+        checker.extractRuntimeMethods();
         var solver = new DependencySolver(checker.methods);
         var startNodes = checker.startNodes();
         solver.solve(startNodes);
         return checker.writeReport(solver, startNodes, checker.intendedTargets(), checker.exemptTargets());
     }
 
-    private void extractRuntimeMethods(ServerLevel world) {
-        extractProcessingRecipes(world);
-        extractVanillaRecipes(world);
+    private void extractRuntimeMethods() {
+        extractProcessingRecipes();
+        extractVanillaRecipes();
         addMachineBridgeMethods();
         addWorkbenchBridgeMethod();
         addMultiblockBridgeMethods();
@@ -131,29 +141,32 @@ public final class DependencyChecker {
         addTagBridgeMethods();
     }
 
-    private void extractProcessingRecipes(ServerLevel world) {
+    private void extractProcessingRecipes() {
         var recipeManager = CORE.recipeManager(world);
         for (var typeInfo : AllRecipes.PROCESSING_TYPES.values()) {
-            for (var recipe : allTinyRecipes(recipeManager, typeInfo.recipeType())) {
+            for (var entry : allTinyRecipeEntries(recipeManager, typeInfo.recipeType())) {
+                var recipe = entry.get();
                 if (recipe instanceof ProcessingRecipe processingRecipe) {
-                    addProcessingRecipeMethod(typeInfo.recipeType().loc(), processingRecipe);
+                    addProcessingRecipeMethod(typeInfo.recipeType().loc(), entry.loc(), processingRecipe);
                 }
             }
         }
-        for (var recipe : recipeManager.getAllRecipesFor(AllRecipes.BOILER)) {
+        for (var entry : recipeManager.getAllRecipesFor(AllRecipes.BOILER)) {
+            var recipe = entry.get();
             var requirements = new ArrayList<IDependencyNode>();
             requirements.add(new MachineNode(BOILER, Voltage.PRIMITIVE));
             stackNode(recipe.input).ifPresent(requirements::add);
             var outputs = new ArrayList<IDependencyNode>();
             stackNode(recipe.output).ifPresent(outputs::add);
-            addMethodIfUseful(recipe.loc() + "#boiler", requirements, outputs, "boiler recipe " + recipe.loc());
+            addMethodIfUseful(entry.loc() + "#boiler", requirements, outputs, "boiler recipe " + entry.loc());
         }
     }
 
-    private void addProcessingRecipeMethod(ResourceLocation recipeTypeId, ProcessingRecipe recipe) {
+    private void addProcessingRecipeMethod(ResourceLocation recipeTypeId, ResourceLocation recipeId,
+        ProcessingRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(recipeTypeId, Voltage.fromValue(recipe.voltage)));
-        addProcessingIngredients(recipe, requirements, false);
+        addProcessingIngredients(recipeId, recipe, requirements, false);
         addProcessingSubtypeRequirements(recipe, requirements, true);
         var outputs = new ArrayList<IDependencyNode>();
         if (recipe instanceof ResearchRecipe researchRecipe) {
@@ -165,17 +178,17 @@ public final class DependencyChecker {
                 .flatMap(Optional::stream)
                 .forEach(outputs::add);
         }
-        addMethodIfUseful(recipe.loc() + "#processing", requirements, outputs, "processing recipe " + recipe.loc());
+        addMethodIfUseful(recipeId + "#processing", requirements, outputs, "processing recipe " + recipeId);
         if (recipe instanceof EngravingRecipe engravingRecipe) {
-            addLithographyRecipeMethods(recipeTypeId, engravingRecipe, outputs);
+            addLithographyRecipeMethods(recipeTypeId, recipeId, engravingRecipe, outputs);
         }
         if (recipe instanceof GeneratorRecipe generatorRecipe) {
-            addGeneratorRecipeMethods(recipeTypeId, generatorRecipe);
+            addGeneratorRecipeMethods(recipeTypeId, recipeId, generatorRecipe);
         }
     }
 
-    private void addLithographyRecipeMethods(ResourceLocation recipeTypeId, EngravingRecipe recipe,
-        Collection<IDependencyNode> outputs) {
+    private void addLithographyRecipeMethods(ResourceLocation recipeTypeId, ResourceLocation recipeId,
+        EngravingRecipe recipe, Collection<IDependencyNode> outputs) {
         var lensInput = recipe.inputs.stream()
             .filter(input -> input.port() == 1)
             .findFirst();
@@ -201,19 +214,20 @@ public final class DependencyChecker {
                 if (recipe.minCleanness > 0d) {
                     requirements.add(new NumericNode(CLEANROOM_CLEANNESS, recipe.minCleanness / entry.getValue()));
                 }
-                addProcessingIngredients(recipe, requirements, true);
+                addProcessingIngredients(recipeId, recipe, requirements, true);
                 addProcessingSubtypeRequirements(recipe, requirements, false);
                 for (var machineInterface : multiblockInterfaceNodes(voltage)) {
                     addMethodIfUseful(
-                        recipe.loc() + "#lithography/" + entry.getKey() + "/" + lensBlock.node().id() +
+                        recipeId + "#lithography/" + entry.getKey() + "/" + lensBlock.node().id() +
                             "/" + machineInterface.id(),
-                        with(requirements, machineInterface), outputs, "lithography recipe " + recipe.loc());
+                        with(requirements, machineInterface), outputs, "lithography recipe " + recipeId);
                 }
             }
         }
     }
 
-    private void addGeneratorRecipeMethods(ResourceLocation recipeTypeId, GeneratorRecipe recipe) {
+    private void addGeneratorRecipeMethods(ResourceLocation recipeTypeId, ResourceLocation recipeId,
+        GeneratorRecipe recipe) {
         var recipeVoltage = Voltage.fromValue(recipe.voltage);
         for (var voltage : Voltage.values()) {
             if (!canRunGeneratorRecipe(recipe, recipeVoltage, voltage)) {
@@ -222,11 +236,11 @@ public final class DependencyChecker {
             var requirements = new ArrayList<IDependencyNode>();
             requirements.add(new MachineNode(recipeTypeId, voltage));
             for (var i = 0; i < recipe.inputs.size(); i++) {
-                ingredientNode(recipe.inputs.get(i).ingredient(), recipe.loc(), i).ifPresent(requirements::add);
+                ingredientNode(recipe.inputs.get(i).ingredient(), recipeId, i).ifPresent(requirements::add);
             }
             var output = new GeneratorNode(voltage);
-            addMethodIfUseful(recipe.loc() + "#generator/" + voltage.id, requirements, List.of(output),
-                "generator recipe " + recipe.loc());
+            addMethodIfUseful(recipeId + "#generator/" + voltage.id, requirements, List.of(output),
+                "generator recipe " + recipeId);
         }
     }
 
@@ -240,14 +254,14 @@ public final class DependencyChecker {
             machineVoltage.rank >= recipeVoltage.rank;
     }
 
-    private void addProcessingIngredients(ProcessingRecipe recipe, Collection<IDependencyNode> requirements,
-        boolean skipLens) {
+    private void addProcessingIngredients(ResourceLocation recipeId, ProcessingRecipe recipe,
+        Collection<IDependencyNode> requirements, boolean skipLens) {
         for (var i = 0; i < recipe.inputs.size(); i++) {
             var input = recipe.inputs.get(i);
             if (skipLens && input.port() == 1) {
                 continue;
             }
-            ingredientNode(input.ingredient(), recipe.loc(), i).ifPresent(requirements::add);
+            ingredientNode(input.ingredient(), recipeId, i).ifPresent(requirements::add);
         }
     }
 
@@ -262,7 +276,8 @@ public final class DependencyChecker {
             TechManagers.server().techByKey(researchRecipe.target)
                 .stream()
                 .flatMap(technology -> technology.getDepends().stream())
-                .map(technology -> new TechnologyNode(technology.loc()))
+                .flatMap(technology -> TechManagers.server().key(technology).stream())
+                .map(TechnologyNode::new)
                 .forEach(requirements::add);
         }
         if (recipe instanceof BlastFurnaceRecipe blastFurnaceRecipe && blastFurnaceRecipe.temperature > 0) {
@@ -276,7 +291,7 @@ public final class DependencyChecker {
         }
     }
 
-    private void extractVanillaRecipes(ServerLevel world) {
+    private void extractVanillaRecipes() {
         var recipeManager = world.getRecipeManager();
         for (var recipe : recipeManager.getAllRecipesFor(RecipeType.SMELTING)) {
             addSmeltingRecipeMethod(recipe);
@@ -284,54 +299,58 @@ public final class DependencyChecker {
         for (var recipe : recipeManager.getAllRecipesFor(RecipeType.CRAFTING)) {
             addCraftingRecipeMethod(recipe);
         }
-        for (var recipe : CORE.recipeManager(world).getAllRecipesFor(AllRecipes.TOOL_CRAFTING)) {
-            addToolRecipeMethod(recipe);
+        for (var entry : CORE.recipeManager(world).getAllRecipesFor(AllRecipes.TOOL_CRAFTING)) {
+            addToolRecipeMethod(entry.loc(), entry.get());
         }
     }
 
-    private void addSmeltingRecipeMethod(SmeltingRecipe recipe) {
+    private void addSmeltingRecipeMethod(RecipeHolder<SmeltingRecipe> entry) {
+        var loc = entry.id();
+        var recipe = entry.value();
         var requirements = new ArrayList<IDependencyNode>();
-        ingredientNode(recipe.getIngredients().get(0), recipe.getId(), 0).ifPresent(requirements::add);
+        ingredientNode(recipe.getIngredients().getFirst(), loc, 0).ifPresent(requirements::add);
         requirements.add(new MachineNode(MINECRAFT_SMELTING, Voltage.PRIMITIVE));
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.getResultItem()).ifPresent(outputs::add);
-        addMethodIfUseful(recipe.getId() + "#smelting", requirements, outputs, "smelting recipe " + recipe.getId());
+        stackNode(recipe.getResultItem(registryAccess)).ifPresent(outputs::add);
+        addMethodIfUseful(loc + "#smelting", requirements, outputs, "smelting recipe " + loc);
     }
 
-    private void addCraftingRecipeMethod(CraftingRecipe recipe) {
+    private void addCraftingRecipeMethod(RecipeHolder<CraftingRecipe> entry) {
+        var loc = entry.id();
+        var recipe = entry.value();
         var requirements = new ArrayList<IDependencyNode>();
         var ingredients = recipe.getIngredients();
         for (var i = 0; i < ingredients.size(); i++) {
             var ingredient = ingredients.get(i);
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.getId(), i).ifPresent(requirements::add);
+                ingredientNode(ingredient, loc, i).ifPresent(requirements::add);
             }
         }
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.getResultItem()).ifPresent(outputs::add);
-        addMethodIfUseful(recipe.getId() + "#crafting", requirements, outputs, "crafting recipe " + recipe.getId());
+        stackNode(recipe.getResultItem(registryAccess)).ifPresent(outputs::add);
+        addMethodIfUseful(loc + "#crafting", requirements, outputs, "crafting recipe " + loc);
     }
 
-    private void addToolRecipeMethod(ToolRecipe recipe) {
+    private void addToolRecipeMethod(ResourceLocation recipeId, ToolRecipe recipe) {
         var requirements = new ArrayList<IDependencyNode>();
         requirements.add(new MachineNode(TOOL_CRAFTING, Voltage.PRIMITIVE));
         var inputIndex = 0;
         for (var ingredient : recipe.shapedRecipe.getIngredients()) {
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.loc(), inputIndex).ifPresent(requirements::add);
+                ingredientNode(ingredient, recipeId, inputIndex).ifPresent(requirements::add);
             }
             inputIndex++;
         }
         for (var ingredient : recipe.toolIngredients) {
             if (!ingredient.isEmpty()) {
-                ingredientNode(ingredient, recipe.loc(), inputIndex).ifPresent(requirements::add);
+                ingredientNode(ingredient, recipeId, inputIndex).ifPresent(requirements::add);
             }
             inputIndex++;
         }
         var outputs = new ArrayList<IDependencyNode>();
-        stackNode(recipe.shapedRecipe.getResultItem()).ifPresent(outputs::add);
-        addMethodIfUseful(recipe.loc() + "#tool_crafting", requirements, outputs,
-            "tool crafting recipe " + recipe.loc());
+        stackNode(recipe.shapedRecipe.getResultItem(registryAccess)).ifPresent(outputs::add);
+        addMethodIfUseful(recipeId + "#tool_crafting", requirements, outputs,
+            "tool crafting recipe " + recipeId);
     }
 
     private void addMachineBridgeMethods() {
@@ -382,7 +401,7 @@ public final class DependencyChecker {
 
     private void addMultiblockBridgeMethods() {
         for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
-            var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
+            var multiblockId = modLoc(entry.getKey());
             var set = entry.getValue();
             var requirements = new ArrayList<IDependencyNode>();
             stackNode(new ItemStack(set.block().get())).ifPresent(requirements::add);
@@ -474,7 +493,7 @@ public final class DependencyChecker {
 
     private void addCleanroomBridgeMethods() {
         for (var entry : AllMultiblocks.CLEANROOM_PROPERTIES.entrySet()) {
-            var multiblock = new MultiblockNode(new ResourceLocation(TinactoryKeys.ID, entry.getKey()));
+            var multiblock = new MultiblockNode(modLoc(entry.getKey()));
             for (var voltage : Voltage.values()) {
                 if (voltage == Voltage.PRIMITIVE || voltage == Voltage.MAX) {
                     continue;
@@ -498,14 +517,14 @@ public final class DependencyChecker {
     }
 
     private void addNuclearReactorBridgeMethods() {
-        for (var item : ForgeRegistries.ITEMS) {
+        for (var item : BuiltInRegistries.ITEM) {
             if (item instanceof NuclearRod nuclearRod) {
                 var requirements = new ArrayList<IDependencyNode>();
                 stackNode(new ItemStack(item)).ifPresent(requirements::add);
                 requirements.add(new MultiblockNode(NUCLEAR_REACTOR));
                 var outputs = new ArrayList<IDependencyNode>();
                 stackNode(nuclearRod.getDepleted()).ifPresent(outputs::add);
-                var itemId = ForgeRegistries.ITEMS.getKey(item);
+                var itemId = BuiltInRegistries.ITEM.getKey(item);
                 addMethodIfUseful("nuclear_reactor/deplete/" + itemId, requirements, outputs,
                     "nuclear reactor depletion bridge");
             }
@@ -530,7 +549,7 @@ public final class DependencyChecker {
     private Collection<LithographyLensBlock> lithographyLensBlocks() {
         if (lithographyLensBlocks == null) {
             var ret = new ArrayList<LithographyLensBlock>();
-            for (var block : ForgeRegistries.BLOCKS) {
+            for (var block : BuiltInRegistries.BLOCK) {
                 if (block instanceof LensBlock lensBlock) {
                     stackNode(new ItemStack(block))
                         .ifPresent(node -> ret.add(new LithographyLensBlock(node, lensBlock.getLens())));
@@ -552,11 +571,11 @@ public final class DependencyChecker {
     }
 
     private void addItemTagBridgeMethods(TagNode tagNode) {
-        var tag = TagKey.create(Registry.ITEM_REGISTRY, tagNode.tagId());
-        for (var item : ForgeRegistries.ITEMS.tags().getTag(tag)) {
+        var tag = TagKey.create(Registries.ITEM, tagNode.tagId());
+        for (var item : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
             var requirements = new ArrayList<IDependencyNode>();
-            stackNode(new ItemStack(item)).ifPresent(requirements::add);
-            addMethodIfUseful("tag/" + tagNode.id() + "/" + ForgeRegistries.ITEMS.getKey(item),
+            stackNode(new ItemStack(item.value())).ifPresent(requirements::add);
+            addMethodIfUseful("tag/" + tagNode.id() + "/" + BuiltInRegistries.ITEM.getKey(item.value()),
                 requirements, List.of(tagNode), "item tag bridge");
         }
     }
@@ -581,7 +600,8 @@ public final class DependencyChecker {
         addMultiblockTargets(ret);
         ret.add(new VoltageNode(MAX_PROGRESS_VOLTAGE));
         TechManagers.server().allTechs().stream()
-            .map(technology -> new TechnologyNode(technology.loc()))
+            .flatMap(technology -> TechManagers.server().key(technology).stream())
+            .map(TechnologyNode::new)
             .forEach(ret::add);
         return ret;
     }
@@ -597,9 +617,9 @@ public final class DependencyChecker {
     }
 
     private void addTinactoryItemTargets(Collection<IDependencyNode> targets) {
-        for (var item : ForgeRegistries.ITEMS) {
-            var key = ForgeRegistries.ITEMS.getKey(item);
-            if (key != null && key.getNamespace().equals(TinactoryKeys.ID)) {
+        for (var item : BuiltInRegistries.ITEM) {
+            var key = BuiltInRegistries.ITEM.getKey(item);
+            if (key.getNamespace().equals(TinactoryKeys.ID)) {
                 stackNode(new ItemStack(item)).ifPresent(targets::add);
             }
         }
@@ -622,7 +642,7 @@ public final class DependencyChecker {
 
     private void addMultiblockTargets(Collection<IDependencyNode> targets) {
         for (var entry : AllMultiblocks.MULTIBLOCK_SETS.entrySet()) {
-            var multiblockId = new ResourceLocation(TinactoryKeys.ID, entry.getKey());
+            var multiblockId = modLoc(entry.getKey());
             targets.add(new MultiblockNode(multiblockId));
         }
     }
@@ -726,35 +746,37 @@ public final class DependencyChecker {
                 .flatMap(stackResult -> stackNode(stackResult.stack())));
     }
 
-    private Optional<IDependencyNode> ingredientNode(Ingredient ingredient, ResourceLocation recipeId, int inputIndex) {
-        var json = ingredient.toJson();
-        if (json.isJsonObject()) {
-            var object = json.getAsJsonObject();
-            if (object.has("tag")) {
-                return Optional.of(new TagNode(PortType.ITEM, new ResourceLocation(object.get("tag").getAsString())));
-            }
-            if (object.has("item")) {
-                var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("item").getAsString()));
-                if (item != null) {
-                    return stackNode(new ItemStack(item)).map(node -> node);
-                }
+    private Optional<IDependencyNode> ingredientNode(Ingredient ingredient,
+        ResourceLocation recipeId, int inputIndex) {
+        // empty
+        if (ingredient.isEmpty()) {
+            return Optional.empty();
+        }
+        // simple tag
+        if (!ingredient.isCustom()) {
+            var values = ingredient.getValues();
+            if (values.length == 1 && values[0] instanceof Ingredient.TagValue(TagKey<Item> tag)) {
+                return Optional.of(new TagNode(PortType.ITEM, tag.location()));
             }
         }
         var items = ingredient.getItems();
+        // empty
         if (items.length == 0) {
             return Optional.empty();
         }
+        // simple item
         if (items.length == 1) {
             return stackNode(items[0]).map(node -> node);
         }
+        // general ingredient node
         var node = new IngredientNode("recipe", recipeId, inputIndex);
         addIngredientBridgeMethods(node, List.of(items));
         return Optional.of(node);
     }
 
-    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient, ResourceLocation multiblockId,
-        int inputIndex) {
-        var candidates = ingredient.expand().stream()
+    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient,
+        ResourceLocation multiblockId, int inputIndex) {
+        var candidates = ingredient.expand(registryAccess).stream()
             .map(ItemStack::new)
             .filter(stack -> !stack.isEmpty())
             .toList();
@@ -762,7 +784,7 @@ public final class DependencyChecker {
             return Optional.empty();
         }
         if (candidates.size() == 1) {
-            return stackNode(candidates.get(0)).map(node -> node);
+            return stackNode(candidates.getFirst()).map(node -> node);
         }
         var node = new IngredientNode("multiblock", multiblockId, inputIndex);
         addIngredientBridgeMethods(node, candidates);
@@ -815,8 +837,8 @@ public final class DependencyChecker {
     }
 
     private Optional<StackNode> itemNode(ResourceLocation loc) {
-        var item = ForgeRegistries.ITEMS.getValue(loc);
-        return item == null ? Optional.empty() : stackNode(new ItemStack(item));
+        return BuiltInRegistries.ITEM.getOptional(loc)
+            .flatMap(item -> stackNode(new ItemStack(item)));
     }
 
     private Optional<StackNode> stackNode(ItemStack stack) {
@@ -839,7 +861,7 @@ public final class DependencyChecker {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static Collection<? extends IRecipe<?>> allTinyRecipes(IRecipeManager recipeManager,
+    private static Collection<? extends IEntry<? extends IRecipe<?>>> allTinyRecipeEntries(IRecipeManager recipeManager,
         IRecipeType<?> recipeType) {
         return recipeManager.getAllRecipesFor((IRecipeType) recipeType);
     }

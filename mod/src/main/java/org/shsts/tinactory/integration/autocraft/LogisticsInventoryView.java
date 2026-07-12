@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.autocraft;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;

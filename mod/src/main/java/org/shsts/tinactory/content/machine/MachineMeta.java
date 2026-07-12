@@ -3,6 +3,7 @@ package org.shsts.tinactory.content.machine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -10,11 +11,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
@@ -54,7 +55,6 @@ import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinycorelib.api.core.Transformer;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
@@ -72,6 +72,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllBlockEntities.MACHINE_SETS;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllRecipes.putTypeInfo;
 import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
@@ -99,7 +109,7 @@ public class MachineMeta extends MetaConsumer {
         var y = GsonHelper.getAsInt(jo, "y");
         var w = GsonHelper.getAsInt(jo, "width");
         var h = GsonHelper.getAsInt(jo, "height");
-        var texLoc = new ResourceLocation(GsonHelper.getAsString(jo, "texture"));
+        var texLoc = ResourceLocation.parse(GsonHelper.getAsString(jo, "texture"));
         var tw = GsonHelper.getAsInt(jo, "textureWidth", w);
         var th = GsonHelper.getAsInt(jo, "textureHeight", sh * h);
         var tex = new Texture(texLoc, tw, th);
@@ -173,61 +183,34 @@ public class MachineMeta extends MetaConsumer {
             return MachineMeta.parseLayout(GsonHelper.getAsJsonObject(jo, "layout"));
         }
 
-        private IRecipeType<ProcessingRecipe.Builder> processingRecipe(
-            IRecipeType.BuilderFactory<ProcessingRecipe.Builder> builderFactory,
-            Class<? extends ProcessingRecipe> clazz) {
-            return REGISTRATE.recipeType(recipeTypeId, builderFactory)
-                .recipeClass(clazz)
-                .serializer(ProcessingHelper.PROCESSING_SERIALIZER)
+        private <R extends ProcessingRecipe> IRecipeType<R> recipeType(Class<R> clazz, MapCodec<R> codec) {
+            return REGISTRATE.recipeType(recipeTypeId, clazz)
+                .serializer(codec)
                 .register();
         }
 
         protected void parseRecipeType() {
             recipeType = switch (recipeTypeStr) {
-                case "default" -> processingRecipe(ProcessingRecipe.Builder::new, ProcessingRecipe.class);
-                case "display_input" -> processingRecipe(DisplayInputRecipe::builder, DisplayInputRecipe.class);
-                case "generator" -> REGISTRATE.recipeType(recipeTypeId, GeneratorRecipe.Builder::new)
-                    .recipeClass(GeneratorRecipe.class)
-                    .serializer(GeneratorRecipe.SERIALIZER)
-                    .register();
-                case "distillation" -> processingRecipe(DistillationRecipe::builder, DistillationRecipe.class);
-                case "research" -> REGISTRATE.recipeType(recipeTypeId, ResearchRecipe.Builder::new)
-                    .recipeClass(ResearchRecipe.class)
-                    .serializer(ProcessingHelper.RESEARCH_SERIALIZER)
-                    .register();
-                case "assembly" -> REGISTRATE.recipeType(recipeTypeId, AssemblyRecipe.Builder::new)
-                    .recipeClass(AssemblyRecipe.class)
-                    .serializer(ProcessingHelper.ASSEMBLY_SERIALIZER)
-                    .register();
-                case "clean" -> REGISTRATE.recipeType(recipeTypeId, CleanRecipe.Builder::new)
-                    .recipeClass(CleanRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
-                    .register();
-                case "engraving" -> REGISTRATE.recipeType(recipeTypeId, EngravingRecipe::builder)
-                    .recipeClass(EngravingRecipe.class)
-                    .serializer(CleanRecipe.SERIALIZER)
-                    .register();
-                case "ore_analyzer" -> REGISTRATE.recipeType(recipeTypeId, OreAnalyzerRecipe.Builder::new)
-                    .recipeClass(OreAnalyzerRecipe.class)
-                    .serializer(OreAnalyzerRecipe.SERIALIZER)
-                    .register();
-                case "chemical_reactor" -> REGISTRATE.recipeType(recipeTypeId, ChemicalReactorRecipe.Builder::new)
-                    .recipeClass(ChemicalReactorRecipe.class)
-                    .serializer(ChemicalReactorRecipe.SERIALIZER)
-                    .register();
-                case "blast_furnace" -> REGISTRATE.recipeType(recipeTypeId, BlastFurnaceRecipe.Builder::new)
-                    .recipeClass(BlastFurnaceRecipe.class)
-                    .serializer(BlastFurnaceRecipe.SERIALIZER)
-                    .register();
+                case "default" -> recipeType(ProcessingRecipe.class, ProcessingHelper.PROCESSING_CODEC);
+                case "display_input" -> recipeType(DisplayInputRecipe.class, ProcessingHelper.DISPLAY_INPUT_CODEC);
+                case "generator" -> recipeType(GeneratorRecipe.class, GeneratorRecipe.CODEC);
+                case "distillation" -> recipeType(DistillationRecipe.class, DistillationRecipe.CODEC);
+                case "research" -> recipeType(ResearchRecipe.class, ProcessingHelper.RESEARCH_CODEC);
+                case "assembly" -> recipeType(AssemblyRecipe.class, ProcessingHelper.ASSEMBLY_CODEC);
+                case "clean" -> recipeType(CleanRecipe.class, CleanRecipe.CODEC);
+                case "engraving" -> recipeType(EngravingRecipe.class, EngravingRecipe.CODEC);
+                case "ore_analyzer" -> recipeType(OreAnalyzerRecipe.class, OreAnalyzerRecipe.CODEC);
+                case "chemical_reactor" -> recipeType(ChemicalReactorRecipe.class, ChemicalReactorRecipe.CODEC);
+                case "blast_furnace" -> recipeType(BlastFurnaceRecipe.class, BlastFurnaceRecipe.CODEC);
                 case "electric_furnace", "none" -> null;
                 default -> throw new UnsupportedTypeException("recipe", recipeTypeStr);
             };
         }
 
         @SuppressWarnings("unchecked")
-        protected <R extends ProcessingRecipe, B extends IRecipeBuilderBase<R>> IRecipeType<B> recipeType() {
+        protected <R extends ProcessingRecipe> IRecipeType<R> recipeType() {
             assert recipeType != null;
-            return (IRecipeType<B>) recipeType;
+            return (IRecipeType<R>) recipeType;
         }
 
         private IMenuType getMenu() {
@@ -255,15 +238,16 @@ public class MachineMeta extends MetaConsumer {
             return BlockEntityBuilder.builder(machineId, PrimitiveBlock::new)
                 .menu(AllMenus.PRIMITIVE_MACHINE)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                    ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(PrimitiveMachine::factory)
                 .transform(RecipeProcessors.machine(List.of(processor), true))
                 .transform(StackProcessingContainer.factory(getLayout(Voltage.PRIMITIVE)))
                 .transform(this::sound)
                 .end()
                 .block()
-                .material(Material.WOOD)
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties($ -> $.strength(2f).sound(SoundType.WOOD))
-                .translucent()
                 .end()
                 .buildObject();
         }
@@ -300,6 +284,7 @@ public class MachineMeta extends MetaConsumer {
             return BlockEntityBuilder.builder(machineId(v), MachineBlocks.processing(v))
                 .transform(MachineSet::baseMachine)
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
                 .end();
         }
@@ -308,6 +293,8 @@ public class MachineMeta extends MetaConsumer {
             return baseMachine(v)
                 .menu(menu)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                    ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(StackProcessingContainer.factory(getLayout(v)))
                 .transform(this::processor)
                 .transform(this::sound)
@@ -322,15 +309,16 @@ public class MachineMeta extends MetaConsumer {
                 .renderer(() -> () -> MultiblockInterfaceRenderer::new)
                 .end()
                 .block()
-                .material(Material.HEAVY_METAL)
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
                 .end();
         }
 
         private IEntry<MachineBlock> multiblockInterface(Voltage v) {
             return baseInterface(v, $ -> {})
                 .blockEntity()
+                .capability(MACHINE, CONTAINER, LAYOUT_PROVIDER, ITEM_HANDLER, FLUID_HANDLER,
+                    MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
                 .transform(MultiblockInterface::factory)
                 .transform(FlexibleStackContainer::factory)
                 .end()
@@ -355,6 +343,7 @@ public class MachineMeta extends MetaConsumer {
                     addTooltip(tooltip, "digitalInterface.2", NUMBER_FORMAT.format(properties.maxParallel()));
                 })
                 .blockEntity()
+                .capability(MACHINE, CONTAINER, LAYOUT_PROVIDER, BYTES_PROVIDER)
                 .transform(DigitalInterface.factory(properties))
                 .end()
                 .buildObject();
@@ -367,9 +356,11 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.BATTERY_BOX)
                 .blockEntity()
+                .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, LAYOUT_PROVIDER, MENU_ITEM_HANDLER)
                 .transform(BatteryBox.factory(layout))
                 .end()
                 .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> i == 0 ? v.color : 0xFFFFFFFF)
                 .end()
                 .buildObject();
@@ -396,7 +387,11 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, ITEM_HANDLER)
                 .transform(ElectricChest.factory(layout, slotSize, power))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
         }
@@ -414,7 +409,12 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, FLUID_HANDLER,
+                    MENU_FLUID_HANDLER)
                 .transform(ElectricTank.factory(layout, slotSize, power))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
         }
@@ -439,7 +439,11 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.LOGISTIC_WORKER)
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(LogisticWorker.factory(properties))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
         }
@@ -473,7 +477,7 @@ public class MachineMeta extends MetaConsumer {
                 recipeTypeId = id;
             }
             if (jo.has("sound")) {
-                var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+                var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo, "sound"));
                 sound = SOUND_EVENTS.getEntry(soundId);
             }
         }

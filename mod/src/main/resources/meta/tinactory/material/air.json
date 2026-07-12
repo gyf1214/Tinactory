@@ -4,13 +4,13 @@
   "fluids": {
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.liquid_air",
+      "texture": "gregtech:block/fluids/fluid.liquid_air",
       "textureColor": "0xFFFFFFFF",
       "displayColor": "0xFF84BCFC"
     },
     "gas": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.air",
+      "texture": "gregtech:block/fluids/fluid.air",
       "textureColor": "0xFFFFFFFF"
     }
   },

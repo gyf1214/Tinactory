@@ -1,40 +1,39 @@
 package org.shsts.tinactory.content.recipe;
 
-import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import org.slf4j.Logger;
 
-import java.util.Random;
+import java.util.List;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CleanRecipe extends ProcessingRecipe {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final MapCodec<CleanRecipe> CODEC = codec(CleanRecipe::new);
 
     public final double minCleanness;
     public final double maxCleanness;
 
-    protected CleanRecipe(Builder builder) {
-        super(builder);
-        this.minCleanness = builder.minCleanness;
-        this.maxCleanness = builder.maxCleanness;
+    public CleanRecipe(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+        double minCleanness, double maxCleanness) {
+        super(inputs, outputs, workTicks, voltage, power);
+        this.minCleanness = minCleanness;
+        this.maxCleanness = maxCleanness;
     }
 
     protected double getCleanness(IMachine machine, Level world, BlockPos pos) {
@@ -62,7 +61,7 @@ public class CleanRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         var rate = getCleannessRate(machine);
         if (rate <= 0d) {
@@ -72,46 +71,21 @@ public class CleanRecipe extends ProcessingRecipe {
         super.insertOutputs(machine, parallel1, random, callback);
     }
 
-    public static class Builder extends BuilderBase<CleanRecipe, Builder> {
-        private double minCleanness = 0d;
-        private double maxCleanness = 0d;
-
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder requireCleanness(double min, double max) {
-            minCleanness = min;
-            maxCleanness = max;
-            return self();
-        }
-
-        @Override
-        protected CleanRecipe createObject() {
-            return new CleanRecipe(this);
-        }
+    @FunctionalInterface
+    protected interface Factory<R extends CleanRecipe> {
+        R create(List<Input> inputs, List<Output> outputs, long workTicks, long voltage, long power,
+            double minCleanness, double maxCleanness);
     }
 
-    public static class Serializer extends ProcessingRecipe.Serializer<CleanRecipe, Builder> {
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec, Codec<IProcessingResult> resultCodec) {
-            super(ingredientCodec, resultCodec);
-        }
-
-        @Override
-        protected Builder buildFromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo) {
-            return super.buildFromJson(type, loc, jo)
-                .requireCleanness(GsonHelper.getAsDouble(jo, "min_cleanness", 0d),
-                    GsonHelper.getAsDouble(jo, "max_cleanness", 0d));
-        }
-
-        @Override
-        public void toJson(JsonObject jo, CleanRecipe recipe) {
-            super.toJson(jo, recipe);
-            jo.addProperty("min_cleanness", recipe.minCleanness);
-            jo.addProperty("max_cleanness", recipe.maxCleanness);
-        }
+    protected static <R extends CleanRecipe> MapCodec<R> codec(Factory<R> factory) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ProcessingHelper.INPUT_CODEC.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            ProcessingHelper.OUTPUT_CODEC.listOf().fieldOf("outputs").forGetter($ -> $.outputs),
+            Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+            Codec.LONG.fieldOf("power").forGetter($ -> $.power),
+            Codec.DOUBLE.fieldOf("min_cleanness").forGetter($ -> $.minCleanness),
+            Codec.DOUBLE.fieldOf("max_cleanness").forGetter($ -> $.maxCleanness)
+        ).apply(instance, factory::create));
     }
-
-    public static IRecipeSerializer<CleanRecipe, Builder> SERIALIZER
-        = new Serializer(ProcessingHelper.INGREDIENT_CODEC, ProcessingHelper.RESULT_CODEC);
 }

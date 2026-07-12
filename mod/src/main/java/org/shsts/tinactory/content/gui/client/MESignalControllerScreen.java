@@ -2,14 +2,14 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
@@ -88,23 +88,22 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY, float partialTick,
             Rect rect, int index, boolean isHovering) {
             getInfo(index).ifPresent(info -> {
-                var z = getBlitOffset();
 
                 var bgW = SWITCH_BUTTON.width();
                 var bgH = SWITCH_BUTTON.height() / 2;
                 var bg = new Rect(0, isSelected(info) ? bgH : 0, bgW, bgH);
-                StretchImage.render(poseStack, SWITCH_BUTTON, z, rect, bg, 3);
+                StretchImage.render(graphics, SWITCH_BUTTON, rect, bg, 3);
 
                 var iconW = INPUT_OUTPUT_OVERLAY.width();
                 var iconH = INPUT_OUTPUT_OVERLAY.height() / 2;
                 var icon = new Rect(0, info.isWrite() ? 0 : iconH, iconW, iconH);
-                RenderUtil.blit(poseStack, INPUT_OUTPUT_OVERLAY, z,
+                RenderUtil.blit(graphics, INPUT_OUTPUT_OVERLAY,
                     rect.offset(0, PORT_PADDING_ICON).resize(iconW, iconH), icon);
 
-                RenderUtil.renderText(poseStack, signalName(info.key()),
+                RenderUtil.renderText(graphics, signalName(info.key()),
                     rect.x() + iconW, rect.y() + PORT_PADDING_TEXT + 1,
                     PORT_TEXT_COLOR);
             });

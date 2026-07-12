@@ -5,8 +5,6 @@ import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.integration.material.MaterialSet
 
-data class RecoveryRecipeKey(val loc: ResourceLocation)
-
 data class RecoveryOutput(
     val item: ItemLike,
     val amount: Int,
@@ -26,6 +24,6 @@ data class RecoveryItemInput(
     override val amount: Double) : RecoveryInput
 
 data class RecoveryRecipe(
-    val key: RecoveryRecipeKey,
+    val key: ResourceLocation,
     val output: RecoveryOutput,
     val inputs: List<RecoveryInput>)

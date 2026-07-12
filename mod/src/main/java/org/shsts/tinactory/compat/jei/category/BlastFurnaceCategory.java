@@ -1,12 +1,12 @@
 package org.shsts.tinactory.compat.jei.category;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.UnknownNullability;
 import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
@@ -17,7 +17,7 @@ import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 @MethodsReturnNonnullByDefault
 public class BlastFurnaceCategory extends ProcessingCategory<BlastFurnaceRecipe> {
 
-    public BlastFurnaceCategory(IRecipeType<? extends IRecipeBuilderBase<BlastFurnaceRecipe>> recipeType,
+    public BlastFurnaceCategory(IRecipeType<BlastFurnaceRecipe> recipeType,
         Layout layout, Block icon) {
         super(recipeType, layout, icon);
     }
@@ -28,8 +28,8 @@ public class BlastFurnaceCategory extends ProcessingCategory<BlastFurnaceRecipe>
     }
 
     @Override
-    protected int drawExtraText(BlastFurnaceRecipe recipe, int y, PoseStack stack) {
+    protected int drawExtraText(BlastFurnaceRecipe recipe, int y, @UnknownNullability GuiGraphics graphics) {
         var text = tr("temperature", NUMBER_FORMAT.format(recipe.temperature));
-        return drawTextLine(stack, text, y);
+        return drawTextLine(graphics, text, y);
     }
 }

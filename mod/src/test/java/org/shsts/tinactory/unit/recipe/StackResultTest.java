@@ -1,20 +1,35 @@
 package org.shsts.tinactory.unit.recipe;
 
+import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.recipe.StackResult;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
-import java.util.Random;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class StackResultTest {
+    @Test
+    void codecShouldRoundTripExactStackResult() {
+        var codec = StackResult.codec("test_stack_result", PortType.ITEM,
+            TestStack.CODEC, TestStack.ADAPTER);
+        var result = new StackResult<>("test_stack_result", PortType.ITEM, 0.75d,
+            TestStack.item("ingot", 3), TestStack.ADAPTER);
+
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), result);
+        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
+
+        assertEquals(result, roundTrip);
+    }
+
     @Test
     void shouldCreateDeterministicScaledPreview() {
         var result = new StackResult<>("test_stack_result", PortType.FLUID, 0.25d,
@@ -32,7 +47,7 @@ class StackResultTest {
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 1d,
             TestStack.item("ingot", 3), TestStack.ADAPTER);
 
-        var inserted = result.insertPort(port, 2, new Random(1L), false);
+        var inserted = result.insertPort(port, 2, RandomSource.create(), false);
 
         assertTrue(inserted.isPresent());
         assertEquals(new TestStack(PortType.ITEM, "ingot", "", 6),
@@ -46,7 +61,7 @@ class StackResultTest {
         var result = new StackResult<>("test_stack_result", PortType.ITEM, 0d,
             TestStack.item("ingot", 3), TestStack.ADAPTER);
 
-        var inserted = result.insertPort(port, 4, new Random(1L), false);
+        var inserted = result.insertPort(port, 4, RandomSource.create(), false);
 
         assertTrue(inserted.isEmpty());
         assertEquals(TestStack.item("ingot", 1), port.storedStack());

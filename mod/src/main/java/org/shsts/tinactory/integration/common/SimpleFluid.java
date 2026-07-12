@@ -1,29 +1,36 @@
 package org.shsts.tinactory.integration.common;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.neoforged.neoforge.fluids.FluidType;
+
+import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SimpleFluid extends EmptyFluid {
-    private final FluidAttributes.Builder builder;
+    @Nullable
+    private FluidType fluidType = null;
+    @Nullable
+    private Supplier<? extends FluidType> fluidTypeSupp;
     public final int displayColor;
 
-    public SimpleFluid(ResourceLocation tex, int texColor, int displayColor) {
-        this.builder = FluidAttributes.builder(tex, null)
-            .color(texColor)
-            .sound(SoundEvents.BUCKET_FILL, SoundEvents.BUCKET_EMPTY);
+    public SimpleFluid(Supplier<? extends FluidType> fluidType, int displayColor) {
+        this.fluidTypeSupp = fluidType;
         this.displayColor = displayColor;
     }
 
     @Override
-    protected FluidAttributes createAttributes() {
-        return builder.build(this);
+    public FluidType getFluidType() {
+        if (fluidType == null) {
+            assert fluidTypeSupp != null;
+            fluidType = fluidTypeSupp.get();
+            fluidTypeSupp = null;
+        }
+        return fluidType;
     }
 
     @Override

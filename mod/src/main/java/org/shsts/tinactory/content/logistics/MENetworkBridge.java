@@ -1,15 +1,11 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
@@ -17,6 +13,7 @@ import org.shsts.tinactory.core.logistics.CombinedPort;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -25,7 +22,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.content.logistics.MEStorageAccess.combinePorts;
@@ -41,7 +37,7 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
     private final CombinedPort<FluidStack> parentFluid;
     private final CombinedPort<ItemStack> childItem;
     private final CombinedPort<FluidStack> childFluid;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     private IMachine machine;
 
@@ -53,12 +49,11 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         this.childFluid = StoragePorts.combinedFluid();
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, power);
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MENetworkBridge(be, power));
+        return $ -> $.container(ID, be -> new MENetworkBridge(be, power));
     }
 
     private void onUpdateLogistics(LogisticComponent logistics, BlockPos parentSubnet, BlockPos childSubnet) {
@@ -66,34 +61,36 @@ public class MENetworkBridge extends CapabilityProvider implements IEventSubscri
         combinePorts(logistics.getStoragePorts(childSubnet), childItem, childFluid);
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private void onConnect(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
 
-        var pos = blockEntity.getBlockPos();
-        var parentSubnet = network.getSubnet(pos, LOGISTICS_SUBNET.get());
-        var childSubnet = pos;
+        var childSubnet = blockEntity.getBlockPos();
+        var parentSubnet = network.getSubnet(childSubnet, LOGISTICS_SUBNET.get());
         if (parentSubnet.equals(childSubnet)) {
             return;
         }
 
-        logistics.registerPort(machine, 0, parentItem, childSubnet);
-        logistics.registerPort(machine, 1, parentFluid, childSubnet);
-        logistics.registerPort(machine, 2, childItem, parentSubnet);
-        logistics.registerPort(machine, 3, childFluid, parentSubnet);
+        logistics.registerPort(machine(), 0, parentItem, childSubnet);
+        logistics.registerPort(machine(), 1, parentFluid, childSubnet);
+        logistics.registerPort(machine(), 2, childItem, parentSubnet);
+        logistics.registerPort(machine(), 3, childFluid, parentSubnet);
         logistics.onUpdate(() -> onUpdateLogistics(logistics, parentSubnet, childSubnet));
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(CONNECT.get(), this::onConnect);
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 }

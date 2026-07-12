@@ -3,22 +3,19 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
-import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
+import java.util.Optional;
 import java.util.UUID;
+
+import static org.shsts.tinactory.integration.autocraft.PatternHelper.PATTERN_CODECS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEPatternEventPacket implements IPacket {
-    private static final PatternNbtCodec CODEC = new PatternNbtCodec(
-        MachineConstraintHelper.CODEC,
-        StackHelper.KEY_CODEC);
-
     private Action action = Action.CREATE;
     @Nullable
     private UUID patternUuid;
@@ -60,21 +57,20 @@ public class MEPatternEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         buf.writeEnum(action);
         buf.writeBoolean(patternUuid != null);
         if (patternUuid != null) {
             buf.writeUUID(patternUuid);
         }
-        buf.writeNbt(pattern == null ? null : CODEC.encodePattern(pattern));
+        CodecHelper.encodeOptionalToBuf(buf, Optional.ofNullable(pattern), PATTERN_CODECS::encodePatternToBuf);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         action = buf.readEnum(Action.class);
         patternUuid = buf.readBoolean() ? buf.readUUID() : null;
-        var patternTag = buf.readNbt();
-        pattern = patternTag == null ? null : CODEC.decodePattern(patternTag);
+        pattern = CodecHelper.parseOptionalFromBuf(buf, PATTERN_CODECS::decodePatternFromBuf).orElse(null);
     }
 
     public enum Action {

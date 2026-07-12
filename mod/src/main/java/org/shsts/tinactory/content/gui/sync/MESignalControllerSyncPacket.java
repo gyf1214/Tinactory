@@ -2,10 +2,11 @@ package org.shsts.tinactory.content.gui.sync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
 import java.util.ArrayList;
@@ -17,19 +18,18 @@ import java.util.UUID;
 public class MESignalControllerSyncPacket implements IPacket {
     public record SignalInfo(UUID machineId, Component machineName, ItemStack icon,
         String key, boolean isWrite) {
-        private static void serialize(FriendlyByteBuf buf, SignalInfo info) {
+        private static void serialize(RegistryFriendlyByteBuf buf, SignalInfo info) {
             buf.writeUUID(info.machineId);
-            buf.writeUtf(CodecHelper.encodeComponent(info.machineName));
-            var jo = CodecHelper.encodeJson(ItemStack.CODEC, info.icon);
-            buf.writeUtf(CodecHelper.jsonToStr(jo));
+            CodecHelper.encodeComponentToBuf(buf, info.machineName);
+            StackHelper.serializeStackToBuf(buf, info.icon);
             buf.writeUtf(info.key);
             buf.writeBoolean(info.isWrite);
         }
 
-        public static SignalInfo deserialize(FriendlyByteBuf buf) {
+        public static SignalInfo deserialize(RegistryFriendlyByteBuf buf) {
             return new SignalInfo(buf.readUUID(),
-                CodecHelper.parseComponent(buf.readUtf()),
-                CodecHelper.parseJson(ItemStack.CODEC, CodecHelper.jsonFromStr(buf.readUtf())),
+                CodecHelper.parseComponentFromBuf(buf),
+                StackHelper.deserializeStackFromBuf(buf),
                 buf.readUtf(), buf.readBoolean());
         }
     }
@@ -49,12 +49,12 @@ public class MESignalControllerSyncPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
-        buf.writeCollection(visibleSignals, SignalInfo::serialize);
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        CodecHelper.encodeCollectionToBuf(buf, visibleSignals, SignalInfo::serialize);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
-        visibleSignals.addAll(buf.readList(SignalInfo::deserialize));
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
+        visibleSignals.addAll(CodecHelper.parseListFromBuf(buf, SignalInfo::deserialize));
     }
 }

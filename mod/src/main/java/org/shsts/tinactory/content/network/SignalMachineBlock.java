@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
@@ -35,12 +36,11 @@ public class SignalMachineBlock extends StaticMachineBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-        List<Component> tooltip, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public int getSignal(BlockState state, BlockGetter world, BlockPos pos, Direction dir) {
         if (!(world instanceof Level world1) || dir != state.getValue(FACING).getOpposite()) {
@@ -52,7 +52,6 @@ public class SignalMachineBlock extends StaticMachineBlock {
             .orElse(0);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public int getDirectSignal(BlockState state, BlockGetter world, BlockPos pos, Direction dir) {
         return state.getSignal(world, pos, dir);

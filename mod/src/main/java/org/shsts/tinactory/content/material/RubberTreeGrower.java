@@ -1,24 +1,17 @@
 package org.shsts.tinactory.content.material;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.block.grower.AbstractTreeGrower;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.block.grower.TreeGrower;
 import org.shsts.tinactory.AllWorldGens;
-import org.shsts.tinactory.integration.util.ServerUtil;
 
-import java.util.Random;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class RubberTreeGrower extends AbstractTreeGrower {
-    @Nullable
-    @Override
-    protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random random, boolean largeHive) {
-        var registry = ServerUtil.getRegistry(Registry.CONFIGURED_FEATURE_REGISTRY);
-        return registry.getHolder(AllWorldGens.RUBBER_TREE_GROWER).orElse(null);
-    }
+public final class RubberTreeGrower {
+    public static final TreeGrower INSTANCE = new TreeGrower("tinactory_rubber",
+        Optional.empty(), Optional.of(AllWorldGens.RUBBER_TREE_GROWER), Optional.empty());
+
+    private RubberTreeGrower() {}
 }

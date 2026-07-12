@@ -5,15 +5,13 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.AllCapabilities;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -239,12 +237,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        return LazyOptional.empty();
-    }
-
-    @Override
-    public CompoundTag serializeOnUpdate() {
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         if (multiblockInterface != null) {
             var pos = multiblockInterface.blockEntity().getBlockPos();
@@ -254,7 +247,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
         multiblockInterfacePos = tag.contains("interfacePos", Tag.TAG_COMPOUND) ?
             CodecHelper.parseBlockPos(tag.getCompound("interfacePos")) : null;
         if (firstTick) {
@@ -282,7 +275,7 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
             super(parent);
             this.factory = factory;
 
-            onCreateObject($ -> parent.capability(ID, $::apply));
+            onCreateObject($ -> parent.container(ID, $::apply));
         }
 
         public Builder<P> layout(Layout val) {
@@ -315,15 +308,15 @@ public class Multiblock extends UpdatableCapabilityProvider implements IEventSub
     }
 
     public static <P> Function<IBlockEntityTypeBuilder<P>, Builder<P>> builder(
-        BiFunction<BlockEntity, Multiblock.Builder<P>, Multiblock> factory) {
+        BiFunction<BlockEntity, Builder<P>, Multiblock> factory) {
         return $ -> new Builder<>($, factory);
     }
 
     public static Optional<Multiblock> tryGet(BlockEntity be) {
-        return tryGetProvider(be, ID, Multiblock.class);
+        return tryGetContainer(be, ID, Multiblock.class);
     }
 
     public static Multiblock get(BlockEntity be) {
-        return getProvider(be, ID, Multiblock.class);
+        return getContainer(be, ID, Multiblock.class);
     }
 }

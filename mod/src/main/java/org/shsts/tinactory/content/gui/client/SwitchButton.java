@@ -1,11 +1,11 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
@@ -41,9 +41,9 @@ public abstract class SwitchButton extends Button {
     protected abstract void setValue(boolean val);
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         var texRect = getValue() ? enableTexY : disableTexY;
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, 0, texRect);
+        RenderUtil.blit(graphics, texture, rect(), 0, texRect);
     }
 
     @Override

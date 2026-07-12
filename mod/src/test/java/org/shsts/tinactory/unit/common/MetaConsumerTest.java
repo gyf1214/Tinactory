@@ -9,11 +9,12 @@ import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class MetaConsumerTest {
     @Test
     void acceptMetaPassesThroughSuccessfulLoads() throws MetaLoadingException {
-        var loc = new ResourceLocation("tinactory", "meta");
+        var loc = modLoc("meta");
         var json = new JsonObject();
         json.addProperty("name", "value");
         var consumer = new RecordingMetaConsumer("sound");
@@ -31,7 +32,7 @@ class MetaConsumerTest {
         var consumer = new ThrowingMetaConsumer("material", expected);
 
         var thrown = assertThrows(MetaLoadingException.class,
-            () -> consumer.acceptMeta(new ResourceLocation("tinactory", "broken"), new JsonObject()));
+            () -> consumer.acceptMeta(modLoc("broken"), new JsonObject()));
 
         assertSame(expected, thrown);
         assertEquals("material", consumer.name());
@@ -43,7 +44,7 @@ class MetaConsumerTest {
         var consumer = new ThrowingMetaConsumer("machine", cause);
 
         var thrown = assertThrows(MetaLoadingException.class,
-            () -> consumer.acceptMeta(new ResourceLocation("tinactory", "broken"), new JsonObject()));
+            () -> consumer.acceptMeta(modLoc("broken"), new JsonObject()));
 
         assertSame(cause, thrown.getCause());
     }

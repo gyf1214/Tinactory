@@ -38,8 +38,10 @@ public final class TestTechnologyHelper {
         Map<String, Integer> modifiers, Optional<ResourceLocation> displayItem,
         Optional<ResourceLocation> displayTexture, int rank) {
 
-        var technology = new Technology(depends, maxProgress, modifiers, displayItem, displayTexture, rank);
-        technology.setLoc(new ResourceLocation(loc));
-        return technology;
+        return new Technology(depends, maxProgress, modifiers, displayItem, displayTexture, rank);
+    }
+
+    public static ResourceLocation loc(String loc) {
+        return ResourceLocation.parse(loc);
     }
 }

@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
@@ -12,9 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -30,6 +29,7 @@ import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
@@ -187,22 +187,20 @@ public class Cleanroom extends Multiblock implements IProcessor, IElectricMachin
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get() || cap == ELECTRIC_MACHINE.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(PROCESSOR, this);
+        builder.attach(ELECTRIC_MACHINE, this);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putDouble("cleanness", cleanness);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         cleanness = tag.getDouble("cleanness");
     }
 

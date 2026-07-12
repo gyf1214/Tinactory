@@ -1,13 +1,14 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftPreviewSyncPacket;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
@@ -71,7 +72,7 @@ public class MECraftPreviewPanel extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY, float partialTick,
             Rect rect, int index, boolean isHovering) {
             var entry = summary.get(index);
             var display = entry.getKey().display();
@@ -79,11 +80,11 @@ public class MECraftPreviewPanel extends Panel {
 
             var color = amounts.consumedFromInventory() > amounts.existingAmount() ?
                 BG_COLOR_ERROR : BG_COLOR;
-            RenderUtil.fill(poseStack, rect, color);
+            RenderUtil.fill(graphics, rect, color);
 
             var rect1 = rect.offset(LABEL_WIDTH + SPACING * 2 + 1, SPACING + 1)
                 .resize(SLOT_SIZE - 2, SLOT_SIZE - 2);
-            RenderUtil.renderDescriptor(poseStack, display, rect1, getBlitOffset());
+            RenderUtil.renderDescriptor(graphics, display, rect1);
 
             var textX = rect.x() + LABEL_SPACING;
             var textY1 = rect.y() + LABEL_SPACING;
@@ -94,8 +95,8 @@ public class MECraftPreviewPanel extends Panel {
                 tr("summary.existing", ClientUtil.getNumberString(amounts.existingAmount()));
             var line2 = tr("summary.consumed", ClientUtil.getNumberString(amounts.consumedFromInventory()));
 
-            RenderUtil.renderText(poseStack, line1, textX, textY1, LABEL_SCALE);
-            RenderUtil.renderText(poseStack, line2, textX, textY2, LABEL_SCALE);
+            RenderUtil.renderText(graphics, line1, textX, textY1, LABEL_SCALE);
+            RenderUtil.renderText(graphics, line2, textX, textY2, LABEL_SCALE);
         }
 
         @Override
@@ -147,7 +148,7 @@ public class MECraftPreviewPanel extends Panel {
         previewMemoryUsage = previewReady ? packet.memoryUsage() : 0L;
         summary.clear();
         packet.summary().entries().entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())
+            .sorted(Map.Entry.comparingByKey(PatternRegistryCache.KEY_DISPLAY_ORDER))
             .forEach(summary::add);
         selectedCpu = null;
         cpuButton.setLabel(defaultCpuLabel);

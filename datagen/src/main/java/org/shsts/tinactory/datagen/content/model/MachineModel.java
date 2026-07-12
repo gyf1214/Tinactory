@@ -8,15 +8,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinactory.content.network.FixedMachineBlock;
 import org.shsts.tinactory.content.network.StaticMachineBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
@@ -41,10 +41,11 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
+import static org.shsts.tinactory.datagen.content.Models.BLOCK_VOID_TEX;
+import static org.shsts.tinactory.datagen.content.Models.CUTOUT_RENDER_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.DIR_TEX_KEYS;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
-import static org.shsts.tinactory.datagen.content.Models.VOID_TEX;
 import static org.shsts.tinactory.datagen.content.Models.rotateModel;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
@@ -54,7 +55,7 @@ import static org.shsts.tinactory.datagen.content.Models.yRotation;
 public class MachineModel {
     public static final String CASING_MODEL = "block/machine/casing";
     public static final String IO_MODEL = "block/machine/io";
-    public static final ResourceLocation PRIMITIVE_TEX = gregtech("blocks/casings/wood_wall");
+    public static final ResourceLocation PRIMITIVE_TEX = gregtech("block/casings/wood_wall");
     public static final String IO_TEX = "overlay/machine/overlay_energy_in_multi";
     public static final String IO_OUT_TEX = "overlay/machine/overlay_energy_out_multi";
     public static final String ME_BUS = "overlay/appeng/me_output_bus";
@@ -80,14 +81,12 @@ public class MachineModel {
         if (casing != null) {
             return casing;
         }
-        if (block instanceof PrimitiveBlock) {
-            return PRIMITIVE_TEX;
-        } else if (block instanceof MachineBlock machineBlock) {
-            return casingTex(machineBlock.voltage);
-        } else if (block instanceof SubnetBlock subnetBlock) {
-            return casingTex(subnetBlock.voltage);
-        }
-        throw new IllegalArgumentException();
+        return switch (block) {
+            case PrimitiveBlock ignored -> PRIMITIVE_TEX;
+            case MachineBlock machineBlock -> casingTex(machineBlock.voltage);
+            case SubnetBlock subnetBlock -> casingTex(subnetBlock.voltage);
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     public static <B extends ModelBuilder<B>> B applyCasing(B model, ResourceLocation tex,
@@ -168,7 +167,7 @@ public class MachineModel {
             .texture("io_overlay", ioTex);
     }
 
-    private void primitive(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void primitive(IEntryDataContext<? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var model = blockModel(ctx.id(), ctx.object(), false, prov);
         var workingModel = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
@@ -181,7 +180,7 @@ public class MachineModel {
             });
     }
 
-    private void sided(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void sided(IEntryDataContext<? extends Block, BlockStateProvider> ctx) {
         var model = blockModel(ctx.id(), ctx.object(), false, ctx.provider().models());
         ctx.provider().getVariantBuilder(ctx.object())
             .forAllStates(state -> {
@@ -208,7 +207,7 @@ public class MachineModel {
         }
     }
 
-    private void machine(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void machine(IEntryDataContext<? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var base = blockModel(ctx.id(), ctx.object(), false, prov);
         var working = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
@@ -233,7 +232,7 @@ public class MachineModel {
         ioState(multipart, io);
     }
 
-    private void fixed(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void fixed(IEntryDataContext<? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var model = blockModel(ctx.id(), ctx.object(), false, prov);
         var workingModel = blockModel(ctx.id() + "_active", ctx.object(), true, prov);
@@ -244,7 +243,7 @@ public class MachineModel {
                 .build());
     }
 
-    private void staticMachine(IEntryDataContext<Block, ? extends Block, BlockStateProvider> ctx) {
+    private void staticMachine(IEntryDataContext<? extends Block, BlockStateProvider> ctx) {
         var prov = ctx.provider().models();
         var base = blockModel(ctx.id(), ctx.object(), false, prov);
         var io = ioModel(ctx.id(), prov);
@@ -262,7 +261,7 @@ public class MachineModel {
         ioState(multipart, io);
     }
 
-    public <U extends Block> Consumer<IEntryDataContext<Block, U, BlockStateProvider>> blockState() {
+    public <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> blockState() {
         return ctx -> {
             if (ctx.object() instanceof PrimitiveBlock) {
                 primitive(ctx);
@@ -281,7 +280,7 @@ public class MachineModel {
         };
     }
 
-    public void itemModel(IEntryDataContext<Item, ? extends Item, ItemModelProvider> ctx) {
+    public void itemModel(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         var model = ctx.provider().withExistingParent(ctx.id(), modLoc(CASING_MODEL));
         applyTextures(model, ctx.provider().existingFileHelper);
     }
@@ -299,7 +298,7 @@ public class MachineModel {
         }
 
         private static ResourceLocation tex(String val) {
-            return gregtech("blocks/" + val);
+            return gregtech("block/" + val);
         }
 
         public Builder<P> casing(ResourceLocation val) {
@@ -365,6 +364,7 @@ public class MachineModel {
 
     private static void genCasingModel(IDataContext<BlockModelProvider> ctx) {
         var model = ctx.provider().withExistingParent(CASING_MODEL, mcLoc("block/block"))
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("particle", "#side")
             .element().from(0, 0, 0).to(16, 16, 16)
             .allFaces((d, f) -> f.cullface(d).texture(switch (d) {
@@ -383,12 +383,13 @@ public class MachineModel {
             })
             .end();
         for (var texKey : DIR_TEX_KEYS.values()) {
-            model.texture(texKey + "_overlay", VOID_TEX);
+            model.texture(texKey + "_overlay", BLOCK_VOID_TEX);
         }
     }
 
     private static void genIOModel(IDataContext<BlockModelProvider> ctx) {
         ctx.provider().withExistingParent(IO_MODEL, mcLoc("block/block"))
+            .renderType(CUTOUT_RENDER_TYPE)
             .element().from(0, 0, 0).to(16, 16, 16)
             .face(FRONT_FACING)
             .cullface(FRONT_FACING)
@@ -401,6 +402,6 @@ public class MachineModel {
         if (voltage == Voltage.PRIMITIVE) {
             return PRIMITIVE_TEX;
         }
-        return gregtech("blocks/casings/voltage/" + voltage.name().toLowerCase(Locale.ROOT));
+        return gregtech("block/casings/voltage/" + voltage.name().toLowerCase(Locale.ROOT));
     }
 }

@@ -4,7 +4,7 @@
   "fluids": {
     "gas": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.hydrochloric_acid",
+      "texture": "gregtech:block/fluids/fluid.hydrochloric_acid",
       "textureColor": "0xFFFFFFFF"
     }
   },

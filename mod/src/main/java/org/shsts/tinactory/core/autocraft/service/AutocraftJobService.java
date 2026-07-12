@@ -2,12 +2,13 @@ package org.shsts.tinactory.core.autocraft.service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.core.autocraft.api.IAutocraftService;
 import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 
 import java.util.ArrayList;
@@ -66,26 +67,26 @@ public class AutocraftJobService implements IAutocraftService {
         return memoryLimit;
     }
 
-    public Optional<CompoundTag> serializeRunningSnapshot(PatternNbtCodec codec) {
+    public Optional<CompoundTag> serializeRunningSnapshot(HolderLookup.Provider provider, PatternCodec codec) {
         if (!isBusy()) {
             return Optional.empty();
         }
         var tag = new CompoundTag();
-        tag.put("targets", serializeAmounts(currentTargets, codec));
-        tag.put("execution", executor.serialize(codec));
+        tag.put("targets", serializeAmounts(provider, currentTargets, codec));
+        tag.put("execution", executor.serialize(provider, codec));
         tag.putLong("memoryUsage", currentMemoryUsage);
         return Optional.of(tag);
     }
 
-    public void restoreRunningSnapshot(CompoundTag tag, PatternNbtCodec codec) {
+    public void restoreRunningSnapshot(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
         if (!currentTargets.isEmpty() || executor.isBusy()) {
             return;
         }
-        var targets = deserializeAmounts(tag.getList("targets", TAG_COMPOUND), codec);
+        var targets = deserializeAmounts(provider, tag.getList("targets", TAG_COMPOUND), codec);
         if (targets.isEmpty()) {
             return;
         }
-        executor.restore(tag.getCompound("execution"), codec);
+        executor.restore(provider, tag.getCompound("execution"), codec);
         currentTargets = executor.isBusy() ? List.copyOf(targets) : List.of();
         currentMemoryUsage = executor.isBusy() ? tag.getLong("memoryUsage") : 0L;
         pendingTicks = 0;
@@ -142,20 +143,21 @@ public class AutocraftJobService implements IAutocraftService {
         return true;
     }
 
-    private static ListTag serializeAmounts(List<CraftAmount> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeAmounts(HolderLookup.Provider provider, List<CraftAmount> amounts,
+        PatternCodec codec) {
         var out = new ListTag();
         for (var amount : amounts) {
-            out.add(codec.encodeAmount(amount));
+            out.add(codec.encodeAmount(provider, amount));
         }
         return out;
     }
 
-    private static List<CraftAmount> deserializeAmounts(ListTag amounts, PatternNbtCodec codec) {
+    private static List<CraftAmount> deserializeAmounts(HolderLookup.Provider provider, ListTag amounts,
+        PatternCodec codec) {
         var out = new ArrayList<CraftAmount>(amounts.size());
         for (var i = 0; i < amounts.size(); i++) {
-            out.add(codec.decodeAmount(amounts.getCompound(i)));
+            out.add(codec.decodeAmount(provider, amounts.getCompound(i)));
         }
         return out;
     }
-
 }

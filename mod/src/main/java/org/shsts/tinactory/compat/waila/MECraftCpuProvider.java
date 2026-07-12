@@ -1,28 +1,25 @@
 package org.shsts.tinactory.compat.waila;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IServerDataProvider;
-import mcp.mobius.waila.api.config.IPluginConfig;
-import mcp.mobius.waila.api.ui.IElement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.FluidRenderDescriptor;
 import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.config.IPluginConfig;
+import snownee.jade.api.ui.IElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +27,12 @@ import java.util.Optional;
 
 import static org.shsts.tinactory.compat.waila.Waila.ME_CRAFT_CPU;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetProvider;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.tryGetContainer;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MECraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+public class MECraftCpuProvider extends ProviderBase implements IServerDataProvider<BlockAccessor> {
     public static final MECraftCpuProvider INSTANCE = new MECraftCpuProvider();
 
     private static final String PREFIX = "tinactoryMECraftCpu";
@@ -63,7 +60,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         }
         add(helper.text(guiTr("cpu.state." + state.get().id).withStyle(ChatFormatting.GRAY)));
         if (tag.contains(TARGET_KEY, Tag.TAG_COMPOUND)) {
-            appendTargetLine(tag);
+            appendTargetLine(tag, accessor);
         }
         if (state.get().busy() && tag.contains(TOTAL_STEPS_KEY, Tag.TAG_INT)) {
             var text = guiTr("cpu.steps",
@@ -83,11 +80,14 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         }
     }
 
-    private void appendTargetLine(CompoundTag tag) {
-        var key = decodeKey(tag.getCompound(TARGET_KEY));
+    private void appendTargetLine(CompoundTag tag, BlockAccessor accessor) {
+        var key = decodeKey(accessor, tag.get(TARGET_KEY));
+        if (key.isEmpty()) {
+            return;
+        }
         var amount = tag.getLong(TARGET_AMOUNT_KEY);
         var line = new ArrayList<IElement>();
-        appendTargetIcon(line, key);
+        appendTargetIcon(line, key.get());
         line.add(helper.text(guiTr("cpu.target", "", ClientUtil.getNumberString(amount))));
         add(line);
     }
@@ -101,7 +101,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         }
     }
 
-    private static TranslatableComponent guiTr(String id, Object... args) {
+    private static MutableComponent guiTr(String id, Object... args) {
         return I18n.tr("tinactory.gui.autocraft." + id, args);
     }
 
@@ -114,9 +114,13 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
     }
 
     @Override
-    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
-        BlockEntity blockEntity, boolean showDetails) {
-        var cpu = tryGetProvider(blockEntity, MECraftCpu.ID, MECraftCpu.class);
+    public void appendServerData(CompoundTag tag, BlockAccessor accessor) {
+        var blockEntity = accessor.getBlockEntity();
+        if (blockEntity == null) {
+            return;
+        }
+
+        var cpu = tryGetContainer(blockEntity, MECraftCpu.ID, MECraftCpu.class);
         if (cpu.isEmpty()) {
             return;
         }
@@ -124,7 +128,7 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         tag.putString(STATE_KEY, status.state().name());
         if (!status.targets().isEmpty()) {
             var target = status.targets().get(0);
-            tag.put(TARGET_KEY, encodeKey(target.key()));
+            tag.put(TARGET_KEY, accessor.encodeAsNbt(StackHelper.KEY_STREAM_CODEC, target.key()));
             tag.putLong(TARGET_AMOUNT_KEY, target.amount());
         }
         tag.putInt(COMPLETED_STEPS_KEY, status.completedSteps());
@@ -134,13 +138,12 @@ public class MECraftCpuProvider extends ProviderBase implements IServerDataProvi
         tag.putLong(MEMORY_USAGE_KEY, status.memoryUsage());
     }
 
-    private static CompoundTag encodeKey(IStackKey key) {
-        var tag = new CompoundTag();
-        tag.put("value", CodecHelper.encodeTag(StackHelper.KEY_CODEC, key));
-        return tag;
+    private static Optional<IStackKey> decodeKey(BlockAccessor accessor, Tag tag) {
+        return accessor.decodeFromNbt(StackHelper.KEY_STREAM_CODEC, tag);
     }
 
-    private static IStackKey decodeKey(CompoundTag tag) {
-        return CodecHelper.parseTag(StackHelper.KEY_CODEC, tag.get("value"));
+    @Override
+    public ResourceLocation getUid() {
+        return ME_CRAFT_CPU;
     }
 }

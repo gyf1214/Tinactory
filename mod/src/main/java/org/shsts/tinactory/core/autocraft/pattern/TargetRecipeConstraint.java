@@ -1,7 +1,6 @@
 package org.shsts.tinactory.core.autocraft.pattern;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -17,9 +16,8 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public record TargetRecipeConstraint(ResourceLocation recipeId) implements IMachineConstraint {
     public static final String TYPE_ID = "tinactory:target_recipe";
-    public static final Codec<TargetRecipeConstraint> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("recipeId").forGetter(TargetRecipeConstraint::recipeId)
-    ).apply(instance, TargetRecipeConstraint::new));
+    public static final MapCodec<TargetRecipeConstraint> CODEC = ResourceLocation.CODEC.fieldOf("recipeId")
+        .xmap(TargetRecipeConstraint::new, TargetRecipeConstraint::recipeId);
 
     public TargetRecipeConstraint {
         if (recipeId.getPath().isBlank()) {

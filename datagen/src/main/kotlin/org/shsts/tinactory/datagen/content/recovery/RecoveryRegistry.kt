@@ -1,13 +1,18 @@
 package org.shsts.tinactory.datagen.content.recovery
 
+import com.mojang.logging.LogUtils
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.core.util.LocHelper.prepend
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.integration.material.MaterialSet
 import kotlin.math.floor
 
 object RecoveryRegistry {
+    private val LOGGER = LogUtils.getLogger()
+
     private data class Config(
         val targetSub: String,
         val recoverRate: Double,
@@ -19,14 +24,13 @@ object RecoveryRegistry {
         val maxRecoveredMaterialAmount: Int)
 
     private lateinit var config: Config
-    val targetSub: String
-        get() = config.targetSub
+    val targetSub: String get() = config.targetSub
     private val recipesByItem = mutableMapOf<ResourceLocation, MutableList<RecoveryRecipe>>()
     private val selectedRecipeByItem = mutableMapOf<ResourceLocation, RecoveryRecipe?>()
     private val compositionByItem = mutableMapOf<ResourceLocation, RecoveryComposition>()
-    private val compositionByRecipe = mutableMapOf<RecoveryRecipeKey, RecoveryComposition>()
+    private val compositionByRecipe = mutableMapOf<ResourceLocation, RecoveryComposition>()
     private val visitingItems = mutableSetOf<ResourceLocation>()
-    private val visitingRecipes = mutableSetOf<RecoveryRecipeKey>()
+    private val visitingRecipes = mutableSetOf<ResourceLocation>()
 
     fun configure(
         targetSub: String,
@@ -50,10 +54,10 @@ object RecoveryRegistry {
         clearResolved()
     }
 
-    fun record(recipe: RecoveryRecipe) {
-        val loc = itemLoc(recipe.output.item)
+    fun record(key: ResourceLocation, output: RecoveryOutput, inputs: List<RecoveryInput>) {
+        val recipe = RecoveryRecipe(key, output, inputs.toList())
+        val loc = itemLoc(output.item)
         recipesByItem.getOrPut(loc) { mutableListOf() }.add(recipe)
-        clearResolved()
     }
 
     fun emitArcFurnaceRecipes() {
@@ -69,7 +73,7 @@ object RecoveryRegistry {
             val recipe = selectedRecipeByItem[loc] ?: continue
             val totalOutputAmount = outputs.sumOf { it.second }
             arcFurnace {
-                recipe(ResourceLocation(loc.namespace, "recovery/${loc.path}")) {
+                recipe(prepend(loc, "recovery")) {
                     voltage(recipe.output.voltage ?: Voltage.HV)
                     workTicks(totalOutputAmount * config.workTicksPerIngot)
                     input(recipe.output.item)
@@ -89,7 +93,7 @@ object RecoveryRegistry {
     private fun compositionOf(loc: ResourceLocation): RecoveryComposition {
         compositionByItem[loc]?.let { return it }
         if (!visitingItems.add(loc)) {
-            println("Skipping cyclic recovery item input $loc")
+            LOGGER.trace("Skipping cyclic recovery item input {}", loc)
             return RecoveryComposition()
         }
         val selected = selectRecipe(loc, recipesByItem[loc].orEmpty())
@@ -103,7 +107,7 @@ object RecoveryRegistry {
     private fun compositionOf(recipe: RecoveryRecipe): RecoveryComposition {
         compositionByRecipe[recipe.key]?.let { return it }
         if (!visitingRecipes.add(recipe.key)) {
-            println("Skipping cyclic recovery recipe input ${recipe.key.loc}")
+            LOGGER.trace("Skipping cyclic recovery recipe input {}", itemLoc(recipe.output.item))
             return RecoveryComposition()
         }
         var ret = RecoveryComposition()
@@ -134,14 +138,12 @@ object RecoveryRegistry {
         val selected = nonEmpty.minWith(compareBy<Pair<RecoveryRecipe, RecoveryComposition>> {
             it.second.topMaterials(1).first().second
         }.thenBy {
-            it.first.key.loc.toString()
+            it.first.key.toString()
         }).first
         if (nonEmpty.size > 1) {
             val discarded = nonEmpty.map { it.first }.filter { it != selected }
             if (discarded.isNotEmpty()) {
-                println("Selected recovery recipe ${selected.key.loc} for $loc; discarded ${
-                    discarded.joinToString { it.key.loc.toString() }
-                }")
+                LOGGER.trace("Selected recovery recipe {} for {}", selected.key, loc)
             }
         }
         return selected
@@ -189,10 +191,6 @@ object RecoveryRegistry {
             loc.path.startsWith("machine/") ||
             loc.path.startsWith("multiblock/") ||
             loc.path.startsWith("network/")
-    }
-
-    private fun itemLoc(item: ItemLike): ResourceLocation {
-        return item.asItem().registryName!!
     }
 
     private fun clearResolved() {

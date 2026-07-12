@@ -4,7 +4,7 @@
   "fluids": {
     "fluid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.biomass",
+      "texture": "gregtech:block/fluids/fluid.biomass",
       "textureColor": "0xFFFFFFFF"
     }
   },

@@ -5,7 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.tech.ITechManager;
@@ -14,20 +16,16 @@ import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
-import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Technology implements ITechnology {
-    @Nullable
-    private ResourceLocation loc = null;
     private final List<ResourceLocation> dependIds;
     private final List<ITechnology> depends = new ArrayList<>();
     private final Map<String, Integer> modifiers;
@@ -48,18 +46,8 @@ public class Technology implements ITechnology {
         this.displayTexture = displayTexture.orElse(null);
         this.display = this.displayItem != null ? new ItemIdRenderDescriptor(this.displayItem) :
             this.displayTexture != null ? new TextureRenderDescriptor(new Texture(this.displayTexture, 16, 16)) :
-            EmptyRenderDescriptor.INSTANCE;
+                EmptyRenderDescriptor.INSTANCE;
         this.rank = rank;
-    }
-
-    @Override
-    public ResourceLocation loc() {
-        assert loc != null;
-        return loc;
-    }
-
-    public void setLoc(ResourceLocation loc) {
-        this.loc = loc;
     }
 
     public void resolve(ITechManager manager) {
@@ -89,57 +77,8 @@ public class Technology implements ITechnology {
         return display;
     }
 
-    @Override
-    public Component getDescription() {
-        return I18n.tr(getDescriptionId(loc()));
-    }
-
-    @Override
-    public Component getDetails() {
-        return I18n.tr(getDetailsId(loc()));
-    }
-
-    /**
-     * Only compares rank, does not imply equal.
-     */
-    @Override
-    public int compareTo(ITechnology o) {
-        return Integer.compare(rank, ((Technology) o).rank);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Technology that = (Technology) o;
-        return Objects.equals(loc, that.loc);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(loc);
-    }
-
-    @Override
-    public String toString() {
-        return "Technology[" + loc + "]";
-    }
-
-    public static String getDescriptionId(ResourceLocation loc) {
-        return loc.getNamespace() + ".technology." + loc.getPath().replace('/', '.');
-    }
-
-    public static String getDetailsId(ResourceLocation loc) {
-        return getDescriptionId(loc) + ".details";
-    }
-
     public static final Codec<Technology> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        ResourceLocation.CODEC.listOf().optionalFieldOf("depends", Collections.emptyList())
-            .forGetter(tech -> tech.dependIds),
+        ResourceLocation.CODEC.listOf().fieldOf("depends").forGetter(tech -> tech.dependIds),
         Codec.LONG.fieldOf("max_progress").forGetter(tech -> tech.maxProgress),
         Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("modifiers").forGetter(tech -> tech.modifiers),
         ResourceLocation.CODEC.optionalFieldOf("display_item")
@@ -148,4 +87,10 @@ public class Technology implements ITechnology {
             .forGetter(tech -> Optional.ofNullable(tech.displayTexture)),
         Codec.INT.fieldOf("rank").forGetter(tech -> tech.rank)
     ).apply(instance, Technology::new));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, Technology> STREAM_CODEC =
+        ByteBufCodecs.fromCodecWithRegistries(CODEC);
+
+    public static final Comparator<ITechnology> DISPLAY_ORDER =
+        Comparator.comparingInt($ -> ((Technology) $).rank);
 }

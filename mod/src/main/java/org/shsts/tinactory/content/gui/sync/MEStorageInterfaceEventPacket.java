@@ -3,9 +3,9 @@ package org.shsts.tinactory.content.gui.sync;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -67,7 +67,7 @@ public class MEStorageInterfaceEventPacket implements IPacket {
     }
 
     @Override
-    public void serializeToBuf(FriendlyByteBuf buf) {
+    public void serializeToBuf(RegistryFriendlyByteBuf buf) {
         if (item == null && fluid == null) {
             buf.writeBoolean(true);
         } else if (item != null) {
@@ -77,20 +77,20 @@ public class MEStorageInterfaceEventPacket implements IPacket {
         } else {
             buf.writeBoolean(false);
             buf.writeBoolean(true);
-            fluid.writeToPacket(buf);
+            StackHelper.serializeFluidStackToBuf(buf, fluid);
         }
         buf.writeVarInt(button);
     }
 
     @Override
-    public void deserializeFromBuf(FriendlyByteBuf buf) {
+    public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         if (buf.readBoolean()) {
             // isEmpty
             item = null;
             fluid = null;
         } else if (buf.readBoolean()) {
             // isFluid
-            fluid = FluidStack.readFromPacket(buf);
+            fluid = StackHelper.deserializeFluidStackFromBuf(buf);
             item = null;
         } else {
             item = StackHelper.deserializeStackFromBuf(buf);

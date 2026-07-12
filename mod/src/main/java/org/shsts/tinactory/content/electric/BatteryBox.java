@@ -1,15 +1,12 @@
 package org.shsts.tinactory.content.electric;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -19,9 +16,9 @@ import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -33,7 +30,6 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -50,7 +46,6 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     private final Voltage voltage;
     private IMachine machine;
     private final WrapperItemHandler items;
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
 
     public BatteryBox(BlockEntity blockEntity, Layout layout) {
         this.blockEntity = blockEntity;
@@ -61,11 +56,10 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             items.setFilter(i, this::allowItem);
         }
-        this.menuItemHandlerCap = IMenuItemHandler.cap(items);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout) {
-        return $ -> $.capability(ID, be -> new BatteryBox(be, layout));
+        return $ -> $.container(ID, be -> new BatteryBox(be, layout));
     }
 
     private boolean allowItem(ItemStack stack) {
@@ -73,8 +67,15 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
             batteryItem.voltage == voltage;
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
     private boolean isDischarge() {
-        return machine.config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+        return machine().config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         if (isDischarge()) {
             factor = -1;
         } else {
-            factor = machine.network().orElseThrow()
+            factor = machine().network().orElseThrow()
                 .getComponent(ELECTRIC_COMPONENT.get())
                 .getBufferFactor();
         }
@@ -177,29 +178,25 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> machine = MACHINE.get(blockEntity));
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
             StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), items));
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ELECTRIC_MACHINE.get() || cap == PROCESSOR.get() ||
-            cap == LAYOUT_PROVIDER.get()) {
-            return myself();
-        } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(ELECTRIC_MACHINE, this);
+        builder.attach(PROCESSOR, this);
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(MENU_ITEM_HANDLER, items);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(items);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, items);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(items, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, items, tag);
     }
 }

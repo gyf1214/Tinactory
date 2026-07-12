@@ -6,7 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -18,6 +18,7 @@ import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 
@@ -71,7 +72,8 @@ public class DigitalInterfaceMenu extends MachineMenu {
     }
 
     private void addFluidSlot(int slot, int port, int index) {
-        addSyncSlot(FLUID_SYNC + slot, () -> new FluidSyncPacket(getInfoFluid(port, index)));
+        addSyncSlot(FLUID_SYNC + slot, FLUID_STACK_SYNC,
+            () -> new FluidSyncPacket(getInfoFluid(port, index)));
     }
 
     @Override

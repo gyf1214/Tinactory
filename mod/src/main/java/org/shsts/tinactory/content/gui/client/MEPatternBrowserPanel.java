@@ -1,9 +1,9 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -45,9 +45,9 @@ public class MEPatternBrowserPanel extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect, 0, 0);
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect, 0, 0);
             if (index >= patterns.size()) {
                 return;
             }
@@ -55,11 +55,11 @@ public class MEPatternBrowserPanel extends Panel {
             var rect1 = rect.offset(1, 1).resize(SLOT_SIZE - 2, SLOT_SIZE - 2);
             var pattern = patterns.get(index);
             if (pattern.outputs().isEmpty()) {
-                RenderUtil.renderItem(new ItemStack(Items.BARRIER), rect1.x(), rect1.y());
+                RenderUtil.renderItem(graphics, new ItemStack(Items.BARRIER), rect1.x(), rect1.y());
                 return;
             }
             var display = pattern.outputs().get(0).key().display();
-            RenderUtil.renderDescriptor(poseStack, display, rect1, getBlitOffset());
+            RenderUtil.renderDescriptor(graphics, display, rect1);
         }
 
         @Override
@@ -97,8 +97,8 @@ public class MEPatternBrowserPanel extends Panel {
 
     private static List<Component> patternTooltip(CraftPattern pattern) {
         var ret = new ArrayList<Component>();
-        ret.add(tr("input", ingredientsTooltip(pattern.inputs())).withStyle(ChatFormatting.GRAY));
-        ret.add(tr("output", ingredientsTooltip(pattern.outputs())).withStyle(ChatFormatting.GRAY));
+        ret.add(tr("input", ingredientsTooltip(pattern.inputs())).copy().withStyle(ChatFormatting.GRAY));
+        ret.add(tr("output", ingredientsTooltip(pattern.outputs())).copy().withStyle(ChatFormatting.GRAY));
         return ret;
     }
 

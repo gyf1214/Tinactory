@@ -1,12 +1,12 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -15,14 +15,22 @@ import org.shsts.tinycorelib.api.gui.MenuBase;
 @MethodsReturnNonnullByDefault
 public abstract class SimpleButton extends Button {
     protected final Texture texture;
+    protected final Texture hoverTexture;
     protected final int normalX, normalY;
     protected final int hoverX, hoverY;
 
     public SimpleButton(MenuBase menu, Texture texture,
         @Nullable Component tooltip, int normalX, int normalY,
         int hoverX, int hoverY) {
+        this(menu, texture, texture, tooltip, normalX, normalY, hoverX, hoverY);
+    }
+
+    public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
+        @Nullable Component tooltip, int normalX, int normalY,
+        int hoverX, int hoverY) {
         super(menu, tooltip);
         this.texture = texture;
+        this.hoverTexture = hoverTexture;
         this.normalX = normalX;
         this.normalY = normalY;
         this.hoverX = hoverX;
@@ -34,12 +42,18 @@ public abstract class SimpleButton extends Button {
         this(menu, texture, tooltip, 0, 0, hoverX, hoverY);
     }
 
+    public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
+        @Nullable Component tooltip, int hoverX, int hoverY) {
+        this(menu, texture, hoverTexture, tooltip, 0, 0, hoverX, hoverY);
+    }
+
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var rect = rect();
         if (isHovered(mouseX, mouseY)) {
-            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, hoverX, hoverY);
+            RenderUtil.blit(graphics, hoverTexture, rect, hoverX, hoverY);
         } else {
-            RenderUtil.blit(poseStack, texture, getBlitOffset(), rect, normalX, normalY);
+            RenderUtil.blit(graphics, texture, rect, normalX, normalY);
         }
     }
 }

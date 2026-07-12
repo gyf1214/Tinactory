@@ -1,25 +1,23 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -40,7 +38,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     private final WrapperItemHandler internalItems;
     private final IPort<ItemStack> externalPort;
     private final ItemStack[] filters;
-    private final LazyOptional<IItemHandler> itemHandlerCap;
+    private final IItemHandler externalHandler;
 
     private class VoidableItemHandler extends WrapperItemHandler {
         public VoidableItemHandler(IItemHandlerModifiable compose) {
@@ -110,14 +108,13 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             internalItems.setFilter(i, stack -> allowStackInSlot(slot, stack));
         }
 
-        var externalHandler = new ExternalItemHandler();
+        this.externalHandler = new ExternalItemHandler();
         this.externalPort = new ItemHandlerPort(internalItems);
-        this.itemHandlerCap = LazyOptional.of(() -> externalHandler);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
         Layout layout, int slotSize, double power) {
-        return $ -> $.capability(ID, be -> new ElectricChest(be, layout, slotSize, power));
+        return $ -> $.container(ID, be -> new ElectricChest(be, layout, slotSize, power));
     }
 
     public ItemStack getStackInSlot(int slot) {
@@ -160,7 +157,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
 
     @Override
     protected void onMachineConfig() {
-        machine.network().ifPresent(network -> registerPort(network, externalPort));
+        machine().network().ifPresent(network -> registerPort(network, externalPort));
     }
 
     @Override
@@ -184,22 +181,20 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == ITEM_HANDLER.get()) {
-            return itemHandlerCap.cast();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(ITEM_HANDLER, externalHandler);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("items", StackHelper.serializeItemHandler(internalItems));
+        tag.put("items", StackHelper.serializeItemHandler(provider, internalItems));
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
             if (filters[i] != null) {
                 var tag2 = new CompoundTag();
-                filters[i].save(tag2);
+                filters[i].save(provider, tag2);
                 tag2.putInt("Slot", i);
                 tag1.add(tag2);
             }
@@ -209,14 +204,14 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(internalItems, tag.getCompound("items"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("items"));
         var tag1 = tag.getList("filters", Tag.TAG_COMPOUND);
         Arrays.fill(filters, null);
         for (var tag2 : tag1) {
             var tag3 = (CompoundTag) tag2;
             var slot = tag3.getInt("Slot");
-            var item = ItemStack.of(tag3);
+            var item = ItemStack.parseOptional(provider, tag3);
             filters[slot] = item;
         }
     }

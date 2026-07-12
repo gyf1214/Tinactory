@@ -5,10 +5,10 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.RangedWrapper;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.wrapper.RangedWrapper;
 import org.shsts.tinactory.api.logistics.ILimitedPort;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IPortFilter;
@@ -137,7 +137,7 @@ public class ItemHandlerPort implements IPort<ItemStack>, IPortFilter<ItemStack>
     }
 
     @Override
-    public int getStorageAmount(ItemStack item) {
+    public long getStorageAmount(ItemStack item) {
         if (item.isEmpty() || !acceptOutput()) {
             return 0;
         }

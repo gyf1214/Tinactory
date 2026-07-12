@@ -2,8 +2,8 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
@@ -12,6 +12,8 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -26,10 +28,11 @@ public final class AllBlockEntities {
         WORKBENCH = BlockEntityBuilder.builder("primitive/workbench", PrimitiveBlock::new)
             .menu(AllMenus.WORKBENCH)
             .blockEntity()
+            .capability(MENU_ITEM_HANDLER)
             .transform(Workbench::factory)
             .end()
             .block()
-            .material(Material.WOOD)
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .properties($ -> $.strength(2f).sound(SoundType.WOOD))
             .end()
             .buildObject();

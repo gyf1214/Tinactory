@@ -2,7 +2,6 @@ package org.shsts.tinactory.unit.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.core.network.INetworkGraphAdapter;
 
@@ -22,8 +21,7 @@ final class NetworkGraphEngineFixtures {
 
     private NetworkGraphEngineFixtures() {}
 
-    private static final class TestSubnetLabel
-        extends ForgeRegistryEntry<ISubnetLabel> implements ISubnetLabel {
+    private static final class TestSubnetLabel implements ISubnetLabel {
     }
 
     static final class Node {

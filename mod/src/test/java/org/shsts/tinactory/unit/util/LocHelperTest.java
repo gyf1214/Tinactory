@@ -11,22 +11,25 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class LocHelperTest {
     @Test
     void locationFactoriesUseExpectedNamespaces() {
-        assertEquals(new ResourceLocation("minecraft", "diamond"), LocHelper.mcLoc("diamond"));
-        assertEquals(new ResourceLocation(TinactoryKeys.ID, "machine"), LocHelper.modLoc("machine"));
-        assertEquals(new ResourceLocation("gregtech", "wire"), LocHelper.gregtech("wire"));
-        assertEquals(new ResourceLocation("appliedenergistics2", "cell"), LocHelper.ae2("cell"));
-        assertEquals(new ResourceLocation("ic2", "cable"), LocHelper.ic2("cable"));
+        assertEquals(ResourceLocation.withDefaultNamespace("diamond"), LocHelper.mcLoc("diamond"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "machine"), LocHelper.modLoc("machine"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath("gregtech", "wire"), LocHelper.gregtech("wire"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath("appliedenergistics2", "cell"), LocHelper.ae2("cell"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath("ic2", "cable"), LocHelper.ic2("cable"));
     }
 
     @Test
     void pathHelpersPreserveIdentityWhenPrefixOrSuffixIsEmpty() {
-        var base = new ResourceLocation("tinactory", "base/path");
+        var base = ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "base/path");
 
         assertSame(base, LocHelper.extend(base, ""));
         assertSame(base, LocHelper.prepend(base, ""));
-        assertEquals(new ResourceLocation("tinactory", "base/path/extra"), LocHelper.extend(base, "extra"));
-        assertEquals(new ResourceLocation("tinactory", "base/path_suffix"), LocHelper.suffix(base, "_suffix"));
-        assertEquals(new ResourceLocation("tinactory", "prefix/base/path"), LocHelper.prepend(base, "prefix"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "base/path/extra"),
+            LocHelper.extend(base, "extra"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "base/path_suffix"),
+            LocHelper.suffix(base, "_suffix"));
+        assertEquals(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "prefix/base/path"),
+            LocHelper.prepend(base, "prefix"));
     }
 
     @Test

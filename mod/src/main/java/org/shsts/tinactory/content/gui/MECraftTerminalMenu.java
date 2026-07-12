@@ -23,7 +23,10 @@ import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.AllMenus.ME_CRAFT_CPU_SYNC;
+import static org.shsts.tinactory.AllMenus.ME_CRAFT_PREVIEW_SYNC;
+import static org.shsts.tinactory.AllMenus.ME_CRAFT_REQUEST_SYNC;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -44,13 +47,14 @@ public class MECraftTerminalMenu extends MenuBase {
     public MECraftTerminalMenu(Properties properties) {
         super(properties);
         this.machine = MACHINE.get(blockEntity());
-        var terminal = getProvider(blockEntity(), MECraftTerminal.ID, MECraftTerminal.class);
+        var terminal = getContainer(blockEntity(), MECraftTerminal.ID, MECraftTerminal.class);
         this.service = world.isClientSide ? null : terminal.createService();
         this.cpuRuntime = world.isClientSide ? null : terminal.cpuRuntime();
-        this.previewScheduler = new ActiveScheduler<>(this::previewPacket);
+        this.previewScheduler = new ActiveScheduler<>(ME_CRAFT_PREVIEW_SYNC, this::previewPacket);
 
-        addSyncSlot(REQUEST_SYNC, new RevisionScheduler<>(this::requestRevision, this::requestPacket));
-        addSyncSlot(CPU_STATUS_SYNC, this::cpuStatusPacket);
+        addSyncSlot(REQUEST_SYNC, new RevisionScheduler<>(ME_CRAFT_REQUEST_SYNC, this::requestRevision,
+            this::requestPacket));
+        addSyncSlot(CPU_STATUS_SYNC, ME_CRAFT_CPU_SYNC, this::cpuStatusPacket);
         addSyncSlot(PREVIEW_SYNC, previewScheduler);
         onEventPacket(ME_CRAFT_ACTION, this::onAction);
     }

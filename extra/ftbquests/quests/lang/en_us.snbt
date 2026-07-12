@@ -1,0 +1,2247 @@
+{
+	chapter.021730EB05578B09.chapter_subtitle: ["Use buffers, transport, and ME networks to turn manual lines into automated systems."]
+	chapter.021730EB05578B09.title: "Logistics"
+	chapter.0264CD4D207EEDA8.chapter_subtitle: ["Start with steel and electrical parts, build LV machines and research, then prepare for integrated circuits and MV"]
+	chapter.0264CD4D207EEDA8.title: "Industry Awakens"
+	chapter.05A550E7057E0000.chapter_subtitle: ["Cross the post-IV gate with PGMs, Assembly Line, and LuV components"]
+	chapter.05A550E7057E0000.title: "Toward LuV"
+	chapter.06FE0000000000FE.chapter_subtitle: ["Bridge toward ZPM with Naquadah, Crystal circuits, hydrometallurgy, and LuV Superconductor"]
+	chapter.06FE0000000000FE.title: "Fusion Era"
+	chapter.1552B98C4F286D86.chapter_subtitle: ["From Netherrack veins and crystal loops to ME automation, rebuild the factory after Rocket T1."]
+	chapter.1552B98C4F286D86.title: "Reenters Spaceflight"
+	chapter.16E428B6C103B73D.chapter_subtitle: ["Use Stainless Steel, Ammonia chemistry, and Rocket Fuel to push the factory toward its first launch."]
+	chapter.16E428B6C103B73D.title: "HV to Liftoff"
+	chapter.18A01183DF6A59D0.chapter_subtitle: ["Compare steam, gas, nuclear, and turbine routes to power each stage."]
+	chapter.18A01183DF6A59D0.title: "Power Generation"
+	chapter.3B5374D34DFEC6AF.chapter_subtitle: ["Use research to unlock ore veins and let the Ore Analyzer read secrets from stone"]
+	chapter.3B5374D34DFEC6AF.title: "Tracing Deep Veins"
+	chapter.4E10B8DB9F33643B.chapter_subtitle: ["Alone on a void island: few blocks underfoot, endless possibilities ahead."]
+	chapter.4E10B8DB9F33643B.title: "Industry from Zero"
+	chapter.7F7BFA5025452CE4.chapter_subtitle: ["Start MV: build a Distillation Tower and Vacuum Freezer, enter chemistry, etch CPU wafers, and make a CPU board."]
+	chapter.7F7BFA5025452CE4.title: "Chem and Circuits"
+	quest.0022A8ABF3D58C41.quest_desc: [
+		"The Calculation Processor is the compute core for higher-tier Craft CPUs. It moves autocrafting from sending requests toward handling longer execution queues."
+		""
+		"This step pulls from a higher chip route. Stabilize Logic Processors first, then add Calculation Processors as the upgrade part for autocrafting."
+	]
+	quest.0022A8ABF3D58C41.quest_subtitle: "Make a Calculation Processor"
+	quest.0022A8ABF3D58C41.title: "Queued Calculation"
+	quest.0046CC5063E9B6AD.quest_desc: [
+		"The Advanced ME Craft CPU provides stronger execution capacity for longer intermediate chains and heavier machine recipes."
+		""
+		"After rockets begin, material chains get wider and deeper. Upgrade autocrafting so large projects need fewer manual checklists and more repeatable production."
+	]
+	quest.0046CC5063E9B6AD.quest_subtitle: "Upgrade to an Advanced ME Craft CPU"
+	quest.0046CC5063E9B6AD.title: "Larger Craft Queue"
+	quest.006B90DE2FF0F2AA.quest_desc: [
+		"Bone Meal is the simplest accelerator for automated farming, while Fertilizer is the formal HV chemical supply for the farm. Tie the line together with carbonates, Ammonium Chloride, and Potassium Nitrate, and crop output no longer depends on hand stockpiles."
+		""
+		"This is not just a small farming task: steady crops feed back into Biomass, organic chemistry, and fuel routes. The bit of green inside a steel factory eventually becomes part of industrial throughput."
+	]
+	quest.006B90DE2FF0F2AA.quest_subtitle: "Prepare Bone Meal and Fertilizer in bulk"
+	quest.006B90DE2FF0F2AA.title: "Chemistry Feeds the Farm"
+	quest.009EA97084668EE0.quest_desc: [
+		"Your first electric blast furnace is the real ticket into LV. In this stage, its main job is simple: make steel."
+		""
+		"The process is straightforward. Put iron dust in the electric blast furnace, wait for it to heat, and collect steel ingots."
+		""
+		"Simple does not mean easy. Steel smelting is slow and uses a lot of power. Later furnace upgrades will help."
+		""
+		"The electric blast furnace can drain your grid fast. If power cannot keep up, steel output will collapse."
+		""
+		"Your best plan is to keep it running steadily."
+		""
+		"Expand steam, improve generation stability, and prepare for better energy. Stable steel makes every LV machine easier."
+		""
+		"When your first steel batch is done, your factory has entered the steel age. Make this furnace a production core."
+	]
+	quest.009EA97084668EE0.quest_subtitle: "Smelt steel"
+	quest.009EA97084668EE0.title: "Steel Eater"
+	quest.00CA4C06134B54A1.quest_desc: [
+		"Potassium Nitrate links the Nitric Acid route into potassium salts, forming the other key salt in the Fertilizer recipe. You already have the acid; now turn it into a solid feedstock that stores and mixes more easily."
+		""
+		"Its value is not one batch of output, but a steady agricultural supply from advanced chemistry. The larger your Automatic Farm grows, the more this nitrate branch deserves automation."
+	]
+	quest.00CA4C06134B54A1.quest_subtitle: "Prepare nitrate for Fertilizer"
+	quest.00CA4C06134B54A1.title: "White Crystals for Explosives"
+	quest.011CB57C780EE663.quest_desc: [
+		"The Advanced Electric Chest can carry heavier intermediates, components, and byproducts after HV."
+		""
+		"It will not replace a full ME network, but it keeps scattered lines from blocking before their materials enter digital storage."
+	]
+	quest.011CB57C780EE663.quest_subtitle: "Make an Advanced Electric Chest"
+	quest.011CB57C780EE663.title: "Large Item Buffer"
+	quest.01653617B5B3450E.quest_desc: [
+		"You are no longer a primitive worker using only your hands. To make industry run, learn to use tools and the Workbench."
+		""
+		"First, make a Workbench."
+		"It looks like an upgraded crafting table, but does more. Some recipes require specific tools and consume tool durability. Place tools in the tool slots below the Workbench to use them in crafting."
+		"Of course, for ordinary items it can also work like a vanilla crafting table."
+		""
+		"Next, make your first two tools:"
+		"Stone Hammer: crushes ores, a key early ore-processing tool."
+		"Flint Mortar: grinds some materials into dust, preparing later smelting steps."
+		""
+		"Tip:"
+		"If multiple tools are in the Workbench, some recipes may conflict and hide the result you want. Remove tools you do not need for now to craft smoothly."
+	]
+	quest.01653617B5B3450E.quest_subtitle: "Make a Workbench and first tools"
+	quest.01653617B5B3450E.title: "Hammering Begins"
+	quest.0238EE075A29E29D.quest_desc: [
+		"You may have found a few rubies in redstone veins. Now a second gem hides in deep graphite veins. Diamond is much rarer than ruby. For now, hammer diamond ore directly for the finished gem."
+		""
+		"Diamonds are not just pretty; they are valuable hard industrial materials. You only need two now: one for a lathe and one for a macerator. Put them to work, not on display."
+	]
+	quest.0238EE075A29E29D.quest_subtitle: "Get diamonds!"
+	quest.0238EE075A29E29D.title: "Shiny Industrial Wonder"
+	quest.029673365CED5C15.quest_desc: [
+		"SMD Resistors and SMD Transistors move circuit parts into denser manufacturing. They take less space than early parts, but will appear often in later HV circuits and precision machines."
+		""
+		"Start planning bulk SMD production now. At this point, the bottleneck is no longer just chips, but whether every small component can reach the assembly line steadily."
+	]
+	quest.029673365CED5C15.quest_subtitle: "Shrink circuits to surface-mount scale"
+	quest.029673365CED5C15.title: "Circuits at Fingertip Scale"
+	quest.02DDF396D6BCCE5E.quest_desc: ["Quartz Vein: Nether Quartz, Certus Quartz, Lapis Lazuli."]
+	quest.02DDF396D6BCCE5E.quest_subtitle: "Unlock Quartz"
+	quest.02DDF396D6BCCE5E.title: "Quartz Vein"
+	quest.02FC118547396204.quest_desc: [
+		"The IV Digital Interface keeps the same ME link moving through IV infrastructure instead of jumping straight from EV to LuV."
+		""
+		"Its recipe uses an IV Machine Hull, IV circuits, PICs, 1M ME Storage Components, and IV Cable, so it fits naturally after the first Digital Interface and IV foundation."
+	]
+	quest.02FC118547396204.quest_subtitle: "Bridge IV multiblocks into ME"
+	quest.02FC118547396204.title: "IV Digital Interface"
+	quest.02FC118547396205.quest_desc: [
+		"The Basic ME Craft CPU is the execution core that makes autocrafting actually run. Terminals submit requests, and the CPU follows patterns into target machines."
+		""
+		"Start with common small-batch recipes to prove the flow. Once stable, turn storage components, electronic parts, and machine hulls into repeatable automation."
+	]
+	quest.02FC118547396205.quest_subtitle: "Let ME execute recipes"
+	quest.02FC118547396205.title: "Basic Craft CPU"
+	quest.02FC118547396206.quest_desc: [
+		"The LuV Digital Interface advances the IV Digital Interface role into LuV structures, keeping higher-tier multiblocks connected to ME and automation."
+		""
+		"It uses a 4M ME Storage Component and LuV Moving Components, fitting after Digital Storage, workstations, and Assembly Line to avoid manual hauling."
+	]
+	quest.02FC118547396206.quest_subtitle: "Link LuV multiblocks to ME"
+	quest.02FC118547396206.title: "LuV Digital Interface"
+	quest.0366D252F6B6B37E.quest_desc: [
+		"The Chemical Reactor is the central chemical machine of MV. Cobblestone generation and ore processing gave you the first raw chemicals; the reactor turns those inputs into useful materials. Research chemical technology first so you can handle liquids, gases, and solids in sealed reactions."
+		""
+		"The reactor handles a huge number of recipes: basic acids, salts, organics, polymers, and alloy precursors all pass through it. After MV, chemistry becomes a constant need, and this machine is its hub. Build this alchemy pot to put your factory on the road to modern industry."
+	]
+	quest.0366D252F6B6B37E.quest_subtitle: "Craft MV Chemical Reactor"
+	quest.0366D252F6B6B37E.title: "Alchemy Pot"
+	quest.03C8552E1546FB6D.quest_desc: [
+		"Hydrogen is an important reducing agent in chemistry and is used often for MV oil processing. It has several sources, so choose what fits your factory:"
+		""
+		"The most common stable route is hydrogen byproduct from electrolyzing water or brine, a classic chlor-alkali byproduct. If your Electrolyzer runs well, that hydrogen will last a while."
+		""
+		"Bulk hydrogen production relies on methane and organic chemistry. Methane is not easy before oil refining, but once stable, it is excellent for mass hydrogen."
+		""
+		"There is also a niche inorganic route: mix iron dust with certain acidic fluids and you get the familiar bubbling reaction. Yes, that makes hydrogen too."
+		""
+		"Whichever route you pick, hydrogen is central to chemistry. From oil cracking to mineral processing, keep a stable hydrogen line for advanced MV manufacturing."
+	]
+	quest.03C8552E1546FB6D.quest_subtitle: "Get Hydrogen"
+	quest.03C8552E1546FB6D.title: "Lightest Gas"
+	quest.04F63737063FFA5E.quest_desc: [
+		"Before building the Electric Blast Furnace, you need tin. Even before LV, tin is required because the furnace materials need bronze, and bronze needs tin."
+		""
+		"To get tin, research and unlock the cassiterite vein. Afterward, tin ore and cassiterite appear in your cobblestone processing system. Process them like iron and copper: wash, grind, and smelt into tin ingots."
+		""
+		"For now tin mainly makes bronze, but in LV, tin cables become essential and your factory will consume a lot of tin."
+	]
+	quest.04F63737063FFA5E.quest_subtitle: "Extract tin and prepare for later"
+	quest.04F63737063FFA5E.title: "A Shiny New Friend"
+	quest.0540D3B8052B479D.quest_desc: [
+		"The Advanced Integrated Circuit is your first HV circuit board and the required part for upgrading the Circuit Assembler to MV. Each Circuit Assembler tier needs the next circuit board tier, so this one is unavoidable."
+		""
+		"Its recipe is integrated circuit nesting: use two Good Integrated Circuits as the body, then add integrated circuit chips, memory chips, and transistors for logic and storage. Electrum connects the modules. Together, these parts form your first smart core for HV."
+		""
+		"You may wonder why you need this so early in MV. It is required for the next two major MV structures: the Distillation Tower and the Vacuum Freezer. Make it to unlock the next stage of chemical industry."
+	]
+	quest.0540D3B8052B479D.quest_subtitle: "Craft Advanced IC"
+	quest.0540D3B8052B479D.title: "Circuit Nesting Evolves"
+	quest.05A550E7057E0001.quest_desc: [
+		"Tungsten Steel carried EV into spaceflight. Now it becomes the first frame for IV machines, where hulls and cables need steady supply."
+		""
+		"This stretch repeatedly consumes IV base parts. Make them repeatable before feeding Assembly Line and higher-component costs."
+	]
+	quest.05A550E7057E0001.quest_subtitle: "Stabilize IV hulls and cables"
+	quest.05A550E7057E0001.title: "IV Frame Takes Shape"
+	quest.05A550E7057E0005.quest_desc: [
+		"After the Tier 2 Rocket brings back End Stone, the EV Ore Analyzer can connect it to new vein work."
+		""
+		"This returns space resources to mineral processing. Ender Pearls and Platinum Metallic should come from planned analysis and processing."
+	]
+	quest.05A550E7057E0005.quest_subtitle: "Analyze End Stone with EV tools"
+	quest.05A550E7057E0005.title: "End Veins Rejoin"
+	quest.05A550E7057E0008.quest_desc: [
+		"Ender Pearls stop being rare drops. Ore processing turns them into the steady resource that post-IV recipes actually consume."
+		""
+		"This source supports control parts first, then Eyes of Ender and Quantum Eyes. Stabilize the vein route before Assembly Line prep piles up."
+	]
+	quest.05A550E7057E0008.quest_subtitle: "Pull Ender materials from the End vein"
+	quest.05A550E7057E0008.title: "Pearls Enter Processing"
+	quest.05A550E7057E000B.quest_desc: [
+		"Blaze materials are the other half of the Ender route, turning mob drops into manufacturable intermediates instead of manual refills."
+		""
+		"A small automatic supply keeps Eyes of Ender moving. When later powder routes scale up, this side line becomes a stability point."
+	]
+	quest.05A550E7057E000B.quest_subtitle: "Stabilize rods and powder"
+	quest.05A550E7057E000B.title: "Blaze Joins the Line"
+	quest.05A550E7057E000E.quest_desc: [
+		"Eye of Ender is no longer only an exploration item. It breaks into dust and ties pearls, Blaze materials, and gas prep into one route."
+		""
+		"This checks whether the inputs are linked. Quantum Eyes will magnify every small gap, and hand crafting will not keep up for long."
+	]
+	quest.05A550E7057E000E.quest_subtitle: "Feed pearls and blaze into chemistry"
+	quest.05A550E7057E000E.title: "Eye of Ender Industrialized"
+	quest.05A550E7057E0011.quest_desc: [
+		"The Eye of Ender route now needs more than mob-drop chemistry. Radon pulls it into isotope processing as the last special input before Quantum Eyes."
+		""
+		"Fill an Iron Fluid Cell to prove 4000 mB of Radon is reachable. Automate the gas line before quantum components start asking for it."
+	]
+	quest.05A550E7057E0011.quest_subtitle: "Feed Radon into the Ender route"
+	quest.05A550E7057E0011.title: "Isotope Feed"
+	quest.05A550E7057E0013.quest_desc: ["The first Quantum Eye turns Ender materials, Radon, and precision parts into a usable node. It opens the quantum circuit branch without blocking the first Assembly Line."]
+	quest.05A550E7057E0013.quest_subtitle: "Gather Ender, Radon, and precision parts"
+	quest.05A550E7057E0013.title: "Quantum Eye Formed"
+	quest.05A550E7057E0015.quest_desc: [
+		"Quantum Processors push electronics into higher-precision material organization, with Quantum Processor Assemblies continuing the same route later."
+		""
+		"Automate this branch early, but it is not required for the Assembly Line. Building the capability now lowers circuit pressure in LuV."
+	]
+	quest.05A550E7057E0015.quest_subtitle: "Shape the Quantum Processor route"
+	quest.05A550E7057E0015.title: "Quantum Logic Starts"
+	quest.05A550E7057E0018.quest_desc: [
+		"IV Sensors and Emitters bring Eyes of Ender into machine-control parts, with costs that stand out more than earlier tiers."
+		""
+		"They feed the Circuit Assembler and later precision equipment. Stabilize this pair before spending effort on extra hulls."
+	]
+	quest.05A550E7057E0018.quest_subtitle: "Stabilize Sensors and Emitters"
+	quest.05A550E7057E0018.title: "IV Control Pair"
+	quest.05A550E7057E001B.quest_desc: ["The IV Assembler combines higher-tier parts before the Assembly Line exists, giving later multiblock structures a reachable entry point."]
+	quest.05A550E7057E001B.quest_subtitle: "Give high-tier parts a workstation"
+	quest.05A550E7057E001B.title: "IV Assembly Entry"
+	quest.05A550E7057E001D.quest_desc: [
+		"The IV Circuit Assembler raises precision circuit work into this stage, leaning harder on Sensors, Emitters, and stable material supply than a normal Assembler."
+		""
+		"It is also a core ingredient for the first Assembly Line. Keeping this standalone recipe prevents Assembly Line construction from requiring itself."
+	]
+	quest.05A550E7057E001D.quest_subtitle: "Prepare the core machine for Assembly Line"
+	quest.05A550E7057E001D.title: "Circuit Assembly at IV"
+	quest.05A550E7057E001F.quest_desc: [
+		"The Assembly Line combines many item inputs, fluid inputs, and a long structure into one multiblock for higher machines."
+		""
+		"It needs the IV Assembler, IV Circuit Assembler, and many Assembler Machine Casings. The structure itself is part of the cost."
+		""
+		"After forming it, move into the LuV component routes that follow. Motors, Sensors, Emitters, and Robot Arms will make the new recipe type matter immediately."
+	]
+	quest.05A550E7057E001F.quest_subtitle: "Build controller and casings"
+	quest.05A550E7057E001F.title: "Assembly Line"
+	quest.05A550E7057E0022.quest_desc: ["Platinum Metallic from the End vein can yield early Platinum before full PGM separation. IV Sensors, Emitters, and wire already consume it, so stock some before the full route is done."]
+	quest.05A550E7057E0022.quest_subtitle: "Smelt usable Platinum early"
+	quest.05A550E7057E0022.title: "Platinum Lands First"
+	quest.05A550E7057E0024.quest_desc: ["Aqua Regia links HV Nitric Acid to Platinum Group Metal processing. It is not an Ender byproduct, but the reagent gate that starts full PGM separation."]
+	quest.05A550E7057E0024.quest_subtitle: "Feed Nitric Acid into PGM chemistry"
+	quest.05A550E7057E0024.title: "Aqua Regia Ignites"
+	quest.05A550E7057E0026.quest_desc: [
+		"Once Platinum Metallic enters Aqua Regia, Platinum Palladium Leachate becomes the first clear split in PGM separation."
+		""
+		"From here, Platinum, Palladium, Rhodium, and rarer metals stop being byproducts and become a staged industrial chain."
+	]
+	quest.05A550E7057E0026.quest_subtitle: "Dissolve Platinum Metallic"
+	quest.05A550E7057E0026.title: "First Leach Split"
+	quest.05A550E7057E0028.quest_desc: ["Palladium first leaves the leachate as usable dust, then feeds Rhodium Plated Palladium and LuV Sensor/Emitter foil. The steadier the ammonia branch, the easier those component costs become."]
+	quest.05A550E7057E0028.quest_subtitle: "Precipitate Palladium Dust"
+	quest.05A550E7057E0028.title: "Palladium Settles Out"
+	quest.05A550E7057E002A.quest_desc: [
+		"Rhodium Metallic Dust is not the endpoint. Split it into Raw Rhodium Dust and Rarest Metallic Dust so Rhodium, Ruthenium, Iridium, and Osmium can continue."
+		""
+		"This turns PGM work from one leaching step into real separation. LuV materials will pull on several branches at once."
+	]
+	quest.05A550E7057E002A.quest_subtitle: "Separate Raw Rhodium and Rarest Metallic Dust"
+	quest.05A550E7057E002A.title: "Rhodium Residue Splits"
+	quest.05A550E7057E002D.quest_desc: ["The Raw Rhodium branch separates Rhodium and Ruthenium: Rhodium feeds Rhodium Plated Palladium, while Ruthenium feeds Ruridit. LuV hull and motor materials both depend on it."]
+	quest.05A550E7057E002D.quest_subtitle: "Finish the Raw Rhodium branch"
+	quest.05A550E7057E002D.title: "Rhodium and Ruthenium Split"
+	quest.05A550E7057E0030.quest_desc: ["Rarest Metallic Dust narrows the PGM chain into Raw Iridium and Osmium Solution. Output is low here, but it controls Ruridit and later high-tier chemistry."]
+	quest.05A550E7057E0030.quest_subtitle: "Split Raw Iridium and Osmium Solution"
+	quest.05A550E7057E0030.title: "Rarest Branch Narrows"
+	quest.05A550E7057E0033.quest_desc: ["Iridium and Osmium prove the PGM separation route is running. Iridium goes straight into Ruridit, while Osmium leaves room for later high-tier materials."]
+	quest.05A550E7057E0033.quest_subtitle: "Obtain Iridium and Osmium Dust"
+	quest.05A550E7057E0033.title: "Rarest Branch Runs"
+	quest.05A550E7057E0036.quest_desc: ["Ruridit compresses Ruthenium and Iridium into the conductor for LuV components. Motor windings, Sensors, and Emitters will keep pulling on this PGM branch."]
+	quest.05A550E7057E0036.quest_subtitle: "Make the LuV motor conductor"
+	quest.05A550E7057E0036.title: "Ruridit Becomes Wire"
+	quest.05A550E7057E0038.quest_desc: [
+		"Raw Rhodium Plated Palladium forms in the IV Assembler, then becomes usable ingots through the Electric Blast Furnace and Vacuum Freezer."
+		""
+		"This staged route is the real material gate for LuV Machine Hulls, tying Palladium, Rhodium, and hot processing into one scaling bottleneck."
+	]
+	quest.05A550E7057E0038.quest_subtitle: "Turn the Palladium/Rhodium bottleneck into LuV hull material"
+	quest.05A550E7057E0038.title: "Rhodium Plated Palladium Ingots"
+	quest.05A550E7057E003B.quest_desc: ["HSS-G is more than another blast-furnace alloy. It carries late-EV mixing and smelting pressure into LuV motion parts, then disappears into motors, pumps, pistons, and Fusion Casings."]
+	quest.05A550E7057E003B.quest_subtitle: "Prepare HSS-G for LuV motion parts"
+	quest.05A550E7057E003B.title: "HSS-G Takes Load"
+	quest.05A550E7057E003D.quest_desc: ["Vanadium Gallium reopens the deferred IV Superconductor route. Coolant, Niobium Titanium pipes, and wiremaking meet here before Field Generators and Fusion prep."]
+	quest.05A550E7057E003D.quest_subtitle: "Prepare the IV Superconductor alloy"
+	quest.05A550E7057E003D.title: "Vanadium Gallium Restarts Superconductors"
+	quest.05A550E7057E003F.quest_desc: ["IV Superconductor Wire ties Vanadium Gallium wire, Niobium Titanium pipes, and Coolant back into advanced wiring. It is not the LuV hull gate, but it restores IV Field Generators."]
+	quest.05A550E7057E003F.quest_subtitle: "Bring advanced wire back into components"
+	quest.05A550E7057E003F.title: "IV Superconductor Returns"
+	quest.05A550E7057E0041.quest_desc: ["The IV Field Generator turns the superconductor branch into a usable control component. It prepares Fusion and later equipment without stepping in front of the main LuV component path."]
+	quest.05A550E7057E0041.quest_subtitle: "Turn the superconductor branch into Fusion prep"
+	quest.05A550E7057E0041.title: "IV Field Generator Returns"
+	quest.05A550E7057E0043.quest_desc: [
+		"Platinum cable brings the voltage tier to LuV, while Rhodium Plated Palladium hulls turn the PGM route into real machine structure. Together, they give the Assembly Line an entry to LuV components."
+		""
+		"This still does not open LuV single-block machines. It exposes the material gate before motors and reactor parts hide the shortage."
+	]
+	quest.05A550E7057E0043.quest_subtitle: "Join Platinum cable and Rhodium Plated Palladium hulls"
+	quest.05A550E7057E0043.title: "LuV Foundation Forms"
+	quest.05A550E7057E0046.quest_desc: ["The LuV Electric Motor pulls HSS-G, Ruridit wire, and LuV cable into Assembly Line crafting. Pumps, Pistons, Conveyors, and Robot Arms all inherit this material bottleneck."]
+	quest.05A550E7057E0046.quest_subtitle: "Start Assembly Line motion parts"
+	quest.05A550E7057E0046.title: "LuV Motor Turns"
+	quest.05A550E7057E0048.quest_desc: ["Electric Pumps, Electric Pistons, and Conveyor Modules share motor, HSS-G, and cable pressure. Automating them as a set fits LuV better than patching parts one at a time."]
+	quest.05A550E7057E0048.quest_subtitle: "Scale pumps, pistons, and conveyors together"
+	quest.05A550E7057E0048.title: "Motion Parts in Sets"
+	quest.05A550E7057E004C.quest_desc: ["LuV Sensors and Emitters put Palladium foil, Ruridit, Eye of Ender, and LuV-tier circuits into one Assembly Line recipe set. This checks precision material supply, not a new circuit node."]
+	quest.05A550E7057E004C.quest_subtitle: "Feed precision materials into LuV control parts"
+	quest.05A550E7057E004C.title: "Sensor and Emitter Upgrade"
+	quest.05A550E7057E004F.quest_desc: ["The LuV Robot Arm consumes motors, pistons, and mixed circuit tiers, turning the first LuV component chain into a reusable node. Larger Assembly Line goals will build on this base."]
+	quest.05A550E7057E004F.quest_subtitle: "Finish the component path with motors and pistons"
+	quest.05A550E7057E004F.title: "Robot Arm Closes the Chain"
+	quest.05A550E7057E0051.quest_desc: [
+		"Fusion Casing presses HSS-G, Rhodium Plated Palladium plates, and Ruridit foil into the first dedicated block for the reactor outer ring, shifting pressure from components to structure count."
+		""
+		"Visible positions can use Fusion Glass, but this quest only checks Fusion Casing. Stock the base shell now so the controller step is not short on blocks."
+	]
+	quest.05A550E7057E0051.quest_subtitle: "Press LuV materials into the reactor ring"
+	quest.05A550E7057E0051.title: "Fusion Shell Starts"
+	quest.05A550E7057E0053.quest_desc: [
+		"The Superconducting Coil combines IV Superconductor Wire, Ruridit foil, and Rhodium Plated Palladium plates in one block. It is not a furnace coil, but an active Fusion Reactor middle-ring part."
+		""
+		"Prepare it beside Fusion Casing and Fusion Glass. Stabilize IV Superconductor Wire and Ruridit first, and reactor construction will not send you back for more wire."
+	]
+	quest.05A550E7057E0053.quest_subtitle: "Bring IV Superconductor Wire into Fusion"
+	quest.05A550E7057E0053.title: "Coils Line the Channel"
+	quest.05A550E7057E0055.quest_desc: [
+		"The Fusion Reactor controller brings Fusion Casing, Superconducting Coil, IV Field Generator, and LuV Robot Arm work together at the end of the Assembly Line. It is the real build endpoint for this stage, not another LuV single-block machine."
+		""
+		"For now, build the reactor frame and control core. Fusion fuel, actual operation, and the later ZPM bridge will continue in the routes ahead."
+	]
+	quest.05A550E7057E0055.quest_subtitle: "Build the first controller"
+	quest.05A550E7057E0055.title: "Fusion Reactor"
+	quest.05A550E7057E0057.quest_desc: [
+		"The LuV Transformer bridges your old grid to the new voltage, while the LuV Electric Buffer gives this subnet a steadier access point. After the cable exists, the power structure needs to catch up."
+		""
+		"This only completes the LuV power backbone; it does not mean LuV single-block machines are open. Later equipment will have somewhere reliable to connect."
+	]
+	quest.05A550E7057E0057.quest_subtitle: "Connect the LuV Transformer and Electric Buffer"
+	quest.05A550E7057E0057.title: "LuV Grid Backbone"
+	quest.062113D36F9444CD.quest_desc: [
+		"Everything you have done, from smelting Monocrystalline Silicon to etching wafers and cutting chips, leads here: your first Integrated Logic Circuit."
+		""
+		"The process is not simple:"
+		"Solder two Electronic Circuit boards together, then add Red Alloy and silver wires for the base."
+		"Insert the IC chip you etched yourself."
+		"Finally solder on resistors, diodes, copper wires, and tin bolts to connect everything."
+		""
+		"This board is still LV and may not seem cheaper than Electronic Circuits while vacuum tubes are plentiful and silicon is slow. Its real value is upgrade potential. Circuit boards nest into higher tiers, but Electronic Circuits only reach MV. Integrated circuits start at LV and can be combined up to HV. Small, efficient boards are the future, and this is your entry point."
+	]
+	quest.062113D36F9444CD.quest_subtitle: "Make an Integrated Logic Circuit; enter chip era"
+	quest.062113D36F9444CD.title: "Tiny Board, Big Aim"
+	quest.0623B327BA00512F.quest_desc: [
+		"Polyethylene is one of the most important and common materials after MV. Machine casings, components, circuit boards, molten plastic, and plastic sheets will all keep it in your storage."
+		""
+		"Making it is simple: put ethylene in a reaction environment with oxygen as an initiator. The ethylene molecules link into long chains and form Polyethylene. This first polymer marks the shift from raw chemistry to material manufacturing."
+	]
+	quest.0623B327BA00512F.quest_subtitle: "Make PE"
+	quest.0623B327BA00512F.title: "Plastic Age Begins"
+	quest.06FE000000000000.quest_desc: [
+		"Once the Fusion Reactor is built, the End Stone Naquadah vein stops being a rare sample and becomes the start of the high-heat material line."
+		""
+		"That line feeds coils, wafers, fuel, Naquadria, and Trinium, so most branches in this chapter depend on it staying stable."
+	]
+	quest.06FE000000000000.quest_subtitle: "Route End Stone ore into post-Fusion processing"
+	quest.06FE000000000000.title: "Naquadah Joins the Main Line"
+	quest.06FE000000000001.quest_desc: ["Naquadah Coils raise the Electric Blast Furnace into a new heat tier, freeing later high-temperature materials from the Tungsten Coil ceiling."]
+	quest.06FE000000000001.quest_subtitle: "Push the EBF to 5400 K"
+	quest.06FE000000000001.title: "Past Tungsten Coils"
+	quest.06FE000000000002.quest_desc: ["The Naquadah boule moves this resource line into wafer production, preparing stronger substrates for SOC, PIC, and finer lithography."]
+	quest.06FE000000000002.quest_subtitle: "Cut raw Naquadah wafers"
+	quest.06FE000000000002.title: "Naquadah Enters Wafers"
+	quest.06FE000000000003.quest_desc: [
+		"Activated Naquadah plasma marks the point where Naquadah refinement truly consumes Fusion output instead of just raising furnace heat."
+		""
+		"It splits into Enriched Naquadah, Naquadria, and residue branches, opening fuel, pre-ZPM material, and Trinium recovery paths at once."
+	]
+	quest.06FE000000000003.quest_subtitle: "Split Naquadah into high-energy branches"
+	quest.06FE000000000003.title: "Fusion Ignites Naquadah"
+	quest.06FE000000000004.quest_desc: ["Enriched Naquadah is not just a refinement branch. It becomes passive reactor fuel rods and feeds power back into the Fusion-era material line."]
+	quest.06FE000000000004.quest_subtitle: "Let Enriched Naquadah support power"
+	quest.06FE000000000004.title: "Fuel from Refinement"
+	quest.06FE000000000005.quest_desc: ["Naquadria stabilizes one of Activated Naquadah's harsher branches into a solid material, keeping a scalable high-energy path ready for later ZPM-tier use."]
+	quest.06FE000000000005.quest_subtitle: "Turn the high-energy branch into material"
+	quest.06FE000000000005.title: "Stabilize Naquadria"
+	quest.06FE000000000006.quest_desc: ["Trinium turns Naquadah residue from a cleanup problem into a bridge-metal source for Crystal chips and pre-ZPM alloys."]
+	quest.06FE000000000006.quest_subtitle: "Turn Naquadah tailings into a bridge metal"
+	quest.06FE000000000006.title: "Trinium from Residue"
+	quest.06FE000000000007.quest_desc: [
+		"Advanced Nether Chemistry turns Ancient Debris and Netherite Scrap from lucky finds into planned high-tier material inputs."
+		""
+		"This supports Fusion-era synthesis, not a shortcut around earlier Nether exploration."
+	]
+	quest.06FE000000000007.quest_subtitle: "Make Ancient Debris a planned source"
+	quest.06FE000000000007.title: "Industrial Nether Materials"
+	quest.06FE000000000008.quest_desc: ["Netherite moves beyond the vanilla scrap recipe here, becoming a heat-resistant material supported by Fusion and Nether chemistry."]
+	quest.06FE000000000008.quest_subtitle: "Let Fusion carry the heat metal"
+	quest.06FE000000000008.title: "Recast Netherite"
+	quest.06FE000000000009.quest_desc: ["Wither Matrix condenses Nether materials, Radon, and high-tier chemistry into the fluid core that starts synthetic Nether Star production."]
+	quest.06FE000000000009.quest_subtitle: "Condense Nether chemistry into a fluid core"
+	quest.06FE000000000009.title: "Wither Matrix Takes Shape"
+	quest.06FE00000000000A.quest_desc: ["The Nether Star seed turns Wither Matrix and Enriched Naquadah into a reproducible star source, moving a rare drop into industry."]
+	quest.06FE00000000000A.quest_subtitle: "Converge matrix and Enriched Naquadah"
+	quest.06FE00000000000A.title: "Grow the Nether Star"
+	quest.06FE00000000000B.quest_desc: ["Quantum Star brings synthetic Nether Stars into stronger wafer engraving, making electronics consume the Nether chemistry branch."]
+	quest.06FE00000000000B.quest_subtitle: "Put Quantum Star into stronger engraving"
+	quest.06FE00000000000B.title: "Starlight for Lithography"
+	quest.06FE00000000000C.quest_desc: ["Advanced SMD parts pull LuV materials, fine Naquadah wire, and new dopants into circuit assembly before Crystal circuits multiply the demand."]
+	quest.06FE00000000000C.quest_subtitle: "Bring all five Advanced SMD parts into scale"
+	quest.06FE00000000000C.title: "SMD Before Crystal"
+	quest.06FE00000000000D.quest_desc: [
+		"Naquadah wafers and Quantum Star push SOC, PIC, and Advanced SOC routes into a stronger lithography step."
+		""
+		"This checks wafer supply and engraving capacity, not a one-off extra chip."
+	]
+	quest.06FE00000000000D.quest_subtitle: "Use Naquadah substrates for SOC/PIC upgrades"
+	quest.06FE00000000000D.title: "Wafer Process Moves On"
+	quest.06FE00000000000E.quest_desc: ["Raw Crystal Chip production pulls Trinium and Wither Matrix into crystal growth, giving Crystal CPUs their first workable chip blank."]
+	quest.06FE00000000000E.quest_subtitle: "Grow chips from Trinium and Wither Matrix"
+	quest.06FE00000000000E.title: "Crystal Chip Blank"
+	quest.06FE00000000000F.quest_desc: ["The Crystal CPU joins the new chip blank with upgraded lithography, starting the move into Crystal Processor circuits."]
+	quest.06FE00000000000F.quest_subtitle: "Build the first Crystal CPU"
+	quest.06FE00000000000F.title: "Light the Crystal Core"
+	quest.06FE000000000010.quest_desc: ["Crystal Processor is the first deliverable Crystal circuit here, proving chip work, Advanced SMD, and clean processing form a stable assembly chain."]
+	quest.06FE000000000010.quest_subtitle: "Join CPU, Advanced SMD, and clean processing"
+	quest.06FE000000000010.title: "Crystal Circuits Land"
+	quest.06FE000000000011.quest_desc: ["Crystal Processor Assembly is the circuit endpoint this bridge can deliver; Crystal Computer and Mainframe remain future ZPM work."]
+	quest.06FE000000000011.quest_subtitle: "Reach this chapter's circuit endpoint"
+	quest.06FE000000000011.title: "Crystal Assembly Capstone"
+	quest.06FE000000000012.quest_desc: [
+		"Advanced Hydrometallurgy brings old sulfide ore streams back into late material loops by extracting Indium Concentrate from Sphalerite and Galena."
+		""
+		"That spreads the pressure behind Advanced SMD Diodes instead of leaving Indium on one isolated source."
+	]
+	quest.06FE000000000012.quest_subtitle: "Concentrate Indium from Sphalerite and Galena"
+	quest.06FE000000000012.title: "Sulfides Return"
+	quest.06FE000000000013.quest_desc: ["Heavy Rare Earth Solution extends the EV rare earth split and uses LuV-grade heat processing to add the Samarium branch for later materials."]
+	quest.06FE000000000013.quest_subtitle: "Produce Samarium from Heavy Rare Earth Solution"
+	quest.06FE000000000013.title: "Rare Earths Go Deeper"
+	quest.06FE000000000014.quest_desc: ["Yttrium comes from downstream heavy rare earth separation and, with Barium, determines whether Yttrium Barium Cuprate can feed LuV Superconductor wire."]
+	quest.06FE000000000014.quest_subtitle: "Recover half of the superconductor precursor"
+	quest.06FE000000000014.title: "Yttrium Separates Out"
+	quest.06FE000000000015.quest_desc: ["Barium brings saved Lithium Brine back into Advanced Hydrometallurgy, completing the other half of the Yttrium Barium Cuprate precursor."]
+	quest.06FE000000000015.quest_subtitle: "Return Lithium Brine to late metallurgy"
+	quest.06FE000000000015.title: "Barium Brings Brine Back"
+	quest.06FE000000000016.quest_desc: ["Yttrium Barium Cuprate combines Yttrium, Barium, Copper, and Oxygen into a wire-ready superconductor precursor before LuV Superconductor proper."]
+	quest.06FE000000000016.quest_subtitle: "Join Yttrium and Barium as Yttrium Barium Cuprate"
+	quest.06FE000000000016.title: "Precursor into Wire"
+	quest.06FE000000000017.quest_desc: ["Liquid Nitrogen checks the Vacuum Freezer and cryogenic fluid handling so LuV Superconductor wire does not stall on coolant supply."]
+	quest.06FE000000000017.quest_subtitle: "Use Liquid Nitrogen for superconductor wire"
+	quest.06FE000000000017.title: "Cryogenics Ready"
+	quest.06FE000000000018.quest_desc: ["HSS-S brings Netherite into the LuV structural layer, while Osmiridium and Naquadah Alloy keep pulling platinum-group metals and Naquadah. Together they form the pre-ZPM alloy base."]
+	quest.06FE000000000018.quest_subtitle: "Join HSS-S, Osmiridium, and Naquadah Alloy"
+	quest.06FE000000000018.title: "Pre-ZPM Alloys Converge"
+	quest.06FE000000000019.quest_desc: [
+		"LuV Superconductor turns Yttrium Barium Cuprate, Liquid Nitrogen, and the pre-ZPM alloy layer into a new high-tier wire for later ZPM infrastructure."
+		""
+		"ZPM cable, ZPM Power Block, Digital Interface, Wetware, and Neutronium remain outside this chapter's quest surface."
+	]
+	quest.06FE000000000019.quest_subtitle: "Finish this chapter's material endpoint"
+	quest.06FE000000000019.title: "LuV Superconductor Closes the Bridge"
+	quest.070F82ED30238005.quest_desc: [
+		"Upgrade your ore processing system. Replace the Primitive Ore Analyzer and Primitive Ore Washer with ULV versions for better efficiency and extra resources."
+		""
+		"The ULV Ore Analyzer can find more ore types, no longer limited to Pyrite and Chalcopyrite. To unlock new ore types, you still need to research related technologies in the Technology Screen."
+		"For example, Cobblestone Minerals lets you extract Limonite veins from cobblestone."
+		""
+		"The ULV Ore Washer can produce byproducts while washing target ores. These byproducts are the main source of many rare materials in Tinactory."
+	]
+	quest.070F82ED30238005.quest_subtitle: "Upgrade ore processing"
+	quest.070F82ED30238005.title: "Ore Processing 2.0"
+	quest.07515AD71E8B26EF.quest_desc: [
+		"Cracking is the most complex step in refining. Build an Oil Cracker with HV Circuit Boards and HV components as its core, plus Clean Stainless Steel Machine Casings and Heating Coils for the shell. If you built a Distillation Tower, this is expensive but manageable."
+		""
+		"There are two cracking methods. Hydrocracking converts heavy fractions into lighter ones for flexible refining. Steam cracking produces more useful organics and feeds many organic materials. Pick the route your factory needs."
+	]
+	quest.07515AD71E8B26EF.quest_subtitle: "Build an Oil Cracker for hydrocracking or steam cracking"
+	quest.07515AD71E8B26EF.title: "Refining Plus"
+	quest.079709D94E4A69A5.quest_desc: [
+		"If your cobblestone generator now produces deepslate, upgrade your analysis tool with an LV ore analyzer."
+		""
+		"This upgraded ULV ore analyzer can identify new vein data hidden in deepslate."
+		""
+		"To craft it, you need the LV sensor you made earlier."
+		""
+		"To get deepslate veins, unlock LV research and complete the needed technologies."
+	]
+	quest.079709D94E4A69A5.quest_subtitle: "Make an LV ore analyzer"
+	quest.079709D94E4A69A5.title: "See Deeper, Dig Farther"
+	quest.09CB7C63AE45690A.quest_desc: [
+		"Tungsten Steel folds Tungsten heat resistance into a structural steel base, becoming the hard material IV components start demanding by name."
+		""
+		"From now on, Titanium or Stainless Steel will not satisfy every part. Make Tungsten Steel repeatable so later motors, pumps, and casings have a frame to stand on."
+	]
+	quest.09CB7C63AE45690A.quest_subtitle: "Give IV components a stronger alloy"
+	quest.09CB7C63AE45690A.title: "Tungsten Steel Load"
+	quest.0A1EE54892C444A8.quest_desc: [
+		"You are well into LV. To advance, reach more resources, and prepare for MV, you must start LV research."
+		""
+		"First craft a new research platform: the LV Research Bench. It replaces your ULV bench for more advanced projects, and its recipe uses the sensor and emitter you already made."
+		""
+		"Next, make research equipment modules in the LV Assembler. These are much more complex than ULV ones: they need LV electric motors and steel gears. Research is about to consume many parts."
+		""
+		"Your key research goal now is unlocking deepslate veins, such as gold, sphalerite, aluminum, and diamond. You need these resources to prepare for MV."
+		""
+		"Tip: higher tier research equipment can replace LV versions, but it is very expensive. Check voltage requirements in JEI before spending materials."
+	]
+	quest.0A1EE54892C444A8.quest_subtitle: "Unlock LV research"
+	quest.0A1EE54892C444A8.title: "LV Research"
+	quest.0AF62D2439E67CD1.quest_desc: [
+		"Gelled Toluene brings Nitric Acid, Sulfuric Acid, and Toluene into one dangerous organic chemistry line. Refinery aromatics become an explosive intermediate late HV will seriously consume."
+		""
+		"Tie this step into stable acid and Toluene supply. What comes next is repeatable industrial TNT production, not a few temporary blasting blocks."
+	]
+	quest.0AF62D2439E67CD1.quest_subtitle: "Use Gelled Toluene for the explosive route"
+	quest.0AF62D2439E67CD1.title: "Aromatics Toward Explosives"
+	quest.0B17D0A26F286ACA.quest_desc: ["LPG provides fuel, and Liquid Oxygen provides the oxidizer. Once these short routes combine into Rocket Fuel, Rocket T2 propulsion leaves the old diesel era behind."]
+	quest.0B17D0A26F286ACA.quest_subtitle: "Merge LPG and Liquid Oxygen into Rocket Fuel"
+	quest.0B17D0A26F286ACA.title: "Propellant Converges"
+	quest.0B73A7F9E0645551.quest_desc: [
+		"You are about to enter the Ultra Low Voltage (ULV) stage, an important transition before electrification. Many materials still depend on your wrought iron tools here."
+		""
+		"In Tinactory, each voltage tier needs three core component types: Machine Hulls, cables, and circuits. The materials differ by voltage, but their roles are similar."
+		""
+		"ULV Machine Hulls and cables both use iron processing. They form the first structure of your electric machines. ULV circuits rely on Vacuum Tubes for control for now."
+		""
+		"As tech improves, Vacuum Tubes will be replaced by better circuits. For now, they open the electric industrial age."
+	]
+	quest.0B73A7F9E0645551.quest_subtitle: "Make ULV Machine Hulls, cables, and Vacuum Tubes"
+	quest.0B73A7F9E0645551.title: "Basic ULV Components"
+	quest.0D368F1749A47D33.quest_desc: ["The Diamond Lens is the key tool for advanced chipmaking and is used in the Laser Engraver for CPU wafers. The process is familiar: sort a flawless gem, craft an exquisite gem, then polish it on the Lathe. Diamond handles the stronger laser needed for precise CPU etching. Make one; it is not consumed."]
+	quest.0D368F1749A47D33.quest_subtitle: "Make a Diamond Lens for CPU etching"
+	quest.0D368F1749A47D33.title: "Light Through the Hardest Gem"
+	quest.0D522F211E92F89B.quest_desc: [
+		"PTFE matters because it is inert. When ordinary materials fail under acids, solvents, and high-temperature processes, it can still stay where it belongs."
+		""
+		"Sheets enter the Large Chemical Reactor structure, while pipes prepare the IV Electric Pump route. Make PTFE a stable material, not a one-off craft for this quest."
+	]
+	quest.0D522F211E92F89B.quest_subtitle: "Make sheets and pipes for harsher reactions"
+	quest.0D522F211E92F89B.title: "PTFE Lining"
+	quest.0D7A901319FE3E62.quest_desc: [
+		"With IV Electric Motor ready, install the drive core into an Electric Pump. PTFE pipes, Titanium parts, and EV Assembler capability are all checked by this recipe."
+		""
+		"Rocket T2 needs four IV Electric Pumps, so this is not a one-off display item. Make these IV components repeatable early so rocket assembly does not stall on the final component slots."
+	]
+	quest.0D7A901319FE3E62.quest_subtitle: "The fluid component Rocket T2 demands"
+	quest.0D7A901319FE3E62.title: "Pump Into IV"
+	quest.0DFE5BEF57423538.quest_desc: [
+		"Nano CPU Chips and NOR Chips push earlier CPU work to a finer scale. The HV Laser Engraver and Cleanroom together check precision, power, and clean processing."
+		""
+		"One chip carries computation, the other logic and storage structure. With both ready, the Nanoprocessor finally has its core chips."
+	]
+	quest.0DFE5BEF57423538.quest_subtitle: "Shape Nano CPU and NOR Chips"
+	quest.0DFE5BEF57423538.title: "Etch the Nano Core"
+	quest.0E15D0E25A9B4C10.quest_desc: [
+		"The End vein yields Platinum Metallic and some Ender Pearl ore, linking spaceflight End Stone back to ore processing."
+		""
+		"This vein is not only for pearls. Platinum and Ender materials both support post-IV components and Assembly Line preparation."
+	]
+	quest.0E15D0E25A9B4C10.quest_subtitle: "Analyze End Stone"
+	quest.0E15D0E25A9B4C10.title: "End Vein"
+	quest.0F25091FBD0AB840.quest_desc: [
+		"Your next target is zinc. You need it for brass, which leads to LV research."
+		""
+		"You cannot get zinc ore directly yet. Sphalerite needs LV research, so for now get zinc indirectly by thermally centrifuging Chalcopyrite ore. It is inefficient, but once LV research is online you can research Sphalerite and get zinc in bulk."
+	]
+	quest.0F25091FBD0AB840.quest_subtitle: "Get zinc for brass"
+	quest.0F25091FBD0AB840.title: "Zinc Glint"
+	quest.0F38B05E2E11756A.quest_desc: [
+		"Epoxy brings Epichlorohydrin, Phenol, Acetone, and sodium hydroxide into one LCR recipe, making it a tougher EV polymer gate."
+		""
+		"Molten Epoxy fits fluid handling, while Epoxy Sheet brings the material back to normal assembly lines."
+		""
+		"Later Carbon Fiber composites consume this capacity directly. Do not stop at quest amounts; start planning continuous production here."
+	]
+	quest.0F38B05E2E11756A.quest_subtitle: "Press two organic routes into structure"
+	quest.0F38B05E2E11756A.title: "Epoxy"
+	quest.0F875BA74B75405A.quest_desc: [
+		"The Netherrack Lava Ore vein is more than a heat source. Recover Magma Blocks from the vein route, then centrifuge them into Lava that can be packaged, moved, and measured."
+		""
+		"A full Iron Fluid Cell proves the Lava route is connected. From here, Lava can feed Steam support, Obsidian production, and later high-temperature processing without manual bucket transfers."
+	]
+	quest.0F875BA74B75405A.quest_subtitle: "Centrifuge Magma Blocks into packageable fluid"
+	quest.0F875BA74B75405A.title: "Lava on the Line"
+	quest.108DE34B8777351F.quest_desc: [
+		"The Arc Furnace turns high current directly into metallurgical heat, giving minerals, alloys, and recovery routes cleaner processing. It is not just a faster furnace, but the start of HV material cycling."
+		""
+		"Once this machine is built, many later metal processes gain a steadier entry point. For a factory preparing for Titanium and Advanced Alloy, it is worth placing early."
+	]
+	quest.108DE34B8777351F.quest_subtitle: "Use arcs to organize metal loops"
+	quest.108DE34B8777351F.title: "Arc-Forged Metallurgy"
+	quest.10B51F73A765F922.quest_desc: [
+		"You have made cables for a long time, from early copper wire to hand-cut tin wire and LV cables. It is time to retire the wire cutters."
+		""
+		"Now build a tool that truly saves material: the LV Wiremill. Its main advantage is high efficiency with no material waste."
+		""
+		"It needs LV power, but compared with the materials it saves, the power cost is tiny."
+	]
+	quest.10B51F73A765F922.quest_subtitle: "Make a LV Wiremill"
+	quest.10B51F73A765F922.title: "Use a Wiremill"
+	quest.11E5FCB1DF1477FD.quest_desc: [
+		"Wood no longer fits your industrial ambition. Time to summon sturdier cobblestone from the void."
+		""
+		"Build a Primitive Cobblestone Generator. It needs no complex power, just some wood and wit, and it can squeeze cobblestone from the void."
+	]
+	quest.11E5FCB1DF1477FD.quest_subtitle: "Make a Primitive Cobblestone Generator"
+	quest.11E5FCB1DF1477FD.title: "Stone from the Void"
+	quest.1213D571D21C3386.quest_desc: [
+		"The Combustion Generator uses more traditional liquid fuels, making it a natural outlet for Diesel and other refining products."
+		""
+		"Its value is stability and easy expansion: if the fuel line keeps flowing, the grid has a steady generation backbone."
+	]
+	quest.1213D571D21C3386.quest_subtitle: "Turn liquid fuel into power"
+	quest.1213D571D21C3386.title: "Combustion Generator"
+	quest.12D6316F28C15A03.quest_desc: [
+		"Epichlorohydrin comes from another post-LCR chemical chain. It does not depend on Phenol or Acetone, but meets them at the Epoxy stage."
+		""
+		"Reserve stable Propylene, Chlorine, and Sodium Hydroxide early, and the Epoxy route will not stall on a single reagent."
+	]
+	quest.12D6316F28C15A03.quest_subtitle: "Feed Epichlorohydrin into the resin route"
+	quest.12D6316F28C15A03.title: "Epoxy's Other Half"
+	quest.1378262C4553AE71.quest_desc: [
+		"The Advanced Electric Tank gives fuels, acids, and coolant loops a wider buffer."
+		""
+		"When a line starts moving fluids continuously, capacity becomes reliability. Put fragile fluids into large buffers before adding heavier control."
+	]
+	quest.1378262C4553AE71.quest_subtitle: "Make an Advanced Electric Tank"
+	quest.1378262C4553AE71.title: "Large Fluid Buffer"
+	quest.13E4096767FAA495.quest_desc: [
+		"Desulfurization is a key refining step. React hydrogen with four oil fractions to remove sulfur impurities. The cleaned products are more stable and easier to process before deeper distillation or cracking. Hydrogen is nearly the universal reducing agent here, which is why you needed it early."
+		""
+		"After desulfurization, some oil fractions can be distilled into organic materials. For more and better organics, you need the top end of refining: cracking."
+	]
+	quest.13E4096767FAA495.quest_subtitle: "Hydrogen-clean 4 sulfur oils"
+	quest.13E4096767FAA495.title: "Smells Like a Chemical Spill"
+	quest.15A12C982E065F64.quest_desc: [
+		"Rocket T2 is the EV chapter's full acceptance test: post-Rocket T1 resources, LCR polymers, entry IV components, fuel routing, and logistics storage all converge here."
+		""
+		"Carbon Plates put Epoxy and Carbon Fiber routes into the structure. IV Electric Pump and IV-tier circuits handle propulsion control and fluids, while Advanced Alloy from HV still carries aerospace stress."
+		""
+		"Do not treat 1M ME Storage Component as side decoration. It comes from the Logistics chapter, but here it reminds you that the next stage of spaceflight already needs materials, data, and automation together."
+	]
+	quest.15A12C982E065F64.quest_subtitle: "Push EV industry into its second launch"
+	quest.15A12C982E065F64.title: "Rocket T2"
+	quest.15B3A44782A386D6.quest_desc: [
+		"If your factory needs a little green among the steel and chemistry, build an Automatic Farm. Feed it seeds and the multiblock handles tilling, planting, and harvesting, producing crops without manual hoe work."
+		""
+		"Unlike manual farming, the Automatic Farm constantly consumes fertilizer. Use Biomass, bone meal, or proper fertilizer to keep it efficient. It was craftable in LV, but MV chemistry finally makes fertilizer production practical."
+		""
+		"This machine automates crops and supplies stable feedstock for Biomass, organic chemistry, and green energy."
+	]
+	quest.15B3A44782A386D6.quest_subtitle: "Build an Automatic Farm for crops"
+	quest.15B3A44782A386D6.title: "Green Magic"
+	quest.16072DE55220A84E.quest_desc: [
+		"MV research is no longer casual. Its device cost reflects your real industrial level. Start with an MV Electric Pump, the upgraded motor component. The bigger test is the Plastic Circuit Board."
+		""
+		"The Plastic Circuit Board checks your whole chemistry chain. You need steady Polyethylene or Polyvinyl Chloride for the base, plus Diluted Sulfuric Acid and Iron Chloride for etching traces. Plastic synthesis, acid production, and salt handling must all work."
+		""
+		"Once MV research devices are built and MV research begins, the tech tree clearly pushes toward HV. Your factory is now a mid-sized technology center combining materials, chemistry, and electronics."
+	]
+	quest.16072DE55220A84E.quest_subtitle: "Make MV research gear; unlock MV research"
+	quest.16072DE55220A84E.title: "Research Checks Your Chemistry"
+	quest.16BF47CD29F96F57.quest_desc: [
+		"To truly run your factory, you need your own power source. Now make a Small Steam Boiler and ULV Steam Turbine to start your first power line."
+		""
+		"Put fuel and water into the Steam Boiler, and it will heat up and make steam. The boiler has a temperature; if it gets too hot, it cannot keep making steam, so keep adding water to maintain a proper temperature."
+		""
+		"Feed boiler steam into the ULV Steam Turbine, and it will run and output power."
+		"Move steam two ways:"
+		"Make an Iron Fluid Cell and manually scoop and pour steam."
+		"Use a Logistic Worker for automated steam transfer, explained in another quest."
+		""
+	]
+	quest.16BF47CD29F96F57.quest_subtitle: "Power with steam machines"
+	quest.16BF47CD29F96F57.title: "Steam Power"
+	quest.171F9ECD8216165F.quest_desc: [
+		"HV Research Equipment compresses this tier's materials, logistics, and assembly ability into one consumable. Advanced Alloy, HV parts, and stable production need to be ready first."
+		""
+		"From here, research is not just handing in materials for recipes; it accepts your HV manufacturing base. Prepare it so later technology can keep moving toward the rocket goal."
+	]
+	quest.171F9ECD8216165F.quest_subtitle: "Prove the HV base with Research Equipment"
+	quest.171F9ECD8216165F.title: "Research Checks HV"
+	quest.180A7F8DD9AD0580.quest_desc: [
+		"Coolant moves power generation from simple burning into heat transport. A full Hot Coolant cell shows fluid handling is serving more complex energy machines."
+		""
+		"This loop will carry safety and efficiency pressure in high-heat machines like Nuclear Reactors, and should not rely on manual filling."
+	]
+	quest.180A7F8DD9AD0580.quest_subtitle: "Prepare Hot Coolant"
+	quest.180A7F8DD9AD0580.title: "Coolant Loop"
+	quest.182DCD33318D27DF.quest_desc: [
+		"Netherrack gold veins do more than refill gold. Topaz and Blue Topaz bring fluorine into your chemical system, making the next Hydrogen Fluoride and PTFE route visible."
+		""
+		"First make both topaz dusts part of stable processing, then connect the acid route. EV corrosion-resistant materials begin with this gem line that looks minor at first."
+	]
+	quest.182DCD33318D27DF.quest_subtitle: "Pull fluorine chemistry from Netherrack gold veins"
+	quest.182DCD33318D27DF.title: "Topaz Dust Line"
+	quest.1839DA1403560DB3.quest_desc: ["Send Ethane and Propane through the mixing route to package LPG. It reuses your refining and light hydrocarbon base, with no LCR required, and prepares the fuel side for Rocket T2."]
+	quest.1839DA1403560DB3.quest_subtitle: "Turn refining into Rocket T2 fuel supply"
+	quest.1839DA1403560DB3.title: "Light Hydrocarbons Tanked"
+	quest.18A01183DF6A59D1.quest_desc: ["EV Superconductor Wire connects Niobium Titanium, PTFE pipe, and Coolant. It is the easy-to-miss support material before EV Field Generators."]
+	quest.18A01183DF6A59D1.quest_subtitle: "Bring Coolant into superconductors"
+	quest.18A01183DF6A59D1.title: "EV Superconductor"
+	quest.18A01183DF6A59D3.quest_desc: ["The Nuclear Reactor needs an EV Field Generator. Calling out the superconductor and generator first makes the power chapter's material gate clearer."]
+	quest.18A01183DF6A59D3.quest_subtitle: "Fill the Nuclear Reactor prerequisite"
+	quest.18A01183DF6A59D3.title: "EV Field Generator"
+	quest.18A01183DF6A59D5.quest_desc: [
+		"Energy Crystal compresses Energy Dust into the first advanced battery material after Power Substation."
+		""
+		"Stabilize it first, so the later Lapotron route does not stall at dusts."
+	]
+	quest.18A01183DF6A59D5.quest_subtitle: "After Power Substation"
+	quest.18A01183DF6A59D5.title: "Energy Crystal"
+	quest.18A01183DF6A59D7.quest_desc: [
+		"Lapotron Crystal follows Energy Crystal, pushing Energy Dust into recrystallized Lapotron Dust."
+		""
+		"It becomes the main IV battery-material gate; manual dust and Salt Water processing will bottleneck later power blocks."
+	]
+	quest.18A01183DF6A59D7.quest_subtitle: "Raise the Energy Dust route"
+	quest.18A01183DF6A59D7.title: "Lapotron Crystal"
+	quest.18A01183DF6A59D9.quest_desc: [
+		"Lapotronic Energy Orb combines Lapotron Crystal, Energy Chip, and IV Field Generator into a dense pre-LuV energy core."
+		""
+		"It relies on LuV Foundation materials, advancing battery parts from single crystals into true advanced energy components."
+	]
+	quest.18A01183DF6A59D9.quest_subtitle: "Join LuV Foundation and IV Field Generator"
+	quest.18A01183DF6A59D9.title: "Lapotronic Energy Orb"
+	quest.190125F22C1A5EE0.quest_desc: ["Sulfide Ore: Sphalerite, Galena, and Silver."]
+	quest.190125F22C1A5EE0.quest_subtitle: "Unlock Sulfide Ore"
+	quest.190125F22C1A5EE0.title: "Sulfur Vein"
+	quest.193B6542AAD430D3.quest_desc: [
+		"Want metal to take shape in one step? Research cold metalworking first. Then you can craft your first MV Forming Press. Its main strength is pressing materials directly into finished shapes without several machines or intermediate steps. One machine can cover many forms and clean up your layout."
+		""
+		"The MV Forming Press needs higher voltage and more power than ordinary processing. If your grid is still weak, it may strain your supply. Check generation before running it. With stable power, it becomes one of the most reliable metal shaping machines of MV."
+	]
+	quest.193B6542AAD430D3.quest_subtitle: "Craft MV Press"
+	quest.193B6542AAD430D3.title: "Metal Magic"
+	quest.1B0502487DD91693.quest_desc: [
+		"Cupronickel coils were only the start. Mix iron, aluminum, and chrome in the right ratio, then smelt Kanthal in the Electric Blast Furnace. Chrome currently comes only from ruby byproducts and is very rare. This also needs a LV Electric Blast Furnace interface and huge power. You need 16 matching coil blocks."
+		""
+		"Research Kanthal technology before crafting the coils. You also need a little silver as base material; once you have sulfur veins, silver is manageable."
+		""
+		"After installation, the new coils raise furnace temperature, unlock recipes, and save energy on ordinary materials. You can judge the value."
+	]
+	quest.1B0502487DD91693.quest_subtitle: "Make Kanthal coils; upgrade your EBF"
+	quest.1B0502487DD91693.title: "More Power, More Heat"
+	quest.1B073B0E13E0484E.quest_desc: [
+		"Annihilation Core and Formation Core are the two read and write ends of ME storage structure. One receives, and one outputs."
+		""
+		"They are usually consumed together, so they belong in stable assembly. With both ready, cells, drives, and interfaces become much smoother."
+	]
+	quest.1B073B0E13E0484E.quest_subtitle: "Make Annihilation and Formation Cores"
+	quest.1B073B0E13E0484E.title: "Paired Storage Cores"
+	quest.1B76C2DFABED3E63.quest_desc: [
+		"With motors ready, craft two LV components: the electric piston and electric pump. Both use motors, mechanisms, and cables."
+		""
+		"Electric pistons push and form the frame of many metalworking machines. Electric pumps handle fluid transfer and mixing."
+		""
+		"You will need both often for new machines and automation. Start making these motion parts now."
+	]
+	quest.1B76C2DFABED3E63.quest_subtitle: "Make LV pistons and pumps"
+	quest.1B76C2DFABED3E63.title: "Motion Parts"
+	quest.1BFBFB6B50555AD4.quest_desc: [
+		"Redstone is another major factory resource. This naturally powered red mineral carries signals and is vital for logic, circuits, and smarter machines."
+		""
+		"Research redstone veins like you did for tin and coal. Then process the new minerals through washing, grinding, and handling to get redstone dust."
+	]
+	quest.1BFBFB6B50555AD4.quest_subtitle: "Get redstone"
+	quest.1BFBFB6B50555AD4.title: "Bright Red Dust"
+	quest.1D933C575C5519B5.quest_desc: [
+		"This checks any IV-tier circuit, without forcing one electronics route. At this stage, CPU Mainframe or Nano Computer can satisfy the tag requirement."
+		""
+		"The point is reaching the control tier Rocket T2 accepts. Do not push the target to Quantum Processor yet; that is outside this EV prep section."
+	]
+	quest.1D933C575C5519B5.quest_subtitle: "Choose CPU Mainframe or Nano Computer"
+	quest.1D933C575C5519B5.title: "Control Core Ready"
+	quest.1DA662F6D90438AB.quest_desc: [
+		"Carbon Mesh is where the composite route closes: Molten Epoxy fixes loose fibers into a pressable structural layer."
+		""
+		"Send it to the Implosion Compressor next, where shock forming turns the mesh into Carbon Plate."
+		""
+		"Rocket T2 will ask for these plates directly. This is not a side material, but part of the next launch's structure bill."
+	]
+	quest.1DA662F6D90438AB.quest_subtitle: "Lock a light frame in Epoxy"
+	quest.1DA662F6D90438AB.title: "Carbon Plate"
+	quest.1DF1F6516600868F.quest_desc: [
+		"The Assembler does not contain every recipe. Besides voltage tier limits, many recipes require researching the related technology first."
+		""
+		"Press ~ to open the Technology Screen and view all technologies. Each technology marks a new stage, such as alloy smelting, which unlocks the Alloy Smelter recipe."
+		""
+		"To research technology, you need two things:"
+		"Research Bench, for required materials"
+		"Research Equipment, consumed during research"
+		""
+		"Research Equipment for each voltage tier needs different materials, so keep upgrading your research ability as tech advances. Research unlocks recipes and new features so your factory can keep growing."
+	]
+	quest.1DF1F6516600868F.quest_subtitle: "Make research gear"
+	quest.1DF1F6516600868F.title: "Research Road"
+	quest.1E207E3075739472.quest_desc: [
+		"You are about to build your first multiblock machine: the Electric Blast Furnace. It makes steel, a core LV material, and starts mechanized smelting."
+		""
+		"The Electric Blast Furnace is not one block. It is a structure made from several parts. Prepare these materials:"
+		"1 EBF controller"
+		"16 Heatproof Machine Casings"
+		"16 Cupronickel Furnace Coils"
+		"1 ULV Multiblock Interface"
+		""
+		"The multiblock must be placed in the required shape. After building it, connect the Multiblock Interface to power, then right-click the interface to open the machine GUI."
+		""
+		"Tip: Tinactory includes litematica schematics for all multiblock machines. Load one to see where each block belongs."
+	]
+	quest.1E207E3075739472.quest_subtitle: "Build your first multiblock machine"
+	quest.1E207E3075739472.title: "Electric Blast Furnace"
+	quest.1E3576759FC89A54.quest_desc: [
+		"Welcome to Tinactory!"
+		"No vast continent here--just you, an obsidian platform, and a starter crate. Every industrial empire begins with a few logs."
+		""
+		"Open the starter crate, take a sapling, and plant it on the island's flat corner. When it grows, chop your first log. Wood is your first step toward machines: planks, tools, fuel, and supports all start here."
+		""
+		"First wooden board: start of your industrial journey. From now on, the Void is no longer empty--it will be filled with your creativity and the roar of machines."
+	]
+	quest.1E3576759FC89A54.quest_subtitle: "Begin Industry"
+	quest.1E3576759FC89A54.title: "Plant Trees First"
+	quest.1E5E7333A9D920E1.quest_desc: [
+		"It is time to make your first wrought iron. This key material lets you craft a full tool set and take a step toward precision machinery."
+		"At this stage, the only way to get wrought iron is by roasting iron nuggets. The process is not simple; complete these steps patiently:"
+		""
+		"1. Grind iron ingot into dust."
+		"2. Split dust into small piles."
+		"3. Smelt small dust piles to nuggets."
+		"4. Smelt nuggets into wrought nuggets."
+		"5. Grind wrought nuggets into small dust piles."
+		"6. Combine small wrought dust piles into dust."
+		"7. Smelt once more to get real wrought iron."
+		""
+		"Luckily, wrought iron is only for tools right now, so you need little. Those tools lead to higher voltage and complex machines."
+	]
+	quest.1E5E7333A9D920E1.quest_subtitle: "Wrought Iron"
+	quest.1E5E7333A9D920E1.title: "Roasting"
+	quest.1E73498504A1B6C4.quest_desc: [
+		"The 1M ME Storage Component is the core piece that makes digital storage real. It compresses crystals, cores, and circuit materials into scalable capacity."
+		""
+		"Item and fluid storage cells both build around it. Make this tier repeatable before pushing capacity higher."
+	]
+	quest.1E73498504A1B6C4.quest_subtitle: "Make a 1M ME Storage Component"
+	quest.1E73498504A1B6C4.title: "First 1M Component"
+	quest.1EA7A1C747AE59C8.quest_desc: [
+		"Rutile is no longer just a mineral stockpile. Feed chlorine, carbon, and titanium dioxide into the reactor, and the Titanium route becomes a real chemical process."
+		""
+		"Titanium Tetrachloride is the key entry to later reduction and high-temperature smelting. Stabilize this fluid first so Hot Titanium Ingots do not starve upstream."
+	]
+	quest.1EA7A1C747AE59C8.quest_subtitle: "Turn Rutile into Titanium Tetrachloride"
+	quest.1EA7A1C747AE59C8.title: "Titanium Enters Chlorination"
+	quest.1EDE3A566356F600.quest_desc: [
+		"Rare Earth dust stops being byproduct stock here. Processing splits it into Cadmium Dust and Neodymium Dust, pulling earlier scattered material into late EV components."
+		""
+		"Cadmium is the parallel gain, but Neodymium is the bottleneck. IV Electric Motor needs Magnetic Neodymium, so secure this source before the magnet gate arrives."
+	]
+	quest.1EDE3A566356F600.quest_subtitle: "Split Cadmium and Neodymium for magnets"
+	quest.1EDE3A566356F600.title: "Rare Earth Finds Work"
+	quest.1F50F86AA284596C.quest_desc: [
+		"You have raw rubber dust. Put it with sulfur dust in an alloy furnace so heat can turn it into usable rubber."
+		""
+		"The alloy furnace will vulcanize the mix into rubber sheets, a core LV material for cables, machine parts, and later electrical builds."
+		""
+		"If sulfur is short, check mineral byproducts from earlier processing. LV needs more and more sulfur, so secure a supply early."
+		""
+		"After this, you have the rubber chain and your factory truly enters the electric LV age."
+	]
+	quest.1F50F86AA284596C.quest_subtitle: "Make a rubber sheet"
+	quest.1F50F86AA284596C.title: "Bake Something Springy"
+	quest.20FAA833E8F252BA.quest_desc: [
+		"Sodium Carbonate makes brine more than an electrolysis feedstock. With Ammonia and carbon dioxide, you can move it into a fuller soda route while also making Ammonium Chloride for later Fertilizer."
+		""
+		"It is also a hub for carbonate chemistry: it can return to Sodium Hydroxide or feed later mineral and salt processing. Stabilize this route to rely less on one electrolysis chain."
+	]
+	quest.20FAA833E8F252BA.quest_subtitle: "Turn brine toward Sodium Carbonate"
+	quest.20FAA833E8F252BA.title: "Soda Builds Alkali"
+	quest.218AB14A3977A136.quest_desc: [
+		"Cobalt Brass is not cheap. Mix brass, cobalt dust, and aluminum dust in a mixer, then smelt it in a normal furnace. It needs no high heat, which is one of its few friendly traits. This strong alloy is ideal for cutting and unlocks the LV Cutting Machine."
+		""
+		"Cobalt Brass also works as a tool material. Compared with pure cobalt, it has even better durability. Expensive, but worth it."
+	]
+	quest.218AB14A3977A136.quest_subtitle: "Make Cobalt Brass for the LV Cutting Machine"
+	quest.218AB14A3977A136.title: "Noble Cutting Alloy"
+	quest.21E237DEB81D960E.quest_desc: [
+		"After Rocket T1, Netherrack is no longer just another stone base. It becomes the entry point for the Tungstate route, turning Tungsten from a future word into a planned resource."
+		""
+		"This step only gets Tungstate dust. The metal still needs chemical extraction and high-temperature smelting, but the EV material gate starts here."
+	]
+	quest.21E237DEB81D960E.quest_subtitle: "Open the Tungsten route from Tungstate dust"
+	quest.21E237DEB81D960E.title: "Tungsten in Netherrack"
+	quest.23460DBF1A586926.quest_desc: ["The MV Assembler is faster and more precise than the LV version, and will start replacing your early LV Assembler. MV adds many component recipes, and many new parts require a higher tier Assembler. This is a required upgrade for smooth MV production."]
+	quest.23460DBF1A586926.quest_subtitle: "Craft an MV Assembler"
+	quest.23460DBF1A586926.title: "A Better Assembler"
+	quest.2373EBE9D5007CFF.quest_desc: [
+		"The Nanoprocessor brings Nano chips, an Advanced Circuit Board, and SMD components into one usable high-tier circuit. HV electronics move from making parts to completing assemblies."
+		""
+		"The first one can prove the route works by hand, but the value comes from batches. Automate chips, boards, and small components so the Nano branch is more than a display piece."
+	]
+	quest.2373EBE9D5007CFF.quest_subtitle: "Assemble chips, board, and SMD parts"
+	quest.2373EBE9D5007CFF.title: "Nano Circuit Takes Shape"
+	quest.23EF0D5A36642102.quest_desc: ["After unlocking oil veins, you will find three special ores in deepslate: natural gas ore, light crude oil ore, and heavy crude oil ore. Unlike normal ores, they do not need crushing, washing, or complex processing. Put them in a Centrifuge to separate the fluids directly. Natural gas is a good fuel, while light and heavy crude oil are core refinery inputs. These dark resources become key chemical stock."]
+	quest.23EF0D5A36642102.quest_subtitle: "Get gas and crude oil"
+	quest.23EF0D5A36642102.title: "Deepslate Oil"
+	quest.24366ACA10086991.quest_desc: [
+		"The Large Boiler expands steam production to multiblock scale, giving Large Turbines a strong enough fluid source."
+		""
+		"It magnifies fuel and water pressure. Plan buffers and logistics interfaces before tying the whole steam system into the main grid."
+	]
+	quest.24366ACA10086991.quest_subtitle: "Feed industrial steam to Large Turbines"
+	quest.24366ACA10086991.title: "Large Boiler"
+	quest.245CDFDE257E9DB5.quest_desc: [
+		"Sodium chloride is an important inorganic input, and seawater distillation provides it easily. It also produces potassium chloride, magnesium chloride, calcium chloride, and lithium brine. You can get potassium, magnesium, and calcium elsewhere, such as calcium carbonate from stone dust and magnesium or potassium from olivine byproducts. Lithium brine has little use in MV, but in HV it becomes battery material, so save some."
+		""
+		"Sodium chloride is used widely, but its key role is being dissolved into brine for electrolysis. Seawater can be electrolyzed directly, but distilled sodium chloride is purer, faster, and avoids wasting other seawater resources. Stable chlorine and sodium hydroxide are the base of inorganic chemistry, and sodium chloride starts it."
+	]
+	quest.245CDFDE257E9DB5.quest_subtitle: "Distill sodium chloride"
+	quest.245CDFDE257E9DB5.title: "Sea Salt"
+	quest.2463E4F002BC25EE.quest_desc: [
+		"The MV Logistic Worker turns automatic transport from a starter tool into a real production component. More tasks and faster cycles reduce manual pressure in multi-machine routes."
+		""
+		"Use it on stable repeated routes: ore processing, chemical feedstock, boiler water, and product return are all good first targets."
+	]
+	quest.2463E4F002BC25EE.quest_subtitle: "Move items and fluids at MV pace"
+	quest.2463E4F002BC25EE.title: "Better Logistic Worker"
+	quest.247F2D17E69312E2.quest_desc: [
+		"The EV Digital Interface lets large machines sit close to ME and automatic logistics instead of relying on manual transfer."
+		""
+		"This ties the chapter's chests, tanks, workers, and ME storage back into larger production equipment. Later automation will depend more and more on this interface layer."
+	]
+	quest.247F2D17E69312E2.quest_subtitle: "Connect EV multiblocks to digital logistics"
+	quest.247F2D17E69312E2.title: "Digital Multiblock Interface"
+	quest.24C0057018E6738D.quest_desc: [
+		"Methane is a basic organic feedstock. It is not as central as ethylene, but appears in many reactions and is excellent for large hydrogen production. With enough methane, hydrogen becomes very reliable. It can also burn in a Gas Turbine."
+		""
+		"You can get methane from two routes. Oil refining produces it among light gases. Distilling Biomass also gives steady methane, keeping an organic chain running without oil."
+		""
+		"Methane is an important gaseous foundation for hydrogen production, fuel power, and organic reactions."
+	]
+	quest.24C0057018E6738D.quest_subtitle: "Get Methane from oil or Biomass"
+	quest.24C0057018E6738D.title: "Simplest Organic Fuel"
+	quest.2575F9DB22B75F1C.quest_desc: [
+		"Rocket Launch Site is the physical project of late HV: materials, research, electronics, logistics, and fuel routes all converge here into a facility that can serve a rocket."
+		""
+		"Its meaning is not just \"build a multiblock.\" From the base to the main structure, you are fixing the whole chapter's industrial capability into a spaceflight platform."
+		""
+		"Once it is built, the remaining problem is clear: prepare Rocket T1 itself, and let this launch site wait for its first real passenger."
+	]
+	quest.2575F9DB22B75F1C.quest_subtitle: "Converge HV industry into a launch platform"
+	quest.2575F9DB22B75F1C.title: "Build the Way Offworld"
+	quest.25F9A6F2B9895E3D.quest_desc: [
+		"Rockets are not impressed by regular Diesel. Connect refining to the cetane-boosting route and prepare enough Cetane Boosted Diesel; only then have you really started laying Rocket Fuel logistics."
+		""
+		"This fuel line is a continuous rocket project demand, not a last-minute bucket poured into the tank. Keep cracking, Diesel, and additive routes stable so the launch site does not stall on fuel night."
+	]
+	quest.25F9A6F2B9895E3D.quest_subtitle: "Prepare Cetane Boosted Diesel"
+	quest.25F9A6F2B9895E3D.title: "First Fuel for Rockets"
+	quest.2669AE71AD768BC1.quest_desc: [
+		"The 64M component is the high-capacity endpoint of this logistics section, giving a large factory a quieter inventory base."
+		""
+		"The larger the capacity, the more important clear input and output planning becomes. Make digital storage an observable stock center, not a hidden sink."
+	]
+	quest.2669AE71AD768BC1.quest_subtitle: "Make a 64M ME Storage Component"
+	quest.2669AE71AD768BC1.title: "64M Expansion"
+	quest.276F3B9EF9562604.quest_desc: [
+		"Liquid air is your first step in gas processing. Send air into the Vacuum Freezer, and low pressure cooling will turn it into this cold condensate. If the Vacuum Freezer is ready, connect air from your Cobblestone Generator and watch it condense quickly."
+		""
+		"Freezing air lets you separate its components by boiling point, giving the Distillation Tower another important job."
+	]
+	quest.276F3B9EF9562604.quest_subtitle: "Liquefy air"
+	quest.276F3B9EF9562604.title: "Put the Sky in a Freezer"
+	quest.29D02376CFF086C1.quest_desc: ["Oil Vein: Natural Gas, Light Oil, Heavy Oil."]
+	quest.29D02376CFF086C1.quest_subtitle: "Unlock Oil"
+	quest.29D02376CFF086C1.title: "Oil Vein"
+	quest.29EE180F83DFFEF3.quest_desc: [
+		"LV machines need specialized drive modules, not just iron and power. Your first goal is a magnetic steel rod."
+		""
+		"This rod is the core part of your first electric motor. Motors will also be used for electric pistons, pumps, and many later components."
+		""
+		"Research electric motor technology, build an LV two-stage magnetizer, and process steel rods into magnetic steel rods."
+	]
+	quest.29EE180F83DFFEF3.quest_subtitle: "Make a magnetizer and magnetic steel rods"
+	quest.29EE180F83DFFEF3.title: "Give Steel a Soul"
+	quest.2A3A2EF77EBB6998.quest_desc: ["The Gem Vein yields Emerald and Sapphire."]
+	quest.2A3A2EF77EBB6998.quest_subtitle: "Unlock Gems"
+	quest.2A3A2EF77EBB6998.title: "Gem Vein"
+	quest.2A41C0F4C70E1293.quest_desc: [
+		"The Cumene Process organizes Benzene, Propylene, and Oxygen into a paired product stream: Phenol on one side, Acetone on the other."
+		""
+		"Acetone feeds Epoxy, and Phenol will not sit idle either. Keeping this LCR process continuous fits later polymer demand better than topping up cells by hand."
+	]
+	quest.2A41C0F4C70E1293.quest_subtitle: "Pull Phenol and Acetone through Cumene"
+	quest.2A41C0F4C70E1293.title: "Paired Organics"
+	quest.2AE9EAB2593C067C.quest_desc: [
+		"Ethylene is one of the most critical base materials in your current organic chain. Many polymers, especially the common Polyethylene, start from ethylene. It is often the product you plan refining around."
+		""
+		"There are two main routes. A refining setup can provide ethylene from distillation or cracking products. The Biomass route can also dehydrate ethanol with sulfuric acid, starting organic chemistry without oil."
+		""
+		"Either way, ethylene is the key to plastics and more complex organic materials. Keep its supply stable before calling your MV chemical plant truly online."
+	]
+	quest.2AE9EAB2593C067C.quest_subtitle: "Get Ethylene"
+	quest.2AE9EAB2593C067C.title: "Organic Benchmark"
+	quest.2C0BDC359D181269.quest_desc: [
+		"Advanced Alloy is the point where late HV materials start getting heavy. It combines Mixed Metal Ingot with shock forming to create composite plates that can meet higher strength requirements."
+		""
+		"You will meet it repeatedly, from research equipment to rocket-related structures. This is not just a material task; it checks whether your Chrome route, implosion forming, and basic logistics can work together."
+		""
+		"Put it into stable production early instead of scraping together one recipe at a time. Later large goals will turn this \"small amount of expensive material\" into continuous demand."
+	]
+	quest.2C0BDC359D181269.quest_subtitle: "The late-HV structural material gate"
+	quest.2C0BDC359D181269.title: "Alloy for Spaceflight"
+	quest.2C542D300438BBE4.quest_desc: [
+		"In LV, logistics move past hoppers. Make a conveyor belt now, since some production machines require it."
+		""
+		"This factory-like component uses two electric motors and molten rubber. Solid rubber cannot replace it."
+	]
+	quest.2C542D300438BBE4.quest_subtitle: "Make a conveyor"
+	quest.2C542D300438BBE4.title: "Better Than Hoppers"
+	quest.2CEA274AB8DF9B7E.quest_desc: [
+		"Still hammering metal plates by hand? Build a LV Bending Machine and leave hand-made plates behind."
+		""
+		"Metal plates are basic materials used in almost every component. The more you use, the more resources matter. Hammer crafting is slow and wastes half the material each time."
+		""
+		"This machine is cheap and efficient, needing only an electric piston as its key part. Once it is online, switch all plate production to machines to save time and resources."
+	]
+	quest.2CEA274AB8DF9B7E.quest_subtitle: "Make LV Bender"
+	quest.2CEA274AB8DF9B7E.title: "Press Plates"
+	quest.2CF3758FBEB5EA41.quest_desc: ["The Coal Vein yields Coal."]
+	quest.2CF3758FBEB5EA41.quest_subtitle: "Unlock Coal"
+	quest.2CF3758FBEB5EA41.title: "Coal Vein"
+	quest.2D2E5DBD8A15CA3F.quest_desc: [
+		"The robot arm is one of your most complex and costly components, and it is key to higher machines."
+		""
+		"One robot arm needs 2 electric motors, 1 electric piston, and 1 LV circuit. It lets you upgrade the ULV assembler into an LV assembler."
+		""
+		"Do not fear the cost. The robot arm unlocks more machine and component recipes and starts true automated production."
+	]
+	quest.2D2E5DBD8A15CA3F.quest_subtitle: "Make an LV robot arm"
+	quest.2D2E5DBD8A15CA3F.title: "Costly, Worth It"
+	quest.2DBD0C0A32F12F52.quest_desc: [
+		"The ME Pattern Terminal edits executable recipes, and the ME Crafting Terminal turns those patterns into requests on the network."
+		""
+		"With a drive, storage cores, and pattern cells ready, the network can move from inventory management into production scheduling. Place the terminals where you work most."
+	]
+	quest.2DBD0C0A32F12F52.quest_subtitle: "Make ME pattern and crafting terminals"
+	quest.2DBD0C0A32F12F52.title: "Write Patterns"
+	quest.2DF7B5D218636018.quest_desc: [
+		"Stainless steel means HV is getting close. To make this strong, corrosion resistant metal, mix iron dust with three old friends: nickel, chromium, and manganese. Nickel and chromium are familiar; manganese comes as an ilmenite byproduct."
+		""
+		"Mix the four elements in an MV Mixer to get even stainless steel dust. Then upgrade your Electric Blast Furnace to MV so it can smelt the dust into stainless steel ingots. Its melting point is not too high, and Kanthal coils can save some power."
+		""
+		"Stainless steel belongs mostly to HV, but you need it now for one major chemical structure: the Distillation Tower. This huge multiblock is an MV chemistry milestone and the key to oil processing. Make the stainless steel now; the big build is next."
+	]
+	quest.2DF7B5D218636018.quest_subtitle: "Make stainless steel"
+	quest.2DF7B5D218636018.title: "Clean and Tough"
+	quest.2E0C38684C061101.quest_desc: [
+		"The EV Logistic Worker increases task capacity and execution speed again, ready for production lines that have grown beyond small batches."
+		""
+		"By now, logistics is not just convenience; it protects throughput. Keep important lines running automatically before digital storage starts receiving them."
+	]
+	quest.2E0C38684C061101.quest_subtitle: "Make an EV Logistic Worker"
+	quest.2E0C38684C061101.title: "Faster Logistics Station"
+	quest.2FA60D4ACE773908.quest_desc: [
+		"You can now craft real LV base components. These parts form the core of almost every machine in this tier."
+		""
+		"To finish them, use nearly everything from earlier quests."
+		""
+		"Use steel from the electric blast furnace for the LV machine casing. It is the sturdy frame for future LV machines."
+		""
+		""
+		"Cables need tin wire and rubber insulation. Together they become the backbone of your power network."
+		""
+		"The electronic circuit is your first LV circuit. It uses a sticky resin board, ULV vacuum tubes, resistors, and red alloy."
+		""
+		"From here, the door to LV is open."
+	]
+	quest.2FA60D4ACE773908.quest_subtitle: "Make casing, LV cable, and a circuit"
+	quest.2FA60D4ACE773908.title: "The LV Starter Trio"
+	quest.2FBE474AB6FB5124.quest_desc: [
+		"In HV, loose wiring exposes problems faster. Machines draw more power, cable loss matters more, and the grid benefits from clear tiers from the start."
+		""
+		"An HV transformer connects your existing power system to the new voltage tier. Build that bridge first, then feed HV machines steadily."
+	]
+	quest.2FBE474AB6FB5124.quest_subtitle: "Connect to the HV grid with a transformer"
+	quest.2FBE474AB6FB5124.title: "Bring HV Online"
+	quest.30A9703C17D78C39.quest_desc: [
+		"You could research metal cutting at the start of LV, but materials blocked real use. Now take the step: make a saw from Cobalt Brass for the Cutting Machine, and use two diamonds for the Lathe and Macerator."
+		""
+		"These three machines matter a lot."
+		"The Lathe makes rods and screws efficiently, replacing slow file work and saving half the material."
+		"The Macerator replaces mill and hammer, automating ore processing."
+		"The Cutting Machine may first look less useful than the Lathe, mostly cutting planks and rods, but chip production will reveal its importance."
+		""
+		"These machines are more than an efficiency boost. They mark a process leap: most metal work in your factory can now be mechanized."
+	]
+	quest.30A9703C17D78C39.quest_subtitle: "Research cutting; build Lathe, Cutter, Macerator"
+	quest.30A9703C17D78C39.title: "Cut, Turn, Crush"
+	quest.30CEEE3CBC4AA11A.quest_desc: [
+		"From here, chemistry is no longer just a few buckets of fluid made on demand. The HV Chemical Reactor gives acid-base work, chlorination, organic synthesis, and hydrometallurgy prep enough speed and capacity for stable production."
+		""
+		"Place it at the entrance to advanced chemistry, not as a machine trophy. Later Chrome, Titanium, explosives, and fuel routes will all pull reaction capacity from this node, and handcrafting will slow the whole factory fast."
+	]
+	quest.30CEEE3CBC4AA11A.quest_subtitle: "Let the HV Chemical Reactor carry complex reactions"
+	quest.30CEEE3CBC4AA11A.title: "Acid and Alkali Junction"
+	quest.312DEB1E14FF9588.quest_desc: [
+		"You have wrought iron. Craft wrought iron tools."
+		""
+		"These tools will help you process metal. You do not need to make every tool at once, but it is best to complete them over time because later machines depend on them."
+		""
+		"Tools include: File, Hammer, Mortar, Saw, Screwdriver, Wire Cutter, and Wrench."
+		"With these tools, you can process ores and metal parts more efficiently, building a firm base for industry."
+	]
+	quest.312DEB1E14FF9588.quest_subtitle: "Craft your first metal tool set"
+	quest.312DEB1E14FF9588.title: "Wrought Iron Tools"
+	quest.330CE0C6D92F38F2.quest_desc: [
+		"Tungsten Trioxide ends this branch in high-temperature metallurgy. Send the reduced powder through the HV Electric Blast Furnace, and Tungsten ingots become the route's first real metal output."
+		""
+		"Tungsten is not warehouse stock for its own sake. It pushes steel toward higher strength and heat tolerance, setting up Tungsten Steel for IV component pressure."
+	]
+	quest.330CE0C6D92F38F2.quest_subtitle: "Smelt the first Tungsten in an HV Electric Blast Furnace"
+	quest.330CE0C6D92F38F2.title: "Tungsten from Heat"
+	quest.3375F9C747DB6DD4.quest_desc: [
+		"Your first real MV parts are MV machine casings and MV cables. They are the base of every MV machine; without them your factory can only think about upgrading. Casings use lighter aluminium, and cables now need stricter materials, so the tech tree is clearly asking more from you."
+		""
+		"For MV circuit boards, you have two routes. If you followed chapter 2 normally, use Good Electronic Circuits. If you pushed the integrated circuit quest line and unlocked Good Integrated Circuits, you can use the better option. Either way, once these parts are ready, your factory can finally build MV machines."
+	]
+	quest.3375F9C747DB6DD4.quest_subtitle: "Craft MV casings and cables"
+	quest.3375F9C747DB6DD4.title: "The First MV Foundation"
+	quest.34020EF584470F85.quest_desc: [
+		"At last, real chips. Put your wafers in the Laser Engraver with a Ruby Lens to etch circuit patterns, producing integrated circuit wafers."
+		""
+		"Do not install them yet; cut the wafers first. Process them again in the Cutting Machine to split each wafer into integrated circuit chips. These chips are the core of integrated circuit boards and the base for future advanced boards."
+	]
+	quest.34020EF584470F85.quest_subtitle: "Engrave and cut wafers into IC chips"
+	quest.34020EF584470F85.title: "One Wafer, Many Uses"
+	quest.340A59CCBC050E4A.quest_desc: [
+		"The 4M component moves digital storage from the first usable capacity into a clearly expandable tier."
+		""
+		"Capacity upgrades repeat the previous material structure. Once 1M components, cores, and quartz are stable, expansion stops being a side project."
+	]
+	quest.340A59CCBC050E4A.quest_subtitle: "Make a 4M ME Storage Component"
+	quest.340A59CCBC050E4A.title: "4M Expansion"
+	quest.34D0991E0CCF5EEC.quest_desc: [
+		"At last, the true metal age begins. Use your tools and machines to turn stone into shining metal."
+		""
+		"The Ore Analyzer can sometimes extract Pyrite Ore and Chalcopyrite Ore from cobblestone. Raw ores cannot be used directly and need several refining steps."
+		""
+		"First, crush the ore twice with a hammer to make fine dust. Then put the dust in the Ore Washer and wash away impurities to get iron dust and copper dust."
+		"Finally, smelt these dusts in a furnace to get your first iron ingot and copper ingot."
+		""
+		"This marks your entry into the metal age. The heart of machinery starts beating."
+	]
+	quest.34D0991E0CCF5EEC.quest_subtitle: "Refine iron and copper"
+	quest.34D0991E0CCF5EEC.title: "Birth of Metal"
+	quest.3501E6D4A903FB90.quest_desc: [
+		"Chalcopyrite ore shows its value again: a Thermal Centrifuge can now process it into a mysterious byproduct, Cobaltite dust."
+		""
+		"It may look plain, but it is the basis of future semiconductor tech. Further centrifuging Cobaltite gives arsenic and cobalt. Cobalt is a durable tool material, while arsenic matters later for integrated circuits."
+		""
+		"No new vein is needed. Use your Chalcopyrite stock to prepare for the next tech jump. Watch Cobaltite output; it may not appear every time."
+	]
+	quest.3501E6D4A903FB90.quest_subtitle: "Get Cobaltite"
+	quest.3501E6D4A903FB90.title: "Chalcopyrite's Secret"
+	quest.35AFA1FBD784B4D2.quest_desc: [
+		"As your machine count grows, moving items and fluids by hand becomes inefficient. Use a Logistic Worker to create your first automatic logistics network."
+		""
+		"The Logistic Worker is a key Tinactory logistics machine with three tiers. You can now craft the Basic Logistic Worker. It moves items or fluids between machines for early automation."
+		""
+		"Power the Logistic Worker, then right-click it to open the GUI. It has three areas:"
+		"Left: configured task list"
+		"Middle: all machines the workstation can access"
+		"Right: all ports on the selected machine"
+		""
+		"A Logistic Worker can configure multiple tasks and cycles through them. To configure a task:"
+		"Pick a task slot, then click source or target config."
+		"Choose the machine in the middle panel."
+		"Choose an input or output port in the right panel."
+		"Optional: click the middle task slot to set filters for specific items or fluids."
+		"Click the middle button to enable it."
+		""
+		"Higher-tier Logistic Workers can run more tasks and work faster. From now on, let machines handle the carrying."
+	]
+	quest.35AFA1FBD784B4D2.quest_subtitle: "Use Basic Logistic Worker"
+	quest.35AFA1FBD784B4D2.title: "Hands Free"
+	quest.361089D5DBD02A97.quest_desc: [
+		"Research unlocks recipes and drives industrial progress. Learn the Technology Screen to plan your technology path efficiently."
+		""
+		"Open the Technology Screen with the ~ key. You will see these areas:"
+		"Upper left: your current research"
+		"Lower left: all technologies"
+		"Right panel: selected technology description, prerequisites and progress"
+		""
+		"Tech status uses three colors:"
+		"Yellow: can be researched now"
+		"Red: locked; finish prerequisites first"
+		"Green: research completed"
+		""
+		"Tip: hover a technology button and press R to view in JEI which recipes it unlocks and what materials the research needs."
+	]
+	quest.361089D5DBD02A97.quest_subtitle: "Technology Screen"
+	quest.361089D5DBD02A97.title: "Research"
+	quest.363746D1E8189E50.quest_desc: [
+		"The Gas Turbine gives light fuels a direct path into the grid, especially byproducts from refining and gas handling."
+		""
+		"Once LPG and other gas routes are stable, it becomes a cleaner supplement than hand-fed solid fuel."
+	]
+	quest.363746D1E8189E50.quest_subtitle: "Generate from gaseous fuel"
+	quest.363746D1E8189E50.title: "Gas Turbine"
+	quest.36F6E91079CD47B2.quest_desc: [
+		"You can now extract and process single metals, but stronger industrial structures need alloys. It is time to make your first Alloy Smelter."
+		""
+		"After unlocking alloy smelting in the Technology Screen, craft the Alloy Smelter in the Assembler. It smelts mixed metal dusts into alloy ingots, so grind metals into dust first."
+		""
+		"Alloys greatly expand the machines and components you can build."
+	]
+	quest.36F6E91079CD47B2.quest_subtitle: "Alloy Smelter"
+	quest.36F6E91079CD47B2.title: "Alloy Smelter"
+	quest.378E7D2AD50D6C50.quest_desc: [
+		"The Large Chemical Reactor is the early EV dividing line. The Netherrack resources, Hydrogen Fluoride, and PTFE from before all converge here into a larger reaction space and steadier throughput."
+		""
+		"From this point on, chemistry is no longer just putting a few inputs into one reactor and waiting. Multiple inputs, multiple fluids, and heavier polymer routes start demanding real production lines."
+		""
+		"Build it, and the later synthetic rubber, silicone rubber, epoxy, and carbon plate routes will have enough industrial footing. The real EV chemistry chapter starts with this machine."
+	]
+	quest.378E7D2AD50D6C50.quest_subtitle: "Move EV chemistry into scaled production"
+	quest.378E7D2AD50D6C50.title: "Large Chemical Reactor"
+	quest.38AD236D90FE95DD.quest_desc: ["Tin Vein: Tin and Cassiterite."]
+	quest.38AD236D90FE95DD.quest_subtitle: "Unlock Tin"
+	quest.38AD236D90FE95DD.title: "Tin Vein"
+	quest.392760BFA9983606.quest_desc: [
+		"You are about to assemble your first Circuit Assembler, a LV one. It uses an MV board, but only automates LV circuit production. It sounds costly because it is an investment. Besides a Good Electronic Circuit, it needs the robot arm, conveyor, emitter, and other expensive parts you worked hard to make."
+		""
+		"This is required for progress. Higher tier circuits will need higher voltage Circuit Assemblers. Pay the cost now, and it will repay you later."
+	]
+	quest.392760BFA9983606.quest_subtitle: "Make a LV Circuit Assembler for auto circuits"
+	quest.392760BFA9983606.title: "Circuit Cost"
+	quest.39307419A9E65EA7.quest_desc: ["You already worked hard in LV to get your first aluminium dust. Now that MV has begun, aluminium becomes a main material. Put the dust into your LV Electric Blast Furnace to smelt it. Aluminium has a low melting point, so you do not need better coils yet, only stable power. The ingots will form the frame of your factory for a long time, from frames to core MV machine parts. Smelt extra now; you will be glad later."]
+	quest.39307419A9E65EA7.quest_subtitle: "Smelt aluminium"
+	quest.39307419A9E65EA7.title: "Shiny Debut"
+	quest.39ADA30CF82902BE.quest_desc: [
+		"If earlier multiblocks felt small, the Large Sifter redefines industrial scale. This huge machine fills a 5x5x5 space and is your largest build so far."
+		""
+		"To build it, prepare one controller, 18 sifter casings, 63 solid steel machine casings, and one multiblock interface. Sifter casings need electric motors, rotors, and zinc filters, plus soldering alloy. The solid steel casings may nearly empty your steel stock."
+		""
+		"Use litematica while building to place the structure correctly. This is both a construction challenge and proof that your industry can handle large automation."
+	]
+	quest.39ADA30CF82902BE.quest_subtitle: "Build a Large Sifter"
+	quest.39ADA30CF82902BE.title: "Huge Sifter"
+	quest.3A37204C020F5B2C.quest_desc: [
+		"Rocket T1 is the acceptance test for the HV chapter, and the first time your factory truly crosses the surface boundary. Reaching it means chemistry, materials, electronics, research, and fuel have converged on one goal."
+		""
+		"This is not one recipe's victory: Advanced Alloy carries the structure, the fuel route provides thrust, EV-tier circuits handle control, and the launch site receives the final liftoff."
+		""
+		"Complete it, and a new resource boundary and the next stage of industry open. Now send the rocket off the ground and extend Tinactory's production line beyond the sky."
+	]
+	quest.3A37204C020F5B2C.quest_subtitle: "The first launch of the HV era"
+	quest.3A37204C020F5B2C.title: "First Rocket"
+	quest.3A5D9501A8B556BF.quest_desc: [
+		"Advanced Circuit Boards pack finer wires, solder points, and laminated layers into one carrier, giving Nanoprocessors enough routing density."
+		""
+		"From here, electronics are not just about etching chips. Boards, SMD parts, clean processing, and assembly pace all need to keep up, or the Nano route stops at the end."
+	]
+	quest.3A5D9501A8B556BF.quest_subtitle: "Bring Advanced Circuit Boards into precision assembly"
+	quest.3A5D9501A8B556BF.title: "Board for Nano Circuits"
+	quest.3B40E5106A3F53F1.quest_desc: [
+		"Carbon Ingot and Carbon Fiber come first, preparing the frame for the lightweight high-strength material route. This line does not need to wait for Epoxy."
+		""
+		"The real composite strength comes from later binding and forming, but Carbon Fiber itself needs steady supply or Carbon Plates will stall before assembly."
+	]
+	quest.3B40E5106A3F53F1.quest_subtitle: "Draw carbon into a weaveable frame"
+	quest.3B40E5106A3F53F1.title: "Carbon Fiber First"
+	quest.3B814E5A86CB22E7.quest_desc: [
+		"Steam Turbines are one of the first stable power entries, converting boiler steam into usable energy."
+		""
+		"The LV version builds on ULV experience. Power is no longer just keeping machines alive; it starts becoming planned supply."
+	]
+	quest.3B814E5A86CB22E7.quest_subtitle: "Make an LV Steam Turbine"
+	quest.3B814E5A86CB22E7.title: "Steam Turbine Start"
+	quest.3BD5E7B3FBD1C438.quest_desc: [
+		"Hydrogen Fluoride is one of the acidic fluids early EV needs to treat seriously. Netherrack gem resources from Rocket T1 turn this route from a theoretical recipe into a sustainable chemical input."
+		""
+		"Preparing a full fluid cell is not the endpoint; it only confirms the line is connected. PTFE will keep consuming it, and small hand batches will collapse quickly under reactor-scale demand."
+	]
+	quest.3BD5E7B3FBD1C438.quest_subtitle: "Make the Rocket T1 fluorine route flow"
+	quest.3BD5E7B3FBD1C438.title: "Hydrogen Fluoride"
+	quest.3C6F611AD202962D.quest_desc: [
+		"Upgrade your primitive or ULV cobblestone generator into the LV version."
+		""
+		"The LV cobblestone generator adds deepslate. It looks like a dark stone block, but it carries a whole new resource system."
+		""
+		"After unlocking LV research equipment, study deepslate samples to unlock new ores and processing routes."
+	]
+	quest.3C6F611AD202962D.quest_subtitle: "Upgrade the generator for deepslate"
+	quest.3C6F611AD202962D.title: "We Need to Go Deeper"
+	quest.3CD314088812FBB4.quest_desc: [
+		"The Magnetite Vein yields Magnetite and Gold. It is the first vein unlocked by Deepslate Ores research."
+		""
+		"You need LV research and an Ore Analyzer."
+	]
+	quest.3CD314088812FBB4.quest_subtitle: "Research Deepslate Ores to unlock the Magnetite Vein"
+	quest.3CD314088812FBB4.title: "Magnetite Vein"
+	quest.3DEB5615111933CF.quest_desc: [
+		"In LV, coal becomes a key resource. Research coal veins, and coal minerals will start appearing in your cobblestone processing loop."
+		""
+		"Coal is not just furnace fuel. Coal dust makes resistors for LV circuit boards, and coal is a solid boiler fuel that frees you from manual tree farming."
+		""
+		"As your factory grows, you will want more coal. Unlock coal veins early and add them to your resource cycle."
+	]
+	quest.3DEB5615111933CF.quest_subtitle: "Unlock coal veins"
+	quest.3DEB5615111933CF.title: "Black, Useful Fuel"
+	quest.3E72DFCA89D79EAD.quest_desc: [
+		"With Lava available as a fluid, Obsidian becomes a controlled recipe instead of a manual placement trick."
+		""
+		"React Lava with Water, handle the Steam output, and stockpile Obsidian for later processing routes that need the block in real quantity."
+	]
+	quest.3E72DFCA89D79EAD.quest_subtitle: "Manage Lava and Water by machine"
+	quest.3E72DFCA89D79EAD.title: "Controlled Obsidian"
+	quest.3EDE299FA6EF6A78.quest_desc: [
+		"Fluix Crystal is no longer only an EV component material. 16M and higher storage components consume it directly, moving ME expansion from dust cores into the crystal route."
+		""
+		"Stabilize the EV dust and Autoclave loop first, then feed crystals into logistics so storage upgrades do not stall here."
+	]
+	quest.3EDE299FA6EF6A78.quest_subtitle: "Feed advanced storage components"
+	quest.3EDE299FA6EF6A78.title: "Fluix Crystal"
+	quest.400AC2B28B69BAD2.quest_desc: [
+		"Send natural gas, light crude oil, and heavy crude oil into the Distillation Tower to get four fractions: refinery gas, naphtha, light fuel, and heavy fuel. Heavier crude gives more heavy fractions, so do not process one oil. Mix the three as needed."
+		""
+		"These fractions are sulfur rich. Using them directly will pollute your chemical system and affect later reactions. Next comes desulfurization, which turns rough oil products into clean inputs for deeper refining."
+	]
+	quest.400AC2B28B69BAD2.quest_subtitle: "Distill four oil fractions"
+	quest.400AC2B28B69BAD2.title: "Crude's Four Faces"
+	quest.40147EDDF5556495.quest_desc: [
+		"The MV Cobblestone Generator is more than a simple LV upgrade. It changes your resource base. MV chemistry expands quickly, and seawater and air are two basic inputs that are easy to overlook."
+		""
+		"The MV Cobblestone Generator lets you produce seawater and air from the void as steadily as cobblestone. Higher speed is useful, but the real value is that your chemical system stops choking on basic inputs. Electrolysis, acids, gas reactions, and larger chains will all need them. Set it up now so your MV factory does not stall later."
+	]
+	quest.40147EDDF5556495.quest_subtitle: "Make seawater and air"
+	quest.40147EDDF5556495.title: "Void Sea Breeze"
+	quest.4034E621C42EBF60.quest_desc: [
+		"Certus Quartz is the quartz base of the ME route. It comes from EV resources, but becomes part of the storage structure here."
+		""
+		"Do not treat it as a one-off quest material. Digital storage keeps consuming crystals and dusts, so connect vein processing and crystal loops early."
+	]
+	quest.4034E621C42EBF60.quest_subtitle: "Obtain Certus Quartz Crystal"
+	quest.4034E621C42EBF60.title: "Certus Quartz Entry"
+	quest.40CB6901FA8C6B10.quest_desc: ["CPU wafers need far more precision than earlier chips. Upgrade the Laser Engraver to MV for stronger, steadier, faster laser scanning. The key material is the MV Emitter, which provides the energy density needed to etch CPU patterns reliably."]
+	quest.40CB6901FA8C6B10.quest_subtitle: "Upgrade the Laser Engraver to etch CPU wafers"
+	quest.40CB6901FA8C6B10.title: "MV Laser Engine"
+	quest.41B2E83E7E86A9A6.quest_desc: [
+		"The 16M component starts pushing the ME system toward large-scale storage for mid- and late-game material growth."
+		""
+		"If every earlier tier was hand-crafted, the cost becomes obvious here. Automating the storage component route will pay back quickly."
+	]
+	quest.41B2E83E7E86A9A6.quest_subtitle: "Make a 16M ME Storage Component"
+	quest.41B2E83E7E86A9A6.title: "16M Expansion"
+	quest.41CAE47DBA5E2C33.quest_desc: [
+		"The Gold Vein yields Gold Ore, Topaz, and Blue Topaz. It is the first vein unlocked by Netherrack Ores research."
+		""
+		"You need HV research, an Ore Analyzer, and Tier 1 Rocket unlocked first."
+	]
+	quest.41CAE47DBA5E2C33.quest_subtitle: "Research Netherrack Ores to unlock the Gold Vein"
+	quest.41CAE47DBA5E2C33.title: "Gold Vein"
+	quest.42B0CA004A0D914B.quest_desc: ["The MV Mixer is a full upgrade over the LV Mixer. It is faster, supports more recipes, and handles a wider range of materials. New alloys in MV need more complex preparation, and mixing is often required. Build it to smooth out both metal and chemical production."]
+	quest.42B0CA004A0D914B.quest_subtitle: "Craft an MV Mixer"
+	quest.42B0CA004A0D914B.title: "MV Flavor"
+	quest.43339C2F022CCAE7.quest_desc: [
+		"Polyvinyl Chloride is the second common polymer you can make in MV. Compared with Polyethylene, its chlorine content improves corrosion resistance and insulation, making it useful for circuit boards, fluid pipes, and other components."
+		""
+		"To make Polyvinyl Chloride, first make Vinyl Chloride. Before the Large Chemical Reactor, the MV route is ethane plus chlorine. Later, you can use the easier ethylene plus hydrogen chloride route. Finally, polymerize Vinyl Chloride with oxygen, turning it into PVC."
+	]
+	quest.43339C2F022CCAE7.quest_subtitle: "Make PVC"
+	quest.43339C2F022CCAE7.title: "Better White Plastic"
+	quest.444451799EE5DB72.quest_desc: [
+		"Sulfuric Acid is one of the most important acids in chemistry. You will use it for ore dissolution, circuit board etching, organic dehydration, and even MV batteries. Most recipes use diluted acid, because the pure fluid is harsh enough to damage the material too."
+		""
+		"Before the Large Chemical Reactor, your only acid route is oxidizing Hydrogen Sulfide. If you are refining oil, desulfurization supplies plenty of it. If not, synthesize a little from hydrogen and sulfur dust."
+		""
+		"Sulfide ore processing produces lots of sulfur dioxide, but it cannot make Sulfuric Acid yet. That route needs a Large Chemical Reactor, unlocked in HV. For now, use Hydrogen Sulfide for your first bucket of Sulfuric Acid."
+	]
+	quest.444451799EE5DB72.quest_subtitle: "Get H2SO4"
+	quest.444451799EE5DB72.title: "Universal Acid"
+	quest.44815DCB0759B5CC.quest_desc: ["CPU Circuit Boards are denser and more complex than any earlier board. Upgrade the Circuit Assembler to MV to assemble them. Besides an MV Emitter, the upgrade needs an HV Circuit Board as the control core. The upgraded machine handles finer soldering, wiring, and component placement for advanced electronics."]
+	quest.44815DCB0759B5CC.quest_subtitle: "Upgrade Circuit Assembler for CPU boards"
+	quest.44815DCB0759B5CC.title: "Soldering"
+	quest.45183BF83F5A72B0.quest_desc: ["The Redstone Vein yields Redstone, Ruby, and Cinnabar."]
+	quest.45183BF83F5A72B0.quest_subtitle: "Unlock Redstone"
+	quest.45183BF83F5A72B0.title: "Redstone Vein"
+	quest.46C15B5CA52BBB56.quest_desc: [
+		"After Rocket T1, the HV Stone Generator is no longer just producing old stone faster. Upgrade it for steady Netherrack output, then let the HV Ore Analyzer read the vein signals inside it."
+		""
+		"This opens the EV starting resource map: quartz, topaz, lava, and tungsten all branch out from Netherrack. The rocket brought back more than distance; it brought a whole new layer of industrial feedstock."
+	]
+	quest.46C15B5CA52BBB56.quest_subtitle: "Turn Rocket T1 into a new resource boundary"
+	quest.46C15B5CA52BBB56.title: "Netherrack Survey"
+	quest.46F8F26339555C62.quest_desc: [
+		"The Implosion Compressor pushes normal pressure processing further: controlled detonation finishes dense forming in an instant."
+		""
+		"It does not replace your regular Compressor. It handles materials that must be shaped by shock, and the later Advanced Alloy route will use this ability soon."
+	]
+	quest.46F8F26339555C62.quest_subtitle: "Use detonation for high-strength forming"
+	quest.46F8F26339555C62.title: "Shape Metal with Implosion"
+	quest.46FCACEBA4A9CB75.quest_desc: [
+		"Aluminum belongs to MV, but LV lets you glimpse it early. Processing Bauxite can rarely yield aluminum dust for key alloys like tough Cobalt Brass or heat-resistant Kanthal for better Electric Blast Furnace coils."
+		""
+		"If you already have enough aluminum dust, you can try smelting aluminum ingots early and assembling some MV machines. Without late LV parts this is hard, so choose whether to rush MV or finish this stage steadily."
+	]
+	quest.46FCACEBA4A9CB75.quest_subtitle: "Get aluminum dust, the star of MV"
+	quest.46FCACEBA4A9CB75.title: "A Glimpse of MV"
+	quest.48B045DFCEA5A96A.quest_desc: [
+		"The Sifter is not for sand; it finds flawless gems. Now you can enter the most precise circuit step: laser engraving."
+		""
+		"First craft a Laser Engraver, using the emitter you made earlier for the laser. Then add a Ruby Lens. Sift flawless ruby, combine it with normal ruby into exquisite ruby, then polish it on the Lathe. The lens is not consumed, so each engraver only needs one."
+		""
+		"A Ruby Lens can engrave basic integrated circuits. Later circuits require different lenses. Your chip line has now entered laser precision work."
+	]
+	quest.48B045DFCEA5A96A.quest_subtitle: "Make a Laser Engraver and Ruby Lens"
+	quest.48B045DFCEA5A96A.title: "Gems Can Make Chips"
+	quest.48DA3208B8573197.quest_desc: [
+		"Your machines now run on the LV grid and work well, but what if you want them faster?"
+		""
+		"Welcome to overclocking. When a machine receives voltage above its default design, it overclocks automatically: work speed doubles, and power use becomes 4x."
+		""
+		"This trades energy for speed. Efficiency drops, but speed-first production steps can benefit from it. For now, with mostly LV machines, the rising power cost is not very visible."
+		""
+		"The good news: future technologies will gradually unlock ways to improve this mechanic."
+		""
+		"Understanding overclocking is essential before entering MV and HV industry. It helps you decide when to chase speed and when to chase efficiency."
+		""
+		"After all, speed has a cost."
+	]
+	quest.48DA3208B8573197.quest_subtitle: "Learn overclocking"
+	quest.48DA3208B8573197.title: "Speed Has a Cost"
+	quest.49720D404935A3A9.quest_desc: [
+		"Parts alone are not enough in industry; solder holds them together. Antimony is the key additive in Soldering Alloy. Find it in sulfur vein byproducts. Yields are low, but you only need a little."
+		""
+		"With enough tin and lead, add a little antimony in the alloy furnace to make stable Soldering Alloy. It joins metal parts and machine casings, and circuit production will consume a lot of it. Start stockpiling now."
+	]
+	quest.49720D404935A3A9.quest_subtitle: "Get antimony; solder"
+	quest.49720D404935A3A9.title: "Solder It Together"
+	quest.49E74949BB1168BC.quest_desc: [
+		"The MV Electrolyzer starts many MV chemical chains. Research electrolysis first to learn element extraction at higher voltage. Once built, it can make chlorine and sodium hydroxide steadily from brine. You will need both often for ore refining and organic chemistry."
+		""
+		"Some ores also need electrolysis to release target elements. Bauxite, for example, uses it to provide aluminium. The Electrolyzer gives your factory its first real ability to split basic elements, a key step from metallurgy into chemical industry."
+	]
+	quest.49E74949BB1168BC.quest_subtitle: "Craft MV Electrolyzer"
+	quest.49E74949BB1168BC.title: "Zap It Until the Elements Give In"
+	quest.4BC5CC00BBABBC80.quest_desc: [
+		"The Vacuum Freezer removes heat quickly under low pressure, cooling fluids until they liquefy or even solidify. Its controller needs an HV circuit board, but the rest uses MV parts and aluminium casings, so it is cheaper than the Distillation Tower. Your first use is liquefying air, then sending it to the Distillation Tower for important gases."
+		""
+		"It is not only for air. Later, difficult metals must be melted at high temperature and then quenched quickly to gain special properties, and the Vacuum Freezer handles that process. Build it now so your factory can freeze materials on demand."
+	]
+	quest.4BC5CC00BBABBC80.quest_subtitle: "Build Vacuum Freezer"
+	quest.4BC5CC00BBABBC80.title: "Fast Chill"
+	quest.4BE9B26C04647BD8.quest_desc: [
+		"Electric Chests bring item buffering into the machine network, so every step does not have to pass through your inventory."
+		""
+		"Start with the Basic version and leave room for inputs, outputs, and temporary buffers. Logistics is about making materials move to the right place by themselves."
+	]
+	quest.4BE9B26C04647BD8.quest_subtitle: "Make a Basic Electric Chest"
+	quest.4BE9B26C04647BD8.title: "Put Chests on the Grid"
+	quest.4CB55DF729A035A0.quest_desc: [
+		"After mass producing integrated circuits, you can tackle the second chip type: memory chips. Better circuit boards need many of them, and the process is stricter. First make a sapphire lens. It is like the ruby lens: get flawless sapphire from the Sifter, assemble it with normal sapphire and sapphire dust into exquisite sapphire, then polish it on the Lathe. The lens is not consumed during etching, so one is enough."
+		""
+		"With the sapphire lens, use the Laser Engraver to etch memory wafers, then cut them into memory chips. The success rate is lower than for integrated circuits. This is not a bug: memory is more sensitive to contamination. Later, a cleanroom will reduce these losses. For now, make your first memory chips and push your circuits forward."
+	]
+	quest.4CB55DF729A035A0.quest_subtitle: "Craft memory chips"
+	quest.4CB55DF729A035A0.title: "Memory Awakens"
+	quest.4CB819ADAB44C238.quest_desc: [
+		"Titanium Tetrachloride is only the entrance to the route; the real metal still needs reduction and high-temperature smelting. Hot Titanium Ingots mean the line has moved from chemistry into material forming."
+		""
+		"Do not treat them like normal ingots yet. Hot metal needs the Vacuum Freezer before it becomes Titanium for structures, Machine Hulls, and later EV materials."
+	]
+	quest.4CB819ADAB44C238.quest_subtitle: "Reduce and pull Hot Titanium Ingots"
+	quest.4CB819ADAB44C238.title: "Titanium from Heat"
+	quest.4D7BE161FBFBB80C.quest_desc: [
+		"Digital logistics does not make basic redstone disappear. A Redstone Torch is the simple entry point for the signal-control route."
+		""
+		"Prepare this small part, then connect it to ME control equipment. Complex systems often still begin with one stable signal."
+	]
+	quest.4D7BE161FBFBB80C.quest_subtitle: "Prepare a Redstone Torch"
+	quest.4D7BE161FBFBB80C.title: "Redstone Still Matters"
+	quest.4DB9BF0E510E3E9C.quest_desc: [
+		"The Large Turbine gathers steam, gas, and combustion power experience into multiblock scale, greatly raising grid throughput."
+		""
+		"It checks more than one controller: fuel, fluids, materials, and power planning all need to support continuous large energy equipment."
+	]
+	quest.4DB9BF0E510E3E9C.quest_subtitle: "Scale three generator routes into a multiblock"
+	quest.4DB9BF0E510E3E9C.title: "Large Turbine"
+	quest.4DCACD0126796140.quest_desc: [
+		"You have used the alloy furnace. Now consider the LV alloy furnace, because some LV alloys cannot be made in the ULV version."
+		""
+		"It uses more power than the electric furnace, and you may not need those alloys yet."
+		""
+		"This is not urgent equipment, but it is important infrastructure. Research it, gather parts, and build it when advanced alloy recipes appear."
+		""
+		"Wait until your LV power system can support high-draw machines running for long periods."
+	]
+	quest.4DCACD0126796140.quest_subtitle: "Make an LV alloy furnace for advanced alloys"
+	quest.4DCACD0126796140.title: "Alloy Furnace 2.0"
+	quest.4E8E2AA5D4AAF81E.quest_desc: [
+		"Tungstate is not metal yet; it is the mineral entry to the extraction route. Use wet processing and chemistry to pull Tungsten into Tungsten Trioxide Dust, a form ready for reduction."
+		""
+		"This is not an LCR checkpoint, but it still checks acid, alkali, and powder loops. Once the oxide supply is steady, high-temperature smelting can stay fed."
+	]
+	quest.4E8E2AA5D4AAF81E.quest_subtitle: "Move Tungsten into oxide form"
+	quest.4E8E2AA5D4AAF81E.title: "Refine Tungstate"
+	quest.4F2ADA90E07C2761.quest_desc: [
+		"The HV Circuit Assembler pushes automatic circuit assembly to a higher voltage. Complex circuits need finer soldering, positioning, and supply timing, and older equipment cannot carry all of it."
+		""
+		"With it, electronics after the Workstation are easier to scale. Feed SMD parts, boards, and chips into the line so later large goals are not held back by circuits."
+	]
+	quest.4F2ADA90E07C2761.quest_subtitle: "Bring advanced circuits to HV pace"
+	quest.4F2ADA90E07C2761.title: "Circuit Assembly Steps Up"
+	quest.4F67F8D6C833BEEB.quest_desc: [
+		"Good news: you can build LV machines now."
+		"Bad news: you cannot power them yet."
+		""
+		"LV machines will not run on plain ULV power, but your grid is still mostly ULV. The answer is the LV transformer."
+		""
+		"An LV transformer bridges ULV and LV grids so early ULV power can drive LV equipment. LV generators need LV machines first, so this bridge is required."
+		""
+		"You must research battery technology to unlock its recipe. You cannot make batteries yet, so this is a tech you research before using fully."
+		""
+		"For early LV, the transformer is your temporary power solution. Without it, progress stops."
+	]
+	quest.4F67F8D6C833BEEB.quest_subtitle: "Make an LV transformer to connect ULV and LV grids"
+	quest.4F67F8D6C833BEEB.title: "Bridging Power Tiers"
+	quest.4F97D1CF666FB365.quest_desc: [
+		"The Item Storage Cell combines a 1M component, storage cores, and casing into usable digital inventory."
+		""
+		"From here, many scattered items can move into one managed system. Reserving ME capacity for common materials greatly reduces chest walls and manual counting."
+	]
+	quest.4F97D1CF666FB365.quest_subtitle: "Make your first ME Item Storage Cell"
+	quest.4F97D1CF666FB365.title: "1M Item Cell"
+	quest.4FF5F28B05D7D3BD.quest_desc: [
+		"The Integrated Processor is your first MV CPU Circuit Board and a milestone for electronics. It starts as a strong MV component and can be upgraded three more times, up to IV, so this board line will follow you into HV and beyond."
+		""
+		"Its core materials are the CPU Chip you just etched and the Plastic Circuit Board from MV research. Add common electronic parts such as resistors, capacitors, transistors, fine wire, and soldering alloy to assemble a real computing brain."
+		""
+		"With the same Plastic Circuit Board and CPU Chip, you can also craft NAND Chips and Microprocessors. They serve as ULV and LV chips, letting CPU circuit boards replace Vacuum Tubes and old Integrated Circuits. They are costly now, but their value grows with better industry, chemistry, and cleanliness."
+	]
+	quest.4FF5F28B05D7D3BD.quest_subtitle: "Make Processor"
+	quest.4FF5F28B05D7D3BD.title: "Computer Age"
+	quest.500AD8E2A926B356.quest_desc: [
+		"Chlorine is an important inorganic chemical. You can make it steadily by electrolyzing brine or seawater. It looks hazardous, but it is extremely useful. Even in organic chemistry, chlorine appears as a key intermediate in many chains. Polymer synthesis and organic conversions will use it often. It can also make hydrogen chloride, an important acid."
+		""
+		"Start the Electrolyzer now. Future chemistry runs better with chlorine available."
+	]
+	quest.500AD8E2A926B356.quest_subtitle: "Electrolyze chlorine"
+	quest.500AD8E2A926B356.title: "A Sharp Green Gas"
+	quest.5088C6076EA6DD18.quest_desc: [
+		"The Good Electronic Circuit is the first MV circuit board you can craft. As an upgrade to the Electronic Circuit, it improves performance and lets you plan circuit automation. You need it for the LV Circuit Assembler, which will end manual circuit assembly."
+		""
+		"Use it to build some MV machines early, or wait until integrated circuit research is done before upgrading further. Many paths are open."
+	]
+	quest.5088C6076EA6DD18.quest_subtitle: "Make a Good Electronic Circuit toward MV"
+	quest.5088C6076EA6DD18.title: "Who Certifies This Board?"
+	quest.509698D71CF37F3F.quest_desc: [
+		"Remember the occasional failures when etching Memory Chips? The machine was fine; the environment was not clean enough. Tiny dust can ruin a wafer. As chips advance, cleanliness matters much more, so build a Cleanroom."
+		""
+		"A Cleanroom can be any size, but its length and width must be odd because the controller belongs at the roof center. Build the shell from lots of Plastic Concrete, and make the entire roof from Filter Casings. For visibility, replace walls with Clean Glass and add a door, but keep it shut."
+		""
+		"The Cleanroom consumes power to maintain cleanliness, and cleanliness directly affects laser etching success. Some advanced chips need more than 100% cleanliness, which future chapters will solve."
+		""
+		"Memory Chips can still be made in a normal environment, but CPUs need at least a Cleanroom or the failure rate is brutal. To bring in power, replace one Plastic Concrete wall block with a Power Relay or Transformer."
+		""
+		"Your electronics industry now enters the age of cleanliness."
+	]
+	quest.509698D71CF37F3F.quest_subtitle: "Build a Cleanroom for chip etching"
+	quest.509698D71CF37F3F.title: "Keep Dust Out"
+	quest.50A4694A51414D54.quest_desc: [
+		"Nitric Acid pushes the Ammonia route into a more aggressive chemical stage. It feeds Potassium Nitrate production, drives Toluene toward Gelled Toluene, and ultimately supports industrial TNT and explosive forming."
+		""
+		"This route will keep consuming Ammonia, oxygen, and water, so do not stop at the one bucket the quest asks for. Later explosives, Fertilizer, and rocket precursor materials will all draw from this capacity."
+	]
+	quest.50A4694A51414D54.quest_subtitle: "Oxidize Ammonia into a strong acid route"
+	quest.50A4694A51414D54.title: "Nitric Acid Opens Doors"
+	quest.513186862F1195DC.quest_desc: [
+		"All your lens, Cleanroom, and etching prep leads to this step: CPU Chips. This is your most complex and precise chip so far, and the core of CPU Circuit Boards."
+		""
+		"Etch CPU wafers in an MV Laser Engraver with the Diamond Lens installed. The lens handles the high energy density, and etching must happen inside a Cleanroom or contamination will ruin the wafer. Even there, success is not 100%; higher cleanliness means better odds."
+		""
+		"After etching, send the CPU Wafer to a Cutting Machine. It no longer needs a Cleanroom, and you will get real CPU Chips. They become the foundation of HV Circuit Boards and advanced computing components."
+	]
+	quest.513186862F1195DC.quest_subtitle: "Etch and cut CPU wafers into CPU chips"
+	quest.513186862F1195DC.title: "Give Silicon the Power to Think"
+	quest.51A3CD15BE4A96D2.quest_desc: [
+		"The ME Storage Detector turns storage state into a usable signal. When stock is full, empty, or at a threshold, production lines can react."
+		""
+		"Pair it with the Signal Controller to reduce overproduction and wake refill lines when important materials run low."
+	]
+	quest.51A3CD15BE4A96D2.quest_subtitle: "Make an ME Storage Detector"
+	quest.51A3CD15BE4A96D2.title: "See Stock Changes"
+	quest.5262782EE36EF6C4.quest_desc: [
+		"Nano-scale chips need steadier etching equipment with higher energy density. Upgrade the Laser Engraver to HV so wafer processing in the Cleanroom can meet the next precision tier."
+		""
+		"This machine is the core entry point for the optional Nano branch. The right gem lenses, clean conditions, and stable power all decide whether your advanced chip line is reliable."
+	]
+	quest.5262782EE36EF6C4.quest_subtitle: "Prepare stronger light for Nano chips"
+	quest.5262782EE36EF6C4.title: "HV Laser Precision"
+	quest.52D537C7D3268C67.quest_desc: [
+		"Oxygen is a common gas used often in chemistry. Distill Liquid Air for a steady source, or collect it as a byproduct from electrolyzing water and oxygen-bearing minerals. It is ordinary in air, but useful in many reactions."
+		""
+		"You need oxygen for high-temperature metallurgy, oxidizing inorganic compounds, acid preparation, and some polymer reactions."
+		""
+		"Keep a stable oxygen line so your chemistry and material production can mature."
+	]
+	quest.52D537C7D3268C67.quest_subtitle: "Get Oxygen from Liquid Air or electrolysis"
+	quest.52D537C7D3268C67.title: "Most Familiar Gas"
+	quest.532FC0BAF2E56F1D.quest_desc: [
+		"Ever wondered why redstone carries signals? The answer is silicon inside it. Centrifuge redstone for silicon dust, dope it with a little Gallium Arsenide, then slowly smelt it in the Electric Blast Furnace into precious Monocrystalline Silicon."
+		""
+		"This process needs Kanthal coil heat, draws heavy power, and is very slow. Check your grid load before starting."
+		""
+		"The good news: even though it is slow, each Monocrystalline Silicon gives many wafers, enough for many chips. This is your step into semiconductors."
+	]
+	quest.532FC0BAF2E56F1D.quest_subtitle: "Smelt Monocrystalline Silicon"
+	quest.532FC0BAF2E56F1D.title: "Redstone's Core"
+	quest.53CF0F042ABA566D.quest_desc: [
+		"Ammonium Chloride is the solid intermediate where Ammonia meets Hydrogen Chloride. It is less visible than acids or bases, but it connects advanced chemistry to the agriculture route."
+		""
+		"In this chapter, its most direct value is entering the Fertilizer recipe. Let Ammonia, Hydrogen Chloride, and Ammonium Chloride back each other up, and your chemical inventory becomes more flexible."
+	]
+	quest.53CF0F042ABA566D.quest_subtitle: "Fix Ammonia into solid salt"
+	quest.53CF0F042ABA566D.title: "Useful White Byproduct"
+	quest.54189E058A630417.quest_desc: [
+		"IV Electric Motor is not just an old motor moved up one tier. Silicone Rubber, Tungsten Steel, and Magnetic Neodymium meet here, checking whether your polymer, alloy, and Rare Earth routes are stable."
+		""
+		"The recipe also pulls in IV Cable. It depends on Silicone Rubber Foil and Annealed Copper Wire, so stabilize both supplies before automated assembly."
+		""
+		"Once this motor is made, the IV component route starts moving. Rocket T2's IV Electric Pump will push the material list further from here."
+	]
+	quest.54189E058A630417.quest_subtitle: "Converge materials into a drive core"
+	quest.54189E058A630417.title: "IV Electric Motor"
+	quest.544D43BC44955AED.quest_desc: [
+		"The Nanoprocessor Assembly organizes several Nanoprocessors into a higher computing unit, letting this branch satisfy EV-tier circuit demand."
+		""
+		"It is powerful, but not the only electronics answer before Rocket T1. If Workstations already cover rocket control, treat the Nano array as a longer-term electronics expansion."
+	]
+	quest.544D43BC44955AED.quest_subtitle: "Optional EV-tier circuit exit"
+	quest.544D43BC44955AED.title: "Nano Array Endpoint"
+	quest.54D61C6A8BA84D5D.quest_desc: [
+		"The Workstation upgrades the mature CPU circuit line into EV-tier circuit capability, making it the clearest and most controllable electronics exit for Rocket T1."
+		""
+		"Compared with completing the full Nano branch, this is the better main path before your first launch. Stabilize CPU production, board supply, and circuit assembly so the rocket has a control core."
+	]
+	quest.54D61C6A8BA84D5D.quest_subtitle: "A visible circuit route to Rocket T1"
+	quest.54D61C6A8BA84D5D.title: "Put Chips to Work"
+	quest.5557C2511290CA78.quest_desc: [
+		"You have automated machines such as the Assembler, but they will not work until configured correctly."
+		""
+		"Each machine has a button in the lower left. Click it to open the supported recipe book. Browse available recipes there and choose a target recipe."
+		""
+		"After you select a recipe, the machine only runs that recipe and only accepts the materials it needs."
+		""
+		"Choosing and managing recipes is essential for stable automated production."
+		""
+		"Tip: hover a recipe book button and press R to open JEI for the recipe details."
+	]
+	quest.5557C2511290CA78.quest_subtitle: "Set recipes so machines work as intended"
+	quest.5557C2511290CA78.title: "Why is my Assembler not working?"
+	quest.55C4BF2F153D12A2.quest_desc: [
+		"Annealed Copper reworks ordinary Copper into material better suited for higher-tier wiring. Use the Arc Furnace route first, then draw it into wire for IV Cable and later motors."
+		""
+		"From here, Copper is no longer just early wiring. If Annealed Copper supply falls behind, IV Electric Motors and higher components will stall on a simple-looking conductor."
+	]
+	quest.55C4BF2F153D12A2.quest_subtitle: "Prepare flexible conductors for IV Cable"
+	quest.55C4BF2F153D12A2.title: "Anneal the Copper"
+	quest.56D30433BF43D996.quest_desc: [
+		"TNT is not combat gear here; it is a consumable for shock forming. Assemble Gelled Toluene and Polyethylene into stable explosives so the Implosion Compressor has reliable input."
+		""
+		"From this point, explosions are part of production planning. Advanced Alloy will keep consuming TNT, so buffer and automate it like any factory material."
+	]
+	quest.56D30433BF43D996.quest_subtitle: "Feed the Implosion Compressor reliably"
+	quest.56D30433BF43D996.title: "Explosions Need Throughput"
+	quest.56D39B7C7922E621.quest_desc: [
+		"HV is not a faster MV, but a new layer of infrastructure. Stainless steel frames, Polyethylene insulation, and CPU-grade circuits start becoming the default machine cost."
+		""
+		"Prepare HV Machine Hulls and HV cables first. Later machines, power, and material routes will all build around them."
+	]
+	quest.56D39B7C7922E621.quest_subtitle: "Assemble HV Machine Hulls and cables"
+	quest.56D39B7C7922E621.title: "The First HV Foundation"
+	quest.58CADDA8A187C6EE.quest_desc: [
+		"Mixed Metal Ingot is not an endpoint material; it is the composite billet prepared for Advanced Alloy. Chrome, Aluminium, Stainless Steel, and Soldering Alloy are organized here into a form that can keep shaping."
+		""
+		"Its value appears downstream: research equipment, rocket structure, and Advanced Alloy all pull this line into the same cost pressure. Smooth it early to avoid emergency batches later."
+	]
+	quest.58CADDA8A187C6EE.quest_subtitle: "Feed Mixed Metal Ingots into Advanced Alloy"
+	quest.58CADDA8A187C6EE.title: "Metals into a Composite Billet"
+	quest.58D2EC265947048E.quest_desc: [
+		"The thermal centrifuge heats and spins minerals to extract special byproducts that other processing methods cannot get."
+		""
+		"Use it at the last step of mineral processing to squeeze out extra value, especially from rare minerals."
+		""
+		"This stronger processing has a cost: it is currently your most power-hungry single-block machine."
+		""
+		"Plan a separate mineral line for it so high-value ores can be handled cleanly."
+	]
+	quest.58D2EC265947048E.quest_subtitle: "Make a thermal centrifuge"
+	quest.58D2EC265947048E.title: "Hotter, Harder Spin"
+	quest.59EBEC74442E5628.quest_desc: [
+		"You can now make MV Sensors and MV Emitters. They are used for MV research devices and Laser Engravers, making them key upgrade parts. The MV Ore Analyzer also gets faster, though it cannot detect higher-tier veins."
+		""
+		"These MV components use ruby as the laser material and electrum for high-conductivity connections. They cost more than LV glass and brass, but your current lines should handle them. Upgrade them to support research and circuit production."
+	]
+	quest.59EBEC74442E5628.quest_subtitle: "Make MV Sensors and Emitters"
+	quest.59EBEC74442E5628.title: "Light and Signals Reach MV"
+	quest.5A4D1E6F0C2B3A10.quest_desc: [
+		"The Naquadah vein yields Raw Naquadah with a smaller Enriched Naquadah signal. It is the End Stone source for the Fusion-era Naquadah line."
+		""
+		"Keep both raw materials. Base Naquadah supports coils, wafers, and refinement, while Enriched Naquadah points toward reactor fuel and later stabilization routes."
+	]
+	quest.5A4D1E6F0C2B3A10.quest_subtitle: "Analyze End Stone for Naquadah"
+	quest.5A4D1E6F0C2B3A10.title: "Naquadah Vein"
+	quest.5AE622A70ABBD7F7.quest_desc: [
+		"LV batteries need cadmium. It has no normal vein here; get it as a byproduct from thermal centrifuging pyrite ore."
+		""
+		"Yield is low, but demand is also small. Process some pyrite early to prepare for batteries."
+	]
+	quest.5AE622A70ABBD7F7.quest_subtitle: "Cadmium"
+	quest.5AE622A70ABBD7F7.title: "Key Battery Material"
+	quest.5B60F443F822A96F.quest_desc: [
+		"You may have noticed sulfur from washing pyrite and chalcopyrite. Sulfur is needed for rubber, which is used in cables, machine parts, and other materials for entering LV."
+		""
+		"In ULV, you do not need to rush rubber farming yet."
+	]
+	quest.5B60F443F822A96F.quest_subtitle: "Get the key byproduct for rubber"
+	quest.5B60F443F822A96F.title: "Extract Sulfur"
+	quest.5C65ABBA0E7F23DC.quest_desc: [
+		"LV will quickly raise your rubber demand. Plant the rubber saplings from your starting chest and begin this key supply chain."
+		""
+		"Plant them like normal trees, then harvest the wood. Rubber trees drop sticky resin, the base for wires, machine parts, and automation."
+		""
+		"Grind sticky resin into raw rubber dust, the first step toward rubber. Without rubber, LV progress will stall, so keep these trees going."
+	]
+	quest.5C65ABBA0E7F23DC.quest_subtitle: "Plant your first rubber tree"
+	quest.5C65ABBA0E7F23DC.title: "A Sticky Future"
+	quest.5CA02C19E0D43DB9.quest_desc: [
+		"The road to industry is great, but building a dream alone is exhausting. Tinactory has its own team system so you can share machines, tech, and progress with partners."
+		""
+		"In singleplayer, or if you want to play alone, press the ~ key to open the Technology Screen and enter any name to create a solo team. This binds your tech and machines to that team."
+		""
+		"On a server, you can also use this command:"
+		""
+		"/tinactory addPlayerToTeam <player>"
+		""
+		"to invite another player to your team."
+		"If server spawn management is enabled, these actions also create a sky island and set spawn for easier team starts."
+		""
+		"Note: FTBQuests cannot directly use vanilla teams, so Tinactory teams do not sync quest progress automatically."
+		"To share quest progress with teammates, create a team with the same name in FTBTeams."
+	]
+	quest.5CA02C19E0D43DB9.quest_subtitle: "Learn to create or join a team"
+	quest.5CA02C19E0D43DB9.title: "Too Lonely Alone"
+	quest.5CD1BF9CBC8CB89F.quest_desc: [
+		"Cetane Boosted Diesel strengthens regular Diesel, preparing a better fuel base for high-tier demand and later rockets."
+		""
+		"This route consumes more chemistry and refining capacity, so automate it early. One quest cell will not keep up for long."
+	]
+	quest.5CD1BF9CBC8CB89F.quest_subtitle: "Upgrade Diesel fuel quality"
+	quest.5CD1BF9CBC8CB89F.title: "Cetane Boosted Diesel"
+	quest.5D3D592F154FE900.quest_desc: [
+		"Besides items and power, many machines handle fluids. Learning fluid input and output helps you run machines such as Ore Washers and boilers that need water or steam."
+		""
+		"In the machine GUI, darker slots are fluid slots, not item slots. They are used to input or output liquids."
+		""
+		"Click a fluid slot with a water or lava bucket/container to insert or extract fluid."
+		"For other fluids, craft Fluid Cells to move and buffer them."
+	]
+	quest.5D3D592F154FE900.quest_subtitle: "Input and output fluids"
+	quest.5D3D592F154FE900.title: "Add Water to Machines?"
+	quest.5DC23C29B4D8EAE1.quest_desc: [
+		"Sensors and emitters are not consumed in bulk, but they unlock important parts of the tech tree."
+		""
+		"LV sensors and emitters need brass, so the zinc from thermal centrifuging is useful now. They also need some circuit boards."
+		""
+		"They unlock LV research gear, upgrade the ULV ore analyzer to LV, and later become core parts for integrated circuit production machines."
+	]
+	quest.5DC23C29B4D8EAE1.quest_subtitle: "Make LV sensors and emitters"
+	quest.5DC23C29B4D8EAE1.title: "Send Signals"
+	quest.5E19A5F390FE2633.quest_desc: [
+		"Your electric blast furnace still runs as ULV. With LV parts like pumps and conveyors, replace its interface to bring it into LV."
+		""
+		"No full multiblock rebuild needed."
+		""
+		"The catch is power: LV multiblocks use 4 times the original power. An LV electric blast furnace can crush a weak grid."
+		""
+		"Make sure your power system is strong."
+	]
+	quest.5E19A5F390FE2633.quest_subtitle: "Make LV multiblock interfaces"
+	quest.5E19A5F390FE2633.title: "New Shells for Old Machines"
+	quest.5EDD9D5E4EE9487D.quest_desc: [
+		"The ME Signal Controller connects redstone logic to the signal network, letting external signals participate in machine control."
+		""
+		"Use it to switch lines, limit refills, or combine with detectors for stock thresholds. The more automated logistics becomes, the more it needs reliable stop conditions."
+	]
+	quest.5EDD9D5E4EE9487D.quest_subtitle: "Make an ME Signal Controller"
+	quest.5EDD9D5E4EE9487D.title: "Signals Join Logistics"
+	quest.6017FD3A9A7ADBFC.quest_desc: [
+		"The Fluid Storage Cell brings acids, fuels, and intermediate fluids into digital storage instead of adding more tanks forever."
+		""
+		"It is best for fluids you need long term but not always in motion. Local lines still need buffers; ME handles central stock."
+	]
+	quest.6017FD3A9A7ADBFC.quest_subtitle: "Make an ME Fluid Storage Cell"
+	quest.6017FD3A9A7ADBFC.title: "1M Fluid Cell"
+	quest.60E67F1969C46975.quest_desc: [
+		"You have magnetic steel rods. Turn one into an electric motor, the common LV drive part your factory will use constantly."
+		""
+		"The recipe needs a magnetic steel rod, a normal steel rod, copper wire, and LV cable."
+		""
+		"You will need motors for many machines and line upgrades. Assemble the parts and get the factory moving."
+	]
+	quest.60E67F1969C46975.quest_subtitle: "Assemble an electric motor"
+	quest.60E67F1969C46975.title: "Make Everything Spin"
+	quest.61B9D2ACAF1C5D38.quest_desc: [
+		"After chlorination, reduction, and quenching, Titanium finally turns from rutile into usable metal. It will carry higher structures, Machine Hulls, and the next stage of material routes."
+		""
+		"From here, the HV factory is no longer just scaling MV processes. It is preparing for EV-level material gates."
+	]
+	quest.61B9D2ACAF1C5D38.quest_subtitle: "Make Titanium usable structure"
+	quest.61B9D2ACAF1C5D38.title: "Light, Tough Titanium"
+	quest.61C306A510164241.quest_desc: [
+		"The ME Storage Interface bridges ordinary machine logistics and digital storage, so later materials do not stay scattered across chests and tanks."
+		""
+		"Prepare the interface first. Once quartz, Fluix, and storage components are ready, this chapter can move from transport networks to unified storage."
+	]
+	quest.61C306A510164241.quest_subtitle: "Make an ME Storage Interface"
+	quest.61C306A510164241.title: "Connect ME Storage"
+	quest.61E3BD587521AAF2.quest_desc: [
+		"In Tinactory, power is the core of an automated factory. Learning the basics helps you build and expand stable industrial networks."
+		""
+		"Basic units:"
+		"EU: energy unit"
+		"EU/t: power unit, where t is one game tick"
+		"V: voltage unit"
+		""
+		"Each machine and recipe has a voltage requirement. ULV is 8V. Adjacent tiers differ by 4x, so LV is 32V. A machine's voltage must meet the recipe voltage or it cannot run."
+		""
+		"Cable links:"
+		"Each voltage has matching cables."
+		"Machines only connect to same-voltage cables."
+		"Different cable voltages cannot connect. Use a transformer to bridge tiers."
+		"Some machines like Steam Boilers have no voltage limit and can use any cable."
+		""
+		"Cables lose power while transmitting it. At the same power, higher voltage means lower loss, so raising voltage reduces waste."
+		""
+		"If you know GregTech, Tinactory's grid is smarter: all generators and consumers on one grid are calculated together. Machines do not request power or store buffers. If power is short, machines slow down instead of tripping."
+		""
+		"This lets you focus on machine layout and power planning instead of complex energy routing."
+	]
+	quest.61E3BD587521AAF2.quest_subtitle: "Voltage, power, and grid basics"
+	quest.61E3BD587521AAF2.title: "Power Grid"
+	quest.622946BC50B50E5E.quest_desc: [
+		"Your factory can handle powders, solids, and fluids. Research heat treatment and build an LV extractor to add melting and forming workflows."
+		""
+		"The extractor melts materials into fluids. In LV, its most important use is rubber processing."
+		""
+		"Molten rubber can be injected into molds for cable insulation. It saves material and is faster and cleaner for automation lines."
+		""
+		"Molten materials can later go to a fluid solidifier for shaped parts. You do not need one now, but in MV it can process metals too."
+	]
+	quest.622946BC50B50E5E.quest_subtitle: "Research heat and make an LV extractor"
+	quest.622946BC50B50E5E.title: "Hot Partner"
+	quest.635C4C25FAC0CA40.quest_desc: ["Send liquid air into the Distillation Tower to separate its three main components: nitrogen, oxygen, and rare argon. Nitrogen is the one you need next. Its value is not reactivity, but doing almost nothing. It is an excellent protective gas that prevents metals and other materials from oxidizing at high temperature. Use the tower for air separation and prepare for high temperature material processing."]
+	quest.635C4C25FAC0CA40.quest_subtitle: "Distill nitrogen"
+	quest.635C4C25FAC0CA40.title: "Harmless Silent Gas"
+	quest.635F21655837922F.quest_desc: [
+		"Biomass is a natural organic feedstock. Put crops, leaves, or seeds into an Extractor to get this pale green plant essence. With an automated farm and a steady bone meal line, you can mass-produce it. Yields differ by crop; sugary crops such as sugar cane are especially good."
+		""
+		"Biomass is an organic chemistry route beside oil. It can be processed into ethanol and methane, replacing some oil products. It is cleaner and greener, but the core organic material you will use later, propylene, still comes only from oil. Even so, biomass lowers your oil dependence."
+	]
+	quest.635F21655837922F.quest_subtitle: "Get Biomass with the Extractor"
+	quest.635F21655837922F.title: "A Different Route"
+	quest.642B670E0BD087C2.quest_desc: ["Pitchblende Vein: Pitchblende and Thorium."]
+	quest.642B670E0BD087C2.quest_subtitle: "Unlock Pitchblende"
+	quest.642B670E0BD087C2.title: "Pitchblende Vein"
+	quest.645CBB8D8FE85012.quest_desc: [
+		"PDMS connects the silicon route to high-tier insulation, then becomes tougher Silicone Rubber Foil. EV starts demanding not just metal conductors, but jackets that can survive the voltage."
+		""
+		"EV Cable directly needs this jacket material. Stabilize PDMS and Silicone Rubber production so later EV Machine Hulls and base components can actually carry power."
+	]
+	quest.645CBB8D8FE85012.quest_subtitle: "Turn PDMS into EV cable jackets"
+	quest.645CBB8D8FE85012.title: "Silicone Carries Power"
+	quest.65D0B60510463343.quest_desc: [
+		"The Silicon Print presses Fluix, circuit metal, and Epoxy into one base, splitting ME autocrafting away from ordinary storage."
+		""
+		"Processors and pattern cells both consume it. Put this small part into assembly first so the autocrafting route does not stall at the entrance."
+	]
+	quest.65D0B60510463343.quest_subtitle: "Make a Silicon Print"
+	quest.65D0B60510463343.title: "Print on Silicon"
+	quest.662483EF1D1C66F5.quest_desc: [
+		"With Certus Seeds and Fluix Dust ready, the Autoclave can bring Fluix into a repeatable crystal loop too. These crystals serve EV component materials, not the full ME storage route yet."
+		""
+		"Stabilize this small loop first. When later Sensors, Emitters, and higher storage materials ask for Fluix, the factory will not fall back to small manual batches."
+	]
+	quest.662483EF1D1C66F5.quest_subtitle: "Connect mixed dust to crystal growth"
+	quest.662483EF1D1C66F5.title: "Fluix Enters the Loop"
+	quest.681E37422C8CADA2.quest_desc: ["The Bauxite Vein yields Bauxite and Ilmenite."]
+	quest.681E37422C8CADA2.quest_subtitle: "Unlock Bauxite"
+	quest.681E37422C8CADA2.title: "Bauxite Vein"
+	quest.6885F61C806D96E5.quest_desc: [
+		"EV Cable and EV Machine Hull turn earlier Silicone Rubber, Titanium materials, and circuit prep into the real base for machines. At this point, EV is no longer just the next label."
+		""
+		"These parts become the common entry to more EV machines. Stabilize cables and hulls first so Assemblers, Electric Pumps, and later components have a reliable start."
+	]
+	quest.6885F61C806D96E5.quest_subtitle: "Bring cables and hulls to the new voltage"
+	quest.6885F61C806D96E5.title: "EV Base Takes Shape"
+	quest.68F5AD73DE837B0F.quest_desc: [
+		"Batteries are finally here. In Tinactory, they store power and help stabilize your grid."
+		""
+		"Build a battery box, connect it to the grid, and insert LV batteries. It will charge or discharge automatically with no setup."
+		""
+		"Batteries need the cadmium you prepared, plus battery alloy and LV cable."
+		""
+		"Your grid now has a buffer and is ready for bigger automation."
+	]
+	quest.68F5AD73DE837B0F.quest_subtitle: "Make LV batteries and a battery box"
+	quest.68F5AD73DE837B0F.title: "Keep the Power"
+	quest.69A0DE7834E046EF.quest_desc: [
+		"The Good Electric Tank fits the growing fluid load of chemistry, boilers, and fuel lines."
+		""
+		"Stable fluid buffers absorb production swings, keeping reactors, turbines, and fuel machines from stopping over one missing batch."
+	]
+	quest.69A0DE7834E046EF.quest_subtitle: "Make a Good Electric Tank"
+	quest.69A0DE7834E046EF.title: "Fluid Buffer Upgrade"
+	quest.6A56C38D3F934B21.quest_desc: [
+		"The Power Substation organizes large grids, connecting scattered generation and factory loads into a clearer energy structure."
+		""
+		"As generation routes multiply, power problems are not only about total output. The network also needs better collection, distribution, and room to expand."
+	]
+	quest.6A56C38D3F934B21.quest_subtitle: "Give large grids a hub"
+	quest.6A56C38D3F934B21.title: "Power Substation"
+	quest.6B49621FBB91226F.quest_desc: [
+		"If vanilla furnaces still handle your smelting, upgrade to an LV electric furnace."
+		""
+		"Research electric heating to unlock it. It runs twice as fast and no longer needs fuel."
+		""
+		"It also uses a fair amount of power. With a weak early LV grid, it may start and then black out your line."
+		""
+		"Build stable LV power first through better steam or generation flow. Otherwise this furnace may just sit idle."
+	]
+	quest.6B49621FBB91226F.quest_subtitle: "Make an LV electric furnace"
+	quest.6B49621FBB91226F.title: "Furnace 2.0"
+	quest.6B8F14E71AA1CA43.quest_desc: [
+		"Electrum is a good alloy of gold and silver. It has warm color and good conductivity, making it key for circuit boards and electrical parts."
+		""
+		"Mix gold dust and silver dust, then bake the blend in an Electric Furnace, or melt both dusts together in an Alloy Smelter. Electrum becomes more important as voltage rises, and later electrical parts will use it often."
+	]
+	quest.6B8F14E71AA1CA43.quest_subtitle: "Craft electrum alloy"
+	quest.6B8F14E71AA1CA43.title: "Gold and Silver Together"
+	quest.6B9A8C331ED24087.quest_desc: [
+		"Now that you have redstone, put copper and redstone into the alloy furnace to make bright, useful red alloy."
+		""
+		"Red alloy has two clear strengths:"
+		"It is soft and easy to work, so it cuts, presses, and forms into small parts well."
+		"It carries electrical signals very well, making it perfect for circuits."
+		""
+		"Because of this, it is excellent for LV circuit boards. Keep the alloy furnace powered and feed it the right copper and redstone mix."
+	]
+	quest.6B9A8C331ED24087.quest_subtitle: "Smelt red alloy"
+	quest.6B9A8C331ED24087.title: "Redstone 2.0"
+	quest.6C282FDF8B8AB341.quest_desc: [
+		"Silicon is the base of semiconductors, but it needs doping to conduct and control signals well. The needed additives are arsenic and gallium. Extract arsenic from Cobaltite dust, and get gallium from three deepslate ores in sulfur veins."
+		""
+		"Once you have enough of both, mix Gallium Arsenide in the mixer. It is a key semiconductor material and your first step toward integrated circuits. Process those new ores early; they are more complex than they look."
+	]
+	quest.6C282FDF8B8AB341.quest_subtitle: "Make Gallium Arsenide for chips"
+	quest.6C282FDF8B8AB341.title: "A Spoonful of Mystery"
+	quest.6C6BCCF6F62D37B0.quest_desc: [
+		"Sodium Hydroxide is an essential base for MV chemistry. As acids dissolve advanced minerals, you still need to recover the minerals from solution. Sodium Hydroxide neutralizes the acid into harmless brine and lets refined minerals precipitate. It also helps control pH in organic chemistry."
+		""
+		"There are two main routes. The direct route is brine electrolysis, which also gives chlorine. The other makes Sodium Carbonate first, then processes it into Sodium Hydroxide. In MV, that route is slower and more expensive than electrolysis."
+		""
+		"As chemistry grows more complex, you will need Sodium Hydroxide often. Keeping Electrolyzers running is the easiest choice."
+	]
+	quest.6C6BCCF6F62D37B0.quest_subtitle: "Get NaOH"
+	quest.6C6BCCF6F62D37B0.title: "Acid Neutralizer"
+	quest.6CBAE7AF9D17A28D.quest_desc: [
+		"The Limonite Vein yields Limonite, Banded Iron, and Garnierite. It is the first vein unlocked by Stone Ores research."
+		""
+		"You need ULV research and an Ore Analyzer."
+	]
+	quest.6CBAE7AF9D17A28D.quest_subtitle: "Research Stone Ores to unlock the Limonite Vein"
+	quest.6CBAE7AF9D17A28D.title: "Limonite Vein"
+	quest.6D4396F046AC59FA.quest_desc: [
+		"The EV Assembler raises both assembly precision and power requirements. Some IV-tier parts can no longer be forced through older equipment and need this voltage to form."
+		""
+		"Its first job is the IV Electric Pump for Rocket T2. Put this machine on the line, and EV components gain a real outlet while the rocket material list keeps converging."
+	]
+	quest.6D4396F046AC59FA.quest_subtitle: "Shape IV components at the new voltage"
+	quest.6D4396F046AC59FA.title: "Assembly Enters EV"
+	quest.6EBA694D07E58E72.quest_desc: [
+		"As you explore ore processing, nickel becomes a new key material. It is needed for heat-resistant alloys such as Invar and Cupronickel, and later for high-temperature processing and advanced parts."
+		""
+		"Nickel comes as a byproduct from limonite and banded iron ore, or by directly processing garnierite. These ores require the ULV Ore Analyzer and the limonite vein research unlock."
+		""
+		"You will soon use it to make tougher metals that can handle heat, preparing your factory for higher voltage tiers."
+	]
+	quest.6EBA694D07E58E72.quest_subtitle: "Get nickel for alloys"
+	quest.6EBA694D07E58E72.title: "First Heat-Resistant Metal"
+	quest.6ECD29DDE2637A82.quest_desc: [
+		"Neodymium Dust is only feedstock. IV Electric Motor needs Magnetic Neodymium that can provide a stable strong field, so shape the Neodymium before magnetizing it."
+		""
+		"This gate looks small, but it can stop the whole component route. Once magnet supply is connected, IV motors can actually enter assembly."
+	]
+	quest.6ECD29DDE2637A82.quest_subtitle: "Turn Neodymium into IV motor magnets"
+	quest.6ECD29DDE2637A82.title: "Magnets in Place"
+	quest.6F4A7B2C1D039E58.quest_desc: [
+		"The Nuclear Reactor pushes generation into dense energy output while checking coolant, EV assembly, and Advanced Alloy foundations together."
+		""
+		"Before building it, confirm the coolant loop and grid can handle continuous operation. Nuclear power brings strong output and stricter logistics planning."
+	]
+	quest.6F4A7B2C1D039E58.quest_subtitle: "Test coolant and materials together"
+	quest.6F4A7B2C1D039E58.title: "Nuclear Reactor"
+	quest.6F6EE8943B6B06BC.quest_desc: [
+		"Now make your first key device: the ULV Assembler. This machine is central to the whole factory system. It can automate many complex crafts and is required for most components and machines."
+		""
+		"In the ULV stage, many components and machines can still be crafted with tools in the Workbench, but this is temporary. At higher voltages, almost all components and machines must be made in an Assembler."
+		""
+		"The Assembler is your first step toward automated, scaled production. The sooner you learn it, the faster your factory can run efficiently."
+	]
+	quest.6F6EE8943B6B06BC.quest_subtitle: "Make a ULV Assembler"
+	quest.6F6EE8943B6B06BC.title: "Assembler"
+	quest.70A3BD39E2350A91.quest_desc: [
+		"With cobblestone, explore its hidden ores. Make a Primitive Ore Analyzer and Primitive Ore Washer to begin your mining tech age."
+		""
+		"Put cobblestone into the analyzer for a chance to find ore crystals. Do not be surprised; this is one of Tinactory's core mechanics. For now, you can only find iron and copper, but more ores will appear as your tech advances."
+		""
+		"Raw ore from analysis cannot be used directly and must be washed. Make a Primitive Ore Washer and supply it with water to get clean ore samples."
+		""
+		"Tip: use the starter chest's two water buckets to make infinite water and keep your washer running."
+	]
+	quest.70A3BD39E2350A91.quest_subtitle: "Analyze and wash ore"
+	quest.70A3BD39E2350A91.title: "Ore Begins"
+	quest.731064B7C69CA184.quest_desc: [
+		"You may be used to making alloys in an alloy furnace, but the LV Mixer opens a new process route."
+		""
+		"The LV Mixer is flexible. It can combine two or more metal dusts into alloy dust, then a furnace or blast furnace can smelt it into ingots. This works for more recipes than an alloy furnace, and some high-heat metals require it."
+		""
+		"It can also mix fluids, not just solids. Later, many processes will require mixing two liquids."
+		""
+		"Tip: this machine does not run automatically. Start it with the recipe book."
+	]
+	quest.731064B7C69CA184.quest_subtitle: "Make a LV Mixer"
+	quest.731064B7C69CA184.title: "Mix It Up"
+	quest.7363E5AC14AECA75.quest_desc: ["The Tungstate Vein yields Tungstate and Molybdate."]
+	quest.7363E5AC14AECA75.quest_subtitle: "Unlock Tungstate"
+	quest.7363E5AC14AECA75.title: "Tungstate Vein"
+	quest.741B39FABC429FFC.quest_desc: [
+		"The Distillation Tower is a true MV chemical multiblock. It splits mixed fluids back into components: salts from seawater, fractions from oil, and different gases from liquid air. The taller the tower, the more complete the separation."
+		""
+		"It is expensive. The shell needs many clean stainless steel casings, and the controller uses several HV components and an HV circuit board, making it your costliest multiblock so far. It can be 3 to 8 layers tall. More layers give more outputs: 3 layers gives 1 product, while 8 layers can separate all 6 fractions."
+		""
+		"This is the first real threshold for large scale chemical industry. Once the Distillation Tower runs, your factory can analyze mixed fluids and prepare for deeper modern industry."
+	]
+	quest.741B39FABC429FFC.quest_subtitle: "Build a Distillation Tower"
+	quest.741B39FABC429FFC.title: "Distill the World's Secrets"
+	quest.742D07DE04DB82F6.quest_desc: [
+		"Launch Site Base turns rocket engineering from a material list into a field structure. Advanced Alloy and HV research first become real spaceflight construction here."
+		""
+		"From here, the goal is not one machine, but infrastructure that can carry a launch flow. Leave space for the base, and leave interfaces for fuel, logistics, and the main structure."
+	]
+	quest.742D07DE04DB82F6.quest_subtitle: "Anchor the first launch facility with its base"
+	quest.742D07DE04DB82F6.title: "Launch Site Touches Ground"
+	quest.74F77E09DA51F48F.quest_desc: [
+		"The Autoclave turns crystal work from waiting and gathering into controlled production. It manages pressure, temperature, and solution conditions, so dusts can grow back into usable crystals."
+		""
+		"Certus Quartz and Fluix crystallization still fits within HV voltage capability, but Rocket T1 delayed the resource entry until here. Now is the right time to bring this machine into early EV."
+	]
+	quest.74F77E09DA51F48F.quest_subtitle: "Build the multiblock for crystal growth"
+	quest.74F77E09DA51F48F.title: "Autoclave"
+	quest.756F380B2118DD7F.quest_desc: [
+		"Netherrack veins bring Certus Quartz and Nether Quartz into steady supply. First connect the dust route to storage; these will become the quartz base for continued EV component upgrades."
+		""
+		"The full Digital Storage route belongs in the Logistics chapter. EV only needs the material value of Certus Quartz and Fluix for now, so later Sensors, Emitters, and components can start moving."
+	]
+	quest.756F380B2118DD7F.quest_subtitle: "Obtain Certus Quartz Dust and Nether Quartz Dust"
+	quest.756F380B2118DD7F.title: "Quartz Vein Access"
+	quest.7588EBD7994D2C3F.quest_desc: [
+		"Battery Alloy is made for batteries, with good insulation and sealing. Mix lead and zinc in a mixer or alloy furnace to make it."
+		""
+		"Get lead and zinc dust from Pyrite or Chalcopyrite byproducts, or wait for sulfur veins later for steadier sources."
+	]
+	quest.7588EBD7994D2C3F.quest_subtitle: "Make Battery Alloy"
+	quest.7588EBD7994D2C3F.title: "Insulating Alloy?"
+	quest.7617169E5734A74B.quest_desc: [
+		"ME Pattern Cells store autocrafting patterns, so recipes do not compete with normal item and fluid storage cells."
+		""
+		"The 1M version is enough for your first common recipes. Encode basic materials, parts, and machine routes before expanding the recipe library."
+	]
+	quest.7617169E5734A74B.quest_subtitle: "Make a 1M ME Pattern Cell"
+	quest.7617169E5734A74B.title: "First Pattern Cell"
+	quest.76896CF4A26C08CD.quest_desc: [
+		"The ME Drive holds storage cells, turning digital storage from loose items into a system block."
+		""
+		"Cells need a stable place to live. Put the drive near your ME network entry so later expansion and maintenance stay easy."
+	]
+	quest.76896CF4A26C08CD.quest_subtitle: "Make an ME Drive"
+	quest.76896CF4A26C08CD.title: "Give Cells a Rack"
+	quest.7696374781756109.quest_desc: ["Fluix Dust does not need the Autoclave to begin. Send Certus Quartz, Nether Quartz, and Redstone into an HV Mixer to make the mixed dust this EV component line will keep scaling."]
+	quest.7696374781756109.quest_subtitle: "Make the dust in an HV Mixer"
+	quest.7696374781756109.title: "Fluix Starts with Mixing"
+	quest.7754C6016593C2B8.quest_desc: [
+		"Rocket Fuel is not only a spaceflight material; it proves you can merge fuel and oxidizer routes into a high-energy fluid."
+		""
+		"Its place in the power chapter is a reminder that fuel industry spans both grids and rockets. Stabilize it before larger goals need propellant."
+	]
+	quest.7754C6016593C2B8.quest_subtitle: "Move light fuel into propulsion"
+	quest.7754C6016593C2B8.title: "Rocket Fuel"
+	quest.77F50D58EF027BF0.quest_desc: ["Once Certus Quartz Dust becomes seeds, the Autoclave can turn one-time vein output into a loop. Start with dust, feed crystals back in, and Certus Quartz becomes fit for long-term EV component demand."]
+	quest.77F50D58EF027BF0.quest_subtitle: "Scale quartz supply with seeds"
+	quest.77F50D58EF027BF0.title: "Certus Starts Cycling"
+	quest.7890894D11E55E47.quest_desc: [
+		"The High Pressure Steam Boiler turns fuel and water into a much stronger steam supply, which is key to expanding steam power."
+		""
+		"Keep fuel, water, and steam buffers stable. The larger the boiler output, the more visible every supply gap becomes."
+	]
+	quest.7890894D11E55E47.quest_subtitle: "Raise steam output"
+	quest.7890894D11E55E47.title: "High Pressure Steam Boiler"
+	quest.78D14C9B7CC16AD1.quest_desc: [
+		"Ammonia is the first base gas that truly opens HV chemistry. Send steady nitrogen and hydrogen into a Chemical Reactor, and you get the core feedstock for Nitric Acid, Ammonium Chloride, Fertilizer, and alkali routes."
+		""
+		"From here, chemistry is no longer just processing byproducts; it starts arranging element flows directly. Give Ammonia stable storage and transport, and later acid, salt, and fuel routes will run more smoothly."
+	]
+	quest.78D14C9B7CC16AD1.quest_subtitle: "Synthesize the first Ammonia"
+	quest.78D14C9B7CC16AD1.title: "Nitrogen Meets Hydrogen"
+	quest.7902ED312A19F27B.quest_desc: [
+		"Diesel is the core fuel that brings refining into power generation, better suited to continuous supply than early solid fuel."
+		""
+		"Connect Diesel production, buffering, and generator input into one loop, and the grid gains a predictable energy route."
+	]
+	quest.7902ED312A19F27B.quest_subtitle: "Prepare standard combustion fuel"
+	quest.7902ED312A19F27B.title: "Diesel"
+	quest.798BE473B9E052D3.quest_desc: [
+		"Chrome is no longer just a rare Kanthal coil ingredient. In HV it enters Sensors, Mixed Metal Ingots, and higher alloy routes, so demand becomes much steadier."
+		""
+		"This wet route can turn gem byproduct Chrome into usable metal, but do not treat it as the only entry point. If you can supply Chrome reliably, the later material chain can keep moving."
+	]
+	quest.798BE473B9E052D3.quest_subtitle: "Bring Chrome into HV alloys"
+	quest.798BE473B9E052D3.title: "Pull Chrome from Solution"
+	quest.79DF7E4A2DFFCC09.quest_desc: [
+		"Ethanol is one path from Biomass into organic chemistry. Send Biomass and oxygen into a Chemical Reactor to ferment it. Ethanol can also burn directly in a Combustion Engine as cleaner green energy, reducing your need for coal for a while."
+		""
+		"In MV, ethanol is most useful as a route to ethylene. Dehydrate it with sulfuric acid to get this key organic monomer without refining oil. If you want chemistry without heavy oil use, ethanol is a strong green feedstock."
+	]
+	quest.79DF7E4A2DFFCC09.quest_subtitle: "Ferment Biomass to Ethanol"
+	quest.79DF7E4A2DFFCC09.title: "Plant Wine"
+	quest.7A00FA0C45702638.quest_desc: [
+		"Electric Tanks handle the fluid side of buffering. Steam, water, acids, and fuels all become easier to automate when they have stable storage."
+		""
+		"Use the Basic tank to learn the input and output rhythm. Higher-tier tanks will keep expanding capacity and throughput."
+	]
+	quest.7A00FA0C45702638.quest_subtitle: "Make a Basic Electric Tank"
+	quest.7A00FA0C45702638.title: "Buffer Fluids Too"
+	quest.7A85227BDB6CB5A2.quest_desc: [
+		"The Good Electric Chest is not the end of storage; it turns early lines from temporary boxes into sustainable buffers."
+		""
+		"Once machines run in parallel, chest capacity directly affects downtime. Give important inputs and byproducts a larger buffer first."
+	]
+	quest.7A85227BDB6CB5A2.quest_subtitle: "Move Electric Chests to Good capacity"
+	quest.7A85227BDB6CB5A2.title: "Item Buffer Upgrade"
+	quest.7AD47A6D95AD744E.quest_desc: [
+		"In Tinactory, ports are the key unit for machine logistics. Whether a Logistic Worker moves items or you add fluids by hand, transfers go through ports."
+		""
+		"A port is a logical group of machine slots. Each port may be an input or output."
+		"Use the machine GUI to view all ports. Click the port button in the lower right to open the port panel. Hover a port name, and the matching slots highlight on the right."
+		""
+		"Understanding ports lets you configure logistics tasks more accurately and connect each task to the correct input or output."
+	]
+	quest.7AD47A6D95AD744E.quest_subtitle: "View machine ports"
+	quest.7AD47A6D95AD744E.title: "What ports does it have?"
+	quest.7AE6BC52B1A42AE8.quest_desc: [
+		"To make higher-tier industrial equipment, you need two heat-resistant alloys: Invar and Cupronickel. Both are basic materials for hot processing, especially the Electric Blast Furnace."
+		""
+		"Invar is smelted from iron dust and nickel dust in a set ratio in the Alloy Smelter. Its heat resistance makes it useful for the Electric Blast Furnace casing."
+		""
+		"Cupronickel is made from copper dust and nickel dust. It conducts heat and is used for Cupronickel Furnace Coils."
+	]
+	quest.7AE6BC52B1A42AE8.quest_subtitle: "Make Invar and Cupronickel for hot machines"
+	quest.7AE6BC52B1A42AE8.title: "Heat-Resistant Alloys"
+	quest.7B6DDB0F8DA8568C.quest_desc: ["The Lava Ore vein yields Magma Blocks."]
+	quest.7B6DDB0F8DA8568C.quest_subtitle: "Unlock Lava Ore"
+	quest.7B6DDB0F8DA8568C.title: "Magma Vein"
+	quest.7B958900C6A6AC26.quest_desc: [
+		"The Logic Processor gives ME equipment the basic control needed for patterns and requests. It is automation control, not just more capacity."
+		""
+		"From here, the ME network does more than store materials. Keep Logic Processors available, because terminals and CPUs will both need them."
+	]
+	quest.7B958900C6A6AC26.quest_subtitle: "Make a Logic Processor"
+	quest.7B958900C6A6AC26.title: "Network Logic"
+	quest.7C26B4317AB3B529.quest_desc: [
+		"A whole Monocrystalline Silicon block is valuable, but it must be cut into thin wafers before chipmaking. Now that you have a Cutting Machine, use it."
+		""
+		"Put the Monocrystalline Silicon into the Cutting Machine to slice it into wafers. Each wafer will carry future circuit patterns for laser etching. One smelt gives many slices, making this first precision cut very efficient."
+	]
+	quest.7C26B4317AB3B529.quest_subtitle: "Cut Monocrystalline Silicon into etchable wafers"
+	quest.7C26B4317AB3B529.title: "One Block, Many Slices"
+	quest.7D54F712F6C6E8DF.quest_desc: [
+		"The MV Electrolyzer gives you steady aluminium and also produces a rare byproduct from bauxite: rutile. Its main content is titanium dioxide. You cannot process it much yet, but it becomes valuable for advanced materials later."
+		""
+		"If you do not have much bauxite, use another route: smelt ilmenite with carbon dust in the Blast Furnace. It gives iron and steady rutile. Stockpile it now; you will want it later."
+	]
+	quest.7D54F712F6C6E8DF.quest_subtitle: "Get rutile from bauxite or ilmenite"
+	quest.7D54F712F6C6E8DF.title: "A Red Hint for Later"
+	quest.7D809662BA293CFF.quest_desc: [
+		"As your factory grows, you may notice the old ore processing line is stable, but its byproducts are too limited. Time for finer separation: the LV Centrifuge."
+		""
+		"This machine spins mixed materials apart. Its most direct use now is processing ore dusts for byproducts washing cannot provide."
+		""
+		"Its early uses are limited, but it becomes more important as research advances. Many rare materials depend on precise centrifuging."
+	]
+	quest.7D809662BA293CFF.quest_subtitle: "Craft a LV Centrifuge to separate more ore byproducts"
+	quest.7D809662BA293CFF.title: "High-Speed Fine Separation"
+	quest.7E351C201E3FE985.quest_desc: [
+		"The Large Chemical Reactor lets Styrene and Butadiene polymerize steadily, turning Raw SBR from a small intermediate into a polymer route with planned throughput."
+		""
+		"This line supplies later high-grade rubber capacity. EV insulation, seals, and components will all need margin from it, so do not stop at one filled fluid cell."
+	]
+	quest.7E351C201E3FE985.quest_subtitle: "Move Raw SBR into LCR throughput"
+	quest.7E351C201E3FE985.title: "Synthetic Rubber Scales Up"
+	quest.7F568D268CA544F6.quest_desc: ["Liquid Oxygen checks the Vacuum Freezer and cryogenic fluid handling, not an LCR. Push steady Oxygen into liquid form so the Rocket T2 fuel route has a usable oxidizer."]
+	quest.7F568D268CA544F6.quest_subtitle: "Supply the oxidizer for Rocket T2"
+	quest.7F568D268CA544F6.title: "Oxygen Goes Cryogenic"
+	quest.7F86524AF19D5E4C.quest_desc: ["Graphite Vein: Graphite and Diamond."]
+	quest.7F86524AF19D5E4C.quest_subtitle: "Unlock Graphite"
+	quest.7F86524AF19D5E4C.title: "Graphite Vein"
+	quest.7FC43799DC08AC4E.quest_desc: [
+		"LPG organizes light hydrocarbons from refining into a fuel that can be stored and moved."
+		""
+		"Fill an Iron Fluid Cell first to prove the line is connected. Later, it can support gas power and continue into Rocket Fuel."
+	]
+	quest.7FC43799DC08AC4E.quest_subtitle: "Prepare light fuel for Gas Turbines"
+	quest.7FC43799DC08AC4E.title: "LPG"
+	task.101389EE911902B9.title: "Research"
+	task.14ADA78EDD6D41C2.title: "Why is my Assembler not working?"
+	task.25F798FEF2D03B2F.title: "Add Water to Machines?"
+	task.2E96AD94136DB828.title: "Speed Has a Cost"
+	task.34D72055101DD93B.title: "What ports does it have?"
+	task.3ED71FF0218E2F8B.title: "Power Grid"
+	task.433A0522B2F3010E.title: "Rocket T2"
+	task.4919C4842FF1F786.title: "Too Lonely Alone"
+	task.58A667C11AA55AF9.title: "First Rocket"
+}

@@ -2,19 +2,21 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
@@ -23,7 +25,6 @@ import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
@@ -34,7 +35,6 @@ import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +58,6 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.ALLOW_ARROW_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
-import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.integration.gui.InventoryMenu.INVENTORY_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
@@ -68,6 +67,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
     private static final int WIDTH = CONFIG_WIDTH + PANEL_WIDTH + PORT_WIDTH + 2 * MARGIN_X;
 
+    private final HolderLookup.Provider provider;
     private final int workerSlots;
     private final IMachineConfig machineConfig;
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
@@ -83,9 +83,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         private static final Rect TO_RECT = new Rect(BUTTON_SIZE * 2 + 2, 1, BUTTON_SIZE, BUTTON_SIZE);
         private static final Rect VALID_RECT = new Rect(BUTTON_SIZE + 2, 1, 20, 20);
         private static final Rect FILTER_RECT = new Rect(BUTTON_SIZE * 3 + 4, 3, 16, 16);
-        private static final Texture BACKGROUND_TEX = new Texture(
-            mcLoc("gui/container/enchanting_table"), 256, 256);
-        private static final Rect BG_TEX_RECT = new Rect(0, 185, 108, 19);
 
         @Nullable
         private TagKey<Item> tagFilter = null;
@@ -110,10 +107,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             var config = getConfig(index);
-            var z = getBlitOffset();
 
             var from = config.from().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
             var to = config.to().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
@@ -127,33 +123,33 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             var toRect = rect.offsetLike(TO_RECT);
             var filterRect = rect.offsetLike(FILTER_RECT);
 
-            StretchImage.render(poseStack, BACKGROUND_TEX, z, rect, BG_TEX_RECT, 2);
-            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack, RECIPE_BUTTON, z, toRect, isTo ? BUTTON_SIZE : 0, 0);
-            RenderUtil.blit(poseStack,
-                ALLOW_ARROW_BUTTON, z, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
-            RenderUtil.renderItem(from, fromRect.x() + 2, fromRect.y() + 2);
-            RenderUtil.renderItem(to, toRect.x() + 2, toRect.y() + 2);
+            // TODO: replace the 1.18.2 enchanting-table strip removed in 1.21.1 with tag-filter panel art.
+            RenderUtil.blit(graphics, RECIPE_BUTTON, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(graphics, RECIPE_BUTTON, toRect, isTo ? BUTTON_SIZE : 0, 0);
+            RenderUtil.blit(graphics,
+                ALLOW_ARROW_BUTTON, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
+            RenderUtil.renderItem(graphics, from, fromRect.x() + 2, fromRect.y() + 2);
+            RenderUtil.renderItem(graphics, to, toRect.x() + 2, toRect.y() + 2);
 
             switch (filterType) {
-                case ITEM -> RenderUtil.renderItem(config.itemFilter(), filterRect.x(), filterRect.y());
-                case FLUID -> RenderUtil.renderFluid(poseStack, config.fluidFilter(), filterRect, z);
+                case ITEM -> RenderUtil.renderItem(graphics, config.itemFilter(), filterRect.x(), filterRect.y());
+                case FLUID -> RenderUtil.renderFluid(graphics, config.fluidFilter(), filterRect);
                 case TAG -> {
                     if (tagFilterItems == null || config.tagFilter() != tagFilter) {
-                        var tags = ForgeRegistries.ITEMS.tags();
-                        assert tags != null;
                         tagFilter = config.tagFilter();
-                        tagFilterItems = tags.getTag(tagFilter).stream()
-                            .map(ItemStack::new)
+                        tagFilterItems = provider.lookup(Registries.ITEM)
+                            .flatMap(items -> items.get(tagFilter))
+                            .stream().flatMap(HolderSet.ListBacked::stream)
+                            .map($ -> new ItemStack($.value()))
                             .toList();
                     }
                     ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
-                        RenderUtil.renderItem(stack, filterRect.x(), filterRect.y()));
+                        RenderUtil.renderItem(graphics, stack, filterRect.x(), filterRect.y()));
                 }
             }
 
             if (FILTER_RECT.in(mouseX, mouseY)) {
-                RenderUtil.renderSlotHover(poseStack, filterRect);
+                RenderUtil.renderSlotHover(graphics, filterRect);
             }
         }
 
@@ -206,17 +202,13 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     if (button == 1) {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-                            var tags = ForgeRegistries.ITEMS.tags();
-                            assert tags != null;
-                            var tagList = tags.getReverseTag(config.itemFilter().getItem())
-                                .map($ -> $.getTagKeys()
-                                    .sorted(Comparator.comparing(TagKey::location,
-                                        ResourceLocation::compareNamespaced))
-                                    .toList())
-                                .orElse(Collections.emptyList());
+                            var tagList = config.itemFilter().getItemHolder().tags()
+                                .sorted(Comparator.comparing(TagKey::location,
+                                    ResourceLocation::compareNamespaced))
+                                .toList();
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;
-                                config.setFilter(tagSelectList.get(0));
+                                config.setFilter(tagSelectList.getFirst());
                                 nextSelectTag = tagList.size() == 1 ? 0 : 1;
                                 tagSet = true;
                             }
@@ -248,7 +240,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
             if (needUpdate) {
                 var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + index, config.serializeNBT());
+                    .set(PREFIX + index, config.serializeNBT(provider));
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             }
         }
@@ -309,15 +301,15 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             getPort(index).ifPresent(port -> {
                 var bgW = SWITCH_BUTTON.width();
                 var bgH = SWITCH_BUTTON.height() / 2;
                 var bg = new Rect(0, isSelected(port) ? bgH : 0, bgW, bgH);
-                StretchImage.render(poseStack, SWITCH_BUTTON, getBlitOffset(), rect, bg, 3);
+                StretchImage.render(graphics, SWITCH_BUTTON, rect, bg, 3);
 
-                RenderUtil.renderText(poseStack, port.portName(),
+                RenderUtil.renderText(graphics, port.portName(),
                     rect.x() + SPACING, rect.y() + PORT_PADDING_TEXT,
                     PORT_TEXT_COLOR);
             });
@@ -336,7 +328,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                     config.setTo(port.machineId(), port.portIndex());
                 }
                 var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + selectedConfig, config.serializeNBT());
+                    .set(PREFIX + selectedConfig, config.serializeNBT(provider));
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             });
         }
@@ -360,6 +352,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.contentHeight = menu.endY();
 
         var blockEntity = menu.blockEntity();
+        this.provider = menu.world().registryAccess();
         this.machineConfig = menu.machine.config();
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
@@ -416,7 +409,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private LogisticWorkerConfig getConfig(int slot) {
         return machineConfig.getCompound(PREFIX + slot)
-            .map(LogisticWorkerConfig::fromTag)
+            .map($ -> LogisticWorkerConfig.fromTag(provider, $))
             .orElseGet(LogisticWorkerConfig::new);
     }
 }

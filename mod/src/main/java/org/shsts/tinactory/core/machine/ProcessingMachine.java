@@ -5,9 +5,11 @@ import com.google.common.collect.ListMultimap;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -22,15 +24,14 @@ import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.core.DistLazy;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -38,15 +39,15 @@ import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<R> {
+public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipeProcessor<IEntry<R>> {
     public static final long PROGRESS_PER_TICK = 256;
 
-    protected final IRecipeType<? extends IRecipeBuilderBase<R>> recipeType;
+    protected final IRecipeType<R> recipeType;
     @Nullable
     private Supplier<IRecipeManager> recipeManagerSupplier;
     @Nullable
     private IRecipeManager recipeManager = null;
-    protected final IRecipeType<MarkerRecipe.Builder> markerType;
+    protected final IRecipeType<MarkerRecipe> markerType;
 
     protected int parallel = 1;
     protected double workFactor = 1d;
@@ -54,10 +55,10 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Nullable
     private ResourceLocation filterRecipeLoc = null;
     @Nullable
-    private ProcessingRecipe filterRecipe = null;
+    private IEntry<? extends ProcessingRecipe> filterRecipe = null;
 
-    public ProcessingMachine(IRecipeType<? extends IRecipeBuilderBase<R>> recipeType,
-        Supplier<IRecipeManager> recipeManagerSupplier, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public ProcessingMachine(IRecipeType<R> recipeType,
+        Supplier<IRecipeManager> recipeManagerSupplier, IRecipeType<MarkerRecipe> markerType) {
         this.recipeType = recipeType;
         this.recipeManagerSupplier = recipeManagerSupplier;
         this.markerType = markerType;
@@ -78,31 +79,25 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Class<R> baseClass() {
-        return (Class<R>) recipeType.recipeClass();
-    }
-
-    @Override
-    public Optional<R> byLoc(ResourceLocation loc) {
+    public Optional<IEntry<R>> byLoc(ResourceLocation loc) {
         return recipeManager().byLoc(recipeType, loc);
     }
 
     @Override
-    public ResourceLocation toLoc(R recipe) {
+    public ResourceLocation toLoc(IEntry<R> recipe) {
         return recipe.loc();
     }
 
-    protected Stream<MarkerRecipe> markers(IMachine machine) {
+    protected Stream<IEntry<MarkerRecipe>> markers(IMachine machine) {
         return recipeManager().getAllRecipesFor(markerType).stream()
-            .filter($ -> $.matchesType(recipeType) && $.canCraft(machine));
+            .filter($ -> $.get().matchesType(recipeType) && $.get().canCraft(machine));
     }
 
-    protected List<ProcessingRecipe> targetRecipes(IMachine machine) {
-        var ret = new ArrayList<ProcessingRecipe>();
+    protected List<IEntry<? extends ProcessingRecipe>> targetRecipes(IMachine machine) {
+        var ret = new ArrayList<IEntry<? extends ProcessingRecipe>>();
         markers(machine).forEach(ret::add);
         recipeManager().getAllRecipesFor(recipeType).stream()
-            .filter($ -> $.canCraft(machine))
+            .filter($ -> $.get().canCraft(machine))
             .forEach(ret::add);
         return ret;
     }
@@ -110,8 +105,8 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     @Override
     public DistLazy<List<IRecipeBookItem>> recipeBookItems(IMachine machine) {
         var loc = targetRecipes(machine);
-        var comparator = Comparator.<ProcessingRecipe>comparingLong($ -> $.voltage)
-            .thenComparing(ProcessingRecipe::loc, ResourceLocation::compareNamespaced);
+        var comparator = Comparator.<IEntry<? extends ProcessingRecipe>>comparingLong($ -> $.get().voltage)
+            .thenComparing(IEntry::loc, ResourceLocation::compareNamespaced);
         loc.sort(comparator);
 
         return () -> () -> loc.stream()
@@ -123,13 +118,13 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     public boolean allowTargetRecipe(boolean isClientSide, ResourceLocation loc, IMachine machine) {
         var marker = recipeManager().byLoc(markerType, loc);
         if (marker.isPresent()) {
-            var recipe = marker.get();
+            var recipe = marker.get().get();
             return recipe.matchesType(recipeType) && recipe.canCraft(machine);
         }
 
         var processing = recipeManager().byLoc(recipeType, loc);
         if (processing.isPresent()) {
-            var recipe = processing.get();
+            var recipe = processing.get().get();
             return isClientSide || recipe.canCraft(machine);
         }
 
@@ -196,10 +191,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         setFilters(container, PortDirection.OUTPUT, filters);
     }
 
-    private Optional<ProcessingRecipe> getTargetRecipe(ResourceLocation loc) {
-        return recipeManager().byLoc(markerType, loc)
-            .map($ -> (ProcessingRecipe) $)
-            .or(() -> recipeManager().byLoc(recipeType, loc));
+    private Optional<? extends IEntry<? extends ProcessingRecipe>> getTargetRecipe(ResourceLocation loc) {
+        var marker = recipeManager().byLoc(markerType, loc);
+        if (marker.isPresent()) {
+            return marker;
+        }
+        return recipeManager().byLoc(recipeType, loc);
     }
 
     @Override
@@ -208,38 +205,38 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
         if (recipe.isEmpty()) {
             return;
         }
-        machine.container().ifPresent(container -> setInputFilters(recipe.get(), container));
+        machine.container().ifPresent(container -> setInputFilters(recipe.get().get(), container));
     }
 
-    protected void setFilterRecipe(IMachine machine, @Nullable ProcessingRecipe recipe) {
+    protected void setFilterRecipe(IMachine machine, @Nullable IEntry<? extends ProcessingRecipe> recipe) {
         filterRecipe = recipe;
         if (recipe != null) {
-            machine.container().ifPresent(container -> setOutputFilters(filterRecipe, container));
+            machine.container().ifPresent(container -> setOutputFilters(recipe.get(), container));
         }
     }
 
     @Override
-    public Optional<R> newRecipe(IMachine machine) {
+    public Optional<IEntry<R>> newRecipe(IMachine machine) {
         setFilterRecipe(machine, null);
         return recipeManager().getRecipeFor(recipeType, machine);
     }
 
     @Override
-    public Optional<R> newRecipe(IMachine machine, ResourceLocation target) {
+    public Optional<IEntry<R>> newRecipe(IMachine machine, ResourceLocation target) {
         var processing = recipeManager().byLoc(recipeType, target);
         if (processing.isPresent()) {
             setFilterRecipe(machine, processing.get());
-            return processing.filter($ -> $.matches(machine));
+            return processing.filter($ -> $.get().matches(machine));
         }
 
         var marker = recipeManager().byLoc(markerType, target);
         if (marker.isPresent()) {
-            var recipe = marker.get();
-            setFilterRecipe(machine, recipe);
+            setFilterRecipe(machine, marker.get());
+            var recipe = marker.get().get();
             if (recipe.matchesType(recipeType) && recipe.canCraft(machine)) {
                 return recipeManager().getAllRecipesFor(recipeType).stream()
-                    .filter($ -> $.matches(machine))
-                    .filter(marker.get()::matches)
+                    .filter($ -> $.get().matches(machine))
+                    .filter(recipe::matches)
                     .findAny();
             }
         }
@@ -286,16 +283,17 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void onWorkBegin(R recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback) {
-        parallel = calculateParallel(recipe, machine, maxParallel);
-        recipe.consumeInputs(machine.container().orElseThrow(), parallel, callback);
-        addOutputInfo(recipe, parallel, callback);
-        calculateFactors(recipe, machine, parallel);
+    public void onWorkBegin(IEntry<R> recipe, IMachine machine, int maxParallel, Consumer<ProcessingInfo> callback) {
+        var recipe1 = recipe.get();
+        parallel = calculateParallel(recipe1, machine, maxParallel);
+        recipe1.consumeInputs(machine.container().orElseThrow(), parallel, callback);
+        addOutputInfo(recipe1, parallel, callback);
+        calculateFactors(recipe1, machine, parallel);
         filterRecipeLoc = filterRecipe == null ? null : filterRecipe.loc();
     }
 
     @Override
-    public void onWorkContinue(R recipe, IMachine machine) {
+    public void onWorkContinue(IEntry<R> recipe, IMachine machine) {
         if (filterRecipeLoc != null) {
             filterRecipe = getTargetRecipe(filterRecipeLoc).orElse(null);
             if (filterRecipe == null) {
@@ -307,25 +305,26 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public long onWorkProgress(R recipe, double partial) {
+    public long onWorkProgress(IEntry<R> recipe, double partial) {
         return (long) Math.floor(partial * workFactor * (double) PROGRESS_PER_TICK);
     }
 
     @Override
-    public void onWorkDone(R recipe, IMachine machine, Random random, Consumer<IProcessingResult> callback) {
+    public void onWorkDone(IEntry<R> recipe, IMachine machine, RandomSource random,
+        Consumer<IProcessingResult> callback) {
         machine.container().ifPresent(container -> {
             if (filterRecipe != null) {
-                setOutputFilters(filterRecipe, container);
+                setOutputFilters(filterRecipe.get(), container);
             }
         });
-        recipe.insertOutputs(machine, parallel, random, callback);
+        recipe.get().insertOutputs(machine, parallel, random, callback);
         filterRecipe = null;
         filterRecipeLoc = null;
     }
 
     @Override
-    public long maxWorkProgress(R recipe) {
-        return recipe.workTicks * PROGRESS_PER_TICK;
+    public long maxWorkProgress(IEntry<R> recipe) {
+        return recipe.get().workTicks * PROGRESS_PER_TICK;
     }
 
     @Override
@@ -339,22 +338,22 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public ElectricMachineType electricMachineType(R recipe) {
+    public ElectricMachineType electricMachineType(IEntry<R> recipe) {
         return ElectricMachineType.CONSUMER;
     }
 
     @Override
-    public double powerGen(R recipe) {
+    public double powerGen(IEntry<R> recipe) {
         return 0;
     }
 
     @Override
-    public double powerCons(R recipe) {
-        return energyFactor * recipe.power;
+    public double powerCons(IEntry<R> recipe) {
+        return energyFactor * recipe.get().power;
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putInt("parallel", parallel);
         tag.putDouble("workFactor", workFactor);
@@ -366,12 +365,12 @@ public class ProcessingMachine<R extends ProcessingRecipe> implements IRecipePro
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         parallel = tag.getInt("parallel");
         workFactor = tag.getDouble("workFactor");
         energyFactor = tag.getDouble("energyFactor");
         if (tag.contains("filterRecipe", Tag.TAG_STRING)) {
-            filterRecipeLoc = new ResourceLocation(tag.getString("filterRecipe"));
+            filterRecipeLoc = ResourceLocation.parse(tag.getString("filterRecipe"));
         } else {
             filterRecipeLoc = null;
         }

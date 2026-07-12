@@ -7,9 +7,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import org.shsts.tinactory.content.logistics.MENetworkBridge;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.network.BridgeBlock;
@@ -28,6 +28,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllItems.COMPONENTS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
@@ -106,6 +109,7 @@ public class ComponentMeta extends MetaConsumer {
             if (tint >= 0) {
                 builder.tint(() -> () -> ($, i) -> i == tint ? v.color : 0xFFFFFFFF);
             }
+            builder.creativeTab(CreativeModeTabs.INGREDIENTS);
             var item = builder.register();
             components.put(v, item);
         }
@@ -119,7 +123,12 @@ public class ComponentMeta extends MetaConsumer {
             var v = Voltage.fromName(entry.getKey());
             var capacity = GsonHelper.convertToInt(entry.getValue(), "items");
             var id = "network/" + v.id + "/" + name;
-            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity)).register();
+            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, BatteryItem::fullItem)
+                .itemProperty(BatteryItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
+                    BatteryItem.normalizedPower(stack))
+                .register();
             components.put(v, item);
         }
         COMPONENTS.put(name, components);
@@ -137,10 +146,9 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
 
             var block = REGISTRATE.block(id, CableBlock.cable(v, resistance, mat, bare))
-                .material(Material.HEAVY_METAL)
                 .properties($ -> $.strength(2f).sound(bare ? SoundType.METAL : SoundType.WOOL))
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .transform(CableBlock.tint(mat.color, bare))
-                .translucent()
                 .register();
             components.put(v, block);
         }
@@ -154,9 +162,8 @@ public class ComponentMeta extends MetaConsumer {
             var id = "network/" + v.id + "/" + name;
             var v1 = Voltage.fromRank(v.rank + voltageOffset);
             var block = REGISTRATE.block(id, SubnetBlock.factory(v, v1))
-                .material(Material.HEAVY_METAL)
                 .properties(MACHINE_PROPERTY)
-                .translucent()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> switch (i) {
                     case 0 -> v.color;
                     case 1 -> v1.color;
@@ -179,7 +186,11 @@ public class ComponentMeta extends MetaConsumer {
                     addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power))))
                 .transform(MachineSet.baseMachine(false))
                 .blockEntity()
+                .capability(MACHINE, ELECTRIC_MACHINE)
                 .transform(MENetworkBridge.factory(power))
+                .end()
+                .block()
+                .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .end()
                 .buildObject();
             components.put(v, block);
@@ -198,6 +209,8 @@ public class ComponentMeta extends MetaConsumer {
             var id = "tool/" + name + "/" + mat.name;
 
             var item = REGISTRATE.item(id, CellItem.factory(capacity))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .capability(FLUID_HANDLER_ITEM)
                 .tint(() -> () -> CellItem::getTint)
                 .register();
             components.put(v, item);
@@ -210,7 +223,7 @@ public class ComponentMeta extends MetaConsumer {
         var components = new HashMap<Voltage, IEntry<Item>>();
         for (var entry : jo1.entrySet()) {
             var v = Voltage.fromName(entry.getKey());
-            var loc = new ResourceLocation(GsonHelper.convertToString(entry.getValue(), "items"));
+            var loc = ResourceLocation.parse(GsonHelper.convertToString(entry.getValue(), "items"));
             var item = ITEMS.getEntry(loc);
             components.put(v, item);
         }

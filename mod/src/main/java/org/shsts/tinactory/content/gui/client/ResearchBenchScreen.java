@@ -1,12 +1,12 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
@@ -31,13 +31,13 @@ public class ResearchBenchScreen extends MachineScreen {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             var team = TechManagers.localTeam();
             tech = team.flatMap(ITeamProfile::getTargetTech).orElse(null);
             if (tech == null) {
                 return;
             }
-            TechPanel.renderTechButton(poseStack, getBlitOffset(), rect, team.get(), tech, false);
+            TechPanel.renderTechButton(graphics, rect(), team.get(), tech, false);
         }
 
         @Override
@@ -50,13 +50,14 @@ public class ResearchBenchScreen extends MachineScreen {
             if (tech == null) {
                 return Optional.empty();
             }
-            return Optional.of(List.of(tech.getDescription()));
+            return TechManagers.client().key(tech)
+                .map(loc -> List.of(Component.translatable(ITechnology.getDescriptionId(loc))));
         }
     }
 
     public ResearchBenchScreen(ProcessingMenu menu, Component title) {
         super(menu, title);
-        var rect = layout.images.get(0).rect().offset(layout.getXOffset(), 0);
+        var rect = layout.images.getFirst().rect().offset(layout.getXOffset(), 0);
         rootPanel.addChild(rect, new TechButton(menu));
     }
 

@@ -4,28 +4,29 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static net.minecraft.world.item.crafting.RecipeType.CRAFTING;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
@@ -47,13 +49,31 @@ public class Workbench extends CapabilityProvider implements
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final String ID = "primitive/workbench_container";
 
-    private static class CraftingStack extends CraftingContainer {
-        private final IItemHandlerModifiable items;
+    private record CraftingStack(IItemHandlerModifiable items, int width, int height)
+        implements CraftingContainer {
+        @Override
+        public int getWidth() {
+            return width;
+        }
 
-        @SuppressWarnings("ConstantConditions")
-        public CraftingStack(IItemHandlerModifiable items, int width, int height) {
-            super(null, width, height);
-            this.items = items;
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public List<ItemStack> getItems() {
+            return List.copyOf(getMutableItems());
+        }
+
+        public CraftingInput asCraftInput() {
+            return CraftingInput.of(width, height, getMutableItems());
+        }
+
+        private List<ItemStack> getMutableItems() {
+            return IntStream.range(0, getContainerSize())
+                .mapToObj(items::getStackInSlot)
+                .toList();
         }
 
         @Override
@@ -103,6 +123,22 @@ public class Workbench extends CapabilityProvider implements
                 items.setStackInSlot(i, ItemStack.EMPTY);
             }
         }
+
+        @Override
+        public void fillStackedContents(StackedContents contents) {
+            for (var i = 0; i < getContainerSize(); i++) {
+                contents.accountStack(items.getStackInSlot(i));
+            }
+        }
+
+        @Override
+        public void setChanged() {
+        }
+
+        @Override
+        public boolean stillValid(Player player) {
+            return true;
+        }
     }
 
     private static class ToolItemHandler extends ItemStackHandler {
@@ -131,8 +167,6 @@ public class Workbench extends CapabilityProvider implements
     @Nullable
     private Object currentRecipe = null;
 
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
-
     private Workbench(BlockEntity blockEntity) {
         this.blockEntity = blockEntity;
 
@@ -146,13 +180,11 @@ public class Workbench extends CapabilityProvider implements
         this.itemView = new WrapperItemHandler(
             new CombinedInvWrapper(toolStorage, craftingView));
         this.itemView.onUpdate(this::onUpdate);
-
-        this.menuItemHandlerCap = IMenuItemHandler.cap(itemView);
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, Workbench::new);
+        return builder.container(ID, Workbench::new);
     }
 
     private void onUpdate() {
@@ -166,13 +198,14 @@ public class Workbench extends CapabilityProvider implements
 
         currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this)
             .map($ -> (Object) $)
-            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack, world))
+            .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack.asCraftInput(), world))
             .orElse(null);
 
         if (currentRecipe instanceof ToolRecipe tool) {
-            output = tool.assemble();
-        } else if (currentRecipe instanceof CraftingRecipe crafting) {
-            output = crafting.assemble(craftingStack);
+            output = tool.assemble(this);
+        } else if (currentRecipe instanceof RecipeHolder<?> holder &&
+            holder.value() instanceof CraftingRecipe crafting) {
+            output = crafting.assemble(craftingStack.asCraftInput(), world.registryAccess());
         } else {
             output = ItemStack.EMPTY;
         }
@@ -213,21 +246,23 @@ public class Workbench extends CapabilityProvider implements
         LOGGER.trace("{} on craft {}", this, stack);
 
         // vanilla logic of crafting triggers
-        stack.onCraftedBy(player.level, player, amount);
-        ForgeEventFactory.firePlayerCraftingEvent(player, stack, craftingStack);
-        if (currentRecipe instanceof CraftingRecipe crafting && !crafting.isSpecial()) {
-            player.awardRecipes(List.of(crafting));
+        stack.onCraftedBy(player.level(), player, amount);
+        EventHooks.firePlayerCraftingEvent(player, stack, craftingStack);
+        if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting &&
+            !crafting.isSpecial()) {
+            player.awardRecipes(List.of(holder));
         }
-        ForgeHooks.setCraftingPlayer(player);
+        CommonHooks.setCraftingPlayer(player);
         List<ItemStack> remaining;
         if (currentRecipe instanceof ToolRecipe tool) {
             remaining = tool.getRemainingItems(this);
-        } else if (currentRecipe instanceof CraftingRecipe crafting) {
-            remaining = crafting.getRemainingItems(craftingStack);
+        } else if (currentRecipe instanceof RecipeHolder<?> holder &&
+            holder.value() instanceof CraftingRecipe crafting) {
+            remaining = crafting.getRemainingItems(craftingStack.asCraftInput());
         } else {
             throw new IllegalStateException();
         }
-        ForgeHooks.setCraftingPlayer(null);
+        CommonHooks.setCraftingPlayer(null);
 
         for (var i = 0; i < remaining.size(); i++) {
             // vanilla logic of decreasing material and set remaining items
@@ -250,8 +285,8 @@ public class Workbench extends CapabilityProvider implements
         onUpdate();
     }
 
-    public CraftingContainer getCraftingContainer() {
-        return craftingStack;
+    public CraftingInput getCraftingInput() {
+        return craftingStack.asCraftInput();
     }
 
     public IItemHandlerModifiable getToolStorage() {
@@ -265,28 +300,25 @@ public class Workbench extends CapabilityProvider implements
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(MENU_ITEM_HANDLER, itemView);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(itemView);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, itemView);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(itemView, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, itemView, tag);
     }
 
     public static Optional<Workbench> tryGet(BlockEntity be) {
-        return tryGetProvider(be, ID, Workbench.class);
+        return tryGetContainer(be, ID, Workbench.class);
     }
 
     public static Workbench get(BlockEntity be) {
-        return getProvider(be, ID, Workbench.class);
+        return getContainer(be, ID, Workbench.class);
     }
 }

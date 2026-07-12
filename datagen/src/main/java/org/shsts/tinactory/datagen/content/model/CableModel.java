@@ -5,12 +5,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
-import net.minecraftforge.client.model.generators.BlockModelProvider;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockModelProvider;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.datagen.api.context.IDataContext;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
@@ -21,8 +20,9 @@ import java.util.stream.Collectors;
 
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.content.Models.BLOCK_WHITE_TEX;
+import static org.shsts.tinactory.datagen.content.Models.CUTOUT_RENDER_TYPE;
 import static org.shsts.tinactory.datagen.content.Models.FRONT_FACING;
-import static org.shsts.tinactory.datagen.content.Models.WHITE_TEX;
 import static org.shsts.tinactory.datagen.content.Models.xRotation;
 import static org.shsts.tinactory.datagen.content.Models.yRotation;
 import static org.shsts.tinactory.integration.network.CableBlock.PIPE_RADIUS;
@@ -44,12 +44,12 @@ public final class CableModel {
     private static final String ITEM_MODEL = "item/network/cable";
     private static final String ITEM_WIRE_MODEL = "item/material/wire";
     private static final String ITEM_PIPE_MODEL = "item/material/pipe";
-    private static final String TEX_PREFIX = "blocks/cable/";
+    private static final String TEX_PREFIX = "block/cable/";
     private static final ResourceLocation INSULATION_OPEN_TEX = gregtech(TEX_PREFIX + "insulation_1");
     private static final ResourceLocation INSULATION_TEX = gregtech(TEX_PREFIX + "insulation_5");
     private static final ResourceLocation WIRE_TEX = gregtech(TEX_PREFIX + "wire");
-    private static final ResourceLocation PIPE_SIDE_TEX = gregtech("blocks/pipe/pipe_side");
-    private static final ResourceLocation PIPE_IN_TEX = gregtech("blocks/pipe/pipe_normal_in");
+    private static final ResourceLocation PIPE_SIDE_TEX = gregtech("block/pipe/pipe_side");
+    private static final ResourceLocation PIPE_IN_TEX = gregtech("block/pipe/pipe_normal_in");
 
     private static BlockModelBuilder genOpenEnd(BlockModelProvider prov, String id, int radius, boolean insulation) {
         var model = prov.withExistingParent(id, prov.mcLoc("block/block"))
@@ -112,20 +112,25 @@ public final class CableModel {
 
     public static void genBlockModels(IDataContext<BlockModelProvider> ctx) {
         genOpenEnd(ctx.provider(), OPEN_MODEL, RADIUS, true)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
         genOpenEnd(ctx.provider(), OPEN_WIRE_MODEL, WIRE_RADIUS, false)
-            .texture("base", WHITE_TEX)
+            .renderType(CUTOUT_RENDER_TYPE)
+            .texture("base", BLOCK_WHITE_TEX)
             .texture("wire", WIRE_TEX);
         genClosedEnd(ctx.provider(), CLOSED_MODEL, RADIUS)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX);
         genClosedEnd(ctx.provider(), CLOSED_WIRE_MODEL, WIRE_RADIUS)
-            .texture("base", WHITE_TEX);
+            .renderType(CUTOUT_RENDER_TYPE)
+            .texture("base", BLOCK_WHITE_TEX);
     }
 
     public static void genItemModels(IDataContext<ItemModelProvider> ctx) {
         genItem(ctx.provider(), ITEM_MODEL, RADIUS, true)
+            .renderType(CUTOUT_RENDER_TYPE)
             .texture("base", INSULATION_TEX)
             .texture("insulation", INSULATION_OPEN_TEX)
             .texture("wire", WIRE_TEX);
@@ -137,8 +142,8 @@ public final class CableModel {
             .texture("wire", PIPE_IN_TEX);
     }
 
-    public static void blockState(IEntryDataContext<Block,
-        ? extends CableBlock, BlockStateProvider> ctx, boolean wire) {
+    public static void blockState(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx,
+        boolean wire) {
         var prov = ctx.provider();
         var models = prov.models();
         var multipart = prov.getMultipartBuilder(ctx.object());
@@ -163,25 +168,21 @@ public final class CableModel {
         }
     }
 
-    public static void cable(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void cable(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_MODEL));
     }
 
-    public static void wire(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void wire(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_WIRE_MODEL));
     }
 
-    public static void ulvCable(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void ulvCable(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         genItem(ctx.provider(), ctx.id(), WIRE_RADIUS, false)
             .texture("base", WIRE_TEX)
             .texture("wire", "#base");
     }
 
-    public static void pipe(IEntryDataContext<Item,
-        ? extends Item, ItemModelProvider> ctx) {
+    public static void pipe(IEntryDataContext<? extends Item, ItemModelProvider> ctx) {
         ctx.provider().withExistingParent(ctx.id(), modLoc(ITEM_PIPE_MODEL));
     }
 }

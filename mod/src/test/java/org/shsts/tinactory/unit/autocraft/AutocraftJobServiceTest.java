@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.autocraft.api.ExecutionError;
@@ -7,13 +8,12 @@ import org.shsts.tinactory.core.autocraft.api.ICraftExecutor;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanSummary;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.List;
@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftJobServiceTest {
     @Test
@@ -145,13 +147,12 @@ class AutocraftJobServiceTest {
         var executor = new TestExecutor(JobState.RUNNING);
         var service = new AutocraftJobService(executor);
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
 
         service.submitPrepared(List.of(target), testPlan());
-        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restoredExecutor = new TestExecutor(JobState.IDLE);
         service = new AutocraftJobService(restoredExecutor);
-        service.restoreRunningSnapshot(persisted, codec);
+        service.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertTrue(restoredExecutor.restoreCalled);
         assertTrue(service.isBusy());
@@ -195,7 +196,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternNbtCodec codec) {
+        public void restore(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
             restoreCalled = true;
         }
 
@@ -239,7 +240,7 @@ class AutocraftJobServiceTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternNbtCodec codec) {
+        public CompoundTag serialize(HolderLookup.Provider provider, PatternCodec codec) {
             return new CompoundTag();
         }
 

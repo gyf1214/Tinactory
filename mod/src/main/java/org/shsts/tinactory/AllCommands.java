@@ -10,26 +10,23 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinactory.integration.util.ServerUtil;
-
-import java.util.Random;
 
 import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
@@ -63,7 +60,7 @@ public final class AllCommands {
         manager.newTeam(player, name);
 
         if (CONFIG.allowTeamSpawnCommands.get()) {
-            var world = player.getLevel();
+            var world = player.serverLevel();
 
             var id = manager.nextId();
             var radius = (int) Math.floor(Math.sqrt(id) / 2);
@@ -72,8 +69,8 @@ public final class AllCommands {
             var angle = 2 * Math.PI * ((double) (id - base)) / ((double) (base1 - base));
             var radius1 = (radius + 1) * CONFIG.teamSpread.get();
 
-            var x = Math.round(Math.cos(angle) * radius1);
-            var z = Math.round(Math.sin(angle) * radius1);
+            var x = (int) Math.round(Math.cos(angle) * radius1);
+            var z = (int) Math.round(Math.sin(angle) * radius1);
             var pos = new BlockPos(x, 64, z);
 
             PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
@@ -83,8 +80,8 @@ public final class AllCommands {
             teleport(world, player, pos1);
         }
 
-        player.sendMessage(I18n.tr("tinactory.chat.createTeam.success",
-            name, player.getDisplayName()), Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.createTeam.success",
+            name, player.getDisplayName()));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -101,7 +98,7 @@ public final class AllCommands {
         manager.addPlayerToTeam(player2, team);
 
         if (CONFIG.allowTeamSpawnCommands.get()) {
-            var world = player.getLevel();
+            var world = player.serverLevel();
             var pos = player.getRespawnPosition();
             if (pos != null) {
                 player2.setRespawnPosition(world.dimension(), pos, 0, true, true);
@@ -109,8 +106,8 @@ public final class AllCommands {
             }
         }
 
-        player.sendMessage(I18n.tr("tinactory.chat.addPlayerToTeam.success",
-            player2.getDisplayName(), team.getName()), Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.addPlayerToTeam.success",
+            player2.getDisplayName(), team.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -120,8 +117,8 @@ public final class AllCommands {
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         manager.leaveTeam(player);
-        player.sendMessage(I18n.tr("tinactory.chat.leaveTeam.success",
-            player.getDisplayName(), team.getName()), Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.leaveTeam.success",
+            player.getDisplayName(), team.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -129,7 +126,7 @@ public final class AllCommands {
         var player = ctx.getSource().getPlayerOrException();
         var manager = TechManagers.server();
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-        var playerTeam = (PlayerTeam) player.getTeam();
+        var playerTeam = player.getTeam();
         assert playerTeam != null;
 
         if (playerTeam.getPlayers().size() != 1) {
@@ -138,8 +135,8 @@ public final class AllCommands {
 
         manager.leaveTeam(player);
         manager.removeTeam(playerTeam);
-        player.sendMessage(I18n.tr("tinactory.chat.removeTeam.success",
-            player.getDisplayName(), team.getName()), Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.removeTeam.success",
+            player.getDisplayName(), team.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -156,8 +153,8 @@ public final class AllCommands {
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTargetTech(tech);
-        player.sendMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
-            tech.getDescription()), Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
+            I18n.tr(ITechnology.getDescriptionId(techName))));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -167,8 +164,7 @@ public final class AllCommands {
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         team.resetTargetTech();
-        player.sendMessage(I18n.tr("tinactory.chat.resetTargetTech.success", team.getName()),
-            Util.NIL_UUID);
+        player.sendSystemMessage(I18n.tr("tinactory.chat.resetTargetTech.success", team.getName()));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -177,7 +173,7 @@ public final class AllCommands {
         var world = ctx.getSource().getLevel();
 
         PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
-            world.getChunkSource().getGenerator(), new Random(), pos);
+            world.getChunkSource().getGenerator(), world.random, pos);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -190,8 +186,8 @@ public final class AllCommands {
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTechProgress(tech, progress);
-        var msg = "Set tech %s process of %s to %d".formatted(tech.loc(), team.getName(), progress);
-        player.sendMessage(new TextComponent(msg), Util.NIL_UUID);
+        var msg = "Set tech %s process of %s to %d".formatted(techName, team.getName(), progress);
+        player.sendSystemMessage(Component.literal(msg));
         return Command.SINGLE_SUCCESS;
     }
 

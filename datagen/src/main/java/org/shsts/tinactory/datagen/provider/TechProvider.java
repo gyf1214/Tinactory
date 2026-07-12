@@ -1,26 +1,25 @@
 package org.shsts.tinactory.datagen.provider;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.datagen.builder.TechBuilder;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -30,52 +29,47 @@ public class TechProvider implements DataProvider {
 
     private final String modid;
     private final IDataHandler<TechProvider> handler;
-    private final DataGenerator generator;
+    private final PackOutput.PathProvider pathProvider;
     private final ExistingFileHelper existingFileHelper;
-    private final Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
-
-    private final List<TechBuilder<?>> techs = new ArrayList<>();
+    private final CompletableFuture<HolderLookup.Provider> lookupProvider;
+    private final List<Entry> techs = new ArrayList<>();
 
     public TechProvider(IDataGen dataGen,
         IDataHandler<TechProvider> handler, GatherDataEvent event) {
         this.modid = dataGen.modid();
         this.handler = handler;
-        this.generator = event.getGenerator();
+        this.pathProvider = event.getGenerator().getPackOutput()
+            .createPathProvider(PackOutput.Target.DATA_PACK, "technologies");
         this.existingFileHelper = event.getExistingFileHelper();
+        this.lookupProvider = event.getLookupProvider();
     }
 
-    public void addTech(TechBuilder<?> builder) {
-        existingFileHelper.trackGenerated(builder.loc(), RESOURCE_TYPE);
-        techs.add(builder);
+    public void addTech(ResourceLocation loc, TechBuilder<?> builder) {
+        existingFileHelper.trackGenerated(loc, RESOURCE_TYPE);
+        techs.add(new Entry(loc, builder));
     }
 
     private Path getPath(ResourceLocation loc) {
-        return generator.getOutputFolder()
-            .resolve("data/" + loc.getNamespace() + "/technologies/" + loc.getPath() + ".json");
+        return pathProvider.json(loc);
     }
 
     @Override
-    public void run(HashCache cache) throws IOException {
-        handler.register(this);
-        for (var tech : techs) {
-            tech.validate(existingFileHelper);
-            var jo = tech.buildObject();
-            var path = getPath(tech.loc());
-            var s = gson.toJson(jo);
-            var hash = SHA1.hashUnencodedChars(s).toString();
-
-            if (!Files.exists(path) || !Objects.equals(cache.getHash(path), hash)) {
-                Files.createDirectories(path.getParent());
-                try (var bw = Files.newBufferedWriter(path)) {
-                    bw.write(s);
-                }
-            }
-            cache.putNew(path, hash);
-        }
+    public CompletableFuture<?> run(CachedOutput output) {
+        return lookupProvider.thenCompose(registries -> {
+            handler.register(this);
+            var futures = techs.stream().map(entry -> {
+                entry.builder().validate(existingFileHelper);
+                var jo = CodecHelper.encodeJson(registries, Technology.CODEC, entry.builder().buildObject());
+                return DataProvider.saveStable(output, jo, getPath(entry.loc()));
+            }).toArray(CompletableFuture[]::new);
+            return CompletableFuture.allOf(futures);
+        });
     }
 
     @Override
     public String getName() {
         return "Technologies: " + modid;
     }
+
+    private record Entry(ResourceLocation loc, TechBuilder<?> builder) {}
 }

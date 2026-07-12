@@ -4,7 +4,7 @@
   "fluids": {
     "fluid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.creosote",
+      "texture": "gregtech:block/fluids/fluid.creosote",
       "textureColor": "0xFFFFFFFF"
     }
   },

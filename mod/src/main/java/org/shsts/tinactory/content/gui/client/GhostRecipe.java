@@ -1,10 +1,10 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.recipe.IProcessingDisplay;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
@@ -27,23 +27,23 @@ public class GhostRecipe extends MenuWidget {
         super(menu);
     }
 
-    private void renderIngredient(PoseStack poseStack, IProcessingObject ingredient, int x, int y) {
+    private void renderIngredient(GuiGraphics graphics, IProcessingObject ingredient, int x, int y) {
         if (ingredient instanceof IProcessingDisplay display) {
-            RenderUtil.renderGhostDescriptor(poseStack, display.display(), new Rect(x, y, 16, 16), getBlitOffset());
+            RenderUtil.renderGhostDescriptor(graphics, display.display(), new Rect(x, y, 16, 16));
         }
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         for (var ingredient : ingredients) {
             var slot = ingredient.slot();
             var slotType = ingredient.slot().type();
             if (slotType == SlotType.NONE) {
                 continue;
             }
-            var x = slot.x() + rect.x() + 1;
-            var y = slot.y() + rect.y() + 1;
-            renderIngredient(poseStack, ingredient.val(), x, y);
+            var x = slot.x() + rect().x() + 1;
+            var y = slot.y() + rect().y() + 1;
+            renderIngredient(graphics, ingredient.val(), x, y);
         }
     }
 

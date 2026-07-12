@@ -6,57 +6,60 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraftforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.resource.ContextAwareReloadListener;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
+import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.util.ServerUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-import static org.shsts.tinactory.Tinactory.CHANNEL;
+import static org.shsts.tinactory.Tinactory.CORE;
+import static org.shsts.tinactory.integration.tech.TechManagers.TECH_INIT;
+import static org.shsts.tinactory.integration.tech.TechManagers.TECH_UPDATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ServerTechManager extends TechManager implements IServerTechManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private class ReloadListener implements PreparableReloadListener {
+    private class ReloadListener extends ContextAwareReloadListener {
         private static final String PREFIX = "technologies";
         private static final String SUFFIX = ".json";
 
-        private static Collection<ResourceLocation> listResources(ResourceManager manager) {
-            return manager.listResources(PREFIX, file -> file.endsWith(SUFFIX));
+        private static Map<ResourceLocation, Resource> listResources(ResourceManager manager) {
+            return manager.listResources(PREFIX, file -> file.getPath().endsWith(SUFFIX));
         }
 
-        private Optional<Technology> loadResource(ResourceManager manager, ResourceLocation loc) {
+        private Optional<Map.Entry<ResourceLocation, Technology>> loadResource(ResourceLocation loc,
+            Resource resource) {
             var path = loc.getPath();
             var path1 = path.substring(PREFIX.length() + 1, path.length() - SUFFIX.length());
-            var loc1 = new ResourceLocation(loc.getNamespace(), path1);
-            try (var resource = manager.getResource(loc)) {
-                var is = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
-                var jo = CodecHelper.jsonFromReader(new BufferedReader(is));
-                var ret = CodecHelper.parseJson(Technology.CODEC, jo);
-                ret.setLoc(loc1);
-                return Optional.of(ret);
+            var loc1 = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), path1);
+            try {
+                try (var ir = resource.openAsReader()) {
+                    var jo = CodecHelper.jsonFromReader(ir);
+                    var ret = CodecHelper.parseJson(getRegistryLookup(), Technology.CODEC, jo);
+                    return Optional.of(Map.entry(loc1, ret));
+                }
             } catch (IOException | RuntimeException ex) {
                 LOGGER.warn("Decode resource {} failed", loc, ex);
             }
@@ -70,14 +73,14 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
             LOGGER.debug("tech manager reload resources");
             return stage.wait(Unit.INSTANCE)
-                .thenApplyAsync(unused -> listResources(manager).stream()
-                    .flatMap(loc -> loadResource(manager, loc).stream())
+                .thenApplyAsync(unused -> listResources(manager).entrySet().stream()
+                    .flatMap(entry -> loadResource(entry.getKey(), entry.getValue()).stream())
                     .toList(), backgroundExecutor)
                 .thenAcceptAsync(techs -> {
-                    technologies.clear();
-                    techs.forEach(tech -> technologies.put(tech.loc(), tech));
+                    unload();
+                    techs.forEach(entry -> putTech(entry.getKey(), entry.getValue()));
                     LOGGER.debug("reload {} techs", technologies.size());
-                    techs.forEach(tech -> tech.resolve(ServerTechManager.this));
+                    techs.forEach(entry -> entry.getValue().resolve(ServerTechManager.this));
                 }, backgroundExecutor);
         }
     }
@@ -90,6 +93,9 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
     @Override
     public void broadcastUpdate(ITeamProfile team, IPacket packet) {
+        if (!(packet instanceof TechUpdatePacket techUpdatePacket)) {
+            return;
+        }
         TechManagers.savedData().setDirty();
         invokeChange(team);
         var playerList = ServerUtil.getPlayerList();
@@ -97,7 +103,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
             for (var playerName : playerTeam.getPlayers()) {
                 var player = playerList.getPlayerByName(playerName);
                 if (player != null) {
-                    CHANNEL.sendToPlayer(player, packet);
+                    CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket);
                 }
             }
         });
@@ -122,7 +128,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
-        CHANNEL.sendToPlayer(player, team.fullUpdatePacket());
+        CORE.sendToPlayer(player, TECH_UPDATE, team.fullUpdatePacket());
     }
 
     @Override
@@ -156,7 +162,7 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     public void onPlayerJoin(ServerPlayer player) {
-        CHANNEL.sendToPlayer(player, new TechInitPacket(technologies.values()));
+        CORE.sendToPlayer(player, TECH_INIT, TechInitPacket.fromMap(technologies));
         syncTeam(player);
     }
 }

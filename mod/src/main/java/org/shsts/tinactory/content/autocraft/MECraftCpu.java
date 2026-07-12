@@ -3,19 +3,17 @@ package org.shsts.tinactory.content.autocraft;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.logistics.MEStorageAccess;
-import org.shsts.tinactory.core.autocraft.pattern.MachineConstraintHelper;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.CpuStatusEntry;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
-import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -24,6 +22,7 @@ import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.integration.autocraft.PatternHelper.PATTERN_CODECS;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -32,8 +31,6 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     public static final String ID = "autocraft/cpu";
     private static final String SNAPSHOT_KEY = "snapshot";
 
-    private final PatternNbtCodec snapshotCodec =
-        new PatternNbtCodec(MachineConstraintHelper.CODEC, StackHelper.KEY_CODEC);
     private final long itemBandwidth;
     private final long fluidBandwidth;
     private final int executionIntervalTicks;
@@ -70,11 +67,11 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
-        return $ -> $.capability(ID, be -> new MECraftCpu(be, properties));
+        return $ -> $.container(ID, be -> new MECraftCpu(be, properties));
     }
 
     public CpuStatusEntry status() {
-        var cpuId = machine.uuid();
+        var cpuId = machine().uuid();
         if (service == null) {
             return CpuStatusEntry.offline(cpuId);
         }
@@ -101,12 +98,13 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         var autocraft = network.getComponent(AUTOCRAFT_COMPONENT.get());
         var snapshot = pendingSnapshot;
+        var provider = machine().registryAccess();
         if (service != null) {
-            snapshot = service.serializeRunningSnapshot(snapshotCodec).orElse(snapshot);
+            snapshot = service.serializeRunningSnapshot(provider, PATTERN_CODECS).orElse(snapshot);
         }
         service = AutocraftServiceBootstrap.create(
             logistics,
-            machine,
+            machine(),
             combinedItem,
             combinedFluid,
             itemBandwidth,
@@ -115,10 +113,10 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
             memoryLimit,
             parallelism);
         if (snapshot != null) {
-            service.restoreRunningSnapshot(snapshot, snapshotCodec);
+            service.restoreRunningSnapshot(provider, snapshot, PATTERN_CODECS);
             pendingSnapshot = null;
         }
-        autocraft.registerCpu(machine, service);
+        autocraft.registerCpu(machine(), service);
         blockEntity.setChanged();
     }
 
@@ -143,10 +141,10 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         var snapshot = service == null ? pendingSnapshot :
-            service.serializeRunningSnapshot(snapshotCodec).orElse(null);
+            service.serializeRunningSnapshot(provider, PATTERN_CODECS).orElse(null);
         if (snapshot != null) {
             tag.put(SNAPSHOT_KEY, snapshot);
         }
@@ -154,7 +152,7 @@ public class MECraftCpu extends MEStorageAccess implements INBTSerializable<Comp
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         if (tag.contains(SNAPSHOT_KEY, Tag.TAG_COMPOUND)) {
             pendingSnapshot = tag.getCompound(SNAPSHOT_KEY).copy();
         } else {

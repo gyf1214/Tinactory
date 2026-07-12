@@ -1,11 +1,11 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
@@ -45,11 +45,10 @@ public class StoragePriorityButton extends Button {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var z = getBlitOffset();
-        RenderUtil.blit(poseStack, Texture.SWITCH_BUTTON, z, rect);
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        RenderUtil.blit(graphics, Texture.SWITCH_BUTTON, rect());
         var x = (getValue() + 1) * SLOT_SIZE;
-        RenderUtil.blit(poseStack, Texture.PRIORITY_OVERLAY, z, rect, x, 0);
+        RenderUtil.blit(graphics, Texture.PRIORITY_OVERLAY, rect(), x, 0);
     }
 
     @Override

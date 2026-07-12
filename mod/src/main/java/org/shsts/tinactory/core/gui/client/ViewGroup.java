@@ -1,9 +1,10 @@
 package org.shsts.tinactory.core.gui.client;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
@@ -27,7 +28,8 @@ public class ViewGroup implements IViewGroup {
     }
 
     protected final List<ViewChild> children = new ArrayList<>();
-    protected Rect rect = Rect.ZERO;
+    @Nullable
+    protected Rect rect = null;
     protected boolean active = true;
 
     @Override
@@ -54,6 +56,12 @@ public class ViewGroup implements IViewGroup {
         for (var child : children) {
             child.child().setRect(child.resolveRect(rect));
         }
+    }
+
+    @Override
+    public Rect rect() {
+        assert rect != null;
+        return rect;
     }
 
     protected void updateDynamicChildren() {}

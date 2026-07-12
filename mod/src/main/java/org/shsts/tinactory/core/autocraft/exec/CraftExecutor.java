@@ -3,6 +3,7 @@ package org.shsts.tinactory.core.autocraft.exec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -14,7 +15,7 @@ import org.shsts.tinactory.core.autocraft.api.IInventoryView;
 import org.shsts.tinactory.core.autocraft.api.IJobEvents;
 import org.shsts.tinactory.core.autocraft.api.IMachineAllocator;
 import org.shsts.tinactory.core.autocraft.api.JobState;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 
@@ -79,8 +80,8 @@ public final class CraftExecutor implements ICraftExecutor {
     }
 
     @Override
-    public void restore(CompoundTag tag, PatternNbtCodec codec) {
-        restore(deserialize(tag, codec));
+    public void restore(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
+        restore(deserialize(provider, tag, codec));
     }
 
     @Override
@@ -145,8 +146,8 @@ public final class CraftExecutor implements ICraftExecutor {
     }
 
     @Override
-    public CompoundTag serialize(PatternNbtCodec codec) {
-        return serialize(snapshot(), codec);
+    public CompoundTag serialize(HolderLookup.Provider provider, PatternCodec codec) {
+        return serialize(provider, snapshot(), codec);
     }
 
     public ExecutorSnapshot snapshot() {
@@ -368,7 +369,7 @@ public final class CraftExecutor implements ICraftExecutor {
             }
         }
         if (!activeRuntimes.isEmpty()) {
-            var reason = activeRuntimes.get(0).blockReason();
+            var reason = activeRuntimes.getFirst().blockReason();
             block(reason == null ? ExecutionError.NONE : reason);
         }
     }
@@ -451,7 +452,8 @@ public final class CraftExecutor implements ICraftExecutor {
         }
     }
 
-    private static CompoundTag serialize(ExecutorSnapshot snapshot, PatternNbtCodec codec) {
+    private static CompoundTag serialize(HolderLookup.Provider provider, ExecutorSnapshot snapshot,
+        PatternCodec codec) {
         var tag = new CompoundTag();
         tag.putString("state", snapshot.state().name());
         tag.putString("phase", snapshot.phase().name());
@@ -459,9 +461,9 @@ public final class CraftExecutor implements ICraftExecutor {
         if (snapshot.stateAfterFlush() != null) {
             tag.putString("stateAfterFlush", snapshot.stateAfterFlush().name());
         }
-        tag.put("plan", serializePlan(snapshot.plan(), codec));
-        tag.put("requiredInventory", serializeKeyedAmounts(snapshot.requiredInventory(), codec));
-        tag.put("sharedBuffer", serializeKeyedAmounts(snapshot.sharedBuffer(), codec));
+        tag.put("plan", serializePlan(provider, snapshot.plan(), codec));
+        tag.put("requiredInventory", serializeKeyedAmounts(provider, snapshot.requiredInventory(), codec));
+        tag.put("sharedBuffer", serializeKeyedAmounts(provider, snapshot.sharedBuffer(), codec));
         tag.putInt("nextUnscheduledStepIndex", snapshot.nextUnscheduledStepIndex());
         var runtimes = new ListTag();
         for (var runtime : snapshot.activeRuntimes()) {
@@ -470,13 +472,13 @@ public final class CraftExecutor implements ICraftExecutor {
             if (runtime.leasedMachineId() != null) {
                 runtimeTag.putUUID("leasedMachineId", runtime.leasedMachineId());
             }
-            runtimeTag.put("requiredInputs", serializeKeyedAmounts(runtime.requiredInputs(), codec));
-            runtimeTag.put("requiredOutputs", serializeKeyedAmounts(runtime.requiredOutputs(), codec));
-            runtimeTag.put("producedOutputs", serializeKeyedAmounts(runtime.producedOutputs(), codec));
-            runtimeTag.put("transmittedInputs", serializeKeyedAmounts(runtime.transmittedInputs(), codec));
+            runtimeTag.put("requiredInputs", serializeKeyedAmounts(provider, runtime.requiredInputs(), codec));
+            runtimeTag.put("requiredOutputs", serializeKeyedAmounts(provider, runtime.requiredOutputs(), codec));
+            runtimeTag.put("producedOutputs", serializeKeyedAmounts(provider, runtime.producedOutputs(), codec));
+            runtimeTag.put("transmittedInputs", serializeKeyedAmounts(provider, runtime.transmittedInputs(), codec));
             runtimeTag.put(
                 "transmittedRequiredOutputs",
-                serializeKeyedAmounts(runtime.transmittedRequiredOutputs(), codec));
+                serializeKeyedAmounts(provider, runtime.transmittedRequiredOutputs(), codec));
             if (runtime.blockReason() != null) {
                 runtimeTag.put("blockReason", serializeError(runtime.blockReason()));
             }
@@ -487,8 +489,9 @@ public final class CraftExecutor implements ICraftExecutor {
         return tag;
     }
 
-    private static ExecutorSnapshot deserialize(CompoundTag tag, PatternNbtCodec codec) {
-        var plan = deserializePlan(tag.getCompound("plan"), codec);
+    private static ExecutorSnapshot deserialize(HolderLookup.Provider provider, CompoundTag tag,
+        PatternCodec codec) {
+        var plan = deserializePlan(provider, tag.getCompound("plan"), codec);
         var activeRuntimeTags = tag.getList("activeRuntimes", TAG_COMPOUND);
         var activeRuntimes = new ArrayList<StepRuntime.Snapshot>();
         for (var i = 0; i < activeRuntimeTags.size(); i++) {
@@ -496,11 +499,12 @@ public final class CraftExecutor implements ICraftExecutor {
             activeRuntimes.add(new StepRuntime.Snapshot(
                 runtimeTag.getInt("stepIndex"),
                 runtimeTag.hasUUID("leasedMachineId") ? runtimeTag.getUUID("leasedMachineId") : null,
-                deserializeKeyedAmounts(runtimeTag.getList("requiredInputs", TAG_COMPOUND), codec),
-                deserializeKeyedAmounts(runtimeTag.getList("requiredOutputs", TAG_COMPOUND), codec),
-                deserializeKeyedAmounts(runtimeTag.getList("producedOutputs", TAG_COMPOUND), codec),
-                deserializeKeyedAmounts(runtimeTag.getList("transmittedInputs", TAG_COMPOUND), codec),
-                deserializeKeyedAmounts(runtimeTag.getList("transmittedRequiredOutputs", TAG_COMPOUND), codec),
+                deserializeKeyedAmounts(provider, runtimeTag.getList("requiredInputs", TAG_COMPOUND), codec),
+                deserializeKeyedAmounts(provider, runtimeTag.getList("requiredOutputs", TAG_COMPOUND), codec),
+                deserializeKeyedAmounts(provider, runtimeTag.getList("producedOutputs", TAG_COMPOUND), codec),
+                deserializeKeyedAmounts(provider, runtimeTag.getList("transmittedInputs", TAG_COMPOUND), codec),
+                deserializeKeyedAmounts(provider,
+                    runtimeTag.getList("transmittedRequiredOutputs", TAG_COMPOUND), codec),
                 runtimeTag.contains("blockReason", TAG_COMPOUND) ?
                     deserializeError(runtimeTag.getCompound("blockReason")) :
                     null,
@@ -513,10 +517,10 @@ public final class CraftExecutor implements ICraftExecutor {
             deserializeStateAfterFlush(tag),
             plan,
             tag.contains("requiredInventory", TAG_LIST) ?
-                deserializeKeyedAmounts(tag.getList("requiredInventory", TAG_COMPOUND), codec) :
+                deserializeKeyedAmounts(provider, tag.getList("requiredInventory", TAG_COMPOUND), codec) :
                 Map.of(),
             tag.contains("sharedBuffer", TAG_LIST) ?
-                deserializeKeyedAmounts(tag.getList("sharedBuffer", TAG_COMPOUND), codec) :
+                deserializeKeyedAmounts(provider, tag.getList("sharedBuffer", TAG_COMPOUND), codec) :
                 Map.of(),
             tag.getInt("nextUnscheduledStepIndex"),
             activeRuntimes);
@@ -527,28 +531,28 @@ public final class CraftExecutor implements ICraftExecutor {
         return tag.contains("stateAfterFlush") ? JobState.valueOf(tag.getString("stateAfterFlush")) : null;
     }
 
-    private static CompoundTag serializePlan(CraftPlan plan, PatternNbtCodec codec) {
+    private static CompoundTag serializePlan(HolderLookup.Provider provider, CraftPlan plan, PatternCodec codec) {
         var tag = new CompoundTag();
         var steps = new ListTag();
         for (var step : plan.steps()) {
             var stepTag = new CompoundTag();
             stepTag.putString("stepId", step.stepId());
             stepTag.putLong("runs", step.runs());
-            stepTag.put("pattern", codec.encodePattern(step.pattern()));
+            stepTag.put("pattern", codec.encodePattern(provider, step.pattern()));
             steps.add(stepTag);
         }
         tag.put("steps", steps);
         return tag;
     }
 
-    private static CraftPlan deserializePlan(CompoundTag tag, PatternNbtCodec codec) {
+    private static CraftPlan deserializePlan(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
         var steps = tag.getList("steps", TAG_COMPOUND);
         var out = new ArrayList<CraftStep>(steps.size());
         for (var i = 0; i < steps.size(); i++) {
             var stepTag = steps.getCompound(i);
             out.add(new CraftStep(
                 stepTag.getString("stepId"),
-                codec.decodePattern(stepTag.getCompound("pattern")),
+                codec.decodePattern(provider, stepTag.getCompound("pattern")),
                 stepTag.getLong("runs")));
         }
         return new CraftPlan(out);
@@ -564,18 +568,20 @@ public final class CraftExecutor implements ICraftExecutor {
         return ExecutionError.valueOf(tag.getString("value"));
     }
 
-    private static ListTag serializeKeyedAmounts(Map<IStackKey, Long> amounts, PatternNbtCodec codec) {
+    private static ListTag serializeKeyedAmounts(HolderLookup.Provider provider, Map<IStackKey, Long> amounts,
+        PatternCodec codec) {
         var out = new ListTag();
         for (var entry : amounts.entrySet()) {
-            out.add(codec.encodeAmount(entry.getKey(), entry.getValue()));
+            out.add(codec.encodeAmount(provider, entry.getKey(), entry.getValue()));
         }
         return out;
     }
 
-    private static Map<IStackKey, Long> deserializeKeyedAmounts(ListTag tags, PatternNbtCodec codec) {
+    private static Map<IStackKey, Long> deserializeKeyedAmounts(HolderLookup.Provider provider, ListTag tags,
+        PatternCodec codec) {
         var out = new LinkedHashMap<IStackKey, Long>();
         for (var i = 0; i < tags.size(); i++) {
-            var amount = codec.decodeAmount(tags.getCompound(i));
+            var amount = codec.decodeAmount(provider, tags.getCompound(i));
             out.put(amount.key(), amount.amount());
         }
         return out;

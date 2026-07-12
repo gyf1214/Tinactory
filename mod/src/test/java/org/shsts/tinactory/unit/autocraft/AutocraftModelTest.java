@@ -1,6 +1,5 @@
 package org.shsts.tinactory.unit.autocraft;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -23,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class AutocraftModelTest {
     @Test
@@ -106,8 +106,8 @@ class AutocraftModelTest {
 
     @Test
     void recipeTypeConstraintShouldMatchSupportedMachineProcessorTypes() {
-        var assembler = new ResourceLocation("tinactory", "assembler");
-        var mixer = new ResourceLocation("tinactory", "mixer");
+        var assembler = modLoc("assembler");
+        var mixer = modLoc("mixer");
         var constraint = new RecipeTypeConstraint(assembler);
         var machine = new TestMachine(null).supportsRecipeType(assembler);
 
@@ -155,21 +155,21 @@ class AutocraftModelTest {
 
     @Test
     void targetRecipeConstraintShouldValidateRecipeId() {
-        var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
+        var recipeId = modLoc("assembler/circuit");
         var constraint = new TargetRecipeConstraint(recipeId);
 
         assertEquals(recipeId, constraint.recipeId());
         assertEquals("tinactory:target_recipe", constraint.typeId());
         assertThrows(IllegalArgumentException.class,
-            () -> new TargetRecipeConstraint(new ResourceLocation("tinactory", "")));
+            () -> new TargetRecipeConstraint(modLoc("")));
     }
 
     @Test
     void targetRecipeConstraintShouldMatchAndRestoreMachineConfig() {
-        var recipeId = new ResourceLocation("tinactory", "assembler/circuit");
-        var previous = new ResourceLocation("tinactory", "assembler/previous");
+        var recipeId = modLoc("assembler/circuit");
+        var previous = modLoc("assembler/previous");
         var constraint = new TargetRecipeConstraint(recipeId);
-        var machine = new TestMachine(null).supportsRecipeType(new ResourceLocation("tinactory", "assembler"))
+        var machine = new TestMachine(null).supportsRecipeType(modLoc("assembler"))
             .targetRecipe(previous);
 
         assertTrue(constraint.matches(machine, Voltage.LV));
@@ -183,9 +183,9 @@ class AutocraftModelTest {
 
     @Test
     void targetRecipeConstraintRestoreCallbacksShouldNestCleanlyWhenGuardedByLeaseRelease() {
-        var firstRecipe = new ResourceLocation("tinactory", "assembler/first");
-        var secondRecipe = new ResourceLocation("tinactory", "assembler/second");
-        var machine = new TestMachine(null).supportsRecipeType(new ResourceLocation("tinactory", "assembler"));
+        var firstRecipe = modLoc("assembler/first");
+        var secondRecipe = modLoc("assembler/second");
+        var machine = new TestMachine(null).supportsRecipeType(modLoc("assembler"));
         var firstRestore = new TargetRecipeConstraint(firstRecipe).configureLease(machine).orElseThrow();
         var secondRestore = new TargetRecipeConstraint(secondRecipe).configureLease(machine).orElseThrow();
 

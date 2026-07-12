@@ -1,12 +1,11 @@
 package org.shsts.tinactory.content.multiblock;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
@@ -30,8 +29,8 @@ public class CoilBlock extends Block {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world,
-        List<Component> tooltip, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
         addTooltip(tooltip, "coil", NUMBER_FORMAT.format(temperature));
     }
 }

@@ -23,6 +23,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.cubeTint
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemKey
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
@@ -387,8 +388,8 @@ object MiscMaterials {
             tag(TOOL_SCREWDRIVER, TOOL)
             tag(TOOL_WRENCH, TOOL)
             tag(TOOL_WIRE_CUTTER, TOOL)
-            tag({ Items.SHEARS }, TOOL_SHEARS)
-            tag({ Items.STICK }, TOOL_HANDLE)
+            tag(itemKey(Items.SHEARS), TOOL_SHEARS)
+            tag(itemKey(Items.STICK), TOOL_HANDLE)
             tag(getMaterial("iron").tag("screw"), TOOL_SCREW)
 
             for (base in OreVariant.entries) {

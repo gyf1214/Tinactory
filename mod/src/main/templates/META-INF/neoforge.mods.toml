@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "All rights reserved"
+
+[[mods]]
+modId = "tinactory"
+version = "${mod_version}"
+displayName = "Tinactory"
+authors = "Tiny"
+
+[[mixins]]
+config = "mixins.tinactory.jei.json"
+
+[[dependencies.tinactory]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory]]
+modId = "tinycorelib"
+type = "required"
+versionRange = "[${tinycorelib_version},)"
+ordering = "NONE"
+side = "BOTH"

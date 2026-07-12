@@ -8,8 +8,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.gui.TechMenu;
@@ -149,8 +149,8 @@ public class TechScreen extends MenuScreen<TechMenu> {
     private void onWelcomePressed() {
         if (menu.player() instanceof LocalPlayer player) {
             var name = welcomeEdit.getValue();
-            var command = "/" + TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
-            player.chat(command);
+            var command = TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
+            player.connection.sendCommand(command);
         }
     }
 }

@@ -2,10 +2,12 @@ package org.shsts.tinactory.unit.recipe;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.logistics.PortDirection;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.recipe.IProcessingIngredient;
+import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.gui.Texture;
@@ -24,27 +26,31 @@ import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
 import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestProcessingObject;
+import org.shsts.tinactory.unit.fixture.TestRecipe;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.input;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.inputStack;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.output;
+import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.outputStack;
 
 class ProcessingRecipeTest {
     @Test
     void shouldMatchInputsWhenEveryIngredientCanBeConsumed() {
-        var recipe = recipeBuilder()
-            .input(0, new TestIngredient("ore", 2))
-            .input(1, new TestIngredient("coolant", 1))
-            .output(2, new TestResult("ingot", 1))
-            .buildObject();
+        var recipe = testRecipe(List.of(input(0, "ore", 2), input(1, "coolant", 1)),
+            List.of(output(2, "ingot", 1)));
+
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
             .port(1, PortDirection.INPUT, new TestPort("coolant", 10, 1))
@@ -56,25 +62,21 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldRespectOutputPortLimitWhenCheckingOutputSpace() {
-        var recipe = recipeBuilder()
-            .input(0, new TestIngredient("ore", 1))
-            .output(2, new TestResult("ingot", 1))
-            .output(2, new TestResult("ingot", 1))
-            .buildObject();
+        var recipe = testRecipe(List.of(input(0, "ore", 1)),
+            List.of(output(2, "ingot", 1), output(2, "ingot", 1)));
+
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
             .port(2, PortDirection.OUTPUT, new TestPort("ingot", 1, 0, 1));
 
-        assertTrue(recipe.matchOutputsForTest(new TestMachine(container), container, 1, new Random(1L)));
+        assertTrue(recipe.matchOutputsForTest(new TestMachine(container), container, 1, RandomSource.create()));
     }
 
     @Test
     void shouldEmitConsumeAndInsertCallbacksWithProcessingInfo() {
-        var recipe = recipeBuilder()
-            .input(0, new TestIngredient("ore", 2))
-            .input(1, new TestIngredient("coolant", 1))
-            .output(2, new TestResult("ingot", 3))
-            .buildObject();
+        var recipe = testRecipe(List.of(input(0, "ore", 2), input(1, "coolant", 1)),
+            List.of(output(2, "ingot", 3)));
+
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 4))
             .port(1, PortDirection.INPUT, new TestPort("coolant", 10, 2))
@@ -83,7 +85,8 @@ class ProcessingRecipeTest {
         var inserted = new ArrayList<TestProcessingObject>();
 
         recipe.consumeInputs(container, 1, consumed::add);
-        recipe.insertOutputs(container, 1, new Random(2L), result -> inserted.add((TestProcessingObject) result));
+        recipe.insertOutputs(container, 1, RandomSource.create(),
+            result -> inserted.add((TestProcessingObject) result));
 
         assertIterableEquals(List.of(
             new ProcessingInfo(0, new TestIngredient("ore", 2)),
@@ -97,122 +100,123 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldDisplayPrimaryOutputBeforeInputFallback() {
-        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
+        var outputDescriptor = new ItemIdRenderDescriptor(modLoc("display/output"));
         var outputTooltip = List.<Component>of(I18n.raw("output tooltip"));
-        var inputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/input"));
+        var inputDescriptor = new ItemIdRenderDescriptor(modLoc("display/input"));
         var inputTooltip = List.<Component>of(I18n.raw("input tooltip"));
-        var recipe = recipeBuilder()
-            .input(4, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))
-            .output(3, new TestResult("ingot", 1, outputDescriptor, outputTooltip))
-            .buildObject();
+        var recipe = testRecipe(
+            List.of(new ProcessingRecipe.Input(4, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))),
+            List.of(new ProcessingRecipe.Output(3, new TestResult("ingot", 1, outputDescriptor, outputTooltip))));
 
         assertEquals(outputDescriptor, recipe.display());
-        assertEquals(outputTooltip, recipe.tooltip().orElseThrow());
+        assertEquals(outputTooltip, recipe.tooltip(modLoc("test")).orElseThrow());
     }
 
     @Test
     void shouldFallbackToPrimaryInputWhenRecipeHasNoOutputs() {
-        var earlierDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/earlier"));
+        var earlierDescriptor = new ItemIdRenderDescriptor(modLoc("display/earlier"));
         var earlierTooltip = List.<Component>of(I18n.raw("earlier tooltip"));
-        var recipe = outputlessRecipeBuilder()
-            .input(4, new TestIngredient("ore", 1,
-                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/later")),
-                List.<Component>of(I18n.raw("later tooltip"))))
-            .input(1, new TestIngredient("dust", 1, earlierDescriptor, earlierTooltip))
-            .buildObject();
+        var laterDescriptor = new ItemIdRenderDescriptor(modLoc("display/later"));
+        var laterTooltip = List.<Component>of(I18n.raw("later tooltip"));
+
+        var recipe = testRecipe(
+            List.of(new ProcessingRecipe.Input(4, new TestIngredient("ore", 1, laterDescriptor, laterTooltip)),
+                new ProcessingRecipe.Input(1, new TestIngredient("dust", 1, earlierDescriptor, earlierTooltip))),
+            List.of());
 
         assertEquals(earlierDescriptor, recipe.display());
-        assertEquals(earlierTooltip, recipe.tooltip().orElseThrow());
+        assertEquals(earlierTooltip, recipe.tooltip(modLoc("test_no_output")).orElseThrow());
     }
 
     @Test
     void shouldFallbackToEmptyDescriptorWhenRepresentativeObjectHasNoDisplay() {
-        var recipe = outputlessRecipeBuilder().buildObject();
+        var recipe = testRecipe(List.of(), List.of());
 
         assertSame(EmptyRenderDescriptor.INSTANCE, recipe.display());
-        assertTrue(recipe.tooltip().isEmpty());
+        assertTrue(recipe.tooltip(modLoc("test_empty")).isEmpty());
     }
 
     @Test
     void shouldUseFirstInputForDisplayInputRecipePresentation() {
-        var firstDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/first"));
+        var firstDescriptor = new ItemIdRenderDescriptor(modLoc("display/first"));
         var firstTooltip = List.<Component>of(I18n.raw("first tooltip"));
-        var recipe = displayInputBuilder()
-            .input(7, new TestIngredient("ore", 1, firstDescriptor, firstTooltip))
-            .input(1, new TestIngredient("dust", 1,
-                new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/second")),
-                List.<Component>of(I18n.raw("second tooltip"))))
-            .output(0, new TestResult("plate", 1))
-            .buildObject();
+        var secondDescriptor = new ItemIdRenderDescriptor(modLoc("display/second"));
+        var secondTooltip = List.<Component>of(I18n.raw("second tooltip"));
+
+        var recipe = new DisplayInputRecipe(
+            List.of(new ProcessingRecipe.Input(7, new TestIngredient("ore", 1, firstDescriptor, firstTooltip)),
+                new ProcessingRecipe.Input(1, new TestIngredient("dust", 1, secondDescriptor, secondTooltip))),
+            List.of(output(0, "plate", 1)),
+            20, 0, 8);
 
         assertEquals(firstDescriptor, recipe.display());
-        assertEquals(firstTooltip, recipe.tooltip().orElseThrow());
+        assertEquals(firstTooltip, recipe.tooltip(modLoc("test_display_input")).orElseThrow());
     }
 
     @Test
     void shouldUseMarkerDisplayIngredientDescriptorAndRecipeTooltip() {
-        var displayDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/marker"));
-        var recipe = markerBuilder()
-            .display(new TestIngredient("display", 1, displayDescriptor,
-                List.<Component>of(I18n.raw("ignored display tooltip"))))
-            .output(0, new TestIngredient("marker_output", 1))
-            .buildObject();
+        var displayDescriptor = new ItemIdRenderDescriptor(modLoc("display/marker"));
+        var displayTooltip = List.<Component>of(I18n.raw("ignored display tooltip"));
+        var loc = modLoc("test_marker");
+
+        var recipe = markerRecipe(input(0, "marker_output", 1),
+            Optional.of(new TestIngredient("display", 1, displayDescriptor, displayTooltip)),
+            Optional.empty());
 
         assertEquals(displayDescriptor, recipe.display());
-        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
-            recipe.tooltip().orElseThrow());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))),
+            recipe.tooltip(loc).orElseThrow());
     }
 
     @Test
     void shouldUseMarkerTextureDescriptorAndRecipeTooltip() {
-        var textureLoc = new ResourceLocation("tinactory", "gui/marker");
-        var recipe = markerBuilder()
-            .display(textureLoc)
-            .output(0, new TestIngredient("marker_output", 1))
-            .buildObject();
+        var textureLoc = modLoc("gui/marker");
+        var loc = modLoc("test_marker_tex");
+
+        var recipe = markerRecipe(input(0, "marker_output", 1),
+            Optional.empty(),
+            Optional.of(textureLoc));
 
         assertEquals(new TextureRenderDescriptor(new Texture(textureLoc, 16, 16)), recipe.display());
-        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
-            recipe.tooltip().orElseThrow());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))),
+            recipe.tooltip(loc).orElseThrow());
     }
 
     @Test
     void shouldFallbackMarkerDescriptorToRepresentativeObjectButKeepRecipeTooltip() {
-        var outputDescriptor = new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display/output"));
-        var recipe = markerBuilder()
-            .output(0, new TestResult("marker_output", 1, outputDescriptor,
-                List.<Component>of(I18n.raw("ignored output tooltip"))))
-            .buildObject();
+        var inputDescriptor = new ItemIdRenderDescriptor(modLoc("display/input"));
+        var inputTooltip = List.<Component>of(I18n.raw("ignored input tooltip"));
+        var loc = modLoc("test_marker_no_display");
 
-        assertEquals(outputDescriptor, recipe.display());
-        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(recipe.loc()))),
-            recipe.tooltip().orElseThrow());
+        var recipe = new MarkerRecipe(
+            List.of(new ProcessingRecipe.Input(0, new TestIngredient("ore", 1, inputDescriptor, inputTooltip))),
+            List.of(), 0, modLoc("test_base"), "",
+            false, Optional.empty(), Optional.empty(), List.of());
+
+        assertEquals(inputDescriptor, recipe.display());
+        assertEquals(List.of(I18n.tr(ProcessingRecipe.getDescriptionId(loc))),
+            recipe.tooltip(loc).orElseThrow());
     }
 
     @Test
     void shouldConsumeAndInsertGenericExactStacksThroughRecipePolicy() {
-        var recipe = recipeBuilder()
-            .input(0, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
-                TestStack.item("ore", 2), TestStack.ADAPTER))
-            .output(1, new StackResult<>("test_stack_result", PortType.ITEM, 1d,
-                TestStack.item("ingot", 3), TestStack.ADAPTER))
-            .buildObject();
+        var recipe = testRecipe(
+            List.of(inputStack(0, "ore", 2)),
+            List.of(outputStack(1, "ingot", 3)));
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort(PortType.ITEM, "ore", "", 4, 16))
             .port(1, PortDirection.OUTPUT, new TestPort(PortType.ITEM, "ingot", "", 0, 16));
         var machine = new TestMachine(container);
         var consumed = new ArrayList<ProcessingInfo>();
-        var inserted = new ArrayList<Object>();
+        var inserted = new ArrayList<IProcessingResult>();
 
-        assertTrue(recipe.matchesForTest(machine, 1, new Random(1L)));
+        assertTrue(recipe.matchesForTest(machine, 1, RandomSource.create()));
 
         recipe.consumeInputs(container, 1, consumed::add);
-        recipe.insertOutputs(container, 1, new Random(2L), inserted::add);
+        recipe.insertOutputs(container, 1, RandomSource.create(), inserted::add);
 
-        assertIterableEquals(List.of(
-            new ProcessingInfo(0, new StackIngredient<>("test_stack_ingredient", PortType.ITEM,
-                TestStack.item("ore", 2), TestStack.ADAPTER))
-        ), consumed);
+        assertIterableEquals(List.of(new ProcessingInfo(0, new StackIngredient<>("test_stack_ingredient",
+            PortType.ITEM, TestStack.item("ore", 2), TestStack.ADAPTER))), consumed);
         assertEquals(List.of(new StackResult<>("test_stack_result", PortType.ITEM, 1d,
             TestStack.item("ingot", 3), TestStack.ADAPTER)), inserted);
         assertEquals(2, container.getTestPort(0).stored());
@@ -221,11 +225,10 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldRequireEnoughMachineVoltageToCraft() {
-        var recipe = recipeBuilder()
-            .input(0, new TestIngredient("ore", 1))
-            .output(1, new TestResult("ingot", 1))
-            .voltage(120)
-            .buildObject();
+        var recipe = new TestRecipe(
+            List.of(input(0, "ore", 1)),
+            List.of(output(1, "ingot", 1)),
+            20, 120, 8);
 
         assertFalse(recipe.canCraft(new TestMachine(new TestContainer()).electricVoltage(32)));
         assertTrue(recipe.canCraft(new TestMachine(new TestContainer()).electricVoltage(120)));
@@ -233,34 +236,31 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldBypassOutputChecksWhenAutoVoidIsEnabled() {
-        var recipe = recipeBuilder()
-            .input(0, new TestIngredient("ore", 1))
-            .output(1, new TestResult("ingot", 1))
-            .buildObject();
+        var recipe = testRecipe(
+            List.of(input(0, "ore", 1)),
+            List.of(output(1, "ingot", 1)));
+
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 10, 1))
             .port(1, PortDirection.OUTPUT, new TestPort("ingot", 1, 1));
         var blockingMachine = new TestMachine(container);
         var autoVoidMachine = new TestMachine(container).autoVoid(true);
 
-        assertFalse(recipe.matchesForTest(blockingMachine, 1, new Random(3L)));
-        assertTrue(recipe.matchesForTest(autoVoidMachine, 1, new Random(3L)));
+        assertFalse(recipe.matchesForTest(blockingMachine, 1, RandomSource.create()));
+        assertTrue(recipe.matchesForTest(autoVoidMachine, 1, RandomSource.create()));
     }
 
     @Test
     void shouldAllowAssemblyRecipeWithoutRequiredTech() {
-        var recipe = assemblyBuilder()
-            .buildObject();
+        var recipe = assemblyRecipe(List.of());
 
         assertTrue(recipe.canCraft(new TestMachine(new TestContainer())));
     }
 
     @Test
     void shouldRejectAssemblyRecipeWhenRequiredTechIsMissing() {
-        var tech = new ResourceLocation("tinactory", "assembler");
-        var recipe = assemblyBuilder()
-            .requireTech(tech)
-            .buildObject();
+        var tech = modLoc("assembler");
+        var recipe = assemblyRecipe(List.of(tech));
         var machine = new TestMachine(new TestContainer());
         machine.team();
 
@@ -269,10 +269,8 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldAcceptAssemblyRecipeWhenRequiredTechIsFinished() {
-        var tech = new ResourceLocation("tinactory", "assembler");
-        var recipe = assemblyBuilder()
-            .requireTech(tech)
-            .buildObject();
+        var tech = modLoc("assembler");
+        var recipe = assemblyRecipe(List.of(tech));
         var machine = new TestMachine(new TestContainer());
         machine.team().finished(tech);
 
@@ -281,10 +279,9 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldRequireActiveMatchingResearchTarget() {
-        var target = new ResourceLocation("tinactory", "research_target");
-        var other = new ResourceLocation("tinactory", "other_research");
-        var recipe = researchBuilder(target)
-            .buildObject();
+        var target = modLoc("research_target");
+        var other = modLoc("other_research");
+        var recipe = researchRecipe(target, 1);
         var missingTargetMachine = new TestMachine(new TestContainer());
         missingTargetMachine.team().available(target);
         var otherTargetMachine = new TestMachine(new TestContainer());
@@ -299,10 +296,8 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldCheckResearchCapacityForParallelProgress() {
-        var target = new ResourceLocation("tinactory", "research_target");
-        var recipe = researchBuilder(target)
-            .progress(4L)
-            .buildObject();
+        var target = modLoc("research_target");
+        var recipe = researchRecipe(target, 4);
         var machine = new TestMachine(new TestContainer());
         machine.team()
             .target(target, 10L)
@@ -314,126 +309,58 @@ class ProcessingRecipeTest {
 
     @Test
     void shouldAdvanceServerSideTechProgressWhenResearchOutputsAreInserted() {
-        var target = new ResourceLocation("tinactory", "research_target");
-        var recipe = researchBuilder(target)
-            .progress(4L)
-            .buildObject();
+        var target = modLoc("research_target");
+        var recipe = researchRecipe(target, 4);
         var machine = new TestMachine(new TestContainer());
         var team = machine.team()
             .target(target, 100L)
             .progress(target, 2L);
 
-        recipe.insertOutputs(machine, 3, new Random(4L), result -> {});
+        recipe.insertOutputs(machine, 3, RandomSource.create(), result -> {});
 
         assertEquals(14L, team.getTechProgress(target));
     }
 
     @Test
-    void shouldRejectNonMultiblockMachineWhenMarkerRequiresMultiblock() {
-        var recipe = markerBuilder()
-            .requireMultiblock(true)
-            .buildObject();
+    void shouldOnlyAcceptMultiblockMachineWhenMarkerRequiresMultiblock() {
+        var recipe = new MarkerRecipe(List.of(), List.of(), 0, modLoc("test_base"), "",
+            true, Optional.empty(), Optional.empty(), List.of());
 
         assertFalse(recipe.canCraft(new TestMachine(new TestContainer())));
-    }
-
-    @Test
-    void shouldAcceptExplicitMultiblockMachineWhenMarkerRequiresMultiblock() {
-        var recipe = markerBuilder()
-            .requireMultiblock(true)
-            .buildObject();
-
         assertTrue(recipe.canCraft(new TestMachine(new TestContainer()).multiblock(true)));
     }
 
     @Test
     void shouldMatchMarkerBaseTypeAndPrefixByLocation() {
-        var baseType = new ResourceLocation("tinactory", "base_type");
-        var otherType = new ResourceLocation("tinactory", "other_type");
-        var recipe = markerBuilder()
-            .baseType(baseType)
-            .prefix("ore")
-            .buildObject();
+        var baseType = modLoc("base_type");
+        var otherType = modLoc("other_type");
+        var recipe = new MarkerRecipe(List.of(), List.of(), 0, baseType, "ore",
+            true, Optional.empty(), Optional.empty(), List.of());
 
         assertTrue(recipe.matchesType(baseType));
         assertFalse(recipe.matchesType(otherType));
-        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore")));
-        assertTrue(recipe.matches(() -> new ResourceLocation("tinactory", "ore/copper")));
-        assertFalse(recipe.matches(() -> new ResourceLocation("tinactory", "dust/copper")));
+        assertTrue(recipe.matches(() -> modLoc("ore")));
+        assertTrue(recipe.matches(() -> modLoc("ore/copper")));
+        assertFalse(recipe.matches(() -> modLoc("dust/copper")));
     }
 
-    private static TestRecipe.Builder recipeBuilder() {
-        return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_recipe"));
+    private static TestRecipe testRecipe(List<ProcessingRecipe.Input> inputs,
+        List<ProcessingRecipe.Output> outputs) {
+        return new TestRecipe(inputs, outputs, 20, 0, 8);
     }
 
-    private static AssemblyRecipe.Builder assemblyBuilder() {
-        return new AssemblyRecipe.Builder(null, new ResourceLocation("tinactory", "test_assembly"))
-            .output(0, new TestResult("assembly", 1))
-            .workTicks(20L)
-            .power(8L);
+    private static MarkerRecipe markerRecipe(ProcessingRecipe.Input output,
+        Optional<IProcessingIngredient> display, Optional<ResourceLocation> tex) {
+        return new MarkerRecipe(List.of(), List.of(), 0, modLoc("test_base"), "",
+            false, display, tex, List.of(output));
     }
 
-    private static ResearchRecipe.Builder researchBuilder(ResourceLocation target) {
-        return new ResearchRecipe.Builder(null, new ResourceLocation("tinactory", "test_research"))
-            .target(target)
-            .workTicks(20L)
-            .power(8L);
+    private static AssemblyRecipe assemblyRecipe(List<ResourceLocation> techs) {
+        return new AssemblyRecipe(List.of(), List.of(output(0, "assembly", 1)),
+            20, 0, 8, techs);
     }
 
-    private static MarkerRecipe.Builder markerBuilder() {
-        return new MarkerRecipe.Builder(null, new ResourceLocation("tinactory", "test_marker"))
-            .baseType(new ResourceLocation("tinactory", "test_base"))
-            .workTicks(20L)
-            .power(8L);
-    }
-
-    private static TestRecipe.Builder outputlessRecipeBuilder() {
-        return new TestRecipe.Builder(new ResourceLocation("tinactory", "test_outputless")) {
-            @Override
-            protected void validate() {}
-        };
-    }
-
-    private static DisplayInputRecipe.Builder displayInputBuilder() {
-        return DisplayInputRecipe.builder(null, new ResourceLocation("tinactory", "test_display_input"))
-            .workTicks(20L)
-            .power(8L);
-    }
-
-    private static final class TestRecipe extends ProcessingRecipe {
-        private TestRecipe(Builder builder) {
-            super(builder);
-        }
-
-        private boolean matchInputsForTest(TestMachine machine, IContainer container, int parallel) {
-            return matchInputs(machine, container, parallel);
-        }
-
-        private boolean matchOutputsForTest(TestMachine machine, IContainer container, int parallel,
-            Random random) {
-            return matchOutputs(machine, container, parallel, random);
-        }
-
-        private boolean matchesForTest(TestMachine machine, int parallel, Random random) {
-            return canCraft(machine) && machine.container()
-                .filter(container -> matchInputs(machine, container, parallel) ||
-                    machine.config().getBoolean("void", false))
-                .filter(container -> machine.config().getBoolean("void", false) ||
-                    matchOutputs(machine, container, parallel, random))
-                .isPresent();
-        }
-
-        private static class Builder extends BuilderBase<TestRecipe, Builder> {
-            private Builder(ResourceLocation loc) {
-                super(null, loc);
-                workTicks(20);
-                power(8);
-            }
-
-            @Override
-            protected TestRecipe createObject() {
-                return new TestRecipe(this);
-            }
-        }
+    private static ResearchRecipe researchRecipe(ResourceLocation target, long progress) {
+        return new ResearchRecipe(List.of(), 20, 0, 8, target, progress);
     }
 }

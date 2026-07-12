@@ -1,12 +1,8 @@
 package org.shsts.tinactory.content.logistics;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -16,15 +12,14 @@ import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CONNECT;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
@@ -43,7 +38,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     protected final BlockEntity blockEntity;
     private final Layout layout;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     protected IMachine machine;
     protected IMachineConfig machineConfig;
@@ -52,7 +47,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
     protected ElectricStorage(BlockEntity blockEntity, Layout layout, IElectricMachine electric) {
         this.blockEntity = blockEntity;
         this.layout = layout;
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = electric;
     }
 
     protected ElectricStorage(BlockEntity blockEntity, Layout layout, double power) {
@@ -60,29 +55,38 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
             getBlockVoltage(blockEntity).value, power));
     }
 
+    protected IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
+    protected IMachineConfig machineConfig() {
+        if (machineConfig == null) {
+            machineConfig = machine().config();
+        }
+        return machineConfig;
+    }
+
     public boolean isUnlocked() {
-        return machineConfig.getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
+        return machineConfig().getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
     }
 
     public boolean isVoid() {
-        return machineConfig.getBoolean(VOID_KEY, VOID_DEFAULT);
+        return machineConfig().getBoolean(VOID_KEY, VOID_DEFAULT);
     }
 
     protected void registerPort(INetwork network, IPort<?> port) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.unregisterPort(machine, 0);
-        logistics.registerStoragePort(machine, 0, port,
-            machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
+        logistics.unregisterPort(machine(), 0);
+        logistics.registerStoragePort(machine(), 0, port,
+            machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 
     protected void onSlotChange() {
         blockEntity.setChanged();
         amountSignal = updateSignal();
-    }
-
-    private void onLoad() {
-        machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config();
     }
 
     protected abstract void onMachineConfig();
@@ -93,7 +97,7 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
         onMachineConfig();
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        signal.registerRead(machine(), AMOUNT_SIGNAL, () -> amountSignal);
         amountSignal = updateSignal();
     }
 
@@ -104,19 +108,13 @@ public abstract class ElectricStorage extends CapabilityProvider implements ILay
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get()) {
-            return myself();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 }

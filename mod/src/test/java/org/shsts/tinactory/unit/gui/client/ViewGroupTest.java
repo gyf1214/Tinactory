@@ -43,6 +43,11 @@ class ViewGroupTest {
         }
 
         @Override
+        public Rect rect() {
+            return rect;
+        }
+
+        @Override
         public void setActive(boolean active) {
             this.active = active;
         }

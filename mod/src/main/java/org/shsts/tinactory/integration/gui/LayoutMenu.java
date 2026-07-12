@@ -3,7 +3,7 @@ package org.shsts.tinactory.integration.gui;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
@@ -18,7 +18,9 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.sync.SyncPackets.doublePacket;
@@ -52,7 +54,7 @@ public class LayoutMenu extends InventoryMenu {
                 var x = xOffset + slot.x() + MARGIN_X + 1;
                 var y = slot.y() + MARGIN_TOP + 1;
                 if (slot.type().portType == PortType.ITEM) {
-                    addSlot(new SlotItemHandler(items.asItemHandler(), slot.index(), x, y));
+                    addSlot(new SlotItemHandler(items, slot.index(), x, y));
                 }
             }
         });
@@ -63,7 +65,7 @@ public class LayoutMenu extends InventoryMenu {
      */
     protected void addProgressBar() {
         if (layout.progressBar != null) {
-            addSyncSlot(PROGRESS_SYNC, () -> doublePacket(getProcessor(blockEntity())
+            addSyncSlot(PROGRESS_SYNC, DOUBLE_SYNC, () -> doublePacket(getProcessor(blockEntity())
                 .map(IProcessor::getProgress)
                 .orElse(0d)));
         }
@@ -76,7 +78,7 @@ public class LayoutMenu extends InventoryMenu {
         MENU_FLUID_HANDLER.tryGet(blockEntity()).ifPresent(fluids -> {
             for (var slot : layout.slots) {
                 if (slot.type().portType == PortType.FLUID) {
-                    addSyncSlot(FLUID_SYNC + slot.index(),
+                    addSyncSlot(FLUID_SYNC + slot.index(), FLUID_STACK_SYNC,
                         () -> new FluidSyncPacket(fluids.getFluidInTank(slot.index())));
                 }
             }

@@ -3,27 +3,28 @@ package org.shsts.tinactory.integration.common;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
+import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
+import org.shsts.tinycorelib.api.item.ICapabilityItem;
+import org.shsts.tinycorelib.api.registrate.entry.IItemCapability;
 
 import java.util.List;
 import java.util.function.Function;
 
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
+import static org.shsts.tinactory.AllDataComponents.FLUID_CELL_CONTENT;
 import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 import static org.shsts.tinactory.integration.util.ClientUtil.fluidAmount;
 import static org.shsts.tinactory.integration.util.ClientUtil.fluidName;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CellItem extends CapabilityItem {
+public class CellItem extends Item implements ICapabilityItem {
     public final int capacity;
 
     public CellItem(Properties properties, int capacity) {
@@ -36,9 +37,7 @@ public class CellItem extends CapabilityItem {
     }
 
     private static FluidStack getFluid(ItemStack item) {
-        return item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
-            .map(fluidHandler -> fluidHandler.getFluidInTank(0))
-            .orElse(FluidStack.EMPTY);
+        return item.getOrDefault(FLUID_CELL_CONTENT.get(), SimpleFluidContent.EMPTY).copy();
     }
 
     public static int getTint(ItemStack item, int index) {
@@ -51,31 +50,30 @@ public class CellItem extends CapabilityItem {
         } else if (fluid.getFluid() instanceof SimpleFluid simpleFluid) {
             return simpleFluid.displayColor;
         } else {
-            return fluid.getFluid().getAttributes().getColor();
+            return 0xFFFFFFFF;
         }
     }
 
     public ItemStack create(FluidStack fluid) {
-        var tag = new CompoundTag();
-        var tag1 = new CompoundTag();
-        fluid.writeToNBT(tag1);
-        tag.put(FluidHandlerItemStack.FLUID_NBT_KEY, tag1);
         var ret = new ItemStack(this);
-        ret.setTag(tag);
+        ret.set(FLUID_CELL_CONTENT.get(), SimpleFluidContent.copyOf(fluid));
         return ret;
     }
 
     @Override
-    public void appendHoverText(ItemStack item, @Nullable Level world,
-        List<Component> tooltip, TooltipFlag flag) {
-        var fluid = getFluid(item);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
+        var fluid = getFluid(stack);
         addTooltip(tooltip, fluidName(fluid));
         addTooltip(tooltip, "fluidCell", fluidAmount(fluid), fluidAmount(capacity));
     }
 
     @Override
-    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-        event.addCapability(modLoc("fluid_cell"),
-            new FluidHandlerItemStack(event.getObject(), capacity));
+    @Nullable
+    public <T> T getCapability(ItemStack stack, IItemCapability<T> capability) {
+        if (FLUID_HANDLER_ITEM.is(capability)) {
+            return capability.cast(new FluidHandlerItemStack(FLUID_CELL_CONTENT, stack, capacity));
+        }
+        return null;
     }
 }

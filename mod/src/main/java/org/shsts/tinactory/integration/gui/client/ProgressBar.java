@@ -1,15 +1,17 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
+
+import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
@@ -37,24 +39,25 @@ public class ProgressBar extends MenuWidget {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, SyncPackets.DoublePacket.class)
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, DOUBLE_SYNC)
             .map(SyncPackets.DoublePacket::getData).orElse(0d), 0d, 1d);
-        var z = getBlitOffset();
+        var rect = rect();
         var h = rect.height();
 
         if (direction == Direction.HORIZONTAL) {
             var w1 = (int) (progress * (double) rect.width());
             var uh = texture == texture2 ? h : 0;
-            RenderUtil.blit(poseStack, texture, z, rect);
-            RenderUtil.blit(poseStack, texture2, z, rect.resize(w1, h), new Rect(0, uh, w1, h));
+            RenderUtil.blit(graphics, texture, rect);
+            RenderUtil.blit(graphics, texture2, rect.resize(w1, h), new Rect(0, uh, w1, h));
         } else {
             var w = rect.width();
             var h1 = (int) ((double) rect.height() * progress);
             var h2 = rect.height() - h1;
             var uh = texture == texture2 ? h : 0;
-            RenderUtil.blit(poseStack, texture, z, rect);
-            RenderUtil.blit(poseStack, texture2, z, rect.resize(w, h1).offset(0, h2), new Rect(0, uh + h2, w, h1));
+            RenderUtil.blit(graphics, texture, rect);
+            RenderUtil.blit(graphics, texture2, rect.resize(w, h1).offset(0, h2),
+                new Rect(0, uh + h2, w, h1));
         }
     }
 }

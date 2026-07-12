@@ -11,21 +11,15 @@ import java.util.Optional;
 public interface ITeamProfile {
     String getName();
 
-    default long getTechProgress(ITechnology tech) {
-        return getTechProgress(tech.loc());
-    }
+    long getTechProgress(ITechnology tech);
 
     long getTechProgress(ResourceLocation tech);
 
-    default boolean isTechFinished(ITechnology tech) {
-        return getTechProgress(tech) >= tech.getMaxProgress();
-    }
+    boolean isTechFinished(ITechnology tech);
 
     boolean isTechFinished(ResourceLocation tech);
 
-    default boolean isTechAvailable(ITechnology tech) {
-        return getTechProgress(tech) > 0 || tech.getDepends().stream().allMatch(this::isTechFinished);
-    }
+    boolean isTechAvailable(ITechnology tech);
 
     boolean isTechAvailable(ResourceLocation tech);
 
@@ -35,15 +29,13 @@ public interface ITeamProfile {
 
     boolean canResearch(ResourceLocation tech, long progress);
 
-    default boolean canResearch(ITechnology tech) {
-        return isTechAvailable(tech) && !isTechFinished(tech);
-    }
+    boolean canResearch(ITechnology tech);
 
-    default boolean canResearch(ITechnology tech, long progress) {
-        return isTechAvailable(tech) && getTechProgress(tech) + progress <= tech.getMaxProgress();
-    }
+    boolean canResearch(ITechnology tech, long progress);
 
     Optional<ITechnology> getTargetTech();
+
+    Optional<ResourceLocation> getTargetTechKey();
 
     int getModifier(String key);
 }

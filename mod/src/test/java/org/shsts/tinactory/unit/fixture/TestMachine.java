@@ -1,10 +1,12 @@
 package org.shsts.tinactory.unit.fixture;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,14 +33,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
 public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
     private final TestMachineConfig config = new TestMachineConfig();
-    private final Random random = new Random(31L);
+    private final RandomSource random = RandomSource.create(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
     private Optional<TestTeamProfile> owner = Optional.empty();
@@ -127,7 +128,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public Component title() {
-        return new TextComponent("test-machine");
+        return Component.literal("test-machine");
     }
 
     @Override
@@ -166,7 +167,7 @@ public final class TestMachine implements IMachine {
     }
 
     @Override
-    public Random random() {
+    public RandomSource random() {
         return random;
     }
 
@@ -236,6 +237,11 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public Optional<Long> getLong(String key) {
+            return Optional.empty();
+        }
+
+        @Override
         public Optional<String> getString(String key) {
             return Optional.ofNullable(strings.get(key));
         }
@@ -246,13 +252,17 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
+        public Optional<Tag> getTag(String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             return new CompoundTag();
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
-        }
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
     }
 
     private record TestProcessor(Set<ResourceLocation> recipeTypes) implements IMachineProcessor {
@@ -364,13 +374,28 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public long getTechProgress(ITechnology tech) {
+            return getTechProgress(techKey(tech));
+        }
+
+        @Override
         public boolean isTechFinished(ResourceLocation tech) {
             return finished.contains(tech);
         }
 
         @Override
+        public boolean isTechFinished(ITechnology tech) {
+            return isTechFinished(techKey(tech));
+        }
+
+        @Override
         public boolean isTechAvailable(ResourceLocation tech) {
             return available.contains(tech);
+        }
+
+        @Override
+        public boolean isTechAvailable(ITechnology tech) {
+            return isTechAvailable(techKey(tech));
         }
 
         @Override
@@ -382,8 +407,23 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public boolean canResearch(ITechnology tech) {
+            return canResearch(techKey(tech));
+        }
+
+        @Override
+        public boolean canResearch(ITechnology tech, long value) {
+            return canResearch(techKey(tech), value);
+        }
+
+        @Override
         public Optional<ITechnology> getTargetTech() {
             return target.map(tech -> tech);
+        }
+
+        @Override
+        public Optional<ResourceLocation> getTargetTechKey() {
+            return target.map(TestTechnology::loc);
         }
 
         @Override
@@ -393,7 +433,7 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void advanceTechProgress(ITechnology tech, long value) {
-            advanceTechProgress(tech.loc(), value);
+            advanceTechProgress(techKey(tech), value);
         }
 
         @Override
@@ -403,13 +443,21 @@ public final class TestMachine implements IMachine {
 
         @Override
         public void setTargetTech(ITechnology tech) {
-            target = Optional.of(new TestTechnology(tech.loc(), tech.getMaxProgress()));
-            available(tech.loc());
+            var loc = techKey(tech);
+            target = Optional.of(new TestTechnology(loc, tech.getMaxProgress()));
+            available(loc);
         }
 
         @Override
         public void resetTargetTech() {
             target = Optional.empty();
+        }
+
+        private static ResourceLocation techKey(ITechnology tech) {
+            if (tech instanceof TestTechnology testTechnology) {
+                return testTechnology.loc();
+            }
+            throw new IllegalArgumentException("Unknown test technology " + tech);
         }
     }
 
@@ -434,19 +482,5 @@ public final class TestMachine implements IMachine {
             return EmptyRenderDescriptor.INSTANCE;
         }
 
-        @Override
-        public Component getDescription() {
-            return TextComponent.EMPTY;
-        }
-
-        @Override
-        public Component getDetails() {
-            return TextComponent.EMPTY;
-        }
-
-        @Override
-        public int compareTo(ITechnology other) {
-            return loc.compareTo(other.loc());
-        }
     }
 }

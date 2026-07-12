@@ -8,15 +8,15 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
@@ -55,6 +55,21 @@ import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
+import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT_ITEM;
+import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
+import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.AllItems.STORAGE_CELLS;
 import static org.shsts.tinactory.AllMaterials.getMaterial;
 import static org.shsts.tinactory.AllMultiblocks.COIL_BLOCKS;
@@ -79,26 +94,17 @@ public class MiscMeta extends MetaConsumer {
         super("Misc");
     }
 
-    private static MaterialColor parseMaterialColor(JsonObject jo) {
+    private static MapColor parseMapColor(JsonObject jo) {
         // TODO: use string instead of integer
-        return MaterialColor.byId(GsonHelper.getAsInt(jo, "materialColor"));
+        return MapColor.byId(GsonHelper.getAsInt(jo, "mapColor"));
     }
 
     private IEntry<Block> casing(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var builder = REGISTRATE.block(id, Block::new)
-            .material(Material.HEAVY_METAL, materialColor)
+            .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY);
-        var renderType = GsonHelper.getAsString(jo, "renderType", "default");
-        switch (renderType) {
-            case "default":
-                break;
-            case "translucent":
-                builder.translucent();
-                break;
-            default:
-                throw new UnsupportedTypeException("renderType", renderType);
-        }
         return builder.register();
     }
 
@@ -113,31 +119,31 @@ public class MiscMeta extends MetaConsumer {
 
     private void coil(String name, String id, JsonObject jo) {
         var temperature = GsonHelper.getAsInt(jo, "temperature");
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var block = REGISTRATE.block(id, CoilBlock.factory(temperature))
-            .material(Material.HEAVY_METAL, materialColor)
+            .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
         COIL_BLOCKS.put(name, block);
     }
 
     private static <U extends Block, P> IBlockBuilder<U, P> glass(IBlockBuilder<U, P> builder) {
-        return builder.material(Material.BARRIER)
-            .properties(MiscMeta.CASING_PROPERTY)
+        return builder.properties(MiscMeta.CASING_PROPERTY)
             .properties($ -> $.isViewBlocking(AllItems::never)
                 .noOcclusion()
-                .sound(SoundType.GLASS))
-            .translucent();
+                .sound(SoundType.GLASS));
     }
 
     private void glass(String id) {
-        REGISTRATE.block(id, GlassBlock::new)
+        REGISTRATE.block(id, TransparentBlock::new)
             .transform(MiscMeta::glass)
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .register();
     }
 
     private void lens(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var ja = GsonHelper.getAsJsonArray(jo, "materials");
         var lens = new ArrayList<Supplier<? extends Item>>();
         for (var je : ja) {
@@ -147,44 +153,47 @@ public class MiscMeta extends MetaConsumer {
         }
 
         REGISTRATE.block(id, LensBlock.factory(lens))
-            .material(Material.HEAVY_METAL, materialColor)
+            .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
-            .translucent()
             .register();
     }
 
     private void power(String name, String id, JsonObject jo) {
         var voltage = Voltage.fromName(GsonHelper.getAsString(jo, "voltage", name));
         var capacity = GsonHelper.getAsLong(jo, "capacity");
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, PowerBlock.factory(voltage, capacity))
-            .material(Material.HEAVY_METAL, materialColor)
+            .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
     }
 
     private void fixed(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         REGISTRATE.block(id, FixedBlock::new)
-            .material(Material.HEAVY_METAL, materialColor)
+            .properties($ -> $.mapColor(mapColor))
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .properties(CASING_PROPERTY)
             .register();
     }
 
     private void coalBlock(String id, JsonObject jo) {
-        var materialColor = parseMaterialColor(jo);
+        var mapColor = parseMapColor(jo);
         var tint = parseColor(jo, "tint");
         var burnTime = GsonHelper.getAsInt(jo, "burnTime");
         REGISTRATE.block(id, Block::new)
-            .material(Material.STONE, materialColor)
-            .properties($ -> $.requiresCorrectToolForDrops().strength(5f, 6f))
+            .properties($ -> $.mapColor(mapColor).requiresCorrectToolForDrops().strength(5f, 6f))
             .tint(tint)
             .blockItem((block, properties) -> new BlockItem(block, properties) {
                 @Override
                 public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
                     return burnTime;
                 }
-            }).end()
+            })
+            .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
+            .end()
             .register();
     }
 
@@ -193,11 +202,13 @@ public class MiscMeta extends MetaConsumer {
         if (jo.has("tint")) {
             builder.tint(parseColor(jo, "tint"));
         }
+        builder.creativeTab(CreativeModeTabs.INGREDIENTS);
         builder.register();
     }
 
     private void nuclearRod(String id, JsonObject jo) {
         REGISTRATE.item(id, prop -> new NuclearRod(prop, NuclearRod.Properties.fromJson(jo)))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
             .register();
     }
 
@@ -207,7 +218,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_INTERFACE)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEStorageInterface.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -224,7 +239,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_DRIVE)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, BYTES_PROVIDER, MENU_ITEM_HANDLER)
             .transform(MEDrive.factory(layout, power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -235,13 +254,24 @@ public class MiscMeta extends MetaConsumer {
         var componentPrefix = GsonHelper.getAsString(jo, "componentPrefix");
         var bytes = GsonHelper.getAsLong(jo, "bytes");
 
-        var component = REGISTRATE.item(componentPrefix + "/" + name).register();
+        var component = REGISTRATE.item(componentPrefix + "/" + name)
+            .creativeTab(CreativeModeTabs.INGREDIENTS)
+            .register();
         var item = REGISTRATE.item(prefix + "item_" + parent + "/" + name,
-            MEStorageCell.itemCell(bytes)).register();
+                MEStorageCell.itemCell(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+            .capability(ITEM_PORT_ITEM, BYTES_PROVIDER_ITEM)
+            .register();
         var fluid = REGISTRATE.item(prefix + "fluid_" + parent + "/" + name,
-            MEStorageCell.fluidCell(bytes)).register();
+                MEStorageCell.fluidCell(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+            .capability(FLUID_PORT_ITEM, BYTES_PROVIDER_ITEM)
+            .register();
         var pattern = REGISTRATE.item(prefix + "pattern_cell/" + name,
-            MEPatternCell.factory(bytes)).register();
+                MEPatternCell.factory(bytes))
+            .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+            .capability(PATTERN_CELL_ITEM)
+            .register();
 
         STORAGE_CELLS.add(new MEStorageCellSet(component, item, fluid, pattern));
     }
@@ -267,7 +297,11 @@ public class MiscMeta extends MetaConsumer {
                 }))
             .transform(MachineSet::baseMachine)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftCpu.factory(config))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -278,7 +312,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_CRAFT_TERMINAL)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MECraftTerminal.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -289,7 +327,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_PATTERN_TERMINAL)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE)
             .transform(MEPatternTerminal.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -303,13 +345,19 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.BOILER)
             .blockEntity()
+            .capability(MACHINE, PROCESSOR, ELECTRIC_MACHINE, CONTAINER, LAYOUT_PROVIDER,
+                ITEM_HANDLER, FLUID_HANDLER, MENU_ITEM_HANDLER, MENU_FLUID_HANDLER)
             .transform(BoilerProcessor.factory(properties))
             .transform(StackProcessingContainer.factory(layout));
         if (jo.has("sound")) {
-            var soundId = new ResourceLocation(GsonHelper.getAsString(jo, "sound"));
+            var soundId = ResourceLocation.parse(GsonHelper.getAsString(jo, "sound"));
             builder.transform(MachineSound.factory(SOUND_EVENTS.getEntry(soundId)));
         }
-        builder.end().build();
+        builder.end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+            .end()
+            .build();
     }
 
     private void meSignalController(String id, JsonObject jo) {
@@ -318,7 +366,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_SIGNAL_CONTROLLER)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MESignalController.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }
@@ -329,7 +381,11 @@ public class MiscMeta extends MetaConsumer {
             .transform(MachineSet::baseMachine)
             .menu(AllMenus.ME_STORAGE_DETECTOR)
             .blockEntity()
+            .capability(MACHINE, ELECTRIC_MACHINE, SIGNAL_MACHINE)
             .transform(MEStorageDetector.factory(power))
+            .end()
+            .block()
+            .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
             .end()
             .build();
     }

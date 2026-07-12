@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.autocraft;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -15,7 +16,8 @@ import org.shsts.tinactory.core.autocraft.api.IPatternRepository;
 import org.shsts.tinactory.core.autocraft.api.JobState;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
-import org.shsts.tinactory.core.autocraft.pattern.PatternNbtCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternCodec;
+import org.shsts.tinactory.core.autocraft.pattern.PatternRegistryCache;
 import org.shsts.tinactory.core.autocraft.plan.CraftPlan;
 import org.shsts.tinactory.core.autocraft.plan.CraftStep;
 import org.shsts.tinactory.core.autocraft.plan.PlanResult;
@@ -24,7 +26,6 @@ import org.shsts.tinactory.core.autocraft.service.AutocraftJobService;
 import org.shsts.tinactory.core.autocraft.service.AutocraftJobSnapshot;
 import org.shsts.tinactory.core.autocraft.service.AutocraftTerminalService;
 import org.shsts.tinactory.unit.fixture.TestAutocraftHelper;
-import org.shsts.tinactory.unit.fixture.TestMachineConstraint;
 import org.shsts.tinactory.unit.fixture.TestStackKey;
 
 import java.util.ArrayList;
@@ -39,7 +40,10 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class AutocraftTerminalServiceExecuteTest {
     @Test
@@ -107,6 +111,7 @@ class AutocraftTerminalServiceExecuteTest {
                 id -> Optional.of(jobService)));
         var preview = service.preview(TestStackKey.item("minecraft:iron_plate", ""), 1);
 
+        assertNotNull(preview.plan());
         assertEquals(75L, preview.plan().memoryUsage());
         assertTrue(service.execute(cpu));
         assertEquals(75L, jobService.getJob().orElseThrow().memoryUsage());
@@ -132,7 +137,7 @@ class AutocraftTerminalServiceExecuteTest {
 
         assertFalse(execute);
         assertTrue(jobService.getJob().isEmpty());
-        assertTrue(service.previewResult().orElseThrow().plan() != null);
+        assertNotNull(service.previewResult().orElseThrow().plan());
     }
 
     @Test
@@ -158,7 +163,7 @@ class AutocraftTerminalServiceExecuteTest {
         var execute = service.execute(cpu);
 
         assertFalse(execute);
-        assertTrue(service.previewResult().orElseThrow().plan() != null);
+        assertNotNull(service.previewResult().orElseThrow().plan());
     }
 
     @Test
@@ -177,7 +182,7 @@ class AutocraftTerminalServiceExecuteTest {
         var execute = service.execute(cpu);
 
         assertFalse(execute);
-        assertTrue(service.previewResult().orElseThrow().plan() != null);
+        assertNotNull(service.previewResult().orElseThrow().plan());
     }
 
     @Test
@@ -216,22 +221,22 @@ class AutocraftTerminalServiceExecuteTest {
                 id -> id.equals(cpu) ? Optional.of(staticService(job)) : Optional.empty()));
 
         var statuses = service.listCpuStatuses();
+        var status = statuses.getFirst();
 
         assertEquals(1, statuses.size());
-        assertEquals(cpu, statuses.get(0).cpuId());
-        assertEquals(targets, statuses.get(0).targets());
-        assertEquals(JobState.BLOCKED, statuses.get(0).state());
-        assertEquals(1, statuses.get(0).completedSteps());
-        assertEquals(1, statuses.get(0).totalSteps());
-        assertEquals(ExecutionError.FLUSH_BLOCKED, statuses.get(0).error());
-        assertEquals(1024L, statuses.get(0).memoryLimit());
-        assertEquals(256L, statuses.get(0).memoryUsage());
+        assertEquals(cpu, status.cpuId());
+        assertEquals(targets, status.targets());
+        assertEquals(JobState.BLOCKED, status.state());
+        assertEquals(1, status.completedSteps());
+        assertEquals(1, status.totalSteps());
+        assertEquals(ExecutionError.FLUSH_BLOCKED, status.error());
+        assertEquals(1024L, status.memoryLimit());
+        assertEquals(256L, status.memoryUsage());
     }
 
     @Test
     void jobSnapshotShouldPersistAndRestoreMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
@@ -239,9 +244,9 @@ class AutocraftTerminalServiceExecuteTest {
             PlanSummary.empty(),
             256L));
 
-        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(persisted, codec);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(256L, persisted.getLong("memoryUsage"));
         assertEquals(256L, restored.getJob().orElseThrow().memoryUsage());
@@ -250,18 +255,17 @@ class AutocraftTerminalServiceExecuteTest {
     @Test
     void oldJobSnapshotShouldRestoreZeroMemoryUsage() {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_plate", ""), 1);
-        var codec = new PatternNbtCodec(TestMachineConstraint.MACHINE_CONSTRAINT_CODEC, TestStackKey.CODEC);
         var service = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
         service.submitPrepared(List.of(target), planRequiring(
             new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1),
             target,
             PlanSummary.empty(),
             256L));
-        var persisted = service.serializeRunningSnapshot(codec).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
         persisted.remove("memoryUsage");
 
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(persisted, codec);
+        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(0L, restored.getJob().orElseThrow().memoryUsage());
     }
@@ -277,14 +281,15 @@ class AutocraftTerminalServiceExecuteTest {
                 id -> Optional.empty()));
 
         var statuses = service.listCpuStatuses();
+        var status = statuses.getFirst();
 
         assertEquals(1, statuses.size());
-        assertEquals(cpu, statuses.get(0).cpuId());
-        assertEquals(JobState.FAILED, statuses.get(0).state());
-        assertEquals(List.of(), statuses.get(0).targets());
-        assertEquals(0, statuses.get(0).completedSteps());
-        assertEquals(0, statuses.get(0).totalSteps());
-        assertEquals(ExecutionError.OFFLINE, statuses.get(0).error());
+        assertEquals(cpu, status.cpuId());
+        assertEquals(JobState.FAILED, status.state());
+        assertEquals(List.of(), status.targets());
+        assertEquals(0, status.completedSteps());
+        assertEquals(0, status.totalSteps());
+        assertEquals(ExecutionError.OFFLINE, status.error());
     }
 
     private static CraftPattern pattern(String id, List<CraftAmount> outputs) {
@@ -315,7 +320,7 @@ class AutocraftTerminalServiceExecuteTest {
                     .flatMap(pattern -> pattern.outputs().stream())
                     .map(CraftAmount::key)
                     .distinct()
-                    .sorted()
+                    .sorted(PatternRegistryCache.KEY_DISPLAY_ORDER)
                     .toList();
             }
 
@@ -472,7 +477,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public void restore(CompoundTag tag, PatternNbtCodec codec) {
+        public void restore(HolderLookup.Provider provider, CompoundTag tag, PatternCodec codec) {
             active = true;
         }
 
@@ -508,7 +513,7 @@ class AutocraftTerminalServiceExecuteTest {
         }
 
         @Override
-        public CompoundTag serialize(PatternNbtCodec codec) {
+        public CompoundTag serialize(HolderLookup.Provider provider, PatternCodec codec) {
             return new CompoundTag();
         }
     }

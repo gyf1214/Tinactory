@@ -4,7 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
@@ -23,7 +23,7 @@ public class MEStorageInterface extends MEStorageAccess {
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(double power) {
-        return $ -> $.capability(ID, be -> new MEStorageInterface(be, power));
+        return $ -> $.container(ID, be -> new MEStorageInterface(be, power));
     }
 
     @Override
@@ -31,8 +31,8 @@ public class MEStorageInterface extends MEStorageAccess {
         super.onConnect(network);
 
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        logistics.registerPort(machine, 0, combinedItem);
-        logistics.registerPort(machine, 1, combinedFluid);
+        logistics.registerPort(machine(), 0, combinedItem);
+        logistics.registerPort(machine(), 1, combinedFluid);
     }
 
     public Collection<ItemStack> getAllItems() {

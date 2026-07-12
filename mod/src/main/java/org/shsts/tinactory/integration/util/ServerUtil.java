@@ -7,13 +7,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.scores.Scoreboard;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ServerUtil {
     public static MinecraftServer getServer() {
-        return ServerLifecycleHooks.getCurrentServer();
+        var ret = ServerLifecycleHooks.getCurrentServer();
+        assert ret != null;
+        return ret;
     }
 
     public static PlayerList getPlayerList() {

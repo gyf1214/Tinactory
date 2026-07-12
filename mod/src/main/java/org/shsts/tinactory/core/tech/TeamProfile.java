@@ -4,11 +4,12 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
@@ -42,7 +43,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public void advanceTechProgress(ITechnology tech, long progress) {
-        var v = technologies.getOrDefault(tech.loc(), 0L) + progress;
+        var loc = techKey(tech);
+        var v = technologies.getOrDefault(loc, 0L) + progress;
         setTechProgress(tech, v);
     }
 
@@ -68,16 +70,17 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
      * Can only be called on server
      */
     public void setTechProgress(ITechnology tech, long progress) {
-        var oldProgress = technologies.getOrDefault(tech.loc(), 0L);
+        var loc = techKey(tech);
+        var oldProgress = technologies.getOrDefault(loc, 0L);
         var maxProgress = tech.getMaxProgress();
         progress = Math.min(progress, maxProgress);
 
-        technologies.put(tech.loc(), progress);
+        technologies.put(loc, progress);
         if (oldProgress < maxProgress && progress >= maxProgress) {
             onTechComplete(tech);
         }
 
-        broadcastUpdate(TechUpdatePacket.progress(tech, progress));
+        broadcastUpdate(TechUpdatePacket.progress(loc, progress));
     }
 
     public void applyProgressUpdate(ResourceLocation tech, long progress) {
@@ -90,8 +93,18 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     @Override
+    public long getTechProgress(ITechnology tech) {
+        return getTechProgress(techKey(tech));
+    }
+
+    @Override
     public boolean isTechFinished(ResourceLocation tech) {
         return techManager.techByKey(tech).map(this::isTechFinished).orElse(false);
+    }
+
+    @Override
+    public boolean isTechFinished(ITechnology tech) {
+        return getTechProgress(tech) >= tech.getMaxProgress();
     }
 
     @Override
@@ -100,13 +113,33 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     @Override
+    public boolean isTechAvailable(ITechnology tech) {
+        return getTechProgress(tech) > 0 || tech.getDepends().stream().allMatch(this::isTechFinished);
+    }
+
+    @Override
     public boolean canResearch(ResourceLocation tech, long progress) {
         return techManager.techByKey(tech).map($ -> canResearch($, progress)).orElse(false);
     }
 
     @Override
+    public boolean canResearch(ITechnology tech) {
+        return isTechAvailable(tech) && !isTechFinished(tech);
+    }
+
+    @Override
+    public boolean canResearch(ITechnology tech, long progress) {
+        return isTechAvailable(tech) && getTechProgress(tech) + progress <= tech.getMaxProgress();
+    }
+
+    @Override
     public Optional<ITechnology> getTargetTech() {
         return Optional.ofNullable(targetTech);
+    }
+
+    @Override
+    public Optional<ResourceLocation> getTargetTechKey() {
+        return targetTech == null ? Optional.empty() : Optional.of(techKey(targetTech));
     }
 
     /**
@@ -115,7 +148,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public void setTargetTech(ITechnology tech) {
         targetTech = tech;
-        broadcastUpdate(TechUpdatePacket.target(tech));
+        broadcastUpdate(TechUpdatePacket.target(techKey(tech)));
     }
 
     @Override
@@ -134,11 +167,11 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     public TechUpdatePacket fullUpdatePacket() {
-        return TechUpdatePacket.full(technologies, targetTech);
+        return TechUpdatePacket.full(technologies, targetTech == null ? null : techKey(targetTech));
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putString("name", name);
         var listTag = new ListTag();
@@ -152,13 +185,13 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         }
         tag.put("tech", listTag);
         if (targetTech != null) {
-            tag.putString("target", targetTech.loc().toString());
+            tag.putString("target", techKey(targetTech).toString());
         }
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         technologies.clear();
         modifiers.clear();
         targetTech = null;
@@ -166,7 +199,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
         var listTag = tag.getList("tech", Tag.TAG_COMPOUND);
         for (var tag1 : listTag) {
             var tag2 = (CompoundTag) tag1;
-            var loc = new ResourceLocation(tag2.getString("id"));
+            var loc = ResourceLocation.parse(tag2.getString("id"));
             var progress = tag2.getLong("progress");
             techManager.techByKey(loc).ifPresent(tech -> {
                 technologies.put(loc, progress);
@@ -176,7 +209,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             });
         }
         if (tag.contains("target", Tag.TAG_STRING)) {
-            var loc = new ResourceLocation(tag.getString("target"));
+            var loc = ResourceLocation.parse(tag.getString("target"));
             targetTech = techManager.techByKey(loc).orElse(null);
         }
     }
@@ -184,5 +217,10 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[" + name + "]";
+    }
+
+    private ResourceLocation techKey(ITechnology tech) {
+        return techManager.key(tech)
+            .orElseThrow(() -> new IllegalArgumentException("Unknown technology " + tech));
     }
 }

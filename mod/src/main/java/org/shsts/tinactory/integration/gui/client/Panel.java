@@ -1,14 +1,14 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.IViewGroup;
@@ -21,7 +21,8 @@ import java.util.function.Consumer;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
+public class Panel implements IViewAdapter, IViewGroup {
+    @Nullable
     private Rect rect;
 
     protected final MenuBase menu;
@@ -70,6 +71,12 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         postLayout();
     }
 
+    @Override
+    public Rect rect() {
+        assert rect != null;
+        return rect;
+    }
+
     protected void postLayout() {
         if (refreshPending && isActive()) {
             refresh();
@@ -109,7 +116,7 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     @Override
-    public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack,
+    public void renderTooltip(MenuScreen<?> screen, GuiGraphics graphics,
         int mouseX, int mouseY) {}
 
     @Override
@@ -122,7 +129,7 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
         viewGroup.addChild(anchor, offset, zIndex, child);
     }
 
-    public <T extends GuiComponent & Widget & GuiEventListener & NarratableEntry> IViewNode addVanillaWidget(
+    public <T extends GuiEventListener & Renderable & NarratableEntry> IViewNode addVanillaWidget(
         RectD anchor, Rect offset, int zIndex, T widget) {
         var adapter = new VanillaWidgetAdapter<>(widget);
         viewGroup.addChild(anchor, offset, zIndex, adapter);
@@ -134,6 +141,7 @@ public class Panel extends GuiComponent implements IViewAdapter, IViewGroup {
     }
 
     public boolean mouseIn(double mouseX, double mouseY) {
+        assert rect != null : "Panel rect must be assigned before geometry reads";
         return rect.in(mouseX, mouseY);
     }
 }

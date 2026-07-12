@@ -1,19 +1,21 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
@@ -78,9 +80,9 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (technology != null) {
-                renderTechButton(poseStack, getBlitOffset(), rect, technology, renderPressed);
+                renderTechButton(graphics, rect(), technology, renderPressed);
             }
         }
 
@@ -113,9 +115,9 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            renderTechButton(poseStack, getBlitOffset(), rect, getTech(index), true);
+            renderTechButton(graphics, rect, getTech(index), true);
         }
 
         @Override
@@ -135,15 +137,14 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             var depends = selectedTech == null ? List.<ITechnology>of() : selectedTech.getDepends();
-            var z = getBlitOffset();
 
             var i = 0;
             for (var depend : depends) {
-                var x = rect.endX() - (i + 1) * TECH_SIZE;
-                var y = rect.y();
-                renderTechButton(poseStack, z, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
+                var x = rect().endX() - (i + 1) * TECH_SIZE;
+                var y = rect().y();
+                renderTechButton(graphics, new Rect(x, y, TECH_SIZE, TECH_SIZE), depend, true);
                 i++;
             }
         }
@@ -153,7 +154,7 @@ public class TechPanel extends Panel {
                 return Optional.empty();
             }
             var depends = selectedTech.getDepends();
-            var index = (int) Math.floor((rect.endX() - mouseX) / TECH_SIZE);
+            var index = (int) Math.floor((rect().endX() - mouseX) / TECH_SIZE);
 
             return index >= 0 && index < depends.size() ? Optional.of(depends.get(index)) : Optional.empty();
         }
@@ -178,13 +179,13 @@ public class TechPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             if (selectedTech == null || team == null) {
                 return;
             }
 
-            var progress = team.getTechProgress(selectedTech) * rect.width() / selectedTech.getMaxProgress();
-            RenderUtil.fill(poseStack, rect.resize((int) progress, rect.height()), PROGRESS_COLOR);
+            var progress = team.getTechProgress(selectedTech) * rect().width() / selectedTech.getMaxProgress();
+            RenderUtil.fill(graphics, rect().resize((int) progress, rect().height()), PROGRESS_COLOR);
         }
 
         @Override
@@ -247,7 +248,7 @@ public class TechPanel extends Panel {
         addGroup(Rect.corners(LEFT_OFFSET, 0, 0, -1), selectedTechPanel);
     }
 
-    public static void renderTechButton(PoseStack poseStack, int z, Rect rect, @Nullable ITeamProfile team,
+    public static void renderTechButton(GuiGraphics graphics, Rect rect, @Nullable ITeamProfile team,
         ITechnology technology, boolean pressed) {
         int color;
         if (team == null) {
@@ -265,23 +266,23 @@ public class TechPanel extends Panel {
         if (pressed) {
             texRect = texRect.offset(0, th);
         }
-        StretchImage.render(poseStack, SWITCH_BUTTON, z, color, rect, texRect, 1);
+        StretchImage.render(graphics, SWITCH_BUTTON, color, rect, texRect, 1);
 
         var x = rect.x() + (rect.width() - 16) / 2;
         var y = rect.y() + (rect.height() - 16) / 2;
-        RenderUtil.renderDescriptor(poseStack, technology.getDisplay(), new Rect(x, y, 16, 16), z);
+        RenderUtil.renderDescriptor(graphics, technology.getDisplay(), new Rect(x, y, 16, 16));
     }
 
-    private void renderTechButton(PoseStack poseStack, int z, Rect rect, ITechnology technology,
-        boolean renderPressed) {
+    private void renderTechButton(GuiGraphics graphics, Rect rect, ITechnology technology, boolean renderPressed) {
         if (team == null) {
             return;
         }
-        renderTechButton(poseStack, z, rect, team, technology, renderPressed && technology == selectedTech);
+        renderTechButton(graphics, rect, team, technology, renderPressed && technology == selectedTech);
     }
 
     private Optional<List<Component>> techTooltip(ITechnology technology) {
-        return Optional.of(List.of(technology.getDescription()));
+        return techManager.key(technology)
+            .map(loc -> List.of(I18n.tr(ITechnology.getDescriptionId(loc))));
     }
 
     private void onSelect(ITechnology technology) {
@@ -291,9 +292,10 @@ public class TechPanel extends Panel {
 
     private void startResearch() {
         if (menu.player() instanceof LocalPlayer player && selectedTech != null) {
-            var loc = selectedTech.loc().toString();
-            var command = "/" + TinactoryKeys.ID + " setTargetTech " + loc;
-            player.chat(command);
+            techManager.key(selectedTech).ifPresent(loc -> {
+                var command = TinactoryKeys.ID + " setTargetTech " + loc;
+                player.connection.sendCommand(command);
+            });
         }
     }
 
@@ -305,8 +307,9 @@ public class TechPanel extends Panel {
         selectedTechPanel.setActive(selectedTech != null);
 
         if (selectedTech != null) {
-            selectedTechLabel.setLine(0, selectedTech.getDescription());
-            selectedTechDetailsLabel.setMultiline(selectedTech.getDetails());
+            var loc = techManager.key(selectedTech).orElseThrow();
+            selectedTechLabel.setLine(0, I18n.tr(ITechnology.getDescriptionId(loc)));
+            selectedTechDetailsLabel.setMultiline(I18n.tr(ITechnology.getDetailsId(loc)));
             startResearchButton.setActive(team.canResearch(selectedTech));
         }
     }
@@ -315,7 +318,7 @@ public class TechPanel extends Panel {
         assert team != null;
         var xa = team.canResearch(a) ? 0 : (team.isTechFinished(a) ? 2 : 1);
         var xb = team.canResearch(b) ? 0 : (team.isTechFinished(b) ? 2 : 1);
-        return xa == xb ? a.compareTo(b) : (xa < xb ? -1 : 1);
+        return xa == xb ? Technology.DISPLAY_ORDER.compare(a, b) : (xa < xb ? -1 : 1);
     }
 
     @Override
@@ -353,14 +356,12 @@ public class TechPanel extends Panel {
     }
 
     public static Optional<ITechnology> getHoveredTech(IViewAdapter component, double mouseX) {
-        if (component instanceof TechButton button) {
-            return Optional.ofNullable(button.technology);
-        } else if (component instanceof RequiredTechButtons buttons) {
-            return buttons.getSelectedTech(mouseX);
-        } else if (component instanceof ButtonPanel.ItemButton itemButton &&
-            itemButton.parent() instanceof TechButtonPanel buttonPanel) {
-            return Optional.of(buttonPanel.getTech(itemButton.itemIndex()));
-        }
-        return Optional.empty();
+        return switch (component) {
+            case TechButton button -> Optional.ofNullable(button.technology);
+            case RequiredTechButtons buttons -> buttons.getSelectedTech(mouseX);
+            case ButtonPanel.ItemButton itemButton when itemButton.parent() instanceof TechButtonPanel buttonPanel ->
+                Optional.of(buttonPanel.getTech(itemButton.itemIndex()));
+            default -> Optional.empty();
+        };
     }
 }

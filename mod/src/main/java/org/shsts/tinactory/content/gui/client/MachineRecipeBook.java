@@ -1,14 +1,14 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.tech.ITeamProfile;
@@ -43,6 +43,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON_HOVERED;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
@@ -76,22 +77,21 @@ public class MachineRecipeBook extends Panel {
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
             var recipe = getRecipe(index);
             var loc = recipe == null ? null : recipe.loc();
-            var z = getBlitOffset();
             if (Objects.equals(getCurrentRecipeLoc(), loc)) {
-                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect, 21, 0);
+                RenderUtil.blit(graphics, RECIPE_BUTTON, rect, 21, 0);
             } else {
-                RenderUtil.blit(poseStack, RECIPE_BUTTON, z, rect);
+                RenderUtil.blit(graphics, RECIPE_BUTTON, rect);
             }
 
             var rect1 = rect.offset(2, 2).enlarge(-5, -5);
             if (recipe == null) {
-                RenderUtil.blit(poseStack, DISABLE_BUTTON, z, rect1);
+                RenderUtil.blit(graphics, DISABLE_BUTTON, rect1);
             } else {
-                RenderUtil.renderDescriptor(poseStack, recipe.display(), rect1, z);
+                RenderUtil.renderDescriptor(graphics, recipe.display(), rect1);
             }
         }
 
@@ -224,8 +224,8 @@ public class MachineRecipeBook extends Panel {
 
     public static void addButton(MenuBase menu, Panel parent, MachineRecipeBook recipeBook,
         RectD anchor, int x, int y, Runnable extraCallback) {
-        var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON,
-            I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 19) {
+        var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON, RECIPE_BOOK_BUTTON_HOVERED,
+            I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 0) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);

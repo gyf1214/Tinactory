@@ -4,13 +4,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,30 +20,34 @@ import java.util.function.BiConsumer;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record ProcessingRecipeBookItem(ProcessingRecipe recipe) implements IRecipeBookItem {
+public record ProcessingRecipeBookItem(IEntry<? extends ProcessingRecipe> entry) implements IRecipeBookItem {
+    private ProcessingRecipe recipe() {
+        return entry.get();
+    }
+
     @Override
     public ResourceLocation loc() {
-        return recipe.loc();
+        return entry.loc();
     }
 
     @Override
     public boolean isMarker() {
-        return recipe instanceof MarkerRecipe;
+        return recipe() instanceof MarkerRecipe;
     }
 
     @Override
     public void select(Layout layout, BiConsumer<Layout.SlotInfo, IProcessingObject> ingredientCons) {
-        layout.getProcessingInputs(recipe).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
-        layout.getProcessingOutputs(recipe).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
+        layout.getProcessingInputs(recipe()).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
+        layout.getProcessingOutputs(recipe()).forEach(x -> ingredientCons.accept(x.slot(), x.val()));
     }
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return recipe.tooltip();
+        return recipe().tooltip(loc());
     }
 
     @Override
     public IRenderDescriptor display() {
-        return recipe.display();
+        return recipe().display();
     }
 }

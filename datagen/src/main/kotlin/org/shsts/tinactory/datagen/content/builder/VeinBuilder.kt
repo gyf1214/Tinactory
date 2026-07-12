@@ -1,14 +1,12 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import org.shsts.tinactory.AllMaterials.getMaterial
-import org.shsts.tinactory.Tinactory.REGISTRATE
-import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.builder.TechBuilder
-import org.shsts.tinactory.datagen.builder.TechBuilder.RANK_PER_VOLTAGE
+import org.shsts.tinactory.datagen.builder.TechBuilder.Companion.RANK_PER_VOLTAGE
 import org.shsts.tinactory.datagen.content.Technologies.BASE_ORE
 import org.shsts.tinactory.datagen.content.Technologies.TECHS
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreAnalyzer
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.material.OreVariant
 
@@ -16,14 +14,14 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
     var primitive = false
     var baseOre = false
     private var variant: OreVariant? = null
-    private var block: ProcessingRecipeBuilder<OreAnalyzerRecipe.Builder>.() -> Unit = {}
+    private var block: OreAnalyzerRecipeBuilder.() -> Unit = {}
     private val ores = mutableListOf<MaterialSet>()
 
     companion object {
         const val VEIN_TECH_RANK = RANK_PER_VOLTAGE / 2
     }
 
-    private fun chain(another: ProcessingRecipeBuilder<OreAnalyzerRecipe.Builder>.() -> Unit) {
+    private fun chain(another: OreAnalyzerRecipeBuilder.() -> Unit) {
         val oldBlock = block
         block = {
             oldBlock()
@@ -63,9 +61,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         val tech = if (baseOre || primitive) {
             baseTech
         } else {
-            TECHS.builder("ore/$id1") { handler, parent, loc ->
-                TechBuilder.factory(handler, parent, loc)
-            }.run {
+            TECHS.builder("ore/$id1", TechBuilder.Companion::factory).run {
                 maxProgress(30)
                 val mat = ores[0]
                 if (mat.hasItem("raw")) {
@@ -76,31 +72,23 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                 depends(baseTech)
                 researchVoltage(variant1.voltage)
                 rank(rank + 1 + VEIN_TECH_RANK)
-                register()
+                build()
             }
         }
 
-        val builder = run {
-            val recipeType = REGISTRATE.getRecipeType<OreAnalyzerRecipe.Builder>("ore_analyzer")
-            val builder = recipeType.recipe(DATA_GEN, id1).apply {
-                rate(this@VeinBuilder.rate)
-            }
-            ProcessingRecipeBuilder(builder).apply {
-                simpleDefaults()
-                amperage = 0.125
-                workTicks(128)
-            }
-        }
-
-        builder.apply(block)
-        if (primitive) {
-            builder.voltage(Voltage.PRIMITIVE)
-        } else {
-            builder.voltage(variant1.voltage)
-            builder.extra {
-                requireTech(tech)
+        oreAnalyzer {
+            recipe(id1) {
+                block()
+                rate(rate)
+                if (primitive) {
+                    voltage(Voltage.PRIMITIVE)
+                } else {
+                    voltage(variant1.voltage)
+                    extra {
+                        requireTech(tech)
+                    }
+                }
             }
         }
-        builder.build()
     }
 }

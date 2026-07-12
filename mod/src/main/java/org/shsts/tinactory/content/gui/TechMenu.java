@@ -2,13 +2,15 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
@@ -158,9 +160,9 @@ public class TechMenu extends MenuBase {
         if (item.is(Items.NAME_TAG)) {
             renameResult = item.copy();
             if (StringUtils.isBlank(name)) {
-                renameResult.resetHoverName();
+                renameResult.remove(DataComponents.CUSTOM_NAME);
             } else {
-                renameResult.setHoverName(new TextComponent(name));
+                renameResult.set(DataComponents.CUSTOM_NAME, Component.literal(name));
             }
         } else {
             renameResult = ItemStack.EMPTY;
@@ -172,7 +174,7 @@ public class TechMenu extends MenuBase {
             return;
         }
         var item = renameItem.getStackInSlot(0);
-        var name = item.hasCustomHoverName() ? item.getHoverName().getString() : "";
+        var name = item.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty()).getString();
         refreshName(name, true);
     }
 
@@ -194,9 +196,8 @@ public class TechMenu extends MenuBase {
         onRefreshName = cb;
     }
 
-    public static void onOpenGui(OpenTechPacket packet, NetworkEvent.Context ctx) {
-        var player = ctx.getSender();
-        if (player != null) {
+    public static void onOpenGui(OpenTechPacket packet, IPayloadContext ctx) {
+        if (ctx.player() instanceof ServerPlayer player) {
             TECH_MENU.open(player);
         }
     }

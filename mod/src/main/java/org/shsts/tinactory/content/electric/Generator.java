@@ -8,6 +8,7 @@ import org.shsts.tinactory.core.machine.ProcessingMachine;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinycorelib.api.recipe.IRecipeManager;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.function.Supplier;
@@ -15,8 +16,8 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class Generator extends ProcessingMachine<ProcessingRecipe> {
-    public Generator(IRecipeType<ProcessingRecipe.Builder> recipeType,
-        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe.Builder> markerType) {
+    public Generator(IRecipeType<ProcessingRecipe> recipeType,
+        Supplier<IRecipeManager> recipeManager, IRecipeType<MarkerRecipe> markerType) {
         super(recipeType, recipeManager, markerType);
     }
 
@@ -44,7 +45,7 @@ public class Generator extends ProcessingMachine<ProcessingRecipe> {
     }
 
     @Override
-    public long onWorkProgress(ProcessingRecipe recipe, double partial) {
+    public long onWorkProgress(IEntry<ProcessingRecipe> recipe, double partial) {
         return PROGRESS_PER_TICK;
     }
 
@@ -59,17 +60,17 @@ public class Generator extends ProcessingMachine<ProcessingRecipe> {
     }
 
     @Override
-    public ElectricMachineType electricMachineType(ProcessingRecipe recipe) {
+    public ElectricMachineType electricMachineType(IEntry<ProcessingRecipe> recipe) {
         return ElectricMachineType.GENERATOR;
     }
 
     @Override
-    public double powerGen(ProcessingRecipe recipe) {
-        return energyFactor * recipe.power;
+    public double powerGen(IEntry<ProcessingRecipe> recipe) {
+        return energyFactor * recipe.get().power;
     }
 
     @Override
-    public double powerCons(ProcessingRecipe recipe) {
+    public double powerCons(IEntry<ProcessingRecipe> recipe) {
         return 0;
     }
 }

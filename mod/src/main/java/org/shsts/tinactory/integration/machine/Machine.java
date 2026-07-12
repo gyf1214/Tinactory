@@ -4,20 +4,20 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.AllEvents;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -31,12 +31,14 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.integration.network.Network;
 import org.shsts.tinactory.integration.tech.TechHelper;
 import org.shsts.tinactory.integration.tech.TechManagers;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.blockentity.IReturnEvent;
@@ -100,11 +102,11 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     public static <P> IBlockEntityTypeBuilder<P> factory(IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, Machine::new);
+        return builder.container(ID, Machine::new);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(boolean activeNetwork) {
-        return builder -> builder.capability(ID, be -> new Machine(be, activeNetwork));
+        return builder -> builder.container(ID, be -> new Machine(be, activeNetwork));
     }
 
     @Override
@@ -139,9 +141,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    private void setName(Component name) {
-        var jo = Component.Serializer.toJson(name);
-        setConfig(SetMachineConfigPacket.builder().set("name", jo).get());
+    private void setName(Level world, Component name) {
+        var tag = CodecHelper.encodeTag(world.registryAccess(), ComponentSerialization.CODEC, name);
+        setConfig(SetMachineConfigPacket.builder().set("name", tag).get());
     }
 
     /**
@@ -149,6 +151,10 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
      */
     private void createNetwork(Level world) {
         if (activeNetwork && team != null) {
+            if (network != null) {
+                LOGGER.warn("{} already has network {}, invalidating before replacement", blockEntity, network);
+                network.invalidate();
+            }
             network = new Network(world, uuid, blockEntity.getBlockPos(), team);
         }
     }
@@ -170,46 +176,47 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
             return;
         }
         var item = arg.stack();
-        if (item.hasCustomHoverName()) {
-            setName(item.getHoverName());
+        if (item.has(DataComponents.CUSTOM_NAME)) {
+            setName(arg.world(), item.getHoverName());
         }
         if (arg.placer() instanceof Player player) {
             setPlayerTeam(arg.world(), player);
         }
     }
 
-    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<ItemInteractionResult> result) {
         var player = arg.player();
         // TODO: unfortunately client does not know whether the player can interact with this machine,
         //       so on client we simply pass.
-        if (player.level.isClientSide) {
+        if (player.level().isClientSide) {
             return;
         }
 
         if (team == null) {
-            setPlayerTeam(player.level, player);
+            setPlayerTeam(player.level(), player);
         }
 
         if (!canPlayerInteract(player)) {
-            result.set(InteractionResult.FAIL);
+            result.set(ItemInteractionResult.FAIL);
             return;
         }
 
-        var item = player.getItemInHand(arg.hand());
-        if (item.is(Items.NAME_TAG) && item.hasCustomHoverName()) {
-            setName(item.getHoverName());
+        var item = arg.stack();
+        if (item.is(Items.NAME_TAG) && item.has(DataComponents.CUSTOM_NAME)) {
+            setName(player.level(), item.getHoverName());
             item.shrink(1);
-            result.set(InteractionResult.sidedSuccess(player.level.isClientSide));
-            return;
+            result.set(ItemInteractionResult.sidedSuccess(player.level().isClientSide));
         }
-
-        result.set(InteractionResult.PASS);
     }
 
     private void onServerLoad(Level world) {
-        team = teamName == null ? null : TechManagers.server().teamByName(teamName).orElse(null);
-        teamName = null;
-        createNetwork(world);
+        if (teamName != null) {
+            team = TechManagers.server().teamByName(teamName).orElse(null);
+            teamName = null;
+        }
+        if (network == null) {
+            createNetwork(world);
+        }
     }
 
     private void onServerTick(Level world) {
@@ -259,8 +266,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
-        return config.getString("name")
-            .map(Component.Serializer::fromJson)
+        return config.getTag("name")
+            .map($ -> CodecHelper.parseTag(registryAccess(), ComponentSerialization.CODEC, $))
             .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 
@@ -383,17 +390,14 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == MACHINE.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(MACHINE, this);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("config", config.serializeNBT());
+        tag.put("config", config.serializeNBT(provider));
         tag.putUUID("uuid", uuid);
         if (team != null) {
             tag.putString("owner", team.getName());
@@ -404,21 +408,21 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         LOGGER.trace("{} deserializer machine NBT, tag={}", blockEntity, tag);
-        config.deserializeNBT(tag.getCompound("config"));
+        config.deserializeNBT(provider, tag.getCompound("config"));
         uuid = tag.getUUID("uuid");
         teamName = tag.contains("owner", Tag.TAG_STRING) ? tag.getString("owner") : null;
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        return serializeNBT();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        return serializeNBT(provider);
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        deserializeNBT(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        deserializeNBT(provider, tag);
         invoke(blockEntity, SET_MACHINE_CONFIG);
     }
 

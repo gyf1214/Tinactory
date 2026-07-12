@@ -5,10 +5,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.ModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ModelProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
 import java.util.Optional;
@@ -22,9 +22,9 @@ import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record IconSet(String subfolder, @Nullable IconSet parent) {
-    private static final ResourceLocation ITEM_LOC = gregtech("items/material_sets");
-    private static final ResourceLocation BLOCK_LOC = gregtech("blocks/material_sets");
-    private static final ResourceLocation MAGNETIC_LOC = gregtech("items/material_sets/magnetic/magnetic_overlay");
+    private static final ResourceLocation ITEM_LOC = gregtech("item/material_sets");
+    private static final ResourceLocation BLOCK_LOC = gregtech("block/material_sets");
+    private static final ResourceLocation MAGNETIC_LOC = gregtech("item/material_sets/magnetic/magnetic_overlay");
 
     public static final IconSet DULL = new IconSet();
     public static final IconSet ROUGH = new IconSet("rough");
@@ -63,12 +63,12 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
     }
 
     public <U extends Item, P extends ItemModelProvider> void itemModel(
-        IEntryDataContext<Item, U, P> ctx, String sub) {
+        IEntryDataContext<U, P> ctx, String sub) {
         this.<U, P>itemModel(sub).accept(ctx);
     }
 
-    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<Item,
-        U, P>> itemModel(String sub) {
+    public <U extends Item, P extends ItemModelProvider> Consumer<IEntryDataContext<U, P>> itemModel(
+        String sub) {
         return ctx -> {
             var helper = ctx.provider().existingFileHelper;
 

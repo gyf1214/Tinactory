@@ -1,10 +1,11 @@
 package org.shsts.tinactory.integration.recipe;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -12,6 +13,7 @@ import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
+import org.shsts.tinactory.core.recipe.DisplayInputRecipe;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -20,6 +22,7 @@ import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -36,31 +39,51 @@ public final class ProcessingHelper {
 
     public static final Codec<IProcessingIngredient> INGREDIENT_CODEC;
     public static final Codec<IProcessingResult> RESULT_CODEC;
+    public static final Codec<IProcessingObject> OBJECT_CODEC;
     public static final Codec<ProcessingInfo> INFO_CODEC;
+    public static final Codec<ProcessingRecipe.Input> INPUT_CODEC;
+    public static final Codec<ProcessingRecipe.Output> OUTPUT_CODEC;
 
-    public static final ProcessingRecipe.Serializer<ProcessingRecipe, ProcessingRecipe.Builder> PROCESSING_SERIALIZER;
-    public static final AssemblyRecipe.Serializer<AssemblyRecipe, AssemblyRecipe.Builder> ASSEMBLY_SERIALIZER;
-    public static final MarkerRecipe.Serializer MARKER_SERIALIZER;
-    public static final ResearchRecipe.Serializer RESEARCH_SERIALIZER;
+    public static final MapCodec<ProcessingRecipe> PROCESSING_CODEC;
+    public static final MapCodec<DisplayInputRecipe> DISPLAY_INPUT_CODEC;
+    public static final MapCodec<AssemblyRecipe> ASSEMBLY_CODEC;
+    public static final MapCodec<MarkerRecipe> MARKER_CODEC;
+    public static final MapCodec<ResearchRecipe> RESEARCH_CODEC;
 
     static {
-        var ingredientCodecs = Map.of(
-            ITEM_INGREDIENT_CODEC_NAME, itemIngredientCodec(),
-            TagIngredient.CODEC_NAME, TagIngredient.codec(),
-            FLUID_INGREDIENT_CODEC_NAME, fluidIngredientCodec());
-        INGREDIENT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, ingredientCodecs::get);
+        var itemIngredient = StackIngredient.codec(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM,
+            ItemStack.CODEC, StackHelper.ITEM_ADAPTER);
+        var fluidIngredient = StackIngredient.codec(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID,
+            FluidStack.CODEC, StackHelper.FLUID_ADAPTER);
+        var ingredients = Map.of(
+            ITEM_INGREDIENT_CODEC_NAME, itemIngredient,
+            TagIngredient.CODEC_NAME, TagIngredient.CODEC,
+            FLUID_INGREDIENT_CODEC_NAME, fluidIngredient);
+        INGREDIENT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, ingredients::get);
 
-        var resultCodecs = Map.of(
-            ITEM_RESULT_CODEC_NAME, itemResultCodec(),
-            FLUID_RESULT_CODEC_NAME, fluidResultCodec());
-        RESULT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, resultCodecs::get);
+        var itemResult = StackResult.codec(ITEM_RESULT_CODEC_NAME, PortType.ITEM,
+            ItemStack.CODEC, StackHelper.ITEM_ADAPTER);
+        var fluidResult = StackResult.codec(FLUID_RESULT_CODEC_NAME, PortType.FLUID,
+            FluidStack.CODEC, StackHelper.FLUID_ADAPTER);
+        var results = Map.of(
+            ITEM_RESULT_CODEC_NAME, itemResult,
+            FLUID_RESULT_CODEC_NAME, fluidResult);
+        RESULT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, results::get);
 
-        INFO_CODEC = ProcessingInfo.codec(INGREDIENT_CODEC, RESULT_CODEC);
+        var objects = new HashMap<String, MapCodec<? extends IProcessingObject>>();
+        objects.putAll(ingredients);
+        objects.putAll(results);
+        OBJECT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, objects::get);
 
-        PROCESSING_SERIALIZER = new ProcessingRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
-        ASSEMBLY_SERIALIZER = new AssemblyRecipe.Serializer<>(INGREDIENT_CODEC, RESULT_CODEC);
-        MARKER_SERIALIZER = new MarkerRecipe.Serializer(INGREDIENT_CODEC, RESULT_CODEC);
-        RESEARCH_SERIALIZER = new ResearchRecipe.Serializer(INGREDIENT_CODEC);
+        INFO_CODEC = ProcessingInfo.codec(OBJECT_CODEC);
+        INPUT_CODEC = ProcessingRecipe.inputCodec(INGREDIENT_CODEC);
+        OUTPUT_CODEC = ProcessingRecipe.outputCodec(RESULT_CODEC);
+
+        PROCESSING_CODEC = ProcessingRecipe.codec(INPUT_CODEC, OUTPUT_CODEC, ProcessingRecipe::new);
+        DISPLAY_INPUT_CODEC = ProcessingRecipe.codec(INPUT_CODEC, OUTPUT_CODEC, DisplayInputRecipe::new);
+        ASSEMBLY_CODEC = AssemblyRecipe.assemblyCodec(INPUT_CODEC, OUTPUT_CODEC, AssemblyRecipe::new);
+        MARKER_CODEC = MarkerRecipe.codec(INGREDIENT_CODEC, INPUT_CODEC, OUTPUT_CODEC);
+        RESEARCH_CODEC = ResearchRecipe.codec(INPUT_CODEC);
     }
 
     private ProcessingHelper() {}
@@ -113,24 +136,6 @@ public final class ProcessingHelper {
 
     public static StackResult<FluidStack> fluidResult(FluidStack stack) {
         return fluidResult(1d, stack);
-    }
-
-    private static Codec<StackIngredient<ItemStack>> itemIngredientCodec() {
-        return StackIngredient.codec(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC,
-            StackHelper.ITEM_ADAPTER);
-    }
-
-    private static Codec<StackIngredient<FluidStack>> fluidIngredientCodec() {
-        return StackIngredient.codec(FLUID_INGREDIENT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC,
-            StackHelper.FLUID_ADAPTER);
-    }
-
-    private static Codec<StackResult<ItemStack>> itemResultCodec() {
-        return StackResult.codec(ITEM_RESULT_CODEC_NAME, PortType.ITEM, ItemStack.CODEC, StackHelper.ITEM_ADAPTER);
-    }
-
-    private static Codec<StackResult<FluidStack>> fluidResultCodec() {
-        return StackResult.codec(FLUID_RESULT_CODEC_NAME, PortType.FLUID, FluidStack.CODEC, StackHelper.FLUID_ADAPTER);
     }
 
     @SuppressWarnings("unchecked")

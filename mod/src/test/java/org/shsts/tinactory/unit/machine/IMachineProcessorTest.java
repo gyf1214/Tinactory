@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 class IMachineProcessorTest {
     @Test
@@ -37,7 +38,7 @@ class IMachineProcessorTest {
     void allowTargetRecipeShouldDefaultToFalse() {
         var processor = new TestProcessor(0, 0);
 
-        assertFalse(processor.allowTargetRecipe(new ResourceLocation("tinactory", "recipe")));
+        assertFalse(processor.allowTargetRecipe(modLoc("recipe")));
     }
 
     private record TestProcessor(long progressTicks, long maxProgressTicks) implements IMachineProcessor {

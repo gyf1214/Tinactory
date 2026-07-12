@@ -1,21 +1,17 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
@@ -24,6 +20,7 @@ import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.network.MachineBlock;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 import org.slf4j.Logger;
@@ -45,7 +42,6 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
 
     private final FireBoiler boiler;
     private final List<BlockPos> fireboxes = new ArrayList<>();
-    private final LazyOptional<IProcessor> processorCap;
 
     private int boilParallel = 1;
 
@@ -73,7 +69,6 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
                 blockEntity.setChanged();
             }
         };
-        this.processorCap = LazyOptional.of(() -> boiler);
     }
 
     @Override
@@ -171,20 +166,18 @@ public class LargeBoiler extends Multiblock implements INBTSerializable<Compound
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get()) {
-            return processorCap.cast();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(PROCESSOR, boiler);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return boiler.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return boiler.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        boiler.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        boiler.deserializeNBT(provider, tag);
     }
 }

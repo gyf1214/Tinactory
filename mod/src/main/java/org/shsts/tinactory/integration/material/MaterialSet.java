@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
@@ -242,6 +243,7 @@ public class MaterialSet {
 
         public Builder<P> item(String sub, Function<Item.Properties, ? extends Item> factory) {
             put(sub, () -> REGISTRATE.item(newId(sub), factory)
+                .creativeTab(CreativeModeTabs.INGREDIENTS)
                 .tint(color)
                 .register());
             return this;
@@ -262,10 +264,10 @@ public class MaterialSet {
             oreVariant = variant;
             if (!blocks.containsKey("ore")) {
                 var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
-                    .material(variant.blockMaterial, variant.materialColor)
-                    .properties(p -> p.strength(variant.destroyTime, variant.explodeResistance)
+                    .properties(p -> p
+                        .strength(variant.destroyTime, variant.explodeResistance)
+                        .mapColor(variant.mapColor)
                         .sound(variant.soundType))
-                    .translucent()
                     .tint(color)
                     .noBlockItem()
                     .register();
@@ -288,6 +290,7 @@ public class MaterialSet {
             private ToolBuilder item(String category, Function<Item.Properties, ToolItem> factory) {
                 var sub = "tool/" + category;
                 put(sub, () -> REGISTRATE.item(newId(sub), factory)
+                    .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                     .tint(0xFFFFFFFF, color)
                     .register());
                 return this;

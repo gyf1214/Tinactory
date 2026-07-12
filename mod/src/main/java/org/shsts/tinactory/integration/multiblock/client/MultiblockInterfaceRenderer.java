@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.slf4j.Logger;
@@ -53,9 +53,9 @@ public class MultiblockInterfaceRenderer implements BlockEntityRenderer<BlockEnt
 
             var random = world.getRandom();
             var seed = blockState.getSeed(pos);
-            // in litematica, the schematic is rendered in a virtual world, which does not work with forge
+            // in litematica, the schematic is rendered in a virtual world, which does not work with NeoForge
             // ModelData. We don't use ModelData anyway but might need a way make sure this works in the future.
-            var modelData = EmptyModelData.INSTANCE;
+            var modelData = ModelData.EMPTY;
             // use translucent for best compatibility
             var vertexConsumer = bufferSource.getBuffer(RenderType.translucent());
             // if the world is not the client world (e.g. litematica schematic world), we render without regard to it.

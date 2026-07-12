@@ -133,7 +133,7 @@ public abstract class DigitalStorage<T> extends PortNotifier implements IPort<T>
         return stackAdapter.withAmount(existing, limit);
     }
 
-    public int getStorageAmount(T stack) {
+    public long getStorageAmount(T stack) {
         if (!acceptOutput()) {
             return 0;
         }

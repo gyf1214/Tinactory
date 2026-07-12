@@ -2,13 +2,11 @@ package org.shsts.tinactory;
 
 import javax.annotation.Nullable;
 import net.minecraft.util.Unit;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinycorelib.api.blockentity.IEvent;
@@ -32,11 +30,11 @@ public final class AllEvents {
     public static final IEntry<IEvent<Level>> SERVER_TICK;
     public static final IEntry<IEvent<Level>> CLIENT_TICK;
 
-    public record OnUseArg(Player player, InteractionHand hand, BlockHitResult hitResult) {}
+    public record OnUseArg(Player player, ItemStack stack) {}
 
     public record OnPlaceArg(Level world, @Nullable LivingEntity placer, ItemStack stack) {}
 
-    public static final IEntry<IReturnEvent<OnUseArg, InteractionResult>> BLOCK_USE;
+    public static final IEntry<IReturnEvent<OnUseArg, ItemInteractionResult>> BLOCK_USE;
     public static final IEntry<IEvent<OnPlaceArg>> BLOCK_PLACE;
     public static final IEntry<IEvent<Unit>> CONTAINER_CHANGE;
     public static final IEntry<IEvent<INetwork>> CONNECT;
@@ -53,7 +51,7 @@ public final class AllEvents {
         SERVER_TICK = EVENTS.getEntry(SERVER_TICK_LOC);
         CLIENT_TICK = EVENTS.getEntry(CLIENT_TICK_LOC);
 
-        BLOCK_USE = REGISTRATE.returnEvent("server_use", InteractionResult.PASS);
+        BLOCK_USE = REGISTRATE.returnEvent("server_use", ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
         BLOCK_PLACE = REGISTRATE.event("server_place");
         CONTAINER_CHANGE = REGISTRATE.event("logistics/container_change");
         CONNECT = REGISTRATE.event("network/connect");

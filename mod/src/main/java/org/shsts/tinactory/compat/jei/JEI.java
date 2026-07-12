@@ -1,5 +1,6 @@
 package org.shsts.tinactory.compat.jei;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -14,10 +15,10 @@ import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.compat.jei.category.AssemblyCategory;
 import org.shsts.tinactory.compat.jei.category.BlastFurnaceCategory;
@@ -34,8 +35,8 @@ import org.shsts.tinactory.compat.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchHandler;
+import org.shsts.tinactory.compat.jei.ingredient.BatterySubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
-import org.shsts.tinactory.compat.jei.ingredient.PartialNbtInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
@@ -50,7 +51,7 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
+import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.ArrayList;
@@ -67,23 +68,38 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public class JEI implements IModPlugin {
     private static final ResourceLocation LOC = modLoc("jei");
 
-    private final ToolCategory toolCategory;
+    @Nullable
+    private ToolCategory toolCategory = null;
     private final List<RecipeCategory<?>> categories;
 
     public JEI() {
         this.categories = new ArrayList<>();
+    }
 
-        this.toolCategory = new ToolCategory();
-        categories.add(toolCategory);
+    @Override
+    public ResourceLocation getPluginUid() {
+        return LOC;
+    }
 
-        for (var type : PROCESSING_TYPES.values()) {
-            addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        for (var item : BuiltInRegistries.ITEM) {
+            if (item instanceof BatteryItem) {
+                registration.registerSubtypeInterpreter(item, BatterySubtypeInterpreter.INSTANCE);
+            }
         }
     }
 
+    @Override
+    public void registerIngredients(IModIngredientRegistration registration) {
+        registration.register(TechIngredient.TYPE, Collections.emptyList(),
+            TechIngredient.HELPER, IngredientRenderers.empty(), TechIngredient.CODEC);
+        registration.register(RecipeMarker.TYPE, Collections.emptyList(),
+            RecipeMarker.HELPER, IngredientRenderers.empty(), RecipeMarker.CODEC);
+    }
+
     @SuppressWarnings("unchecked")
-    private static <A extends IRecipeBuilderBase<?>,
-        B extends IRecipeBuilderBase<?>> IRecipeType<B> cast(IRecipeType<A> type) {
+    private static <A extends IRecipe<?>, B extends IRecipe<?>> IRecipeType<B> cast(IRecipeType<A> type) {
         return (IRecipeType<B>) type;
     }
 
@@ -111,29 +127,13 @@ public class JEI implements IModPlugin {
     }
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return LOC;
-    }
-
-    @Override
-    public void registerIngredients(IModIngredientRegistration registration) {
-        registration.register(TechIngredient.TYPE, Collections.emptyList(),
-            TechIngredient.HELPER, IngredientRenderers.empty());
-        registration.register(RecipeMarker.TYPE, Collections.emptyList(),
-            RecipeMarker.HELPER, IngredientRenderers.empty());
-    }
-
-    @Override
-    public void registerItemSubtypes(ISubtypeRegistration registration) {
-        for (var item : ForgeRegistries.ITEMS) {
-            if (item instanceof BatteryItem) {
-                registration.registerSubtypeInterpreter(item, PartialNbtInterpreter.INSTANCE);
-            }
-        }
-    }
-
-    @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        categories.clear();
+        toolCategory = new ToolCategory();
+        categories.add(toolCategory);
+        for (var type : PROCESSING_TYPES.values()) {
+            addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
+        }
         for (var category : categories) {
             category.registerCategory(registration);
         }
@@ -163,6 +163,7 @@ public class JEI implements IModPlugin {
         registration.addGuiContainerHandler(TechScreen.class, new TechMenuHandler());
         registration.addGuiContainerHandler(ProcessingScreen.class, new ProcessingHandler());
         registration.addGuiContainerHandler(ResearchBenchScreen.class, new ResearchHandler());
+        assert toolCategory != null;
         WorkbenchHandler.addWorkbenchClickArea(registration, toolCategory);
     }
 
@@ -174,14 +175,14 @@ public class JEI implements IModPlugin {
             }
         }
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
-            RecipeTypes.SMELTING.getRecipeClass(), MEPatternTransferHandler::fromSmelting,
+            RecipeTypes.SMELTING, MEPatternTransferHandler::fromSmelting,
             registration.getTransferHelper()), RecipeTypes.SMELTING);
     }
 
     private static <R extends ProcessingRecipe> void addProcessingTransferHandler(
         IRecipeTransferRegistration registration, ProcessingCategory<R> category) {
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
-            category.jeiRecipeType().getRecipeClass(),
+            category.jeiRecipeType(),
             recipe -> MEPatternTransferHandler.fromProcessing(recipe, category.recipeTypeId()),
             registration.getTransferHelper()), category.jeiRecipeType());
     }

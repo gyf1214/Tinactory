@@ -1,28 +1,20 @@
 package org.shsts.tinactory.core.recipe;
 
-import com.google.common.collect.Streams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
-import javax.annotation.Nullable;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraft.util.RandomSource;
 import org.shsts.tinactory.api.logistics.IContainer;
-import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
-import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
@@ -31,22 +23,23 @@ public class ResearchRecipe extends ProcessingRecipe {
     public final ResourceLocation target;
     public final long progress;
 
-    protected ResearchRecipe(Builder builder) {
-        super(builder);
-        this.target = builder.getTarget();
-        this.progress = builder.progress;
+    public ResearchRecipe(List<Input> inputs, long workTicks, long voltage, long power,
+        ResourceLocation target, long progress) {
+        super(inputs, List.of(), workTicks, voltage, power);
+        this.target = target;
+        this.progress = progress;
     }
 
     @Override
     protected boolean matchTeam(Optional<ITeamProfile> team) {
         return team.filter($ -> $.canResearch(target))
-            .flatMap(ITeamProfile::getTargetTech)
-            .filter(tech -> tech.loc().equals(target))
+            .flatMap(ITeamProfile::getTargetTechKey)
+            .filter(target::equals)
             .isPresent();
     }
 
     @Override
-    protected boolean matchOutputs(IMachine machine, IContainer container, int parallel, Random random) {
+    protected boolean matchOutputs(IMachine machine, IContainer container, int parallel, RandomSource random) {
         var progress1 = parallel <= 1 ? 1 : progress * parallel;
         return machine.owner()
             .filter($ -> $.canResearch(target, progress1))
@@ -54,91 +47,20 @@ public class ResearchRecipe extends ProcessingRecipe {
     }
 
     @Override
-    public void insertOutputs(IMachine machine, int parallel, Random random,
+    public void insertOutputs(IMachine machine, int parallel, RandomSource random,
         Consumer<IProcessingResult> callback) {
         machine.owner()
             .ifPresent(team -> ((IServerTeamProfile) team).advanceTechProgress(target, progress * parallel));
     }
 
-    public static class Builder extends ProcessingRecipe.BuilderBase<ResearchRecipe, Builder> {
-        @Nullable
-        private ResourceLocation target = null;
-        private long progress = 1;
-
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder input(IProcessingIngredient ingredient) {
-            var port = ingredient.type() == PortType.ITEM ? 0 : 1;
-            return input(port, ingredient);
-        }
-
-        public Builder target(ResourceLocation value) {
-            target = value;
-            return this;
-        }
-
-        public Builder progress(long value) {
-            progress = value;
-            return this;
-        }
-
-        private ResourceLocation getTarget() {
-            assert target != null;
-            return target;
-        }
-
-        @Override
-        protected void validate() {
-            assert power > 0 : loc;
-            assert workTicks > 0 : loc;
-        }
-
-        @Override
-        protected ResearchRecipe createObject() {
-            return new ResearchRecipe(this);
-        }
-    }
-
-    public static class Serializer implements IRecipeSerializer<ResearchRecipe, Builder> {
-        private final Codec<IProcessingIngredient> ingredientCodec;
-
-        public Serializer(Codec<IProcessingIngredient> ingredientCodec) {
-            this.ingredientCodec = ingredientCodec;
-        }
-
-        protected Codec<IProcessingIngredient> ingredientCodec() {
-            return ingredientCodec;
-        }
-
-        @Override
-        public ResearchRecipe fromJson(IRecipeType<Builder> type, ResourceLocation loc, JsonObject jo,
-            ICondition.IContext context) {
-            var builder = type.getBuilder(loc);
-            Streams.stream(GsonHelper.getAsJsonArray(jo, "inputs"))
-                .map(je -> CodecHelper.parseJson(ingredientCodec(), je.getAsJsonObject()))
-                .forEach(builder::input);
-            return builder.target(new ResourceLocation(GsonHelper.getAsString(jo, "target")))
-                .progress(GsonHelper.getAsLong(jo, "progress"))
-                .workTicks(GsonHelper.getAsLong(jo, "work_ticks"))
-                .voltage(GsonHelper.getAsLong(jo, "voltage"))
-                .power(GsonHelper.getAsLong(jo, "power"))
-                .buildObject();
-        }
-
-        @Override
-        public void toJson(JsonObject jo, ResearchRecipe recipe) {
-            var inputs = new JsonArray();
-            recipe.inputs.stream()
-                .map(input -> CodecHelper.encodeJson(ingredientCodec(), input.ingredient()))
-                .forEach(inputs::add);
-            jo.add("inputs", inputs);
-            jo.addProperty("target", recipe.target.toString());
-            jo.addProperty("progress", recipe.progress);
-            jo.addProperty("work_ticks", recipe.workTicks);
-            jo.addProperty("voltage", recipe.voltage);
-            jo.addProperty("power", recipe.power);
-        }
+    public static MapCodec<ResearchRecipe> codec(Codec<Input> inputCodec) {
+        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+            inputCodec.listOf().fieldOf("inputs").forGetter($ -> $.inputs),
+            Codec.LONG.fieldOf("work_ticks").forGetter($ -> $.workTicks),
+            Codec.LONG.fieldOf("voltage").forGetter($ -> $.voltage),
+            Codec.LONG.fieldOf("power").forGetter($ -> $.power),
+            ResourceLocation.CODEC.fieldOf("target").forGetter($ -> $.target),
+            Codec.LONG.fieldOf("progress").forGetter($ -> $.progress)
+        ).apply(instance, ResearchRecipe::new));
     }
 }

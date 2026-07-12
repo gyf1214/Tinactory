@@ -4,7 +4,7 @@
   "fluids": {
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:blocks/fluids/fluid.toluene",
+      "texture": "gregtech:block/fluids/fluid.toluene",
       "textureColor": "0xFFFFFFFF"
     }
   },

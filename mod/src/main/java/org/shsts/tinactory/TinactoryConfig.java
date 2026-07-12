@@ -2,8 +2,8 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public final class TinactoryConfig {
     public final ConfigValue<Boolean> allowTeamSpawnCommands;
     public final ConfigValue<Integer> teamSpread;
 
-    public TinactoryConfig(ForgeConfigSpec.Builder builder) {
+    public TinactoryConfig(ModConfigSpec.Builder builder) {
         builder.push("logistics");
         fluidSlotSize = builder.comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
@@ -51,7 +51,7 @@ public final class TinactoryConfig {
         primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
         machineResistanceFactor = builder.comment("Machine resistance factor")
-            .defineList("machine_resistance_factor", List.of(0d),
+            .defineList("machine_resistance_factor", List.of(0d), () -> 0d,
                 i -> ((Number) i).doubleValue() >= 0d);
         workFactorExponent = builder.comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
@@ -79,10 +79,10 @@ public final class TinactoryConfig {
     }
 
     public static final TinactoryConfig CONFIG;
-    public static final ForgeConfigSpec CONFIG_SPEC;
+    public static final ModConfigSpec CONFIG_SPEC;
 
     static {
-        var pair = new ForgeConfigSpec.Builder().configure(TinactoryConfig::new);
+        var pair = new ModConfigSpec.Builder().configure(TinactoryConfig::new);
 
         CONFIG = pair.getKey();
         CONFIG_SPEC = pair.getValue();

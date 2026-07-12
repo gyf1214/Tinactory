@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
@@ -38,7 +38,7 @@ public class MEPatternMachinePanel extends Panel {
         this.draft = draft;
         this.recipeTypeEdit = Widgets.editBox();
         this.targetRecipeEdit = Widgets.editBox();
-        this.voltageButton = new VanillaButton(menu, TextComponent.EMPTY, null, () -> {}) {
+        this.voltageButton = new VanillaButton(menu, Component.empty(), null, () -> {}) {
             @Override
             protected boolean canClick(int button, double mouseX, double mouseY) {
                 return true;
@@ -84,7 +84,7 @@ public class MEPatternMachinePanel extends Panel {
         }
         if (draft.voltageTier() != null) {
             var v = Voltage.fromRank(draft.voltageTier());
-            voltageButton.setLabel(new TextComponent(v.displayName()));
+            voltageButton.setLabel(Component.literal(v.displayName()));
         } else {
             voltageButton.setLabel(tr("ignoreVoltage"));
         }

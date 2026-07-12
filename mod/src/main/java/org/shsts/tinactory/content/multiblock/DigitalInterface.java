@@ -1,19 +1,16 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
@@ -28,6 +25,7 @@ import org.shsts.tinactory.core.logistics.IDigitalProvider;
 import org.shsts.tinactory.core.logistics.IFlexibleContainer;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
@@ -38,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.CONTAINER;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 
@@ -193,23 +192,23 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         public void reset() {}
 
         @Override
-        public CompoundTag serializeNBT() {
+        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
-            tag.put("items", internalItem.serializeNBT());
-            tag.put("fluids", internalFluid.serializeNBT());
+            tag.put("items", internalItem.serializeNBT(provider));
+            tag.put("fluids", internalFluid.serializeNBT(provider));
             return tag;
         }
 
         @Override
-        public void deserializeNBT(CompoundTag tag) {
+        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
             bytesUsed = 0;
-            internalItem.deserializeNBT(tag.getCompound("items"));
-            internalFluid.deserializeNBT(tag.getCompound("fluids"));
+            internalItem.deserializeNBT(provider, tag.getCompound("items"));
+            internalFluid.deserializeNBT(provider, tag.getCompound("fluids"));
         }
 
         private void recomputeBytesUsed() {
-            var tag = serializeNBT();
-            deserializeNBT(tag);
+            var tag = serializeNBT(registryAccess());
+            deserializeNBT(registryAccess(), tag);
         }
     }
 
@@ -226,8 +225,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         this.inputTypeReserveBytes = properties.inputTypeReserveBytes;
         this.inputTypeReserveSlots = properties.inputTypeReserveSlots;
         this.outputReserveBytes = properties.outputReserveBytes;
-        var reservedBytes = saturatedAdd(saturatedMultiply(inputTypeReserveBytes, inputTypeReserveSlots),
-            outputReserveBytes);
+        var reservedBytes = inputTypeReserveBytes * inputTypeReserveSlots + outputReserveBytes;
         if (reservedBytes > bytesLimit) {
             throw new IllegalArgumentException("Digital Interface reserve bytes exceed total capacity: " +
                 reservedBytes + " > " + bytesLimit);
@@ -236,7 +234,7 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
-        return $ -> $.capability(ID, be -> new DigitalInterface(be, properties));
+        return $ -> $.container(ID, be -> new DigitalInterface(be, properties));
     }
 
     @Override
@@ -311,8 +309,8 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
     }
 
     @Override
-    protected void onLoad() {
-        container = this;
+    protected IFlexibleContainer flexibleContainer() {
+        return this;
     }
 
     private long sharedCapacity() {
@@ -425,52 +423,35 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
         return limit > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) limit;
     }
 
-    private static long saturatedMultiply(long left, long right) {
-        if (left == 0L || right == 0L) {
-            return 0L;
-        }
-        if (left > Long.MAX_VALUE / right) {
-            return Long.MAX_VALUE;
-        }
-        return left * right;
-    }
-
-    private static long saturatedAdd(long left, long right) {
-        if (Long.MAX_VALUE - left < right) {
-            return Long.MAX_VALUE;
-        }
-        return left + right;
+    @Override
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(CONTAINER, this);
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(BYTES_PROVIDER, this);
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        var tag = super.serializeNBT();
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        var tag = super.serializeNBT(provider);
 
         var tag1 = new ListTag();
         for (var storage : storages) {
-            tag1.add(storage.serializeNBT());
+            tag1.add(storage.serializeNBT(provider));
         }
         tag.put("storage", tag1);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        super.deserializeNBT(tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeNBT(provider, tag);
 
         resetAccounting();
         storages.clear();
         for (var tag1 : tag.getList("storage", Tag.TAG_COMPOUND)) {
             var storage = new Storage();
-            storage.deserializeNBT((CompoundTag) tag1);
+            storage.deserializeNBT(provider, (CompoundTag) tag1);
             storages.add(storage);
         }
     }

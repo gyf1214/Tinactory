@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.ME_SIGNAL_CONTROLLER_SYNC;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.MACHINE_COMPARATOR;
@@ -33,7 +34,7 @@ public class MESignalControllerMenu extends MenuBase {
     public MESignalControllerMenu(Properties properties) {
         super(properties);
 
-        var scheduler = new ActiveScheduler<>(() ->
+        var scheduler = new ActiveScheduler<>(ME_SIGNAL_CONTROLLER_SYNC, () ->
             new MESignalControllerSyncPacket(getVisibleSignals()));
         this.onUpdatePorts = scheduler::invokeUpdate;
 

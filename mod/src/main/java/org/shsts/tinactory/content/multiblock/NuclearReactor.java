@@ -1,20 +1,17 @@
 package org.shsts.tinactory.content.multiblock;
 
 import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -29,6 +26,7 @@ import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import java.util.ArrayList;
@@ -308,18 +306,16 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get()) {
-            return myself();
-        }
-        return super.getCapability(cap, side);
+    public void attachCapability(ICapabilityBuilder builder) {
+        super.attachCapability(builder);
+        builder.attach(PROCESSOR, this);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
-        tag.put("boiler", boiler.serializeNBT());
-        tag.put("reactorItems", StackHelper.serializeItemHandler(reactorItems));
+        tag.put("boiler", boiler.serializeNBT(provider));
+        tag.put("reactorItems", StackHelper.serializeItemHandler(provider, reactorItems));
 
         var listTag = new ListTag();
         for (var cell : cells) {
@@ -333,9 +329,9 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        boiler.deserializeNBT(tag.getCompound("boiler"));
-        StackHelper.deserializeItemHandler(reactorItems, tag.getCompound("reactorItems"));
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        boiler.deserializeNBT(provider, tag.getCompound("boiler"));
+        StackHelper.deserializeItemHandler(provider, reactorItems, tag.getCompound("reactorItems"));
 
         var i = 0;
         for (var tag1 : tag.getList("cells", Tag.TAG_COMPOUND)) {
@@ -347,8 +343,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
         if (multiblockInterface != null) {
             tag.putInt("rows", rows);
             tag.putInt("columns", columns);
@@ -357,8 +353,8 @@ public class NuclearReactor extends Multiblock implements IBoiler,
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        super.deserializeOnUpdate(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeOnUpdate(provider, tag);
         if (tag.contains("rows", Tag.TAG_INT)) {
             rows = tag.getInt("rows");
             columns = tag.getInt("columns");

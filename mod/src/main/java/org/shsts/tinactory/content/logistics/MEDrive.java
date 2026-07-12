@@ -1,17 +1,14 @@
 package org.shsts.tinactory.content.logistics;
 
 import com.mojang.logging.LogUtils;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.IPort;
@@ -26,10 +23,10 @@ import org.shsts.tinactory.core.logistics.IBytesProvider;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
-import org.shsts.tinactory.integration.logistics.IMenuItemHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.StoragePorts;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -39,17 +36,16 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER;
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
-import static org.shsts.tinactory.AllCapabilities.FLUID_PORT;
-import static org.shsts.tinactory.AllCapabilities.ITEM_PORT;
+import static org.shsts.tinactory.AllCapabilities.FLUID_PORT_ITEM;
+import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.LAYOUT_PROVIDER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL;
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
@@ -74,8 +70,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private final WrapperItemHandler storages;
     private final CombinedPort<ItemStack> combinedItems;
     private final CombinedPort<FluidStack> combinedFluids;
-    private final LazyOptional<IMenuItemHandler> menuItemHandlerCap;
-    private final LazyOptional<IElectricMachine> electricCap;
+    private final IElectricMachine electric;
 
     private IMachine machine;
     private IMachineConfig machineConfig;
@@ -89,22 +84,20 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         for (var i = 0; i < size; i++) {
             storages.setFilter(i, this::allowItem);
         }
-        this.menuItemHandlerCap = IMenuItemHandler.cap(storages);
         storages.onUpdate(this::onStorageChange);
 
-        this.combinedItems = StoragePorts.combinedItem();
+        this.combinedItems = StoragePorts.combinedItem(false);
         combinedItems.onUpdate(this::onContainerChange);
 
-        this.combinedFluids = StoragePorts.combinedFluid();
+        this.combinedFluids = StoragePorts.combinedFluid(false);
         combinedFluids.onUpdate(this::onContainerChange);
 
         var voltage = getBlockVoltage(blockEntity);
-        var electric = new SimpleElectricConsumer(voltage.value, power);
-        this.electricCap = LazyOptional.of(() -> electric);
+        this.electric = new SimpleElectricConsumer(voltage.value, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Layout layout, double power) {
-        return $ -> $.capability(ID, be -> new MEDrive(be, layout, power));
+        return $ -> $.container(ID, be -> new MEDrive(be, layout, power));
     }
 
     private boolean allowItem(ItemStack stack) {
@@ -129,8 +122,8 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (storage.isEmpty()) {
                 continue;
             }
-            storage.getCapability(BYTES_PROVIDER.get()).ifPresent(digital::add);
-            storage.getCapability(PATTERN_CELL.get()).ifPresent(patterns::add);
+            BYTES_PROVIDER_ITEM.tryGet(storage).ifPresent(digital::add);
+            PATTERN_CELL_ITEM.tryGet(storage).ifPresent(patterns::add);
         }
         return aggregateByteStats(digital, patterns);
     }
@@ -151,6 +144,20 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         return new ByteStats(bytesUsed, bytesCapacity);
     }
 
+    private IMachine machine() {
+        if (machine == null) {
+            machine = MACHINE.get(blockEntity);
+        }
+        return machine;
+    }
+
+    private IMachineConfig machineConfig() {
+        if (machineConfig == null) {
+            machineConfig = machine().config();
+        }
+        return machineConfig;
+    }
+
     private int updateSignal() {
         var totalBytes = bytesUsed();
         var totalCapacity = bytesCapacity();
@@ -159,11 +166,11 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
-        logistics.unregisterPort(machine, 0);
-        logistics.unregisterPort(machine, 1);
-        logistics.registerStoragePort(machine, 0, combinedItems, priority);
-        logistics.registerStoragePort(machine, 1, combinedFluids, priority);
+        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        logistics.unregisterPort(machine(), 0);
+        logistics.unregisterPort(machine(), 1);
+        logistics.registerStoragePort(machine(), 0, combinedItems, priority);
+        logistics.registerStoragePort(machine(), 1, combinedFluids, priority);
     }
 
     private void onConnect(INetwork network) {
@@ -171,7 +178,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
         registerPatternCells(network);
 
         var signal = network.getComponent(SIGNAL_COMPONENT.get());
-        signal.registerRead(machine, AMOUNT_SIGNAL, () -> amountSignal);
+        signal.registerRead(machine(), AMOUNT_SIGNAL, () -> amountSignal);
         amountSignal = updateSignal();
     }
 
@@ -194,42 +201,37 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
             if (stack.isEmpty()) {
                 continue;
             }
-            stack.getCapability(ITEM_PORT.get()).ifPresent(items::add);
-            stack.getCapability(FLUID_PORT.get()).ifPresent(fluids::add);
+            ITEM_PORT_ITEM.tryGet(stack).ifPresent(items::add);
+            FLUID_PORT_ITEM.tryGet(stack).ifPresent(fluids::add);
         }
         combinedItems.setComposes(items);
         combinedFluids.setComposes(fluids);
         if (machine != null) {
-            machine.network().ifPresent(this::registerPatternCells);
+            machine().network().ifPresent(this::registerPatternCells);
         }
         onContainerChange();
     }
 
     private void registerPatternCells(INetwork network) {
         var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
-        patternRepository.removeCellPorts(machine.uuid());
-        var priority = machineConfig.getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        patternRepository.removeCellPorts(machine().uuid());
+        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
         for (var i = 0; i < storages.getSlots(); i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {
                 continue;
             }
             var slotIndex = i;
-            stack.getCapability(PATTERN_CELL.get()).ifPresent(port ->
-                patternRepository.addCellPort(machine.uuid(), priority, slotIndex, port));
+            PATTERN_CELL_ITEM.tryGet(stack).ifPresent(port ->
+                patternRepository.addCellPort(machine().uuid(), priority, slotIndex, port));
         }
     }
 
     private void onMachineConfig() {
-        machine.network().ifPresent(network -> {
+        machine().network().ifPresent(network -> {
             registerPort(network);
             registerPatternCells(network);
         });
-    }
-
-    private void onLoad() {
-        machine = MACHINE.get(blockEntity);
-        machineConfig = machine.config();
     }
 
     @Override
@@ -238,21 +240,15 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == LAYOUT_PROVIDER.get() || cap == BYTES_PROVIDER.get()) {
-            return myself();
-        } else if (cap == MENU_ITEM_HANDLER.get()) {
-            return menuItemHandlerCap.cast();
-        } else if (cap == ELECTRIC_MACHINE.get()) {
-            return electricCap.cast();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(LAYOUT_PROVIDER, this);
+        builder.attach(BYTES_PROVIDER, this);
+        builder.attach(MENU_ITEM_HANDLER, storages);
+        builder.attach(ELECTRIC_MACHINE, electric);
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::onMachineConfig);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
@@ -260,12 +256,12 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     }
 
     @Override
-    public CompoundTag serializeNBT() {
-        return StackHelper.serializeItemHandler(storages);
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return StackHelper.serializeItemHandler(provider, storages);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
-        StackHelper.deserializeItemHandler(storages, tag);
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
+        StackHelper.deserializeItemHandler(provider, storages, tag);
     }
 }

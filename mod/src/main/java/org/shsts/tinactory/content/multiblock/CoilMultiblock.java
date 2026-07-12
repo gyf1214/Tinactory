@@ -3,8 +3,11 @@ package org.shsts.tinactory.content.multiblock;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,8 +17,6 @@ import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 
 import java.util.OptionalInt;
-
-import static org.shsts.tinactory.AllRegistries.BLOCKS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -52,24 +53,32 @@ public class CoilMultiblock extends Multiblock {
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
-        if (coilBlock != null && coilBlock.getRegistryName() != null) {
-            tag.putString("coilBlock", coilBlock.getRegistryName().toString());
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
+        if (coilBlock != null) {
+            provider.lookup(Registries.BLOCK)
+                .flatMap(registry -> registry.listElements()
+                    .filter($ -> $.value() == coilBlock)
+                    .map($ -> $.key().location())
+                    .findFirst())
+                .ifPresent(loc -> tag.putString("coilBlock", loc.toString()));
         }
         return tag;
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
         coilBlock = null;
         if (tag.contains("coilBlock", Tag.TAG_STRING)) {
-            var loc = new ResourceLocation(tag.getString("coilBlock"));
-            var block = BLOCKS.getEntry(loc).get();
-            if (block instanceof CoilBlock coilBlock1) {
-                coilBlock = coilBlock1;
-            }
+            var loc = ResourceLocation.parse(tag.getString("coilBlock"));
+            var key = ResourceKey.create(Registries.BLOCK, loc);
+            provider.lookup(Registries.BLOCK)
+                .flatMap(registry -> registry.get(key))
+                .map($ -> $.value())
+                .filter($ -> $ instanceof CoilBlock)
+                .map($ -> (CoilBlock) $)
+                .ifPresent($ -> coilBlock = $);
         }
-        super.deserializeOnUpdate(tag);
+        super.deserializeOnUpdate(provider, tag);
     }
 }

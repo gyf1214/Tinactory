@@ -23,8 +23,13 @@ import java.util.UUID;
 @MethodsReturnNonnullByDefault
 public final class PatternRegistryCache implements IPatternRepository {
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    public static final Comparator<IStackKey> KEY_DISPLAY_ORDER = Comparator
+        .comparing(IStackKey::type)
+        .thenComparing($ -> $.name().toString());
+
     private static final Comparator<CraftPattern> DISPLAY_ORDER = Comparator
-        .comparing((CraftPattern pattern) -> pattern.outputs().get(0).key())
+        .<CraftPattern, IStackKey>comparing(pattern -> pattern.outputs().getFirst().key(), KEY_DISPLAY_ORDER)
         .thenComparing(CraftPattern::patternUuid);
 
     private final Map<CellKey, CellState> cellsByKey = new HashMap<>();
@@ -41,7 +46,7 @@ public final class PatternRegistryCache implements IPatternRepository {
 
     @Override
     public List<IStackKey> listRequestables() {
-        return byOutput.keySet().stream().sorted().toList();
+        return byOutput.keySet().stream().sorted(KEY_DISPLAY_ORDER).toList();
     }
 
     @Override

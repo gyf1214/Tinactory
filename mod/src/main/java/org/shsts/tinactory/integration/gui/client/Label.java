@@ -1,12 +1,11 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import org.shsts.tinactory.core.gui.Menu;
 import org.shsts.tinactory.core.gui.Rect;
@@ -99,7 +98,7 @@ public class Label extends MenuWidget {
         multiline = null;
         formattedLines.clear();
         while (lines.size() <= index) {
-            lines.add(TextComponent.EMPTY);
+            lines.add(Component.empty());
         }
         lines.set(index, value);
         updateSize();
@@ -128,17 +127,18 @@ public class Label extends MenuWidget {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var rect = rect();
         int x = rect.inX(horizontalAlign.value) - (int) (cacheWidth * horizontalAlign.value);
         int y = rect.inY(verticalAlign.value) - (int) (cacheHeight * verticalAlign.value);
         if (formattedLines.isEmpty()) {
             for (var line : lines) {
-                RenderUtil.renderText(poseStack, line, x, y, color, scale);
+                RenderUtil.renderText(graphics, line, x, y, color, scale);
                 y += scaledLineSpacing();
             }
         } else {
             for (var line : formattedLines) {
-                RenderUtil.renderText(poseStack, line, x, y, color, scale);
+                RenderUtil.renderText(graphics, line, x, y, color, scale);
                 y += scaledLineSpacing();
             }
         }

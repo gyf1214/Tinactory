@@ -2,33 +2,42 @@ package org.shsts.tinactory.integration.logistics;
 
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.common.util.DataComponentUtil;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import static net.minecraft.world.item.ItemStack.isSameItemSameComponents;
+import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -45,43 +54,41 @@ public final class StackHelper {
 
     public static final Codec<IStackKey> KEY_CODEC = Codec.STRING.dispatch(
         StackHelper::keyCodecName,
-        StackHelper::keyCodec
-    );
+        StackHelper::keyCodec);
+
+    public static final Codec<ItemStack> ITEM_STACK_NO_LIMIT_CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            ItemStack.ITEM_NON_AIR_CODEC.fieldOf("id").forGetter(ItemStack::getItemHolder),
+            ExtraCodecs.POSITIVE_INT.fieldOf("count").orElse(1).forGetter(ItemStack::getCount),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                .forGetter(ItemStack::getComponentsPatch)
+        ).apply(instance, ItemStack::new));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
+        ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
 
     /**
-     * Use this if the itemStack can have more than 255 items.
+     * Use this if the itemStack can have more than 99 items.
      */
-    public static CompoundTag serializeItemStack(ItemStack stack) {
-        var tag = new CompoundTag();
-        stack.save(tag);
-        tag.putInt("CountInt", stack.getCount());
-        return tag;
+    public static CompoundTag serializeItemStack(HolderLookup.Provider provider, ItemStack stack) {
+        return (CompoundTag) DataComponentUtil.wrapEncodingExceptions(stack, ITEM_STACK_NO_LIMIT_CODEC, provider);
     }
 
     /**
-     * Use this if the itemStack can have more than 255 items.
+     * Use this if the itemStack can have more than 99 items.
      */
-    public static ItemStack deserializeItemStack(CompoundTag tag) {
-        var stack = ItemStack.of(tag);
-        if (tag.contains("CountInt", Tag.TAG_INT)) {
-            stack.setCount(tag.getInt("CountInt"));
-        }
-        return stack;
+    public static ItemStack deserializeItemStack(HolderLookup.Provider provider, CompoundTag tag) {
+        return ITEM_STACK_NO_LIMIT_CODEC.parse(provider.createSerializationContext(NbtOps.INSTANCE), tag)
+            .getOrThrow();
     }
 
-    public static CompoundTag serializeFluidStack(FluidStack stack) {
-        var tag = new CompoundTag();
-        stack.writeToNBT(tag);
-        return tag;
-    }
-
-    public static CompoundTag serializeItemHandler(IItemHandler itemHandler) {
+    public static CompoundTag serializeItemHandler(HolderLookup.Provider provider, IItemHandler itemHandler) {
         var listTag = new ListTag();
         var size = itemHandler.getSlots();
         for (var i = 0; i < size; i++) {
             var stack = itemHandler.getStackInSlot(i);
             if (!stack.isEmpty()) {
-                var itemTag = serializeItemStack(stack);
+                var itemTag = serializeItemStack(provider, stack);
                 itemTag.putInt("Slot", i);
                 listTag.add(itemTag);
             }
@@ -92,7 +99,8 @@ public final class StackHelper {
         return tag;
     }
 
-    public static void deserializeItemHandler(IItemHandlerModifiable itemHandler, CompoundTag tag) {
+    public static void deserializeItemHandler(HolderLookup.Provider provider, IItemHandlerModifiable itemHandler,
+        CompoundTag tag) {
         var size = itemHandler.getSlots();
         for (int i = 0; i < size; i++) {
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
@@ -102,44 +110,33 @@ public final class StackHelper {
             var itemTag = (CompoundTag) tag1;
             int slot = itemTag.getInt("Slot");
             if (slot >= 0 && slot < size) {
-                var stack = deserializeItemStack(itemTag);
+                var stack = deserializeItemStack(provider, itemTag);
                 itemHandler.setStackInSlot(slot, stack);
             }
         }
     }
 
-    public static void serializeStackToBuf(FriendlyByteBuf buf, ItemStack stack) {
-        if (stack.isEmpty()) {
-            buf.writeBoolean(false);
-        } else {
-            buf.writeBoolean(true);
-            var item = stack.getItem();
-            buf.writeVarInt(Item.getId(item));
-            buf.writeVarInt(stack.getCount());
-            var tag = item.isDamageable(stack) || item.shouldOverrideMultiplayerNbt() ?
-                stack.getShareTag() : null;
-            buf.writeNbt(tag);
-        }
+    public static void serializeStackToBuf(RegistryFriendlyByteBuf buf, ItemStack stack) {
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
     }
 
-    public static ItemStack deserializeStackFromBuf(FriendlyByteBuf buf) {
-        if (!buf.readBoolean()) {
-            return ItemStack.EMPTY;
-        }
-        int id = buf.readVarInt();
-        int count = buf.readVarInt();
-        var stack = new ItemStack(Item.byId(id), count);
-        stack.readShareTag(buf.readNbt());
-        return stack;
+    public static ItemStack deserializeStackFromBuf(RegistryFriendlyByteBuf buf) {
+        return ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+    }
+
+    public static void serializeFluidStackToBuf(RegistryFriendlyByteBuf buf, FluidStack stack) {
+        FluidStack.OPTIONAL_STREAM_CODEC.encode(buf, stack);
+    }
+
+    public static FluidStack deserializeFluidStackFromBuf(RegistryFriendlyByteBuf buf) {
+        return FluidStack.OPTIONAL_STREAM_CODEC.decode(buf);
     }
 
     /**
      * This also ignores the stack limit. This means ItemStack with exact same NBT can also stack.
      */
     public static boolean canItemsStack(ItemStack a, ItemStack b) {
-        return !a.isEmpty() && !b.isEmpty() && a.sameItem(b) && a.hasTag() == b.hasTag() &&
-            (!a.hasTag() || Objects.equals(a.getTag(), b.getTag())) &&
-            a.areCapsCompatible(b);
+        return !a.isEmpty() && !b.isEmpty() && isSameItemSameComponents(a, b);
     }
 
     public static boolean itemStackEqual(ItemStack a, ItemStack b) {
@@ -150,7 +147,7 @@ public final class StackHelper {
         if (stack.isEmpty() || count <= 0) {
             return ItemStack.EMPTY;
         }
-        return ItemHandlerHelper.copyStackWithSize(stack, count);
+        return stack.copyWithCount(count);
     }
 
     public static FluidStack copyWithAmount(FluidStack stack, int amount) {
@@ -160,15 +157,6 @@ public final class StackHelper {
         var ret = stack.copy();
         ret.setAmount(amount);
         return ret;
-    }
-
-    public static Optional<ItemStack> hasItem(IPort<ItemStack> port, Predicate<ItemStack> ingredient) {
-        for (var stack : port.getAllStorages()) {
-            if (ingredient.test(stack)) {
-                return Optional.of(stack);
-            }
-        }
-        return Optional.empty();
     }
 
     /**
@@ -213,9 +201,9 @@ public final class StackHelper {
         if (item2.isEmpty()) {
             return Optional.of(item1);
         }
-        if (ItemHandlerHelper.canItemStacksStack(item1, item2) &&
+        if (isSameItemSameComponents(item1, item2) &&
             item1.getCount() + item2.getCount() <= item1.getMaxStackSize()) {
-            return Optional.of(ItemHandlerHelper.copyStackWithSize(item1, item1.getCount() + item2.getCount()));
+            return Optional.of(copyWithCount(item1, item1.getCount() + item2.getCount()));
         }
         return Optional.empty();
     }
@@ -224,7 +212,7 @@ public final class StackHelper {
         if (stack.isEmpty()) {
             return Optional.empty();
         }
-        return FluidUtil.getFluidHandler(stack).resolve();
+        return FLUID_HANDLER_ITEM.tryGet(stack).or(() -> FluidUtil.getFluidHandler(stack));
     }
 
     public static FluidStack getFluidFromItem(ItemStack stack) {
@@ -280,7 +268,7 @@ public final class StackHelper {
         };
     }
 
-    private static Codec<? extends IStackKey> keyCodec(String name) {
+    private static MapCodec<? extends IStackKey> keyCodec(String name) {
         return switch (name) {
             case "item" -> ItemPortAdapter.KEY_CODEC;
             case "fluid" -> FluidPortAdapter.KEY_CODEC;

@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
 import org.shsts.tinactory.content.gui.client.MEPatternDraft;
@@ -23,7 +23,9 @@ import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_PATTERN_ACTION;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getProvider;
+import static org.shsts.tinactory.AllMenus.ME_PATTERN_SYNC;
+import static org.shsts.tinactory.AllMenus.UNIT_SYNC;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -42,11 +44,12 @@ public class MEPatternTerminalMenu extends InventoryMenu {
     public MEPatternTerminalMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
-        var terminal = getProvider(blockEntity(), MEPatternTerminal.ID, MEPatternTerminal.class);
+        var terminal = getContainer(blockEntity(), MEPatternTerminal.ID, MEPatternTerminal.class);
         this.repository = world.isClientSide ? null : terminal.patternRepository();
-        this.resultScheduler = new ActiveScheduler<>(() -> SyncPackets.UnitPacket.INSTANCE);
+        this.resultScheduler = new ActiveScheduler<>(UNIT_SYNC, () -> SyncPackets.UnitPacket.INSTANCE);
 
-        addSyncSlot(PATTERN_SYNC, new RevisionScheduler<>(this::patternRevision, this::patternPacket));
+        addSyncSlot(PATTERN_SYNC, new RevisionScheduler<>(ME_PATTERN_SYNC, this::patternRevision,
+            this::patternPacket));
         addSyncSlot(PATTERN_RESULT_SYNC, resultScheduler);
         onEventPacket(ME_PATTERN_ACTION, this::onAction);
     }

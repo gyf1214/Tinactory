@@ -1,10 +1,10 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.client.IViewNode;
 
 @OnlyIn(Dist.CLIENT)
@@ -17,5 +17,5 @@ public interface IViewAdapter extends IViewNode {
 
     boolean isHovered(double mouseX, double mouseY);
 
-    void renderTooltip(MenuScreen<?> screen, PoseStack poseStack, int mouseX, int mouseY);
+    void renderTooltip(MenuScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY);
 }

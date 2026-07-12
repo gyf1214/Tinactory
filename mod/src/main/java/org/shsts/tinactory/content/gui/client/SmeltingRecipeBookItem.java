@@ -4,9 +4,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
@@ -25,12 +26,14 @@ import java.util.function.BiConsumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class SmeltingRecipeBookItem implements IRecipeBookItem {
+    private final ResourceLocation loc;
     private final SmeltingRecipe recipe;
     private final int inputPort;
     private final int outputPort;
 
-    public SmeltingRecipeBookItem(SmeltingRecipe recipe, int inputPort, int outputPort) {
-        this.recipe = recipe;
+    public SmeltingRecipeBookItem(RecipeHolder<SmeltingRecipe> recipe, int inputPort, int outputPort) {
+        this.loc = recipe.id();
+        this.recipe = recipe.value();
         this.inputPort = inputPort;
         this.outputPort = outputPort;
     }
@@ -41,7 +44,7 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
 
     @Override
     public ResourceLocation loc() {
-        return recipe.getId();
+        return loc;
     }
 
     @Override
@@ -57,21 +60,21 @@ public class SmeltingRecipeBookItem implements IRecipeBookItem {
         var outputSlot = layout.slots.stream()
             .filter(slot -> slot.port() == outputPort)
             .findFirst().orElseThrow();
-        var ingredient = ItemsIngredient.of(recipe.getIngredients().get(0), 1);
-        var result = ProcessingHelper.itemResult(1d, recipe.getResultItem());
+        var ingredient = ItemsIngredient.of(recipe.getIngredients().getFirst(), 1);
+        var result = ProcessingHelper.itemResult(1d, recipe.getResultItem(ClientUtil.registryAccess()));
         ingredientCons.accept(inputSlot, ingredient);
         ingredientCons.accept(outputSlot, result);
     }
 
     @Override
     public Optional<List<Component>> buttonToolTip() {
-        return ClientUtil.selectItemFromItems(recipe.getIngredients().get(0))
+        return ClientUtil.selectItemFromItems(recipe.getIngredients().getFirst())
             .map(ClientUtil::itemTooltip);
     }
 
     @Override
     public IRenderDescriptor display() {
-        return ClientUtil.selectItemFromItems(recipe.getIngredients().get(0))
+        return ClientUtil.selectItemFromItems(recipe.getIngredients().getFirst())
             .<IRenderDescriptor>map(ItemRenderDescriptor::new)
             .orElse(EmptyRenderDescriptor.INSTANCE);
     }

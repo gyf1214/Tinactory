@@ -1,22 +1,19 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
-import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class VanillaButton extends Button {
-    private final Texture texture;
     private final Font font;
     private Component label;
     private int textWidth;
@@ -28,7 +25,6 @@ public class VanillaButton extends Button {
         super(menu, tooltip);
         this.label = label;
         this.onPress = onPress;
-        texture = Texture.VANILLA_WIDGETS;
         font = ClientUtil.getFont();
         textWidth = font.width(label);
     }
@@ -39,17 +35,17 @@ public class VanillaButton extends Button {
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        int y;
-        y = disabled ? 66 - BUTTON_HEIGHT : (isHovered(mouseX, mouseY) ? 66 + BUTTON_HEIGHT : 66);
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        var rect = rect();
+        var texture = disabled ? Texture.VANILLA_BUTTON_DISABLED :
+            isHovered(mouseX, mouseY) ? Texture.VANILLA_BUTTON_HOVERED : Texture.VANILLA_BUTTON;
         var w = rect.width() / 2;
         var rect1 = new Rect(rect.x(), rect.y(), w, rect.height());
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1, 0, y);
-        RenderUtil.blit(poseStack, texture, getBlitOffset(), rect1.offset(w, 0), 200 - w, y);
+        RenderUtil.blit(graphics, texture, rect1);
+        RenderUtil.blit(graphics, texture, rect1.offset(w, 0), texture.width() - w, 0);
 
-        font.drawShadow(poseStack, label, rect.x() + w - (float) textWidth / 2,
-            rect.y() + (float) (rect.height() - font.lineHeight) / 2,
-            RenderUtil.WHITE);
+        graphics.drawString(font, label, rect.x() + w - textWidth / 2,
+            rect.y() + (rect.height() - font.lineHeight) / 2, RenderUtil.WHITE, true);
     }
 
     @Override

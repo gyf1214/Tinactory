@@ -3,7 +3,9 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -16,7 +18,6 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
@@ -58,8 +59,12 @@ public interface IMachine {
         return ret;
     }
 
-    default Random random() {
+    default RandomSource random() {
         return world().random;
+    }
+
+    default RegistryAccess registryAccess() {
+        return world().registryAccess();
     }
 
     Optional<BlockState> workBlock();

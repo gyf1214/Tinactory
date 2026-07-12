@@ -11,20 +11,25 @@ import com.mojang.serialization.JsonOps;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.StreamDecoder;
+import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
 
 import java.io.Reader;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,34 +38,30 @@ import java.util.function.Function;
 public final class CodecHelper {
     public static final Gson GSON = new Gson();
     public static final Codec<PortDirection> PORT_DIRECTION_CODEC =
-        StringRepresentable.fromEnum(PortDirection::values, PortDirection::fromName);
-
-    public static JsonObject jsonFromStr(String s) {
-        return GSON.fromJson(s, JsonObject.class);
-    }
+        StringRepresentable.fromEnum(PortDirection::values);
 
     public static JsonObject jsonFromReader(Reader s) {
         return GSON.fromJson(s, JsonObject.class);
     }
 
-    public static String jsonToStr(JsonElement je) {
-        return GSON.toJson(je);
+    public static <P> P parseJson(HolderLookup.Provider provider, Decoder<P> decoder, JsonElement je) {
+        var ops = provider.createSerializationContext(JsonOps.INSTANCE);
+        return decoder.parse(ops, je).getOrThrow();
     }
 
-    public static <P> P parseJson(Decoder<P> decoder, JsonElement je) {
-        return decoder.parse(JsonOps.INSTANCE, je).getOrThrow(false, $ -> {});
+    public static <P> JsonElement encodeJson(HolderLookup.Provider provider, Encoder<P> encoder, P sth) {
+        var ops = provider.createSerializationContext(JsonOps.INSTANCE);
+        return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
-    public static <P> JsonElement encodeJson(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(JsonOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+    public static <P> P parseTag(HolderLookup.Provider provider, Decoder<P> decoder, Tag tag) {
+        var ops = provider.createSerializationContext(NbtOps.INSTANCE);
+        return decoder.parse(ops, tag).getOrThrow();
     }
 
-    public static <P> P parseTag(Decoder<P> decoder, Tag tag) {
-        return decoder.parse(NbtOps.INSTANCE, tag).getOrThrow(false, $ -> {});
-    }
-
-    public static <P> Tag encodeTag(Encoder<P> encoder, P sth) {
-        return encoder.encodeStart(NbtOps.INSTANCE, sth).getOrThrow(false, $ -> {});
+    public static <P> Tag encodeTag(HolderLookup.Provider provider, Encoder<P> encoder, P sth) {
+        var ops = provider.createSerializationContext(NbtOps.INSTANCE);
+        return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
     public static CompoundTag readRequiredNbt(FriendlyByteBuf buf, String name) {
@@ -86,12 +87,12 @@ public final class CodecHelper {
         return new BlockPos(x, y, z);
     }
 
-    public static String encodeComponent(Component component) {
-        return Component.Serializer.toJson(component);
+    public static void encodeComponentToBuf(RegistryFriendlyByteBuf buf, Component component) {
+        ComponentSerialization.STREAM_CODEC.encode(buf, component);
     }
 
-    public static Component parseComponent(String json) {
-        return Objects.requireNonNullElse(Component.Serializer.fromJsonLenient(json), TextComponent.EMPTY);
+    public static Component parseComponentFromBuf(RegistryFriendlyByteBuf buf) {
+        return ComponentSerialization.STREAM_CODEC.decode(buf);
     }
 
     public static <T> ListTag encodeList(List<T> list, Function<T, Tag> encoder) {
@@ -112,5 +113,30 @@ public final class CodecHelper {
             ret[i++] = x;
         }
         return ret;
+    }
+
+    public static <T> void encodeCollectionToBuf(RegistryFriendlyByteBuf buf,
+        Collection<T> collection, StreamEncoder<RegistryFriendlyByteBuf, T> encoder) {
+        buf.writeCollection(collection, (buf1, sth) -> encoder.encode((RegistryFriendlyByteBuf) buf1, sth));
+    }
+
+    public static <T> List<T> parseListFromBuf(RegistryFriendlyByteBuf buf,
+        StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
+        return buf.readList(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
+    }
+
+    public static void parseWithCountFromBuf(RegistryFriendlyByteBuf buf,
+        Consumer<RegistryFriendlyByteBuf> cons) {
+        buf.readWithCount(buf1 -> cons.accept((RegistryFriendlyByteBuf) buf1));
+    }
+
+    public static <T> void encodeOptionalToBuf(RegistryFriendlyByteBuf buf,
+        Optional<T> sth, StreamEncoder<RegistryFriendlyByteBuf, T> encoder) {
+        buf.writeOptional(sth, (buf1, sth1) -> encoder.encode((RegistryFriendlyByteBuf) buf1, sth1));
+    }
+
+    public static <T> Optional<T> parseOptionalFromBuf(RegistryFriendlyByteBuf buf,
+        StreamDecoder<RegistryFriendlyByteBuf, T> decoder) {
+        return buf.readOptional(buf1 -> decoder.decode((RegistryFriendlyByteBuf) buf1));
     }
 }

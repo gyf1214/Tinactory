@@ -4,15 +4,12 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -39,12 +36,12 @@ public class MachineSound extends CapabilityProvider implements IEventSubscriber
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Supplier<SoundEvent> sound) {
-        return builder -> builder.capability(ID, be -> new MachineSound(be, sound));
+        return builder -> builder.container(ID, be -> new MachineSound(be, sound));
     }
 
     private void onClientTick(Level world) {
-        if (world.isClientSide) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::tickClient);
+        if (world.isClientSide && FMLEnvironment.dist.isClient()) {
+            tickClient();
         }
     }
 
@@ -80,10 +77,5 @@ public class MachineSound extends CapabilityProvider implements IEventSubscriber
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CLIENT_TICK.get(), this::onClientTick);
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        return LazyOptional.empty();
     }
 }

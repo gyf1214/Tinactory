@@ -2,8 +2,7 @@ package org.shsts.tinactory.integration.network;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.core.Registry;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.INetworkComponent;
@@ -12,8 +11,7 @@ import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ComponentType<T extends INetworkComponent>
-    extends ForgeRegistryEntry<IComponentType<?>> implements IComponentType<T> {
+public class ComponentType<T extends INetworkComponent> implements IComponentType<T> {
     private final Class<T> clazz;
     private final NetworkComponent.Factory<T> factory;
 
@@ -34,8 +32,8 @@ public class ComponentType<T extends INetworkComponent>
 
     private static Collection<IComponentType<?>> componentTypes;
 
-    public static void onBake(IForgeRegistry<IComponentType<?>> registry) {
-        componentTypes = registry.getValues();
+    public static void onBake(Registry<IComponentType<?>> registry) {
+        componentTypes = registry.stream().toList();
     }
 
     public static Collection<IComponentType<?>> getComponentTypes() {

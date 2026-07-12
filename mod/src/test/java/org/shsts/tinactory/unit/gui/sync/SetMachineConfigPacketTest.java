@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.gui.sync;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,12 +27,13 @@ class SetMachineConfigPacketTest {
         var packet = SetMachineConfigPacket.builder()
             .set("enabled", true)
             .set("speed", 12)
+            .set("capacity", 3000000000L)
             .set("name", "washer")
             .set("nested", nested)
             .reset("obsolete")
             .reset("legacy")
             .get();
-        var buf = TestBufferHelper.buf();
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new SetMachineConfigPacket();
@@ -42,6 +43,7 @@ class SetMachineConfigPacketTest {
         assertEquals(packet.getResets(), decoded.getResets());
         assertTrue(decoded.getSets().getBoolean("enabled"));
         assertEquals(12, decoded.getSets().getInt("speed"));
+        assertEquals(3000000000L, decoded.getSets().getLong("capacity"));
         assertEquals("washer", decoded.getSets().getString("name"));
         assertEquals("value", decoded.getSets().getCompound("nested").getString("child"));
         assertEquals(2, decoded.getResets().size());

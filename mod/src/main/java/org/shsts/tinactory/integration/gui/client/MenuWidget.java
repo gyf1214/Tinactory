@@ -1,16 +1,17 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -20,16 +21,15 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class MenuWidget extends GuiComponent implements
-    IViewAdapter, Widget, GuiEventListener, NarratableEntry {
-
+public abstract class MenuWidget implements IViewAdapter, Renderable, GuiEventListener, NarratableEntry {
     protected final MenuBase menu;
+    @Nullable
     protected Rect rect;
     protected boolean active = true;
+    protected boolean focused = false;
 
     public MenuWidget(MenuBase menu) {
         this.menu = menu;
-        this.setBlitOffset(0);
     }
 
     @Override
@@ -40,14 +40,27 @@ public abstract class MenuWidget extends GuiComponent implements
     @Override
     public void setActive(boolean value) {
         active = value;
+        if (!value) {
+            focused = false;
+        }
     }
 
-    public abstract void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick);
+    public Rect rect() {
+        assert rect != null;
+        return rect;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public abstract void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick);
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (active) {
-            doRender(poseStack, mouseX, mouseY, partialTick);
+            rect();
+            doRender(graphics, mouseX, mouseY, partialTick);
         }
     }
 
@@ -58,7 +71,28 @@ public abstract class MenuWidget extends GuiComponent implements
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return active && canHover() && rect.in(mouseX, mouseY);
+        return active && canHover() && rect().in(mouseX, mouseY);
+    }
+
+    @Override
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return active && rect().in(mouseX, mouseY);
+    }
+
+    @Override
+    public ScreenRectangle getRectangle() {
+        var rect = rect();
+        return new ScreenRectangle(rect.x(), rect.y(), rect.width(), rect.height());
+    }
+
+    @Override
+    public boolean isFocused() {
+        return focused;
+    }
+
+    @Override
+    public void setFocused(boolean focused) {
+        this.focused = active && focused;
     }
 
     public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
@@ -74,9 +108,12 @@ public abstract class MenuWidget extends GuiComponent implements
     }
 
     @Override
-    public void renderTooltip(MenuScreen<?> screen, PoseStack poseStack, int mouseX, int mouseY) {
+    public void renderTooltip(MenuScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY) {
+        if (!active) {
+            return;
+        }
         getTooltip(mouseX, mouseY).ifPresent(tooltip ->
-            screen.renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY));
+            screen.renderTooltip(graphics, tooltip, Optional.empty(), mouseX, mouseY));
     }
 
     protected boolean canClick(int button, double mouseX, double mouseY) {
@@ -84,7 +121,7 @@ public abstract class MenuWidget extends GuiComponent implements
     }
 
     protected boolean isClicking(double mouseX, double mouseY, int button) {
-        return active && rect.in(mouseX, mouseY) && canClick(button, mouseX, mouseY);
+        return active && rect().in(mouseX, mouseY) && canClick(button, mouseX, mouseY);
     }
 
     @Override

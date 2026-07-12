@@ -1,30 +1,32 @@
 package org.shsts.tinactory.content.recipe;
 
-import com.google.gson.JsonObject;
-import javax.annotation.Nullable;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.machine.Boiler;
-import org.shsts.tinactory.core.builder.RecipeBuilder;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
-import org.shsts.tinycorelib.api.recipe.IRecipeSerializer;
-import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class BoilerRecipe implements IRecipe<Boiler> {
-    private final ResourceLocation loc;
+    public static final MapCodec<BoilerRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        FluidStack.CODEC.fieldOf("input").forGetter($ -> $.input),
+        FluidStack.CODEC.fieldOf("output").forGetter($ -> $.output),
+        Codec.DOUBLE.fieldOf("minHeat").forGetter($ -> $.minHeat),
+        Codec.DOUBLE.fieldOf("optimalHeat").forGetter($ -> $.optimalHeat),
+        Codec.DOUBLE.fieldOf("maxHeat").forGetter($ -> $.maxHeat),
+        Codec.DOUBLE.fieldOf("reactionRate").forGetter($ -> $.reactionRate),
+        Codec.DOUBLE.fieldOf("absorbRate").forGetter($ -> $.absorbRate)
+    ).apply(instance, BoilerRecipe::new));
+
     public final FluidStack input;
     public final FluidStack output;
     private final double minHeat;
@@ -33,23 +35,18 @@ public class BoilerRecipe implements IRecipe<Boiler> {
     private final double reactionRate;
     private final double absorbRate;
 
-    private BoilerRecipe(Builder builder) {
-        this.loc = builder.loc;
-        this.input = Objects.requireNonNull(builder.input);
-        this.output = Objects.requireNonNull(builder.output);
-        this.minHeat = builder.minHeat;
-        this.optimalHeat = builder.optimalHeat;
-        this.maxHeat = builder.maxHeat;
-        this.reactionRate = builder.reactionRate;
-        this.absorbRate = builder.absorbRate;
+    public BoilerRecipe(FluidStack input, FluidStack output, double minHeat, double optimalHeat, double maxHeat,
+        double reactionRate, double absorbRate) {
+        this.input = input;
+        this.output = output;
+        this.minHeat = minHeat;
+        this.optimalHeat = optimalHeat;
+        this.maxHeat = maxHeat;
+        this.reactionRate = reactionRate;
+        this.absorbRate = absorbRate;
 
         assert minHeat > 0 && optimalHeat > minHeat && maxHeat > optimalHeat &&
             reactionRate > 0 && absorbRate > 0;
-    }
-
-    @Override
-    public ResourceLocation loc() {
-        return loc;
     }
 
     @Override
@@ -83,78 +80,4 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         return absorbRate * reaction1;
     }
 
-    public static class Builder extends RecipeBuilder<BoilerRecipe, Builder> {
-        @Nullable
-        private FluidStack input = null;
-        @Nullable
-        private FluidStack output = null;
-        private double minHeat = 0;
-        private double reactionRate = 0;
-        private double absorbRate = 0;
-        private double optimalHeat = 0;
-        private double maxHeat = 0;
-
-        public Builder(IRecipeType<Builder> parent, ResourceLocation loc) {
-            super(parent, loc);
-        }
-
-        public Builder input(FluidStack val) {
-            input = val;
-            return this;
-        }
-
-        public Builder output(FluidStack val) {
-            output = val;
-            return this;
-        }
-
-        public Builder heat(double minHeat, double optimalHeat, double maxHeat) {
-            this.minHeat = minHeat;
-            this.optimalHeat = optimalHeat;
-            this.maxHeat = maxHeat;
-            return this;
-        }
-
-        public Builder reaction(double reactionRate, double absorbRate) {
-            this.reactionRate = reactionRate;
-            this.absorbRate = absorbRate;
-            return this;
-        }
-
-        @Override
-        protected BoilerRecipe createObject() {
-            return new BoilerRecipe(this);
-        }
-    }
-
-    private static class Serializer implements IRecipeSerializer<BoilerRecipe, BoilerRecipe.Builder> {
-        @Override
-        public BoilerRecipe fromJson(IRecipeType<Builder> type, ResourceLocation loc,
-            JsonObject jo, ICondition.IContext context) {
-            return type.getBuilder(loc)
-                .input(CodecHelper.parseJson(FluidStack.CODEC,
-                    GsonHelper.getAsJsonObject(jo, "input")))
-                .output(CodecHelper.parseJson(FluidStack.CODEC,
-                    GsonHelper.getAsJsonObject(jo, "output")))
-                .heat(GsonHelper.getAsDouble(jo, "minHeat"),
-                    GsonHelper.getAsDouble(jo, "optimalHeat"),
-                    GsonHelper.getAsDouble(jo, "maxHeat"))
-                .reaction(GsonHelper.getAsDouble(jo, "reactionRate"),
-                    GsonHelper.getAsDouble(jo, "absorbRate"))
-                .buildObject();
-        }
-
-        @Override
-        public void toJson(JsonObject jo, BoilerRecipe recipe) {
-            jo.add("input", CodecHelper.encodeJson(FluidStack.CODEC, recipe.input));
-            jo.add("output", CodecHelper.encodeJson(FluidStack.CODEC, recipe.output));
-            jo.addProperty("minHeat", recipe.minHeat);
-            jo.addProperty("optimalHeat", recipe.optimalHeat);
-            jo.addProperty("maxHeat", recipe.maxHeat);
-            jo.addProperty("reactionRate", recipe.reactionRate);
-            jo.addProperty("absorbRate", recipe.absorbRate);
-        }
-    }
-
-    public static final IRecipeSerializer<BoilerRecipe, BoilerRecipe.Builder> SERIALIZER = new Serializer();
 }

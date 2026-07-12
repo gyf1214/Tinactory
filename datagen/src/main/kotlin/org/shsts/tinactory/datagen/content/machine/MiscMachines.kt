@@ -217,9 +217,8 @@ object MiscMachines {
         ulv(getComponent(name).item(Voltage.ULV), base)
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>,
-        RB : ProcessingRecipeBuilder<*>> RecipeFactory<B, RB>.logistics(
-        id: String, amount: Int = 1, block: RB.() -> Unit) {
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.logistics(
+        id: String, amount: Int = 1, block: B.() -> Unit) {
         output(getItem("logistics/$id"), amount, block = block)
     }
 

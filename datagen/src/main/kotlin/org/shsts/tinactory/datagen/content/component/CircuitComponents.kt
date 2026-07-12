@@ -15,11 +15,10 @@ import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.content.electric.Circuits.getCircuit
 import org.shsts.tinactory.content.electric.Circuits.getCircuitComponent
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.datagen.content.Technologies
-import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
@@ -32,6 +31,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssemb
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 import kotlin.math.max
@@ -465,7 +465,7 @@ object CircuitComponents {
 
     private class ComponentTierFactory(val tier: CircuitComponentTier) {
         fun AssemblyRecipeFactory.component(name: String, amount: Int,
-            suffix: String = "", block: AssemblyRecipeBuilder.() -> Unit) {
+            suffix: String = "", block: SimpleAssemblyRecipeBuilder.() -> Unit) {
             output(getCircuitComponent(name).item(tier), amount, suffix, block = block)
         }
     }
@@ -629,7 +629,7 @@ object CircuitComponents {
                 for (i in level..<WAFER_RAW_LIST.size) {
                     val j = i - level
                     val rawWafer = WAFER_RAW_LIST.item(i)
-                    val rawId = name(rawWafer.asItem().registryName!!.path, -1)
+                    val rawId = name(itemLoc(rawWafer.asItem()).path, -1)
                     output(wafer, 1 shl j, suffix = "_from_$rawId") {
                         input(rawWafer)
                         voltage(Voltage.fromRank(voltage.rank + j))
@@ -799,12 +799,12 @@ object CircuitComponents {
         }
     }
 
-    private fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuit(
+    private fun ProcessingRecipeBuilder<*, *>.circuit(
         name: String, amount: Int = 1) {
         input(getCircuit(name).item, amount)
     }
 
-    fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.chip(
+    fun ProcessingRecipeBuilder<*, *>.chip(
         name: String, amount: Int = 1) {
         input(CHIP.item(name), amount)
     }
@@ -823,7 +823,7 @@ object CircuitComponents {
             val solder = (1 shl (level - 1)) / 2.0
             input("soldering_alloy", amount = solder)
             voltage(voltage ?: voltage1)
-            workTicks(workTicks ?: 200L * level)
+            workTicks(workTicks ?: (200L * level))
         }
     }
 
@@ -849,7 +849,7 @@ object CircuitComponents {
 
         val circuitBoard = circuitBoard(tier).get()
 
-        fun <B : ProcessingRecipe.BuilderBase<*, B>> ProcessingRecipeBuilder<B>.circuitComponent(
+        fun ProcessingRecipeBuilder<*, *>.circuitComponent(
             name: String, amount: Int = 1) {
             input(getCircuitComponent(name).tag(componentTier), amount)
         }

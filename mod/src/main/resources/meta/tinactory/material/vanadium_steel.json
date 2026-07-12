@@ -1,7 +1,7 @@
 {
   "color": "0xFFC0C0C0",
   "tools": {
-    "tier": "minecraft:diamond",
+    "tier": "diamond",
     "durability": 1200,
     "items": [
       "file",

@@ -3,11 +3,12 @@ package org.shsts.tinactory.datagen;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.shsts.tinactory.datagen.content.AllData;
 import org.shsts.tinactory.datagen.content.AllDataMeta;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
@@ -28,9 +29,7 @@ public class TinactoryDatagen {
     public static ITinyDataGen DATA_CORE;
     public static IDataGen DATA_GEN;
 
-    public TinactoryDatagen() {
-        var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+    public TinactoryDatagen(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::onConstruct);
         modEventBus.addListener(this::init);
         modEventBus.addListener(this::onGatherData);

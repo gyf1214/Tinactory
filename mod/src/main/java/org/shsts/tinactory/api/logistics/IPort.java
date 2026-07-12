@@ -3,7 +3,7 @@ package org.shsts.tinactory.api.logistics;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +47,7 @@ public interface IPort<T> {
 
     T extract(int limit, boolean simulate);
 
-    int getStorageAmount(T stack);
+    long getStorageAmount(T stack);
 
     Collection<T> getAllStorages();
 
@@ -83,7 +83,7 @@ public interface IPort<T> {
         }
 
         @Override
-        public int getStorageAmount(Object stack) {
+        public long getStorageAmount(Object stack) {
             return 0;
         }
 

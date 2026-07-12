@@ -10,17 +10,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -84,6 +88,39 @@ public final class TinactoryGameTest {
     }
 
     @GameTest(timeoutTicks = 40)
+    public static void testPlacedMachineKeepsNetworkThroughLoadAndFirstUse(GameTestHelper helper) {
+        var machinePos = new BlockPos(1, 1, 1);
+        var floorPos = machinePos.below();
+        helper.setBlock(floorPos, Blocks.STONE);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var scoreboard = helper.getLevel().getScoreboard();
+        var team = scoreboard.getPlayerTeam(TEAM_NAME);
+        assert team != null;
+        scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
+        var machineStack = new ItemStack(machineState(Direction.EAST).getBlock());
+        player.setItemInHand(InteractionHand.MAIN_HAND, machineStack);
+        var absoluteFloorPos = helper.absolutePos(floorPos);
+        machineStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absoluteFloorPos), Direction.UP, absoluteFloorPos, false)));
+        var machine = MACHINE.get(helper.getBlockEntity(machinePos));
+        var placementNetwork = machine.network().orElseThrow();
+
+        helper.runAfterDelay(4, () -> {
+            if (machine.owner().isEmpty()) {
+                helper.fail("Machine lost its team during server load", machinePos);
+            }
+            if (machine.network().orElseThrow() != placementNetwork) {
+                helper.fail("Machine replaced its placement network during server load", machinePos);
+            }
+            useWithTeamMockPlayer(helper, machinePos);
+            if (machine.network().orElseThrow() != placementNetwork) {
+                helper.fail("Machine replaced its placement network during first use", machinePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 40)
     public static void testNetworkConnectivity(GameTestHelper helper) {
         var machinePos = new BlockPos(1, 1, 1);
         var cablePos = machinePos.east();
@@ -117,7 +154,7 @@ public final class TinactoryGameTest {
                 helper.fail("Electric buffer was not connected to the machine network", subnetPos);
             }
             var network = MACHINE.tryGet(helper.getBlockEntity(machinePos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             if (!network.getSubnet(absoluteCablePos, ELECTRIC_SUBNET.get()).equals(absoluteMachinePos)) {
                 helper.fail("Cable did not inherit the machine subnet", cablePos);
@@ -182,7 +219,7 @@ public final class TinactoryGameTest {
                 helper.fail("Child machine was not connected through the network bridge", childMachinePos);
             }
             var network = MACHINE.tryGet(helper.getBlockEntity(parentMachinePos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             if (!network.getSubnet(absoluteBridgePos, LOGISTICS_SUBNET.get()).equals(absoluteParentMachinePos)) {
                 helper.fail("Network bridge did not inherit the parent logistics subnet", bridgePos);
@@ -224,7 +261,7 @@ public final class TinactoryGameTest {
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(parentStoragePos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
@@ -260,7 +297,7 @@ public final class TinactoryGameTest {
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(parentWorkerPos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
             var bridge = MACHINE.get(helper.getBlockEntity(bridgePos));
@@ -299,18 +336,18 @@ public final class TinactoryGameTest {
         helper.setBlock(batteryBoxPos, batteryBoxState);
         var battery = batteryItem(voltage);
         var batteryStack = new ItemStack(battery);
-        battery.setPowerLevel(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         var batteryMachine = MACHINE.get(batteryBoxEntity);
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
             .set(DISCHARGE_KEY, true)
             .get());
-        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithTeamMockPlayer(helper, consumerPos);
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(consumerPos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             var electric = network.getComponent(ELECTRIC_COMPONENT.get());
             var consumer = ELECTRIC_MACHINE.get(helper.getBlockEntity(consumerPos));
@@ -378,14 +415,14 @@ public final class TinactoryGameTest {
 
         var battery = batteryItem(Voltage.HV);
         var batteryStack = new ItemStack(battery);
-        battery.setPowerLevel(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
-        MENU_ITEM_HANDLER.get(batteryBoxEntity).asItemHandler().insertItem(0, batteryStack, false);
+        MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithTeamMockPlayer(helper, batteryBoxPos);
 
         helper.runAfterDelay(80, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(batteryBoxPos))
-                .flatMap(machine -> machine.network())
+                .flatMap(IMachine::network)
                 .orElseThrow();
             var electric = network.getComponent(ELECTRIC_COMPONENT.get());
             var consumerPower = 0d;
@@ -407,7 +444,7 @@ public final class TinactoryGameTest {
                 ", batteryPower=" + batteryPower;
             if (electric.getWorkFactor() <= 0d || electric.getWorkFactor() >= 1d) {
                 helper.fail("HV buffer through transformer should partially power oversized EV consumers: " +
-                    factorReport,
+                        factorReport,
                     evCableStartPos.south());
             }
             if (electric.getBufferFactor() >= 0d) {
@@ -469,7 +506,7 @@ public final class TinactoryGameTest {
     }
 
     private static void useWithTeamMockPlayer(GameTestHelper helper, BlockPos pos) {
-        var player = helper.makeMockPlayer();
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var scoreboard = helper.getLevel().getScoreboard();
         var team = scoreboard.getPlayerTeam(TEAM_NAME);
         assert team != null;
@@ -477,7 +514,7 @@ public final class TinactoryGameTest {
 
         var absolutePos = helper.absolutePos(pos);
         var state = helper.getLevel().getBlockState(absolutePos);
-        state.use(helper.getLevel(), player, InteractionHand.MAIN_HAND, new BlockHitResult(
-            Vec3.atCenterOf(absolutePos), Direction.NORTH, absolutePos, true));
+        state.useItemOn(ItemStack.EMPTY, helper.getLevel(), player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absolutePos), Direction.NORTH, absolutePos, true));
     }
 }

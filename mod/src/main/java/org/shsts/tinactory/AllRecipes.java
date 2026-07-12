@@ -2,13 +2,11 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
@@ -22,47 +20,35 @@ import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance.hasItems;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRecipes {
-    public static final IRecipeType<ToolRecipe.Builder> TOOL_CRAFTING;
-    public static final IRecipeType<BoilerRecipe.Builder> BOILER;
+    public static final IRecipeType<ToolRecipe> TOOL_CRAFTING;
+    public static final IRecipeType<BoilerRecipe> BOILER;
     // Recipes only used to mark input for recipe book purpose
-    public static final IRecipeType<MarkerRecipe.Builder> MARKER;
+    public static final IRecipeType<MarkerRecipe> MARKER;
 
     public static final Map<String, RecipeTypeInfo> PROCESSING_TYPES = new HashMap<>();
 
     static {
-        TOOL_CRAFTING = REGISTRATE.vanillaRecipeType("tool_crafting", ToolRecipe.Builder::new)
-            .recipeClass(ToolRecipe.class)
-            .serializer(ToolRecipe.SERIALIZER)
+        TOOL_CRAFTING = REGISTRATE.recipeType("tool_crafting", ToolRecipe.class)
+            .serializer(ToolRecipe.CODEC)
             .register();
 
-        BOILER = REGISTRATE.recipeType("boiler", BoilerRecipe.Builder::new)
-            .recipeClass(BoilerRecipe.class)
-            .serializer(BoilerRecipe.SERIALIZER)
+        BOILER = REGISTRATE.recipeType("boiler", BoilerRecipe.class)
+            .serializer(BoilerRecipe.CODEC)
             .register();
 
-        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.Builder::new)
-            .recipeClass(MarkerRecipe.class)
-            .serializer(ProcessingHelper.MARKER_SERIALIZER)
+        MARKER = REGISTRATE.recipeType("marker", MarkerRecipe.class)
+            .serializer(ProcessingHelper.MARKER_CODEC)
             .register();
-
     }
 
-    public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
-    }
-
-    public static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
-    }
-
-    private static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... predicates) {
-        return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
-            MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, predicates);
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> hasTag(TagKey<Item> tag) {
+        return hasItems(ItemPredicate.Builder.item().of(tag).build());
     }
 
     public static void putTypeInfo(IRecipeType<?> recipeType, Layout layout,

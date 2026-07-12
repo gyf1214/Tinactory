@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.core.network.NetworkManager;
+import org.shsts.tinactory.core.network.SchedulingSorter;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -45,8 +46,8 @@ public final class WorldNetworkManagers {
         }
     }
 
-    public static void setSortedSchedulings(List<IScheduling> sortedSchedulings) {
-        WorldNetworkManagers.sortedSchedulings = List.copyOf(sortedSchedulings);
+    public static void setSchedulings(Iterable<IScheduling> schedulings) {
+        WorldNetworkManagers.sortedSchedulings = SchedulingSorter.sort(schedulings);
     }
 
     public static List<IScheduling> getSortedSchedulings() {

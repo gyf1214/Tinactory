@@ -1,10 +1,11 @@
 package org.shsts.tinactory.compat.jei.ingredient;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.ingredients.IIngredientType;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
-import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.I18n;
 
 @ParametersAreNonnullByDefault
@@ -14,7 +15,7 @@ public record TechIngredient(ResourceLocation loc) {
 
     public static final IngredientHelper<TechIngredient> HELPER = new IngredientHelper<>(TYPE) {
         @Override
-        public String getWildcardId(TechIngredient ingredient) {
+        public String getGroupingUid(TechIngredient ingredient) {
             return "tech:" + ingredient.loc;
         }
 
@@ -25,7 +26,7 @@ public record TechIngredient(ResourceLocation loc) {
 
         @Override
         public String getDisplayName(TechIngredient ingredient) {
-            return I18n.tr(Technology.getDescriptionId(ingredient.loc)).toString();
+            return I18n.tr(ITechnology.getDescriptionId(ingredient.loc)).toString();
         }
 
         @Override
@@ -33,4 +34,7 @@ public record TechIngredient(ResourceLocation loc) {
             return new TechIngredient(ingredient.loc);
         }
     };
+
+    public static final Codec<TechIngredient> CODEC =
+        ResourceLocation.CODEC.xmap(TechIngredient::new, TechIngredient::loc);
 }

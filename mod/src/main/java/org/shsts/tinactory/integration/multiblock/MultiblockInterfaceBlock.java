@@ -44,7 +44,6 @@ public class MultiblockInterfaceBlock extends SidedMachineBlock {
             .setValue(IO_FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return state.getValue(JOINED) ?

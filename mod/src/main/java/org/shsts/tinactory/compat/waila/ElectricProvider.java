@@ -1,14 +1,10 @@
 package org.shsts.tinactory.compat.waila;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import mcp.mobius.waila.api.BlockAccessor;
-import mcp.mobius.waila.api.IServerDataProvider;
-import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -16,6 +12,9 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IServerDataProvider;
+import snownee.jade.api.config.IPluginConfig;
 
 import java.util.Optional;
 
@@ -23,16 +22,15 @@ import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.compat.waila.Waila.ELECTRIC;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricProvider extends ProviderBase implements IServerDataProvider<BlockEntity> {
+public class ElectricProvider extends ProviderBase implements IServerDataProvider<BlockAccessor> {
     public static final ElectricProvider INSTANCE = new ElectricProvider();
 
     public ElectricProvider() {
-        super(modLoc("electric"));
+        super(ELECTRIC);
     }
 
     private void addTr(CompoundTag tag, String key) {
@@ -70,8 +68,12 @@ public class ElectricProvider extends ProviderBase implements IServerDataProvide
     }
 
     @Override
-    public void appendServerData(CompoundTag tag, ServerPlayer player, Level world,
-        BlockEntity blockEntity, boolean showDetails) {
+    public void appendServerData(CompoundTag tag, BlockAccessor accessor) {
+        var blockEntity = accessor.getBlockEntity();
+        if (blockEntity == null) {
+            return;
+        }
+
         var component = getComponent(blockEntity);
         var electric = getElectric(blockEntity);
 
@@ -96,5 +98,10 @@ public class ElectricProvider extends ProviderBase implements IServerDataProvide
                 }
             }
         }
+    }
+
+    @Override
+    public ResourceLocation getUid() {
+        return ELECTRIC;
     }
 }

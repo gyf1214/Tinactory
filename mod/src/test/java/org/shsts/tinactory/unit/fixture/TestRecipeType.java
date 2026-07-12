@@ -3,22 +3,18 @@ package org.shsts.tinactory.unit.fixture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import org.shsts.tinycorelib.api.recipe.IRecipeBuilderBase;
-import org.shsts.tinycorelib.api.recipe.IRecipeDataConsumer;
+import org.shsts.tinycorelib.api.recipe.IRecipe;
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
-import java.util.function.BiFunction;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
-public final class TestRecipeType<B extends IRecipeBuilderBase<?>> implements IRecipeType<B> {
+public final class TestRecipeType<R extends IRecipe<?>> implements IRecipeType<R> {
     private final ResourceLocation loc;
-    private final Class<?> recipeClass;
-    private final BiFunction<IRecipeType<B>, ResourceLocation, B> builderFactory;
+    private final Class<R> recipeClass;
 
-    public TestRecipeType(String path, Class<?> recipeClass,
-        BiFunction<IRecipeType<B>, ResourceLocation, B> builderFactory) {
-        this.loc = new ResourceLocation("tinactory", path);
+    public TestRecipeType(String path, Class<R> recipeClass) {
+        this.loc = modLoc(path);
         this.recipeClass = recipeClass;
-        this.builderFactory = builderFactory;
     }
 
     @Override
@@ -27,18 +23,8 @@ public final class TestRecipeType<B extends IRecipeBuilderBase<?>> implements IR
     }
 
     @Override
-    public Class<?> recipeClass() {
+    public Class<R> recipeClass() {
         return recipeClass;
-    }
-
-    @Override
-    public B getBuilder(ResourceLocation loc) {
-        return builderFactory.apply(this, loc);
-    }
-
-    @Override
-    public B recipe(IRecipeDataConsumer consumer, ResourceLocation loc) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

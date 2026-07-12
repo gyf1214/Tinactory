@@ -1,0 +1,44 @@
+modLoader = "kotlinforforge"
+loaderVersion = "[5.3,)"
+license = "All rights reserved"
+
+[[mods]]
+modId = "tinactory_datagen"
+version = "${mod_version}"
+displayName = "Tinactory Datagen"
+authors = "Tiny"
+
+[[dependencies.tinactory_datagen]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory_datagen]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory_datagen]]
+modId = "tinycorelib"
+type = "required"
+versionRange = "[${tinycorelib_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory_datagen]]
+modId = "tinydatagen"
+type = "required"
+versionRange = "[${tinycorelib_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.tinactory_datagen]]
+modId = "tinactory"
+type = "required"
+versionRange = "[0,)"
+ordering = "NONE"
+side = "BOTH"

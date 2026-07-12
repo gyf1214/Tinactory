@@ -1,8 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
-import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactoryBase
+import org.shsts.tinactory.datagen.content.builder.GeneratorRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.boiler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.combustionGenerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.gasTurbine
@@ -44,7 +43,7 @@ object Generators {
         }
     }
 
-    private fun ProcessingRecipeFactoryBase<GeneratorRecipe.Builder>.generator(
+    private fun GeneratorRecipeFactory.generator(
         name: String, ratio: Number, ticks: Long,
         input: String = "fluid", output: String? = null,
         minVoltage: Voltage = Voltage.LV) {

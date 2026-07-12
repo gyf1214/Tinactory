@@ -1,14 +1,16 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
@@ -54,19 +56,19 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
 
         @Override
-        protected void renderButton(PoseStack poseStack, int mouseX, int mouseY,
+        protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            RenderUtil.blit(poseStack, SLOT_BACKGROUND, getBlitOffset(), rect);
+            RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
             if (index < items.size()) {
                 var item = items.get(index);
-                RenderUtil.renderItemWithDecoration(item, rect1.x(), rect1.y());
+                RenderUtil.renderItemWithDecoration(graphics, item, rect1.x(), rect1.y());
             } else if (index - items.size() < fluids.size()) {
                 var fluid = fluids.get(index - items.size());
-                RenderUtil.renderFluidWithDecoration(poseStack, fluid, rect1, getBlitOffset());
+                RenderUtil.renderFluidWithDecoration(graphics, fluid, rect1);
             }
             if (isHovering) {
-                RenderUtil.renderSlotHover(poseStack, rect1);
+                RenderUtil.renderSlotHover(graphics, rect1);
             }
         }
 
@@ -133,7 +135,8 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
         items.clear();
         items.addAll(itemsMap.values());
-        items.sort(Comparator.comparing($ -> $.getItem().getRegistryName()));
+        items.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.ITEM, $.getItem()),
+            ResourceLocation::compareNamespaced));
 
         var fluidsMap = new HashMap<IStackKey, FluidStack>();
         for (var newFluid : packet.fluids()) {
@@ -146,7 +149,8 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         }
         fluids.clear();
         fluids.addAll(fluidsMap.values());
-        fluids.sort(Comparator.comparing($ -> $.getFluid().getRegistryName()));
+        fluids.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.FLUID, $.getFluid()),
+            ResourceLocation::compareNamespaced));
 
         panel.refresh();
     }

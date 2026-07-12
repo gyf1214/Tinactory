@@ -1,11 +1,11 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
@@ -68,10 +68,10 @@ public class PortPanel extends Panel {
         }
 
         @Override
-        public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            super.doRender(poseStack, mouseX, mouseY, partialTick);
+        public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            super.doRender(graphics, mouseX, mouseY, partialTick);
             if (isHovered(mouseX, mouseY)) {
-                renderHoverOverlay(poseStack, slots);
+                renderHoverOverlay(graphics, slots);
             }
         }
 
@@ -117,13 +117,13 @@ public class PortPanel extends Panel {
         }
     }
 
-    private void renderHoverOverlay(PoseStack poseStack, List<Layout.SlotInfo> slots) {
+    private void renderHoverOverlay(GuiGraphics graphics, List<Layout.SlotInfo> slots) {
         var bx = screen.getGuiLeft() + MARGIN_X + xOffset;
         var by = screen.getGuiTop() + MARGIN_TOP;
         for (var slot : slots) {
             var x = slot.x() + 1 + bx;
             var y = slot.y() + 1 + by;
-            RenderUtil.fill(poseStack, new Rect(x, y, 16, 16), OVERLAY_COLOR);
+            RenderUtil.fill(graphics, new Rect(x, y, 16, 16), OVERLAY_COLOR);
         }
     }
 

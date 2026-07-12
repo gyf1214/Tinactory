@@ -14,5 +14,5 @@ public class TinactoryKeys {
 
     public static final String METRICS_CALLBACKS = "metrics_callback";
     public static final ResourceKey<Registry<IMetricsCallback>> METRICS_CALLBACKS_KEY =
-        ResourceKey.createRegistryKey(new ResourceLocation(ID, METRICS_CALLBACKS));
+        ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(ID, METRICS_CALLBACKS));
 }

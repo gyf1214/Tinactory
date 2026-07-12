@@ -1,14 +1,14 @@
 package org.shsts.tinactory.integration.gui.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.util.ClientUtil;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllMenus.FLUID_SLOT_CLICK;
+import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -44,10 +45,10 @@ public class FluidSlot extends MenuWidget {
 
     public FluidStack getFluidStack() {
         if (syncName != null) {
-            return menu.getSyncPacket(syncName, FluidSyncPacket.class)
+            return menu.getSyncPacket(syncName, FLUID_STACK_SYNC)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         } else {
-            return menu.getSyncPacket(syncSlot, FluidSyncPacket.class)
+            return menu.getSyncPacket(syncSlot, FLUID_STACK_SYNC)
                 .map(FluidSyncPacket::getFluidStack).orElse(FluidStack.EMPTY);
         }
     }
@@ -60,7 +61,7 @@ public class FluidSlot extends MenuWidget {
     @Override
     public Optional<List<Component>> getTooltip(double mouseX, double mouseY) {
         var stack = getFluidStack();
-        if (stack.isEmpty() || stack.getFluid() == null) {
+        if (stack.isEmpty()) {
             return Optional.empty();
         }
         return Optional.of(ClientUtil.fluidTooltip(stack, true));
@@ -77,15 +78,16 @@ public class FluidSlot extends MenuWidget {
         menu.triggerEvent(FLUID_SLOT_CLICK, () -> new SlotEventPacket(tank, button));
     }
 
-    protected void renderSlot(PoseStack poseStack, int mouseX, int mouseY) {
-        RenderUtil.renderFluidWithDecoration(poseStack, getFluidStack(), rect, getBlitOffset());
+    protected void renderSlot(GuiGraphics graphics, int mouseX, int mouseY) {
+        var rect = rect();
+        RenderUtil.renderFluidWithDecoration(graphics, getFluidStack(), rect);
         if (isHovered(mouseX, mouseY)) {
-            RenderUtil.renderSlotHover(poseStack, rect);
+            RenderUtil.renderSlotHover(graphics, rect);
         }
     }
 
     @Override
-    public void doRender(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        renderSlot(poseStack, mouseX, mouseY);
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        renderSlot(graphics, mouseX, mouseY);
     }
 }

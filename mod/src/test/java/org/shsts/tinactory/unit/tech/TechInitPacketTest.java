@@ -6,38 +6,47 @@ import org.shsts.tinactory.core.gui.ItemIdRenderDescriptor;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.unit.fixture.TestBufferHelper;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class TechInitPacketTest {
     @Test
     void roundTripsTechnologiesWithUnifiedDisplayAndCompatibleCodecFields() {
         var dependency = technology("tinactory:dependency", List.of(), Optional.empty(), Optional.empty(), 1);
-        var technology = technology("tinactory:target", List.of(dependency.loc()),
-            Optional.of(new ResourceLocation("tinactory", "display_item")),
-            Optional.of(new ResourceLocation("tinactory", "textures/gui/technology/target")), 2);
-        var packet = new TechInitPacket(List.of(dependency, technology));
-        var buf = TestBufferHelper.buf();
+        var dependencyLoc = modLoc("dependency");
+        var technology = technology("tinactory:target", List.of(dependencyLoc),
+            Optional.of(modLoc("display_item")),
+            Optional.of(modLoc("textures/gui/technology/target")), 2);
+        var technologyLoc = modLoc("target");
+        var technologies = new LinkedHashMap<ResourceLocation, Technology>();
+        technologies.put(dependencyLoc, dependency);
+        technologies.put(technologyLoc, technology);
+        var packet = TechInitPacket.fromMap(technologies);
+        var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
         var decoded = new TechInitPacket();
         decoded.deserializeFromBuf(buf);
 
-        var decodedTechs = decoded.getTechs().stream().toList();
+        var decodedTechs = decoded.entries().stream().toList();
         assertEquals(2, decodedTechs.size());
-        assertEquals(dependency.loc(), decodedTechs.get(0).loc());
-        assertEquals(technology.loc(), decodedTechs.get(1).loc());
-        assertEquals(new ItemIdRenderDescriptor(new ResourceLocation("tinactory", "display_item")),
-            decodedTechs.get(1).getDisplay());
+        assertEquals(dependencyLoc, decodedTechs.get(0).loc());
+        assertEquals(technologyLoc, decodedTechs.get(1).loc());
+        assertEquals(new ItemIdRenderDescriptor(modLoc("display_item")),
+            decodedTechs.get(1).technology().getDisplay());
 
-        var encoded = CodecHelper.encodeJson(Technology.CODEC, decodedTechs.get(1)).getAsJsonObject();
-        assertEquals("tinactory:display_item", encoded.get("display_item").getAsString());
-        assertEquals("tinactory:textures/gui/technology/target", encoded.get("display_texture").getAsString());
+        var jo = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decodedTechs.get(1).technology())
+            .getAsJsonObject();
+        assertEquals("tinactory:display_item", jo.get("display_item").getAsString());
+        assertEquals("tinactory:textures/gui/technology/target", jo.get("display_texture").getAsString());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends,

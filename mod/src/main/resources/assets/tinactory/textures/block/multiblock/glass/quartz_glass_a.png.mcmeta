@@ -1,0 +1,13 @@
+{
+  "ctm": {
+    "ctm_version": 1,
+    "type": "CTM",
+    "layer": "CUTOUT",
+    "textures": [
+      "tinactory:block/multiblock/glass/quartz_glass_a_ctm"
+    ],
+    "extra": {
+      "connect_inside": true
+    }
+  }
+}

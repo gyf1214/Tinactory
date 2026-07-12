@@ -1,15 +1,12 @@
 package org.shsts.tinactory.content.multiblock;
 
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
@@ -19,6 +16,7 @@ import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
+import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
@@ -119,22 +117,20 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-        if (cap == PROCESSOR.get() || cap == ELECTRIC_MACHINE.get()) {
-            return myself();
-        }
-        return LazyOptional.empty();
+    public void attachCapability(ICapabilityBuilder builder) {
+        builder.attach(PROCESSOR, this);
+        builder.attach(ELECTRIC_MACHINE, this);
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         tag.putLong("power", power);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         power = tag.getLong("power");
     }
 }

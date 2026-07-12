@@ -5,11 +5,12 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,11 +36,9 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static org.shsts.tinactory.AllEvents.CLIENT_LOAD;
 import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
-import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -73,9 +72,16 @@ public class MultiblockInterface extends Machine {
         this.voltage = getBlockVoltage(be);
     }
 
+    protected IFlexibleContainer flexibleContainer() {
+        if (container == null) {
+            container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
+        }
+        return container;
+    }
+
     public static <P> IBlockEntityTypeBuilder<P> factory(
         IBlockEntityTypeBuilder<P> builder) {
-        return builder.capability(ID, MultiblockInterface::new);
+        return builder.container(ID, MultiblockInterface::new);
     }
 
     /**
@@ -103,7 +109,7 @@ public class MultiblockInterface extends Machine {
     public void setContainerLayout(Layout val) {
         if (layout != val) {
             LOGGER.debug("{}: set container layout={}", this, val);
-            container.setLayout(val);
+            flexibleContainer().setLayout(val);
             layout = val;
             if (multiblock != null) {
                 multiblock.onContainerReady();
@@ -113,7 +119,7 @@ public class MultiblockInterface extends Machine {
 
     public void resetContainerLayout() {
         LOGGER.debug("{}: reset container layout", this);
-        container.resetLayout();
+        flexibleContainer().resetLayout();
         layout = null;
     }
 
@@ -155,10 +161,6 @@ public class MultiblockInterface extends Machine {
         electricMachine = null;
         resetContainerLayout();
         onMultiblockUpdate();
-    }
-
-    protected void onLoad() {
-        container = (IFlexibleContainer) AllCapabilities.CONTAINER.get(blockEntity);
     }
 
     private void onContainerChange() {
@@ -222,25 +224,23 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<InteractionResult> result) {
+    protected void onUse(AllEvents.OnUseArg arg, IReturnEvent.Result<ItemInteractionResult> result) {
         super.onUse(arg, result);
-        if (result.get() != InteractionResult.PASS || multiblock == null) {
+        if (result.get() != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION || multiblock == null) {
             return;
         }
 
         var player = arg.player();
-        var world = player.level;
+        var world = player.level();
         if (!world.isClientSide && player instanceof ServerPlayer serverPlayer) {
             multiblock.menu(this).open(serverPlayer, blockEntity.getBlockPos());
         }
-        result.set(InteractionResult.sidedSuccess(world.isClientSide));
+        result.set(ItemInteractionResult.sidedSuccess(world.isClientSide));
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(SERVER_LOAD.get(), $ -> onLoad());
-        eventManager.subscribe(CLIENT_LOAD.get(), $ -> onLoad());
         eventManager.subscribe(CLIENT_TICK.get(), $ -> onClientTick());
         eventManager.subscribe(CONTAINER_CHANGE.get(), this::onContainerChange);
         eventManager.subscribe(CONNECT.get(), this::onConnect);
@@ -270,7 +270,7 @@ public class MultiblockInterface extends Machine {
 
     @Override
     public Optional<IContainer> container() {
-        return Optional.of(container);
+        return Optional.of(flexibleContainer());
     }
 
     @Override
@@ -319,8 +319,8 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    public CompoundTag serializeOnUpdate() {
-        var tag = super.serializeOnUpdate();
+    public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
+        var tag = super.serializeOnUpdate(provider);
         if (multiblock != null) {
             var pos = multiblock.blockEntity.getBlockPos();
             tag.put("multiblockPos", CodecHelper.encodeBlockPos(pos));
@@ -329,8 +329,8 @@ public class MultiblockInterface extends Machine {
     }
 
     @Override
-    public void deserializeOnUpdate(CompoundTag tag) {
-        super.deserializeOnUpdate(tag);
+    public void deserializeOnUpdate(HolderLookup.Provider provider, CompoundTag tag) {
+        super.deserializeOnUpdate(provider, tag);
 
         multiblockPos = tag.contains("multiblockPos", Tag.TAG_COMPOUND) ?
             CodecHelper.parseBlockPos(tag.getCompound("multiblockPos")) : null;

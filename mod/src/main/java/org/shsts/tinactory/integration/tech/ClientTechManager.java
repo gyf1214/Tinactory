@@ -57,10 +57,13 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     }
 
     public void handleTechInit(TechInitPacket packet) {
-        technologies.clear();
-        var techs = packet.getTechs();
-        techs.forEach(tech -> technologies.put(tech.loc(), tech));
-        techs.forEach(tech -> tech.resolve(this));
+        unload();
+        for (var entry : packet.entries()) {
+            putTech(entry.loc(), entry.technology());
+        }
+        for (var entry : packet.entries()) {
+            entry.technology().resolve(this);
+        }
         LOGGER.debug("reload {} techs", technologies.size());
     }
 
