@@ -43,6 +43,7 @@ import static org.shsts.tinactory.core.util.LocHelper.prepend;
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.CASING_MODEL;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCasing;
+import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCompanion;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -194,11 +195,13 @@ public final class Models {
         var baseModel = modLoc(CASING_MODEL);
         var casingTex = gregtech("block/" + casing);
         var overlayTex = gregtech("block/" + overlay);
-        return applyCasing(models.withExistingParent(id, baseModel), casingTex, models.existingFileHelper)
-            .texture("front_overlay", overlayTex)
-            .texture("back_overlay", overlayTex)
-            .texture("left_overlay", overlayTex)
-            .texture("right_overlay", overlayTex);
+        var model = applyCasing(models.withExistingParent(id, baseModel), casingTex,
+            models.existingFileHelper);
+        for (var dir : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
+            applyCompanion(model, DIR_TEX_KEYS.get(dir) + "_overlay", overlayTex,
+                models.existingFileHelper);
+        }
+        return model;
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> cubeCasing(
@@ -219,8 +222,9 @@ public final class Models {
         String tex, @Nullable ResourceLocation renderType) {
         return ctx -> {
             var model = ctx.provider().models()
-                .withExistingParent(ctx.id(), modLoc("block/cube_tint"))
-                .texture("all", gregtech("block/" + tex));
+                .withExistingParent(ctx.id(), modLoc("block/cube_tint"));
+            applyCompanion(model, "all", gregtech("block/" + tex),
+                ctx.provider().models().existingFileHelper);
             if (renderType != null) {
                 model.renderType(renderType);
             }
@@ -348,11 +352,22 @@ public final class Models {
                     .texture("#all").cullface(dir).tintindex(0)
                     .end())
                 .end()
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                    .texture("#all_emissive").cullface(dir).tintindex(0)
+                    .end())
+                .end()
+                .texture("all_emissive", BLOCK_VOID_TEX)
                 .texture("particle", "#all"))
             .blockModel(CableModel::genBlockModels)
             .itemModel(CableModel::genItemModels)
             .blockModel(MachineModel::genBlockModels)
-            .blockModel(ctx -> IconSet.DULL.blockOverlay(ctx.provider(),
-                "material/ore", "ore").renderType(CUTOUT_RENDER_TYPE));
+            .blockModel(ctx -> {
+                var model = IconSet.DULL.blockOverlay(ctx.provider(), "material/ore", "ore")
+                    .renderType(CUTOUT_RENDER_TYPE);
+                applyCompanion(model, "all", gregtech("block/material_sets/dull/ore"),
+                    ctx.provider().existingFileHelper);
+            });
     }
 }
