@@ -247,7 +247,14 @@ object Multiblocks {
                     val overlay = gregtech("block/casings/firebox/machine_casing_firebox_tungstensteel")
                     val working = suffix(overlay, "_active")
                     val baseModel = models.cubeColumn(ctx.id(), overlay, casing)
-                    val workingModel = models.cubeColumn(ctx.id() + "_active", working, casing)
+                    val workingModel = models.withExistingParent(
+                        ctx.id() + "_active", modLoc("block/cube_column_emissive"))
+                        .texture("side", working)
+                        .texture("end", casing)
+                    val emissive = suffix(working, "_emissive")
+                    if (models.existingFileHelper.exists(emissive, Models.TEXTURE_TYPE)) {
+                        workingModel.texture("side_emissive", emissive)
+                    }
                     provider.getVariantBuilder(ctx.`object`()).forAllStates { state ->
                         val model = if (state.getValue(MachineBlock.WORKING)) workingModel else baseModel
                         ConfiguredModel.builder()

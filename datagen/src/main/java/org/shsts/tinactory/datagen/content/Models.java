@@ -368,6 +368,24 @@ public final class Models {
                     .renderType(CUTOUT_RENDER_TYPE);
                 applyCompanion(model, "all", gregtech("block/material_sets/dull/ore"),
                     ctx.provider().existingFileHelper);
-            });
+            })
+            .blockModel(ctx -> ctx.provider()
+                .withExistingParent("cube_column_emissive", mcLoc("block/block"))
+                .texture("particle", "#side")
+                .texture("side_emissive", BLOCK_VOID_TEX)
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                    .texture(dir.getAxis() == Direction.Axis.Y ? "#end" : "#side")
+                    .cullface(dir)
+                    .end())
+                .end()
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .face(Direction.NORTH).texture("#side_emissive").cullface(Direction.NORTH).end()
+                .face(Direction.SOUTH).texture("#side_emissive").cullface(Direction.SOUTH).end()
+                .face(Direction.WEST).texture("#side_emissive").cullface(Direction.WEST).end()
+                .face(Direction.EAST).texture("#side_emissive").cullface(Direction.EAST).end()
+                .end());
     }
 }
