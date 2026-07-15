@@ -92,12 +92,12 @@ public class MachineModel {
     public static <B extends ModelBuilder<B>> B applyCasing(B model, ResourceLocation tex,
         ExistingFileHelper existingHelper) {
         if (existingHelper.exists(tex, TEXTURE_TYPE)) {
-            model = applyCompanion(model, "top", tex, existingHelper);
-            model = applyCompanion(model, "bottom", tex, existingHelper);
+            applyCompanion(model, "top", tex, existingHelper);
+            applyCompanion(model, "bottom", tex, existingHelper);
             return applyCompanion(model, "side", tex, existingHelper);
         } else {
-            model = applyCompanion(model, "top", extend(tex, "top"), existingHelper);
-            model = applyCompanion(model, "bottom", extend(tex, "bottom"), existingHelper);
+            applyCompanion(model, "top", extend(tex, "top"), existingHelper);
+            applyCompanion(model, "bottom", extend(tex, "bottom"), existingHelper);
             return applyCompanion(model, "side", extend(tex, "side"), existingHelper);
         }
     }
@@ -144,7 +144,7 @@ public class MachineModel {
                 Optional.<ResourceLocation>empty();
             tex = tex.or(() -> getOverlay(e.getKey(), "", existingHelper));
             if (tex.isPresent()) {
-                model = applyCompanion(model, e.getValue() + "_overlay", tex.get(), existingHelper);
+                applyCompanion(model, e.getValue() + "_overlay", tex.get(), existingHelper);
                 hasOverlay = true;
             }
         }

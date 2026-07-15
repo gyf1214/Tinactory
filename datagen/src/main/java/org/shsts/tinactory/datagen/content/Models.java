@@ -1,6 +1,8 @@
 package org.shsts.tinactory.datagen.content;
 
 import com.google.common.collect.ImmutableMap;
+import com.supermartijn642.fusion.api.model.custom.geometry.CuboidModelGeometry;
+import com.supermartijn642.fusion.api.model.types.connecting.ConnectingModelData;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -18,6 +20,7 @@ import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import org.joml.Vector3f;
 import org.shsts.tinactory.content.multiblock.TurbineBlock;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -30,7 +33,9 @@ import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE;
@@ -40,7 +45,9 @@ import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
 import static org.shsts.tinactory.core.util.LocHelper.prepend;
+import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
+import static org.shsts.tinactory.datagen.TinactoryDatagen.FUSION_MODELS;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.CASING_MODEL;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCasing;
 import static org.shsts.tinactory.datagen.content.model.MachineModel.applyCompanion;
@@ -64,6 +71,8 @@ public final class Models {
     public static final ResourceLocation ITEM_VOID_TEX = modLoc("item/void");
     public static final ResourceLocation CUTOUT_RENDER_TYPE = mcLoc("cutout");
     public static final ResourceLocation TRANSLUCENT_RENDER_TYPE = mcLoc("translucent");
+    public static final String CUBE_COLUMN_EMISSIVE_MODEL = "block/cube_column_emissive";
+    public static final String CUBE_CTM_MODEL = "block/cube_ctm";
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -197,7 +206,7 @@ public final class Models {
         var overlayTex = gregtech("block/" + overlay);
         var model = applyCasing(models.withExistingParent(id, baseModel), casingTex,
             models.existingFileHelper);
-        for (var dir : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
+        for (var dir : List.of(Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST)) {
             applyCompanion(model, DIR_TEX_KEYS.get(dir) + "_overlay", overlayTex,
                 models.existingFileHelper);
         }
@@ -254,6 +263,39 @@ public final class Models {
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlock(
         String tex, ResourceLocation renderType) {
         return ctx -> solidBlock(ctx, gregtech("block/" + tex), renderType);
+    }
+
+    public static <U extends Block> void solidBlockCtm(IEntryDataContext<U, BlockStateProvider> ctx,
+        ResourceLocation tex) {
+        solidBlockCtm(ctx, tex, null);
+    }
+
+    public static <U extends Block> void solidBlockCtm(IEntryDataContext<U, BlockStateProvider> ctx,
+        ResourceLocation tex, @Nullable ResourceLocation renderType) {
+        var existingFile = ctx.provider().models().existingFileHelper;
+        var model = ctx.provider().models()
+            .getBuilder(ctx.id())
+            // because Fusion provider runs after BlockStateProvider, we can only use unchecked model file
+            .parent(new ModelFile.UncheckedModelFile(modLoc(CUBE_CTM_MODEL)))
+            .texture("all", tex);
+        var emissiveTex = suffix(tex, "_bloom");
+        if (existingFile.exists(emissiveTex, TEXTURE_TYPE)) {
+            model.texture("all_emissive", emissiveTex);
+        }
+        if (renderType != null) {
+            model.renderType(renderType);
+        }
+        ctx.provider().simpleBlock(ctx.object(), model);
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlockCtm(
+        String tex, ResourceLocation renderType) {
+        return ctx -> solidBlockCtm(ctx, gregtech("block/" + tex), renderType);
+    }
+
+    public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> solidBlockCtm(
+        String tex) {
+        return ctx -> solidBlockCtm(ctx, gregtech("block/" + tex));
     }
 
     public static void cableBlock(IEntryDataContext<? extends CableBlock, BlockStateProvider> ctx) {
@@ -343,6 +385,19 @@ public final class Models {
         return model::itemModel;
     }
 
+    private static CuboidModelGeometry.Element cubeElement(String tex) {
+        var builder = CuboidModelGeometry.Element.builder()
+            .fromTo(new Vector3f(0, 0, 0), new Vector3f(16, 16, 16));
+        for (var dir : Direction.values()) {
+            var face = CuboidModelGeometry.Face.builder()
+                .cullDirection(dir)
+                .material(tex)
+                .build();
+            builder.face(dir, face);
+        }
+        return builder.build();
+    }
+
     public static void init() {
         DATA_GEN.blockModel(ctx -> ctx.provider()
                 .withExistingParent("cube_tint", mcLoc("block/block"))
@@ -370,7 +425,7 @@ public final class Models {
                     ctx.provider().existingFileHelper);
             })
             .blockModel(ctx -> ctx.provider()
-                .withExistingParent("cube_column_emissive", mcLoc("block/block"))
+                .withExistingParent(CUBE_COLUMN_EMISSIVE_MODEL, mcLoc("block/block"))
                 .texture("particle", "#side")
                 .texture("side_emissive", BLOCK_VOID_TEX)
                 .element()
@@ -382,10 +437,14 @@ public final class Models {
                 .end()
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)
-                .face(Direction.NORTH).texture("#side_emissive").cullface(Direction.NORTH).end()
-                .face(Direction.SOUTH).texture("#side_emissive").cullface(Direction.SOUTH).end()
-                .face(Direction.WEST).texture("#side_emissive").cullface(Direction.WEST).end()
-                .face(Direction.EAST).texture("#side_emissive").cullface(Direction.EAST).end()
+                .allFacesExcept((dir, face) -> face.texture("#side_emissive").cullface(dir),
+                    Set.of(Direction.UP, Direction.DOWN))
                 .end());
+
+        FUSION_MODELS.addCallback(prov -> prov.addConnecting(CUBE_CTM_MODEL, ConnectingModelData.builder()
+            .parent(mcLoc("block/block"))
+            .elements(cubeElement("#all"), cubeElement("#all_emissive"))
+            .material("particle", "#all")
+            .material("all_emissive", BLOCK_VOID_TEX)));
     }
 }
