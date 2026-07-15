@@ -71,8 +71,10 @@ public final class Models {
     public static final ResourceLocation ITEM_VOID_TEX = modLoc("item/void");
     public static final ResourceLocation CUTOUT_RENDER_TYPE = mcLoc("cutout");
     public static final ResourceLocation TRANSLUCENT_RENDER_TYPE = mcLoc("translucent");
+    public static final String CUBE_TINT_MODEL = "block/cube_tint";
     public static final String CUBE_COLUMN_EMISSIVE_MODEL = "block/cube_column_emissive";
     public static final String CUBE_CTM_MODEL = "block/cube_ctm";
+    public static final String CUBE_CTM_EMISSIVE_MODEL = "block/cube_ctm_emissive";
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -231,7 +233,7 @@ public final class Models {
         String tex, @Nullable ResourceLocation renderType) {
         return ctx -> {
             var model = ctx.provider().models()
-                .withExistingParent(ctx.id(), modLoc("block/cube_tint"));
+                .withExistingParent(ctx.id(), modLoc(CUBE_TINT_MODEL));
             applyCompanion(model, "all", gregtech("block/" + tex),
                 ctx.provider().models().existingFileHelper);
             if (renderType != null) {
@@ -267,24 +269,25 @@ public final class Models {
 
     public static <U extends Block> void solidBlockCtm(IEntryDataContext<U, BlockStateProvider> ctx,
         ResourceLocation tex) {
-        solidBlockCtm(ctx, tex, null);
+        // due to limitations of fusion models. every child model need an explicit render type. use cutout by default.
+        solidBlockCtm(ctx, tex, CUTOUT_RENDER_TYPE);
     }
 
     public static <U extends Block> void solidBlockCtm(IEntryDataContext<U, BlockStateProvider> ctx,
-        ResourceLocation tex, @Nullable ResourceLocation renderType) {
+        ResourceLocation tex, ResourceLocation renderType) {
         var existingFile = ctx.provider().models().existingFileHelper;
+        var emissiveTex = suffix(tex, "_bloom");
+        var hasEmissive = existingFile.exists(emissiveTex, TEXTURE_TYPE);
+        var parent = hasEmissive ? modLoc(CUBE_CTM_EMISSIVE_MODEL) : modLoc(CUBE_CTM_MODEL);
         var model = ctx.provider().models()
             .getBuilder(ctx.id())
             // because Fusion provider runs after BlockStateProvider, we can only use unchecked model file
-            .parent(new ModelFile.UncheckedModelFile(modLoc(CUBE_CTM_MODEL)))
+            .parent(new ModelFile.UncheckedModelFile(parent))
             .texture("all", tex);
-        var emissiveTex = suffix(tex, "_bloom");
-        if (existingFile.exists(emissiveTex, TEXTURE_TYPE)) {
+        if (hasEmissive) {
             model.texture("all_emissive", emissiveTex);
         }
-        if (renderType != null) {
-            model.renderType(renderType);
-        }
+        model.renderType(renderType);
         ctx.provider().simpleBlock(ctx.object(), model);
     }
 
@@ -353,10 +356,8 @@ public final class Models {
             var casingTex = gregtech("block/" + casing);
 
             idles[i] = applyCasing(models.withExistingParent(id, casingModel), casingTex, existingHelper)
-                .renderType(CUTOUT_RENDER_TYPE)
                 .texture("front_overlay", extend(idle, Integer.toString(i)));
             spins[i] = applyCasing(models.withExistingParent(id1, casingModel), casingTex, existingHelper)
-                .renderType(CUTOUT_RENDER_TYPE)
                 .texture("front_overlay", extend(spin, Integer.toString(i)));
         }
 
@@ -400,7 +401,7 @@ public final class Models {
 
     public static void init() {
         DATA_GEN.blockModel(ctx -> ctx.provider()
-                .withExistingParent("cube_tint", mcLoc("block/block"))
+                .withExistingParent(CUBE_TINT_MODEL, mcLoc("block/block"))
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)
                 .allFaces((dir, face) -> face
@@ -443,8 +444,12 @@ public final class Models {
 
         FUSION_MODELS.addCallback(prov -> prov.addConnecting(CUBE_CTM_MODEL, ConnectingModelData.builder()
             .parent(mcLoc("block/block"))
+            .elements(cubeElement("#all"))
+            .material("particle", "#all")));
+
+        FUSION_MODELS.addCallback(prov -> prov.addConnecting(CUBE_CTM_EMISSIVE_MODEL, ConnectingModelData.builder()
+            .parent(mcLoc("block/block"))
             .elements(cubeElement("#all"), cubeElement("#all_emissive"))
-            .material("particle", "#all")
-            .material("all_emissive", BLOCK_VOID_TEX)));
+            .material("particle", "#all")));
     }
 }
