@@ -11,6 +11,9 @@ authors = "Tiny"
 [[mixins]]
 config = "mixins.tinactory.jei.json"
 
+[[mixins]]
+config = "mixins.tinactory.fusion.json"
+
 [[dependencies.tinactory]]
 modId = "neoforge"
 type = "required"
