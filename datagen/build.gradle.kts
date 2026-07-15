@@ -52,6 +52,7 @@ dependencies {
     implementation("thedarkcolour:kotlinforforge-neoforge:${property("kff_version")}")
     implementation("dev.architectury:architectury-neoforge:${property("architectury_version")}")
     implementation("dev.ftb.mods:ftb-library-neoforge:${property("ftb_library_version")}")
+    implementation("curse.maven:fusion-connected-textures-854949:${property("fusion_id")}")
 }
 
 checkSource {
