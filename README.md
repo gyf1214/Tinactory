@@ -1,4 +1,4 @@
-# Tinactory
+1245# Tinactory
 
 A minecraft mod that ports gregtech to 1.21.1 and more.
 
@@ -10,11 +10,11 @@ A minecraft mod that ports gregtech to 1.21.1 and more.
 
 - Clone the repository.
 - Import the repository into IntelliJ.
-- Download the following file: <https://www.shsts.org/m2/extra/tinactory_extra_resources_v3.zip>, put the file in
+- Download the following file: <https://www.shsts.org/m2/extra/tinactory_extra_resources_v4.zip>, put the file in
   `libs`.
 - Run the Gradle task `runData` to generate data and asset files.
 - Run the Gradle task `runClient` to start the testing client.
-- Copy `libs/tinactory_extra_resources_v3.zip` to `run/client/resourcepacks`.
+- Copy `libs/tinactory_extra_resources_v4.zip` to `run/client/resourcepacks`.
 - Restart the client. Load the resource pack `Tinactory extra texture resources`.
 
 ## Code Structure

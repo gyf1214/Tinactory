@@ -8,7 +8,7 @@
 
 - Use `./gradlew runData` to generate resources for `mod`.
 - Before `runData`, ensure `libs/tinactory_extra_resources_{version}.zip` exists (current:
-  `libs/tinactory_extra_resources_v3.zip`).
+  `libs/tinactory_extra_resources_v4.zip`).
 - Run `runData` once before testing/packaging, or whenever `datagen` changes.
 - NeoForge's merged JAR is generated at `mod/build/moddev/artifacts/neoforge-{version}-merged.jar` and its source JAR
   at `mod/build/moddev/artifacts/neoforge-{version}-sources.jar`.
