@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.datagen.content.Models.CUBE_TINT_MODEL;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
 
 @ParametersAreNonnullByDefault
@@ -89,7 +90,7 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
             new IllegalArgumentException("No block overlay %s for icon set %s"
                 .formatted(sub, subfolder)));
-        return prov.withExistingParent(id + "_overlay", modLoc("block/cube_tint"))
+        return prov.withExistingParent(id + "_overlay", modLoc(CUBE_TINT_MODEL))
             .texture("all", tex);
     }
 }

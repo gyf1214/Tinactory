@@ -73,7 +73,7 @@ dependencies {
     implementation("dev.ftb.mods:ftb-library-neoforge:${property("ftb_library_version")}")
     implementation("dev.ftb.mods:ftb-quests-neoforge:${property("ftb_quests_version")}")
 
-    runtimeOnly("curse.maven:ctm-267602:${property("ctm_id")}")
+    implementation("curse.maven:fusion-connected-textures-854949:${property("fusion_id")}")
     runtimeOnly("dev.ftb.mods:ftb-teams-neoforge:${property("ftb_teams_version")}")
     runtimeOnly("dev.ftb.mods:ftb-filter-system-neoforge:${property("ftb_filter_system_version")}")
     runtimeOnly("dev.ftb.mods:ftb-xmod-compat-neoforge:${property("ftb_xmod_compat_version")}") {

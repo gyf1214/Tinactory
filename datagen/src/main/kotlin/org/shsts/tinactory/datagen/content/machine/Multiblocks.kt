@@ -30,11 +30,13 @@ import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.util.LocHelper.name
 import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.content.Models
+import org.shsts.tinactory.datagen.content.Models.CUBE_COLUMN_EMISSIVE_MODEL
 import org.shsts.tinactory.datagen.content.Models.cubeCasing
 import org.shsts.tinactory.datagen.content.Models.cubeColumn
 import org.shsts.tinactory.datagen.content.Models.multiblockInterface
 import org.shsts.tinactory.datagen.content.Models.rotateModel
 import org.shsts.tinactory.datagen.content.Models.solidBlock
+import org.shsts.tinactory.datagen.content.Models.solidBlockCtm
 import org.shsts.tinactory.datagen.content.Models.turbineBlock
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
@@ -125,14 +127,15 @@ object Multiblocks {
             }
 
             misc("clear_glass") {
-                blockState { ctx -> solidBlock(ctx, modLoc("block/multiblock/glass/quartz_glass_a"),
-                    Models.CUTOUT_RENDER_TYPE) }
+                blockState { ctx ->
+                    solidBlockCtm(ctx, modLoc("block/multiblock/glass/quartz_glass_a"))
+                }
                 tag(CLEANROOM_WALL)
                 tag(Tags.Blocks.GLASS_BLOCKS)
             }
 
             misc("hardened_glass") {
-                blockState(solidBlock("casings/transparent/tempered_glass", Models.TRANSLUCENT_RENDER_TYPE))
+                blockState(solidBlockCtm("casings/transparent/tempered_glass", Models.TRANSLUCENT_RENDER_TYPE))
                 tag(GLASS_CASING)
             }
 
@@ -247,7 +250,14 @@ object Multiblocks {
                     val overlay = gregtech("block/casings/firebox/machine_casing_firebox_tungstensteel")
                     val working = suffix(overlay, "_active")
                     val baseModel = models.cubeColumn(ctx.id(), overlay, casing)
-                    val workingModel = models.cubeColumn(ctx.id() + "_active", working, casing)
+                    val workingModel = models.withExistingParent(
+                        ctx.id() + "_active", modLoc(CUBE_COLUMN_EMISSIVE_MODEL))
+                        .texture("side", working)
+                        .texture("end", casing)
+                    val emissive = suffix(working, "_emissive")
+                    if (models.existingFileHelper.exists(emissive, Models.TEXTURE_TYPE)) {
+                        workingModel.texture("side_emissive", emissive)
+                    }
                     provider.getVariantBuilder(ctx.`object`()).forAllStates { state ->
                         val model = if (state.getValue(MachineBlock.WORKING)) workingModel else baseModel
                         ConfiguredModel.builder()
@@ -263,12 +273,12 @@ object Multiblocks {
             }
 
             misc("fusion_casing") {
-                blockState(solidBlock("casings/fusion/machine_casing_fusion"))
+                blockState(solidBlockCtm("casings/fusion/machine_casing_fusion"))
                 tag(FUSION_SHELL)
             }
 
             misc("fusion_glass") {
-                blockState(solidBlock("casings/transparent/fusion_glass", Models.CUTOUT_RENDER_TYPE))
+                blockState(solidBlockCtm("casings/transparent/fusion_glass"))
                 tag(FUSION_SHELL)
             }
 
@@ -288,7 +298,7 @@ object Multiblocks {
         val entry = COIL_BLOCKS.getValue(name)
         val tex = "casings/coils/machine_coil_$texName"
         block(entry) {
-            blockState(solidBlock(tex))
+            blockState(solidBlockCtm(tex))
             tag(COIL)
         }
     }

@@ -11,6 +11,9 @@ authors = "Tiny"
 [[mixins]]
 config = "mixins.tinactory.jei.json"
 
+[[mixins]]
+config = "mixins.tinactory.fusion.json"
+
 [[dependencies.tinactory]]
 modId = "neoforge"
 type = "required"
@@ -31,3 +34,10 @@ type = "required"
 versionRange = "[${tinycorelib_version},)"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.tinactory]]
+modId = "fusion"
+type = "required"
+versionRange = "[1.3.4,)"
+ordering = "NONE"
+side = "CLIENT"

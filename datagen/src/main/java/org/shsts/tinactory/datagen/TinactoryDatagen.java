@@ -11,8 +11,10 @@ import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.shsts.tinactory.datagen.content.AllData;
 import org.shsts.tinactory.datagen.content.AllDataMeta;
+import org.shsts.tinactory.datagen.provider.FusionConnectingModelProvider;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
+import org.shsts.tinycorelib.datagen.api.IDataHandler;
 import org.shsts.tinycorelib.datagen.api.ITinyDataGen;
 import org.slf4j.Logger;
 
@@ -28,6 +30,7 @@ public class TinactoryDatagen {
     public static ITinyCoreLib CORE;
     public static ITinyDataGen DATA_CORE;
     public static IDataGen DATA_GEN;
+    public static IDataHandler<FusionConnectingModelProvider> FUSION_MODELS;
 
     public TinactoryDatagen(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::onConstruct);
@@ -47,6 +50,7 @@ public class TinactoryDatagen {
     private void onGatherData(GatherDataEvent event) {
         DATA_CORE = ITinyDataGen.get();
         DATA_GEN = DATA_CORE.dataGen(REGISTRATE, true);
+        FUSION_MODELS = DATA_GEN.createHandler(FusionConnectingModelProvider::new);
 
         AllData.init();
         DATA_GEN.onGatherData(event);

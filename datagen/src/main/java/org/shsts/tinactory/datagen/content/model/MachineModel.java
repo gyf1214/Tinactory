@@ -92,14 +92,24 @@ public class MachineModel {
     public static <B extends ModelBuilder<B>> B applyCasing(B model, ResourceLocation tex,
         ExistingFileHelper existingHelper) {
         if (existingHelper.exists(tex, TEXTURE_TYPE)) {
-            return model.texture("top", tex)
-                .texture("bottom", tex)
-                .texture("side", tex);
+            applyCompanion(model, "top", tex, existingHelper);
+            applyCompanion(model, "bottom", tex, existingHelper);
+            return applyCompanion(model, "side", tex, existingHelper);
         } else {
-            return model.texture("top", extend(tex, "top"))
-                .texture("bottom", extend(tex, "bottom"))
-                .texture("side", extend(tex, "side"));
+            applyCompanion(model, "top", extend(tex, "top"), existingHelper);
+            applyCompanion(model, "bottom", extend(tex, "bottom"), existingHelper);
+            return applyCompanion(model, "side", extend(tex, "side"), existingHelper);
         }
+    }
+
+    public static <B extends ModelBuilder<B>> B applyCompanion(B model, String key,
+        ResourceLocation tex, ExistingFileHelper existingHelper) {
+        model.texture(key, tex);
+        var emissive = suffix(tex, "_emissive");
+        if (existingHelper.exists(emissive, TEXTURE_TYPE)) {
+            model.texture(key + "_emissive", emissive);
+        }
+        return model;
     }
 
     private Optional<ResourceLocation> getOverlay(Direction dir, String suffix,
@@ -134,7 +144,7 @@ public class MachineModel {
                 Optional.<ResourceLocation>empty();
             tex = tex.or(() -> getOverlay(e.getKey(), "", existingHelper));
             if (tex.isPresent()) {
-                model = model.texture(e.getValue() + "_overlay", tex.get());
+                applyCompanion(model, e.getValue() + "_overlay", tex.get(), existingHelper);
                 hasOverlay = true;
             }
         }
@@ -373,6 +383,12 @@ public class MachineModel {
                 default -> "#side";
             })).end()
             .element().from(0, 0, 0).to(16, 16, 16)
+            .allFaces((d, f) -> f.cullface(d).texture(switch (d) {
+                case UP -> "#top_emissive";
+                case DOWN -> "#bottom_emissive";
+                default -> "#side_emissive";
+            })).end()
+            .element().from(0, 0, 0).to(16, 16, 16)
             .allFaces((d, f) -> {
                 f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay");
                 if (d == Direction.NORTH) {
@@ -381,9 +397,23 @@ public class MachineModel {
                     f.tintindex(1);
                 }
             })
+            .end()
+            .element().from(0, 0, 0).to(16, 16, 16)
+            .allFaces((d, f) -> {
+                f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay_emissive");
+                if (d == Direction.NORTH) {
+                    f.tintindex(0);
+                } else if (d == Direction.SOUTH) {
+                    f.tintindex(1);
+                }
+            })
             .end();
+        model.texture("top_emissive", BLOCK_VOID_TEX)
+            .texture("bottom_emissive", BLOCK_VOID_TEX)
+            .texture("side_emissive", BLOCK_VOID_TEX);
         for (var texKey : DIR_TEX_KEYS.values()) {
-            model.texture(texKey + "_overlay", BLOCK_VOID_TEX);
+            model.texture(texKey + "_overlay", BLOCK_VOID_TEX)
+                .texture(texKey + "_overlay_emissive", BLOCK_VOID_TEX);
         }
     }
 
