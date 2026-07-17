@@ -1,4 +1,4 @@
-1245# Tinactory
+# Tinactory
 
 A minecraft mod that ports gregtech to 1.21.1 and more.
 
