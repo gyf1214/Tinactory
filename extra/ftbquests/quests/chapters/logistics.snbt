@@ -1,506 +1,452 @@
 {
-	id: "021730EB05578B09"
-	group: ""
-	order_index: 8
-	filename: "logistics"
-	icon: {id: "tinactory:component/hv/conveyor_module"}
-	default_quest_shape: ""
 	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "logistics"
+	group: ""
+	icon: {
+		id: "tinactory:component/hv/conveyor_module"
+	}
+	id: "021730EB05578B09"
+	order_index: 8
+	quest_links: [ ]
 	quests: [
 		{
-			x: -2.0d
-			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4BE9B26C04647BD8"
-			tasks: [
-				{
-					id: "7A74D28C27706858"
-					type: "item"
-					item: "tinactory:logistics/ulv/electric_chest"
-				}
-			]
+			tasks: [{
+				id: "7A74D28C27706858"
+				item: { count: 1, id: "tinactory:logistics/ulv/electric_chest" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 0.0d
 		}
 		{
-			x: 0.0d
-			y: 0.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "7A00FA0C45702638"
-			tasks: [
-				{
-					id: "06A8D0B166EE238E"
-					type: "item"
-					item: "tinactory:logistics/ulv/electric_tank"
-				}
-			]
+			tasks: [{
+				id: "06A8D0B166EE238E"
+				item: { count: 1, id: "tinactory:logistics/ulv/electric_tank" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 0.0d
 		}
 		{
-			x: -2.0d
-			y: 2.0d
 			dependencies: [
 				"4BE9B26C04647BD8"
 				"3375F9C747DB6DD4"
 			]
 			id: "7A85227BDB6CB5A2"
-			tasks: [
-				{
-					id: "79CD6E3DF40ED430"
-					type: "item"
-					item: "tinactory:logistics/mv/electric_chest"
-				}
-			]
+			tasks: [{
+				id: "79CD6E3DF40ED430"
+				item: { count: 1, id: "tinactory:logistics/mv/electric_chest" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 2.0d
 		}
 		{
-			x: 0.0d
-			y: 2.0d
 			dependencies: [
 				"7A00FA0C45702638"
 				"3375F9C747DB6DD4"
 			]
 			id: "69A0DE7834E046EF"
-			tasks: [
-				{
-					id: "046467BEAD2A7F6D"
-					type: "item"
-					item: "tinactory:logistics/mv/electric_tank"
-				}
-			]
+			tasks: [{
+				id: "046467BEAD2A7F6D"
+				item: { count: 1, id: "tinactory:logistics/mv/electric_tank" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 2.0d
 		}
 		{
-			x: 6.0d
-			y: 2.0d
 			dependencies: [
 				"35AFA1FBD784B4D2"
 				"3375F9C747DB6DD4"
 			]
-			size: 2.0d
 			id: "2463E4F002BC25EE"
-			tasks: [
-				{
-					id: "1937D4E89BCBCE47"
-					type: "item"
-					item: "tinactory:logistics/mv/logistic_worker"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "1937D4E89BCBCE47"
+				item: { count: 1, id: "tinactory:logistics/mv/logistic_worker" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 2.0d
 		}
 		{
-			x: 10.0d
-			y: 2.0d
 			dependencies: [
 				"2463E4F002BC25EE"
 				"6885F61C806D96E5"
 			]
-			size: 2.0d
 			id: "2E0C38684C061101"
-			tasks: [
-				{
-					id: "5E2579053D3B7EA3"
-					type: "item"
-					item: "tinactory:logistics/ev/logistic_worker"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "5E2579053D3B7EA3"
+				item: { count: 1, id: "tinactory:logistics/ev/logistic_worker" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 2.0d
 		}
 		{
-			x: 0.0d
-			y: 4.0d
 			dependencies: ["69A0DE7834E046EF"]
 			id: "1378262C4553AE71"
-			tasks: [
-				{
-					id: "5B510765A5FED29C"
-					type: "item"
-					item: "tinactory:logistics/ev/electric_tank"
-				}
-			]
+			tasks: [{
+				id: "5B510765A5FED29C"
+				item: { count: 1, id: "tinactory:logistics/ev/electric_tank" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 4.0d
 		}
 		{
-			x: -2.0d
-			y: 4.0d
 			dependencies: ["7A85227BDB6CB5A2"]
 			id: "011CB57C780EE663"
-			tasks: [
-				{
-					id: "36D47CAD42C9D33B"
-					type: "item"
-					item: "tinactory:logistics/ev/electric_chest"
-				}
-			]
+			tasks: [{
+				id: "36D47CAD42C9D33B"
+				item: { count: 1, id: "tinactory:logistics/ev/electric_chest" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 4.0d
 		}
 		{
+			dependencies: ["56D39B7C7922E621"]
+			id: "61C306A510164241"
+			size: 2.0d
+			tasks: [{
+				id: "77A95FD01A15AA43"
+				item: { count: 1, id: "tinactory:logistics/me_storage_interface" }
+				type: "item"
+			}]
 			x: -2.0d
 			y: 8.0d
-			dependencies: ["56D39B7C7922E621"]
-			size: 2.0d
-			id: "61C306A510164241"
-			tasks: [
-				{
-					id: "77A95FD01A15AA43"
-					type: "item"
-					item: "tinactory:logistics/me_storage_interface"
-				}
-			]
 		}
 		{
+			dependencies: ["4034E621C42EBF60"]
+			id: "1E73498504A1B6C4"
+			size: 2.0d
+			tasks: [{
+				id: "78515AB8B77327B6"
+				item: { count: 1, id: "tinactory:component/storage_component/1m" }
+				type: "item"
+			}]
 			x: 6.0d
 			y: 12.0d
-			dependencies: ["4034E621C42EBF60"]
-			size: 2.0d
-			id: "1E73498504A1B6C4"
-			tasks: [
-				{
-					id: "78515AB8B77327B6"
-					type: "item"
-					item: "tinactory:component/storage_component/1m"
-				}
-			]
 		}
 		{
-			x: 2.0d
-			y: 8.0d
 			dependencies: ["756F380B2118DD7F"]
 			id: "4034E621C42EBF60"
-			tasks: [
-				{
-					id: "018ABCD56E6CDF11"
-					type: "item"
-					item: "tinactory:material/gem/certus_quartz"
-				}
-			]
+			tasks: [{
+				id: "018ABCD56E6CDF11"
+				item: { count: 1, id: "tinactory:material/gem/certus_quartz" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 8.0d
 		}
 		{
-			x: 2.0d
-			y: 10.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
 			]
 			id: "4F97D1CF666FB365"
-			tasks: [
-				{
-					id: "46612088A2590B00"
-					type: "item"
-					item: "tinactory:logistics/item_storage_cell/1m"
-				}
-			]
+			tasks: [{
+				id: "46612088A2590B00"
+				item: { count: 1, id: "tinactory:logistics/item_storage_cell/1m" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 10.0d
 		}
 		{
-			x: 10.0d
-			y: 12.0d
 			dependencies: ["7696374781756109"]
 			id: "3EDE299FA6EF6A78"
-			tasks: [
-				{
-					id: "54401F085EBBA288"
-					type: "item"
-					item: "tinactory:material/gem/fluix"
-				}
-			]
+			tasks: [{
+				id: "54401F085EBBA288"
+				item: { count: 1, id: "tinactory:material/gem/fluix" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 12.0d
 		}
 		{
-			icon: {id: "tinactory:component/annihilation_core"}
-			x: -2.0d
-			y: 12.0d
 			dependencies: [
 				"7696374781756109"
 				"4034E621C42EBF60"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:component/annihilation_core"
+			}
 			id: "1B073B0E13E0484E"
+			size: 2.0d
 			tasks: [
 				{
 					id: "1C0BC68DF8FF932B"
+					item: { count: 1, id: "tinactory:component/annihilation_core" }
 					type: "item"
-					item: "tinactory:component/annihilation_core"
 				}
 				{
 					id: "3F6467B8A53C304A"
+					item: { count: 1, id: "tinactory:component/formation_core" }
 					type: "item"
-					item: "tinactory:component/formation_core"
 				}
 			]
+			x: -2.0d
+			y: 12.0d
 		}
 		{
-			x: 2.0d
-			y: 12.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
 			]
 			id: "6017FD3A9A7ADBFC"
-			tasks: [
-				{
-					id: "76640E908F83E787"
-					type: "item"
-					item: "tinactory:logistics/fluid_storage_cell/1m"
-				}
-			]
+			tasks: [{
+				id: "76640E908F83E787"
+				item: { count: 1, id: "tinactory:logistics/fluid_storage_cell/1m" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 12.0d
 		}
 		{
-			x: 6.0d
-			y: 14.0d
 			dependencies: ["1E73498504A1B6C4"]
 			id: "340A59CCBC050E4A"
-			tasks: [
-				{
-					id: "7BAE68761D1A1DCA"
-					type: "item"
-					item: "tinactory:component/storage_component/4m"
-				}
-			]
+			tasks: [{
+				id: "7BAE68761D1A1DCA"
+				item: { count: 1, id: "tinactory:component/storage_component/4m" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 14.0d
 		}
 		{
-			x: 6.0d
-			y: 16.0d
 			dependencies: [
 				"340A59CCBC050E4A"
 				"3EDE299FA6EF6A78"
 			]
 			id: "41B2E83E7E86A9A6"
-			tasks: [
-				{
-					id: "6F81858A92A85A94"
-					type: "item"
-					item: "tinactory:component/storage_component/16m"
-				}
-			]
+			tasks: [{
+				id: "6F81858A92A85A94"
+				item: { count: 1, id: "tinactory:component/storage_component/16m" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 16.0d
 		}
 		{
-			x: 6.0d
-			y: 18.0d
 			dependencies: ["41B2E83E7E86A9A6"]
 			id: "2669AE71AD768BC1"
-			tasks: [
-				{
-					id: "13A65F1E77DE3E44"
-					type: "item"
-					item: "tinactory:component/storage_component/64m"
-				}
-			]
+			tasks: [{
+				id: "13A65F1E77DE3E44"
+				item: { count: 1, id: "tinactory:component/storage_component/64m" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 18.0d
 		}
 		{
-			x: -2.0d
-			y: 14.0d
 			dependencies: ["1B073B0E13E0484E"]
 			id: "76896CF4A26C08CD"
-			tasks: [
-				{
-					id: "2B366A0DAB8EECA7"
-					type: "item"
-					item: "tinactory:logistics/me_drive"
-				}
-			]
+			tasks: [{
+				id: "2B366A0DAB8EECA7"
+				item: { count: 1, id: "tinactory:logistics/me_drive" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 14.0d
 		}
 		{
-			x: 10.0d
-			y: 8.0d
 			dependencies: [
 				"4D7BE161FBFBB80C"
 				"062113D36F9444CD"
 			]
-			size: 2.0d
 			id: "5EDD9D5E4EE9487D"
-			tasks: [
-				{
-					id: "30ABF7B962DCE800"
-					type: "item"
-					item: "tinactory:logistics/me_signal_controller"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "30ABF7B962DCE800"
+				item: { count: 1, id: "tinactory:logistics/me_signal_controller" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 8.0d
 		}
 		{
-			x: 10.0d
-			y: 6.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "4D7BE161FBFBB80C"
-			tasks: [
-				{
-					id: "24E0261762CDEB46"
-					type: "item"
-					item: "minecraft:redstone_torch"
-				}
-			]
+			tasks: [{
+				id: "24E0261762CDEB46"
+				item: { count: 1, id: "minecraft:redstone_torch" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 6.0d
 		}
 		{
-			x: 10.0d
-			y: 10.0d
 			dependencies: ["5EDD9D5E4EE9487D"]
 			id: "51A3CD15BE4A96D2"
-			tasks: [
-				{
-					id: "4989E371941CFD39"
-					type: "item"
-					item: "tinactory:logistics/me_storage_detector"
-				}
-			]
+			tasks: [{
+				id: "4989E371941CFD39"
+				item: { count: 1, id: "tinactory:logistics/me_storage_detector" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 10.0d
 		}
 		{
-			x: 2.0d
-			y: 14.0d
 			dependencies: [
 				"1B073B0E13E0484E"
 				"1E73498504A1B6C4"
 				"6885F61C806D96E5"
 			]
-			size: 2.0d
 			id: "247F2D17E69312E2"
-			tasks: [
-				{
-					id: "512E697EC1750715"
-					type: "item"
-					item: "tinactory:multiblock/ev/digital_interface"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "512E697EC1750715"
+				item: { count: 1, id: "tinactory:multiblock/ev/digital_interface" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 14.0d
 		}
 		{
-			x: 12.0d
-			y: 14.0d
 			dependencies: [
 				"3EDE299FA6EF6A78"
 				"0F38B05E2E11756A"
 			]
 			id: "65D0B60510463343"
-			tasks: [
-				{
-					id: "56244F730AB9A22A"
-					type: "item"
-					item: "tinactory:component/silicon_print"
-				}
-			]
+			tasks: [{
+				id: "56244F730AB9A22A"
+				item: { count: 1, id: "tinactory:component/silicon_print" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 14.0d
 		}
 		{
-			x: 2.0d
-			y: 16.0d
 			dependencies: [
 				"247F2D17E69312E2"
 				"05A550E7057E0001"
 			]
 			id: "02FC118547396204"
-			tasks: [
-				{
-					id: "02FC118547396208"
-					type: "item"
-					item: "tinactory:multiblock/iv/digital_interface"
-				}
-			]
+			tasks: [{
+				id: "02FC118547396208"
+				item: { count: 1, id: "tinactory:multiblock/iv/digital_interface" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 16.0d
 		}
 		{
-			x: 2.0d
-			y: 18.0d
 			dependencies: [
 				"02FC118547396204"
 				"05A550E7057E0043"
 				"05A550E7057E0048"
 			]
 			id: "02FC118547396206"
-			tasks: [
-				{
-					id: "02FC118547396207"
-					type: "item"
-					item: "tinactory:multiblock/luv/digital_interface"
-				}
-			]
+			tasks: [{
+				id: "02FC118547396207"
+				item: { count: 1, id: "tinactory:multiblock/luv/digital_interface" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 18.0d
 		}
 		{
-			x: 12.0d
-			y: 16.0d
 			dependencies: [
 				"65D0B60510463343"
 				"4FF5F28B05D7D3BD"
 			]
 			id: "7B958900C6A6AC26"
-			tasks: [
-				{
-					id: "2D058F1038369B69"
-					type: "item"
-					item: "tinactory:component/logic_processor"
-				}
-			]
+			tasks: [{
+				id: "2D058F1038369B69"
+				item: { count: 1, id: "tinactory:component/logic_processor" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 16.0d
 		}
 		{
-			x: 12.0d
-			y: 20.0d
 			dependencies: [
 				"7B958900C6A6AC26"
 				"0DFE5BEF57423538"
 			]
 			id: "0022A8ABF3D58C41"
-			tasks: [
-				{
-					id: "0409D3611E7A4662"
-					type: "item"
-					item: "tinactory:component/calculation_processor"
-				}
-			]
+			tasks: [{
+				id: "0409D3611E7A4662"
+				item: { count: 1, id: "tinactory:component/calculation_processor" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 20.0d
 		}
 		{
-			x: 10.0d
-			y: 14.0d
 			dependencies: [
 				"65D0B60510463343"
 				"1E73498504A1B6C4"
 				"61B9D2ACAF1C5D38"
 			]
 			id: "7617169E5734A74B"
-			tasks: [
-				{
-					id: "1C716FC7E9EE5689"
-					type: "item"
-					item: "tinactory:logistics/pattern_cell/1m"
-				}
-			]
+			tasks: [{
+				id: "1C716FC7E9EE5689"
+				item: { count: 1, id: "tinactory:logistics/pattern_cell/1m" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 14.0d
 		}
 		{
-			icon: {id: "tinactory:logistics/me_pattern_terminal"}
-			x: 10.0d
-			y: 16.0d
 			dependencies: [
 				"7617169E5734A74B"
 				"7B958900C6A6AC26"
 			]
+			icon: {
+				id: "tinactory:logistics/me_pattern_terminal"
+			}
 			id: "2DBD0C0A32F12F52"
 			tasks: [
 				{
 					id: "011B9EEA0AAE6440"
+					item: { count: 1, id: "tinactory:logistics/me_pattern_terminal" }
 					type: "item"
-					item: "tinactory:logistics/me_pattern_terminal"
 				}
 				{
 					id: "0361556F57161B6C"
+					item: { count: 1, id: "tinactory:logistics/me_craft_terminal" }
 					type: "item"
-					item: "tinactory:logistics/me_craft_terminal"
 				}
 			]
+			x: 10.0d
+			y: 16.0d
 		}
 		{
+			dependencies: ["2DBD0C0A32F12F52"]
+			id: "02FC118547396205"
+			size: 2.0d
+			tasks: [{
+				id: "027740CD7531F1DA"
+				item: { count: 1, id: "tinactory:logistics/me_craft_cpu/basic" }
+				type: "item"
+			}]
 			x: 10.0d
 			y: 18.0d
-			dependencies: ["2DBD0C0A32F12F52"]
-			size: 2.0d
-			id: "02FC118547396205"
-			tasks: [
-				{
-					id: "027740CD7531F1DA"
-					type: "item"
-					item: "tinactory:logistics/me_craft_cpu/basic"
-				}
-			]
 		}
 		{
-			x: 10.0d
-			y: 20.0d
 			dependencies: [
 				"02FC118547396205"
 				"0022A8ABF3D58C41"
 				"15A12C982E065F64"
 			]
 			id: "0046CC5063E9B6AD"
-			tasks: [
-				{
-					id: "39FE594EC92F6C1B"
-					type: "item"
-					item: "tinactory:logistics/me_craft_cpu/advanced"
-				}
-			]
+			tasks: [{
+				id: "39FE594EC92F6C1B"
+				item: { count: 1, id: "tinactory:logistics/me_craft_cpu/advanced" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: 20.0d
 		}
 	]
-	quest_links: []
 }

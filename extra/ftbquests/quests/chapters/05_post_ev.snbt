@@ -1,659 +1,625 @@
 {
-	id: "05A550E7057E0000"
-	group: ""
-	order_index: 5
-	filename: "05_post_ev"
-	icon: {id: "tinactory:component/luv/machine_hull"}
-	default_quest_shape: ""
 	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "05_post_ev"
+	group: ""
+	icon: {
+		id: "tinactory:component/luv/machine_hull"
+	}
+	id: "05A550E7057E0000"
+	order_index: 5
+	quest_links: [ ]
 	quests: [
 		{
-			icon: {id: "tinactory:component/iv/machine_hull"}
-			x: 0.0d
-			y: 6.0d
 			dependencies: [
 				"09CB7C63AE45690A"
 				"6D4396F046AC59FA"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:component/iv/machine_hull"
+			}
 			id: "05A550E7057E0001"
+			size: 2.0d
 			tasks: [
 				{
 					id: "05A550E7057E0002"
+					item: { count: 1, id: "tinactory:component/iv/machine_hull" }
 					type: "item"
-					item: "tinactory:component/iv/machine_hull"
 				}
 				{
 					id: "267070A180715499"
+					item: { count: 1, id: "tinactory:network/iv/cable" }
 					type: "item"
-					item: "tinactory:network/iv/cable"
 				}
 			]
+			x: 0.0d
+			y: 6.0d
 		}
 		{
-			icon: {id: "minecraft:end_stone"}
-			x: 0.0d
-			y: 0.0d
 			dependencies: [
 				"15A12C982E065F64"
 				"46C15B5CA52BBB56"
 			]
-			size: 2.0d
+			icon: {
+				id: "minecraft:end_stone"
+			}
 			id: "05A550E7057E0005"
+			size: 2.0d
 			tasks: [
 				{
 					id: "553022B11F686A46"
+					item: { count: 1, id: "tinactory:machine/ev/stone_generator" }
 					type: "item"
-					item: "tinactory:machine/ev/stone_generator"
 				}
 				{
 					id: "05A550E7057E0006"
+					item: { count: 1, id: "minecraft:end_stone" }
 					type: "item"
-					item: "minecraft:end_stone"
 				}
 				{
 					id: "05A550E7057E0007"
+					item: { count: 1, id: "tinactory:machine/ev/ore_analyzer" }
 					type: "item"
-					item: "tinactory:machine/ev/ore_analyzer"
 				}
 			]
+			x: 0.0d
+			y: 0.0d
 		}
 		{
-			icon: {id: "tinactory:material/raw/ender_pearl"}
-			x: 0.0d
-			y: 2.0d
 			dependencies: [
 				"05A550E7057E0005"
 				"0E15D0E25A9B4C10"
 			]
+			icon: {
+				id: "tinactory:material/raw/ender_pearl"
+			}
 			id: "05A550E7057E0008"
 			tasks: [
 				{
 					id: "05A550E7057E0009"
+					item: { count: 1, id: "tinactory:material/raw/ender_pearl" }
 					type: "item"
-					item: "tinactory:material/raw/ender_pearl"
 				}
 				{
 					id: "05A550E7057E000A"
+					item: { count: 1, id: "minecraft:ender_pearl" }
 					type: "item"
-					item: "minecraft:ender_pearl"
 				}
 			]
+			x: 0.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "minecraft:blaze_rod"}
-			x: 2.0d
-			y: 0.0d
 			dependencies: ["0F875BA74B75405A"]
+			icon: {
+				id: "minecraft:blaze_rod"
+			}
 			id: "05A550E7057E000B"
 			tasks: [
 				{
 					id: "05A550E7057E000C"
+					item: { count: 1, id: "minecraft:blaze_rod" }
 					type: "item"
-					item: "minecraft:blaze_rod"
 				}
 				{
 					id: "05A550E7057E000D"
+					item: { count: 1, id: "minecraft:blaze_powder" }
 					type: "item"
-					item: "minecraft:blaze_powder"
 				}
 			]
+			x: 2.0d
+			y: 0.0d
 		}
 		{
-			icon: {id: "minecraft:ender_eye"}
-			x: 2.0d
-			y: 2.0d
 			dependencies: [
 				"05A550E7057E0008"
 				"05A550E7057E000B"
 				"635C4C25FAC0CA40"
 			]
+			icon: {
+				id: "minecraft:ender_eye"
+			}
 			id: "05A550E7057E000E"
 			tasks: [
 				{
 					id: "05A550E7057E000F"
+					item: { count: 1, id: "minecraft:ender_eye" }
 					type: "item"
-					item: "minecraft:ender_eye"
 				}
 				{
 					id: "05A550E7057E0010"
+					item: { count: 1, id: "tinactory:material/dust/ender_eye" }
 					type: "item"
-					item: "tinactory:material/dust/ender_eye"
 				}
 			]
+			x: 2.0d
+			y: 2.0d
 		}
 		{
-			x: 4.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E000E"]
 			id: "05A550E7057E0011"
-			tasks: [
-				{
-					id: "05A550E7057E0012"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/gas/radon"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0012"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/radon" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 4.0d
+			y: 2.0d
 		}
 		{
-			x: 6.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E0011"]
 			id: "05A550E7057E0013"
-			tasks: [
-				{
-					id: "05A550E7057E0014"
-					type: "item"
-					item: "tinactory:component/quantum_eye"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0014"
+				item: { count: 1, id: "tinactory:component/quantum_eye" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:circuit/quantum_processor"}
+			dependencies: ["05A550E7057E0013"]
+			icon: {
+				id: "tinactory:circuit/quantum_processor"
+			}
+			id: "05A550E7057E0015"
+			tasks: [{
+				id: "05A550E7057E0016"
+				item: { count: 1, id: "tinactory:circuit/quantum_processor" }
+				type: "item"
+			}]
 			x: 8.0d
 			y: 2.0d
-			dependencies: ["05A550E7057E0013"]
-			id: "05A550E7057E0015"
-			tasks: [
-				{
-					id: "05A550E7057E0016"
-					type: "item"
-					item: "tinactory:circuit/quantum_processor"
-				}
-			]
 		}
 		{
-			icon: {id: "tinactory:component/iv/sensor"}
-			x: 2.0d
-			y: 4.0d
 			dependencies: [
 				"05A550E7057E0001"
 				"05A550E7057E000E"
 			]
+			icon: {
+				id: "tinactory:component/iv/sensor"
+			}
 			id: "05A550E7057E0018"
 			tasks: [
 				{
 					id: "05A550E7057E0019"
+					item: { count: 1, id: "tinactory:component/iv/sensor" }
 					type: "item"
-					item: "tinactory:component/iv/sensor"
 				}
 				{
 					id: "05A550E7057E001A"
+					item: { count: 1, id: "tinactory:component/iv/emitter" }
 					type: "item"
-					item: "tinactory:component/iv/emitter"
 				}
 			]
+			x: 2.0d
+			y: 4.0d
 		}
 		{
-			x: 2.0d
-			y: 8.0d
 			dependencies: ["05A550E7057E0001"]
 			id: "05A550E7057E001B"
-			tasks: [
-				{
-					id: "05A550E7057E001C"
-					type: "item"
-					item: "tinactory:machine/iv/assembler"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E001C"
+				item: { count: 1, id: "tinactory:machine/iv/assembler" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 8.0d
 		}
 		{
-			x: 4.0d
-			y: 6.0d
 			dependencies: [
 				"05A550E7057E001B"
 				"05A550E7057E0018"
 			]
 			id: "05A550E7057E001D"
-			tasks: [
-				{
-					id: "05A550E7057E001E"
-					type: "item"
-					item: "tinactory:machine/iv/circuit_assembler"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E001E"
+				item: { count: 1, id: "tinactory:machine/iv/circuit_assembler" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 6.0d
 		}
 		{
-			icon: {id: "tinactory:multiblock/assembly_line"}
-			x: 8.0d
-			y: 6.0d
 			dependencies: ["05A550E7057E001D"]
-			size: 2.0d
+			icon: {
+				id: "tinactory:multiblock/assembly_line"
+			}
 			id: "05A550E7057E001F"
+			size: 2.0d
 			tasks: [
 				{
 					id: "05A550E7057E0020"
+					item: { count: 1, id: "tinactory:multiblock/assembly_line" }
 					type: "item"
-					item: "tinactory:multiblock/assembly_line"
 				}
 				{
 					id: "05A550E7057E0021"
+					item: { count: 1, id: "tinactory:multiblock/misc/assembler_machine_casing" }
 					type: "item"
-					item: "tinactory:multiblock/misc/assembler_machine_casing"
 				}
 			]
+			x: 8.0d
+			y: 6.0d
 		}
 		{
-			x: -2.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E0008"]
 			id: "05A550E7057E0022"
-			tasks: [
-				{
-					id: "05A550E7057E0023"
-					type: "item"
-					item: "tinactory:material/ingot/platinum"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0023"
+				item: { count: 1, id: "tinactory:material/ingot/platinum" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 2.0d
 		}
 		{
-			x: -4.0d
-			y: 0.0d
 			dependencies: ["50A4694A51414D54"]
 			id: "05A550E7057E0024"
-			tasks: [
-				{
-					id: "05A550E7057E0025"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/aqua_regia"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0025"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/aqua_regia" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -4.0d
+			y: 0.0d
 		}
 		{
-			x: -4.0d
-			y: 2.0d
 			dependencies: [
 				"05A550E7057E0022"
 				"05A550E7057E0024"
 			]
 			id: "05A550E7057E0026"
-			tasks: [
-				{
-					id: "05A550E7057E0027"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/platinum_palladium_leachate"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0027"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/platinum_palladium_leachate" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -4.0d
+			y: 2.0d
 		}
 		{
-			x: -4.0d
-			y: 4.0d
 			dependencies: ["05A550E7057E0026"]
 			id: "05A550E7057E0028"
-			tasks: [
-				{
-					id: "05A550E7057E0029"
-					type: "item"
-					item: "tinactory:material/dust/palladium"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0029"
+				item: { count: 1, id: "tinactory:material/dust/palladium" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 4.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/raw_rhodium"}
-			x: -6.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E0026"]
+			icon: {
+				id: "tinactory:material/dust/raw_rhodium"
+			}
 			id: "05A550E7057E002A"
 			tasks: [
 				{
 					id: "05A550E7057E002B"
+					item: { count: 1, id: "tinactory:material/dust/raw_rhodium" }
 					type: "item"
-					item: "tinactory:material/dust/raw_rhodium"
 				}
 				{
 					id: "05A550E7057E002C"
+					item: { count: 1, id: "tinactory:material/dust/rarest_metallic" }
 					type: "item"
-					item: "tinactory:material/dust/rarest_metallic"
 				}
 			]
+			x: -6.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/rhodium"}
-			x: -6.0d
-			y: 4.0d
 			dependencies: ["05A550E7057E002A"]
+			icon: {
+				id: "tinactory:material/dust/rhodium"
+			}
 			id: "05A550E7057E002D"
 			tasks: [
 				{
 					id: "05A550E7057E002E"
+					item: { count: 1, id: "tinactory:material/dust/rhodium" }
 					type: "item"
-					item: "tinactory:material/dust/rhodium"
 				}
 				{
 					id: "05A550E7057E002F"
+					item: { count: 1, id: "tinactory:material/dust/ruthenium" }
 					type: "item"
-					item: "tinactory:material/dust/ruthenium"
 				}
 			]
+			x: -6.0d
+			y: 4.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/raw_iridium"}
-			x: -8.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E002A"]
+			icon: {
+				id: "tinactory:material/dust/raw_iridium"
+			}
 			id: "05A550E7057E0030"
 			tasks: [
 				{
 					id: "05A550E7057E0031"
+					item: { count: 1, id: "tinactory:material/dust/raw_iridium" }
 					type: "item"
-					item: "tinactory:material/dust/raw_iridium"
 				}
 				{
 					id: "05A550E7057E0032"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/osmium_solution"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/osmium_solution" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 			]
+			x: -8.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/iridium"}
-			x: -8.0d
-			y: 4.0d
 			dependencies: ["05A550E7057E0030"]
+			icon: {
+				id: "tinactory:material/dust/iridium"
+			}
 			id: "05A550E7057E0033"
 			tasks: [
 				{
 					id: "05A550E7057E0034"
+					item: { count: 1, id: "tinactory:material/dust/iridium" }
 					type: "item"
-					item: "tinactory:material/dust/iridium"
 				}
 				{
 					id: "05A550E7057E0035"
+					item: { count: 1, id: "tinactory:material/dust/osmium" }
 					type: "item"
-					item: "tinactory:material/dust/osmium"
 				}
 			]
+			x: -8.0d
+			y: 4.0d
 		}
 		{
-			x: -8.0d
-			y: 6.0d
 			dependencies: [
 				"05A550E7057E002D"
 				"05A550E7057E0033"
 			]
 			id: "05A550E7057E0036"
-			tasks: [
-				{
-					id: "05A550E7057E0037"
-					type: "item"
-					item: "tinactory:material/ingot/ruridit"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0037"
+				item: { count: 1, id: "tinactory:material/ingot/ruridit" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: 6.0d
 		}
 		{
-			icon: {id: "tinactory:component/raw_rhodium_plated_palladium"}
-			x: -4.0d
-			y: 6.0d
 			dependencies: [
 				"05A550E7057E0028"
 				"05A550E7057E002D"
 			]
+			icon: {
+				id: "tinactory:component/raw_rhodium_plated_palladium"
+			}
 			id: "05A550E7057E0038"
 			tasks: [
 				{
 					id: "05A550E7057E0039"
+					item: { count: 1, id: "tinactory:component/raw_rhodium_plated_palladium" }
 					type: "item"
-					item: "tinactory:component/raw_rhodium_plated_palladium"
 				}
 				{
 					id: "05A550E7057E003A"
+					item: { count: 1, id: "tinactory:material/ingot/rhodium_plated_palladium" }
 					type: "item"
-					item: "tinactory:material/ingot/rhodium_plated_palladium"
 				}
 			]
+			x: -4.0d
+			y: 6.0d
 		}
 		{
-			x: -8.0d
-			y: 10.0d
 			dependencies: ["330CE0C6D92F38F2"]
 			id: "05A550E7057E003B"
-			tasks: [
-				{
-					id: "05A550E7057E003C"
-					type: "item"
-					item: "tinactory:material/ingot/hssg"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E003C"
+				item: { count: 1, id: "tinactory:material/ingot/hssg" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: 10.0d
 		}
 		{
-			x: 4.0d
-			y: 10.0d
 			dependencies: ["330CE0C6D92F38F2"]
 			id: "05A550E7057E003D"
-			tasks: [
-				{
-					id: "05A550E7057E003E"
-					type: "item"
-					item: "tinactory:material/ingot/vanadium_gallium"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E003E"
+				item: { count: 1, id: "tinactory:material/ingot/vanadium_gallium" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 10.0d
 		}
 		{
-			x: 2.0d
-			y: 10.0d
 			dependencies: [
 				"05A550E7057E003D"
 				"05A550E7057E001B"
 			]
 			id: "05A550E7057E003F"
-			tasks: [
-				{
-					id: "05A550E7057E0040"
-					type: "item"
-					item: "tinactory:material/wire/iv_superconductor"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0040"
+				item: { count: 1, id: "tinactory:material/wire/iv_superconductor" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 10.0d
 		}
 		{
-			x: 4.0d
-			y: 12.0d
 			dependencies: ["05A550E7057E003F"]
 			id: "05A550E7057E0041"
-			tasks: [
-				{
-					id: "05A550E7057E0042"
-					type: "item"
-					item: "tinactory:component/iv/field_generator"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0042"
+				item: { count: 1, id: "tinactory:component/iv/field_generator" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 12.0d
 		}
 		{
-			icon: {id: "tinactory:component/luv/machine_hull"}
-			x: -4.0d
-			y: 10.0d
 			dependencies: [
 				"05A550E7057E001B"
 				"05A550E7057E0038"
 				"05A550E7057E0036"
 				"05A550E7057E003B"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:component/luv/machine_hull"
+			}
 			id: "05A550E7057E0043"
+			size: 2.0d
 			tasks: [
 				{
 					id: "05A550E7057E0044"
+					item: { count: 1, id: "tinactory:network/luv/cable" }
 					type: "item"
-					item: "tinactory:network/luv/cable"
 				}
 				{
 					id: "05A550E7057E0045"
+					item: { count: 1, id: "tinactory:component/luv/machine_hull" }
 					type: "item"
-					item: "tinactory:component/luv/machine_hull"
 				}
 			]
+			x: -4.0d
+			y: 10.0d
 		}
 		{
-			x: 8.0d
-			y: 10.0d
 			dependencies: ["05A550E7057E001F"]
 			id: "05A550E7057E0046"
-			tasks: [
-				{
-					id: "05A550E7057E0047"
-					type: "item"
-					item: "tinactory:component/luv/electric_motor"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0047"
+				item: { count: 1, id: "tinactory:component/luv/electric_motor" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 10.0d
 		}
 		{
-			icon: {id: "tinactory:network/luv/transformer"}
-			x: -8.0d
-			y: 14.0d
 			dependencies: ["05A550E7057E0043"]
+			icon: {
+				id: "tinactory:network/luv/transformer"
+			}
 			id: "05A550E7057E0057"
 			tasks: [
 				{
 					id: "05A550E7057E0058"
+					item: { count: 1, id: "tinactory:network/luv/transformer" }
 					type: "item"
-					item: "tinactory:network/luv/transformer"
 				}
 				{
 					id: "05A550E7057E0059"
+					item: { count: 1, id: "tinactory:network/luv/electric_buffer" }
 					type: "item"
-					item: "tinactory:network/luv/electric_buffer"
 				}
 			]
+			x: -8.0d
+			y: 14.0d
 		}
 		{
-			icon: {id: "tinactory:component/luv/electric_pump"}
-			x: 8.0d
-			y: 12.0d
 			dependencies: ["05A550E7057E0046"]
+			icon: {
+				id: "tinactory:component/luv/electric_pump"
+			}
 			id: "05A550E7057E0048"
 			tasks: [
 				{
 					id: "05A550E7057E0049"
+					item: { count: 1, id: "tinactory:component/luv/electric_pump" }
 					type: "item"
-					item: "tinactory:component/luv/electric_pump"
 				}
 				{
 					id: "05A550E7057E004A"
+					item: { count: 1, id: "tinactory:component/luv/electric_piston" }
 					type: "item"
-					item: "tinactory:component/luv/electric_piston"
 				}
 				{
 					id: "05A550E7057E004B"
+					item: { count: 1, id: "tinactory:component/luv/conveyor_module" }
 					type: "item"
-					item: "tinactory:component/luv/conveyor_module"
 				}
 			]
+			x: 8.0d
+			y: 12.0d
 		}
 		{
-			icon: {id: "tinactory:component/luv/sensor"}
-			x: 10.0d
-			y: 10.0d
 			dependencies: ["05A550E7057E0046"]
+			icon: {
+				id: "tinactory:component/luv/sensor"
+			}
 			id: "05A550E7057E004C"
 			tasks: [
 				{
 					id: "05A550E7057E004D"
+					item: { count: 1, id: "tinactory:component/luv/sensor" }
 					type: "item"
-					item: "tinactory:component/luv/sensor"
 				}
 				{
 					id: "05A550E7057E004E"
+					item: { count: 1, id: "tinactory:component/luv/emitter" }
 					type: "item"
-					item: "tinactory:component/luv/emitter"
 				}
 			]
+			x: 10.0d
+			y: 10.0d
 		}
 		{
-			x: 8.0d
-			y: 14.0d
 			dependencies: ["05A550E7057E0048"]
 			id: "05A550E7057E004F"
-			tasks: [
-				{
-					id: "05A550E7057E0050"
-					type: "item"
-					item: "tinactory:component/luv/robot_arm"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0050"
+				item: { count: 1, id: "tinactory:component/luv/robot_arm" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 14.0d
 		}
 		{
-			x: -4.0d
-			y: 14.0d
 			dependencies: ["05A550E7057E0043"]
 			id: "05A550E7057E0051"
-			tasks: [
-				{
-					id: "05A550E7057E0052"
-					type: "item"
-					item: "tinactory:multiblock/misc/fusion_casing"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0052"
+				item: { count: 1, id: "tinactory:multiblock/misc/fusion_casing" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 14.0d
 		}
 		{
-			x: 0.0d
-			y: 12.0d
 			dependencies: [
 				"05A550E7057E003F"
 				"05A550E7057E0043"
 			]
 			id: "05A550E7057E0053"
-			tasks: [
-				{
-					id: "05A550E7057E0054"
-					type: "item"
-					item: "tinactory:multiblock/misc/superconducting_coil"
-				}
-			]
+			tasks: [{
+				id: "05A550E7057E0054"
+				item: { count: 1, id: "tinactory:multiblock/misc/superconducting_coil" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 12.0d
 		}
 		{
-			x: 2.0d
-			y: 14.0d
 			dependencies: [
 				"05A550E7057E0051"
 				"05A550E7057E0053"
 				"05A550E7057E0041"
 				"05A550E7057E004F"
 			]
-			size: 2.0d
 			id: "05A550E7057E0055"
-			tasks: [
-				{
-					id: "05A550E7057E0056"
-					type: "item"
-					item: "tinactory:multiblock/fusion_reactor"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "05A550E7057E0056"
+				item: { count: 1, id: "tinactory:multiblock/fusion_reactor" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 14.0d
 		}
 	]
-	quest_links: []
 }

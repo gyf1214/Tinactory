@@ -1,498 +1,486 @@
 {
-	id: "4E10B8DB9F33643B"
-	group: ""
-	order_index: 0
-	filename: "00_ultra_low_voltage"
-	icon: {id: "minecraft:oak_sapling"}
-	default_quest_shape: ""
 	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "00_ultra_low_voltage"
+	group: ""
+	icon: {
+		id: "minecraft:oak_sapling"
+	}
+	id: "4E10B8DB9F33643B"
+	order_index: 0
+	quest_links: [ ]
 	quests: [
 		{
+			id: "1E3576759FC89A54"
+			size: 2.0d
+			tasks: [{
+				id: "53A27D5233E299A8"
+				item: { count: 1, id: "minecraft:oak_log" }
+				type: "item"
+			}]
 			x: 0.0d
 			y: 0.0d
-			size: 2.0d
-			id: "1E3576759FC89A54"
-			tasks: [
-				{
-					id: "53A27D5233E299A8"
-					type: "item"
-					item: "minecraft:oak_log"
-				}
-			]
 		}
 		{
-			icon: {id: "minecraft:creeper_head"}
+			icon: {
+				id: "minecraft:creeper_head"
+			}
+			id: "5CA02C19E0D43DB9"
+			shape: "pentagon"
+			tasks: [{
+				id: "4919C4842FF1F786"
+				type: "checkmark"
+			}]
 			x: -2.0d
 			y: 0.0d
-			shape: "pentagon"
-			id: "5CA02C19E0D43DB9"
-			tasks: [
-				{
-					id: "4919C4842FF1F786"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			icon: {id: "minecraft:cobblestone"}
-			x: 0.0d
-			y: 2.0d
 			dependencies: ["1E3576759FC89A54"]
+			icon: {
+				id: "minecraft:cobblestone"
+			}
 			id: "11E5FCB1DF1477FD"
 			tasks: [
 				{
 					id: "0E15862A4CF7D517"
+					item: { count: 1, id: "tinactory:primitive/stone_generator" }
 					type: "item"
-					item: "tinactory:primitive/stone_generator"
 				}
 				{
 					id: "69098CD79DB53833"
+					item: { count: 1, id: "minecraft:cobblestone" }
 					type: "item"
-					item: "minecraft:cobblestone"
 				}
 			]
+			x: 0.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:material/raw/chalcopyrite"}
-			x: -1.5d
-			y: 3.5d
 			dependencies: ["11E5FCB1DF1477FD"]
+			icon: {
+				id: "tinactory:material/raw/chalcopyrite"
+			}
 			id: "70A3BD39E2350A91"
 			tasks: [
 				{
 					id: "473E482E21997F8C"
+					item: { count: 1, id: "tinactory:primitive/ore_analyzer" }
 					type: "item"
-					item: "tinactory:primitive/ore_analyzer"
 				}
 				{
 					id: "51D2A9E4E3F8041A"
+					item: { count: 1, id: "tinactory:primitive/ore_washer" }
 					type: "item"
-					item: "tinactory:primitive/ore_washer"
 				}
 			]
+			x: -1.5d
+			y: 3.5d
 		}
 		{
-			icon: {id: "tinactory:primitive/workbench"}
-			x: 1.5d
-			y: 3.5d
 			dependencies: ["11E5FCB1DF1477FD"]
+			icon: {
+				id: "tinactory:primitive/workbench"
+			}
 			id: "01653617B5B3450E"
 			tasks: [
 				{
 					id: "7B0E27B01D1CB7C4"
+					item: { count: 1, id: "tinactory:primitive/workbench" }
 					type: "item"
-					item: "tinactory:primitive/workbench"
 				}
 				{
 					id: "7D1236B774D8D04A"
+					item: { count: 1, id: "tinactory:tool/hammer/stone" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/hammer/stone"
-					}
 				}
 				{
 					id: "49C9B3755FBF5F8B"
+					item: { count: 1, id: "tinactory:tool/mortar/flint" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/mortar/flint"
-					}
 				}
 			]
+			x: 1.5d
+			y: 3.5d
 		}
 		{
-			icon: {id: "minecraft:iron_ingot"}
-			x: 0.0d
-			y: 5.0d
 			dependencies: [
 				"70A3BD39E2350A91"
 				"01653617B5B3450E"
 			]
-			size: 2.0d
+			icon: {
+				id: "minecraft:iron_ingot"
+			}
 			id: "34D0991E0CCF5EEC"
+			size: 2.0d
 			tasks: [
 				{
 					id: "75033FD840BE757C"
+					item: { count: 1, id: "minecraft:iron_ingot" }
 					type: "item"
-					item: "minecraft:iron_ingot"
 				}
 				{
 					id: "62EC3912A8455EE5"
+					item: { count: 1, id: "minecraft:copper_ingot" }
 					type: "item"
-					item: "minecraft:copper_ingot"
 				}
 			]
+			x: 0.0d
+			y: 5.0d
 		}
 		{
-			x: 0.0d
-			y: 7.0d
 			dependencies: ["34D0991E0CCF5EEC"]
 			id: "1E5E7333A9D920E1"
-			tasks: [
-				{
-					id: "5F139379566C7F48"
-					type: "item"
-					item: "tinactory:material/ingot/wrought_iron"
-				}
-			]
+			tasks: [{
+				id: "5F139379566C7F48"
+				item: { count: 1, id: "tinactory:material/ingot/wrought_iron" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 7.0d
 		}
 		{
+			dependencies: ["1E5E7333A9D920E1"]
 			icon: {
 				id: "tinactory:tool/file/wrought_iron"
 			}
-			x: 2.0d
-			y: 7.0d
-			dependencies: ["1E5E7333A9D920E1"]
 			id: "312DEB1E14FF9588"
 			tasks: [
 				{
 					id: "6B9ABB6522F87014"
+					item: { count: 1, id: "tinactory:tool/file/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/file/wrought_iron"
-					}
 				}
 				{
 					id: "52F16B3DAD9ECD3F"
+					item: { count: 1, id: "tinactory:tool/hammer/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/hammer/wrought_iron"
-					}
 				}
 				{
 					id: "128A69EB13C648C0"
+					item: { count: 1, id: "tinactory:tool/mortar/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/mortar/wrought_iron"
-					}
 				}
 				{
 					id: "028A57CB20BD7787"
+					item: { count: 1, id: "tinactory:tool/saw/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/saw/wrought_iron"
-					}
 				}
 				{
 					id: "438E65747A63A25D"
+					item: { count: 1, id: "tinactory:tool/screwdriver/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/screwdriver/wrought_iron"
-					}
 				}
 				{
 					id: "70F6DC1A66FD0E07"
+					item: { count: 1, id: "tinactory:tool/wire_cutter/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/wire_cutter/wrought_iron"
-					}
 				}
 				{
 					id: "4D4FFAEBAE478796"
+					item: { count: 1, id: "tinactory:tool/wrench/wrought_iron" }
 					type: "item"
-					item: {
-						id: "tinactory:tool/wrench/wrought_iron"
-					}
 				}
 			]
+			x: 2.0d
+			y: 7.0d
 		}
 		{
-			icon: {id: "tinactory:component/ulv/machine_hull"}
-			x: 0.0d
-			y: 9.0d
 			dependencies: ["1E5E7333A9D920E1"]
-			size: 2.0d
+			icon: {
+				id: "tinactory:component/ulv/machine_hull"
+			}
 			id: "0B73A7F9E0645551"
+			size: 2.0d
 			tasks: [
 				{
 					id: "6E8B21C6AA52C1D7"
+					item: { count: 1, id: "tinactory:component/ulv/machine_hull" }
 					type: "item"
-					item: "tinactory:component/ulv/machine_hull"
 				}
 				{
 					id: "28CFC6971BD56024"
+					item: { count: 1, id: "tinactory:network/ulv/cable" }
 					type: "item"
-					item: "tinactory:network/ulv/cable"
 				}
 				{
 					id: "5FE9F4CB6CA9994E"
+					item: { count: 1, id: "tinactory:circuit/vacuum_tube" }
 					type: "item"
-					item: "tinactory:circuit/vacuum_tube"
 				}
 			]
+			x: 0.0d
+			y: 9.0d
 		}
 		{
-			icon: {id: "tinactory:machine/ulv/steam_turbine"}
-			x: 2.0d
-			y: 9.0d
 			dependencies: ["0B73A7F9E0645551"]
+			icon: {
+				id: "tinactory:machine/ulv/steam_turbine"
+			}
 			id: "16BF47CD29F96F57"
 			tasks: [
 				{
 					id: "2AF36D71FC53DEB3"
+					item: { count: 1, id: "tinactory:machine/boiler/low" }
 					type: "item"
-					item: "tinactory:machine/boiler/low"
 				}
 				{
 					id: "6F8DA5F7379D5997"
+					item: { count: 1, id: "tinactory:machine/ulv/steam_turbine" }
 					type: "item"
-					item: "tinactory:machine/ulv/steam_turbine"
 				}
 			]
+			x: 2.0d
+			y: 9.0d
 		}
 		{
-			x: 0.0d
-			y: 11.0d
 			dependencies: ["0B73A7F9E0645551"]
 			id: "6F6EE8943B6B06BC"
-			tasks: [
-				{
-					id: "2165D6BBA2D46650"
-					type: "item"
-					item: "tinactory:machine/ulv/assembler"
-				}
-			]
+			tasks: [{
+				id: "2165D6BBA2D46650"
+				item: { count: 1, id: "tinactory:machine/ulv/assembler" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 11.0d
 		}
 		{
-			icon: {id: "tinactory:component/ulv/research_equipment"}
-			x: 2.0d
-			y: 11.0d
 			dependencies: [
 				"6F6EE8943B6B06BC"
 				"16BF47CD29F96F57"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:component/ulv/research_equipment"
+			}
 			id: "1DF1F6516600868F"
+			size: 2.0d
 			tasks: [
 				{
 					id: "56F55824D0761E28"
+					item: { count: 1, id: "tinactory:machine/ulv/research_bench" }
 					type: "item"
-					item: "tinactory:machine/ulv/research_bench"
 				}
 				{
 					id: "22E255C03F85B2E4"
+					item: { count: 1, id: "tinactory:component/ulv/research_equipment" }
 					type: "item"
-					item: "tinactory:component/ulv/research_equipment"
 				}
 			]
+			x: 2.0d
+			y: 11.0d
 		}
 		{
-			icon: {id: "tinactory:material/crushed_purified/chalcopyrite"}
-			x: -2.0d
-			y: 11.0d
 			dependencies: ["0B73A7F9E0645551"]
+			icon: {
+				id: "tinactory:material/crushed_purified/chalcopyrite"
+			}
 			id: "070F82ED30238005"
 			tasks: [
 				{
 					id: "3BE38EF75C2BC9B0"
+					item: { count: 1, id: "tinactory:machine/ulv/ore_analyzer" }
 					type: "item"
-					item: "tinactory:machine/ulv/ore_analyzer"
 				}
 				{
 					id: "482622842F504ADD"
+					item: { count: 1, id: "tinactory:machine/ulv/ore_washer" }
 					type: "item"
-					item: "tinactory:machine/ulv/ore_washer"
 				}
 			]
+			x: -2.0d
+			y: 11.0d
 		}
 		{
-			x: 0.0d
-			y: 13.0d
 			dependencies: [
 				"070F82ED30238005"
 				"1DF1F6516600868F"
 			]
 			id: "6EBA694D07E58E72"
-			tasks: [
-				{
-					id: "65AF8B4B6ABA164C"
-					type: "item"
-					item: "tinactory:material/dust/nickel"
-				}
-			]
+			tasks: [{
+				id: "65AF8B4B6ABA164C"
+				item: { count: 1, id: "tinactory:material/dust/nickel" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 13.0d
 		}
 		{
-			x: 2.0d
-			y: 13.0d
 			dependencies: ["1DF1F6516600868F"]
 			id: "36F6E91079CD47B2"
-			tasks: [
-				{
-					id: "51CF4D42AEBC55B6"
-					type: "item"
-					item: "tinactory:machine/ulv/alloy_smelter"
-				}
-			]
+			tasks: [{
+				id: "51CF4D42AEBC55B6"
+				item: { count: 1, id: "tinactory:machine/ulv/alloy_smelter" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 13.0d
 		}
 		{
-			x: -4.0d
-			y: 13.0d
 			dependencies: ["070F82ED30238005"]
 			id: "5B60F443F822A96F"
-			tasks: [
-				{
-					id: "20B43EE906163E08"
-					type: "item"
-					item: "tinactory:material/dust/sulfur"
-				}
-			]
+			tasks: [{
+				id: "20B43EE906163E08"
+				item: { count: 1, id: "tinactory:material/dust/sulfur" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 13.0d
 		}
 		{
-			icon: {id: "tinactory:multiblock/blast_furnace"}
-			x: 0.0d
-			y: 17.0d
 			dependencies: [
 				"7AE6BC52B1A42AE8"
 				"04F63737063FFA5E"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:multiblock/blast_furnace"
+			}
 			id: "1E207E3075739472"
+			size: 2.0d
 			tasks: [
 				{
 					id: "6B8FF60AFCD0E05D"
+					item: { count: 1, id: "tinactory:multiblock/blast_furnace" }
 					type: "item"
-					item: "tinactory:multiblock/blast_furnace"
 				}
 				{
+					count: 16L
 					id: "238075606372E15B"
+					item: { count: 1, id: "tinactory:multiblock/coil/cupronickel" }
 					type: "item"
-					item: "tinactory:multiblock/coil/cupronickel"
-					count: 16L
 				}
 				{
-					id: "4E5DC538BE3D3E69"
-					type: "item"
-					item: "tinactory:multiblock/solid/heatproof"
 					count: 16L
+					id: "4E5DC538BE3D3E69"
+					item: { count: 1, id: "tinactory:multiblock/solid/heatproof" }
+					type: "item"
 				}
 				{
 					id: "642EBCEBAE64CA52"
+					item: { count: 1, id: "tinactory:multiblock/ulv/interface" }
 					type: "item"
-					item: "tinactory:multiblock/ulv/interface"
 				}
 			]
+			x: 0.0d
+			y: 17.0d
 		}
 		{
-			icon: {id: "tinactory:material/ingot/invar"}
-			x: 0.0d
-			y: 15.0d
 			dependencies: [
 				"6EBA694D07E58E72"
 				"36F6E91079CD47B2"
 			]
+			icon: {
+				id: "tinactory:material/ingot/invar"
+			}
 			id: "7AE6BC52B1A42AE8"
 			tasks: [
 				{
 					id: "6D4E7912C5BC638E"
+					item: { count: 1, id: "tinactory:material/ingot/invar" }
 					type: "item"
-					item: "tinactory:material/ingot/invar"
 				}
 				{
 					id: "50E169B96982299A"
+					item: { count: 1, id: "tinactory:material/ingot/cupronickel" }
 					type: "item"
-					item: "tinactory:material/ingot/cupronickel"
 				}
 			]
+			x: 0.0d
+			y: 15.0d
 		}
 		{
+			dependencies: ["0B73A7F9E0645551"]
+			id: "35AFA1FBD784B4D2"
+			size: 2.0d
+			tasks: [{
+				id: "7B774713F00DB381"
+				item: { count: 1, id: "tinactory:logistics/ulv/logistic_worker" }
+				type: "item"
+			}]
 			x: -3.0d
 			y: 9.0d
-			dependencies: ["0B73A7F9E0645551"]
-			size: 2.0d
-			id: "35AFA1FBD784B4D2"
-			tasks: [
-				{
-					id: "7B774713F00DB381"
-					type: "item"
-					item: "tinactory:logistics/ulv/logistic_worker"
-				}
-			]
 		}
 		{
-			icon: {id: "tinactory:network/lv/cable"}
+			dependencies: ["16BF47CD29F96F57"]
+			icon: {
+				id: "tinactory:network/lv/cable"
+			}
+			id: "61E3BD587521AAF2"
+			shape: "pentagon"
+			tasks: [{
+				id: "3ED71FF0218E2F8B"
+				type: "checkmark"
+			}]
 			x: 4.0d
 			y: 9.0d
-			shape: "pentagon"
-			dependencies: ["16BF47CD29F96F57"]
-			id: "61E3BD587521AAF2"
-			tasks: [
-				{
-					id: "3ED71FF0218E2F8B"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			icon: {id: "tinactory:component/lv/conveyor_module"}
+			dependencies: ["35AFA1FBD784B4D2"]
+			icon: {
+				id: "tinactory:component/lv/conveyor_module"
+			}
+			id: "7AD47A6D95AD744E"
+			shape: "pentagon"
+			tasks: [{
+				id: "34D72055101DD93B"
+				type: "checkmark"
+			}]
 			x: -5.0d
 			y: 9.0d
-			shape: "pentagon"
-			dependencies: ["35AFA1FBD784B4D2"]
-			id: "7AD47A6D95AD744E"
-			tasks: [
-				{
-					id: "34D72055101DD93B"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			icon: {id: "minecraft:book"}
+			dependencies: ["6F6EE8943B6B06BC"]
+			icon: {
+				id: "minecraft:book"
+			}
+			id: "5557C2511290CA78"
+			shape: "pentagon"
+			tasks: [{
+				id: "14ADA78EDD6D41C2"
+				type: "checkmark"
+			}]
 			x: 4.0d
 			y: 11.0d
-			shape: "pentagon"
-			dependencies: ["6F6EE8943B6B06BC"]
-			id: "5557C2511290CA78"
-			tasks: [
-				{
-					id: "14ADA78EDD6D41C2"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			icon: {id: "tinactory:machine/ulv/research_bench"}
+			dependencies: ["1DF1F6516600868F"]
+			icon: {
+				id: "tinactory:machine/ulv/research_bench"
+			}
+			id: "361089D5DBD02A97"
+			shape: "pentagon"
+			tasks: [{
+				id: "101389EE911902B9"
+				type: "checkmark"
+			}]
 			x: 4.0d
 			y: 13.0d
-			shape: "pentagon"
-			dependencies: ["1DF1F6516600868F"]
-			id: "361089D5DBD02A97"
-			tasks: [
-				{
-					id: "101389EE911902B9"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			icon: {id: "minecraft:water_bucket"}
+			dependencies: ["70A3BD39E2350A91"]
+			icon: {
+				id: "minecraft:water_bucket"
+			}
+			id: "5D3D592F154FE900"
+			shape: "pentagon"
+			tasks: [{
+				id: "25F798FEF2D03B2F"
+				type: "checkmark"
+			}]
 			x: -3.0d
 			y: 3.5d
-			shape: "pentagon"
-			dependencies: ["70A3BD39E2350A91"]
-			id: "5D3D592F154FE900"
-			tasks: [
-				{
-					id: "25F798FEF2D03B2F"
-					type: "checkmark"
-				}
-			]
 		}
 		{
-			x: -2.0d
-			y: 15.0d
 			dependencies: [
 				"070F82ED30238005"
 				"1DF1F6516600868F"
 			]
 			id: "04F63737063FFA5E"
-			tasks: [
-				{
-					id: "2BE074EE34626987"
-					type: "item"
-					item: "tinactory:material/dust/tin"
-				}
-			]
+			tasks: [{
+				id: "2BE074EE34626987"
+				item: { count: 1, id: "tinactory:material/dust/tin" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 15.0d
 		}
 	]
-	quest_links: []
 }

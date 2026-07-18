@@ -1,515 +1,461 @@
 {
-	id: "06FE0000000000FE"
-	group: ""
-	order_index: 6
-	filename: "06_fusion_era"
-	icon: {id: "tinactory:material/ingot/naquadah"}
-	default_quest_shape: ""
 	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "06_fusion_era"
+	group: ""
+	icon: {
+		id: "tinactory:material/ingot/naquadah"
+	}
+	id: "06FE0000000000FE"
+	order_index: 6
+	quest_links: [ ]
 	quests: [
 		{
-			x: 0.0d
-			y: 0.0d
 			dependencies: [
 				"05A550E7057E0055"
 				"5A4D1E6F0C2B3A10"
 			]
-			size: 2.0d
 			id: "06FE000000000000"
-			tasks: [
-				{
-					id: "06FE000000000100"
-					type: "item"
-					item: "tinactory:material/ingot/naquadah"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "06FE000000000100"
+				item: { count: 1, id: "tinactory:material/ingot/naquadah" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 0.0d
 		}
 		{
-			x: 0.0d
-			y: -2.0d
 			dependencies: ["06FE000000000000"]
 			id: "06FE000000000001"
-			tasks: [
-				{
-					id: "06FE000000000101"
-					type: "item"
-					item: "tinactory:multiblock/coil/naquadah"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000101"
+				item: { count: 1, id: "tinactory:multiblock/coil/naquadah" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: -2.0d
 		}
 		{
-			icon: {id: "tinactory:boule/naquadah"}
-			x: -2.0d
-			y: -2.0d
 			dependencies: ["06FE000000000000"]
+			icon: {
+				id: "tinactory:boule/naquadah"
+			}
 			id: "06FE000000000002"
 			tasks: [
 				{
 					id: "06FE000000000102"
+					item: { count: 1, id: "tinactory:boule/naquadah" }
 					type: "item"
-					item: "tinactory:boule/naquadah"
 				}
 				{
 					id: "06FE000000000103"
+					item: { count: 1, id: "tinactory:wafer_raw/naquadah" }
 					type: "item"
-					item: "tinactory:wafer_raw/naquadah"
 				}
 			]
+			x: -2.0d
+			y: -2.0d
 		}
 		{
-			x: 0.0d
-			y: 6.0d
 			dependencies: [
 				"06FE000000000000"
 				"05A550E7057E0055"
 			]
-			size: 2.0d
 			id: "06FE000000000003"
-			tasks: [
-				{
-					id: "06FE000000000104"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/plasma/activated_naquadah"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "06FE000000000104"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/plasma/activated_naquadah" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 0.0d
+			y: 6.0d
 		}
 		{
-			icon: {id: "tinactory:material/ingot/enriched_naquadah"}
-			x: 2.0d
-			y: 4.0d
 			dependencies: ["06FE000000000003"]
+			icon: {
+				id: "tinactory:material/ingot/enriched_naquadah"
+			}
 			id: "06FE000000000004"
 			tasks: [
 				{
 					id: "06FE000000000105"
+					item: { count: 1, id: "tinactory:material/ingot/enriched_naquadah" }
 					type: "item"
-					item: "tinactory:material/ingot/enriched_naquadah"
 				}
 				{
 					id: "06FE000000000106"
+					item: { count: 1, id: "tinactory:component/enriched_naquadah_fuel_rod" }
 					type: "item"
-					item: "tinactory:component/enriched_naquadah_fuel_rod"
 				}
 			]
+			x: 2.0d
+			y: 4.0d
 		}
 		{
-			x: -4.0d
-			y: 6.0d
 			dependencies: ["06FE000000000003"]
 			id: "06FE000000000005"
-			tasks: [
-				{
-					id: "06FE000000000107"
-					type: "item"
-					item: "tinactory:material/ingot/naquadria"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000107"
+				item: { count: 1, id: "tinactory:material/ingot/naquadria" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 6.0d
 		}
 		{
-			x: 6.0d
-			y: 6.0d
 			dependencies: ["06FE000000000003"]
 			id: "06FE000000000006"
-			tasks: [
-				{
-					id: "06FE000000000108"
-					type: "item"
-					item: "tinactory:material/ingot/trinium"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000108"
+				item: { count: 1, id: "tinactory:material/ingot/trinium" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 6.0d
 		}
 		{
-			icon: {id: "minecraft:ancient_debris"}
-			x: 2.0d
-			y: -2.0d
 			dependencies: ["06FE000000000000"]
+			icon: {
+				id: "minecraft:ancient_debris"
+			}
 			id: "06FE000000000007"
 			tasks: [
 				{
 					id: "06FE000000000109"
+					item: { count: 1, id: "minecraft:ancient_debris" }
 					type: "item"
-					item: "minecraft:ancient_debris"
 				}
 				{
 					id: "06FE00000000010A"
+					item: { count: 1, id: "minecraft:netherite_scrap" }
 					type: "item"
-					item: "minecraft:netherite_scrap"
 				}
 			]
+			x: 2.0d
+			y: -2.0d
 		}
 		{
-			x: 10.0d
-			y: -2.0d
 			dependencies: [
 				"06FE000000000007"
 				"05A550E7057E0055"
 			]
 			id: "06FE000000000008"
-			tasks: [
-				{
-					id: "06FE00000000010B"
-					type: "item"
-					item: "minecraft:netherite_ingot"
-				}
-			]
+			tasks: [{
+				id: "06FE00000000010B"
+				item: { count: 1, id: "minecraft:netherite_ingot" }
+				type: "item"
+			}]
+			x: 10.0d
+			y: -2.0d
 		}
 		{
-			x: 2.0d
-			y: 0.0d
 			dependencies: [
 				"06FE000000000007"
 				"05A550E7057E0011"
 			]
 			id: "06FE000000000009"
-			tasks: [
-				{
-					id: "06FE00000000010C"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/wither_matrix"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "06FE00000000010C"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/wither_matrix" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 2.0d
+			y: 0.0d
 		}
 		{
-			icon: {id: "tinactory:material/seed/nether_star"}
-			x: 2.0d
-			y: 2.0d
 			dependencies: [
 				"06FE000000000004"
 				"06FE000000000009"
 			]
+			icon: {
+				id: "tinactory:material/seed/nether_star"
+			}
 			id: "06FE00000000000A"
 			tasks: [
 				{
 					id: "06FE00000000010D"
+					item: { count: 1, id: "tinactory:material/seed/nether_star" }
 					type: "item"
-					item: "tinactory:material/seed/nether_star"
 				}
 				{
 					id: "06FE00000000010E"
+					item: { count: 1, id: "minecraft:nether_star" }
 					type: "item"
-					item: "minecraft:nether_star"
 				}
 			]
+			x: 2.0d
+			y: 2.0d
 		}
 		{
-			x: 4.0d
-			y: 2.0d
 			dependencies: ["06FE00000000000A"]
 			id: "06FE00000000000B"
-			tasks: [
-				{
-					id: "06FE00000000010F"
-					type: "item"
-					item: "tinactory:component/quantum_star"
-				}
-			]
+			tasks: [{
+				id: "06FE00000000010F"
+				item: { count: 1, id: "tinactory:component/quantum_star" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:circuit_component/resistor/advanced_smd"}
-			x: -2.0d
-			y: 2.0d
 			dependencies: [
 				"06FE000000000000"
 				"05A550E7057E0043"
 				"06FE000000000012"
 			]
+			icon: {
+				id: "tinactory:circuit_component/resistor/advanced_smd"
+			}
 			id: "06FE00000000000C"
 			tasks: [
 				{
 					id: "06FE000000000110"
+					item: { count: 1, id: "tinactory:circuit_component/resistor/advanced_smd" }
 					type: "item"
-					item: "tinactory:circuit_component/resistor/advanced_smd"
 				}
 				{
 					id: "06FE000000000111"
+					item: { count: 1, id: "tinactory:circuit_component/capacitor/advanced_smd" }
 					type: "item"
-					item: "tinactory:circuit_component/capacitor/advanced_smd"
 				}
 				{
 					id: "06FE000000000112"
+					item: { count: 1, id: "tinactory:circuit_component/inductor/advanced_smd" }
 					type: "item"
-					item: "tinactory:circuit_component/inductor/advanced_smd"
 				}
 				{
 					id: "06FE000000000113"
+					item: { count: 1, id: "tinactory:circuit_component/diode/advanced_smd" }
 					type: "item"
-					item: "tinactory:circuit_component/diode/advanced_smd"
 				}
 				{
 					id: "06FE000000000114"
+					item: { count: 1, id: "tinactory:circuit_component/transistor/advanced_smd" }
 					type: "item"
-					item: "tinactory:circuit_component/transistor/advanced_smd"
 				}
 			]
+			x: -2.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:wafer/soc"}
-			x: -4.0d
-			y: -2.0d
 			dependencies: [
 				"06FE000000000002"
 				"05A550E7057E0013"
 			]
+			icon: {
+				id: "tinactory:wafer/soc"
+			}
 			id: "06FE00000000000D"
 			tasks: [
 				{
 					id: "06FE000000000115"
+					item: { count: 1, id: "tinactory:wafer/soc" }
 					type: "item"
-					item: "tinactory:wafer/soc"
 				}
 				{
 					id: "06FE000000000116"
+					item: { count: 1, id: "tinactory:wafer/high_pic" }
 					type: "item"
-					item: "tinactory:wafer/high_pic"
 				}
 			]
+			x: -4.0d
+			y: -2.0d
 		}
 		{
-			x: 6.0d
-			y: 0.0d
 			dependencies: [
 				"06FE000000000006"
 				"06FE000000000009"
 			]
 			id: "06FE00000000000E"
-			tasks: [
-				{
-					id: "06FE000000000118"
-					type: "item"
-					item: "tinactory:component/raw_crystal_chip"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000118"
+				item: { count: 1, id: "tinactory:component/raw_crystal_chip" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 0.0d
 		}
 		{
-			x: 8.0d
-			y: 0.0d
 			dependencies: ["06FE00000000000E"]
 			id: "06FE00000000000F"
-			tasks: [
-				{
-					id: "06FE000000000119"
-					type: "item"
-					item: "tinactory:component/crystal_cpu"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000119"
+				item: { count: 1, id: "tinactory:component/crystal_cpu" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 0.0d
 		}
 		{
-			x: 6.0d
-			y: 8.0d
-			hide_dependency_lines: true
 			dependencies: [
 				"06FE00000000000C"
 				"06FE00000000000F"
 			]
-			size: 2.0d
+			hide_dependency_lines: true
 			id: "06FE000000000010"
-			tasks: [
-				{
-					id: "06FE00000000011A"
-					type: "item"
-					item: "tinactory:circuit/crystal_processor"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "06FE00000000011A"
+				item: { count: 1, id: "tinactory:circuit/crystal_processor" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 8.0d
 		}
 		{
-			x: 6.0d
-			y: 10.0d
 			dependencies: ["06FE000000000010"]
 			id: "06FE000000000011"
-			tasks: [
-				{
-					id: "06FE00000000011B"
-					type: "item"
-					item: "tinactory:circuit/crystal_assembly"
-				}
-			]
+			tasks: [{
+				id: "06FE00000000011B"
+				item: { count: 1, id: "tinactory:circuit/crystal_assembly" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 10.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/indium"}
-			x: -4.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E0043"]
+			icon: {
+				id: "tinactory:material/dust/indium"
+			}
 			id: "06FE000000000012"
 			tasks: [
 				{
 					id: "06FE00000000011C"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/indium_concentrate"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/indium_concentrate" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 				{
 					id: "06FE00000000011D"
+					item: { count: 1, id: "tinactory:material/dust/indium" }
 					type: "item"
-					item: "tinactory:material/dust/indium"
 				}
 			]
+			x: -4.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "tinactory:material/ingot/samarium"}
-			x: 12.0d
-			y: 0.0d
 			dependencies: ["05A550E7057E0043"]
+			icon: {
+				id: "tinactory:material/ingot/samarium"
+			}
 			id: "06FE000000000013"
 			tasks: [
 				{
 					id: "06FE00000000011E"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/heavy_rare_earth_solution"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/heavy_rare_earth_solution" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 				{
 					id: "06FE00000000011F"
+					item: { count: 1, id: "tinactory:material/ingot/samarium" }
 					type: "item"
-					item: "tinactory:material/ingot/samarium"
 				}
 			]
+			x: 12.0d
+			y: 0.0d
 		}
 		{
-			x: 12.0d
-			y: 2.0d
 			dependencies: ["06FE000000000013"]
 			id: "06FE000000000014"
-			tasks: [
-				{
-					id: "06FE000000000120"
-					type: "item"
-					item: "tinactory:material/dust/yttrium"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000120"
+				item: { count: 1, id: "tinactory:material/dust/yttrium" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 2.0d
 		}
 		{
-			x: 14.0d
-			y: 2.0d
 			dependencies: ["05A550E7057E0043"]
 			id: "06FE000000000015"
-			tasks: [
-				{
-					id: "06FE000000000121"
-					type: "item"
-					item: "tinactory:material/dust/barium"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000121"
+				item: { count: 1, id: "tinactory:material/dust/barium" }
+				type: "item"
+			}]
+			x: 14.0d
+			y: 2.0d
 		}
 		{
-			x: 12.0d
-			y: 4.0d
 			dependencies: [
 				"06FE000000000014"
 				"06FE000000000015"
 			]
 			id: "06FE000000000016"
-			tasks: [
-				{
-					id: "06FE000000000122"
-					type: "item"
-					item: "tinactory:material/wire/yttrium_barium_cuprate"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000122"
+				item: { count: 1, id: "tinactory:material/wire/yttrium_barium_cuprate" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 4.0d
 		}
 		{
-			x: 14.0d
-			y: 4.0d
 			dependencies: [
 				"4BC5CC00BBABBC80"
 				"56D39B7C7922E621"
 			]
 			id: "06FE000000000017"
-			tasks: [
-				{
-					id: "06FE000000000123"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/nitrogen"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000123"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/nitrogen" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 14.0d
+			y: 4.0d
 		}
 		{
-			icon: {id: "tinactory:material/ingot/hsss"}
-			x: 10.0d
-			y: 6.0d
 			dependencies: [
 				"06FE000000000006"
 				"06FE000000000008"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:material/ingot/hsss"
+			}
 			id: "06FE000000000018"
+			size: 2.0d
 			tasks: [
 				{
 					id: "06FE000000000124"
+					item: { count: 1, id: "tinactory:material/ingot/hsss" }
 					type: "item"
-					item: "tinactory:material/ingot/hsss"
 				}
 				{
 					id: "06FE000000000125"
+					item: { count: 1, id: "tinactory:material/ingot/osmiridium" }
 					type: "item"
-					item: "tinactory:material/ingot/osmiridium"
 				}
 				{
 					id: "06FE000000000126"
+					item: { count: 1, id: "tinactory:material/ingot/naquadah_alloy" }
 					type: "item"
-					item: "tinactory:material/ingot/naquadah_alloy"
 				}
 			]
+			x: 10.0d
+			y: 6.0d
 		}
 		{
-			x: 12.0d
-			y: 6.0d
 			dependencies: [
 				"06FE000000000016"
 				"06FE000000000017"
 				"06FE000000000018"
 			]
 			id: "06FE000000000019"
-			tasks: [
-				{
-					id: "06FE000000000127"
-					type: "item"
-					item: "tinactory:material/wire/luv_superconductor"
-				}
-			]
+			tasks: [{
+				id: "06FE000000000127"
+				item: { count: 1, id: "tinactory:material/wire/luv_superconductor" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 6.0d
 		}
 	]
-	quest_links: []
 }

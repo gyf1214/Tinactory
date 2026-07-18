@@ -19,6 +19,7 @@
 	chapter.4E10B8DB9F33643B.title: "Industry from Zero"
 	chapter.7F7BFA5025452CE4.chapter_subtitle: ["Start MV: build a Distillation Tower and Vacuum Freezer, enter chemistry, etch CPU wafers, and make a CPU board."]
 	chapter.7F7BFA5025452CE4.title: "Chem and Circuits"
+	file.0000000000000001.title: "Tinactory"
 	quest.0022A8ABF3D58C41.quest_desc: [
 		"The Calculation Processor is the compute core for higher-tier Craft CPUs. It moves autocrafting from sending requests toward handling longer execution queues."
 		""

@@ -1,671 +1,564 @@
 {
-	id: "1552B98C4F286D86"
-	group: ""
-	order_index: 4
-	filename: "04_extreme_voltage"
-	icon: {id: "tinactory:component/iv/electric_pump"}
-	default_quest_shape: ""
 	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "04_extreme_voltage"
+	group: ""
+	icon: {
+		id: "tinactory:component/iv/electric_pump"
+	}
+	id: "1552B98C4F286D86"
+	order_index: 4
+	quest_links: [ ]
 	quests: [
 		{
-			icon: {id: "minecraft:netherrack"}
-			x: 0.0d
-			y: 0.0d
 			dependencies: ["3A37204C020F5B2C"]
-			size: 2.0d
+			icon: {
+				id: "minecraft:netherrack"
+			}
 			id: "46C15B5CA52BBB56"
+			size: 2.0d
 			tasks: [
 				{
 					id: "2CE813177769CA05"
+					item: { count: 1, id: "tinactory:machine/hv/stone_generator" }
 					type: "item"
-					item: "tinactory:machine/hv/stone_generator"
 				}
 				{
 					id: "60D997BBB82F3389"
+					item: { count: 1, id: "minecraft:netherrack" }
 					type: "item"
-					item: "minecraft:netherrack"
 				}
 				{
 					id: "2F9C6F62A39B33D0"
+					item: { count: 1, id: "tinactory:machine/hv/ore_analyzer" }
 					type: "item"
-					item: "tinactory:machine/hv/ore_analyzer"
 				}
 			]
+			x: 0.0d
+			y: 0.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/certus_quartz"}
-			x: 0.0d
-			y: -2.0d
 			dependencies: ["46C15B5CA52BBB56"]
+			icon: {
+				id: "tinactory:material/dust/certus_quartz"
+			}
 			id: "756F380B2118DD7F"
 			tasks: [
 				{
 					id: "172DF6DABE273B6F"
+					item: { count: 1, id: "tinactory:material/dust/certus_quartz" }
 					type: "item"
-					item: "tinactory:material/dust/certus_quartz"
 				}
 				{
 					id: "23EC33FAEC6CF23C"
+					item: { count: 1, id: "tinactory:material/dust/nether_quartz" }
 					type: "item"
-					item: "tinactory:material/dust/nether_quartz"
 				}
 			]
+			x: 0.0d
+			y: -2.0d
 		}
 		{
-			x: -2.0d
-			y: -2.0d
 			dependencies: ["46C15B5CA52BBB56"]
 			id: "74F77E09DA51F48F"
-			tasks: [
-				{
-					id: "6320DD50271FC37D"
-					type: "item"
-					item: "tinactory:multiblock/autoclave"
-				}
-			]
+			tasks: [{
+				id: "6320DD50271FC37D"
+				item: { count: 1, id: "tinactory:multiblock/autoclave" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: -2.0d
 		}
 		{
-			x: 0.0d
-			y: -4.0d
 			dependencies: [
 				"756F380B2118DD7F"
 				"74F77E09DA51F48F"
 			]
 			id: "77F50D58EF027BF0"
-			tasks: [
-				{
-					id: "0A7B0E21C9053A7A"
-					type: "item"
-					item: "tinactory:material/seed/certus_quartz"
-				}
-			]
+			tasks: [{
+				id: "0A7B0E21C9053A7A"
+				item: { count: 1, id: "tinactory:material/seed/certus_quartz" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: -4.0d
 		}
 		{
-			x: 2.0d
-			y: -2.0d
 			dependencies: ["756F380B2118DD7F"]
 			id: "7696374781756109"
-			tasks: [
-				{
-					id: "5A1EA8BDBB2FB07D"
-					type: "item"
-					item: "tinactory:material/dust/fluix"
-				}
-			]
+			tasks: [{
+				id: "5A1EA8BDBB2FB07D"
+				item: { count: 1, id: "tinactory:material/dust/fluix" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: -2.0d
 		}
 		{
-			x: 2.0d
-			y: -4.0d
 			dependencies: [
 				"77F50D58EF027BF0"
 				"7696374781756109"
 			]
 			id: "662483EF1D1C66F5"
-			tasks: [
-				{
-					id: "7E33A3A6D6A2E86C"
-					type: "item"
-					item: "tinactory:material/seed/fluix"
-				}
-			]
+			tasks: [{
+				id: "7E33A3A6D6A2E86C"
+				item: { count: 1, id: "tinactory:material/seed/fluix" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: -4.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/topaz"}
-			x: 0.0d
-			y: 2.0d
 			dependencies: ["46C15B5CA52BBB56"]
+			icon: {
+				id: "tinactory:material/dust/topaz"
+			}
 			id: "182DCD33318D27DF"
 			tasks: [
 				{
 					id: "2C8FEDE4222EF045"
+					item: { count: 1, id: "tinactory:material/dust/topaz" }
 					type: "item"
-					item: "tinactory:material/dust/topaz"
 				}
 				{
 					id: "2582015F034C8B06"
+					item: { count: 1, id: "tinactory:material/dust/blue_topaz" }
 					type: "item"
-					item: "tinactory:material/dust/blue_topaz"
 				}
 			]
+			x: 0.0d
+			y: 2.0d
 		}
 		{
-			icon: {id: "minecraft:lava_bucket"}
-			x: -2.0d
-			y: 2.0d
 			dependencies: ["46C15B5CA52BBB56"]
+			icon: {
+				id: "minecraft:lava_bucket"
+			}
 			id: "0F875BA74B75405A"
 			tasks: [
 				{
 					id: "6B9710E5205623C2"
+					item: { count: 1, id: "minecraft:magma_block" }
 					type: "item"
-					item: "minecraft:magma_block"
 				}
 				{
 					id: "5A67F346104F8578"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "minecraft:lava"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "minecraft:lava" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 			]
+			x: -2.0d
+			y: 2.0d
 		}
 		{
-			x: -2.0d
-			y: 4.0d
 			dependencies: ["0F875BA74B75405A"]
 			id: "3E72DFCA89D79EAD"
-			tasks: [
-				{
-					id: "60B970B8FF23A6EE"
-					type: "item"
-					item: "minecraft:obsidian"
-				}
-			]
+			tasks: [{
+				id: "60B970B8FF23A6EE"
+				item: { count: 1, id: "minecraft:obsidian" }
+				type: "item"
+			}]
+			x: -2.0d
+			y: 4.0d
 		}
 		{
-			x: 0.0d
-			y: 4.0d
 			dependencies: ["182DCD33318D27DF"]
 			id: "3BD5E7B3FBD1C438"
-			tasks: [
-				{
-					id: "7FD844865F9F60B5"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/gas/hydrogen_fluoride"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "7FD844865F9F60B5"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/hydrogen_fluoride" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 0.0d
+			y: 4.0d
 		}
 		{
-			icon: {id: "tinactory:material/pipe/polytetrafluoro_ethylene"}
-			x: 0.0d
-			y: 6.0d
 			dependencies: ["3BD5E7B3FBD1C438"]
+			icon: {
+				id: "tinactory:material/pipe/polytetrafluoro_ethylene"
+			}
 			id: "0D522F211E92F89B"
 			tasks: [
 				{
 					id: "2710E57133302C4A"
+					item: { count: 1, id: "tinactory:material/sheet/polytetrafluoro_ethylene" }
 					type: "item"
-					item: "tinactory:material/sheet/polytetrafluoro_ethylene"
 				}
 				{
 					id: "0B97E98E9F578427"
+					item: { count: 1, id: "tinactory:material/pipe/polytetrafluoro_ethylene" }
 					type: "item"
-					item: "tinactory:material/pipe/polytetrafluoro_ethylene"
 				}
 			]
+			x: 0.0d
+			y: 6.0d
 		}
 		{
+			dependencies: ["0D522F211E92F89B"]
+			id: "378E7D2AD50D6C50"
+			size: 2.0d
+			tasks: [{
+				id: "4E5C8F682C2644E8"
+				item: { count: 1, id: "tinactory:multiblock/large_chemical_reactor" }
+				type: "item"
+			}]
 			x: 0.0d
 			y: 8.0d
-			dependencies: ["0D522F211E92F89B"]
-			size: 2.0d
-			id: "378E7D2AD50D6C50"
-			tasks: [
-				{
-					id: "4E5C8F682C2644E8"
-					type: "item"
-					item: "tinactory:multiblock/large_chemical_reactor"
-				}
-			]
 		}
 		{
-			x: -2.0d
-			y: 8.0d
 			dependencies: ["378E7D2AD50D6C50"]
 			id: "7E351C201E3FE985"
-			tasks: [
-				{
-					id: "684CE569A359D3AA"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/molten/raw_styrene_butadiene_rubber"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "684CE569A359D3AA"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/molten/raw_styrene_butadiene_rubber" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -2.0d
+			y: 8.0d
 		}
 		{
-			icon: {id: "tinactory:material/foil/silicone_rubber"}
-			x: 2.0d
-			y: 8.0d
 			dependencies: ["378E7D2AD50D6C50"]
+			icon: {
+				id: "tinactory:material/foil/silicone_rubber"
+			}
 			id: "645CBB8D8FE85012"
 			tasks: [
 				{
 					id: "656FCCB57A385FA3"
+					item: { count: 1, id: "tinactory:material/dust/polydimethyl_siloxane" }
 					type: "item"
-					item: "tinactory:material/dust/polydimethyl_siloxane"
 				}
 				{
 					id: "10AD6C96CFC4FDA8"
+					item: { count: 1, id: "tinactory:material/foil/silicone_rubber" }
 					type: "item"
-					item: "tinactory:material/foil/silicone_rubber"
 				}
 			]
+			x: 2.0d
+			y: 8.0d
 		}
 		{
+			dependencies: ["378E7D2AD50D6C50"]
 			icon: {
-				id: "tinactory:tool/fluid_cell/iron"
 				components: {
 					"tinactory:fluid_cell_content": {
-						id: "tinactory:material/liquid/phenol"
 						amount: 4000
+						id: "tinactory:material/liquid/phenol"
 					}
 				}
+				id: "tinactory:tool/fluid_cell/iron"
 			}
-			x: 2.0d
-			y: 10.0d
-			dependencies: ["378E7D2AD50D6C50"]
 			id: "2A41C0F4C70E1293"
 			tasks: [
 				{
 					id: "22A7083D709D239B"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/phenol"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/phenol" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 				{
 					id: "6D06B8C0A5E75172"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/acetone"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/acetone" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 			]
+			x: 2.0d
+			y: 10.0d
 		}
 		{
-			x: -2.0d
-			y: 10.0d
 			dependencies: ["378E7D2AD50D6C50"]
 			id: "12D6316F28C15A03"
-			tasks: [
-				{
-					id: "4F85D22EC1D68B38"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/epichlorohydrin"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "4F85D22EC1D68B38"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/epichlorohydrin" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -2.0d
+			y: 10.0d
 		}
 		{
-			icon: {id: "tinactory:material/sheet/epoxy"}
-			x: 0.0d
-			y: 12.0d
 			dependencies: [
 				"2A41C0F4C70E1293"
 				"12D6316F28C15A03"
 			]
-			size: 2.0d
+			icon: {
+				id: "tinactory:material/sheet/epoxy"
+			}
 			id: "0F38B05E2E11756A"
+			size: 2.0d
 			tasks: [
 				{
 					id: "13F7B5157711D67E"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/molten/epoxy"
-								amount: 4000
-							}
-						}
-					}
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/molten/epoxy" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
 					match_components: "fuzzy"
+					type: "item"
 				}
 				{
 					id: "0A6DB073CB709457"
+					item: { count: 1, id: "tinactory:material/sheet/epoxy" }
 					type: "item"
-					item: "tinactory:material/sheet/epoxy"
 				}
 			]
+			x: 0.0d
+			y: 12.0d
 		}
 		{
-			icon: {id: "tinactory:component/carbon_fiber"}
-			x: 4.0d
-			y: 10.0d
 			dependencies: [
 				"56D30433BF43D996"
 				"46F8F26339555C62"
 			]
+			icon: {
+				id: "tinactory:component/carbon_fiber"
+			}
 			id: "3B40E5106A3F53F1"
 			tasks: [
 				{
 					id: "79284BE77C62ED10"
+					item: { count: 1, id: "tinactory:material/ingot/carbon" }
 					type: "item"
-					item: "tinactory:material/ingot/carbon"
 				}
 				{
 					id: "5A24C3F991184B24"
+					item: { count: 1, id: "tinactory:component/carbon_fiber" }
 					type: "item"
-					item: "tinactory:component/carbon_fiber"
 				}
 			]
+			x: 4.0d
+			y: 10.0d
 		}
 		{
-			icon: {id: "tinactory:component/carbon_plate"}
-			x: 4.0d
-			y: 12.0d
 			dependencies: [
 				"0F38B05E2E11756A"
 				"3B40E5106A3F53F1"
 			]
+			icon: {
+				id: "tinactory:component/carbon_plate"
+			}
 			id: "1DA662F6D90438AB"
 			tasks: [
 				{
 					id: "22BDD789AF84E5CB"
+					item: { count: 1, id: "tinactory:component/carbon_mesh" }
 					type: "item"
-					item: "tinactory:component/carbon_mesh"
 				}
 				{
 					id: "5B301E3F45469D08"
+					item: { count: 1, id: "tinactory:component/carbon_plate" }
 					type: "item"
-					item: "tinactory:component/carbon_plate"
 				}
 			]
+			x: 4.0d
+			y: 12.0d
 		}
 		{
-			icon: {id: "tinactory:component/ev/machine_hull"}
-			x: 4.0d
-			y: 8.0d
 			dependencies: [
 				"645CBB8D8FE85012"
 				"61B9D2ACAF1C5D38"
 			]
+			icon: {
+				id: "tinactory:component/ev/machine_hull"
+			}
 			id: "6885F61C806D96E5"
 			tasks: [
 				{
 					id: "602AAF86116609F2"
+					item: { count: 1, id: "tinactory:network/ev/cable" }
 					type: "item"
-					item: "tinactory:network/ev/cable"
 				}
 				{
 					id: "2BCEF5C59B954718"
+					item: { count: 1, id: "tinactory:component/ev/machine_hull" }
 					type: "item"
-					item: "tinactory:component/ev/machine_hull"
 				}
 			]
+			x: 4.0d
+			y: 8.0d
 		}
 		{
-			x: 6.0d
-			y: 8.0d
 			dependencies: ["6885F61C806D96E5"]
 			id: "6D4396F046AC59FA"
-			tasks: [
-				{
-					id: "09F50AB90C269FB0"
-					type: "item"
-					item: "tinactory:machine/ev/assembler"
-				}
-			]
+			tasks: [{
+				id: "09F50AB90C269FB0"
+				item: { count: 1, id: "tinactory:machine/ev/assembler" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 8.0d
 		}
 		{
-			x: 2.0d
-			y: 0.0d
 			dependencies: ["46C15B5CA52BBB56"]
 			id: "21E237DEB81D960E"
-			tasks: [
-				{
-					id: "1E3DC9B5A75EBDF2"
-					type: "item"
-					item: "tinactory:material/dust/tungstate"
-				}
-			]
+			tasks: [{
+				id: "1E3DC9B5A75EBDF2"
+				item: { count: 1, id: "tinactory:material/dust/tungstate" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 0.0d
 		}
 		{
-			x: 4.0d
-			y: 0.0d
 			dependencies: ["21E237DEB81D960E"]
 			id: "4E8E2AA5D4AAF81E"
-			tasks: [
-				{
-					id: "64AECF2298B7CD22"
-					type: "item"
-					item: "tinactory:material/dust/tungsten_trioxide"
-				}
-			]
+			tasks: [{
+				id: "64AECF2298B7CD22"
+				item: { count: 1, id: "tinactory:material/dust/tungsten_trioxide" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 0.0d
 		}
 		{
-			x: 6.0d
-			y: 0.0d
 			dependencies: ["4E8E2AA5D4AAF81E"]
 			id: "330CE0C6D92F38F2"
-			tasks: [
-				{
-					id: "40D6627359C944CA"
-					type: "item"
-					item: "tinactory:material/ingot/tungsten"
-				}
-			]
+			tasks: [{
+				id: "40D6627359C944CA"
+				item: { count: 1, id: "tinactory:material/ingot/tungsten" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 0.0d
 		}
 		{
-			x: 8.0d
-			y: 0.0d
 			dependencies: ["330CE0C6D92F38F2"]
 			id: "09CB7C63AE45690A"
-			tasks: [
-				{
-					id: "01122A97337F3568"
-					type: "item"
-					item: "tinactory:material/ingot/tungsten_steel"
-				}
-			]
+			tasks: [{
+				id: "01122A97337F3568"
+				item: { count: 1, id: "tinactory:material/ingot/tungsten_steel" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 0.0d
 		}
 		{
-			icon: {id: "tinactory:material/dust/neodymium"}
-			x: 4.0d
-			y: 4.0d
 			dependencies: ["30CEEE3CBC4AA11A"]
+			icon: {
+				id: "tinactory:material/dust/neodymium"
+			}
 			id: "1EDE3A566356F600"
 			tasks: [
 				{
 					id: "6EB15AF9231FF9A6"
+					item: { count: 1, id: "tinactory:material/dust/cadmium" }
 					type: "item"
-					item: "tinactory:material/dust/cadmium"
 				}
 				{
 					id: "05D4588060EB1CD6"
+					item: { count: 1, id: "tinactory:material/dust/neodymium" }
 					type: "item"
-					item: "tinactory:material/dust/neodymium"
 				}
 			]
+			x: 4.0d
+			y: 4.0d
 		}
 		{
-			x: 6.0d
-			y: 6.0d
 			dependencies: ["1EDE3A566356F600"]
 			id: "6ECD29DDE2637A82"
-			tasks: [
-				{
-					id: "21107D967F8EBB0C"
-					type: "item"
-					item: "tinactory:material/magnetic/neodymium"
-				}
-			]
+			tasks: [{
+				id: "21107D967F8EBB0C"
+				item: { count: 1, id: "tinactory:material/magnetic/neodymium" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 6.0d
 		}
 		{
-			x: 6.0d
-			y: 10.0d
 			dependencies: ["108DE34B8777351F"]
 			id: "55C4BF2F153D12A2"
-			tasks: [
-				{
-					id: "7CB678EE1B4A9878"
-					type: "item"
-					item: "tinactory:material/wire/annealed_copper"
-				}
-			]
+			tasks: [{
+				id: "7CB678EE1B4A9878"
+				item: { count: 1, id: "tinactory:material/wire/annealed_copper" }
+				type: "item"
+			}]
+			x: 6.0d
+			y: 10.0d
 		}
 		{
-			x: -2.0d
-			y: 16.0d
 			dependencies: ["07515AD71E8B26EF"]
 			id: "1839DA1403560DB3"
-			tasks: [
-				{
-					id: "40C01BE1DA394F53"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/fluid/lpg"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "40C01BE1DA394F53"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/lpg" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -2.0d
+			y: 16.0d
 		}
 		{
-			x: -2.0d
-			y: 14.0d
 			dependencies: [
 				"4BC5CC00BBABBC80"
 				"52D537C7D3268C67"
 			]
 			id: "7F568D268CA544F6"
-			tasks: [
-				{
-					id: "016E65A3D7D38AF7"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/oxygen"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "016E65A3D7D38AF7"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/oxygen" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -2.0d
+			y: 14.0d
 		}
 		{
-			x: 0.0d
-			y: 16.0d
 			dependencies: [
 				"1839DA1403560DB3"
 				"7F568D268CA544F6"
 			]
 			id: "0B17D0A26F286ACA"
-			tasks: [
-				{
-					id: "35A3FE06E5C9BE85"
-					type: "item"
-					item: {
-						id: "tinactory:tool/fluid_cell/iron"
-						components: {
-							"tinactory:fluid_cell_content": {
-								id: "tinactory:material/liquid/rocket_fuel"
-								amount: 4000
-							}
-						}
-					}
-					match_components: "fuzzy"
-				}
-			]
+			tasks: [{
+				id: "35A3FE06E5C9BE85"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/rocket_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 0.0d
+			y: 16.0d
 		}
 		{
-			x: 8.0d
-			y: 8.0d
 			dependencies: [
 				"09CB7C63AE45690A"
 				"6ECD29DDE2637A82"
 				"55C4BF2F153D12A2"
 				"6D4396F046AC59FA"
 			]
-			size: 2.0d
 			id: "54189E058A630417"
-			tasks: [
-				{
-					id: "400682BB41B108AA"
-					type: "item"
-					item: "tinactory:component/iv/electric_motor"
-				}
-			]
+			size: 2.0d
+			tasks: [{
+				id: "400682BB41B108AA"
+				item: { count: 1, id: "tinactory:component/iv/electric_motor" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 8.0d
 		}
 		{
-			x: 8.0d
-			y: 12.0d
 			dependencies: ["54189E058A630417"]
 			id: "0D7A901319FE3E62"
-			tasks: [
-				{
-					id: "53AD07135F7BCC67"
-					type: "item"
-					item: "tinactory:component/iv/electric_pump"
-				}
-			]
+			tasks: [{
+				id: "53AD07135F7BCC67"
+				item: { count: 1, id: "tinactory:component/iv/electric_pump" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 12.0d
 		}
 		{
-			x: 8.0d
-			y: 16.0d
 			dependencies: ["54D61C6A8BA84D5D"]
 			id: "1D933C575C5519B5"
-			tasks: [
-				{
-					id: "6B23623D91F637BA"
-					type: "item"
-					item: {
-						id: "ftbfiltersystem:smart_filter"
-						count: 1
-						components: {
-							"ftbfiltersystem:filter": "ftbfiltersystem:item_tag(tinactory:circuit/iv)"
-						}
-					}
-				}
-			]
+			tasks: [{
+				id: "6B23623D91F637BA"
+				item: { components: { "ftbfiltersystem:filter": "ftbfiltersystem:item_tag(tinactory:circuit/iv)" }, count: 1, id: "ftbfiltersystem:smart_filter" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 16.0d
 		}
 		{
-			x: 4.0d
-			y: 16.0d
 			dependencies: [
 				"1DA662F6D90438AB"
 				"0B17D0A26F286ACA"
@@ -674,20 +567,21 @@
 				"1E73498504A1B6C4"
 				"2C0BDC359D181269"
 			]
-			size: 2.0d
 			id: "15A12C982E065F64"
-			tasks: [
-				{
-					id: "433A0522B2F3010E"
-					type: "custom"
-					icon: {id: "minecraft:end_portal_frame"}
-					tags: [
-						"tinactory_technology"
-						"tinactory_technology_tinactory_rocket_t2"
-					]
+			size: 2.0d
+			tasks: [{
+				icon: {
+					id: "minecraft:end_portal_frame"
 				}
-			]
+				id: "433A0522B2F3010E"
+				tags: [
+					"tinactory_technology"
+					"tinactory_technology_tinactory_rocket_t2"
+				]
+				type: "custom"
+			}]
+			x: 4.0d
+			y: 16.0d
 		}
 	]
-	quest_links: []
 }

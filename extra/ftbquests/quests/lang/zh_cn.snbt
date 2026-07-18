@@ -19,6 +19,7 @@
 	chapter.4E10B8DB9F33643B.title: "从零开始的工业梦"
 	chapter.7F7BFA5025452CE4.chapter_subtitle: ["从中压起步，建造蒸馏塔与真空冷冻机，迈向化工时代；在超净间中刻蚀CPU晶圆，完成第一块CPU电路板。"]
 	chapter.7F7BFA5025452CE4.title: "化工与电子交织"
+	file.0000000000000001.title: "Tinactory"
 	quest.0022A8ABF3D58C41.quest_desc: [
 		"运算处理器是更高阶合成CPU的计算核心。它把自动合成从能发出请求，推进到能承载更复杂的执行队列。"
 		""
