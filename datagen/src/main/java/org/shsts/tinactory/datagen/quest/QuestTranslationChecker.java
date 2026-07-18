@@ -27,9 +27,10 @@ public final class QuestTranslationChecker {
     private static final Path PROJECT_ROOT = Path.of(System.getProperty(PROJECT_ROOT_PROPERTY, "."));
     private static final Path CHAPTERS_PATH = PROJECT_ROOT.resolve("extra/ftbquests/quests/chapters");
     private static final Path LANG_PATH = PROJECT_ROOT.resolve("extra/ftbquests/quests/lang");
+    private static final QuestObject QUEST_FILE = new QuestObject("file", "0000000000000001");
     private static final Pattern OBJECT_ID = Pattern.compile("[0-9A-F]{16}");
     private static final Pattern TRANSLATION_KEY =
-        Pattern.compile("(chapter|quest|task|reward)[.]([0-9A-F]{16})[.]([a-z_]+)");
+        Pattern.compile("(chapter|file|quest|task|reward)[.]([0-9A-F]{16})[.]([a-z_]+)");
     private static final Set<String> SUPPORTED_TRANSLATION_KEYS =
         Set.of("title", "quest_subtitle", "quest_desc", "chapter_subtitle");
     private static final Set<String> LOCALES = Set.of("zh_cn", "en_us");
@@ -49,6 +50,8 @@ public final class QuestTranslationChecker {
     }
 
     private void run() throws IOException {
+        questObjects.add(QUEST_FILE);
+        objectIds.add(QUEST_FILE.id());
         for (var path : listChapters()) {
             processChapter(path);
         }
@@ -137,6 +140,9 @@ public final class QuestTranslationChecker {
         checkObjectId(locale + ":" + key, objectId);
         if (!SUPPORTED_TRANSLATION_KEYS.contains(translationKey)) {
             errors.add("Unsupported " + locale + " FTB quest translation key: " + key);
+        }
+        if (objectType.equals("file") && !translationKey.equals("title")) {
+            errors.add("Unsupported " + locale + " FTB quest file translation key: " + key);
         }
         if (!questObjects.contains(new QuestObject(objectType, objectId))) {
             errors.add("Stale " + locale + " FTB quest translation key for missing object: " + key);
