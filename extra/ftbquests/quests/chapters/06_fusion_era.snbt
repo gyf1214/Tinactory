@@ -3,7 +3,7 @@
 	group: ""
 	order_index: 6
 	filename: "06_fusion_era"
-	icon: "tinactory:material/ingot/naquadah"
+	icon: {id: "tinactory:material/ingot/naquadah"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
@@ -38,7 +38,7 @@
 			]
 		}
 		{
-			icon: "tinactory:boule/naquadah"
+			icon: {id: "tinactory:boule/naquadah"}
 			x: -2.0d
 			y: -2.0d
 			dependencies: ["06FE000000000000"]
@@ -71,11 +71,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/plasma/activated_naquadah"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/plasma/activated_naquadah"
+								amount: 4000
 							}
 						}
 					}
@@ -84,7 +83,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/ingot/enriched_naquadah"
+			icon: {id: "tinactory:material/ingot/enriched_naquadah"}
 			x: 2.0d
 			y: 4.0d
 			dependencies: ["06FE000000000003"]
@@ -129,7 +128,7 @@
 			]
 		}
 		{
-			icon: "minecraft:ancient_debris"
+			icon: {id: "minecraft:ancient_debris"}
 			x: 2.0d
 			y: -2.0d
 			dependencies: ["06FE000000000000"]
@@ -177,11 +176,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/wither_matrix"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/wither_matrix"
+								amount: 4000
 							}
 						}
 					}
@@ -190,7 +188,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/seed/nether_star"
+			icon: {id: "tinactory:material/seed/nether_star"}
 			x: 2.0d
 			y: 2.0d
 			dependencies: [
@@ -225,7 +223,7 @@
 			]
 		}
 		{
-			icon: "tinactory:circuit_component/resistor/advanced_smd"
+			icon: {id: "tinactory:circuit_component/resistor/advanced_smd"}
 			x: -2.0d
 			y: 2.0d
 			dependencies: [
@@ -263,7 +261,7 @@
 			]
 		}
 		{
-			icon: "tinactory:wafer/soc"
+			icon: {id: "tinactory:wafer/soc"}
 			x: -4.0d
 			y: -2.0d
 			dependencies: [
@@ -345,7 +343,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/indium"
+			icon: {id: "tinactory:material/dust/indium"}
 			x: -4.0d
 			y: 2.0d
 			dependencies: ["05A550E7057E0043"]
@@ -356,11 +354,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/indium_concentrate"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/indium_concentrate"
+								amount: 4000
 							}
 						}
 					}
@@ -374,7 +371,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/ingot/samarium"
+			icon: {id: "tinactory:material/ingot/samarium"}
 			x: 12.0d
 			y: 0.0d
 			dependencies: ["05A550E7057E0043"]
@@ -385,11 +382,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/heavy_rare_earth_solution"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/heavy_rare_earth_solution"
+								amount: 4000
 							}
 						}
 					}
@@ -458,11 +454,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/nitrogen"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/nitrogen"
+								amount: 4000
 							}
 						}
 					}
@@ -471,7 +466,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/ingot/hsss"
+			icon: {id: "tinactory:material/ingot/hsss"}
 			x: 10.0d
 			y: 6.0d
 			dependencies: [

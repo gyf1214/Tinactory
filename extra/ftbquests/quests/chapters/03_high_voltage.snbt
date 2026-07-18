@@ -3,12 +3,12 @@
 	group: ""
 	order_index: 3
 	filename: "03_high_voltage"
-	icon: "tinactory:component/advanced_alloy"
+	icon: {id: "tinactory:component/advanced_alloy"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
 		{
-			icon: "tinactory:component/hv/machine_hull"
+			icon: {id: "tinactory:component/hv/machine_hull"}
 			x: 0.0d
 			y: -2.0d
 			dependencies: [
@@ -75,11 +75,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/ammonia"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/ammonia"
+								amount: 4000
 							}
 						}
 					}
@@ -98,11 +97,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/nitric_acid"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/nitric_acid"
+								amount: 4000
 							}
 						}
 					}
@@ -153,7 +151,7 @@
 			]
 		}
 		{
-			icon: "minecraft:bone_meal"
+			icon: {id: "minecraft:bone_meal"}
 			x: -8.0d
 			y: 2.0d
 			dependencies: [
@@ -189,7 +187,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/ingot_hot/chrome"
+			icon: {id: "tinactory:material/ingot_hot/chrome"}
 			x: -8.0d
 			y: 8.0d
 			dependencies: ["4BC5CC00BBABBC80"]
@@ -218,11 +216,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/titanium_tetrachloride"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/titanium_tetrachloride"
+								amount: 4000
 							}
 						}
 					}
@@ -258,7 +255,7 @@
 			]
 		}
 		{
-			icon: "tinactory:circuit_component/resistor/smd"
+			icon: {id: "tinactory:circuit_component/resistor/smd"}
 			x: 2.0d
 			y: -2.0d
 			dependencies: ["56D39B7C7922E621"]
@@ -306,7 +303,7 @@
 			]
 		}
 		{
-			icon: "tinactory:chip/nano_cpu"
+			icon: {id: "tinactory:chip/nano_cpu"}
 			x: 4.0d
 			y: -4.0d
 			dependencies: ["5262782EE36EF6C4"]
@@ -472,11 +469,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/cetane_boosted_diesel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/cetane_boosted_diesel"
+								amount: 4000
 							}
 						}
 					}
@@ -538,7 +534,7 @@
 				{
 					id: "58A667C11AA55AF9"
 					type: "custom"
-					icon: "minecraft:crying_obsidian"
+					icon: {id: "minecraft:crying_obsidian"}
 					tags: [
 						"tinactory_technology"
 						"tinactory_technology_tinactory_rocket_t1"

@@ -3,7 +3,7 @@
 	group: ""
 	order_index: 9
 	filename: "power_generation"
-	icon: "tinactory:chip/low_pic"
+	icon: {id: "tinactory:chip/low_pic"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
@@ -63,11 +63,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/lpg"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/lpg"
+								amount: 4000
 							}
 						}
 					}
@@ -89,11 +88,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/rocket_fuel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/rocket_fuel"
+								amount: 4000
 							}
 						}
 					}
@@ -127,11 +125,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/diesel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/diesel"
+								amount: 4000
 							}
 						}
 					}
@@ -153,11 +150,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/cetane_boosted_diesel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/cetane_boosted_diesel"
+								amount: 4000
 							}
 						}
 					}
@@ -211,11 +207,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/coolant"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/coolant"
+								amount: 4000
 							}
 						}
 					}

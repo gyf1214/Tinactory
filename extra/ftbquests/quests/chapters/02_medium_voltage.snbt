@@ -3,7 +3,7 @@
 	group: ""
 	order_index: 2
 	filename: "02_medium_voltage"
-	icon: "tinactory:material/sheet/polyethylene"
+	icon: {id: "tinactory:material/sheet/polyethylene"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
@@ -24,7 +24,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/mv/machine_hull"
+			icon: {id: "tinactory:component/mv/machine_hull"}
 			x: 0.0d
 			y: 2.0d
 			dependencies: [
@@ -139,7 +139,7 @@
 			]
 		}
 		{
-			icon: "tinactory:chip/ram"
+			icon: {id: "tinactory:chip/ram"}
 			x: -2.0d
 			y: 10.0d
 			dependencies: ["062113D36F9444CD"]
@@ -245,11 +245,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/chlorine"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/chlorine"
+								amount: 4000
 							}
 						}
 					}
@@ -257,7 +256,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/sodium_chloride"
+			icon: {id: "tinactory:material/dust/sodium_chloride"}
 			x: -4.0d
 			y: 6.0d
 			dependencies: ["741B39FABC429FFC"]
@@ -281,11 +280,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/air"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/air"
+								amount: 4000
 							}
 						}
 					}
@@ -303,11 +301,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/nitrogen"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/nitrogen"
+								amount: 4000
 							}
 						}
 					}
@@ -317,11 +314,10 @@
 		{
 			icon: {
 				id: "tinactory:tool/fluid_cell/iron"
-				Count: 1b
-				tag: {
-					Fluid: {
-						FluidName: "tinactory:material/fluid/light_oil"
-						Amount: 4000
+				components: {
+					"tinactory:fluid_cell_content": {
+						id: "tinactory:material/fluid/light_oil"
+						amount: 4000
 					}
 				}
 			}
@@ -338,11 +334,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/natural_gas"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/natural_gas"
+								amount: 4000
 							}
 						}
 					}
@@ -352,11 +347,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/light_oil"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/light_oil"
+								amount: 4000
 							}
 						}
 					}
@@ -366,11 +360,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/heavy_oil"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/heavy_oil"
+								amount: 4000
 							}
 						}
 					}
@@ -380,11 +373,10 @@
 		{
 			icon: {
 				id: "tinactory:tool/fluid_cell/iron"
-				Count: 1b
-				tag: {
-					Fluid: {
-						FluidName: "tinactory:material/sulfuric/naphtha"
-						Amount: 4000
+				components: {
+					"tinactory:fluid_cell_content": {
+						id: "tinactory:material/sulfuric/naphtha"
+						amount: 4000
 					}
 				}
 			}
@@ -401,11 +393,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/sulfuric/refinery_gas"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/sulfuric/refinery_gas"
+								amount: 4000
 							}
 						}
 					}
@@ -415,11 +406,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/sulfuric/naphtha"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/sulfuric/naphtha"
+								amount: 4000
 							}
 						}
 					}
@@ -429,11 +419,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/sulfuric/light_fuel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/sulfuric/light_fuel"
+								amount: 4000
 							}
 						}
 					}
@@ -443,11 +432,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/sulfuric/heavy_fuel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/sulfuric/heavy_fuel"
+								amount: 4000
 							}
 						}
 					}
@@ -457,11 +445,10 @@
 		{
 			icon: {
 				id: "tinactory:tool/fluid_cell/iron"
-				Count: 1b
-				tag: {
-					Fluid: {
-						FluidName: "tinactory:material/fluid/naphtha"
-						Amount: 4000
+				components: {
+					"tinactory:fluid_cell_content": {
+						id: "tinactory:material/fluid/naphtha"
+						amount: 4000
 					}
 				}
 			}
@@ -478,11 +465,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/refinery_gas"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/refinery_gas"
+								amount: 4000
 							}
 						}
 					}
@@ -492,11 +478,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/naphtha"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/naphtha"
+								amount: 4000
 							}
 						}
 					}
@@ -506,11 +491,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/light_fuel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/light_fuel"
+								amount: 4000
 							}
 						}
 					}
@@ -520,11 +504,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/heavy_fuel"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/heavy_fuel"
+								amount: 4000
 							}
 						}
 					}
@@ -542,11 +525,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/fluid/biomass"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/fluid/biomass"
+								amount: 4000
 							}
 						}
 					}
@@ -567,11 +549,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/ethanol"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/ethanol"
+								amount: 4000
 							}
 						}
 					}
@@ -589,11 +570,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/sulfuric_acid"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/sulfuric_acid"
+								amount: 4000
 							}
 						}
 					}
@@ -601,7 +581,7 @@
 			]
 		}
 		{
-			icon: "tinactory:multiblock/misc/autofarm_base"
+			icon: {id: "tinactory:multiblock/misc/autofarm_base"}
 			x: 4.0d
 			y: 0.0d
 			dependencies: ["0A1EE54892C444A8"]
@@ -630,11 +610,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/ethylene"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/ethylene"
+								amount: 4000
 							}
 						}
 					}
@@ -674,11 +653,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/hydrogen"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/hydrogen"
+								amount: 4000
 							}
 						}
 					}
@@ -701,11 +679,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/methane"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/methane"
+								amount: 4000
 							}
 						}
 					}
@@ -728,11 +705,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/oxygen"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/oxygen"
+								amount: 4000
 							}
 						}
 					}
@@ -819,7 +795,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/mv/sensor"
+			icon: {id: "tinactory:component/mv/sensor"}
 			x: 4.0d
 			y: 10.0d
 			dependencies: ["6B8F14E71AA1CA43"]

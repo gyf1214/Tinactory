@@ -3,12 +3,12 @@
 	group: ""
 	order_index: 5
 	filename: "05_post_ev"
-	icon: "tinactory:component/luv/machine_hull"
+	icon: {id: "tinactory:component/luv/machine_hull"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
 		{
-			icon: "tinactory:component/iv/machine_hull"
+			icon: {id: "tinactory:component/iv/machine_hull"}
 			x: 0.0d
 			y: 6.0d
 			dependencies: [
@@ -31,7 +31,7 @@
 			]
 		}
 		{
-			icon: "minecraft:end_stone"
+			icon: {id: "minecraft:end_stone"}
 			x: 0.0d
 			y: 0.0d
 			dependencies: [
@@ -59,7 +59,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/ender_pearl"
+			icon: {id: "tinactory:material/raw/ender_pearl"}
 			x: 0.0d
 			y: 2.0d
 			dependencies: [
@@ -81,7 +81,7 @@
 			]
 		}
 		{
-			icon: "minecraft:blaze_rod"
+			icon: {id: "minecraft:blaze_rod"}
 			x: 2.0d
 			y: 0.0d
 			dependencies: ["0F875BA74B75405A"]
@@ -100,7 +100,7 @@
 			]
 		}
 		{
-			icon: "minecraft:ender_eye"
+			icon: {id: "minecraft:ender_eye"}
 			x: 2.0d
 			y: 2.0d
 			dependencies: [
@@ -133,11 +133,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/gas/radon"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/gas/radon"
+								amount: 4000
 							}
 						}
 					}
@@ -159,7 +158,7 @@
 			]
 		}
 		{
-			icon: "tinactory:circuit/quantum_processor"
+			icon: {id: "tinactory:circuit/quantum_processor"}
 			x: 8.0d
 			y: 2.0d
 			dependencies: ["05A550E7057E0013"]
@@ -173,7 +172,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/iv/sensor"
+			icon: {id: "tinactory:component/iv/sensor"}
 			x: 2.0d
 			y: 4.0d
 			dependencies: [
@@ -224,7 +223,7 @@
 			]
 		}
 		{
-			icon: "tinactory:multiblock/assembly_line"
+			icon: {id: "tinactory:multiblock/assembly_line"}
 			x: 8.0d
 			y: 6.0d
 			dependencies: ["05A550E7057E001D"]
@@ -267,11 +266,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/aqua_regia"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/aqua_regia"
+								amount: 4000
 							}
 						}
 					}
@@ -293,11 +291,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/platinum_palladium_leachate"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/platinum_palladium_leachate"
+								amount: 4000
 							}
 						}
 					}
@@ -319,7 +316,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/raw_rhodium"
+			icon: {id: "tinactory:material/dust/raw_rhodium"}
 			x: -6.0d
 			y: 2.0d
 			dependencies: ["05A550E7057E0026"]
@@ -338,7 +335,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/rhodium"
+			icon: {id: "tinactory:material/dust/rhodium"}
 			x: -6.0d
 			y: 4.0d
 			dependencies: ["05A550E7057E002A"]
@@ -357,7 +354,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/raw_iridium"
+			icon: {id: "tinactory:material/dust/raw_iridium"}
 			x: -8.0d
 			y: 2.0d
 			dependencies: ["05A550E7057E002A"]
@@ -373,11 +370,10 @@
 					type: "item"
 					item: {
 						id: "tinactory:tool/fluid_cell/iron"
-						Count: 1b
-						tag: {
-							Fluid: {
-								FluidName: "tinactory:material/liquid/osmium_solution"
-								Amount: 4000
+						components: {
+							"tinactory:fluid_cell_content": {
+								id: "tinactory:material/liquid/osmium_solution"
+								amount: 4000
 							}
 						}
 					}
@@ -386,7 +382,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/iridium"
+			icon: {id: "tinactory:material/dust/iridium"}
 			x: -8.0d
 			y: 4.0d
 			dependencies: ["05A550E7057E0030"]
@@ -421,7 +417,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/raw_rhodium_plated_palladium"
+			icon: {id: "tinactory:component/raw_rhodium_plated_palladium"}
 			x: -4.0d
 			y: 6.0d
 			dependencies: [
@@ -498,7 +494,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/luv/machine_hull"
+			icon: {id: "tinactory:component/luv/machine_hull"}
 			x: -4.0d
 			y: 10.0d
 			dependencies: [
@@ -536,7 +532,7 @@
 			]
 		}
 		{
-			icon: "tinactory:network/luv/transformer"
+			icon: {id: "tinactory:network/luv/transformer"}
 			x: -8.0d
 			y: 14.0d
 			dependencies: ["05A550E7057E0043"]
@@ -555,7 +551,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/luv/electric_pump"
+			icon: {id: "tinactory:component/luv/electric_pump"}
 			x: 8.0d
 			y: 12.0d
 			dependencies: ["05A550E7057E0046"]
@@ -579,7 +575,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/luv/sensor"
+			icon: {id: "tinactory:component/luv/sensor"}
 			x: 10.0d
 			y: 10.0d
 			dependencies: ["05A550E7057E0046"]

@@ -3,7 +3,7 @@
 	group: ""
 	order_index: 1
 	filename: "01_low_voltage"
-	icon: "tinactory:material/ingot/steel"
+	icon: {id: "tinactory:material/ingot/steel"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
@@ -25,7 +25,7 @@
 			]
 		}
 		{
-			icon: "tinactory:rubber_tree/sticky_resin"
+			icon: {id: "tinactory:rubber_tree/sticky_resin"}
 			x: -2.0d
 			y: -2.0d
 			id: "5C65ABBA0E7F23DC"
@@ -43,7 +43,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/lv/machine_hull"
+			icon: {id: "tinactory:component/lv/machine_hull"}
 			x: 2.0d
 			y: 0.0d
 			dependencies: [
@@ -147,7 +147,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/magnetic/steel"
+			icon: {id: "tinactory:material/magnetic/steel"}
 			x: 2.0d
 			y: 2.0d
 			dependencies: ["2FA60D4ACE773908"]
@@ -222,7 +222,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/lv/electric_piston"
+			icon: {id: "tinactory:component/lv/electric_piston"}
 			x: 6.0d
 			y: 4.0d
 			dependencies: ["60E67F1969C46975"]
@@ -241,7 +241,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/lv/sensor"
+			icon: {id: "tinactory:component/lv/sensor"}
 			x: 2.0d
 			y: 8.0d
 			dependencies: ["0F25091FBD0AB840"]
@@ -273,7 +273,7 @@
 			]
 		}
 		{
-			icon: "minecraft:cobbled_deepslate"
+			icon: {id: "minecraft:cobbled_deepslate"}
 			x: 6.0d
 			y: 2.0d
 			dependencies: ["1B76C2DFABED3E63"]
@@ -292,7 +292,7 @@
 			]
 		}
 		{
-			icon: "minecraft:blaze_powder"
+			icon: {id: "minecraft:blaze_powder"}
 			x: 8.0d
 			y: 4.0d
 			dependencies: ["1B76C2DFABED3E63"]
@@ -319,7 +319,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/lv/robot_arm"
+			icon: {id: "tinactory:component/lv/robot_arm"}
 			x: 8.0d
 			y: 10.0d
 			dependencies: ["2C542D300438BBE4"]
@@ -408,7 +408,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/lv/research_equipment"
+			icon: {id: "tinactory:component/lv/research_equipment"}
 			x: 4.0d
 			y: 10.0d
 			dependencies: [
@@ -431,7 +431,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/dust/zinc"
+			icon: {id: "tinactory:material/dust/zinc"}
 			x: -2.0d
 			y: 8.0d
 			dependencies: ["58D2EC265947048E"]
@@ -514,7 +514,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/buzzsaw/basic"
+			icon: {id: "tinactory:component/buzzsaw/basic"}
 			x: 4.0d
 			y: 14.0d
 			dependencies: [
@@ -590,7 +590,7 @@
 			]
 		}
 		{
-			icon: "tinactory:multiblock/misc/grate_machine_casing"
+			icon: {id: "tinactory:multiblock/misc/grate_machine_casing"}
 			x: 6.0d
 			y: 12.0d
 			dependencies: ["0A1EE54892C444A8"]
@@ -621,7 +621,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/lens/ruby"
+			icon: {id: "tinactory:material/lens/ruby"}
 			x: 6.0d
 			y: 14.0d
 			dependencies: [
@@ -754,7 +754,7 @@
 			]
 		}
 		{
-			icon: "minecraft:golden_horse_armor"
+			icon: {id: "minecraft:golden_horse_armor"}
 			x: 10.0d
 			y: 8.0d
 			shape: "pentagon"

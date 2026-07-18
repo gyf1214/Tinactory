@@ -3,7 +3,7 @@
 	group: ""
 	order_index: 8
 	filename: "logistics"
-	icon: "tinactory:component/hv/conveyor_module"
+	icon: {id: "tinactory:component/hv/conveyor_module"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
@@ -196,7 +196,7 @@
 			]
 		}
 		{
-			icon: "tinactory:component/annihilation_core"
+			icon: {id: "tinactory:component/annihilation_core"}
 			x: -2.0d
 			y: 12.0d
 			dependencies: [
@@ -449,7 +449,7 @@
 			]
 		}
 		{
-			icon: "tinactory:logistics/me_pattern_terminal"
+			icon: {id: "tinactory:logistics/me_pattern_terminal"}
 			x: 10.0d
 			y: 16.0d
 			dependencies: [

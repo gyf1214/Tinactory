@@ -3,12 +3,12 @@
 	group: ""
 	order_index: 7
 	filename: "ore_veins"
-	icon: "minecraft:raw_iron"
+	icon: {id: "minecraft:raw_iron"}
 	default_quest_shape: ""
 	default_hide_dependency_lines: false
 	quests: [
 		{
-			icon: "tinactory:material/raw/limonite"
+			icon: {id: "tinactory:material/raw/limonite"}
 			x: 0.0d
 			y: 0.0d
 			dependencies: [
@@ -54,7 +54,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/redstone"
+			icon: {id: "tinactory:material/raw/redstone"}
 			x: 0.0d
 			y: 2.0d
 			dependencies: ["6CBAE7AF9D17A28D"]
@@ -91,7 +91,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/magnetite"
+			icon: {id: "tinactory:material/raw/magnetite"}
 			x: 8.0d
 			y: 0.0d
 			dependencies: [
@@ -115,7 +115,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/graphite"
+			icon: {id: "tinactory:material/raw/graphite"}
 			x: 6.0d
 			y: 0.0d
 			dependencies: ["3CD314088812FBB4"]
@@ -134,7 +134,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/bauxite"
+			icon: {id: "tinactory:material/raw/bauxite"}
 			x: 6.5d
 			y: 2.0d
 			dependencies: ["3CD314088812FBB4"]
@@ -153,7 +153,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/galena"
+			icon: {id: "tinactory:material/raw/galena"}
 			x: 10.0d
 			y: 0.0d
 			dependencies: ["3CD314088812FBB4"]
@@ -177,7 +177,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/emerald"
+			icon: {id: "tinactory:material/raw/emerald"}
 			x: 8.0d
 			y: -2.0d
 			dependencies: ["3CD314088812FBB4"]
@@ -196,7 +196,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw_fluid/natural_gas"
+			icon: {id: "tinactory:material/raw_fluid/natural_gas"}
 			x: 9.5d
 			y: 2.0d
 			dependencies: ["3CD314088812FBB4"]
@@ -220,7 +220,7 @@
 			]
 		}
 		{
-			icon: "minecraft:raw_gold"
+			icon: {id: "minecraft:raw_gold"}
 			x: 0.0d
 			y: 8.0d
 			dependencies: ["3A37204C020F5B2C"]
@@ -245,7 +245,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/nether_quartz"
+			icon: {id: "tinactory:material/raw/nether_quartz"}
 			x: -2.0d
 			y: 8.0d
 			dependencies: ["41CAE47DBA5E2C33"]
@@ -269,7 +269,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/tungstate"
+			icon: {id: "tinactory:material/raw/tungstate"}
 			x: 2.0d
 			y: 8.0d
 			dependencies: ["41CAE47DBA5E2C33"]
@@ -288,7 +288,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/pitchblende"
+			icon: {id: "tinactory:material/raw/pitchblende"}
 			x: 0.0d
 			y: 10.0d
 			dependencies: ["41CAE47DBA5E2C33"]
@@ -320,7 +320,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/ender_pearl"
+			icon: {id: "tinactory:material/raw/ender_pearl"}
 			x: 8.0d
 			y: 8.0d
 			dependencies: [
@@ -343,7 +343,7 @@
 			]
 		}
 		{
-			icon: "tinactory:material/raw/naquadah"
+			icon: {id: "tinactory:material/raw/naquadah"}
 			x: 10.0d
 			y: 8.0d
 			dependencies: ["0E15D0E25A9B4C10"]
