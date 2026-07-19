@@ -12,7 +12,7 @@ import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.core.gui.client.IRecipeBookItemBase;
 import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SmeltingRecipeBookItem implements IRecipeBookItem {
+public class SmeltingRecipeBookItem implements IRecipeBookItemBase {
     private final ResourceLocation loc;
     private final SmeltingRecipe recipe;
     private final int inputPort;

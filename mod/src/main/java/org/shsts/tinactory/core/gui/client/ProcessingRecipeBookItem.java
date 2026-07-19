@@ -20,7 +20,7 @@ import java.util.function.BiConsumer;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record ProcessingRecipeBookItem(IEntry<? extends ProcessingRecipe> entry) implements IRecipeBookItem {
+public record ProcessingRecipeBookItem(IEntry<? extends ProcessingRecipe> entry) implements IRecipeBookItemBase {
     private ProcessingRecipe recipe() {
         return entry.get();
     }
