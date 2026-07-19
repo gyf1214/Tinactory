@@ -62,6 +62,8 @@ public class MachineRecipeBook extends Panel {
         PANEL_BORDER + BUTTON_TOP_MARGIN, -PANEL_BORDER, -PANEL_BORDER);
 
     private class RecipeButtonPanel extends ButtonPanel {
+        private boolean pendingPage = true;
+
         public RecipeButtonPanel() {
             super(MachineRecipeBook.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
@@ -133,14 +135,22 @@ public class MachineRecipeBook extends Panel {
             return -1;
         }
 
+        public void resetPage() {
+            pendingPage = true;
+            refresh();
+        }
+
         @Override
         protected void doRefresh() {
-            var slotCount = gridViewGroup.getSlotCount();
-            if (slotCount > 0) {
-                var currentIndex = findCurrentIndex();
-                if (currentIndex >= 0) {
-                    page = currentIndex / slotCount;
+            if (pendingPage) {
+                var slotCount = gridViewGroup.getSlotCount();
+                if (slotCount > 0) {
+                    var currentIndex = findCurrentIndex();
+                    if (currentIndex >= 0) {
+                        page = currentIndex / slotCount;
+                    }
                 }
+                pendingPage = false;
             }
             super.doRefresh();
         }
@@ -150,7 +160,7 @@ public class MachineRecipeBook extends Panel {
     private final IMachineConfig machineConfig;
     private final Layout layout;
     private final Panel bookPanel;
-    private final ButtonPanel buttonPanel;
+    private final RecipeButtonPanel buttonPanel;
     private final GhostRecipe ghostRecipe;
     private final List<IRecipeBookItem> recipes = new ArrayList<>();
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
@@ -205,6 +215,9 @@ public class MachineRecipeBook extends Panel {
     }
 
     public void setBookActive(boolean value) {
+        if (value) {
+            buttonPanel.resetPage();
+        }
         bookPanel.setActive(value);
     }
 
