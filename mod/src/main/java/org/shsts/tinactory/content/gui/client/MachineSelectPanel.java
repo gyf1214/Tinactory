@@ -40,14 +40,14 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_BG
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MachineSelectPanel extends ButtonPanel {
+public class MachineSelectPanel<T> extends ButtonPanel {
     private static final Rect BUTTON_OFFSET = PAGE_PANEL_OFFSET
         .offset(0, BUTTON_TOP_MARGIN).enlarge(0, -BUTTON_TOP_MARGIN);
     private static final int SEARCH_BOX_Y = SEARCH_BOX_MARGIN + SPACING;
     private static final Rect SEARCH_BOX_OFFSET = Rect.corners(SEARCH_SIZE + SPACING * 2,
         SEARCH_BOX_Y, -4, SEARCH_BOX_Y + FONT_HEIGHT);
 
-    private record MachineInfo(UUID id, Component name, ItemStack icon) {
+    private record MachineInfo<T>(UUID id, Component name, ItemStack icon, @Nullable T extra) {
         public boolean matchSearch(String query) {
             if (query.isEmpty()) {
                 return true;
@@ -59,8 +59,8 @@ public class MachineSelectPanel extends ButtonPanel {
     }
 
     private final EditBox searchBox;
-    private final List<MachineInfo> machineList = new ArrayList<>();
-    private final List<MachineInfo> displayMachineList = new ArrayList<>();
+    private final List<MachineInfo<T>> machineList = new ArrayList<>();
+    private final List<MachineInfo<T>> displayMachineList = new ArrayList<>();
     private final HashSet<UUID> machines = new HashSet<>();
 
     @Nullable
@@ -94,9 +94,13 @@ public class MachineSelectPanel extends ButtonPanel {
         machines.clear();
     }
 
-    public void add(UUID machine, Component name, ItemStack icon) {
-        machineList.add(new MachineInfo(machine, name, icon));
+    public void add(UUID machine, Component name, ItemStack icon, @Nullable T extra) {
+        machineList.add(new MachineInfo<>(machine, name, icon, extra));
         machines.add(machine);
+    }
+
+    public void add(UUID machine, Component name, ItemStack icon) {
+        add(machine, name, icon, null);
     }
 
     private void refreshDisplayMachines(String query) {
@@ -116,6 +120,11 @@ public class MachineSelectPanel extends ButtonPanel {
     @Override
     protected int getItemCount() {
         return displayMachineList.size();
+    }
+
+    @Nullable
+    protected T getExtra(int index) {
+        return displayMachineList.get(index).extra;
     }
 
     @Override
