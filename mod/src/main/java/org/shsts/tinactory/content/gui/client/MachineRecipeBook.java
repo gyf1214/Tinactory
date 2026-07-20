@@ -2,7 +2,6 @@ package org.shsts.tinactory.content.gui.client;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -26,7 +25,6 @@ import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
-import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -57,7 +55,7 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TE
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends Panel {
-    private static final int SEARCH_SIZE = 12;
+    public static final int SEARCH_SIZE = 12;
     private static final int BUTTON_PER_LINE = 4;
     public static final int BUTTON_TOP_MARGIN = SEARCH_SIZE + SPACING * 2;
     public static final int PANEL_BORDER = 8;
@@ -68,8 +66,9 @@ public class MachineRecipeBook extends Panel {
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER,
         PANEL_BORDER + BUTTON_TOP_MARGIN, -PANEL_BORDER, -PANEL_BORDER);
     private static final int SEARCH_POS = PANEL_BORDER + SPACING;
-    private static final int SEARCH_BOX_Y = SEARCH_POS + (SEARCH_SIZE - FONT_HEIGHT + 1) / 2;
-    private static final RectD SEARCH_BOX_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
+    public static final int SEARCH_BOX_MARGIN = (SEARCH_SIZE - FONT_HEIGHT + 1) / 2;
+    private static final int SEARCH_BOX_Y = SEARCH_POS + SEARCH_BOX_MARGIN;
+    public static final RectD SEARCH_BOX_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
     private static final Rect SEARCH_BOX_OFFSET = Rect.corners(SEARCH_POS + SEARCH_SIZE + SPACING,
         SEARCH_BOX_Y, -PANEL_BORDER - 4, SEARCH_BOX_Y + FONT_HEIGHT);
 
@@ -186,14 +185,10 @@ public class MachineRecipeBook extends Panel {
         this.bookPanel = new Panel(screen);
         this.layout = screen.menu().layout();
         this.ghostRecipe = new GhostRecipe(menu);
-        this.searchBox = Widgets.editBox();
-        searchBox.setBordered(false);
-        searchBox.setResponder(this::refreshDisplayRecipes);
-        searchBox.setHint(I18n.tr("gui.recipebook.search_hint")
-            .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+        this.searchBox = Widgets.searchBox(this::refreshDisplayRecipes);
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
-        var searchIcon = new StaticWidget(menu, RECIPE_BOOK_BG, 11, 15);
+        var searchIcon = Widgets.searchIcon(menu);
 
         bookPanel.addChild(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addGroup(BUTTON_PANEL_OFFSET, buttonPanel);

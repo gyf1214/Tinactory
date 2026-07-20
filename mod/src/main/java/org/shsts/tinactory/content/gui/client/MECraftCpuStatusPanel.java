@@ -105,11 +105,13 @@ public class MECraftCpuStatusPanel extends Panel {
     public void updateStatus(MECraftCpuSyncPacket packet) {
         cpuPanel.clearList();
         packet.entries().forEach(cpuPanel::add);
+        cpuPanel.refreshDisplayMachines();
     }
 
     public void onSelectCpu(@Nullable Consumer<MECraftCpuSyncPacket.CpuInfo> val) {
         onSelectCpu = val;
         cpuPanel.clearSelect();
+        cpuPanel.setSearchQuery("");
         cancelButton.setLabel(val == null ? cancelJobLabel : cancelLabel);
     }
 

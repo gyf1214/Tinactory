@@ -196,7 +196,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
             l.sort(Comparator.comparing(MESignalControllerSyncPacket.SignalInfo::key));
         }
 
-        machinePanel.refresh();
+        machinePanel.refreshDisplayMachines();
         signalPanel.refresh();
 
         getConfig().ifPresent($ -> machinePanel.select($.machine()));

@@ -407,7 +407,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             l.sort(Comparator.comparingInt(LogisticWorkerSyncPacket.PortInfo::portIndex));
         }
 
-        machinePanel.refresh();
+        machinePanel.refreshDisplayMachines();
         portPanel.refresh();
     }
 
