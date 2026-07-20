@@ -57,6 +57,11 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
         }
     }
 
+    protected ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing,
+        Rect offset) {
+        super(screen, buttonWidth, buttonHeight, verticalSpacing, offset);
+    }
+
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
         super(screen, buttonWidth, buttonHeight, verticalSpacing);
     }

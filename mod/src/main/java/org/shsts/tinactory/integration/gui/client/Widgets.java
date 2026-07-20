@@ -2,14 +2,20 @@ package org.shsts.tinactory.integration.gui.client;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
+
+import java.util.function.Consumer;
+
+import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -34,5 +40,18 @@ public final class Widgets {
         };
         editBox.setTextShadow(false);
         return editBox;
+    }
+
+    public static StaticWidget searchIcon(MenuBase menu) {
+        return new StaticWidget(menu, RECIPE_BOOK_BG, 11, 15);
+    }
+
+    public static EditBox searchBox(Consumer<String> responder) {
+        var ret = editBox();
+        ret.setBordered(false);
+        ret.setResponder(responder);
+        ret.setHint(I18n.tr("gui.recipebook.search_hint")
+            .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+        return ret;
     }
 }

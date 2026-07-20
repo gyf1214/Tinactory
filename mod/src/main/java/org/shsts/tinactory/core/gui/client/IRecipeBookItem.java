@@ -25,4 +25,6 @@ public interface IRecipeBookItem extends ILoc {
     Optional<List<Component>> buttonToolTip();
 
     IRenderDescriptor display();
+
+    boolean matchSearch(String query);
 }

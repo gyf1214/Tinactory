@@ -16,6 +16,7 @@ import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -29,28 +30,24 @@ import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MECraftCpuStatusPanel extends Panel {
-    private class CpuPanel extends MachineSelectPanel {
-        private final List<MECraftCpuSyncPacket.CpuInfo> cpus = new ArrayList<>();
-
+    private class CpuPanel extends MachineSelectPanel<MECraftCpuSyncPacket.CpuInfo> {
         public CpuPanel() {
             super(MECraftCpuStatusPanel.this.screen);
         }
 
-        @Override
-        public void clearList() {
-            super.clearList();
-            cpus.clear();
+        public void add(MECraftCpuSyncPacket.CpuInfo info) {
+            add(info.status().cpuId(), info.name(), info.icon(), info);
         }
 
-        public void add(MECraftCpuSyncPacket.CpuInfo info) {
-            add(info.status().cpuId(), info.name(), info.icon());
-            cpus.add(info);
+        @Override
+        protected MECraftCpuSyncPacket.CpuInfo getExtra(int index) {
+            return Objects.requireNonNull(super.getExtra(index));
         }
 
         @Override
         protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
             var ret = new ArrayList<Component>();
-            var entry = cpus.get(index);
+            var entry = getExtra(index);
             var status = entry.status();
             ret.add(entry.name());
             ret.add(tr("cpu.state." + status.state().id).copy().withStyle(ChatFormatting.GRAY));
@@ -76,7 +73,7 @@ public class MECraftCpuStatusPanel extends Panel {
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
             if (onSelectCpu != null) {
-                onSelectCpu.accept(cpus.get(index));
+                onSelectCpu.accept(getExtra(index));
             } else {
                 super.onSelect(index, mouseX, mouseY, button);
             }
@@ -105,11 +102,13 @@ public class MECraftCpuStatusPanel extends Panel {
     public void updateStatus(MECraftCpuSyncPacket packet) {
         cpuPanel.clearList();
         packet.entries().forEach(cpuPanel::add);
+        cpuPanel.refreshDisplayMachines();
     }
 
     public void onSelectCpu(@Nullable Consumer<MECraftCpuSyncPacket.CpuInfo> val) {
         onSelectCpu = val;
         cpuPanel.clearSelect();
+        cpuPanel.setSearchQuery("");
         cancelButton.setLabel(val == null ? cancelJobLabel : cancelLabel);
     }
 

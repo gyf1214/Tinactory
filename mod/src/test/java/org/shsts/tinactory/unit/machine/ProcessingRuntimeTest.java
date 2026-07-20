@@ -29,6 +29,7 @@ import org.shsts.tinycorelib.api.core.DistLazy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -556,6 +557,12 @@ class ProcessingRuntimeTest {
         @Override
         public IRenderDescriptor display() {
             return EmptyRenderDescriptor.INSTANCE;
+        }
+
+        @Override
+        public boolean matchSearch(String query) {
+            var query1 = query.toLowerCase(Locale.ROOT);
+            return loc.toString().toLowerCase(Locale.ROOT).contains(query1);
         }
     }
 }

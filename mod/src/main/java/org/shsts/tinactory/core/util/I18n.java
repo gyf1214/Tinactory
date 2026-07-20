@@ -1,12 +1,15 @@
 package org.shsts.tinactory.core.util;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+
+import java.util.Locale;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -30,5 +33,9 @@ public final class I18n {
 
     public static MutableComponent raw(String format, Object... args) {
         return Component.literal(format.formatted(args));
+    }
+
+    public static String flattenComponent(Component text) {
+        return ChatFormatting.stripFormatting(text.getString()).trim().toLowerCase(Locale.ROOT);
     }
 }

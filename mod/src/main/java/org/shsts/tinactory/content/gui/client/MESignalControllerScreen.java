@@ -130,7 +130,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
         }
     }
 
-    private final MachineSelectPanel machinePanel;
+    private final MachineSelectPanel<Void> machinePanel;
     private final SignalSelectPanel signalPanel;
 
     private static MutableComponent tr(String key) {
@@ -143,7 +143,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
         this.contentHeight = HEIGHT;
         this.machineConfig = menu.machine.config();
 
-        this.machinePanel = new MachineSelectPanel(this) {
+        this.machinePanel = new MachineSelectPanel<>(this) {
             @Override
             protected boolean canClickButton(int index, double mouseX, double mouseY, int button) {
                 return button == 0 || button == 1;
@@ -196,7 +196,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
             l.sort(Comparator.comparing(MESignalControllerSyncPacket.SignalInfo::key));
         }
 
-        machinePanel.refresh();
+        machinePanel.refreshDisplayMachines();
         signalPanel.refresh();
 
         getConfig().ifPresent($ -> machinePanel.select($.machine()));

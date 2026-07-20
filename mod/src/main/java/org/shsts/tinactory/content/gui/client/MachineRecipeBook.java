@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,6 +26,7 @@ import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -37,9 +39,11 @@ import java.util.function.Consumer;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
@@ -51,8 +55,9 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TE
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends Panel {
+    public static final int SEARCH_SIZE = 12;
     private static final int BUTTON_PER_LINE = 4;
-    public static final int BUTTON_TOP_MARGIN = BUTTON_SIZE / 2;
+    public static final int BUTTON_TOP_MARGIN = SEARCH_SIZE + SPACING * 2;
     public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
@@ -60,20 +65,28 @@ public class MachineRecipeBook extends Panel {
         -MARGIN_TOP, -MARGIN_X, MARGIN_VERTICAL);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER,
         PANEL_BORDER + BUTTON_TOP_MARGIN, -PANEL_BORDER, -PANEL_BORDER);
+    private static final int SEARCH_POS = PANEL_BORDER + SPACING;
+    public static final int SEARCH_BOX_MARGIN = (SEARCH_SIZE - FONT_HEIGHT + 1) / 2;
+    private static final int SEARCH_BOX_Y = SEARCH_POS + SEARCH_BOX_MARGIN;
+    public static final RectD SEARCH_BOX_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
+    private static final Rect SEARCH_BOX_OFFSET = Rect.corners(SEARCH_POS + SEARCH_SIZE + SPACING,
+        SEARCH_BOX_Y, -PANEL_BORDER - 4, SEARCH_BOX_Y + FONT_HEIGHT);
 
     private class RecipeButtonPanel extends ButtonPanel {
+        private boolean pendingPage = true;
+
         public RecipeButtonPanel() {
             super(MachineRecipeBook.this.screen, BUTTON_SIZE, BUTTON_SIZE, 0);
         }
 
         @Override
         protected int getItemCount() {
-            return recipes.size() + 1;
+            return displayRecipes.size() + 1;
         }
 
         @Nullable
         public IRecipeBookItem getRecipe(int index) {
-            return index >= 1 && index < recipes.size() + 1 ? recipes.get(index - 1) : null;
+            return index >= 1 && index < displayRecipes.size() + 1 ? displayRecipes.get(index - 1) : null;
         }
 
         @Override
@@ -125,22 +138,30 @@ public class MachineRecipeBook extends Panel {
             if (currentLoc == null) {
                 return 0;
             }
-            for (var i = 0; i < recipes.size(); i++) {
-                if (currentLoc.equals(recipes.get(i).loc())) {
+            for (var i = 0; i < displayRecipes.size(); i++) {
+                if (currentLoc.equals(displayRecipes.get(i).loc())) {
                     return i + 1;
                 }
             }
             return -1;
         }
 
+        public void resetPage() {
+            pendingPage = true;
+            refresh();
+        }
+
         @Override
         protected void doRefresh() {
-            var slotCount = gridViewGroup.getSlotCount();
-            if (slotCount > 0) {
-                var currentIndex = findCurrentIndex();
-                if (currentIndex >= 0) {
-                    page = currentIndex / slotCount;
+            if (pendingPage) {
+                var slotCount = gridViewGroup.getSlotCount();
+                if (slotCount > 0) {
+                    var currentIndex = findCurrentIndex();
+                    if (currentIndex >= 0) {
+                        page = currentIndex / slotCount;
+                    }
                 }
+                pendingPage = false;
             }
             super.doRefresh();
         }
@@ -150,9 +171,11 @@ public class MachineRecipeBook extends Panel {
     private final IMachineConfig machineConfig;
     private final Layout layout;
     private final Panel bookPanel;
-    private final ButtonPanel buttonPanel;
+    private final RecipeButtonPanel buttonPanel;
+    private final EditBox searchBox;
     private final GhostRecipe ghostRecipe;
     private final List<IRecipeBookItem> recipes = new ArrayList<>();
+    private final List<IRecipeBookItem> displayRecipes = new ArrayList<>();
     private final Consumer<ITeamProfile> onTechChange = $ -> onTechChange();
 
     public MachineRecipeBook(ProcessingScreen screen) {
@@ -162,11 +185,15 @@ public class MachineRecipeBook extends Panel {
         this.bookPanel = new Panel(screen);
         this.layout = screen.menu().layout();
         this.ghostRecipe = new GhostRecipe(menu);
-
+        this.searchBox = Widgets.searchBox(this::refreshDisplayRecipes);
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
+        var searchIcon = Widgets.searchIcon(menu);
+
         bookPanel.addChild(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addGroup(BUTTON_PANEL_OFFSET, buttonPanel);
+        bookPanel.addVanillaWidget(SEARCH_BOX_ANCHOR, SEARCH_BOX_OFFSET, 0, searchBox);
+        bookPanel.addChild(new Rect(SEARCH_POS, SEARCH_POS, SEARCH_SIZE, SEARCH_SIZE), searchIcon);
         bookPanel.setActive(false);
 
         addChild(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);
@@ -185,6 +212,12 @@ public class MachineRecipeBook extends Panel {
         TechManagers.client().removeProgressChangeListener(onTechChange);
     }
 
+    private void refreshDisplayRecipes(String query) {
+        displayRecipes.clear();
+        recipes.stream().filter($ -> $.matchSearch(query)).forEach(displayRecipes::add);
+        buttonPanel.refresh();
+    }
+
     private void refreshRecipes() {
         recipes.clear();
         var processor = MACHINE.tryGet(blockEntity).flatMap(IMachine::processor);
@@ -192,6 +225,7 @@ public class MachineRecipeBook extends Panel {
             var items = machineProcessor.recipeBookItems().getValue();
             recipes.addAll(items);
         }
+        refreshDisplayRecipes(searchBox.getValue());
         ghostRecipe.clear();
         var loc = getCurrentRecipeLoc();
         if (loc != null) {
@@ -205,6 +239,10 @@ public class MachineRecipeBook extends Panel {
     }
 
     public void setBookActive(boolean value) {
+        if (value) {
+            buttonPanel.resetPage();
+            searchBox.setValue("");
+        }
         bookPanel.setActive(value);
     }
 

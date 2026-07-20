@@ -343,7 +343,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
-    private final MachineSelectPanel machinePanel;
+    private final MachineSelectPanel<Void> machinePanel;
     private final PortSelectPanel portPanel;
 
     private static Component tr(String key) {
@@ -361,7 +361,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
         var configPanel = new ConfigPanel();
-        this.machinePanel = new MachineSelectPanel(this) {
+        this.machinePanel = new MachineSelectPanel<>(this) {
             @Override
             public void select(UUID machine) {
                 super.select(machine);
@@ -407,7 +407,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             l.sort(Comparator.comparingInt(LogisticWorkerSyncPacket.PortInfo::portIndex));
         }
 
-        machinePanel.refresh();
+        machinePanel.refreshDisplayMachines();
         portPanel.refresh();
     }
 
