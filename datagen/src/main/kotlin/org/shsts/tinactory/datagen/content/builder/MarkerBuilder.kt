@@ -9,16 +9,26 @@ import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.material.Fluid
 import net.neoforged.neoforge.fluids.FluidStack
+import org.shsts.tinactory.AllRecipes
 import org.shsts.tinactory.api.recipe.IProcessingIngredient
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
+import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.integration.material.MaterialSet
 import org.shsts.tinactory.integration.recipe.ProcessingHelper
 import org.shsts.tinactory.integration.recipe.TagIngredient
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
 import java.util.Optional
+
+class MarkerFactory : RecipeFactory<MarkerRecipe, MarkerBuilder>(AllRecipes.MARKER, ::MarkerBuilder) {
+    override fun onBuild(loc: ResourceLocation, builder: MarkerBuilder) {
+        dataGen {
+            trackLang(ProcessingRecipe.getDescriptionId(loc))
+        }
+    }
+}
 
 class MarkerBuilder(parent: IRecipeFactory<MarkerRecipe, MarkerBuilder>) :
     ProcessingRecipeBuilder<MarkerRecipe, MarkerBuilder>(parent) {

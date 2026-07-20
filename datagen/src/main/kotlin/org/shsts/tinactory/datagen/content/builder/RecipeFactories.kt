@@ -7,9 +7,7 @@ import org.shsts.tinactory.content.recipe.CleanRecipe
 import org.shsts.tinactory.content.recipe.GeneratorRecipe
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.recipe.MarkerRecipe
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
-import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinycorelib.api.recipe.IRecipe
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
@@ -20,7 +18,6 @@ typealias GeneratorRecipeFactory = RecipeFactory<GeneratorRecipe, GeneratorRecip
 typealias BlastFurnaceRecipeFactory = RecipeFactory<BlastFurnaceRecipe, BlastFurnaceBuilder>
 typealias OreAnalyzerRecipeFactory = RecipeFactory<OreAnalyzerRecipe, OreAnalyzerRecipeBuilder>
 typealias ChemicalRecipeFactory = RecipeFactory<ChemicalReactorRecipe, ChemicalRecipeBuilder>
-typealias MarkerFactory = RecipeFactory<MarkerRecipe, MarkerBuilder>
 
 object RecipeFactories {
     fun vanilla(replace: Boolean = false, block: VanillaRecipeFactory.() -> Unit) {
@@ -390,6 +387,6 @@ object RecipeFactories {
     }
 
     fun marker(block: MarkerFactory.() -> Unit) {
-        RecipeFactory(recipeType("marker"), ::MarkerBuilder).block()
+        MarkerFactory().block()
     }
 }
