@@ -442,12 +442,12 @@ object MiscComponents {
             componentVoltage = Voltage.LUV
             misc("lapotronic_energy_orb") {
                 misc("lapotron_crystal", 8)
-                misc("energy_chip", 24)
+                misc("energy_chip", 12)
+                circuit(1)
                 component("field_generator", voltage = Voltage.IV)
-                pic(4)
-                component("cable", 4)
-                input("battery_alloy", "plate", 3)
-                input("soldering_alloy", amount = 2)
+                input("platinum", "wire_fine", 24)
+                input("platinum", "bolt", 16)
+                input("soldering_alloy", amount = 3)
                 voltage(Voltage.LUV)
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.POWER_SUBSTATION)

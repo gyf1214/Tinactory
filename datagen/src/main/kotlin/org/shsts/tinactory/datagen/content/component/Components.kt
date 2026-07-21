@@ -147,11 +147,11 @@ object Components {
             }
 
             component("raw_crystal_chip") {
-                model(basicItem("metaitems/crystal.raw_chip"))
+                model(basicItem("metaitems/crystal.raw"))
             }
 
             component("raw_crystal_chip_part") {
-                model(basicItem("metaitems/crystal.raw"))
+                model(basicItem("metaitems/crystal.raw_chip"))
             }
 
             component("crystal_cpu") {
