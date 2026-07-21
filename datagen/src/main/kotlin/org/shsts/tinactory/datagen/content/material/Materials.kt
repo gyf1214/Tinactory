@@ -510,6 +510,12 @@ object Materials {
                 component("argon")
             }
         }
+        material("neutronium", BRIGHT) {
+            machineProcess(Voltage.LUV, 2.0)
+            blast(Voltage.ZPM, 6300, 1280) {
+                component("argon")
+            }
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("activated_naquadah", DULL)

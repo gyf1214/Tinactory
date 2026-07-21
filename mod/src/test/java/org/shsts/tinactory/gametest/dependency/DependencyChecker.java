@@ -96,9 +96,9 @@ public final class DependencyChecker {
     private static final String CLEANROOM_CLEANNESS = "cleanroom_cleanness";
     private static final String TEST_MATERIAL = "test";
     private static final Voltage MAX_PROGRESS_VOLTAGE = Voltage.LUV;
-    // Current progression baseline is calibrated from the runtime dependency-checker report. The remaining list
-    // includes later wetware-board and Neutronium targets.
-    private static final int ACCEPTED_UNREACHABLE_NODES = 4;
+    // Current progression baseline is calibrated from the runtime dependency-checker report. The remaining targets
+    // are the deferred Wetware Board and Wetware Circuit Board.
+    private static final int ACCEPTED_UNREACHABLE_NODES = 2;
 
     private final ServerLevel world;
     private final RegistryAccess registryAccess;

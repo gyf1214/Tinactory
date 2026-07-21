@@ -1,0 +1,25 @@
+{
+  "color": "0xFFFFFFFF",
+  "items": [
+    "dust",
+    "dust_tiny",
+    "ingot",
+    "ingot_hot",
+    "plate"
+  ],
+  "fluids": {
+    "molten": {
+      "baseAmount": 144,
+      "texture": "gregtech:block/material_sets/dull/liquid"
+    },
+    "plasma": {
+      "baseAmount": 144,
+      "texture": "gregtech:block/material_sets/dull/plasma"
+    }
+  },
+  "aliases": {
+    "primary": "ingot",
+    "fluid": "molten"
+  },
+  "existings": {}
+}

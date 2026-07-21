@@ -1184,6 +1184,13 @@ object Multiblocks {
                 voltage(Voltage.LUV)
                 workTicks(800)
             }
+            recipe("multiblock/neutronium") {
+                input("nether_star", "molten", 1f / 36f)
+                input("naquadria", "molten", 1f / 36f)
+                output("neutronium", "plasma", 1f / 144f)
+                voltage(Voltage.ZPM)
+                workTicks(200)
+            }
             recipe("multiblock/activated_naquadah") {
                 input("naquadah", "molten")
                 input("hydrogen", "gas", 0.125)

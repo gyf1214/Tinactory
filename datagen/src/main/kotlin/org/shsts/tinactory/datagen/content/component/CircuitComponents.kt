@@ -509,6 +509,16 @@ object CircuitComponents {
                     temperature(3900)
                 }
             }
+            output(BOULE.item("neutronium")) {
+                input("silicon", "ingot", 64)
+                input("indium")
+                input("neutronium", "molten")
+                voltage(Voltage.ZPM)
+                workTicks(16000)
+                extra {
+                    temperature(4800)
+                }
+            }
         }
 
         autoclave {
