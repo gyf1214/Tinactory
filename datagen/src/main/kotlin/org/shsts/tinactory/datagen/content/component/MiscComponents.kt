@@ -453,6 +453,22 @@ object MiscComponents {
                 tech(Technologies.POWER_SUBSTATION)
             }
         }
+        assembler {
+            componentVoltage = Voltage.ZPM
+            misc("lapotronic_energy_orb_cluster") {
+                misc("lapotronic_energy_orb", 2)
+                misc("energy_chip", 16)
+                misc("lapotron_chip", 8)
+                component("field_generator", voltage = Voltage.LUV)
+                circuit(1)
+                input("niobium_titanium", "wire_fine", 24)
+                input("naquadah", "bolt", 16)
+                input("soldering_alloy", amount = 5)
+                voltage(Voltage.ZPM)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.POWER_SUBSTATION, Technologies.ASSEMBLY_LINE)
+            }
+        }
     }
 
     private fun rockets() {

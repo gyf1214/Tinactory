@@ -50,6 +50,7 @@ object ProcessingMachines {
             rotor = "titanium")
 
         advancedMachine(Voltage.LUV)
+        advancedMachine(Voltage.ZPM)
     }
 
     private fun AssemblyRecipeFactory.commonMachine(lastVoltage: Voltage) {

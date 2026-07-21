@@ -183,6 +183,10 @@ object Components {
                 model(basicItem("metaitems/energy.lapotronic_orb/1"))
             }
 
+            component("lapotronic_energy_orb_cluster") {
+                model(basicItem("metaitems/energy.lapotronic_orb_cluster/1"))
+            }
+
             for (entry in STORAGE_CELLS) {
                 val k = name(entry.component.id(), -1).replace('m', 'k')
                 item(entry.component) {

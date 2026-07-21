@@ -496,6 +496,20 @@ object Materials {
                 component("argon")
             }
         }
+        material("indium_tin_barium_titanium_cuprate", BRIGHT) {
+            machineProcess(Voltage.LUV, 1.5)
+            mix(Voltage.LUV) {
+                component("indium", 4)
+                component("tin", 2)
+                component("barium", 2)
+                component("titanium")
+                component("copper", 7)
+                component("oxygen", 14)
+            }
+            blast(Voltage.LUV, 6300, 1280) {
+                component("argon")
+            }
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("activated_naquadah", DULL)
@@ -646,6 +660,7 @@ object Materials {
         material("ev_superconductor", SHINY)
         material("iv_superconductor", SHINY)
         material("luv_superconductor", SHINY)
+        material("zpm_superconductor", SHINY)
     }
 
     private fun ores() {

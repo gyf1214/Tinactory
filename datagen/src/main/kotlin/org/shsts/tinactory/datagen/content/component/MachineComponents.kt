@@ -113,6 +113,18 @@ object MachineComponents {
             sensorCore = "ender_eye",
             sensorBody = "ruridit",
             sensorFoil = "palladium")
+
+        advancedComponent(Voltage.ZPM,
+            main = "hsss",
+            casing = "naquadah_alloy",
+            insulation = "ptfe",
+            motorWire = "naquadah",
+            pipe = "hsss",
+            rotor = "trinium",
+            magnetic = "samarium",
+            sensorCore = "nether_star",
+            sensorBody = "osmiridium",
+            sensorFoil = "naquadria")
     }
 
     private fun component(v: Voltage, main: String, motor: String,
@@ -352,6 +364,7 @@ object MachineComponents {
             superconductor(Voltage.EV, "niobium_titanium", "ptfe", "coolant")
             superconductor(Voltage.IV, "vanadium_gallium", "niobium_titanium", "coolant")
             superconductor(Voltage.LUV, "yttrium_barium_cuprate", "hsss", "nitrogen", "liquid")
+            superconductor(Voltage.ZPM, "indium_tin_barium_titanium_cuprate", "hsss", "nitrogen", "liquid")
         }
     }
 

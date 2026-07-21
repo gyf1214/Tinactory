@@ -106,6 +106,7 @@ object Multiblocks {
             coil("nichrome")
             coil("tungsten", "rtm_alloy")
             coil("naquadah")
+            coil("trinium")
 
             misc("grate_machine_casing") {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
@@ -321,6 +322,7 @@ object Multiblocks {
             coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", "pe", Technologies.NICHROME)
             coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", "pe", Technologies.TUNGSTEN_STEEL)
             coil("naquadah", Voltage.IV, "naquadah", "hssg", "ptfe", Technologies.NAQUADAH_PROCESSING)
+            coil("trinium", Voltage.ZPM, "trinium", "hsss", "ptfe", Technologies.ADVANCED_NETHER_CHEMISTRY)
         }
 
         val itemFilter = getItem("component/item_filter")
@@ -670,6 +672,7 @@ object Multiblocks {
             powerBlock(Voltage.EV, "energy_crystal", 10)
             powerBlock(Voltage.IV, "lapotron_crystal", 8)
             powerBlock(Voltage.LUV, "lapotronic_energy_orb")
+            powerBlock(Voltage.ZPM, "lapotronic_energy_orb_cluster")
         }
     }
 

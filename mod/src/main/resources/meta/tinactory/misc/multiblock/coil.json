@@ -20,6 +20,10 @@
     "naquadah": {
       "mapColor": 22,
       "temperature": 5400
+    },
+    "trinium": {
+      "mapColor": 22,
+      "temperature": 6300
     }
   }
 }

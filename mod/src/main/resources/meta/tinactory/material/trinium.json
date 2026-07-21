@@ -2,8 +2,13 @@
   "color": "0xFFCACACA",
   "items": [
     "dust",
+    "dust_tiny",
     "ingot",
-    "ingot_hot"
+    "ingot_hot",
+    "plate",
+    "rotor",
+    "wire",
+    "wire_fine"
   ],
   "fluids": {
     "molten": {
