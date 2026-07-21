@@ -439,34 +439,33 @@ object MiscComponents {
             }
         }
         assembler {
+            defaults {
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.POWER_SUBSTATION)
+                circuit(1)
+            }
+
             componentVoltage = Voltage.LUV
             misc("lapotronic_energy_orb") {
                 misc("lapotron_crystal", 8)
                 misc("energy_chip", 12)
-                circuit(1)
                 component("field_generator", voltage = Voltage.IV)
-                input("platinum", "wire_fine", 24)
-                input("platinum", "bolt", 16)
+                input("platinum", "wire_fine", 16)
+                input("platinum", "bolt", 8)
                 input("soldering_alloy", amount = 3)
                 voltage(Voltage.LUV)
-                workTicks(COMPONENT_TICKS)
-                tech(Technologies.POWER_SUBSTATION)
             }
-        }
-        assembler {
+
             componentVoltage = Voltage.ZPM
             misc("lapotronic_energy_orb_cluster") {
                 misc("lapotronic_energy_orb", 2)
-                misc("energy_chip", 16)
                 misc("lapotron_chip", 8)
+                misc("energy_chip", 16)
                 component("field_generator", voltage = Voltage.LUV)
-                circuit(1)
                 input("niobium_titanium", "wire_fine", 24)
                 input("naquadah", "bolt", 16)
                 input("soldering_alloy", amount = 5)
                 voltage(Voltage.ZPM)
-                workTicks(COMPONENT_TICKS)
-                tech(Technologies.POWER_SUBSTATION, Technologies.ASSEMBLY_LINE)
             }
         }
     }

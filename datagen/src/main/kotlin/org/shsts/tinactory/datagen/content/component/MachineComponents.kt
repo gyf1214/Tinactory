@@ -335,6 +335,7 @@ object MachineComponents {
                 input(sensorBody, "plate", 6)
                 input(sensorCore, "gem")
                 component("emitter", 2)
+                component("sensor")
                 circuit(2)
                 input(v.id + "_superconductor", "wire", 64)
                 component("cable", 4)

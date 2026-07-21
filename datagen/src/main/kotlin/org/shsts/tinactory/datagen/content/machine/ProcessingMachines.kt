@@ -280,15 +280,6 @@ object ProcessingMachines {
                 input("glass", "primary")
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
-            machine("multiblock/digital_interface") {
-                circuit(4)
-                pic(4)
-                misc("annihilation_core")
-                misc("formation_core")
-                storage(2)
-                component("cable", 4)
-                tech(Technologies.DIGITAL_STORAGE)
-            }
             machine("battery_box") {
                 circuit(2)
                 pic(2)
@@ -318,6 +309,21 @@ object ProcessingMachines {
                 tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
             }
         }
+        assembler {
+            componentVoltage = v
+            machine("multiblock/digital_interface") {
+                machine("multiblock/interface")
+                circuit(2)
+                pic(2)
+                misc("annihilation_core")
+                misc("formation_core")
+                storage(2)
+                component("cable", 4)
+                voltage(lastVoltage)
+                workTicks(MACHINE_TICKS)
+                tech(Technologies.DIGITAL_STORAGE)
+            }
+        }
     }
 
     private fun advancedMachine(v: Voltage) {
@@ -345,6 +351,7 @@ object ProcessingMachines {
                 misc("annihilation_core", 2)
                 misc("formation_core", 2)
                 storage(4)
+                component("robot_arm")
                 component("conveyor_module", 2)
                 component("electric_pump", 2)
                 tech(Technologies.DIGITAL_STORAGE)

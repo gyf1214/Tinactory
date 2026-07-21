@@ -407,8 +407,6 @@ object Multiblocks {
                 workTicks(CASING_TICKS)
                 tech(Technologies.ROCKET_SCIENCE)
             }
-
-            componentVoltage = Voltage.EV
             misc("lithography_lens/basic") {
                 input("titanium", "stick", 4)
                 component("robot_arm", 2)
@@ -421,6 +419,8 @@ object Multiblocks {
                 workTicks(MULTIBLOCK_TICKS)
                 tech(Technologies.LITHOGRAPHY)
             }
+
+            componentVoltage = Voltage.EV
             misc("turbine_blade") {
                 solid("stable_titanium")
                 pic(1)
@@ -520,8 +520,6 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.MATERIAL_CONDITIONING)
             }
-
-            componentVoltage = Voltage.IV
             misc("lithography_lens/good") {
                 misc("lithography_lens/basic")
                 component("robot_arm", 2)
@@ -531,6 +529,8 @@ object Multiblocks {
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.LITHOGRAPHY)
             }
+
+            componentVoltage = Voltage.IV
             misc("phase_converter_casing") {
                 misc("ptfe_pipe_casing")
                 circuit(2)
@@ -608,24 +608,9 @@ object Multiblocks {
                 workTicks(CASING_TICKS)
                 tech(Technologies.FUSION)
             }
-            misc("superconducting_coil") {
-                input("iv_superconductor", "wire", 32)
-                input("ruridit", "foil", 32)
-                input("rhodium_plated_palladium", "plate", 2)
-                input("ptfe", amount = 2)
-                input("soldering_alloy", amount = 4)
-                workTicks(COIL_TICKS)
-                tech(Technologies.FUSION)
-            }
-            misc("superconducting_coil", suffix = "_from_luv_superconductor") {
-                input("luv_superconductor", "wire", 4)
-                input("ruridit", "foil", 4)
-                input("rhodium_plated_palladium", "plate", 2)
-                input("ptfe", amount = 2)
-                input("soldering_alloy", amount = 4)
-                workTicks(COIL_TICKS)
-                tech(Technologies.FUSION)
-            }
+            superConductingCoil("iv_superconductor", 64)
+            superConductingCoil("luv_superconductor", 8, "_from_luv")
+            superConductingCoil("zpm_superconductor", 1, "_from_zpm")
             misc("lithography_lens/advanced") {
                 misc("lithography_lens/good")
                 component("robot_arm", 2)
@@ -738,6 +723,18 @@ object Multiblocks {
             voltage(v)
             workTicks(COIL_TICKS)
             tech(tech)
+        }
+    }
+
+    private fun AssemblyRecipeFactory.superConductingCoil(mat: String, amount: Int, suffix: String = "") {
+        misc("superconducting_coil", suffix = suffix) {
+            input(mat, "wire", amount)
+            input("ruridit", "foil", amount)
+            input("rhodium_plated_palladium", "plate", 2)
+            input("ptfe", amount = 2)
+            input("soldering_alloy", amount = 4)
+            workTicks(COIL_TICKS)
+            tech(Technologies.FUSION)
         }
     }
 
