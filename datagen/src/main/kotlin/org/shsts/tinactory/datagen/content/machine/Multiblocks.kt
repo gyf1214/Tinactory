@@ -48,6 +48,7 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
@@ -224,6 +225,10 @@ object Multiblocks {
             misc("electrode_casing") {
                 blockState(cubeCasing("casings/solid/machine_casing_inert_ptfe",
                     "overlay/machine/overlay_energy_out"))
+            }
+
+            misc("sterile_bacteria_vat_casing") {
+                blockState(solidBlock("casings/solid/machine_casing_inert_ptfe"))
             }
 
             misc("turbine_blade") {
@@ -641,6 +646,45 @@ object Multiblocks {
         }
 
         powerBlocks()
+
+        assemblyLine {
+            componentVoltage = Voltage.ZPM
+            misc("sterile_bacteria_vat_casing") {
+                input("hsss", "stick", 8)
+                input("polystyrene", "sheet", 16)
+                input("rhodium_plated_palladium", "plate", 4)
+                circuit(1)
+                component("robot_arm")
+                component("electric_motor", 2)
+                component("electric_pump", 2)
+                input("trinium", "rotor", 2)
+                input("ptfe", "pipe", 2)
+                input("niobium_titanium", "pipe", 2)
+                input("soldering_alloy", amount = 2)
+                voltage(Voltage.ZPM)
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
+            }
+            multiblock("bacteria_vat") {
+                misc("sterile_bacteria_vat_casing", 4)
+                component("machine_hull")
+                component("robot_arm", 2)
+                component("sensor", 2)
+                component("electric_motor", 4)
+                component("electric_pump", 4)
+                input("trinium", "rotor", 4)
+                input("naquadah", "wire", 32)
+                input("naquadria", "foil", 16)
+                input("ptfe", "pipe", 8)
+                input("soldering_alloy", amount = 8)
+                circuit(2, Voltage.UV)
+                voltage(Voltage.ZPM)
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+                tech(Technologies.CRYSTAL_CIRCUITRY)
+            }
+        }
+
+        bacteriaVat {}
     }
 
     private fun powerBlocks() {

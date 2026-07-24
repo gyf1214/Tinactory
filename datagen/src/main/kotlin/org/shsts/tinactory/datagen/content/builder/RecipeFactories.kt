@@ -370,6 +370,16 @@ object RecipeFactories {
         }.block()
     }
 
+    fun bacteriaVat(block: CleanRecipeFactory.() -> Unit) {
+        clean("bacteria_vat") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            defaultOutputFluid = 3
+            amperage = 0.5
+        }.block()
+    }
+
     fun oilCracking(block: ProcessingRecipeFactory.() -> Unit) {
         processing("oil_cracking") {
             defaultInputFluid = 0
