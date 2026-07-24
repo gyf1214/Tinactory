@@ -29,6 +29,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
@@ -319,6 +320,48 @@ object CircuitComponents {
                     voltage(Voltage.LUV)
                     workTicks(800)
                     tech(Technologies.CRYSTAL_CIRCUITRY)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.WETWARE) {
+            circuitAssembler {
+                circuit("wetware_processor", voltage = Voltage.ZPM) {
+                    input(getItem("component/stem_cell"))
+                    chip("qbit_cpu")
+                    circuitComponent("capacitor", 6)
+                    circuitComponent("transistor", 6)
+                    input("yttrium_barium_cuprate", "wire_fine", 8)
+                }
+                circuit("wetware_assembly", voltage = Voltage.ZPM) {
+                    circuit("wetware_processor", 2)
+                    circuitComponent("inductor", 4)
+                    circuitComponent("capacitor", 8)
+                    chip("ram", 24)
+                    input("trinium", "wire_fine", 16)
+                }
+                circuit("wetware_computer", voltage = Voltage.ZPM) {
+                    circuit("wetware_assembly", 2)
+                    input(getItem("component/neuro_processor"))
+                    chip("ram", 4)
+                    chip("nor", 32)
+                    chip("nand", 64)
+                    input("trinium", "wire_fine", 32)
+                }
+            }
+            assemblyLine {
+                output(getCircuit("wetware_mainframe").item) {
+                    circuit("wetware_computer", 2)
+                    input("hsss", "stick", 8)
+                    chip("ram", 32)
+                    chip("pic", 2)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("capacitor", 16)
+                    circuitComponent("diode", 8)
+                    input("trinium", "wire", 8)
+                    input("soldering_alloy", amount = 10)
+                    voltage(Voltage.ZPM)
+                    workTicks(800)
                 }
             }
         }
@@ -804,6 +847,53 @@ object CircuitComponents {
                     voltage(Voltage.EV)
                     workTicks(480)
                     tech(Technologies.CRYSTAL_CIRCUITRY)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.WETWARE) {
+            assembler {
+                output(board) {
+                    input(circuitBoard(CircuitTier.QUANTUM).get())
+                    input("polystyrene", "sheet")
+                    input("yttrium_barium_cuprate", "wire_fine", 16)
+                    input("soldering_alloy", amount = 2)
+                    voltage(Voltage.LUV)
+                    workTicks(CIRCUIT_TICKS)
+                }
+            }
+            chemicalReactor {
+                output(circuitBoard) {
+                    input(board)
+                    input("osmiridium", "foil", 16)
+                    input("iron_chloride")
+                    voltage(Voltage.LUV)
+                    workTicks(480)
+                    tech(Technologies.WETWARE)
+                }
+            }
+            extractor {
+                output(getItem("component/stem_cell")) {
+                    input("cultivated_bacteria", "fluid", 0.1)
+                    voltage(Voltage.LUV)
+                    workTicks(CIRCUIT_TICKS)
+                }
+            }
+            assemblyLine {
+                output(getItem("component/neuro_processor")) {
+                    input(board)
+                    input("polystyrene", "sheet", 4)
+                    input("advanced_bacteria", amount = 0.05)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("transistor", 8)
+                    chip("ram", 8)
+                    chip("nand", 8)
+                    input("trinium", "wire_fine", 16)
+                    input("niobium_titanium", "pipe", 4)
+                    input("soldering_alloy", amount = 2)
+                    voltage(Voltage.ZPM)
+                    workTicks(1200)
+                    tech(Technologies.WETWARE)
                 }
             }
         }

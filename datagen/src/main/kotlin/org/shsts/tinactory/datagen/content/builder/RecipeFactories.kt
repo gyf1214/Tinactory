@@ -236,9 +236,11 @@ object RecipeFactories {
     fun extractor(block: ProcessingRecipeFactory.() -> Unit) {
         processing("extractor") {
             defaultInputItem = 0
+            defaultInputFluid = 1
             defaultOutputItem = 2
             defaultOutputFluid = 3
             amperage = 0.5
+            workTicks(200)
         }.block()
     }
 
@@ -377,6 +379,7 @@ object RecipeFactories {
             defaultOutputItem = 2
             defaultOutputFluid = 3
             amperage = 0.5
+            workTicks(200)
         }.block()
     }
 

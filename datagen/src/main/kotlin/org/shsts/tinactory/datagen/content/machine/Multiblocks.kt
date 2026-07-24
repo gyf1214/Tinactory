@@ -684,7 +684,43 @@ object Multiblocks {
             }
         }
 
-        bacteriaVat {}
+        bacteriaVat {
+            recipe("bacteria_culture") {
+                input("biomass", amount = 0.1)
+                input("nuclear_waste", "slurry", 0.01)
+                output("bacteria_culture", amount = 0.01)
+                voltage(Voltage.HV)
+                extra { requireCleanness(0.7, 1.0) }
+            }
+            recipe("bacteria_culture_reproduction") {
+                input("bacteria_culture", amount = 0.001)
+                input("sterile_growth_medium", amount = 0.001)
+                output("bacteria_culture", amount = 0.002)
+                voltage(Voltage.LV)
+                extra { requireCleanness(0.5, 0.8) }
+            }
+            recipe("cultivated_bacteria") {
+                input("bacteria_culture", amount = 0.1)
+                input("radon", amount = 0.01)
+                output("cultivated_bacteria", amount = 0.01)
+                voltage(Voltage.HV)
+                extra { requireCleanness(0.85, 1.35) }
+            }
+            recipe("cultivated_bacteria_reproduction") {
+                input("cultivated_bacteria", amount = 0.001)
+                input("enriched_growth_medium", amount = 0.001)
+                output("cultivated_bacteria", amount = 0.002)
+                voltage(Voltage.MV)
+                extra { requireCleanness(0.6, 0.85) }
+            }
+            recipe("advanced_bacteria") {
+                input("cultivated_bacteria", amount = 0.1)
+                input("naquadria", "molten", 1f / 72f)
+                output("advanced_bacteria", amount = 0.01)
+                voltage(Voltage.IV)
+                extra { requireCleanness(0.9, 1.4) }
+            }
+        }
     }
 
     private fun powerBlocks() {

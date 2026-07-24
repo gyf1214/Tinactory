@@ -24,6 +24,8 @@
     "quantum_star",
     "raw_crystal_chip",
     "raw_crystal_chip_part",
-    "crystal_cpu"
+    "crystal_cpu",
+    "stem_cell",
+    "neuro_processor"
   ]
 }

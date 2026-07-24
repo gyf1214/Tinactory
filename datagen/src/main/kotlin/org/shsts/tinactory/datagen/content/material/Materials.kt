@@ -516,6 +516,24 @@ object Materials {
                 component("argon")
             }
         }
+        material("bacteria_culture", DULL)
+        material("cultivated_bacteria", DULL)
+        material("advanced_bacteria", DULL)
+        material("sterile_growth_medium", DULL) {
+            fluidMix(Voltage.MV) {
+                component("biomass")
+                component("ammonia", 0.5)
+                component("water", 0.5)
+                amount(2)
+            }
+        }
+        material("enriched_growth_medium", DULL) {
+            fluidMix(Voltage.ZPM) {
+                component("sterile_growth_medium")
+                component("neutronium", 1f / 144f, "molten")
+                amount(1)
+            }
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("activated_naquadah", DULL)

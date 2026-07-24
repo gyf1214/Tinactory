@@ -95,6 +95,14 @@ object InorganicChemistry {
     }
 
     private fun mv() {
+        chemicalReactor {
+            output("nuclear_waste", "slurry") {
+                input("nuclear_waste", "dust")
+                input("hydrogen_sulfide")
+                voltage(Voltage.MV)
+                workTicks(200)
+            }
+        }
         mixer {
             output(Items.GUNPOWDER, 6) {
                 input("sulfur")
