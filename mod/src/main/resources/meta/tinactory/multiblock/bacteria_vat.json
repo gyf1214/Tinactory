@@ -1,6 +1,6 @@
 {
   "sound": "tinactory:tick.chemical_reactor",
-  "recipe": "tinactory:bacteria_vat",
+  "recipe": "clean",
   "autoRecipe": false,
   "layout": {
     "slots": [

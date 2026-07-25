@@ -158,6 +158,14 @@ object Components {
                 model(basicItem("metaitems/crystal.central_processing_unit"))
             }
 
+            component("stem_cell") {
+                model(basicItem("metaitems/stem_cells"))
+            }
+
+            component("neuro_processor") {
+                model(basicItem("metaitems/processor.neuro"))
+            }
+
             component("raw_rhodium_plated_palladium") {
                 model(basicItem(ResourceLocation.fromNamespaceAndPath(
                     "gregtech4", "item/iridium_alloy_ingot")))

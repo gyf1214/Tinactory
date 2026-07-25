@@ -854,7 +854,7 @@ object CircuitComponents {
         circuitTier(CircuitTier.WETWARE) {
             assembler {
                 output(board) {
-                    input(circuitBoard(CircuitTier.QUANTUM).get())
+                    input(getItem("board/epoxy"))
                     input("polystyrene", "sheet")
                     input("yttrium_barium_cuprate", "wire_fine", 16)
                     input("soldering_alloy", amount = 2)
