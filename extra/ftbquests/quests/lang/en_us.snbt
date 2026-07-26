@@ -104,7 +104,7 @@
 	]
 	quest.029673365CED5C15.quest_subtitle: "Shrink circuits to surface-mount scale"
 	quest.029673365CED5C15.title: "Circuits at Fingertip Scale"
-	quest.02DDF396D6BCCE5E.quest_desc: ["Quartz Vein: Nether Quartz, Certus Quartz, Lapis Lazuli."]
+	quest.02DDF396D6BCCE5E.quest_desc: ["The Quartz Vein yields Nether Quartz, Certus Quartz, and Lapis Lazuli. Quartz and Certus Quartz are continuously consumed by circuit and ME routes."]
 	quest.02DDF396D6BCCE5E.quest_subtitle: "Unlock Quartz"
 	quest.02DDF396D6BCCE5E.title: "Quartz Vein"
 	quest.02FC118547396204.quest_desc: [
@@ -208,7 +208,7 @@
 	]
 	quest.05A550E7057E0011.quest_subtitle: "Feed Radon into the Ender route"
 	quest.05A550E7057E0011.title: "Isotope Feed"
-	quest.05A550E7057E0013.quest_desc: ["The first Quantum Eye turns Ender materials, Radon, and precision parts into a usable node. It opens the quantum circuit branch without blocking the first Assembly Line."]
+	quest.05A550E7057E0013.quest_desc: ["The first Quantum Eye combines Ender materials, Radon, and precision components into a reusable quantum node. It opens the quantum circuit branch, so stabilize these inputs before later scaling returns you to ad hoc refills."]
 	quest.05A550E7057E0013.quest_subtitle: "Gather Ender, Radon, and precision parts"
 	quest.05A550E7057E0013.title: "Quantum Eye Formed"
 	quest.05A550E7057E0015.quest_desc: [
@@ -225,7 +225,7 @@
 	]
 	quest.05A550E7057E0018.quest_subtitle: "Stabilize Sensors and Emitters"
 	quest.05A550E7057E0018.title: "IV Control Pair"
-	quest.05A550E7057E001B.quest_desc: ["The IV Assembler combines higher-tier parts before the Assembly Line exists, giving later multiblock structures a reachable entry point."]
+	quest.05A550E7057E001B.quest_desc: ["The IV Assembler combines higher-tier components before the Assembly Line is built, providing the transition into multiblock structures. Put common parts on stable recipes so later Assembly Line casings and control components have a reliable source."]
 	quest.05A550E7057E001B.quest_subtitle: "Give high-tier parts a workstation"
 	quest.05A550E7057E001B.title: "IV Assembly Entry"
 	quest.05A550E7057E001D.quest_desc: [
@@ -244,10 +244,10 @@
 	]
 	quest.05A550E7057E001F.quest_subtitle: "Build controller and casings"
 	quest.05A550E7057E001F.title: "Assembly Line"
-	quest.05A550E7057E0022.quest_desc: ["Platinum Metallic from the End vein can yield early Platinum before full PGM separation. IV Sensors, Emitters, and wire already consume it, so stock some before the full route is done."]
+	quest.05A550E7057E0022.quest_desc: ["Platinum Metallic from the End Stone Vein provides early Platinum before full Platinum Group Metal separation. IV Sensors, Emitters, and wire already consume it, so build a reserve before advancing the complete separation line."]
 	quest.05A550E7057E0022.quest_subtitle: "Smelt usable Platinum early"
 	quest.05A550E7057E0022.title: "Platinum Lands First"
-	quest.05A550E7057E0024.quest_desc: ["Aqua Regia links HV Nitric Acid to Platinum Group Metal processing. It is not an Ender byproduct, but the reagent gate that starts full PGM separation."]
+	quest.05A550E7057E0024.quest_desc: ["Aqua Regia connects the HV Nitric Acid route to Platinum Group Metal processing and opens the leaching chemistry needed for full separation. It is not an Ender byproduct; keep Nitric Acid and chloride supply steady so later precious-metal branches can run continuously."]
 	quest.05A550E7057E0024.quest_subtitle: "Feed Nitric Acid into PGM chemistry"
 	quest.05A550E7057E0024.title: "Aqua Regia Ignites"
 	quest.05A550E7057E0026.quest_desc: [
@@ -257,7 +257,7 @@
 	]
 	quest.05A550E7057E0026.quest_subtitle: "Dissolve Platinum Metallic"
 	quest.05A550E7057E0026.title: "First Leach Split"
-	quest.05A550E7057E0028.quest_desc: ["Palladium first leaves the leachate as usable dust, then feeds Rhodium Plated Palladium and LuV Sensor/Emitter foil. The steadier the ammonia branch, the easier those component costs become."]
+	quest.05A550E7057E0028.quest_desc: ["Palladium first precipitates from the leachate as usable dust, then feeds Rhodium Plated Palladium and the foil used by LuV Sensors and Emitters. Stabilize the ammonia-processing branch to keep the cost of these precision components predictable."]
 	quest.05A550E7057E0028.quest_subtitle: "Precipitate Palladium Dust"
 	quest.05A550E7057E0028.title: "Palladium Settles Out"
 	quest.05A550E7057E002A.quest_desc: [
@@ -267,16 +267,16 @@
 	]
 	quest.05A550E7057E002A.quest_subtitle: "Separate Raw Rhodium and Rarest Metallic Dust"
 	quest.05A550E7057E002A.title: "Rhodium Residue Splits"
-	quest.05A550E7057E002D.quest_desc: ["The Raw Rhodium branch separates Rhodium and Ruthenium: Rhodium feeds Rhodium Plated Palladium, while Ruthenium feeds Ruridit. LuV hull and motor materials both depend on it."]
+	quest.05A550E7057E002D.quest_desc: ["The Raw Rhodium branch separates Rhodium and Ruthenium into usable material routes: Rhodium feeds Rhodium Plated Palladium, while Ruthenium feeds Ruridit. LuV hulls and moving components both depend on this split, so do not treat it as a one-time byproduct."]
 	quest.05A550E7057E002D.quest_subtitle: "Finish the Raw Rhodium branch"
 	quest.05A550E7057E002D.title: "Rhodium and Ruthenium Split"
-	quest.05A550E7057E0030.quest_desc: ["Rarest Metallic Dust narrows the PGM chain into Raw Iridium and Osmium Solution. Output is low here, but it controls Ruridit and later high-tier chemistry."]
+	quest.05A550E7057E0030.quest_desc: ["Rarest Metallic Dust pushes the Platinum Group Metal chain into its narrowest branch, producing Raw Iridium and Osmium Solution. Output here limits later high-tier alloys, so begin maintaining a buffer now."]
 	quest.05A550E7057E0030.quest_subtitle: "Split Raw Iridium and Osmium Solution"
 	quest.05A550E7057E0030.title: "Rarest Branch Narrows"
-	quest.05A550E7057E0033.quest_desc: ["Iridium and Osmium prove the PGM separation route is running. Iridium goes straight into Ruridit, while Osmium leaves room for later high-tier materials."]
+	quest.05A550E7057E0033.quest_desc: ["Obtaining Iridium and Osmium proves that the rarest Platinum Group Metal separation route is operating. Iridium feeds Ruridit while Osmium supports later alloys, so keep this low-output line running continuously."]
 	quest.05A550E7057E0033.quest_subtitle: "Obtain Iridium and Osmium Dust"
 	quest.05A550E7057E0033.title: "Rarest Branch Runs"
-	quest.05A550E7057E0036.quest_desc: ["Ruridit compresses Ruthenium and Iridium into the conductor for LuV components. Motor windings, Sensors, and Emitters will keep pulling on this PGM branch."]
+	quest.05A550E7057E0036.quest_desc: ["Ruridit combines Ruthenium and Iridium into the conductor required by LuV components. Motor windings, Sensors, and Emitters repeatedly draw on this branch, so stock it as a regularly used wire material."]
 	quest.05A550E7057E0036.quest_subtitle: "Make the LuV motor conductor"
 	quest.05A550E7057E0036.title: "Ruridit Becomes Wire"
 	quest.05A550E7057E0038.quest_desc: [
@@ -286,16 +286,16 @@
 	]
 	quest.05A550E7057E0038.quest_subtitle: "Turn the Palladium/Rhodium bottleneck into LuV hull material"
 	quest.05A550E7057E0038.title: "Rhodium Plated Palladium Ingots"
-	quest.05A550E7057E003B.quest_desc: ["HSS-G is more than another blast-furnace alloy. It carries late-EV mixing and smelting pressure into LuV motion parts, then disappears into motors, pumps, pistons, and Fusion Casings."]
+	quest.05A550E7057E003B.quest_desc: ["HSS-G carries late-EV mixing and high-temperature smelting pressure into LuV moving components. Motors, Pumps, Pistons, Conveyor Modules, and Fusion Casings all consume it, so scale the alloy line to steady output first."]
 	quest.05A550E7057E003B.quest_subtitle: "Prepare HSS-G for LuV motion parts"
 	quest.05A550E7057E003B.title: "HSS-G Takes Load"
-	quest.05A550E7057E003D.quest_desc: ["Vanadium Gallium reopens the deferred IV Superconductor route. Coolant, Niobium Titanium pipes, and wiremaking meet here before Field Generators and Fusion prep."]
+	quest.05A550E7057E003D.quest_desc: ["Vanadium Gallium reopens the IV Superconductor route, bringing Coolant, Niobium Titanium pipes, and wire processing into one high-tier material. It supplies IV Field Generators and Fusion preparation, making it suitable for continuous production alongside the main path."]
 	quest.05A550E7057E003D.quest_subtitle: "Prepare the IV Superconductor alloy"
 	quest.05A550E7057E003D.title: "Vanadium Gallium Restarts Superconductors"
-	quest.05A550E7057E003F.quest_desc: ["IV Superconductor Wire ties Vanadium Gallium wire, Niobium Titanium pipes, and Coolant back into advanced wiring. It is not the LuV hull gate, but it restores IV Field Generators."]
+	quest.05A550E7057E003F.quest_desc: ["IV Superconductor Wire turns Vanadium Gallium wire, Niobium Titanium pipes, and Coolant into wiring for higher-tier components. It is not the main LuV hull bottleneck, but it reconnects IV Field Generators to the Fusion route."]
 	quest.05A550E7057E003F.quest_subtitle: "Bring advanced wire back into components"
 	quest.05A550E7057E003F.title: "IV Superconductor Returns"
-	quest.05A550E7057E0041.quest_desc: ["The IV Field Generator turns the superconductor branch into a usable control component. It prepares Fusion and later equipment without stepping in front of the main LuV component path."]
+	quest.05A550E7057E0041.quest_desc: ["The IV Field Generator turns the superconductor branch into a usable control component. It reserves key capability for Fusion and later equipment; prepare a batch without letting it displace the main LuV component line."]
 	quest.05A550E7057E0041.quest_subtitle: "Turn the superconductor branch into Fusion prep"
 	quest.05A550E7057E0041.title: "IV Field Generator Returns"
 	quest.05A550E7057E0043.quest_desc: [
@@ -305,16 +305,16 @@
 	]
 	quest.05A550E7057E0043.quest_subtitle: "Join Platinum cable and Rhodium Plated Palladium hulls"
 	quest.05A550E7057E0043.title: "LuV Foundation Forms"
-	quest.05A550E7057E0046.quest_desc: ["The LuV Electric Motor pulls HSS-G, Ruridit wire, and LuV cable into Assembly Line crafting. Pumps, Pistons, Conveyors, and Robot Arms all inherit this material bottleneck."]
+	quest.05A550E7057E0046.quest_desc: ["The LuV Electric Motor brings HSS-G, Ruridit wire, and LuV Cable into an Assembly Line recipe, becoming the shared core of moving components. Pumps, Pistons, Conveyor Modules, and Robot Arms inherit this material pressure, so establish a repeatable motor line first."]
 	quest.05A550E7057E0046.quest_subtitle: "Start Assembly Line motion parts"
 	quest.05A550E7057E0046.title: "LuV Motor Turns"
-	quest.05A550E7057E0048.quest_desc: ["Electric Pumps, Electric Pistons, and Conveyor Modules share motor, HSS-G, and cable pressure. Automating them as a set fits LuV better than patching parts one at a time."]
+	quest.05A550E7057E0048.quest_desc: ["Electric Pumps, Electric Pistons, and Conveyor Modules share demand for motors, HSS-G, and cable. Automating them as a set prevents LuV from falling back to ad hoc component crafting before each new machine recipe."]
 	quest.05A550E7057E0048.quest_subtitle: "Scale pumps, pistons, and conveyors together"
 	quest.05A550E7057E0048.title: "Motion Parts in Sets"
-	quest.05A550E7057E004C.quest_desc: ["LuV Sensors and Emitters put Palladium foil, Ruridit, Eye of Ender, and LuV-tier circuits into one Assembly Line recipe set. This checks precision material supply, not a new circuit node."]
+	quest.05A550E7057E004C.quest_desc: ["LuV Sensors and Emitters combine Palladium foil, Ruridit, Eye of Ender, and LuV-tier circuits into precision control components. This tests continuous supply of precious metals and Ender materials rather than introducing a new circuit node."]
 	quest.05A550E7057E004C.quest_subtitle: "Feed precision materials into LuV control parts"
 	quest.05A550E7057E004C.title: "Sensor and Emitter Upgrade"
-	quest.05A550E7057E004F.quest_desc: ["The LuV Robot Arm consumes motors, pistons, and mixed circuit tiers, turning the first LuV component chain into a reusable node. Larger Assembly Line goals will build on this base."]
+	quest.05A550E7057E004F.quest_desc: ["The LuV Robot Arm combines motors, pistons, and multiple circuit tiers into a reusable automation component. It closes the first LuV moving-component chain and provides a stable base for larger Assembly Line goals."]
 	quest.05A550E7057E004F.quest_subtitle: "Finish the component path with motors and pistons"
 	quest.05A550E7057E004F.title: "Robot Arm Closes the Chain"
 	quest.05A550E7057E0051.quest_desc: [
@@ -371,10 +371,10 @@
 	]
 	quest.06FE000000000000.quest_subtitle: "Route End Stone ore into post-Fusion processing"
 	quest.06FE000000000000.title: "Naquadah Joins the Main Line"
-	quest.06FE000000000001.quest_desc: ["Naquadah Coils raise the Electric Blast Furnace into a new heat tier, freeing later high-temperature materials from the Tungsten Coil ceiling."]
+	quest.06FE000000000001.quest_desc: ["Naquadah Coils raise the Electric Blast Furnace to 5400 K, removing the Tungsten Coil limit from later high-temperature materials. Stabilize the coils and power first, then turn high-temperature recipes into permanent lines."]
 	quest.06FE000000000001.quest_subtitle: "Push the EBF to 5400 K"
 	quest.06FE000000000001.title: "Past Tungsten Coils"
-	quest.06FE000000000002.quest_desc: ["The Naquadah boule moves this resource line into wafer production, preparing stronger substrates for SOC, PIC, and finer lithography."]
+	quest.06FE000000000002.quest_desc: ["The Naquadah Boule brings the Naquadah resource line into wafer production, providing substrates for SoC, PIC, and finer lithography. Wafers consume Naquadah continuously, so stabilize boule growth and cutting."]
 	quest.06FE000000000002.quest_subtitle: "Cut raw Naquadah wafers"
 	quest.06FE000000000002.title: "Naquadah Enters Wafers"
 	quest.06FE000000000003.quest_desc: [
@@ -384,13 +384,13 @@
 	]
 	quest.06FE000000000003.quest_subtitle: "Split Naquadah into high-energy branches"
 	quest.06FE000000000003.title: "Fusion Ignites Naquadah"
-	quest.06FE000000000004.quest_desc: ["Enriched Naquadah is not just a refinement branch. It becomes passive reactor fuel rods and feeds power back into the Fusion-era material line."]
+	quest.06FE000000000004.quest_desc: ["Enriched Naquadah turns one refinement branch of Activated Naquadah into passive reactor fuel rods. It lets material processing help carry Fusion-era power demand, so maintain a reserve alongside the main energy line."]
 	quest.06FE000000000004.quest_subtitle: "Let Enriched Naquadah support power"
 	quest.06FE000000000004.title: "Fuel from Refinement"
-	quest.06FE000000000005.quest_desc: ["Naquadria stabilizes one of Activated Naquadah's harsher branches into a solid material, keeping a scalable high-energy path ready for later ZPM-tier use."]
+	quest.06FE000000000005.quest_desc: ["Naquadria fixes Activated Naquadah's more unstable high-energy branch into a workable solid material. It feeds later ZPM-tier uses, so accumulate it continuously once Activated Naquadah production is stable."]
 	quest.06FE000000000005.quest_subtitle: "Turn the high-energy branch into material"
 	quest.06FE000000000005.title: "Stabilize Naquadria"
-	quest.06FE000000000006.quest_desc: ["Trinium turns Naquadah residue from a cleanup problem into a bridge-metal source for Crystal chips and pre-ZPM alloys."]
+	quest.06FE000000000006.quest_desc: ["Trinium turns Naquadah residue from a recovery burden into a valuable bridge metal. It connects Crystal chip and pre-ZPM alloy routes, so keep tailings processing at stable output."]
 	quest.06FE000000000006.quest_subtitle: "Turn Naquadah tailings into a bridge metal"
 	quest.06FE000000000006.title: "Trinium from Residue"
 	quest.06FE000000000007.quest_desc: [
@@ -400,19 +400,19 @@
 	]
 	quest.06FE000000000007.quest_subtitle: "Make Ancient Debris a planned source"
 	quest.06FE000000000007.title: "Industrial Nether Materials"
-	quest.06FE000000000008.quest_desc: ["Netherite moves beyond the vanilla scrap recipe here, becoming a heat-resistant material supported by Fusion and Nether chemistry."]
+	quest.06FE000000000008.quest_desc: ["Netherite no longer depends on vanilla scrap crafting, instead entering an industrial route supported by Fusion and Nether chemistry. Make both Fusion inputs and Nether feedstocks repeatable for later heat-resistant structures."]
 	quest.06FE000000000008.quest_subtitle: "Let Fusion carry the heat metal"
 	quest.06FE000000000008.title: "Recast Netherite"
-	quest.06FE000000000009.quest_desc: ["Wither Matrix condenses Nether materials, Radon, and high-tier chemistry into the fluid core that starts synthetic Nether Star production."]
+	quest.06FE000000000009.quest_desc: ["Wither Matrix condenses Nether materials, Radon, and high-tier chemistry into the fluid core of synthetic Nether Star production. Stabilize gas and fluid buffers first so later star production does not stall."]
 	quest.06FE000000000009.quest_subtitle: "Condense Nether chemistry into a fluid core"
 	quest.06FE000000000009.title: "Wither Matrix Takes Shape"
-	quest.06FE00000000000A.quest_desc: ["The Nether Star seed turns Wither Matrix and Enriched Naquadah into a reproducible star source, moving a rare drop into industry."]
+	quest.06FE00000000000A.quest_desc: ["The Nether Star Seed combines Wither Matrix and Enriched Naquadah into a reproducible source of Nether Stars. It supplies Quantum Stars and later lithography, so move from one-off crafting to stable batch production."]
 	quest.06FE00000000000A.quest_subtitle: "Converge matrix and Enriched Naquadah"
 	quest.06FE00000000000A.title: "Grow the Nether Star"
-	quest.06FE00000000000B.quest_desc: ["Quantum Star brings synthetic Nether Stars into stronger wafer engraving, making electronics consume the Nether chemistry branch."]
+	quest.06FE00000000000B.quest_desc: ["The Quantum Star brings synthetic Nether Stars into higher-intensity wafer lithography, making Nether chemistry serve electronics directly. It increases star consumption, so prepare continuous supply before advancing high-tier wafers."]
 	quest.06FE00000000000B.quest_subtitle: "Put Quantum Star into stronger engraving"
 	quest.06FE00000000000B.title: "Starlight for Lithography"
-	quest.06FE00000000000C.quest_desc: ["Advanced SMD parts pull LuV materials, fine Naquadah wire, and new dopants into circuit assembly before Crystal circuits multiply the demand."]
+	quest.06FE00000000000C.quest_desc: ["Advanced SMD parts bring LuV materials, fine Naquadah wire, and new dopant requirements into circuit assembly. Crystal circuits sharply multiply demand for all five types, so mass-produce them as a complete component set first."]
 	quest.06FE00000000000C.quest_subtitle: "Bring all five Advanced SMD parts into scale"
 	quest.06FE00000000000C.title: "SMD Before Crystal"
 	quest.06FE00000000000D.quest_desc: [
@@ -422,16 +422,16 @@
 	]
 	quest.06FE00000000000D.quest_subtitle: "Use Naquadah substrates for SOC/PIC upgrades"
 	quest.06FE00000000000D.title: "Wafer Process Moves On"
-	quest.06FE00000000000E.quest_desc: ["Raw Crystal Chip production pulls Trinium and Wither Matrix into crystal growth, giving Crystal CPUs their first workable chip blank."]
+	quest.06FE00000000000E.quest_desc: ["Raw Crystal Chips bring Trinium and Wither Matrix into crystal growth, providing the first workable blank for Crystal CPUs. They become a continuing Crystal-circuit consumable, so stabilize feedstocks and growth together."]
 	quest.06FE00000000000E.quest_subtitle: "Grow chips from Trinium and Wither Matrix"
 	quest.06FE00000000000E.title: "Crystal Chip Blank"
-	quest.06FE00000000000F.quest_desc: ["The Crystal CPU joins the new chip blank with upgraded lithography, starting the move into Crystal Processor circuits."]
+	quest.06FE00000000000F.quest_desc: ["The Crystal CPU combines the new chip blank with the upgraded lithography route, beginning the move into Crystal Processor circuits. It is the core input for every later Crystal circuit, so validate the full process chain before scaling assembly."]
 	quest.06FE00000000000F.quest_subtitle: "Build the first Crystal CPU"
 	quest.06FE00000000000F.title: "Light the Crystal Core"
-	quest.06FE000000000010.quest_desc: ["Crystal Processor is the first deliverable Crystal circuit here, proving chip work, Advanced SMD, and clean processing form a stable assembly chain."]
+	quest.06FE000000000010.quest_desc: ["The Crystal Processor is this chapter's first deliverable Crystal circuit, proving that chip work, Advanced SMD parts, and clean processing form a stable assembly chain. Automate the small components so this upgrade becomes genuinely repeatable."]
 	quest.06FE000000000010.quest_subtitle: "Join CPU, Advanced SMD, and clean processing"
 	quest.06FE000000000010.title: "Crystal Circuits Land"
-	quest.06FE000000000011.quest_desc: ["Crystal Processor Assembly, Computer, and Mainframe complete the crystal route before ZPM. Automate them so the Bacteria Vat and later components receive their required circuit tags."]
+	quest.06FE000000000011.quest_desc: ["Crystal Processor Assemblies, Computers, and Mainframes complete the pre-ZPM Crystal circuit tier and provide the circuit tags required by later equipment. The Bacteria Vat and higher-tier components will repeatedly request them, so build a scalable complete line rather than crafting only the quest amount."]
 	quest.06FE000000000011.quest_subtitle: "Complete all three Crystal Processor products"
 	quest.06FE000000000011.title: "Crystal Mainframe"
 	quest.06FE000000000012.quest_desc: [
@@ -441,22 +441,22 @@
 	]
 	quest.06FE000000000012.quest_subtitle: "Concentrate Indium from Sphalerite and Galena"
 	quest.06FE000000000012.title: "Sulfides Return"
-	quest.06FE000000000013.quest_desc: ["Heavy Rare Earth Solution extends the EV rare earth split and uses LuV-grade heat processing to add the Samarium branch for later materials."]
+	quest.06FE000000000013.quest_desc: ["Heavy Rare Earth Solution extends EV rare-earth separation into LuV-grade heat processing and opens Samarium's later-material branch. Retain an adequate solution buffer for superconductors and higher-tier components."]
 	quest.06FE000000000013.quest_subtitle: "Produce Samarium from Heavy Rare Earth Solution"
 	quest.06FE000000000013.title: "Rare Earths Go Deeper"
-	quest.06FE000000000014.quest_desc: ["Yttrium comes from downstream heavy rare earth separation and, with Barium, determines whether Yttrium Barium Cuprate can feed LuV Superconductor wire."]
+	quest.06FE000000000014.quest_desc: ["Yttrium is recovered from downstream heavy rare-earth separation and forms one half of the Yttrium Barium Cuprate precursor. Accumulate it before rare-earth separation stalls LuV Superconductor Wire."]
 	quest.06FE000000000014.quest_subtitle: "Recover half of the superconductor precursor"
 	quest.06FE000000000014.title: "Yttrium Separates Out"
-	quest.06FE000000000015.quest_desc: ["Barium brings saved Lithium Brine back into Advanced Hydrometallurgy, completing the other half of the Yttrium Barium Cuprate precursor."]
+	quest.06FE000000000015.quest_desc: ["Barium brings saved Lithium Brine back into Advanced Hydrometallurgy, completing the other half of the Yttrium Barium Cuprate precursor. Keep this recovery line supplying Barium steadily."]
 	quest.06FE000000000015.quest_subtitle: "Return Lithium Brine to late metallurgy"
 	quest.06FE000000000015.title: "Barium Brings Brine Back"
-	quest.06FE000000000016.quest_desc: ["Yttrium Barium Cuprate combines Yttrium, Barium, Copper, and Oxygen into a wire-ready superconductor precursor before LuV Superconductor proper."]
+	quest.06FE000000000016.quest_desc: ["Yttrium Barium Cuprate combines Yttrium, Barium, Copper, and Oxygen into a wire-ready superconductor precursor. Prepare continuous feedstock before cryogenic processing begins."]
 	quest.06FE000000000016.quest_subtitle: "Join Yttrium and Barium as Yttrium Barium Cuprate"
 	quest.06FE000000000016.title: "Precursor into Wire"
-	quest.06FE000000000017.quest_desc: ["Liquid Nitrogen checks the Vacuum Freezer and cryogenic fluid handling so LuV Superconductor wire does not stall on coolant supply."]
+	quest.06FE000000000017.quest_desc: ["Liquid Nitrogen verifies that the Vacuum Freezer and cryogenic fluid handling can operate steadily. Establish buffering and replenishment before wire production stalls on cryogenic fluid."]
 	quest.06FE000000000017.quest_subtitle: "Use Liquid Nitrogen for superconductor wire"
 	quest.06FE000000000017.title: "Cryogenics Ready"
-	quest.06FE000000000018.quest_desc: ["HSS-S brings Netherite into the LuV structural layer, while Osmiridium and Naquadah Alloy keep pulling platinum-group metals and Naquadah. Together they form the pre-ZPM alloy base."]
+	quest.06FE000000000018.quest_desc: ["HSS-S brings Netherite into LuV structural materials, while Osmiridium and Naquadah Alloy continue drawing on Platinum Group Metals and Naquadah. Scale the three alloys together as the pre-ZPM structural base."]
 	quest.06FE000000000018.quest_subtitle: "Join HSS-S, Osmiridium, and Naquadah Alloy"
 	quest.06FE000000000018.title: "Pre-ZPM Alloys Converge"
 	quest.06FE000000000019.quest_desc: [
@@ -466,65 +466,65 @@
 	]
 	quest.06FE000000000019.quest_subtitle: "Finish this chapter's material endpoint"
 	quest.06FE000000000019.title: "LuV Superconductor Closes the Bridge"
-	quest.0700000000000000.quest_desc: ["The Trinium Coil opens 6300 K processing for the ZPM superconductor route."]
-	quest.0700000000000000.quest_subtitle: "Craft a Trinium Coil"
+	quest.0700000000000000.quest_desc: ["The Trinium Furnace Coil raises the Electric Blast Furnace limit to 6300 K, opening the high-temperature processing required for ZPM superconductors.", "", "It also confirms that Trinium, HSS-S, and PTFE production is stable. Stock the coils and power first, then keep the superconductor route running."]
+	quest.0700000000000000.quest_subtitle: "Craft a Trinium Furnace Coil"
 	quest.0700000000000000.title: "The 6300 K Threshold"
-	quest.0700000000000001.quest_desc: ["ITBT Cuprate and ZPM Superconductor wire advance the bridge into ZPM power delivery."]
+	quest.0700000000000001.quest_desc: ["After 6300 K processing, ITBT Cuprate is drawn into ZPM Superconductor wire, carrying the previous chapter's material bridge into ZPM-scale power delivery. It supplies stable power for Field Generators and later advanced assembly; make the ceramic, cooling, and wire-drawing steps continuous so ZPM production does not stop at its conductor supply."]
 	quest.0700000000000001.quest_subtitle: "Produce a ZPM Superconductor"
 	quest.0700000000000001.title: "Zero-Point Superconductivity"
-	quest.0700000000000002.quest_desc: ["ZPM Machine Hulls and cable form the shared frame for advanced machinery."]
-	quest.0700000000000002.quest_subtitle: "Craft the ZPM machine core"
+	quest.0700000000000002.quest_desc: ["The ZPM Machine Hull and ZPM cable combine advanced structure, insulation, and power delivery into a common foundation for ZPM components and multiblocks. Both recur in later recipes, so stock and automate them early to keep Robot Arm, Pump, and interface assembly supplied."]
+	quest.0700000000000002.quest_subtitle: "Craft a ZPM Machine Hull and cable"
 	quest.0700000000000002.title: "ZPM Frame"
-	quest.0700000000000003.quest_desc: ["Motion, pumping, and control components supply terminal assembly hardware."]
+	quest.0700000000000003.quest_desc: ["ZPM Electric Motors, Electric Pumps, and Robot Arms provide motion, fluid transfer, and automated handling, turning ZPM hulls into working equipment. They are recurring inputs for the Bacteria Vat, Digital Interface, and terminal assembly; produce each component in batches so one part does not bottleneck later large recipes."]
 	quest.0700000000000003.quest_subtitle: "Craft ZPM core components"
 	quest.0700000000000003.title: "Components at Scale"
-	quest.0700000000000013.quest_desc: ["ZPM Superconductor wire gives the Field Generator the stable power supply needed to maintain interstellar travel constraints."]
+	quest.0700000000000013.quest_desc: ["The ZPM Field Generator turns ZPM Superconductor power delivery into stable field control and is a key part of Rocket T3's containment field. It also consumes precision structures and advanced components; stock it before beginning final rocket assembly so the terminal lines can converge on schedule."]
 	quest.0700000000000013.quest_subtitle: "Craft a ZPM Field Generator"
 	quest.0700000000000013.title: "Constraint Field Ready"
-	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface supports large automation but is not a Rocket T3 input."]
+	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface gives large processing equipment ZPM-scale parallelism and automation, turning scattered advanced recipes into factory lines that can run continuously.", "", "It is especially useful for cultivation, fluid processing, and repeatable material routes. Prepare stable logistics, power, and input buffers before connecting it so parallelism becomes real output."]
 	quest.0700000000000004.quest_subtitle: "Craft a ZPM Digital Interface"
 	quest.0700000000000004.title: "Digital Connection"
-	quest.0700000000000005.quest_desc: ["Fusion Neutronium binds Nether Stars and Naquadria into interstellar structural metal."]
+	quest.0700000000000005.quest_desc: ["Molten Nether Star and molten Naquadria form Neutronium plasma in the Fusion Reactor, then the Vacuum Freezer stabilizes it into Neutronium.", "", "Neutronium turns established fusion capacity into interstellar structural material and semiconductor feedstock. Stabilize Naquadria and plasma handling before accumulating this expensive line."]
 	quest.0700000000000005.quest_subtitle: "Obtain a Neutronium Ingot"
 	quest.0700000000000005.title: "Fusion-Made Neutronium"
-	quest.0700000000000006.quest_desc: ["Neutronium Boules and Raw Wafers provide an optional high-yield chip substrate."]
+	quest.0700000000000006.quest_desc: ["Cutting Neutronium Boules into Neutronium Raw Wafers turns costly fusion material into a substrate for advanced chips. It improves substrate output for SoC and later chip routes; connect boule production, cutting, and wafer buffers into a steady process to turn Neutronium investment into continuous electronics capacity."]
 	quest.0700000000000006.quest_subtitle: "Craft Neutronium substrates"
 	quest.0700000000000006.title: "Neutronium Substrates"
-	quest.0700000000000007.quest_desc: ["Neutronium plates carry the Rocket T3 structural and thermal load."]
+	quest.0700000000000007.quest_desc: ["Neutronium Plates turn fusion material into hull parts able to bear interstellar structural and thermal loads. Rocket T3 consumes them directly, and plate processing increases pressure on Neutronium stock; begin accumulating plates before fuel and terminal components are all ready."]
 	quest.0700000000000007.quest_subtitle: "Craft Neutronium Plates"
 	quest.0700000000000007.title: "Interstellar Hull Metal"
-	quest.0700000000000008.quest_desc: ["Advanced SoC is an optional Neutronium route and does not gate Wetware."]
+	quest.0700000000000008.quest_desc: ["Advanced SoC extends the high-yield advantage of Neutronium Raw Wafers into higher-tier chip processing, reducing wafer pressure in chip-hungry assembly lines. It does not gate the Wetware route, but it can substantially ease substrate turnover when expanding PIC and terminal electronics production."]
 	quest.0700000000000008.quest_subtitle: "Craft an Advanced SoC"
 	quest.0700000000000008.title: "Advanced SoC"
-	quest.0700000000000009.quest_desc: ["The Bacteria Vat brings controlled biological processing into the ZPM factory."]
+	quest.0700000000000009.quest_desc: ["The Sterile Bacteria Vat brings controlled biological processing into the ZPM factory: sterile casings, clean conditions, and ZPM components support strain cultivation and mutation. It is not a one-time structure but the production center for Wetware circuits; connect stable logistics, power, and input buffers before expanding its capacity with enough sterile casings.", "", "Vat recipes are affected by cleanness, making the strain route more reliable at better clean processing. Stabilize clean operations and the base-strain supply first, then make cultivation, mutation, and extraction continuous so Neuro Processors and Wetware circuits do not run dry."]
 	quest.0700000000000009.quest_subtitle: "Build the Bacteria Vat"
 	quest.0700000000000009.title: "Sterile Bacteria Vat"
-	quest.070000000000000A.quest_desc: ["Nuclear Waste Slurry inoculates Bacteria Culture and starts the biological route."]
+	quest.070000000000000A.quest_desc: ["Nuclear Waste Slurry inoculates Bacteria Culture, establishing the first strain source for the Bacteria Vat. Bacteria Culture continues into reproduction and mutation; keep slurry, growth medium, and fluid buffers supplied so the biological line becomes sustained production instead of a one-time inoculation."]
 	quest.070000000000000A.quest_subtitle: "Inoculate Bacteria Culture"
 	quest.070000000000000A.title: "Inoculate the Culture"
-	quest.070000000000000B.quest_desc: ["Cultivated Bacteria and Stem Cells provide the first Wetware inputs."]
+	quest.070000000000000B.quest_desc: ["Cultivated Bacteria advances the base strain into a stable Wetware input and provides Stem Cells during extraction. Stem Cells go directly into the Wetware Processor, while Cultivated Bacteria must keep reproducing for later consumption; buffer the two outputs separately so circuit production and cultivation do not compete for the same stock."]
 	quest.070000000000000B.quest_subtitle: "Obtain Cultivated Bacteria and Stem Cells"
 	quest.070000000000000B.title: "Cultivated Biology"
-	quest.070000000000000C.quest_desc: ["Enriched Growth Medium makes Cultivated Bacteria reproduction repeatable."]
+	quest.070000000000000C.quest_desc: ["Enriched Growth Medium turns Cultivated Bacteria reproduction from a limited strain supply into a repeatable one, using the Neutronium route as its material gate. It determines whether Wetware production can scale over time; automate the medium and bacteria loop before adding Advanced Bacteria and Neuro Processors."]
 	quest.070000000000000C.quest_subtitle: "Produce Enriched Growth Medium"
 	quest.070000000000000C.title: "Enriched Growth Medium"
-	quest.070000000000000D.quest_desc: ["Advanced Bacteria and Neuro Processors advance the biological route."]
+	quest.070000000000000D.quest_desc: ["Advanced Bacteria pushes cultivation into the final biological input for Wetware and is consumed directly by Neuro Processors. Neuro Processors then converge with advanced chips for Wetware circuit upgrades; buffer mutation output and schedule batches around processor demand so the biological branch does not slow Mainframe assembly."]
 	quest.070000000000000D.quest_subtitle: "Obtain Advanced Bacteria and a Neuro Processor"
 	quest.070000000000000D.title: "Advanced Bacteria"
-	quest.070000000000000E.quest_desc: ["Wetware Boards and Circuit Boards provide the manufacturing base for Wetware circuits."]
-	quest.070000000000000E.quest_subtitle: "Craft Wetware boards"
+	quest.070000000000000E.quest_desc: ["The Wetware Board combines a Quantum Board, Polystyrene, and fine wire into biological-circuit stock, then etches into a Wetware Circuit Board.", "", "Only the finished Wetware Circuit Board enters standard Wetware circuit recipes. Automate both substrate stages and the etchant supply to support later circuit upgrades reliably."]
+	quest.070000000000000E.quest_subtitle: "Craft a Wetware Board and Wetware Circuit Board"
 	quest.070000000000000E.title: "Wetware Substrate"
-	quest.070000000000000F.quest_desc: ["The Wetware Processor connects the Stem Cell route to advanced circuits."]
+	quest.070000000000000F.quest_desc: ["The Wetware Processor combines Wetware Circuit Boards and biological components into the first Wetware circuit tier for advanced assembly. It will be upgraded into Wetware Assemblies, Computers, and Mainframes; keep substrate production, biological outputs, and processor assembly supplied in batches now so the later circuit ladder does not repeatedly stop."]
 	quest.070000000000000F.quest_subtitle: "Craft a Wetware Processor"
 	quest.070000000000000F.title: "Wetware Processor"
-	quest.0700000000000010.quest_desc: ["The Wetware Mainframe is the highest circuit-control core required for interstellar guidance."]
-	quest.0700000000000010.quest_subtitle: "Craft a Wetware Mainframe"
+	quest.0700000000000010.quest_desc: ["The Wetware Assembly, Wetware Computer, and Wetware Mainframe raise biological circuits step by step into the highest control core required for interstellar guidance.", "", "This chain converges Neuro Processors, advanced chips, and ZPM-scale assembly. Stock intermediate circuits by tier and stabilize Advanced Bacteria supply so no branch stalls the final Mainframe."]
+	quest.0700000000000010.quest_subtitle: "Craft a Wetware Assembly, Wetware Computer, and Wetware Mainframe"
 	quest.0700000000000010.title: "Wetware Mainframe"
-	quest.0700000000000011.quest_desc: ["Fusion makes the fuel plasma, then the Vacuum Freezer stabilizes it for interstellar propulsion."]
+	quest.0700000000000011.quest_desc: ["Naquadria-Infused Rocket Fuel first forms as plasma in the Fusion Reactor, then the Vacuum Freezer stabilizes it into transportable interstellar propellant. Rocket T3 needs this fuel line for propulsion; coordinate Naquadria input, fusion batches, and freezer throughput early so the final launch is not delayed by its last tank of fuel."]
 	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
 	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
-	quest.0700000000000012.quest_desc: ["Wetware control, storage, ZPM Field Generators, Neutronium, and propellant converge at the Launch Site. Rocket T3 marks the current technological completion."]
-	quest.0700000000000012.quest_subtitle: "Complete Interstellar Travel"
+	quest.0700000000000012.quest_desc: ["The Wetware Mainframe, Lapotronic Energy Orb Clusters, ZPM Field Generators, 64M ME Storage Components, Neutronium Plates, ZPM Electric Pumps, and Naquadria-Infused Rocket Fuel converge here. They provide guidance, energy storage, field containment, mission data, hull structure, feed hardware, and propulsion.", "", "Complete the Rocket T3 recipe at the Rocket Launch Site to assemble these separate terminal lines into a real interstellar launch. Check every stockpile and fluid input before beginning final assembly.", "", "Interstellar Travel is the current end of the factory's technological route. It opens no higher machine or research tier; it proves that the complete industrial system can accomplish its terminal task."]
+	quest.0700000000000012.quest_subtitle: "Complete Rocket T3 interstellar travel technology"
 	quest.0700000000000012.title: "Interstellar Travel"
 	quest.070F82ED30238005.quest_desc: [
 		"Upgrade your ore processing system. Replace the Primitive Ore Analyzer and Primitive Ore Washer with ULV versions for better efficiency and extra resources."
@@ -625,7 +625,7 @@
 		"This vein is not only for pearls. Platinum and Ender materials both support post-IV components and Assembly Line preparation."
 	]
 	quest.0E15D0E25A9B4C10.quest_subtitle: "Analyze End Stone"
-	quest.0E15D0E25A9B4C10.title: "End Vein"
+	quest.0E15D0E25A9B4C10.title: "End Stone Vein"
 	quest.0F25091FBD0AB840.quest_desc: [
 		"Your next target is zinc. You need it for brass, which leads to LV research."
 		""
@@ -764,10 +764,10 @@
 	quest.1839DA1403560DB3.quest_desc: ["Send Ethane and Propane through the mixing route to package LPG. It reuses your refining and light hydrocarbon base, with no LCR required, and prepares the fuel side for Rocket T2."]
 	quest.1839DA1403560DB3.quest_subtitle: "Turn refining into Rocket T2 fuel supply"
 	quest.1839DA1403560DB3.title: "Light Hydrocarbons Tanked"
-	quest.18A01183DF6A59D1.quest_desc: ["EV Superconductor Wire connects Niobium Titanium, PTFE pipe, and Coolant. It is the easy-to-miss support material before EV Field Generators."]
+	quest.18A01183DF6A59D1.quest_desc: ["EV Superconductor Wire combines Niobium Titanium, PTFE pipe, and Hot Coolant into a transmission material for higher-power systems.", "", "It supports the EV Field Generator; stabilize the Hot Coolant supply before this recipe becomes an energy-component bottleneck."]
 	quest.18A01183DF6A59D1.quest_subtitle: "Bring Coolant into superconductors"
-	quest.18A01183DF6A59D1.title: "EV Superconductor"
-	quest.18A01183DF6A59D3.quest_desc: ["The Nuclear Reactor needs an EV Field Generator. Calling out the superconductor and generator first makes the power chapter's material gate clearer."]
+	quest.18A01183DF6A59D1.title: "EV Superconductor Wire"
+	quest.18A01183DF6A59D3.quest_desc: ["The EV Field Generator provides containment and energy-control capability as a key Nuclear Reactor component.", "", "It depends on superconductors and a stable EV-component supply; automate this line before building the reactor to handle later batch demand."]
 	quest.18A01183DF6A59D3.quest_subtitle: "Fill the Nuclear Reactor prerequisite"
 	quest.18A01183DF6A59D3.title: "EV Field Generator"
 	quest.18A01183DF6A59D5.quest_desc: [
@@ -791,12 +791,12 @@
 	]
 	quest.18A01183DF6A59D9.quest_subtitle: "Join LuV Foundation and IV Field Generator"
 	quest.18A01183DF6A59D9.title: "Lapotronic Energy Orb"
-	quest.18A01183DF6A59DB.quest_desc: ["The Lapotronic Energy Orb Cluster raises the storage route into ZPM launch hardware. Keep the cores and Power Substation stable for batch production."]
+	quest.18A01183DF6A59DB.quest_desc: ["The Lapotronic Energy Orb Cluster consolidates individual storage parts into an advanced power component for ZPM launch hardware.", "", "It depends on stable Energy Orb and Power Substation supply; keep both routes producing in batches so launch preparation does not stall on energy storage."]
 	quest.18A01183DF6A59DB.quest_subtitle: "Craft a Lapotronic Energy Orb Cluster"
 	quest.18A01183DF6A59DB.title: "Stored Energy Converges"
 	quest.190125F22C1A5EE0.quest_desc: ["Sulfide Ore: Sphalerite, Galena, and Silver."]
 	quest.190125F22C1A5EE0.quest_subtitle: "Unlock Sulfide Ore"
-	quest.190125F22C1A5EE0.title: "Sulfur Vein"
+	quest.190125F22C1A5EE0.title: "Sulfide Vein"
 	quest.193B6542AAD430D3.quest_desc: [
 		"Want metal to take shape in one step? Research cold metalworking first. Then you can craft your first MV Forming Press. Its main strength is pressing materials directly into finished shapes without several machines or intermediate steps. One machine can cover many forms and clean up your layout."
 		""
@@ -1941,7 +1941,7 @@
 	]
 	quest.635F21655837922F.quest_subtitle: "Get Biomass with the Extractor"
 	quest.635F21655837922F.title: "A Different Route"
-	quest.642B670E0BD087C2.quest_desc: ["Pitchblende Vein: Pitchblende and Thorium."]
+	quest.642B670E0BD087C2.quest_desc: ["The Pitchblende Vein yields Pitchblende and Thorium. Process both early to build planned reserves for nuclear fuel and power routes."]
 	quest.642B670E0BD087C2.quest_subtitle: "Unlock Pitchblende"
 	quest.642B670E0BD087C2.title: "Pitchblende Vein"
 	quest.645CBB8D8FE85012.quest_desc: [
@@ -2113,9 +2113,9 @@
 	]
 	quest.731064B7C69CA184.quest_subtitle: "Make a LV Mixer"
 	quest.731064B7C69CA184.title: "Mix It Up"
-	quest.7363E5AC14AECA75.quest_desc: ["The Tungstate Vein yields Tungstate and Molybdate."]
+	quest.7363E5AC14AECA75.quest_desc: ["The Tungsten Vein yields Tungstate and Molybdate. Both minerals provide feedstock for heat-resistant alloys and high-temperature equipment."]
 	quest.7363E5AC14AECA75.quest_subtitle: "Unlock Tungstate"
-	quest.7363E5AC14AECA75.title: "Tungstate Vein"
+	quest.7363E5AC14AECA75.title: "Tungsten Vein"
 	quest.741B39FABC429FFC.quest_desc: [
 		"The Distillation Tower is a true MV chemical multiblock. It splits mixed fluids back into components: salts from seawater, fractions from oil, and different gases from liquid air. The taller the tower, the more complete the separation."
 		""
@@ -2248,9 +2248,9 @@
 	]
 	quest.7AE6BC52B1A42AE8.quest_subtitle: "Make Invar and Cupronickel for hot machines"
 	quest.7AE6BC52B1A42AE8.title: "Heat-Resistant Alloys"
-	quest.7B6DDB0F8DA8568C.quest_desc: ["The Lava Ore vein yields Magma Blocks."]
+	quest.7B6DDB0F8DA8568C.quest_desc: ["The Lava Vein yields Magma Blocks. Centrifuge them into Lava for obsidian, steam, and high-temperature processing routes."]
 	quest.7B6DDB0F8DA8568C.quest_subtitle: "Unlock Lava Ore"
-	quest.7B6DDB0F8DA8568C.title: "Magma Vein"
+	quest.7B6DDB0F8DA8568C.title: "Lava Vein"
 	quest.7B958900C6A6AC26.quest_desc: [
 		"The Logic Processor gives ME equipment the basic control needed for patterns and requests. It is automation control, not just more capacity."
 		""
@@ -2291,7 +2291,7 @@
 	quest.7F568D268CA544F6.quest_desc: ["Liquid Oxygen checks the Vacuum Freezer and cryogenic fluid handling, not an LCR. Push steady Oxygen into liquid form so the Rocket T2 fuel route has a usable oxidizer."]
 	quest.7F568D268CA544F6.quest_subtitle: "Supply the oxidizer for Rocket T2"
 	quest.7F568D268CA544F6.title: "Oxygen Goes Cryogenic"
-	quest.7F86524AF19D5E4C.quest_desc: ["Graphite Vein: Graphite and Diamond."]
+	quest.7F86524AF19D5E4C.quest_desc: ["The Graphite Vein yields Graphite and Diamond."]
 	quest.7F86524AF19D5E4C.quest_subtitle: "Unlock Graphite"
 	quest.7F86524AF19D5E4C.title: "Graphite Vein"
 	quest.7FC43799DC08AC4E.quest_desc: [
