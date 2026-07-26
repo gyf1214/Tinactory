@@ -796,8 +796,6 @@ object CircuitComponents {
 
         circuitTier(CircuitTier.CRYSTAL) {
             assembler {
-                defaults {
-                }
                 output(board) {
                     input(lastBoard)
                     input("platinum", "wire_fine", 16)
@@ -828,6 +826,7 @@ object CircuitComponents {
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.LUV)
                     workTicks(CIRCUIT_TICKS)
+                    tech(Technologies.WETWARE)
                 }
             }
             chemicalReactor {
