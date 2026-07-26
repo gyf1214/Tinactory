@@ -475,9 +475,12 @@
 	quest.0700000000000002.quest_desc: ["ZPM Machine Hulls and cable form the shared frame for advanced machinery."]
 	quest.0700000000000002.quest_subtitle: "Craft the ZPM machine core"
 	quest.0700000000000002.title: "ZPM Frame"
-	quest.0700000000000003.quest_desc: ["Motion, pumping, control, and field components supply terminal assembly hardware."]
+	quest.0700000000000003.quest_desc: ["Motion, pumping, and control components supply terminal assembly hardware."]
 	quest.0700000000000003.quest_subtitle: "Craft ZPM core components"
 	quest.0700000000000003.title: "Components at Scale"
+	quest.0700000000000013.quest_desc: ["ZPM Superconductor wire gives the Field Generator the stable power supply needed to maintain interstellar travel constraints."]
+	quest.0700000000000013.quest_subtitle: "Craft a ZPM Field Generator"
+	quest.0700000000000013.title: "Constraint Field Ready"
 	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface supports large automation but is not a Rocket T3 input."]
 	quest.0700000000000004.quest_subtitle: "Craft a ZPM Digital Interface"
 	quest.0700000000000004.title: "Digital Connection"
@@ -520,7 +523,7 @@
 	quest.0700000000000011.quest_desc: ["Fusion makes the fuel plasma, then the Vacuum Freezer stabilizes it for interstellar propulsion."]
 	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
 	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
-	quest.0700000000000012.quest_desc: ["Wetware control, storage, ZPM components, Neutronium, and propellant converge at the Launch Site. Rocket T3 marks the current technological completion."]
+	quest.0700000000000012.quest_desc: ["Wetware control, storage, ZPM Field Generators, Neutronium, and propellant converge at the Launch Site. Rocket T3 marks the current technological completion."]
 	quest.0700000000000012.quest_subtitle: "Complete Interstellar Travel"
 	quest.0700000000000012.title: "Interstellar Travel"
 	quest.070F82ED30238005.quest_desc: [

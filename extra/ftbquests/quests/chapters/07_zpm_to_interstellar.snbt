@@ -68,9 +68,6 @@
 		}
 		{
 			dependencies: ["0700000000000002"]
-			icon: {
-				id: "tinactory:component/zpm/field_generator"
-			}
 			id: "0700000000000003"
 			tasks: [
 				{
@@ -88,14 +85,23 @@
 					item: { count: 1, id: "tinactory:component/zpm/robot_arm" }
 					type: "item"
 				}
-				{
-					id: "0700000000000108"
-					item: { count: 1, id: "tinactory:component/zpm/field_generator" }
-					type: "item"
-				}
 			]
 			x: 2.0d
 			y: 6.0d
+		}
+		{
+			dependencies: ["0700000000000001"]
+			icon: {
+				id: "tinactory:component/zpm/field_generator"
+			}
+			id: "0700000000000013"
+			tasks: [{
+				id: "0700000000000120"
+				item: { count: 1, id: "tinactory:component/zpm/field_generator" }
+				type: "item"
+			}]
+			x: 4.0d
+			y: 8.0d
 		}
 		{
 			dependencies: ["0700000000000003"]
@@ -348,6 +354,7 @@
 			dependencies: [
 				"0700000000000010"
 				"18A01183DF6A59DB"
+				"0700000000000013"
 				"0700000000000007"
 				"0700000000000011"
 				"2669AE71AD768BC1"
@@ -355,6 +362,9 @@
 			id: "0700000000000012"
 			size: 2.0d
 			tasks: [{
+				icon: {
+					id: "tinactory:multiblock/rocket_launch_site"
+				}
 				id: "070000000000011F"
 				tags: [
 					"tinactory_technology"
