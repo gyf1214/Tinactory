@@ -476,6 +476,17 @@ object MiscComponents {
                 input("rocket_fuel")
                 voltage(Voltage.EV)
             }
+            target(Technologies.INTERSTELLAR_TRAVEL) {
+                input(AllTags.circuit(Voltage.MAX))
+                input(getItem("component/lapotronic_energy_orb_cluster"), 4)
+                input(getComponent("field_generator").item(Voltage.ZPM), 4)
+                input(STORAGE_CELLS[3].component.get(), 4)
+                input("neutronium", "plate", 32)
+                input(getComponent("electric_pump").item(Voltage.ZPM), 16)
+                input("soldering_alloy", amount = 16)
+                input("naquadria_infused_rocket_fuel", amount = 8)
+                voltage(Voltage.ZPM)
+            }
         }
     }
 

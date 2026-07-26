@@ -49,6 +49,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -1213,6 +1214,13 @@ object Multiblocks {
         }
 
         fusionReactor {
+            recipe("multiblock/naquadria_infused_rocket_fuel") {
+                input("rocket_fuel", "liquid")
+                input("naquadria", "molten")
+                output("naquadria_infused_rocket_fuel", "plasma")
+                voltage(Voltage.ZPM)
+                workTicks(200)
+            }
             recipe("multiblock/netherite") {
                 input("netherite_scrap", "molten")
                 input("gold", "molten")
@@ -1247,6 +1255,14 @@ object Multiblocks {
                 output("water", "gas", 2)
                 voltage(Voltage.LUV)
                 workTicks(200)
+            }
+        }
+
+        vacuumFreezer {
+            output("naquadria_infused_rocket_fuel", "liquid") {
+                input("naquadria_infused_rocket_fuel", "plasma")
+                voltage(Voltage.ZPM)
+                workTicks(800)
             }
         }
     }

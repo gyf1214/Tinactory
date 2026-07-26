@@ -108,6 +108,7 @@ object Technologies {
     val ADVANCED_NETHER_CHEMISTRY: ResourceLocation
     val CRYSTAL_CIRCUITRY: ResourceLocation
     val WETWARE: ResourceLocation
+    val INTERSTELLAR_TRAVEL: ResourceLocation
 
     init {
         Factory().apply {
@@ -483,6 +484,13 @@ object Technologies {
                 maxProgress(480)
                 displayItem(getItem("component/stem_cell"))
                 depends(NAQUADAH_PROCESSING, ADVANCED_NETHER_CHEMISTRY)
+            }
+
+            INTERSTELLAR_TRAVEL = tech("interstellar_travel") {
+                maxProgress(0)
+                displayItem(getMultiblock("rocket_launch_site").block)
+                depends(ROCKET_T2, FUSION, WETWARE)
+                noResearch()
             }
         }
     }
