@@ -230,6 +230,13 @@
 			y: 2.0d
 		}
 		{
+			dependencies: ["18A01183DF6A59D9", "6A56C38D3F934B21", "06FE000000000011"]
+			id: "18A01183DF6A59DB"
+			tasks: [{ id: "18A01183DF6A59DC", item: { count: 1, id: "tinactory:component/lapotronic_energy_orb_cluster" }, type: "item" }]
+			x: 12.0d
+			y: 8.0d
+		}
+		{
 			dependencies: [
 				"6D4396F046AC59FA"
 				"2C0BDC359D181269"

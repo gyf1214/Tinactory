@@ -309,11 +309,12 @@
 		{
 			dependencies: ["06FE000000000010"]
 			id: "06FE000000000011"
-			tasks: [{
-				id: "06FE00000000011B"
-				item: { count: 1, id: "tinactory:circuit/crystal_assembly" }
-				type: "item"
-			}]
+			icon: { id: "tinactory:circuit/crystal_mainframe" }
+			tasks: [
+				{ id: "06FE00000000011B", item: { count: 1, id: "tinactory:circuit/crystal_assembly" }, type: "item" }
+				{ id: "06FE000000000128", item: { count: 1, id: "tinactory:circuit/crystal_computer" }, type: "item" }
+				{ id: "06FE000000000129", item: { count: 1, id: "tinactory:circuit/crystal_mainframe" }, type: "item" }
+			]
 			x: 6.0d
 			y: 10.0d
 		}

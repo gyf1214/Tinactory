@@ -429,9 +429,6 @@
 	quest.06FE000000000010.quest_desc: ["水晶处理器是本章第一种可交付的水晶电路，证明芯片、高级贴片和洁净加工已经连成稳定装配链。"]
 	quest.06FE000000000010.quest_subtitle: "合并CPU、高级贴片与洁净加工"
 	quest.06FE000000000010.title: "水晶电路落地"
-	quest.06FE000000000011.quest_desc: ["水晶处理器集群是这座桥能交付的电路终点；水晶计算机和主机仍留给之后的ZPM工作。"]
-	quest.06FE000000000011.quest_subtitle: "抵达本章电路端点"
-	quest.06FE000000000011.title: "水晶集群封顶"
 	quest.06FE000000000012.quest_desc: [
 		"高级湿法冶金让旧硫化矿重新进入后期材料循环，从闪锌矿和方铅矿中抽出铟浓缩液。"
 		""
@@ -2245,4 +2242,69 @@
 	task.433A0522B2F3010E.title: "二阶火箭"
 	task.4919C4842FF1F786.title: "一个人太孤单了"
 	task.58A667C11AA55AF9.title: "第一枚火箭"
+	chapter.07000000000000FE.chapter_subtitle: ["以ZPM基础设施、聚变中子素、湿件生物线和推进剂完成星际发射。"]
+	chapter.07000000000000FE.title: "迈向星际"
+	quest.0700000000000000.quest_desc: ["钛合金线圈打开6300K熔炼能力，为ZPM超导体准备温度门槛。"]
+	quest.0700000000000000.quest_subtitle: "制作钛合金线圈"
+	quest.0700000000000000.title: "6300K门槛"
+	quest.0700000000000001.quest_desc: ["铟锡钡钛铜酸盐与ZPM超导线把桥梁推进到零点压输电。"]
+	quest.0700000000000001.quest_subtitle: "制备ZPM超导体"
+	quest.0700000000000001.title: "零点超导"
+	quest.0700000000000002.quest_desc: ["ZPM机械外壳和线缆构成高阶机器的共同骨架。"]
+	quest.0700000000000002.quest_subtitle: "制作ZPM机械核心"
+	quest.0700000000000002.title: "ZPM骨架"
+	quest.0700000000000003.quest_desc: ["批量运动、泵送、操控和场发生组件为终端装配提供硬件。"]
+	quest.0700000000000003.quest_subtitle: "制作ZPM关键组件"
+	quest.0700000000000003.title: "组件成套"
+	quest.0700000000000004.quest_desc: ["ZPM数字多方块接口服务于大型自动化，但不直接构成火箭需求。"]
+	quest.0700000000000004.quest_subtitle: "制作ZPM数字多方块接口"
+	quest.0700000000000004.title: "数字接入"
+	quest.0700000000000005.quest_desc: ["聚变中子素把下界之星和硅盐约束为星际结构金属。"]
+	quest.0700000000000005.quest_subtitle: "获得中子素锭"
+	quest.0700000000000005.title: "聚变中子素"
+	quest.0700000000000006.quest_desc: ["中子素晶棒和原始晶圆为高产芯片路线提供可选基底。"]
+	quest.0700000000000006.quest_subtitle: "制作中子素晶圆"
+	quest.0700000000000006.title: "中子素基底"
+	quest.0700000000000007.quest_desc: ["中子素板材承担火箭的结构与热负荷。"]
+	quest.0700000000000007.quest_subtitle: "制作中子素板"
+	quest.0700000000000007.title: "星际船体"
+	quest.0700000000000008.quest_desc: ["高级SoC是中子素基底的可选收益，不阻断湿件主线。"]
+	quest.0700000000000008.quest_subtitle: "制作高级SoC"
+	quest.0700000000000008.title: "可选芯片"
+	quest.0700000000000009.quest_desc: ["无菌细菌培养槽让受控生物处理进入ZPM工厂。"]
+	quest.0700000000000009.quest_subtitle: "建造细菌培养槽"
+	quest.0700000000000009.title: "无菌培养"
+	quest.070000000000000A.quest_desc: ["用核废料浆液接种细菌培养液，建立生物链起点。"]
+	quest.070000000000000A.quest_subtitle: "接种细菌培养液"
+	quest.070000000000000A.title: "培养起点"
+	quest.070000000000000B.quest_desc: ["培养菌与干细胞为湿件处理器提供最初的生物输入。"]
+	quest.070000000000000B.quest_subtitle: "获得培养菌与干细胞"
+	quest.070000000000000B.title: "培养成形"
+	quest.070000000000000C.quest_desc: ["富集生长培养基让培养菌可以稳定复制。"]
+	quest.070000000000000C.quest_subtitle: "制备富集生长培养基"
+	quest.070000000000000C.title: "富集培养"
+	quest.070000000000000D.quest_desc: ["高级菌与神经处理器把生物链推向高阶湿件组件。"]
+	quest.070000000000000D.quest_subtitle: "获得高级菌与神经处理器"
+	quest.070000000000000D.title: "神经升级"
+	quest.070000000000000E.quest_desc: ["湿件板与电路板提供湿件电路的制造基底。"]
+	quest.070000000000000E.quest_subtitle: "制作湿件基板"
+	quest.070000000000000E.title: "湿件基底"
+	quest.070000000000000F.quest_desc: ["湿件处理器把干细胞路线接入高阶电路。"]
+	quest.070000000000000F.quest_subtitle: "制作湿件处理器"
+	quest.070000000000000F.title: "湿件处理"
+	quest.0700000000000010.quest_desc: ["湿件主机是星际制导所需的最高电路控制核心。"]
+	quest.0700000000000010.quest_subtitle: "制作湿件主机"
+	quest.0700000000000010.title: "湿件主机"
+	quest.0700000000000011.quest_desc: ["硅盐强化火箭燃料经聚变制成等离子体，再稳定为星际推进剂。"]
+	quest.0700000000000011.quest_subtitle: "制备硅盐强化火箭燃料"
+	quest.0700000000000011.title: "星际推进剂"
+	quest.0700000000000012.quest_desc: ["湿件主机、储能、ZPM组件、中子素和强化推进剂在发射场汇合。完成三阶火箭代表当前工厂技术路线的终点。"]
+	quest.0700000000000012.quest_subtitle: "完成星际航行技术"
+	quest.0700000000000012.title: "星际航行"
+	quest.06FE000000000011.quest_desc: ["水晶处理器装配、计算机与主机把水晶线路完整接到ZPM前的桥梁。把它们稳定量产，细菌培养槽和后续高阶组件才能获得所需电路标签。"]
+	quest.06FE000000000011.quest_subtitle: "完成水晶处理器的全部三级产品"
+	quest.06FE000000000011.title: "水晶主机成形"
+	quest.18A01183DF6A59DB.quest_desc: ["能量宝珠集群把储能路线提升为ZPM发射硬件。保持核心和供电站稳定，为火箭准备批量储能。"]
+	quest.18A01183DF6A59DB.quest_subtitle: "制作蓝波顿能量宝珠集群"
+	quest.18A01183DF6A59DB.title: "储能汇聚"
 }
