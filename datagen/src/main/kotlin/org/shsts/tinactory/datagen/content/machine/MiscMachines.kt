@@ -528,7 +528,8 @@ object MiscMachines {
                 Items.BLAZE_POWDER,
                 Items.ENDER_EYE,
                 Items.END_CRYSTAL,
-                Items.ENDER_CHEST)
+                Items.ENDER_CHEST,
+                Items.BEACON)
         }
     }
 
