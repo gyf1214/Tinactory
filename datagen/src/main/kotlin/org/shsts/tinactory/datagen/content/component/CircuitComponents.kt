@@ -627,40 +627,16 @@ object CircuitComponents {
         engraving("pic", "topaz", 1, Voltage.HV, 0.2, 1.2)
         engraving("qbit_cpu", "ender_eye", 1, Voltage.EV, 0.5, 1.5, "cpu")
         engraving("nand", "emerald", 1, Voltage.EV, 0.4, 1.4, "ram")
+        engraving("soc", "ender_eye", 2, Voltage.IV, 1.0, 2.0)
+        engraving("high_pic", "ender_eye", 2, Voltage.IV, 1.2, 2.0, "pic")
+        engraving("advanced_soc", "nether_star", 2, Voltage.LUV, 1.5, 2.0, "soc")
 
         laserEngraver {
-            defaults {
-                workTicks(2000)
-            }
-            output(WAFER.item("soc"), suffix = "_from_naquadah") {
-                input(WAFER_RAW.item("naquadah"))
-                input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.IV)
-                extra {
-                    requireCleanness(1.0, 2.0)
-                }
-            }
-            output(WAFER.item("high_pic"), suffix = "_from_pic") {
-                input(WAFER.item("pic"))
-                input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.IV)
-                extra {
-                    requireCleanness(1.2, 2.0)
-                }
-            }
-            output(WAFER.item("advanced_soc"), suffix = "_from_soc") {
-                input(WAFER.item("soc"))
-                input("nether_star", "lens", 0, port = 1)
-                voltage(Voltage.LUV)
-                extra {
-                    requireCleanness(1.5, 2.0)
-                }
-            }
             output(crystalCpu) {
                 input(rawCrystalChip)
                 input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.LUV)
-                workTicks(1200)
+                voltage(Voltage.IV)
+                workTicks(4000)
                 extra {
                     requireCleanness(0.75, 1.75)
                 }
