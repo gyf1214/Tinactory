@@ -487,9 +487,8 @@ object Technologies {
             }
 
             INTERSTELLAR_TRAVEL = tech("interstellar_travel") {
-                maxProgress(1)
+                maxProgress(1000)
                 displayItem(getMultiblock("rocket_launch_site").block)
-                depends(ROCKET_T2, FUSION, WETWARE)
                 noResearch()
             }
         }
