@@ -29,6 +29,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
@@ -138,7 +139,7 @@ object CircuitComponents {
                     chip("ram", 2)
                     circuitComponent("transistor", 4)
                     input("electrum", "wire_fine", 8)
-                    input("copper", "bolt", 8)
+                    input("gold", "bolt", 8)
                 }
             }
         }
@@ -153,16 +154,16 @@ object CircuitComponents {
                 circuit("microprocessor", 3) {
                     chip("cpu")
                     circuitComponent("resistor", 2)
-                    circuitComponent("capacitor", 2)
                     circuitComponent("transistor", 2)
                     input("copper", "wire_fine", 2)
+                    input("tin", "bolt", 2)
                 }
                 circuit("processor") {
                     chip("cpu")
                     circuitComponent("resistor", 4)
-                    circuitComponent("capacitor", 4)
                     circuitComponent("transistor", 4)
                     input("red_alloy", "wire_fine", 4)
+                    input("silver", "bolt", 4)
                 }
                 circuit("assembly") {
                     circuit("processor", 2)
@@ -176,16 +177,16 @@ object CircuitComponents {
                     circuitComponent("resistor", 4)
                     circuitComponent("diode", 4)
                     chip("ram", 4)
-                    input("electrum", "wire_fine", 16)
+                    input("electrum", "wire_fine", 8)
                     input("gold", "bolt", 16)
                 }
-                circuit("mainframe") {
+                circuit("mainframe", voltage = Voltage.HV) {
                     input("aluminium", "stick", 8)
                     circuit("workstation", 2)
                     circuitComponent("inductor", 8)
                     circuitComponent("capacitor", 16)
                     chip("nor", 8)
-                    input("annealed_copper", "wire", 16)
+                    input("annealed_copper", "wire", 8)
                 }
                 soc("microprocessor", 3) {
                     chip("simple_soc")
@@ -205,9 +206,9 @@ object CircuitComponents {
                 circuit("nano_processor") {
                     chip("nano_cpu")
                     circuitComponent("resistor", 4)
-                    circuitComponent("capacitor", 4)
                     circuitComponent("transistor", 4)
                     input("electrum", "wire_fine", 4)
+                    input("gold", "bolt", 4)
                 }
                 circuit("nano_assembly") {
                     circuit("nano_processor", 2)
@@ -218,19 +219,19 @@ object CircuitComponents {
                 }
                 circuit("nano_computer") {
                     circuit("nano_assembly", 2)
-                    circuitComponent("resistor", 4)
-                    circuitComponent("diode", 4)
+                    circuitComponent("diode", 8)
+                    chip("ram", 4)
                     chip("nor", 4)
-                    input("annealed_copper", "wire_fine", 16)
+                    input("annealed_copper", "wire_fine", 8)
                     input("gold", "bolt", 16)
                 }
-                circuit("nano_mainframe") {
+                circuit("nano_mainframe", voltage = Voltage.EV) {
                     input("titanium", "stick", 8)
                     circuit("nano_computer", 2)
                     circuitComponent("inductor", 8)
                     circuitComponent("capacitor", 16)
                     chip("nor", 16)
-                    input("annealed_copper", "wire", 16)
+                    input("annealed_copper", "wire", 8)
                 }
                 soc("nano_processor") {
                     chip("soc")
@@ -245,7 +246,7 @@ object CircuitComponents {
                 circuit("quantum_processor") {
                     chip("qbit_cpu")
                     chip("nano_cpu")
-                    circuitComponent("capacitor", 6)
+                    circuitComponent("resistor", 6)
                     circuitComponent("transistor", 6)
                     input("platinum", "wire_fine", 8)
                 }
@@ -258,13 +259,13 @@ object CircuitComponents {
                 }
                 circuit("quantum_computer") {
                     circuit("quantum_processor", 2)
-                    circuitComponent("resistor", 8)
                     circuitComponent("diode", 8)
+                    chip("ram", 8)
                     chip("nor", 8)
                     input("niobium_titanium", "wire_fine", 8)
                     input("platinum", "bolt", 16)
                 }
-                circuit("quantum_mainframe") {
+                circuit("quantum_mainframe", voltage = Voltage.IV) {
                     input("tungsten_steel", "stick", 8)
                     circuit("quantum_computer", 2)
                     circuitComponent("inductor", 12)
@@ -286,39 +287,98 @@ object CircuitComponents {
                 circuit("crystal_processor") {
                     input(crystalCpu)
                     chip("nano_cpu", 2)
-                    circuitComponent("capacitor", 6)
+                    circuitComponent("resistor", 6)
                     circuitComponent("transistor", 6)
                     input("niobium_titanium", "wire_fine", 8)
                 }
-                circuit("crystal_assembly", 2, voltage = Voltage.LUV) {
+                circuit("crystal_assembly") {
                     circuit("crystal_processor", 2)
                     circuitComponent("inductor", 4)
                     circuitComponent("capacitor", 8)
                     chip("ram", 24)
                     input("niobium_titanium", "wire_fine", 16)
                 }
-                circuit("crystal_computer", voltage = Voltage.ZPM, workTicks = 400) {
+                circuit("crystal_computer", voltage = Voltage.LUV) {
                     circuit("crystal_assembly", 2)
-                    chip("ram", 4)
-                    chip("nor", 32)
-                    chip("nand", 64)
-                    input("niobium_titanium", "wire_fine", 32)
+                    circuitComponent("diode", 8)
+                    chip("nor", 16)
+                    chip("nand", 8)
+                    input("yttrium_barium_cuprate", "wire_fine", 8)
+                    input("naquadah", "bolt", 16)
+                }
+                soc("crystal_processor") {
+                    chip("advanced_soc")
+                    input("niobium_titanium", "wire_fine", 2)
+                    input("naquadah", "bolt", 2)
                 }
             }
             assemblyLine {
                 output(getCircuit("crystal_mainframe").item) {
                     input("hssg", "stick", 8)
                     circuit("crystal_computer", 2)
-                    chip("ram", 32)
-                    chip("pic", 2)
-                    input("niobium_titanium", "wire", 8)
                     circuitComponent("inductor", 8)
                     circuitComponent("capacitor", 16)
                     circuitComponent("diode", 8)
+                    chip("nand", 16)
+                    chip("pic", 4)
+                    input("yttrium_barium_cuprate", "wire", 8)
                     input("soldering_alloy", amount = 10)
                     voltage(Voltage.LUV)
                     workTicks(800)
                     tech(Technologies.CRYSTAL_CIRCUITRY)
+                }
+            }
+        }
+
+        circuitTier(CircuitTier.WETWARE) {
+            circuitAssembler {
+                circuit("wetware_processor") {
+                    input(getItem("component/stem_cell"))
+                    chip("qbit_cpu")
+                    circuitComponent("resistor", 6)
+                    circuitComponent("transistor", 6)
+                    input("yttrium_barium_cuprate", "wire_fine", 8)
+                }
+                circuit("wetware_assembly") {
+                    circuit("wetware_processor", 2)
+                    circuitComponent("inductor", 4)
+                    circuitComponent("capacitor", 8)
+                    chip("ram", 32)
+                    input("yttrium_barium_cuprate", "wire_fine", 16)
+                }
+                circuit("wetware_computer", voltage = Voltage.ZPM) {
+                    input(getItem("component/neuro_processor"))
+                    circuit("wetware_assembly", 2)
+                    circuitComponent("diode", 8)
+                    chip("nand", 16)
+                    input("trinium", "wire_fine", 8)
+                    input("naquadah", "bolt", 16)
+                }
+                output(getCircuit("wetware_processor").item, 3, suffix = "_from_soc") {
+                    input(getItem("component/neuro_processor"))
+                    chip("advanced_soc", 3)
+                    input("yttrium_barium_cuprate", "wire_fine", 6)
+                    input("naquadah", "bolt", 6)
+                    input("soldering_alloy", amount = 1.5)
+                    voltage(Voltage.ZPM)
+                    workTicks(300L)
+                }
+            }
+            assemblyLine {
+                output(getCircuit("wetware_mainframe").item) {
+                    input("hsss", "stick", 8)
+                    input(getItem("component/neuro_processor"))
+                    circuit("wetware_computer", 2)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("capacitor", 16)
+                    circuitComponent("diode", 8)
+                    chip("nand", 32)
+                    chip("high_pic", 4)
+                    input("trinium", "wire", 8)
+                    input("soldering_alloy", amount = 10)
+                    voltage(Voltage.ZPM)
+                    workTicks(800)
+                    tech(Technologies.WETWARE)
                 }
             }
         }
@@ -485,9 +545,7 @@ object CircuitComponents {
                 input("gallium_arsenide")
                 voltage(Voltage.LV)
                 workTicks(6400)
-                extra {
-                    temperature(2100)
-                }
+                temperature(2100)
             }
             output(BOULE.item("glowstone")) {
                 input("silicon", amount = 64)
@@ -495,9 +553,7 @@ object CircuitComponents {
                 input("nitrogen", amount = 6)
                 voltage(Voltage.HV)
                 workTicks(9600)
-                extra {
-                    temperature(3000)
-                }
+                temperature(3000)
             }
             output(BOULE.item("naquadah")) {
                 input("silicon", "ingot", 32)
@@ -505,9 +561,15 @@ object CircuitComponents {
                 input("argon", amount = 6)
                 voltage(Voltage.IV)
                 workTicks(12800)
-                extra {
-                    temperature(3900)
-                }
+                temperature(3900)
+            }
+            output(BOULE.item("neutronium")) {
+                input("silicon", "ingot", 64)
+                input("indium")
+                input("neutronium", "molten")
+                voltage(Voltage.ZPM)
+                workTicks(16000)
+                temperature(4800)
             }
         }
 
@@ -517,18 +579,14 @@ object CircuitComponents {
                 input("trinium", "molten")
                 voltage(Voltage.LUV)
                 workTicks(3200)
-                extra {
-                    requireCleanness(0.75, 1.0)
-                }
+                requireCleanness(0.75, 1.0)
             }
             output(rawCrystalChip, suffix = "_from_part") {
                 input(rawCrystalChipPart)
                 input("wither_matrix", "liquid")
                 voltage(Voltage.LUV)
                 workTicks(1600)
-                extra {
-                    requireCleanness(0.75, 1.0)
-                }
+                requireCleanness(0.75, 1.0)
             }
         }
 
@@ -566,43 +624,17 @@ object CircuitComponents {
         engraving("pic", "topaz", 1, Voltage.HV, 0.2, 1.2)
         engraving("qbit_cpu", "ender_eye", 1, Voltage.EV, 0.5, 1.5, "cpu")
         engraving("nand", "emerald", 1, Voltage.EV, 0.4, 1.4, "ram")
+        engraving("soc", "ender_eye", 2, Voltage.IV, 1.0, 2.0)
+        engraving("high_pic", "ender_eye", 2, Voltage.IV, 1.2, 2.0, "pic")
+        engraving("advanced_soc", "nether_star", 2, Voltage.LUV, 1.5, 2.0, "soc")
 
         laserEngraver {
-            defaults {
-                workTicks(2000)
-            }
-            output(WAFER.item("soc"), suffix = "_from_naquadah") {
-                input(WAFER_RAW.item("naquadah"))
-                input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.IV)
-                extra {
-                    requireCleanness(1.0, 2.0)
-                }
-            }
-            output(WAFER.item("high_pic"), suffix = "_from_pic") {
-                input(WAFER.item("pic"))
-                input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.IV)
-                extra {
-                    requireCleanness(1.2, 2.0)
-                }
-            }
-            output(WAFER.item("advanced_soc"), suffix = "_from_soc") {
-                input(WAFER.item("soc"))
-                input("nether_star", "lens", 0, port = 1)
-                voltage(Voltage.LUV)
-                extra {
-                    requireCleanness(1.5, 2.0)
-                }
-            }
             output(crystalCpu) {
                 input(rawCrystalChip)
                 input("ender_eye", "lens", 0, port = 1)
-                voltage(Voltage.LUV)
-                workTicks(1200)
-                extra {
-                    requireCleanness(0.75, 1.75)
-                }
+                voltage(Voltage.IV)
+                workTicks(4000)
+                requireCleanness(0.75, 1.75)
             }
         }
     }
@@ -615,9 +647,7 @@ object CircuitComponents {
             defaults {
                 input(lens, "lens", 0, port = 1)
                 workTicks(1000L shl level)
-                extra {
-                    requireCleanness(minCleanness, maxCleanness)
-                }
+                requireCleanness(minCleanness, maxCleanness)
             }
 
             if (source != null) {
@@ -775,8 +805,6 @@ object CircuitComponents {
 
         circuitTier(CircuitTier.CRYSTAL) {
             assembler {
-                defaults {
-                }
                 output(board) {
                     input(lastBoard)
                     input("platinum", "wire_fine", 16)
@@ -797,6 +825,54 @@ object CircuitComponents {
                 }
             }
         }
+
+        circuitTier(CircuitTier.WETWARE) {
+            assembler {
+                output(board) {
+                    input(getItem("board/epoxy"))
+                    input("polystyrene", "sheet")
+                    input("niobium_titanium", "wire_fine", 16)
+                    input("soldering_alloy", amount = 2)
+                    voltage(Voltage.LUV)
+                    workTicks(CIRCUIT_TICKS)
+                    tech(Technologies.WETWARE)
+                }
+            }
+            chemicalReactor {
+                output(circuitBoard) {
+                    input(board)
+                    input("osmiridium", "foil", 16)
+                    input("iron_chloride")
+                    voltage(Voltage.LUV)
+                    workTicks(480)
+                    tech(Technologies.WETWARE)
+                }
+            }
+            extractor {
+                output(getItem("component/stem_cell")) {
+                    input("cultivated_bacteria", "fluid", 0.1)
+                    voltage(Voltage.LUV)
+                    workTicks(160)
+                }
+            }
+            assemblyLine {
+                output(getItem("component/neuro_processor")) {
+                    input(board)
+                    input("polystyrene", "sheet", 4)
+                    input("advanced_bacteria", amount = 0.05)
+                    circuitComponent("inductor", 8)
+                    circuitComponent("transistor", 8)
+                    chip("ram", 8)
+                    chip("nand", 8)
+                    input("trinium", "wire_fine", 16)
+                    input("niobium_titanium", "pipe", 4)
+                    input("soldering_alloy", amount = 2)
+                    voltage(Voltage.ZPM)
+                    workTicks(1200)
+                    tech(Technologies.WETWARE)
+                }
+            }
+        }
     }
 
     private fun ProcessingRecipeBuilder<*, *>.circuit(
@@ -810,7 +886,7 @@ object CircuitComponents {
     }
 
     private fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
-        voltage: Voltage? = null, workTicks: Long? = null, block: SimpleProcessingBuilder.() -> Unit) {
+        voltage: Voltage? = null, block: SimpleProcessingBuilder.() -> Unit) {
         val circuit = getCircuit(name)
         output(circuit.item, amount) {
             if (circuit.level().voltageOffset < 2) {
@@ -823,7 +899,7 @@ object CircuitComponents {
             val solder = (1 shl (level - 1)) / 2.0
             input("soldering_alloy", amount = solder)
             voltage(voltage ?: voltage1)
-            workTicks(workTicks ?: (200L * level))
+            workTicks(200L * level)
         }
     }
 

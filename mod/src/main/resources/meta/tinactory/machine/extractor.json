@@ -11,21 +11,27 @@
         "y": 10
       },
       {
+        "port": 1,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
         "port": 2,
         "type": "item_output",
-        "x": 54,
+        "x": 72,
         "y": 10
       },
       {
         "port": 3,
         "type": "fluid_output",
-        "x": 72,
+        "x": 90,
         "y": 10
       }
     ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_extract",
-      "x": 26,
+      "x": 44,
       "y": 9,
       "width": 20,
       "height": 20

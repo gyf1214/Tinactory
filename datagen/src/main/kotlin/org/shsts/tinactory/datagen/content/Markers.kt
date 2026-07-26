@@ -26,9 +26,7 @@ object Markers {
             recipe("smelting") {
                 baseType(RecipeType.SMELTING)
                 display(Items.FURNACE)
-                extra {
-                    requireMultiblock(true)
-                }
+                requireMultiblock(true)
             }
             baseMarker("alloy_smelter")
             baseMarker("arc_furnace")

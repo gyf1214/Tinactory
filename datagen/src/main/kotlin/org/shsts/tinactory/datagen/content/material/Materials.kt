@@ -496,6 +496,44 @@ object Materials {
                 component("argon")
             }
         }
+        material("indium_tin_barium_titanium_cuprate", BRIGHT) {
+            machineProcess(Voltage.LUV, 1.5)
+            mix(Voltage.LUV) {
+                component("indium", 4)
+                component("tin", 2)
+                component("barium", 2)
+                component("titanium")
+                component("copper", 7)
+                component("oxygen", 14)
+            }
+            blast(Voltage.LUV, 6300, 1280) {
+                component("argon")
+            }
+        }
+        material("neutronium", BRIGHT) {
+            machineProcess(Voltage.LUV, 2.0)
+            blast(Voltage.ZPM, 6300, 1280) {
+                component("argon")
+            }
+        }
+        material("bacteria_culture", DULL)
+        material("cultivated_bacteria", DULL)
+        material("advanced_bacteria", DULL)
+        material("sterile_growth_medium", DULL) {
+            fluidMix(Voltage.MV) {
+                component("biomass")
+                component("ammonia", 0.5)
+                component("water", 0.5)
+                amount(2)
+            }
+        }
+        material("enriched_growth_medium", DULL) {
+            fluidMix(Voltage.ZPM) {
+                component("sterile_growth_medium")
+                component("neutronium", 1f / 144f, "molten")
+                amount(1)
+            }
+        }
         material("rhodium_metallic", ROUGH)
         material("rarest_metallic", SHINY)
         material("activated_naquadah", DULL)
@@ -637,6 +675,9 @@ object Materials {
                 component("oxygen", sub = "liquid")
             }
         }
+        material("naquadria_infused_rocket_fuel", DULL) {
+            machineProcess(Voltage.LUV)
+        }
         material("aqua_regia", DULL) {
             fluidMix(Voltage.HV) {
                 component("hydrogen_chloride", 3)
@@ -646,6 +687,7 @@ object Materials {
         material("ev_superconductor", SHINY)
         material("iv_superconductor", SHINY)
         material("luv_superconductor", SHINY)
+        material("zpm_superconductor", SHINY)
     }
 
     private fun ores() {

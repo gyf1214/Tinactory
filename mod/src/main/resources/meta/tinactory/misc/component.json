@@ -17,12 +17,15 @@
     "energy_chip",
     "lapotron_chip",
     "lapotronic_energy_orb",
+    "lapotronic_energy_orb_cluster",
     "carbon_fiber",
     "carbon_mesh",
     "carbon_plate",
     "quantum_star",
     "raw_crystal_chip",
     "raw_crystal_chip_part",
-    "crystal_cpu"
+    "crystal_cpu",
+    "stem_cell",
+    "neuro_processor"
   ]
 }

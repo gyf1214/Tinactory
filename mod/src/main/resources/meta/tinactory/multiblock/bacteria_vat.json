@@ -1,0 +1,76 @@
+{
+  "sound": "tinactory:tick.chemical_reactor",
+  "recipe": "clean",
+  "autoRecipe": false,
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 0,
+        "type": "fluid_input",
+        "x": 18,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "fluid_output",
+        "x": 72,
+        "y": 10
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_mixer",
+      "x": 44,
+      "y": 9,
+      "width": 20,
+      "height": 20
+    }
+  },
+  "appearance": "tinactory:multiblock/misc/sterile_bacteria_vat_casing",
+  "layers": [
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BB$BB"
+    ],
+    [
+      "GGGGG",
+      "GAAAG",
+      "GAAAG",
+      "GAAAG",
+      "GGGGG"
+    ],
+    [
+      "GGGGG",
+      "GAAAG",
+      "GAAAG",
+      "GAAAG",
+      "GGGGG"
+    ],
+    [
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB",
+      "BBBBB"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/misc/sterile_bacteria_vat_casing"
+    },
+    "G": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/glass_casing"
+    },
+    "A": "air"
+  }
+}

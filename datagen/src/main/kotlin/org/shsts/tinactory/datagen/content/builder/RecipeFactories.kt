@@ -236,9 +236,11 @@ object RecipeFactories {
     fun extractor(block: ProcessingRecipeFactory.() -> Unit) {
         processing("extractor") {
             defaultInputItem = 0
+            defaultInputFluid = 1
             defaultOutputItem = 2
             defaultOutputFluid = 3
             amperage = 0.5
+            workTicks(200)
         }.block()
     }
 
@@ -367,6 +369,15 @@ object RecipeFactories {
             defaultInputFluid = 1
             defaultOutputItem = 2
             amperage = 1.5
+        }.block()
+    }
+
+    fun bacteriaVat(block: CleanRecipeFactory.() -> Unit) {
+        clean("bacteria_vat") {
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
+            amperage = 0.5
+            workTicks(200)
         }.block()
     }
 

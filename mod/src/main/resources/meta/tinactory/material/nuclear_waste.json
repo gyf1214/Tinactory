@@ -3,7 +3,14 @@
   "items": [
     "dust"
   ],
-  "fluids": {},
-  "aliases": {},
+  "fluids": {
+    "slurry": {
+      "baseAmount": 1000,
+      "texture": "gregtech:block/material_sets/dull/liquid"
+    }
+  },
+  "aliases": {
+    "fluid": "slurry"
+  },
   "existings": {}
 }

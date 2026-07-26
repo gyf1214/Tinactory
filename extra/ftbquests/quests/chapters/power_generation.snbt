@@ -7,7 +7,7 @@
 		id: "tinactory:chip/low_pic"
 	}
 	id: "18A01183DF6A59D0"
-	order_index: 9
+	order_index: 10
 	quest_links: [ ]
 	quests: [
 		{
@@ -228,6 +228,21 @@
 			}]
 			x: -4.0d
 			y: 2.0d
+		}
+		{
+			dependencies: [
+				"18A01183DF6A59D9"
+				"6A56C38D3F934B21"
+				"06FE000000000011"
+			]
+			id: "18A01183DF6A59DB"
+			tasks: [{
+				id: "18A01183DF6A59DC"
+				item: { count: 1, id: "tinactory:component/lapotronic_energy_orb_cluster" }
+				type: "item"
+			}]
+			x: 12.0d
+			y: 8.0d
 		}
 		{
 			dependencies: [

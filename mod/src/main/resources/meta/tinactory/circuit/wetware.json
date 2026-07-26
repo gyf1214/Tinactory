@@ -1,0 +1,11 @@
+{
+  "type": "circuit",
+  "tier": "wetware",
+  "baseLevel": "normal",
+  "items": [
+    "wetware_processor",
+    "wetware_assembly",
+    "wetware_computer",
+    "wetware_mainframe"
+  ]
+}

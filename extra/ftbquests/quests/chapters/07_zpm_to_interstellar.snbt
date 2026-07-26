@@ -1,0 +1,383 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "07_zpm_to_interstellar"
+	group: ""
+	icon: {
+		id: "tinactory:component/zpm/field_generator"
+	}
+	id: "07000000000000FE"
+	order_index: 7
+	quest_links: [ ]
+	quests: [
+		{
+			dependencies: ["0700000000000004"]
+			id: "0700000000000000"
+			tasks: [{
+				id: "0700000000000100"
+				item: { count: 1, id: "tinactory:multiblock/coil/trinium" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 8.0d
+		}
+		{
+			dependencies: [
+				"0700000000000000"
+				"06FE000000000019"
+			]
+			icon: {
+				id: "tinactory:material/wire/zpm_superconductor"
+			}
+			id: "0700000000000001"
+			tasks: [
+				{
+					id: "0700000000000101"
+					item: { count: 1, id: "tinactory:material/dust/indium_tin_barium_titanium_cuprate" }
+					type: "item"
+				}
+				{
+					id: "0700000000000102"
+					item: { count: 1, id: "tinactory:material/wire/zpm_superconductor" }
+					type: "item"
+				}
+			]
+			x: 2.0d
+			y: 8.0d
+		}
+		{
+			dependencies: ["06FE000000000018"]
+			icon: {
+				id: "tinactory:component/zpm/machine_hull"
+			}
+			id: "0700000000000002"
+			tasks: [
+				{
+					id: "0700000000000103"
+					item: { count: 1, id: "tinactory:component/zpm/machine_hull" }
+					type: "item"
+				}
+				{
+					id: "0700000000000104"
+					item: { count: 1, id: "tinactory:network/zpm/cable" }
+					type: "item"
+				}
+			]
+			x: 2.0d
+			y: 4.0d
+		}
+		{
+			dependencies: ["0700000000000002"]
+			icon: {
+				id: "tinactory:component/zpm/electric_motor"
+			}
+			id: "0700000000000003"
+			tasks: [
+				{
+					id: "0700000000000105"
+					item: { count: 1, id: "tinactory:component/zpm/electric_motor" }
+					type: "item"
+				}
+				{
+					id: "0700000000000106"
+					item: { count: 1, id: "tinactory:component/zpm/electric_pump" }
+					type: "item"
+				}
+				{
+					id: "0700000000000107"
+					item: { count: 1, id: "tinactory:component/zpm/robot_arm" }
+					type: "item"
+				}
+			]
+			x: 2.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["0700000000000001"]
+			icon: {
+				id: "tinactory:component/zpm/field_generator"
+			}
+			id: "0700000000000013"
+			tasks: [{
+				id: "0700000000000120"
+				item: { count: 1, id: "tinactory:component/zpm/field_generator" }
+				type: "item"
+			}]
+			x: 2.0d
+			y: 10.0d
+		}
+		{
+			dependencies: ["0700000000000003"]
+			id: "0700000000000004"
+			size: 2.0d
+			tasks: [{
+				id: "0700000000000109"
+				item: { count: 1, id: "tinactory:multiblock/zpm/digital_interface" }
+				type: "item"
+			}]
+			x: 0.0d
+			y: 6.0d
+		}
+		{
+			dependencies: [
+				"06FE000000000005"
+				"0700000000000004"
+			]
+			id: "0700000000000005"
+			size: 2.0d
+			tasks: [{
+				id: "070000000000010A"
+				item: { count: 1, id: "tinactory:material/ingot/neutronium" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["0700000000000005"]
+			icon: {
+				id: "tinactory:wafer_raw/neutronium"
+			}
+			id: "0700000000000006"
+			tasks: [
+				{
+					id: "070000000000010B"
+					item: { count: 1, id: "tinactory:boule/neutronium" }
+					type: "item"
+				}
+				{
+					id: "070000000000010C"
+					item: { count: 1, id: "tinactory:wafer_raw/neutronium" }
+					type: "item"
+				}
+			]
+			x: -6.0d
+			y: 8.0d
+		}
+		{
+			dependencies: ["0700000000000005"]
+			id: "0700000000000007"
+			tasks: [{
+				id: "070000000000010D"
+				item: { count: 1, id: "tinactory:material/plate/neutronium" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 10.0d
+		}
+		{
+			dependencies: ["0700000000000006"]
+			id: "0700000000000008"
+			tasks: [{
+				id: "070000000000010E"
+				item: { count: 1, id: "tinactory:chip/advanced_soc" }
+				type: "item"
+			}]
+			x: -6.0d
+			y: 10.0d
+		}
+		{
+			dependencies: [
+				"06FE000000000011"
+				"0700000000000003"
+			]
+			icon: {
+				id: "tinactory:multiblock/bacteria_vat"
+			}
+			id: "0700000000000009"
+			size: 2.0d
+			tasks: [
+				{
+					id: "070000000000010F"
+					item: { count: 1, id: "tinactory:multiblock/misc/sterile_bacteria_vat_casing" }
+					type: "item"
+				}
+				{
+					id: "0700000000000110"
+					item: { count: 1, id: "tinactory:multiblock/bacteria_vat" }
+					type: "item"
+				}
+			]
+			x: 4.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["0700000000000009"]
+			icon: {
+				id: "tinactory:tool/fluid_cell/iron"
+			}
+			id: "070000000000000A"
+			tasks: [
+				{
+					id: "0700000000000111"
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/slurry/nuclear_waste" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
+					type: "item"
+				}
+				{
+					id: "0700000000000112"
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/bacteria_culture" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
+					type: "item"
+				}
+			]
+			x: 8.0d
+			y: 6.0d
+		}
+		{
+			dependencies: ["070000000000000A"]
+			icon: {
+				id: "tinactory:component/stem_cell"
+			}
+			id: "070000000000000B"
+			tasks: [
+				{
+					id: "0700000000000113"
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/cultivated_bacteria" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
+					type: "item"
+				}
+				{
+					id: "0700000000000114"
+					item: { count: 1, id: "tinactory:component/stem_cell" }
+					type: "item"
+				}
+			]
+			x: 8.0d
+			y: 8.0d
+		}
+		{
+			dependencies: ["070000000000000B"]
+			id: "070000000000000C"
+			tasks: [{
+				id: "0700000000000115"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/enriched_growth_medium" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: 10.0d
+			y: 10.0d
+		}
+		{
+			dependencies: ["070000000000000B"]
+			icon: {
+				id: "tinactory:component/neuro_processor"
+			}
+			id: "070000000000000D"
+			tasks: [
+				{
+					id: "0700000000000116"
+					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/advanced_bacteria" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
+					type: "item"
+				}
+				{
+					id: "0700000000000117"
+					item: { count: 1, id: "tinactory:component/neuro_processor" }
+					type: "item"
+				}
+			]
+			x: 6.0d
+			y: 10.0d
+		}
+		{
+			dependencies: ["070000000000000B"]
+			icon: {
+				id: "tinactory:circuit_board/wetware"
+			}
+			id: "070000000000000E"
+			tasks: [
+				{
+					id: "0700000000000118"
+					item: { count: 1, id: "tinactory:board/wetware" }
+					type: "item"
+				}
+				{
+					id: "0700000000000119"
+					item: { count: 1, id: "tinactory:circuit_board/wetware" }
+					type: "item"
+				}
+			]
+			x: 8.0d
+			y: 10.0d
+		}
+		{
+			dependencies: ["070000000000000E"]
+			id: "070000000000000F"
+			size: 2.0d
+			tasks: [{
+				id: "070000000000011A"
+				item: { count: 1, id: "tinactory:circuit/wetware_processor" }
+				type: "item"
+			}]
+			x: 8.0d
+			y: 14.0d
+		}
+		{
+			dependencies: [
+				"070000000000000D"
+				"070000000000000F"
+			]
+			icon: {
+				id: "tinactory:circuit/wetware_mainframe"
+			}
+			id: "0700000000000010"
+			tasks: [
+				{
+					id: "070000000000011B"
+					item: { count: 1, id: "tinactory:circuit/wetware_assembly" }
+					type: "item"
+				}
+				{
+					id: "070000000000011C"
+					item: { count: 1, id: "tinactory:circuit/wetware_computer" }
+					type: "item"
+				}
+				{
+					id: "070000000000011D"
+					item: { count: 1, id: "tinactory:circuit/wetware_mainframe" }
+					type: "item"
+				}
+			]
+			x: 6.0d
+			y: 14.0d
+		}
+		{
+			dependencies: ["06FE000000000005"]
+			id: "0700000000000011"
+			tasks: [{
+				id: "070000000000011E"
+				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/naquadria_infused_rocket_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
+				type: "item"
+			}]
+			x: -4.0d
+			y: 14.0d
+		}
+		{
+			dependencies: [
+				"0700000000000010"
+				"18A01183DF6A59DB"
+				"0700000000000013"
+				"0700000000000007"
+				"0700000000000011"
+				"2669AE71AD768BC1"
+			]
+			id: "0700000000000012"
+			size: 2.0d
+			tasks: [{
+				icon: {
+					id: "tinactory:multiblock/rocket_launch_site"
+				}
+				id: "070000000000011F"
+				tags: [
+					"tinactory_technology"
+					"tinactory_technology_tinactory_interstellar_travel"
+				]
+				type: "custom"
+			}]
+			x: 2.0d
+			y: 14.0d
+		}
+	]
+}

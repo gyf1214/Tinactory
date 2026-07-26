@@ -323,7 +323,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 return
             }
 
-            val v = if (material.hasItem("sheet") || input == "primary" && material.hasFluid("plasma")) {
+            val v = if (material.hasItem("sheet") || (input == "primary" && material.hasFluid("plasma"))) {
                 voltage
             } else {
                 Voltage.fromRank(voltage.rank + 1)
@@ -366,15 +366,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         private fun plasma() {
-            if (!material.hasFluid("plasma") || !material.hasFluid("molten")) {
+            if (!material.hasFluid("plasma") || !material.hasFluid("fluid")) {
                 return
             }
 
             vacuumFreezer {
-                output(material, "molten") {
+                output(material) {
                     input(material, "plasma")
                     voltage(this@ProcessBuilder.voltage)
-                    workTicks(ticks(800))
+                    workTicks(ticks(120))
                 }
             }
         }
@@ -559,7 +559,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         fun extra(block: B.() -> Unit) {
-            builder.extra(block)
+            builder.block()
         }
 
         fun build(block: ComposeBuilder<R, B>.() -> Unit) {
@@ -671,18 +671,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 output(material, "gem") {
                     input(material, "seed")
                     input(mat2, amount = amount)
-                    extra {
-                        requireCleanness(baseCleanness, normalCleanness)
-                    }
+                    requireCleanness(baseCleanness, normalCleanness)
                 }
             }
             if (idealCleanness != null) {
                 output(material, "gem", suffix = if (normalCleanness == null) "" else "_from_dust") {
                     input(material, "dust")
                     input(mat2, amount = amount)
-                    extra {
-                        requireCleanness(baseCleanness, idealCleanness)
-                    }
+                    requireCleanness(baseCleanness, idealCleanness)
                 }
             }
         }

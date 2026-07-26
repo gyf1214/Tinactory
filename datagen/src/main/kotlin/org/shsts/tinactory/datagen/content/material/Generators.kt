@@ -55,9 +55,7 @@ object Generators {
                 output?.let { output(name, it, outputAmount) }
                 voltage(v)
                 workTicks(ticks)
-                extra {
-                    exactVoltage(v != Voltage.HV)
-                }
+                exactVoltage(v != Voltage.HV)
             }
         }
     }

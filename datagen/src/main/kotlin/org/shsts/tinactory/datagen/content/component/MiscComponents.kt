@@ -148,18 +148,14 @@ object MiscComponents {
                 input("radon")
                 voltage(Voltage.EV)
                 workTicks(1600)
-                extra {
-                    requireCleanness(0.5, 2.0)
-                }
+                requireCleanness(0.5, 2.0)
             }
             misc("quantum_star") {
                 input("nether_star", "gem")
                 input("naquadria", "molten")
                 voltage(Voltage.LUV)
                 workTicks(3200)
-                extra {
-                    requireCleanness(0.5, 2.0)
-                }
+                requireCleanness(0.5, 2.0)
             }
         }
 
@@ -390,8 +386,7 @@ object MiscComponents {
             storageComponent(3) {
                 chip("nand", 16)
                 input("fluix", "gem", 4)
-                // TODO
-                input("platinum", "wire_fine", 16)
+                input("trinium", "wire_fine", 16)
                 voltage(Voltage.EV)
             }
         }
@@ -404,18 +399,14 @@ object MiscComponents {
                 input("salt_water")
                 voltage(Voltage.EV)
                 workTicks(600)
-                extra {
-                    requireCleanness(0.0, 0.85)
-                }
+                requireCleanness(0.0, 0.85)
             }
             misc("lapotron_crystal") {
                 input("lapotron", "dust", 8)
                 input("salt_water")
                 voltage(Voltage.IV)
                 workTicks(800)
-                extra {
-                    requireCleanness(0.5, 0.9)
-                }
+                requireCleanness(0.5, 0.9)
             }
         }
         laserEngraver {
@@ -424,33 +415,44 @@ object MiscComponents {
                 input("ruby", "lens", 0, port = 1)
                 voltage(Voltage.IV)
                 workTicks(800)
-                extra {
-                    requireCleanness(0.4, 1.4)
-                }
+                requireCleanness(0.4, 1.4)
             }
             misc("lapotron_chip") {
                 misc("lapotron_crystal")
                 input("blue_topaz", "lens", 0, port = 1)
                 voltage(Voltage.LUV)
                 workTicks(1200)
-                extra {
-                    requireCleanness(0.5, 1.5)
-                }
+                requireCleanness(0.5, 1.5)
             }
         }
         assembler {
+            defaults {
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.POWER_SUBSTATION)
+                circuit(1)
+            }
+
             componentVoltage = Voltage.LUV
             misc("lapotronic_energy_orb") {
                 misc("lapotron_crystal", 8)
                 misc("energy_chip", 12)
-                circuit(1)
                 component("field_generator", voltage = Voltage.IV)
-                input("platinum", "wire_fine", 24)
-                input("platinum", "bolt", 16)
+                input("platinum", "wire_fine", 16)
+                input("platinum", "bolt", 8)
                 input("soldering_alloy", amount = 3)
                 voltage(Voltage.LUV)
-                workTicks(COMPONENT_TICKS)
-                tech(Technologies.POWER_SUBSTATION)
+            }
+
+            componentVoltage = Voltage.ZPM
+            misc("lapotronic_energy_orb_cluster") {
+                misc("lapotronic_energy_orb", 2)
+                misc("lapotron_chip", 8)
+                misc("energy_chip", 16)
+                component("field_generator", voltage = Voltage.LUV)
+                input("niobium_titanium", "wire_fine", 24)
+                input("naquadah", "bolt", 16)
+                input("soldering_alloy", amount = 5)
+                voltage(Voltage.ZPM)
             }
         }
     }
@@ -474,6 +476,17 @@ object MiscComponents {
                 input("rocket_fuel")
                 voltage(Voltage.EV)
             }
+            target(Technologies.INTERSTELLAR_TRAVEL) {
+                input(AllTags.circuit(Voltage.MAX))
+                input(getItem("component/lapotronic_energy_orb_cluster"), 4)
+                input(getComponent("field_generator").item(Voltage.ZPM), 4)
+                input(STORAGE_CELLS[3].component.get(), 4)
+                input("neutronium", "plate", 32)
+                input(getComponent("electric_pump").item(Voltage.ZPM), 16)
+                input("soldering_alloy", amount = 16)
+                input("naquadria_infused_rocket_fuel", amount = 8)
+                voltage(Voltage.ZPM)
+            }
         }
     }
 
@@ -482,6 +495,7 @@ object MiscComponents {
             defaults {
                 voltage(Voltage.HV)
                 workTicks(COMPONENT_TICKS)
+                tech(Technologies.NUCLEAR_PHYSICS)
             }
             misc("empty_nuclear_rod") {
                 input("titanium", "stick", 2)
@@ -495,8 +509,6 @@ object MiscComponents {
             misc("enriched_naquadah_fuel_rod") {
                 misc("empty_nuclear_rod")
                 input("enriched_naquadah", "bolt")
-                voltage(Voltage.IV)
-                workTicks(400)
             }
             misc("moderator_rod") {
                 misc("empty_nuclear_rod")
@@ -517,7 +529,7 @@ object MiscComponents {
                 output(getItem("component/empty_nuclear_rod"))
                 output("nuclear_waste", "dust")
             }
-            input(getItem("component/depleted_enriched_naquadah_fuel_rod")) {
+            input(getItem("component/depleted_naquadah_fuel_rod")) {
                 output(getItem("component/empty_nuclear_rod"))
                 output("naquadah", "bolt")
                 voltage(Voltage.IV)

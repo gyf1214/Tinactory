@@ -48,7 +48,6 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -68,6 +67,7 @@ object Multiblocks {
     fun init() {
         components()
         componentRecipes()
+        powerBlocks()
         machines()
         machineRecipes()
     }
@@ -106,6 +106,7 @@ object Multiblocks {
             coil("nichrome")
             coil("tungsten", "rtm_alloy")
             coil("naquadah")
+            coil("trinium")
 
             misc("grate_machine_casing") {
                 blockState(solidBlock("casings/pipe/grate_steel_front/top"))
@@ -225,6 +226,10 @@ object Multiblocks {
                     "overlay/machine/overlay_energy_out"))
             }
 
+            misc("sterile_bacteria_vat_casing") {
+                blockState(solidBlock("casings/solid/machine_casing_inert_ptfe"))
+            }
+
             misc("turbine_blade") {
                 blockState { ctx ->
                     turbineBlock(ctx, "casings/solid/machine_casing_stable_titanium",
@@ -321,6 +326,7 @@ object Multiblocks {
             coil("nichrome", Voltage.MV, "nichrome", "stainless_steel", "pe", Technologies.NICHROME)
             coil("tungsten", Voltage.HV, "tungsten", "annealed_copper", "pe", Technologies.TUNGSTEN_STEEL)
             coil("naquadah", Voltage.IV, "naquadah", "hssg", "ptfe", Technologies.NAQUADAH_PROCESSING)
+            coil("trinium", Voltage.ZPM, "trinium", "hsss", "ptfe", Technologies.ADVANCED_NETHER_CHEMISTRY)
         }
 
         val itemFilter = getItem("component/item_filter")
@@ -405,8 +411,6 @@ object Multiblocks {
                 workTicks(CASING_TICKS)
                 tech(Technologies.ROCKET_SCIENCE)
             }
-
-            componentVoltage = Voltage.EV
             misc("lithography_lens/basic") {
                 input("titanium", "stick", 4)
                 component("robot_arm", 2)
@@ -419,6 +423,8 @@ object Multiblocks {
                 workTicks(MULTIBLOCK_TICKS)
                 tech(Technologies.LITHOGRAPHY)
             }
+
+            componentVoltage = Voltage.EV
             misc("turbine_blade") {
                 solid("stable_titanium")
                 pic(1)
@@ -518,8 +524,6 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 tech(Technologies.MATERIAL_CONDITIONING)
             }
-
-            componentVoltage = Voltage.IV
             misc("lithography_lens/good") {
                 misc("lithography_lens/basic")
                 component("robot_arm", 2)
@@ -529,6 +533,8 @@ object Multiblocks {
                 input("soldering_alloy", amount = 3)
                 tech(Technologies.LITHOGRAPHY)
             }
+
+            componentVoltage = Voltage.IV
             misc("phase_converter_casing") {
                 misc("ptfe_pipe_casing")
                 circuit(2)
@@ -606,24 +612,9 @@ object Multiblocks {
                 workTicks(CASING_TICKS)
                 tech(Technologies.FUSION)
             }
-            misc("superconducting_coil") {
-                input("iv_superconductor", "wire", 32)
-                input("ruridit", "foil", 32)
-                input("rhodium_plated_palladium", "plate", 2)
-                input("ptfe", amount = 2)
-                input("soldering_alloy", amount = 4)
-                workTicks(COIL_TICKS)
-                tech(Technologies.FUSION)
-            }
-            misc("superconducting_coil", suffix = "_from_luv_superconductor") {
-                input("luv_superconductor", "wire", 4)
-                input("ruridit", "foil", 4)
-                input("rhodium_plated_palladium", "plate", 2)
-                input("ptfe", amount = 2)
-                input("soldering_alloy", amount = 4)
-                workTicks(COIL_TICKS)
-                tech(Technologies.FUSION)
-            }
+            superConductingCoil("iv_superconductor", 64)
+            superConductingCoil("luv_superconductor", 8, "_from_luv")
+            superConductingCoil("zpm_superconductor", 1, "_from_zpm")
             misc("lithography_lens/advanced") {
                 misc("lithography_lens/good")
                 component("robot_arm", 2)
@@ -653,7 +644,25 @@ object Multiblocks {
             }
         }
 
-        powerBlocks()
+        assemblyLine {
+            componentVoltage = Voltage.ZPM
+            misc("sterile_bacteria_vat_casing") {
+                input("hsss", "stick", 8)
+                input("polystyrene", "sheet", 16)
+                input("rhodium_plated_palladium", "plate", 4)
+                circuit(1)
+                component("robot_arm")
+                component("electric_motor", 2)
+                component("electric_pump", 2)
+                input("trinium", "rotor", 2)
+                input("ptfe", "pipe", 2)
+                input("niobium_titanium", "pipe", 2)
+                input("soldering_alloy", amount = 2)
+                voltage(Voltage.ZPM)
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+                tech(Technologies.WETWARE)
+            }
+        }
     }
 
     private fun powerBlocks() {
@@ -670,6 +679,7 @@ object Multiblocks {
             powerBlock(Voltage.EV, "energy_crystal", 10)
             powerBlock(Voltage.IV, "lapotron_crystal", 8)
             powerBlock(Voltage.LUV, "lapotronic_energy_orb")
+            powerBlock(Voltage.ZPM, "lapotronic_energy_orb_cluster")
         }
     }
 
@@ -738,6 +748,18 @@ object Multiblocks {
         }
     }
 
+    private fun AssemblyRecipeFactory.superConductingCoil(mat: String, amount: Int, suffix: String = "") {
+        misc("superconducting_coil", suffix = suffix) {
+            input(mat, "wire", amount)
+            input("ruridit", "foil", amount)
+            input("rhodium_plated_palladium", "plate", 2)
+            input("ptfe", amount = 2)
+            input("soldering_alloy", amount = 4)
+            workTicks(COIL_TICKS)
+            tech(Technologies.FUSION)
+        }
+    }
+
     private fun machines() {
         blockData {
             defaults {
@@ -773,6 +795,7 @@ object Multiblocks {
             multiblock("large_chemical_reactor", "inert_ptfe")
             multiblock("implosion_compressor", "solid_steel")
             multiblock("autoclave", "clean_stainless_steel", "blast_furnace")
+            multiblock("bacteria_vat", "inert_ptfe", "blast_furnace")
             multiblock("lithography_machine", "stable_titanium", "blast_furnace")
             multiblock("rocket_launch_site", "solid_steel", "blast_furnace")
             multiblock("multi_smelter", "heatproof", "blast_furnace") {
@@ -1153,50 +1176,38 @@ object Multiblocks {
         }
 
         assemblyLine {
+            defaults {
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+            }
+
             componentVoltage = Voltage.LUV
             multiblock("fusion_reactor") {
-                component("machine_hull")
+                input("hssg", "stick", 8)
+                circuit(8)
+                component("field_generator", 8, Voltage.IV)
                 component("robot_arm", 4)
                 component("electric_pump", 4)
-                component("field_generator", 8, Voltage.IV)
-                circuit(8)
-                input("hssg", "stick", 8)
                 input("ruridit", "foil", 32)
                 input("soldering_alloy", amount = 16)
                 voltage(Voltage.IV)
-                workTicks(ADVANCED_MULTIBLOCK_TICKS)
                 tech(Technologies.FUSION)
             }
-        }
 
-        fusionReactor {
-            recipe("multiblock/netherite") {
-                input("netherite_scrap", "molten")
-                input("gold", "molten")
-                output("netherite", "plasma", 0.25)
-                voltage(Voltage.LUV)
-                workTicks(400)
-            }
-            recipe("multiblock/nether_star") {
-                input("wither_matrix", "liquid")
-                input("enriched_naquadah", "molten")
-                output("nether_star", "plasma")
-                voltage(Voltage.LUV)
-                workTicks(800)
-            }
-            recipe("multiblock/activated_naquadah") {
-                input("naquadah", "molten")
-                input("hydrogen", "gas", 0.125)
-                output("activated_naquadah", "plasma")
-                voltage(Voltage.LUV)
-                workTicks(400)
-            }
-            recipe("multiblock/fusion_reactor_smoke") {
-                input("water", "liquid", 1)
-                input("water", "gas", 1)
-                output("water", "gas", 2)
-                voltage(Voltage.LUV)
-                workTicks(200)
+            componentVoltage = Voltage.ZPM
+            multiblock("bacteria_vat") {
+                misc("sterile_bacteria_vat_casing")
+                circuit(1, Voltage.UV)
+                component("robot_arm", 2)
+                component("sensor", 2)
+                component("electric_motor", 4)
+                component("electric_pump", 4)
+                input("trinium", "rotor", 4)
+                input("naquadah", "wire", 12)
+                input("naquadria", "foil", 16)
+                input("ptfe", "pipe", 8)
+                input("soldering_alloy", amount = 8)
+                voltage(Voltage.ZPM)
+                tech(Technologies.WETWARE)
             }
         }
     }

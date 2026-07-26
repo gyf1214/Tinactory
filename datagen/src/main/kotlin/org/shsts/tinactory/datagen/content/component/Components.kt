@@ -158,6 +158,14 @@ object Components {
                 model(basicItem("metaitems/crystal.central_processing_unit"))
             }
 
+            component("stem_cell") {
+                model(basicItem("metaitems/stem_cells"))
+            }
+
+            component("neuro_processor") {
+                model(basicItem("metaitems/processor.neuro"))
+            }
+
             component("raw_rhodium_plated_palladium") {
                 model(basicItem(ResourceLocation.fromNamespaceAndPath(
                     "gregtech4", "item/iridium_alloy_ingot")))
@@ -181,6 +189,10 @@ object Components {
 
             component("lapotronic_energy_orb") {
                 model(basicItem("metaitems/energy.lapotronic_orb/1"))
+            }
+
+            component("lapotronic_energy_orb_cluster") {
+                model(basicItem("metaitems/energy.lapotronic_orb_cluster/1"))
             }
 
             for (entry in STORAGE_CELLS) {
@@ -212,12 +224,8 @@ object Components {
             }
 
             component("enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("item/reactor/fuel_rod/uranium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/mox")))
                 tag(AllTags.NUCLEAR_ITEM)
-            }
-
-            component("depleted_enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
 
             component("moderator_rod") {
@@ -231,6 +239,10 @@ object Components {
             }
 
             component("nuclear_waste_rod") {
+                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
+            }
+
+            component("depleted_naquadah_fuel_rod") {
                 model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
         }

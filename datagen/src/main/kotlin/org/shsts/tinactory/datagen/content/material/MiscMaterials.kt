@@ -28,10 +28,12 @@ import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -136,15 +138,79 @@ object MiscMaterials {
                 output("rhodium_plated_palladium", "ingot_hot")
                 voltage(Voltage.IV)
                 workTicks(1280)
-                extra {
-                    temperature(4500)
-                }
+                temperature(4500)
             }
         }
 
-        naquadahProcessing()
+        bacteriaVat {
+            output("bacteria_culture", amount = 0.01, suffix = "_from_biomass") {
+                input("biomass", amount = 0.1)
+                input("nuclear_waste", "slurry", 0.01)
+                voltage(Voltage.HV)
+                requireCleanness(0.7, 1.0)
+            }
+            output("bacteria_culture", amount = 0.002) {
+                input("bacteria_culture", amount = 0.001)
+                input("sterile_growth_medium", amount = 0.001)
+                voltage(Voltage.LV)
+                requireCleanness(0.5, 0.8)
+            }
+            output("cultivated_bacteria", amount = 0.01) {
+                input("bacteria_culture", amount = 0.1)
+                input("radon", amount = 0.01)
+                voltage(Voltage.HV)
+                requireCleanness(0.85, 1.35)
+            }
+            output("cultivated_bacteria", amount = 0.02, suffix = "_from_reproduction") {
+                input("cultivated_bacteria", amount = 0.001)
+                input("enriched_growth_medium", amount = 0.001)
+                voltage(Voltage.MV)
+                requireCleanness(0.6, 0.85)
+            }
+            output("advanced_bacteria", amount = 0.01) {
+                input("cultivated_bacteria", amount = 0.1)
+                input("naquadria", "molten", 1f / 72f)
+                voltage(Voltage.IV)
+                requireCleanness(0.9, 1.4)
+            }
+        }
+
+        fusionReactor {
+            output("naquadria_infused_rocket_fuel", "plasma") {
+                input("rocket_fuel", "liquid")
+                input("naquadria", "molten")
+                voltage(Voltage.ZPM)
+                workTicks(200)
+            }
+            output("netherite", "plasma", 0.25) {
+                input("netherite_scrap", "molten")
+                input("gold", "molten")
+                voltage(Voltage.LUV)
+                workTicks(128)
+            }
+            output("nether_star", "plasma", 0.125) {
+                input("enriched_naquadah", "molten", 0.125)
+                input("wither_matrix", "liquid", 0.125)
+                voltage(Voltage.LUV)
+                workTicks(64)
+            }
+            output("activated_naquadah", "plasma") {
+                input("naquadah", "molten")
+                input("hydrogen", "gas", 0.125)
+                voltage(Voltage.LUV)
+                workTicks(256)
+            }
+            output("neutronium", "plasma", 1f / 144f) {
+                input("nether_star", "molten", 1f / 36f)
+                input("naquadria", "molten", 1f / 36f)
+                voltage(Voltage.ZPM)
+                workTicks(96)
+            }
+        }
+
         generateStone()
         stone()
+        naquadahProcessing()
         tags()
     }
 
@@ -194,9 +260,7 @@ object MiscMaterials {
                 output("potassium_bifluoride", amount = 2)
                 voltage(Voltage.LUV)
                 workTicks(2400)
-                extra {
-                    temperature(5400)
-                }
+                temperature(5400)
             }
             output("trinium", "ingot_hot", suffix = "_from_sulfide") {
                 input("trinium_sulfide")
@@ -204,9 +268,7 @@ object MiscMaterials {
                 output("sulfur")
                 voltage(Voltage.LUV)
                 workTicks(2400)
-                extra {
-                    temperature(5400)
-                }
+                temperature(5400)
             }
         }
 

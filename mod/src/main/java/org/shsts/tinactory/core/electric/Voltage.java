@@ -14,7 +14,7 @@ public enum Voltage {
     PRIMITIVE(0, 0xFFFFFFFF), ULV(1, 0xFFC80000),
     LV(2, 0xFFDCDCDC), MV(3, 0xFFFF6400), HV(4, 0xFFFFFF1E),
     EV(5, 0xFF808080), IV(6, 0xFFF0F0F5), LUV(7, 0xFFE99797), ZPM(8, 0xFF7EC3C4),
-    MAX(9, 0xFFFFFFFF);
+    UV(9, 0xFF00AAAA), MAX(10, 0xFFFFFFFF);
 
     public final int rank;
     public final long value;

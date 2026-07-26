@@ -84,9 +84,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
                     voltage(Voltage.PRIMITIVE)
                 } else {
                     voltage(variant1.voltage)
-                    extra {
-                        requireTech(tech)
-                    }
+                    requireTech(tech)
                 }
             }
         }
