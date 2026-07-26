@@ -536,9 +536,7 @@ object CircuitComponents {
                 input("gallium_arsenide")
                 voltage(Voltage.LV)
                 workTicks(6400)
-                extra {
-                    temperature(2100)
-                }
+                temperature(2100)
             }
             output(BOULE.item("glowstone")) {
                 input("silicon", amount = 64)
@@ -546,9 +544,7 @@ object CircuitComponents {
                 input("nitrogen", amount = 6)
                 voltage(Voltage.HV)
                 workTicks(9600)
-                extra {
-                    temperature(3000)
-                }
+                temperature(3000)
             }
             output(BOULE.item("naquadah")) {
                 input("silicon", "ingot", 32)
@@ -556,9 +552,7 @@ object CircuitComponents {
                 input("argon", amount = 6)
                 voltage(Voltage.IV)
                 workTicks(12800)
-                extra {
-                    temperature(3900)
-                }
+                temperature(3900)
             }
             output(BOULE.item("neutronium")) {
                 input("silicon", "ingot", 64)
@@ -566,9 +560,7 @@ object CircuitComponents {
                 input("neutronium", "molten")
                 voltage(Voltage.ZPM)
                 workTicks(16000)
-                extra {
-                    temperature(4800)
-                }
+                temperature(4800)
             }
         }
 
@@ -578,18 +570,14 @@ object CircuitComponents {
                 input("trinium", "molten")
                 voltage(Voltage.LUV)
                 workTicks(3200)
-                extra {
-                    requireCleanness(0.75, 1.0)
-                }
+                requireCleanness(0.75, 1.0)
             }
             output(rawCrystalChip, suffix = "_from_part") {
                 input(rawCrystalChipPart)
                 input("wither_matrix", "liquid")
                 voltage(Voltage.LUV)
                 workTicks(1600)
-                extra {
-                    requireCleanness(0.75, 1.0)
-                }
+                requireCleanness(0.75, 1.0)
             }
         }
 
@@ -637,9 +625,7 @@ object CircuitComponents {
                 input("ender_eye", "lens", 0, port = 1)
                 voltage(Voltage.IV)
                 workTicks(4000)
-                extra {
-                    requireCleanness(0.75, 1.75)
-                }
+                requireCleanness(0.75, 1.75)
             }
         }
     }
@@ -652,9 +638,7 @@ object CircuitComponents {
             defaults {
                 input(lens, "lens", 0, port = 1)
                 workTicks(1000L shl level)
-                extra {
-                    requireCleanness(minCleanness, maxCleanness)
-                }
+                requireCleanness(minCleanness, maxCleanness)
             }
 
             if (source != null) {

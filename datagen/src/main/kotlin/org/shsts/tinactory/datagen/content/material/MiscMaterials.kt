@@ -137,9 +137,7 @@ object MiscMaterials {
                 output("rhodium_plated_palladium", "ingot_hot")
                 voltage(Voltage.IV)
                 workTicks(1280)
-                extra {
-                    temperature(4500)
-                }
+                temperature(4500)
             }
         }
 
@@ -148,31 +146,31 @@ object MiscMaterials {
                 input("biomass", amount = 0.1)
                 input("nuclear_waste", "slurry", 0.01)
                 voltage(Voltage.HV)
-                extra { requireCleanness(0.7, 1.0) }
+                requireCleanness(0.7, 1.0)
             }
             output("bacteria_culture", amount = 0.002) {
                 input("bacteria_culture", amount = 0.001)
                 input("sterile_growth_medium", amount = 0.001)
                 voltage(Voltage.LV)
-                extra { requireCleanness(0.5, 0.8) }
+                requireCleanness(0.5, 0.8)
             }
             output("cultivated_bacteria", amount = 0.01) {
                 input("bacteria_culture", amount = 0.1)
                 input("radon", amount = 0.01)
                 voltage(Voltage.HV)
-                extra { requireCleanness(0.85, 1.35) }
+                requireCleanness(0.85, 1.35)
             }
             output("cultivated_bacteria", amount = 0.02, suffix = "_from_reproduction") {
                 input("cultivated_bacteria", amount = 0.001)
                 input("enriched_growth_medium", amount = 0.001)
                 voltage(Voltage.MV)
-                extra { requireCleanness(0.6, 0.85) }
+                requireCleanness(0.6, 0.85)
             }
             output("advanced_bacteria", amount = 0.01) {
                 input("cultivated_bacteria", amount = 0.1)
                 input("naquadria", "molten", 1f / 72f)
                 voltage(Voltage.IV)
-                extra { requireCleanness(0.9, 1.4) }
+                requireCleanness(0.9, 1.4)
             }
         }
 
@@ -228,9 +226,7 @@ object MiscMaterials {
                 output("potassium_bifluoride", amount = 2)
                 voltage(Voltage.LUV)
                 workTicks(2400)
-                extra {
-                    temperature(5400)
-                }
+                temperature(5400)
             }
             output("trinium", "ingot_hot", suffix = "_from_sulfide") {
                 input("trinium_sulfide")
@@ -238,9 +234,7 @@ object MiscMaterials {
                 output("sulfur")
                 voltage(Voltage.LUV)
                 workTicks(2400)
-                extra {
-                    temperature(5400)
-                }
+                temperature(5400)
             }
         }
 

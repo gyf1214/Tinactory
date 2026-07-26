@@ -559,7 +559,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         fun extra(block: B.() -> Unit) {
-            builder.extra(block)
+            builder.block()
         }
 
         fun build(block: ComposeBuilder<R, B>.() -> Unit) {
@@ -671,18 +671,14 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 output(material, "gem") {
                     input(material, "seed")
                     input(mat2, amount = amount)
-                    extra {
-                        requireCleanness(baseCleanness, normalCleanness)
-                    }
+                    requireCleanness(baseCleanness, normalCleanness)
                 }
             }
             if (idealCleanness != null) {
                 output(material, "gem", suffix = if (normalCleanness == null) "" else "_from_dust") {
                     input(material, "dust")
                     input(mat2, amount = amount)
-                    extra {
-                        requireCleanness(baseCleanness, idealCleanness)
-                    }
+                    requireCleanness(baseCleanness, idealCleanness)
                 }
             }
         }

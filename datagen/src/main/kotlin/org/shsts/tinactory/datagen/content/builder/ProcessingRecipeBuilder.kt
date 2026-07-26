@@ -108,10 +108,6 @@ abstract class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecip
         output(getMaterial(name), sub, amount, port, rate)
     }
 
-    fun extra(block: B.() -> Unit) {
-        self().block()
-    }
-
     fun workTicks(value: Long) {
         workTicks = value
     }

@@ -148,18 +148,14 @@ object MiscComponents {
                 input("radon")
                 voltage(Voltage.EV)
                 workTicks(1600)
-                extra {
-                    requireCleanness(0.5, 2.0)
-                }
+                requireCleanness(0.5, 2.0)
             }
             misc("quantum_star") {
                 input("nether_star", "gem")
                 input("naquadria", "molten")
                 voltage(Voltage.LUV)
                 workTicks(3200)
-                extra {
-                    requireCleanness(0.5, 2.0)
-                }
+                requireCleanness(0.5, 2.0)
             }
         }
 
@@ -404,18 +400,14 @@ object MiscComponents {
                 input("salt_water")
                 voltage(Voltage.EV)
                 workTicks(600)
-                extra {
-                    requireCleanness(0.0, 0.85)
-                }
+                requireCleanness(0.0, 0.85)
             }
             misc("lapotron_crystal") {
                 input("lapotron", "dust", 8)
                 input("salt_water")
                 voltage(Voltage.IV)
                 workTicks(800)
-                extra {
-                    requireCleanness(0.5, 0.9)
-                }
+                requireCleanness(0.5, 0.9)
             }
         }
         laserEngraver {
@@ -424,18 +416,14 @@ object MiscComponents {
                 input("ruby", "lens", 0, port = 1)
                 voltage(Voltage.IV)
                 workTicks(800)
-                extra {
-                    requireCleanness(0.4, 1.4)
-                }
+                requireCleanness(0.4, 1.4)
             }
             misc("lapotron_chip") {
                 misc("lapotron_crystal")
                 input("blue_topaz", "lens", 0, port = 1)
                 voltage(Voltage.LUV)
                 workTicks(1200)
-                extra {
-                    requireCleanness(0.5, 1.5)
-                }
+                requireCleanness(0.5, 1.5)
             }
         }
         assembler {

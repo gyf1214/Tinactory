@@ -12,11 +12,9 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReact
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.electrolyzer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 
 object InorganicChemistry {
     fun init() {
@@ -35,9 +33,7 @@ object InorganicChemistry {
             defaults {
                 voltage(Voltage.LV)
                 workTicks(400)
-                extra {
-                    temperature(2000)
-                }
+                temperature(2000)
             }
             input("chalcopyrite", amount = 2) {
                 input("oxygen", amount = 6)
@@ -670,9 +666,7 @@ object InorganicChemistry {
                 input("titanium_tetrachloride")
                 output("magnesium_chloride", amount = 2)
                 workTicks(800)
-                extra {
-                    temperature(2300)
-                }
+                temperature(2300)
             }
             output("obsidian", "slurry") {
                 input("obsidian")
@@ -680,9 +674,7 @@ object InorganicChemistry {
                 output("niobium", rate = 0.3)
                 output("platinum_metallic", rate = 0.1)
                 workTicks(400)
-                extra {
-                    temperature(1300)
-                }
+                temperature(1300)
             }
             output("tungsten", "ingot_hot", 2, suffix = "_from_tungsten_trioxide") {
                 input("tungsten_trioxide", amount = 2)
@@ -690,9 +682,7 @@ object InorganicChemistry {
                 input("nitrogen", amount = 2)
                 output("carbon_dioxide", amount = 3)
                 workTicks(2560)
-                extra {
-                    temperature(3600)
-                }
+                temperature(3600)
             }
             output("molybdenum", "ingot_hot", 2, suffix = "_from_molybdenum_trioxide") {
                 input("molybdenum_trioxide", amount = 2)
@@ -700,9 +690,7 @@ object InorganicChemistry {
                 input("nitrogen", amount = 2)
                 output("carbon_dioxide", amount = 3)
                 workTicks(2560)
-                extra {
-                    temperature(2800)
-                }
+                temperature(2800)
             }
             output("samarium", "ingot_hot", suffix = "_from_rare_earth_slurry") {
                 input("rare_earth", "slurry")
@@ -710,17 +698,13 @@ object InorganicChemistry {
                 output("heavy_rare_earth_solution")
                 voltage(Voltage.LUV)
                 workTicks(1600)
-                extra {
-                    temperature(5100)
-                }
+                temperature(5100)
             }
             output("platinum", "nugget", 2, suffix = "_from_sludge") {
                 input("platinum_metallic")
                 input("nitrogen")
                 workTicks(640)
-                extra {
-                    temperature(2300)
-                }
+                temperature(2300)
             }
         }
 
@@ -771,9 +755,7 @@ object InorganicChemistry {
                 input("lava")
                 voltage(Voltage.HV)
                 workTicks(720)
-                extra {
-                    temperature(3100)
-                }
+                temperature(3100)
             }
             output("end_stone", "slurry") {
                 input("end_stone")
@@ -782,9 +764,7 @@ object InorganicChemistry {
                 output("ender_pearl", "seed", rate = 0.1)
                 voltage(Voltage.EV)
                 workTicks(256)
-                extra {
-                    temperature(2100)
-                }
+                temperature(2100)
             }
         }
 
@@ -905,17 +885,13 @@ object InorganicChemistry {
                 output("raw_rhodium", amount = 4)
                 output("rarest_metallic")
                 workTicks(800)
-                extra {
-                    temperature(3500)
-                }
+                temperature(3500)
             }
             input("raw_ruthenium", amount = 16) {
                 input("carbon", amount = 3)
                 output("ruthenium", amount = 16)
                 workTicks(2000)
-                extra {
-                    temperature(2000)
-                }
+                temperature(2000)
             }
         }
 
@@ -969,9 +945,7 @@ object InorganicChemistry {
                 output("carbon_dioxide", amount = 2)
                 voltage(Voltage.IV)
                 workTicks(800)
-                extra {
-                    temperature(5100)
-                }
+                temperature(5100)
             }
         }
 
@@ -1063,9 +1037,7 @@ object InorganicChemistry {
                 input("nether_star", "molten", 0.5)
                 voltage(Voltage.LUV)
                 workTicks(1600)
-                extra {
-                    requireCleanness(0.5, 1.0)
-                }
+                requireCleanness(0.5, 1.0)
             }
         }
     }
