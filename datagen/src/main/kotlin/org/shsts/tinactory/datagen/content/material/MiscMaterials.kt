@@ -28,6 +28,7 @@ import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
 import org.shsts.tinactory.datagen.content.builder.DataFactories.dataGen
 import org.shsts.tinactory.datagen.content.builder.DataFactories.itemData
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
@@ -142,9 +143,42 @@ object MiscMaterials {
             }
         }
 
-        naquadahProcessing()
+        bacteriaVat {
+            output("bacteria_culture", amount = 0.01, suffix = "_from_biomass") {
+                input("biomass", amount = 0.1)
+                input("nuclear_waste", "slurry", 0.01)
+                voltage(Voltage.HV)
+                extra { requireCleanness(0.7, 1.0) }
+            }
+            output("bacteria_culture", amount = 0.002) {
+                input("bacteria_culture", amount = 0.001)
+                input("sterile_growth_medium", amount = 0.001)
+                voltage(Voltage.LV)
+                extra { requireCleanness(0.5, 0.8) }
+            }
+            output("cultivated_bacteria", amount = 0.01) {
+                input("bacteria_culture", amount = 0.1)
+                input("radon", amount = 0.01)
+                voltage(Voltage.HV)
+                extra { requireCleanness(0.85, 1.35) }
+            }
+            output("cultivated_bacteria", amount = 0.02, suffix = "_from_reproduction") {
+                input("cultivated_bacteria", amount = 0.001)
+                input("enriched_growth_medium", amount = 0.001)
+                voltage(Voltage.MV)
+                extra { requireCleanness(0.6, 0.85) }
+            }
+            output("advanced_bacteria", amount = 0.01) {
+                input("cultivated_bacteria", amount = 0.1)
+                input("naquadria", "molten", 1f / 72f)
+                voltage(Voltage.IV)
+                extra { requireCleanness(0.9, 1.4) }
+            }
+        }
+
         generateStone()
         stone()
+        naquadahProcessing()
         tags()
     }
 

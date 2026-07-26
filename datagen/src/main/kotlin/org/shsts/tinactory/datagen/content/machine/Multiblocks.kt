@@ -48,7 +48,6 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
@@ -69,6 +68,7 @@ object Multiblocks {
     fun init() {
         components()
         componentRecipes()
+        powerBlocks()
         machines()
         machineRecipes()
     }
@@ -645,8 +645,6 @@ object Multiblocks {
             }
         }
 
-        powerBlocks()
-
         assemblyLine {
             componentVoltage = Voltage.ZPM
             misc("sterile_bacteria_vat_casing") {
@@ -663,62 +661,7 @@ object Multiblocks {
                 input("soldering_alloy", amount = 2)
                 voltage(Voltage.ZPM)
                 workTicks(ADVANCED_MULTIBLOCK_TICKS)
-                tech(Technologies.ADVANCED_NETHER_CHEMISTRY)
-            }
-            multiblock("bacteria_vat") {
-                misc("sterile_bacteria_vat_casing", 4)
-                component("machine_hull")
-                component("robot_arm", 2)
-                component("sensor", 2)
-                component("electric_motor", 4)
-                component("electric_pump", 4)
-                input("trinium", "rotor", 4)
-                input("naquadah", "wire", 32)
-                input("naquadria", "foil", 16)
-                input("ptfe", "pipe", 8)
-                input("soldering_alloy", amount = 8)
-                circuit(2, Voltage.UV)
-                voltage(Voltage.ZPM)
-                workTicks(ADVANCED_MULTIBLOCK_TICKS)
-                tech(Technologies.CRYSTAL_CIRCUITRY)
-            }
-        }
-
-        bacteriaVat {
-            recipe("bacteria_culture") {
-                input("biomass", amount = 0.1)
-                input("nuclear_waste", "slurry", 0.01)
-                output("bacteria_culture", amount = 0.01)
-                voltage(Voltage.HV)
-                extra { requireCleanness(0.7, 1.0) }
-            }
-            recipe("bacteria_culture_reproduction") {
-                input("bacteria_culture", amount = 0.001)
-                input("sterile_growth_medium", amount = 0.001)
-                output("bacteria_culture", amount = 0.002)
-                voltage(Voltage.LV)
-                extra { requireCleanness(0.5, 0.8) }
-            }
-            recipe("cultivated_bacteria") {
-                input("bacteria_culture", amount = 0.1)
-                input("radon", amount = 0.01)
-                output("cultivated_bacteria", amount = 0.01)
-                voltage(Voltage.HV)
-                extra { requireCleanness(0.85, 1.35) }
-            }
-            recipe("cultivated_bacteria_reproduction") {
-                input("cultivated_bacteria", amount = 0.001)
-                input("enriched_growth_medium", amount = 0.001)
-                output("cultivated_bacteria", amount = 0.002)
-                voltage(Voltage.MV)
-                extra { requireCleanness(0.6, 0.85) }
-            }
-            recipe("advanced_bacteria") {
-                input("cultivated_bacteria", amount = 0.1)
-                input("naquadria", "molten", 1f / 72f)
-                output("advanced_bacteria", amount = 0.01)
-                voltage(Voltage.IV)
-                extra { requireCleanness(0.9, 1.4) }
+                tech(Technologies.WETWARE)
             }
         }
     }
@@ -1234,19 +1177,38 @@ object Multiblocks {
         }
 
         assemblyLine {
+            defaults {
+                workTicks(ADVANCED_MULTIBLOCK_TICKS)
+            }
+
             componentVoltage = Voltage.LUV
             multiblock("fusion_reactor") {
-                component("machine_hull")
+                input("hssg", "stick", 8)
+                circuit(8)
+                component("field_generator", 8, Voltage.IV)
                 component("robot_arm", 4)
                 component("electric_pump", 4)
-                component("field_generator", 8, Voltage.IV)
-                circuit(8)
-                input("hssg", "stick", 8)
                 input("ruridit", "foil", 32)
                 input("soldering_alloy", amount = 16)
                 voltage(Voltage.IV)
-                workTicks(ADVANCED_MULTIBLOCK_TICKS)
                 tech(Technologies.FUSION)
+            }
+
+            componentVoltage = Voltage.ZPM
+            multiblock("bacteria_vat") {
+                misc("sterile_bacteria_vat_casing")
+                circuit(1, Voltage.UV)
+                component("robot_arm", 2)
+                component("sensor", 2)
+                component("electric_motor", 4)
+                component("electric_pump", 4)
+                input("trinium", "rotor", 4)
+                input("naquadah", "wire", 12)
+                input("naquadria", "foil", 16)
+                input("ptfe", "pipe", 8)
+                input("soldering_alloy", amount = 8)
+                voltage(Voltage.ZPM)
+                tech(Technologies.WETWARE)
             }
         }
 

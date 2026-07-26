@@ -374,10 +374,8 @@ object RecipeFactories {
 
     fun bacteriaVat(block: CleanRecipeFactory.() -> Unit) {
         clean("bacteria_vat") {
-            defaultInputItem = 0
-            defaultInputFluid = 1
-            defaultOutputItem = 2
-            defaultOutputFluid = 3
+            defaultInputFluid = 0
+            defaultOutputFluid = 1
             amperage = 0.5
             workTicks(200)
         }.block()

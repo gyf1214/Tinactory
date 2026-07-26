@@ -884,7 +884,7 @@ object CircuitComponents {
                 output(getItem("component/stem_cell")) {
                     input("cultivated_bacteria", "fluid", 0.1)
                     voltage(Voltage.LUV)
-                    workTicks(CIRCUIT_TICKS)
+                    workTicks(160)
                 }
             }
             assemblyLine {

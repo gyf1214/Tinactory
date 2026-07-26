@@ -31,7 +31,7 @@
     ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_extract",
-      "x": 26,
+      "x": 44,
       "y": 9,
       "width": 20,
       "height": 20
