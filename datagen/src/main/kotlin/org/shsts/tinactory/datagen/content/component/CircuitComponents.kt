@@ -354,6 +354,15 @@ object CircuitComponents {
                     input("trinium", "wire_fine", 8)
                     input("naquadah", "bolt", 16)
                 }
+                output(getCircuit("wetware_processor").item, 3, suffix = "_from_soc") {
+                    input(getItem("component/neuro_processor"))
+                    chip("advanced_soc", 3)
+                    input("yttrium_barium_cuprate", "wire_fine", 6)
+                    input("naquadah", "bolt", 6)
+                    input("soldering_alloy", amount = 1.5)
+                    voltage(Voltage.ZPM)
+                    workTicks(300L)
+                }
             }
             assemblyLine {
                 output(getCircuit("wetware_mainframe").item) {
@@ -822,7 +831,7 @@ object CircuitComponents {
                 output(board) {
                     input(getItem("board/epoxy"))
                     input("polystyrene", "sheet")
-                    input("yttrium_barium_cuprate", "wire_fine", 16)
+                    input("niobium_titanium", "wire_fine", 16)
                     input("soldering_alloy", amount = 2)
                     voltage(Voltage.LUV)
                     workTicks(CIRCUIT_TICKS)
@@ -877,7 +886,7 @@ object CircuitComponents {
     }
 
     private fun ProcessingRecipeFactory.circuit(name: String, amount: Int = 1,
-        voltage: Voltage? = null, workTicks: Long? = null, block: SimpleProcessingBuilder.() -> Unit) {
+        voltage: Voltage? = null, block: SimpleProcessingBuilder.() -> Unit) {
         val circuit = getCircuit(name)
         output(circuit.item, amount) {
             if (circuit.level().voltageOffset < 2) {
@@ -890,7 +899,7 @@ object CircuitComponents {
             val solder = (1 shl (level - 1)) / 2.0
             input("soldering_alloy", amount = solder)
             voltage(voltage ?: voltage1)
-            workTicks(workTicks ?: (200L * level))
+            workTicks(200L * level)
         }
     }
 
