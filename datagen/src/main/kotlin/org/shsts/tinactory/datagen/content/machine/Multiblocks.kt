@@ -48,8 +48,6 @@ import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.arcFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assemblyLine
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.machine.Machines.MACHINE_TICKS
@@ -1210,59 +1208,6 @@ object Multiblocks {
                 input("soldering_alloy", amount = 8)
                 voltage(Voltage.ZPM)
                 tech(Technologies.WETWARE)
-            }
-        }
-
-        fusionReactor {
-            recipe("multiblock/naquadria_infused_rocket_fuel") {
-                input("rocket_fuel", "liquid")
-                input("naquadria", "molten")
-                output("naquadria_infused_rocket_fuel", "plasma")
-                voltage(Voltage.ZPM)
-                workTicks(200)
-            }
-            recipe("multiblock/netherite") {
-                input("netherite_scrap", "molten")
-                input("gold", "molten")
-                output("netherite", "plasma", 0.25)
-                voltage(Voltage.LUV)
-                workTicks(400)
-            }
-            recipe("multiblock/nether_star") {
-                input("wither_matrix", "liquid")
-                input("enriched_naquadah", "molten")
-                output("nether_star", "plasma")
-                voltage(Voltage.LUV)
-                workTicks(800)
-            }
-            recipe("multiblock/neutronium") {
-                input("nether_star", "molten", 1f / 36f)
-                input("naquadria", "molten", 1f / 36f)
-                output("neutronium", "plasma", 1f / 144f)
-                voltage(Voltage.ZPM)
-                workTicks(200)
-            }
-            recipe("multiblock/activated_naquadah") {
-                input("naquadah", "molten")
-                input("hydrogen", "gas", 0.125)
-                output("activated_naquadah", "plasma")
-                voltage(Voltage.LUV)
-                workTicks(400)
-            }
-            recipe("multiblock/fusion_reactor_smoke") {
-                input("water", "liquid", 1)
-                input("water", "gas", 1)
-                output("water", "gas", 2)
-                voltage(Voltage.LUV)
-                workTicks(200)
-            }
-        }
-
-        vacuumFreezer {
-            output("naquadria_infused_rocket_fuel", "liquid") {
-                input("naquadria_infused_rocket_fuel", "plasma")
-                voltage(Voltage.ZPM)
-                workTicks(800)
             }
         }
     }

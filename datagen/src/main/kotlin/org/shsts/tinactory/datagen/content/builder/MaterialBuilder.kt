@@ -323,7 +323,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 return
             }
 
-            val v = if (material.hasItem("sheet") || input == "primary" && material.hasFluid("plasma")) {
+            val v = if (material.hasItem("sheet") || (input == "primary" && material.hasFluid("plasma"))) {
                 voltage
             } else {
                 Voltage.fromRank(voltage.rank + 1)
@@ -366,15 +366,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
 
         private fun plasma() {
-            if (!material.hasFluid("plasma") || !material.hasFluid("molten")) {
+            if (!material.hasFluid("plasma") || !material.hasFluid("fluid")) {
                 return
             }
 
             vacuumFreezer {
-                output(material, "molten") {
+                output(material) {
                     input(material, "plasma")
                     voltage(this@ProcessBuilder.voltage)
-                    workTicks(ticks(800))
+                    workTicks(ticks(120))
                 }
             }
         }

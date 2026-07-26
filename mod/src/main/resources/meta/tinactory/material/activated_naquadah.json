@@ -7,8 +7,6 @@
       "texture": "gregtech:block/material_sets/dull/plasma"
     }
   },
-  "aliases": {
-    "fluid": "plasma"
-  },
+  "aliases": {},
   "existings": {}
 }

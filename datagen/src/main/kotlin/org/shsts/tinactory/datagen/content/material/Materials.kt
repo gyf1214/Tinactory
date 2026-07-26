@@ -675,7 +675,9 @@ object Materials {
                 component("oxygen", sub = "liquid")
             }
         }
-        material("naquadria_infused_rocket_fuel", DULL)
+        material("naquadria_infused_rocket_fuel", DULL) {
+            machineProcess(Voltage.LUV)
+        }
         material("aqua_regia", DULL) {
             fluidMix(Voltage.HV) {
                 component("hydrogen_chloride", 3)

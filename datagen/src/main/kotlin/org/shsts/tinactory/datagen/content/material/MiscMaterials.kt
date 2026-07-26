@@ -33,6 +33,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -171,6 +172,39 @@ object MiscMaterials {
                 input("naquadria", "molten", 1f / 72f)
                 voltage(Voltage.IV)
                 requireCleanness(0.9, 1.4)
+            }
+        }
+
+        fusionReactor {
+            output("naquadria_infused_rocket_fuel", "plasma") {
+                input("rocket_fuel", "liquid")
+                input("naquadria", "molten")
+                voltage(Voltage.ZPM)
+                workTicks(200)
+            }
+            output("netherite", "plasma", 0.25) {
+                input("netherite_scrap", "molten")
+                input("gold", "molten")
+                voltage(Voltage.LUV)
+                workTicks(128)
+            }
+            output("nether_star", "plasma", 0.125) {
+                input("enriched_naquadah", "molten", 0.125)
+                input("wither_matrix", "liquid", 0.125)
+                voltage(Voltage.LUV)
+                workTicks(64)
+            }
+            output("activated_naquadah", "plasma") {
+                input("naquadah", "molten")
+                input("hydrogen", "gas", 0.125)
+                voltage(Voltage.LUV)
+                workTicks(256)
+            }
+            output("neutronium", "plasma", 1f / 144f) {
+                input("nether_star", "molten", 1f / 36f)
+                input("naquadria", "molten", 1f / 36f)
+                voltage(Voltage.ZPM)
+                workTicks(96)
             }
         }
 

@@ -4,11 +4,11 @@
   "fluids": {
     "plasma": {
       "baseAmount": 1000,
-      "texture": "gregtech:block/material_sets/fluid/plasma"
+      "texture": "gregtech:block/material_sets/dull/plasma"
     },
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:block/material_sets/fluid/liquid"
+      "texture": "gregtech:block/material_sets/dull/liquid"
     }
   },
   "aliases": {

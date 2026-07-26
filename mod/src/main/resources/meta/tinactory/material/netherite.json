@@ -6,9 +6,7 @@
   "fluids": {
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:block/material_sets/dull/liquid",
-      "textureColor": "0xFF4B4042",
-      "displayColor": "0xFF4B4042"
+      "texture": "gregtech:block/material_sets/dull/liquid"
     },
     "plasma": {
       "baseAmount": 144,
@@ -18,7 +16,8 @@
     }
   },
   "aliases": {
-    "primary": "ingot"
+    "primary": "ingot",
+    "fluid": "molten"
   },
   "existings": {
     "ingot": "minecraft:netherite_ingot"

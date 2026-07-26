@@ -6,9 +6,7 @@
   "fluids": {
     "molten": {
       "baseAmount": 144,
-      "texture": "gregtech:block/material_sets/dull/liquid",
-      "textureColor": "0xFFFEFFC6",
-      "displayColor": "0xFFFEFFC6"
+      "texture": "gregtech:block/material_sets/dull/liquid"
     },
     "plasma": {
       "baseAmount": 144,
@@ -17,7 +15,9 @@
       "displayColor": "0xFF7FD7E2"
     }
   },
-  "aliases": {},
+  "aliases": {
+    "fluid": "molten"
+  },
   "existings": {
     "gem": "minecraft:nether_star",
     "lens": "tinactory:component/quantum_star"
