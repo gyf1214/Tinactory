@@ -466,7 +466,11 @@
 	]
 	quest.06FE000000000019.quest_subtitle: "Finish this chapter's material endpoint"
 	quest.06FE000000000019.title: "LuV Superconductor Closes the Bridge"
-	quest.0700000000000000.quest_desc: ["The Trinium Furnace Coil raises the Electric Blast Furnace limit to 6300 K, opening the high-temperature processing required for ZPM superconductors.", "", "It also confirms that Trinium, HSS-S, and PTFE production is stable. Stock the coils and power first, then keep the superconductor route running."]
+	quest.0700000000000000.quest_desc: [
+		"The Trinium Furnace Coil raises the Electric Blast Furnace limit to 6300 K, opening the high-temperature processing required for ZPM superconductors."
+		""
+		"It also confirms that Trinium, HSS-S, and PTFE production is stable. Stock the coils and power first, then keep the superconductor route running."
+	]
 	quest.0700000000000000.quest_subtitle: "Craft a Trinium Furnace Coil"
 	quest.0700000000000000.title: "The 6300 K Threshold"
 	quest.0700000000000001.quest_desc: ["After 6300 K processing, ITBT Cuprate is drawn into ZPM Superconductor wire, carrying the previous chapter's material bridge into ZPM-scale power delivery. It supplies stable power for Field Generators and later advanced assembly; make the ceramic, cooling, and wire-drawing steps continuous so ZPM production does not stop at its conductor supply."]
@@ -478,13 +482,18 @@
 	quest.0700000000000003.quest_desc: ["ZPM Electric Motors, Electric Pumps, and Robot Arms provide motion, fluid transfer, and automated handling, turning ZPM hulls into working equipment. They are recurring inputs for the Bacteria Vat, Digital Interface, and terminal assembly; produce each component in batches so one part does not bottleneck later large recipes."]
 	quest.0700000000000003.quest_subtitle: "Craft ZPM core components"
 	quest.0700000000000003.title: "Components at Scale"
-	quest.0700000000000013.quest_desc: ["The ZPM Field Generator turns ZPM Superconductor power delivery into stable field control and is a key part of Rocket T3's containment field. It also consumes precision structures and advanced components; stock it before beginning final rocket assembly so the terminal lines can converge on schedule."]
-	quest.0700000000000013.quest_subtitle: "Craft a ZPM Field Generator"
-	quest.0700000000000013.title: "Constraint Field Ready"
-	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface gives large processing equipment ZPM-scale parallelism and automation, turning scattered advanced recipes into factory lines that can run continuously.", "", "It is especially useful for cultivation, fluid processing, and repeatable material routes. Prepare stable logistics, power, and input buffers before connecting it so parallelism becomes real output."]
+	quest.0700000000000004.quest_desc: [
+		"The ZPM Digital Interface gives large processing equipment ZPM-scale parallelism and automation, turning scattered advanced recipes into factory lines that can run continuously."
+		""
+		"It is especially useful for cultivation, fluid processing, and repeatable material routes. Prepare stable logistics, power, and input buffers before connecting it so parallelism becomes real output."
+	]
 	quest.0700000000000004.quest_subtitle: "Craft a ZPM Digital Interface"
 	quest.0700000000000004.title: "Digital Connection"
-	quest.0700000000000005.quest_desc: ["Molten Nether Star and molten Naquadria form Neutronium plasma in the Fusion Reactor, then the Vacuum Freezer stabilizes it into Neutronium.", "", "Neutronium turns established fusion capacity into interstellar structural material and semiconductor feedstock. Stabilize Naquadria and plasma handling before accumulating this expensive line."]
+	quest.0700000000000005.quest_desc: [
+		"Molten Nether Star and molten Naquadria form Neutronium plasma in the Fusion Reactor, then the Vacuum Freezer stabilizes it into Neutronium."
+		""
+		"Neutronium turns established fusion capacity into interstellar structural material and semiconductor feedstock. Stabilize Naquadria and plasma handling before accumulating this expensive line."
+	]
 	quest.0700000000000005.quest_subtitle: "Obtain a Neutronium Ingot"
 	quest.0700000000000005.title: "Fusion-Made Neutronium"
 	quest.0700000000000006.quest_desc: ["Cutting Neutronium Boules into Neutronium Raw Wafers turns costly fusion material into a substrate for advanced chips. It improves substrate output for SoC and later chip routes; connect boule production, cutting, and wafer buffers into a steady process to turn Neutronium investment into continuous electronics capacity."]
@@ -496,7 +505,11 @@
 	quest.0700000000000008.quest_desc: ["Advanced SoC extends the high-yield advantage of Neutronium Raw Wafers into higher-tier chip processing, reducing wafer pressure in chip-hungry assembly lines. It does not gate the Wetware route, but it can substantially ease substrate turnover when expanding PIC and terminal electronics production."]
 	quest.0700000000000008.quest_subtitle: "Craft an Advanced SoC"
 	quest.0700000000000008.title: "Advanced SoC"
-	quest.0700000000000009.quest_desc: ["The Sterile Bacteria Vat brings controlled biological processing into the ZPM factory: sterile casings, clean conditions, and ZPM components support strain cultivation and mutation. It is not a one-time structure but the production center for Wetware circuits; connect stable logistics, power, and input buffers before expanding its capacity with enough sterile casings.", "", "Vat recipes are affected by cleanness, making the strain route more reliable at better clean processing. Stabilize clean operations and the base-strain supply first, then make cultivation, mutation, and extraction continuous so Neuro Processors and Wetware circuits do not run dry."]
+	quest.0700000000000009.quest_desc: [
+		"The Sterile Bacteria Vat brings controlled biological processing into the ZPM factory: sterile casings, clean conditions, and ZPM components support strain cultivation and mutation. It is not a one-time structure but the production center for Wetware circuits; connect stable logistics, power, and input buffers before expanding its capacity with enough sterile casings."
+		""
+		"Vat recipes are affected by cleanness, making the strain route more reliable at better clean processing. Stabilize clean operations and the base-strain supply first, then make cultivation, mutation, and extraction continuous so Neuro Processors and Wetware circuits do not run dry."
+	]
 	quest.0700000000000009.quest_subtitle: "Build the Bacteria Vat"
 	quest.0700000000000009.title: "Sterile Bacteria Vat"
 	quest.070000000000000A.quest_desc: ["Nuclear Waste Slurry inoculates Bacteria Culture, establishing the first strain source for the Bacteria Vat. Bacteria Culture continues into reproduction and mutation; keep slurry, growth medium, and fluid buffers supplied so the biological line becomes sustained production instead of a one-time inoculation."]
@@ -511,21 +524,38 @@
 	quest.070000000000000D.quest_desc: ["Advanced Bacteria pushes cultivation into the final biological input for Wetware and is consumed directly by Neuro Processors. Neuro Processors then converge with advanced chips for Wetware circuit upgrades; buffer mutation output and schedule batches around processor demand so the biological branch does not slow Mainframe assembly."]
 	quest.070000000000000D.quest_subtitle: "Obtain Advanced Bacteria and a Neuro Processor"
 	quest.070000000000000D.title: "Advanced Bacteria"
-	quest.070000000000000E.quest_desc: ["The Wetware Board combines a Quantum Board, Polystyrene, and fine wire into biological-circuit stock, then etches into a Wetware Circuit Board.", "", "Only the finished Wetware Circuit Board enters standard Wetware circuit recipes. Automate both substrate stages and the etchant supply to support later circuit upgrades reliably."]
+	quest.070000000000000E.quest_desc: [
+		"The Wetware Board combines a Quantum Board, Polystyrene, and fine wire into biological-circuit stock, then etches into a Wetware Circuit Board."
+		""
+		"Only the finished Wetware Circuit Board enters standard Wetware circuit recipes. Automate both substrate stages and the etchant supply to support later circuit upgrades reliably."
+	]
 	quest.070000000000000E.quest_subtitle: "Craft a Wetware Board and Wetware Circuit Board"
 	quest.070000000000000E.title: "Wetware Substrate"
 	quest.070000000000000F.quest_desc: ["The Wetware Processor combines Wetware Circuit Boards and biological components into the first Wetware circuit tier for advanced assembly. It will be upgraded into Wetware Assemblies, Computers, and Mainframes; keep substrate production, biological outputs, and processor assembly supplied in batches now so the later circuit ladder does not repeatedly stop."]
 	quest.070000000000000F.quest_subtitle: "Craft a Wetware Processor"
 	quest.070000000000000F.title: "Wetware Processor"
-	quest.0700000000000010.quest_desc: ["The Wetware Assembly, Wetware Computer, and Wetware Mainframe raise biological circuits step by step into the highest control core required for interstellar guidance.", "", "This chain converges Neuro Processors, advanced chips, and ZPM-scale assembly. Stock intermediate circuits by tier and stabilize Advanced Bacteria supply so no branch stalls the final Mainframe."]
+	quest.0700000000000010.quest_desc: [
+		"The Wetware Assembly, Wetware Computer, and Wetware Mainframe raise biological circuits step by step into the highest control core required for interstellar guidance."
+		""
+		"This chain converges Neuro Processors, advanced chips, and ZPM-scale assembly. Stock intermediate circuits by tier and stabilize Advanced Bacteria supply so no branch stalls the final Mainframe."
+	]
 	quest.0700000000000010.quest_subtitle: "Craft a Wetware Assembly, Wetware Computer, and Wetware Mainframe"
 	quest.0700000000000010.title: "Wetware Mainframe"
 	quest.0700000000000011.quest_desc: ["Naquadria-Infused Rocket Fuel first forms as plasma in the Fusion Reactor, then the Vacuum Freezer stabilizes it into transportable interstellar propellant. Rocket T3 needs this fuel line for propulsion; coordinate Naquadria input, fusion batches, and freezer throughput early so the final launch is not delayed by its last tank of fuel."]
 	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
 	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
-	quest.0700000000000012.quest_desc: ["The Wetware Mainframe, Lapotronic Energy Orb Clusters, ZPM Field Generators, 64M ME Storage Components, Neutronium Plates, ZPM Electric Pumps, and Naquadria-Infused Rocket Fuel converge here. They provide guidance, energy storage, field containment, mission data, hull structure, feed hardware, and propulsion.", "", "Complete the Rocket T3 recipe at the Rocket Launch Site to assemble these separate terminal lines into a real interstellar launch. Check every stockpile and fluid input before beginning final assembly.", "", "Interstellar Travel is the current end of the factory's technological route. It opens no higher machine or research tier; it proves that the complete industrial system can accomplish its terminal task."]
+	quest.0700000000000012.quest_desc: [
+		"The Wetware Mainframe, Lapotronic Energy Orb Clusters, ZPM Field Generators, 64M ME Storage Components, Neutronium Plates, ZPM Electric Pumps, and Naquadria-Infused Rocket Fuel converge here. They provide guidance, energy storage, field containment, mission data, hull structure, feed hardware, and propulsion."
+		""
+		"Complete the Rocket T3 recipe at the Rocket Launch Site to assemble these separate terminal lines into a real interstellar launch. Check every stockpile and fluid input before beginning final assembly."
+		""
+		"Interstellar Travel is the current end of the factory's technological route. It opens no higher machine or research tier; it proves that the complete industrial system can accomplish its terminal task."
+	]
 	quest.0700000000000012.quest_subtitle: "Complete Rocket T3 at the Launch Site"
 	quest.0700000000000012.title: "Interstellar Travel"
+	quest.0700000000000013.quest_desc: ["The ZPM Field Generator turns ZPM Superconductor power delivery into stable field control and is a key part of Rocket T3's containment field. It also consumes precision structures and advanced components; stock it before beginning final rocket assembly so the terminal lines can converge on schedule."]
+	quest.0700000000000013.quest_subtitle: "Craft a ZPM Field Generator"
+	quest.0700000000000013.title: "Constraint Field Ready"
 	quest.070F82ED30238005.quest_desc: [
 		"Upgrade your ore processing system. Replace the Primitive Ore Analyzer and Primitive Ore Washer with ULV versions for better efficiency and extra resources."
 		""
@@ -764,10 +794,18 @@
 	quest.1839DA1403560DB3.quest_desc: ["Send Ethane and Propane through the mixing route to package LPG. It reuses your refining and light hydrocarbon base, with no LCR required, and prepares the fuel side for Rocket T2."]
 	quest.1839DA1403560DB3.quest_subtitle: "Turn refining into Rocket T2 fuel supply"
 	quest.1839DA1403560DB3.title: "Light Hydrocarbons Tanked"
-	quest.18A01183DF6A59D1.quest_desc: ["EV Superconductor Wire combines Niobium Titanium, PTFE pipe, and Hot Coolant into a transmission material for higher-power systems.", "", "It supports the EV Field Generator; stabilize the Hot Coolant supply before this recipe becomes an energy-component bottleneck."]
+	quest.18A01183DF6A59D1.quest_desc: [
+		"EV Superconductor Wire combines Niobium Titanium, PTFE pipe, and Hot Coolant into a transmission material for higher-power systems."
+		""
+		"It supports the EV Field Generator; stabilize the Hot Coolant supply before this recipe becomes an energy-component bottleneck."
+	]
 	quest.18A01183DF6A59D1.quest_subtitle: "Bring Coolant into superconductors"
 	quest.18A01183DF6A59D1.title: "EV Superconductor Wire"
-	quest.18A01183DF6A59D3.quest_desc: ["The EV Field Generator provides containment and energy-control capability as a key Nuclear Reactor component.", "", "It depends on superconductors and a stable EV-component supply; automate this line before building the reactor to handle later batch demand."]
+	quest.18A01183DF6A59D3.quest_desc: [
+		"The EV Field Generator provides containment and energy-control capability as a key Nuclear Reactor component."
+		""
+		"It depends on superconductors and a stable EV-component supply; automate this line before building the reactor to handle later batch demand."
+	]
 	quest.18A01183DF6A59D3.quest_subtitle: "Fill the Nuclear Reactor prerequisite"
 	quest.18A01183DF6A59D3.title: "EV Field Generator"
 	quest.18A01183DF6A59D5.quest_desc: [
@@ -791,7 +829,11 @@
 	]
 	quest.18A01183DF6A59D9.quest_subtitle: "Join LuV Foundation and IV Field Generator"
 	quest.18A01183DF6A59D9.title: "Lapotronic Energy Orb"
-	quest.18A01183DF6A59DB.quest_desc: ["The Lapotronic Energy Orb Cluster consolidates individual storage parts into an advanced power component for ZPM launch hardware.", "", "It depends on stable Energy Orb and Power Substation supply; keep both routes producing in batches so launch preparation does not stall on energy storage."]
+	quest.18A01183DF6A59DB.quest_desc: [
+		"The Lapotronic Energy Orb Cluster consolidates individual storage parts into an advanced power component for ZPM launch hardware."
+		""
+		"It depends on stable Energy Orb and Power Substation supply; keep both routes producing in batches so launch preparation does not stall on energy storage."
+	]
 	quest.18A01183DF6A59DB.quest_subtitle: "Craft a Lapotronic Energy Orb Cluster"
 	quest.18A01183DF6A59DB.title: "Stored Energy Converges"
 	quest.190125F22C1A5EE0.quest_desc: ["Sulfide Ore: Sphalerite, Galena, and Silver."]

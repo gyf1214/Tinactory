@@ -549,6 +549,9 @@
 		}
 		{
 			dependencies: ["54D61C6A8BA84D5D"]
+			icon: {
+				id: "tinactory:circuit/mainframe"
+			}
 			id: "1D933C575C5519B5"
 			tasks: [{
 				id: "6B23623D91F637BA"
