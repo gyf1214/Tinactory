@@ -524,7 +524,7 @@
 	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
 	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
 	quest.0700000000000012.quest_desc: ["The Wetware Mainframe, Lapotronic Energy Orb Clusters, ZPM Field Generators, 64M ME Storage Components, Neutronium Plates, ZPM Electric Pumps, and Naquadria-Infused Rocket Fuel converge here. They provide guidance, energy storage, field containment, mission data, hull structure, feed hardware, and propulsion.", "", "Complete the Rocket T3 recipe at the Rocket Launch Site to assemble these separate terminal lines into a real interstellar launch. Check every stockpile and fluid input before beginning final assembly.", "", "Interstellar Travel is the current end of the factory's technological route. It opens no higher machine or research tier; it proves that the complete industrial system can accomplish its terminal task."]
-	quest.0700000000000012.quest_subtitle: "Complete Rocket T3 interstellar travel technology"
+	quest.0700000000000012.quest_subtitle: "Complete Rocket T3 at the Launch Site"
 	quest.0700000000000012.title: "Interstellar Travel"
 	quest.070F82ED30238005.quest_desc: [
 		"Upgrade your ore processing system. Replace the Primitive Ore Analyzer and Primitive Ore Washer with ULV versions for better efficiency and extra resources."
