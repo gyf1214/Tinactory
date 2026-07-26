@@ -7,6 +7,8 @@
 	chapter.05A550E7057E0000.title: "Toward LuV"
 	chapter.06FE0000000000FE.chapter_subtitle: ["Bridge toward ZPM with Naquadah, Crystal circuits, hydrometallurgy, and LuV Superconductor"]
 	chapter.06FE0000000000FE.title: "Fusion Era"
+	chapter.07000000000000FE.chapter_subtitle: ["Complete an interstellar launch through ZPM infrastructure, fusion Neutronium, Wetware biology, and propellant."]
+	chapter.07000000000000FE.title: "Toward the Stars"
 	chapter.1552B98C4F286D86.chapter_subtitle: ["From Netherrack veins and crystal loops to ME automation, rebuild the factory after Rocket T1."]
 	chapter.1552B98C4F286D86.title: "Reenters Spaceflight"
 	chapter.16E428B6C103B73D.chapter_subtitle: ["Use Stainless Steel, Ammonia chemistry, and Rocket Fuel to push the factory toward its first launch."]
@@ -429,6 +431,9 @@
 	quest.06FE000000000010.quest_desc: ["Crystal Processor is the first deliverable Crystal circuit here, proving chip work, Advanced SMD, and clean processing form a stable assembly chain."]
 	quest.06FE000000000010.quest_subtitle: "Join CPU, Advanced SMD, and clean processing"
 	quest.06FE000000000010.title: "Crystal Circuits Land"
+	quest.06FE000000000011.quest_desc: ["Crystal Processor Assembly, Computer, and Mainframe complete the crystal route before ZPM. Automate them so the Bacteria Vat and later components receive their required circuit tags."]
+	quest.06FE000000000011.quest_subtitle: "Complete all three Crystal Processor products"
+	quest.06FE000000000011.title: "Crystal Mainframe"
 	quest.06FE000000000012.quest_desc: [
 		"Advanced Hydrometallurgy brings old sulfide ore streams back into late material loops by extracting Indium Concentrate from Sphalerite and Galena."
 		""
@@ -461,6 +466,63 @@
 	]
 	quest.06FE000000000019.quest_subtitle: "Finish this chapter's material endpoint"
 	quest.06FE000000000019.title: "LuV Superconductor Closes the Bridge"
+	quest.0700000000000000.quest_desc: ["The Trinium Coil opens 6300 K processing for the ZPM superconductor route."]
+	quest.0700000000000000.quest_subtitle: "Craft a Trinium Coil"
+	quest.0700000000000000.title: "The 6300 K Threshold"
+	quest.0700000000000001.quest_desc: ["ITBT Cuprate and ZPM Superconductor wire advance the bridge into ZPM power delivery."]
+	quest.0700000000000001.quest_subtitle: "Produce a ZPM Superconductor"
+	quest.0700000000000001.title: "Zero-Point Superconductivity"
+	quest.0700000000000002.quest_desc: ["ZPM Machine Hulls and cable form the shared frame for advanced machinery."]
+	quest.0700000000000002.quest_subtitle: "Craft the ZPM machine core"
+	quest.0700000000000002.title: "ZPM Frame"
+	quest.0700000000000003.quest_desc: ["Motion, pumping, control, and field components supply terminal assembly hardware."]
+	quest.0700000000000003.quest_subtitle: "Craft ZPM core components"
+	quest.0700000000000003.title: "Components at Scale"
+	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface supports large automation but is not a Rocket T3 input."]
+	quest.0700000000000004.quest_subtitle: "Craft a ZPM Digital Interface"
+	quest.0700000000000004.title: "Digital Connection"
+	quest.0700000000000005.quest_desc: ["Fusion Neutronium binds Nether Stars and Naquadria into interstellar structural metal."]
+	quest.0700000000000005.quest_subtitle: "Obtain a Neutronium Ingot"
+	quest.0700000000000005.title: "Fusion-Made Neutronium"
+	quest.0700000000000006.quest_desc: ["Neutronium Boules and Raw Wafers provide an optional high-yield chip substrate."]
+	quest.0700000000000006.quest_subtitle: "Craft Neutronium substrates"
+	quest.0700000000000006.title: "Neutronium Substrates"
+	quest.0700000000000007.quest_desc: ["Neutronium plates carry the Rocket T3 structural and thermal load."]
+	quest.0700000000000007.quest_subtitle: "Craft Neutronium Plates"
+	quest.0700000000000007.title: "Interstellar Hull Metal"
+	quest.0700000000000008.quest_desc: ["Advanced SoC is an optional Neutronium route and does not gate Wetware."]
+	quest.0700000000000008.quest_subtitle: "Craft an Advanced SoC"
+	quest.0700000000000008.title: "Advanced SoC"
+	quest.0700000000000009.quest_desc: ["The Bacteria Vat brings controlled biological processing into the ZPM factory."]
+	quest.0700000000000009.quest_subtitle: "Build the Bacteria Vat"
+	quest.0700000000000009.title: "Sterile Bacteria Vat"
+	quest.070000000000000A.quest_desc: ["Nuclear Waste Slurry inoculates Bacteria Culture and starts the biological route."]
+	quest.070000000000000A.quest_subtitle: "Inoculate Bacteria Culture"
+	quest.070000000000000A.title: "Inoculate the Culture"
+	quest.070000000000000B.quest_desc: ["Cultivated Bacteria and Stem Cells provide the first Wetware inputs."]
+	quest.070000000000000B.quest_subtitle: "Obtain Cultivated Bacteria and Stem Cells"
+	quest.070000000000000B.title: "Cultivated Biology"
+	quest.070000000000000C.quest_desc: ["Enriched Growth Medium makes Cultivated Bacteria reproduction repeatable."]
+	quest.070000000000000C.quest_subtitle: "Produce Enriched Growth Medium"
+	quest.070000000000000C.title: "Enriched Growth Medium"
+	quest.070000000000000D.quest_desc: ["Advanced Bacteria and Neuro Processors advance the biological route."]
+	quest.070000000000000D.quest_subtitle: "Obtain Advanced Bacteria and a Neuro Processor"
+	quest.070000000000000D.title: "Advanced Bacteria"
+	quest.070000000000000E.quest_desc: ["Wetware Boards and Circuit Boards provide the manufacturing base for Wetware circuits."]
+	quest.070000000000000E.quest_subtitle: "Craft Wetware boards"
+	quest.070000000000000E.title: "Wetware Substrate"
+	quest.070000000000000F.quest_desc: ["The Wetware Processor connects the Stem Cell route to advanced circuits."]
+	quest.070000000000000F.quest_subtitle: "Craft a Wetware Processor"
+	quest.070000000000000F.title: "Wetware Processor"
+	quest.0700000000000010.quest_desc: ["The Wetware Mainframe is the highest circuit-control core required for interstellar guidance."]
+	quest.0700000000000010.quest_subtitle: "Craft a Wetware Mainframe"
+	quest.0700000000000010.title: "Wetware Mainframe"
+	quest.0700000000000011.quest_desc: ["Fusion makes the fuel plasma, then the Vacuum Freezer stabilizes it for interstellar propulsion."]
+	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
+	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
+	quest.0700000000000012.quest_desc: ["Wetware control, storage, ZPM components, Neutronium, and propellant converge at the Launch Site. Rocket T3 marks the current technological completion."]
+	quest.0700000000000012.quest_subtitle: "Complete Interstellar Travel"
+	quest.0700000000000012.title: "Interstellar Travel"
 	quest.070F82ED30238005.quest_desc: [
 		"Upgrade your ore processing system. Replace the Primitive Ore Analyzer and Primitive Ore Washer with ULV versions for better efficiency and extra resources."
 		""
@@ -726,6 +788,9 @@
 	]
 	quest.18A01183DF6A59D9.quest_subtitle: "Join LuV Foundation and IV Field Generator"
 	quest.18A01183DF6A59D9.title: "Lapotronic Energy Orb"
+	quest.18A01183DF6A59DB.quest_desc: ["The Lapotronic Energy Orb Cluster raises the storage route into ZPM launch hardware. Keep the cores and Power Substation stable for batch production."]
+	quest.18A01183DF6A59DB.quest_subtitle: "Craft a Lapotronic Energy Orb Cluster"
+	quest.18A01183DF6A59DB.title: "Stored Energy Converges"
 	quest.190125F22C1A5EE0.quest_desc: ["Sulfide Ore: Sphalerite, Galena, and Silver."]
 	quest.190125F22C1A5EE0.quest_subtitle: "Unlock Sulfide Ore"
 	quest.190125F22C1A5EE0.title: "Sulfur Vein"
@@ -2242,69 +2307,4 @@
 	task.433A0522B2F3010E.title: "Rocket T2"
 	task.4919C4842FF1F786.title: "Too Lonely Alone"
 	task.58A667C11AA55AF9.title: "First Rocket"
-	chapter.07000000000000FE.chapter_subtitle: ["Complete an interstellar launch through ZPM infrastructure, fusion Neutronium, Wetware biology, and propellant."]
-	chapter.07000000000000FE.title: "Toward the Stars"
-	quest.0700000000000000.quest_desc: ["The Trinium Coil opens 6300 K processing for the ZPM superconductor route."]
-	quest.0700000000000000.quest_subtitle: "Craft a Trinium Coil"
-	quest.0700000000000000.title: "The 6300 K Threshold"
-	quest.0700000000000001.quest_desc: ["ITBT Cuprate and ZPM Superconductor wire advance the bridge into ZPM power delivery."]
-	quest.0700000000000001.quest_subtitle: "Produce a ZPM Superconductor"
-	quest.0700000000000001.title: "Zero-Point Superconductivity"
-	quest.0700000000000002.quest_desc: ["ZPM Machine Hulls and cable form the shared frame for advanced machinery."]
-	quest.0700000000000002.quest_subtitle: "Craft the ZPM machine core"
-	quest.0700000000000002.title: "ZPM Frame"
-	quest.0700000000000003.quest_desc: ["Motion, pumping, control, and field components supply terminal assembly hardware."]
-	quest.0700000000000003.quest_subtitle: "Craft ZPM core components"
-	quest.0700000000000003.title: "Components at Scale"
-	quest.0700000000000004.quest_desc: ["The ZPM Digital Interface supports large automation but is not a Rocket T3 input."]
-	quest.0700000000000004.quest_subtitle: "Craft a ZPM Digital Interface"
-	quest.0700000000000004.title: "Digital Connection"
-	quest.0700000000000005.quest_desc: ["Fusion Neutronium binds Nether Stars and Naquadria into interstellar structural metal."]
-	quest.0700000000000005.quest_subtitle: "Obtain a Neutronium Ingot"
-	quest.0700000000000005.title: "Fusion-Made Neutronium"
-	quest.0700000000000006.quest_desc: ["Neutronium Boules and Raw Wafers provide an optional high-yield chip substrate."]
-	quest.0700000000000006.quest_subtitle: "Craft Neutronium substrates"
-	quest.0700000000000006.title: "Neutronium Substrates"
-	quest.0700000000000007.quest_desc: ["Neutronium plates carry the Rocket T3 structural and thermal load."]
-	quest.0700000000000007.quest_subtitle: "Craft Neutronium Plates"
-	quest.0700000000000007.title: "Interstellar Hull Metal"
-	quest.0700000000000008.quest_desc: ["Advanced SoC is an optional Neutronium route and does not gate Wetware."]
-	quest.0700000000000008.quest_subtitle: "Craft an Advanced SoC"
-	quest.0700000000000008.title: "Advanced SoC"
-	quest.0700000000000009.quest_desc: ["The Bacteria Vat brings controlled biological processing into the ZPM factory."]
-	quest.0700000000000009.quest_subtitle: "Build the Bacteria Vat"
-	quest.0700000000000009.title: "Sterile Bacteria Vat"
-	quest.070000000000000A.quest_desc: ["Nuclear Waste Slurry inoculates Bacteria Culture and starts the biological route."]
-	quest.070000000000000A.quest_subtitle: "Inoculate Bacteria Culture"
-	quest.070000000000000A.title: "Inoculate the Culture"
-	quest.070000000000000B.quest_desc: ["Cultivated Bacteria and Stem Cells provide the first Wetware inputs."]
-	quest.070000000000000B.quest_subtitle: "Obtain Cultivated Bacteria and Stem Cells"
-	quest.070000000000000B.title: "Cultivated Biology"
-	quest.070000000000000C.quest_desc: ["Enriched Growth Medium makes Cultivated Bacteria reproduction repeatable."]
-	quest.070000000000000C.quest_subtitle: "Produce Enriched Growth Medium"
-	quest.070000000000000C.title: "Enriched Growth Medium"
-	quest.070000000000000D.quest_desc: ["Advanced Bacteria and Neuro Processors advance the biological route."]
-	quest.070000000000000D.quest_subtitle: "Obtain Advanced Bacteria and a Neuro Processor"
-	quest.070000000000000D.title: "Advanced Bacteria"
-	quest.070000000000000E.quest_desc: ["Wetware Boards and Circuit Boards provide the manufacturing base for Wetware circuits."]
-	quest.070000000000000E.quest_subtitle: "Craft Wetware boards"
-	quest.070000000000000E.title: "Wetware Substrate"
-	quest.070000000000000F.quest_desc: ["The Wetware Processor connects the Stem Cell route to advanced circuits."]
-	quest.070000000000000F.quest_subtitle: "Craft a Wetware Processor"
-	quest.070000000000000F.title: "Wetware Processor"
-	quest.0700000000000010.quest_desc: ["The Wetware Mainframe is the highest circuit-control core required for interstellar guidance."]
-	quest.0700000000000010.quest_subtitle: "Craft a Wetware Mainframe"
-	quest.0700000000000010.title: "Wetware Mainframe"
-	quest.0700000000000011.quest_desc: ["Fusion makes the fuel plasma, then the Vacuum Freezer stabilizes it for interstellar propulsion."]
-	quest.0700000000000011.quest_subtitle: "Produce Naquadria-Infused Rocket Fuel"
-	quest.0700000000000011.title: "Naquadria-Infused Rocket Fuel"
-	quest.0700000000000012.quest_desc: ["Wetware control, storage, ZPM components, Neutronium, and propellant converge at the Launch Site. Rocket T3 marks the current technological completion."]
-	quest.0700000000000012.quest_subtitle: "Complete Interstellar Travel"
-	quest.0700000000000012.title: "Interstellar Travel"
-	quest.06FE000000000011.quest_desc: ["Crystal Processor Assembly, Computer, and Mainframe complete the crystal route before ZPM. Automate them so the Bacteria Vat and later components receive their required circuit tags."]
-	quest.06FE000000000011.quest_subtitle: "Complete all three Crystal Processor products"
-	quest.06FE000000000011.title: "Crystal Mainframe"
-	quest.18A01183DF6A59DB.quest_desc: ["The Lapotronic Energy Orb Cluster raises the storage route into ZPM launch hardware. Keep the cores and Power Substation stable for batch production."]
-	quest.18A01183DF6A59DB.quest_subtitle: "Craft a Lapotronic Energy Orb Cluster"
-	quest.18A01183DF6A59DB.title: "Stored Energy Converges"
 }

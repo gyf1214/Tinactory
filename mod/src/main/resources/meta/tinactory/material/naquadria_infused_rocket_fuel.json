@@ -8,7 +8,7 @@
     },
     "liquid": {
       "baseAmount": 1000,
-      "texture": "gregtech:block/material_sets/dull/liquid"
+      "texture": "gregtech:block/material_sets/fluid/liquid"
     }
   },
   "aliases": {
