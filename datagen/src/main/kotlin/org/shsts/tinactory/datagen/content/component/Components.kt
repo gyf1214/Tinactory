@@ -224,12 +224,8 @@ object Components {
             }
 
             component("enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("item/reactor/fuel_rod/uranium")))
+                model(basicItem(ic2("item/reactor/fuel_rod/mox")))
                 tag(AllTags.NUCLEAR_ITEM)
-            }
-
-            component("depleted_enriched_naquadah_fuel_rod") {
-                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
 
             component("moderator_rod") {
@@ -243,6 +239,10 @@ object Components {
             }
 
             component("nuclear_waste_rod") {
+                model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
+            }
+
+            component("depleted_naquadah_fuel_rod") {
                 model(basicItem(ic2("item/reactor/fuel_rod/tritium")))
             }
         }

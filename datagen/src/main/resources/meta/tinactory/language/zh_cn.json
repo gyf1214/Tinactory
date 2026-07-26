@@ -213,7 +213,7 @@
     "empty_nuclear_rod": "空核燃料棒",
     "uranium_fuel_rod": "铀燃料棒",
     "enriched_naquadah_fuel_rod": "浓缩硅盐燃料棒",
-    "depleted_enriched_naquadah_fuel_rod": "耗尽浓缩硅盐燃料棒",
+    "depleted_naquadah_fuel_rod": "贫瘠硅盐燃料棒",
     "moderator_rod": "中子减速棒",
     "control_rod": "中子控制棒",
     "nuclear_waste_rod": "废弃核燃料棒",

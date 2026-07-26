@@ -386,8 +386,7 @@ object MiscComponents {
             storageComponent(3) {
                 chip("nand", 16)
                 input("fluix", "gem", 4)
-                // TODO
-                input("platinum", "wire_fine", 16)
+                input("trinium", "wire_fine", 16)
                 voltage(Voltage.EV)
             }
         }
@@ -485,6 +484,7 @@ object MiscComponents {
             defaults {
                 voltage(Voltage.HV)
                 workTicks(COMPONENT_TICKS)
+                tech(Technologies.NUCLEAR_PHYSICS)
             }
             misc("empty_nuclear_rod") {
                 input("titanium", "stick", 2)
@@ -498,8 +498,6 @@ object MiscComponents {
             misc("enriched_naquadah_fuel_rod") {
                 misc("empty_nuclear_rod")
                 input("enriched_naquadah", "bolt")
-                voltage(Voltage.IV)
-                workTicks(400)
             }
             misc("moderator_rod") {
                 misc("empty_nuclear_rod")
@@ -520,7 +518,7 @@ object MiscComponents {
                 output(getItem("component/empty_nuclear_rod"))
                 output("nuclear_waste", "dust")
             }
-            input(getItem("component/depleted_enriched_naquadah_fuel_rod")) {
+            input(getItem("component/depleted_naquadah_fuel_rod")) {
                 output(getItem("component/empty_nuclear_rod"))
                 output("naquadah", "bolt")
                 voltage(Voltage.IV)

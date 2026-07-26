@@ -122,6 +122,7 @@ object MiscMachines {
                 component("cable", 2)
                 input("iron", "rotor", 2)
                 input("copper", "pipe", 2)
+                tech(Technologies.SOLDERING)
             }
             machine("multiblock/interface") {
                 component("cable", 2)
