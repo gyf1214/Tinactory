@@ -34,6 +34,7 @@ object Crops {
         farm(Items.BROWN_MUSHROOM)
         farm(Items.RED_MUSHROOM)
         farm(Items.NETHER_WART)
+        farm(Items.BAMBOO)
 
         // cut melon
         cutter {
@@ -82,9 +83,9 @@ object Crops {
         biomass(Items.PUMPKIN_SEEDS, 16, 1.6, 64)
 
         // sifting seeds
-        siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT)
+        siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT, Items.BAMBOO)
         siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO)
-        siftSeed(Items.PODZOL, Items.COCOA_BEANS, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM)
+        siftSeed(Items.PODZOL, Items.COCOA_BEANS, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM, Items.MANGROVE_PROPAGULE)
         siftSeed(Items.SAND, Items.CACTUS, Items.SUGAR_CANE, Items.KELP, Items.SEA_PICKLE)
         siftSeed(Items.MOSS_BLOCK, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.AZALEA, Items.FLOWERING_AZALEA)
         siftSeed(Items.SOUL_SOIL, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
@@ -158,7 +159,7 @@ object Crops {
         }
     }
 
-    private fun siftSeed(base: Item, vararg items: Item, rate: Double = 0.1) {
+    fun siftSeed(base: ItemLike, vararg items: ItemLike, rate: Double = 0.1) {
         sifter {
             input(base) {
                 for (item in items) {
