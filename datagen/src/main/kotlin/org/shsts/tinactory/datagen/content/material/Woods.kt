@@ -338,8 +338,11 @@ object Woods {
 
         // bamboo stuff
         vanilla {
-            nullRecipe(Items.BAMBOO_BLOCK, Items.BAMBOO_MOSAIC)
+            nullRecipe(Items.BAMBOO_BLOCK, Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, Items.BAMBOO_MOSAIC_STAIRS)
             nullRecipe("stick_from_bamboo")
+        }
+        toolCrafting {
+            shapeless(Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, TOOL_SAW, 2)
         }
         assembler {
             output(Items.BAMBOO_BLOCK) {
