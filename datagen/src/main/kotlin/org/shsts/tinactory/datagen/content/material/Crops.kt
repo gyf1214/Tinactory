@@ -34,8 +34,6 @@ object Crops {
         farm(Items.BROWN_MUSHROOM)
         farm(Items.RED_MUSHROOM)
         farm(Items.NETHER_WART)
-        farm(Items.CRIMSON_FUNGUS)
-        farm(Items.WARPED_FUNGUS)
 
         // cut melon
         cutter {
