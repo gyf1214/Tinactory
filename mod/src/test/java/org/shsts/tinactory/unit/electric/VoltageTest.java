@@ -30,8 +30,8 @@ class VoltageTest {
     void fromRankFindsExactRankAndRejectsUnknownRanks() {
         assertSame(Voltage.PRIMITIVE, Voltage.fromRank(0));
         assertSame(Voltage.ZPM, Voltage.fromRank(8));
-        assertSame(Voltage.MAX, Voltage.fromRank(9));
-        assertThrows(NoSuchElementException.class, () -> Voltage.fromRank(10));
+        assertSame(Voltage.MAX, Voltage.fromRank(10));
+        assertThrows(NoSuchElementException.class, () -> Voltage.fromRank(11));
     }
 
     @Test
