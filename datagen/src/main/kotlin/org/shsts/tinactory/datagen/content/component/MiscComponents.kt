@@ -188,32 +188,38 @@ object MiscComponents {
         buildingTrio("bricks", "brick")
         buildingTrio("cobbled_deepslate")
         buildingTrio("cobblestone")
-        buildingTrio("cut_copper")
-        buildingTrio("cut_red_sandstone")
-        buildingTrio("cut_sandstone")
+        buildingTrio("cut_copper", extraCuttingInputs = listOf("copper_block"))
+        buildingTrio("cut_red_sandstone", extraCuttingInputs = listOf("red_sandstone"))
+        buildingTrio("cut_sandstone", extraCuttingInputs = listOf("sandstone"))
         buildingTrio("dark_prismarine")
-        buildingTrio("deepslate_bricks", "deepslate_brick")
-        buildingTrio("deepslate_tiles", "deepslate_tile")
+        buildingTrio("deepslate_bricks", "deepslate_brick",
+            extraCuttingInputs = listOf("cobbled_deepslate", "polished_deepslate"))
+        buildingTrio("deepslate_tiles", "deepslate_tile",
+            extraCuttingInputs = listOf("cobbled_deepslate", "deepslate_bricks", "polished_deepslate"))
         buildingTrio("diorite")
-        buildingTrio("end_stone_bricks", "end_stone_brick")
-        buildingTrio("exposed_cut_copper")
+        buildingTrio("end_stone_bricks", "end_stone_brick",
+            extraCuttingInputs = listOf("end_stone", "end_stone_brick"))
+        buildingTrio("exposed_cut_copper", extraCuttingInputs = listOf("exposed_copper"))
         buildingTrio("granite")
         buildingTrio("mossy_cobblestone")
-        buildingTrio("mossy_stone_bricks", "mossy_stone_brick")
+        buildingTrio("mossy_stone_bricks", "mossy_stone_brick",
+            extraCuttingInputs = listOf("mossy_stone_brick"))
         buildingTrio("mud_bricks", "mud_brick")
         buildingTrio("nether_bricks", "nether_brick")
-        buildingTrio("oxidized_cut_copper")
-        buildingTrio("polished_andesite")
-        buildingTrio("polished_blackstone")
-        buildingTrio("polished_blackstone_bricks", "polished_blackstone_brick")
-        buildingTrio("polished_deepslate")
-        buildingTrio("polished_diorite")
-        buildingTrio("polished_granite")
-        buildingTrio("polished_tuff")
+        buildingTrio("oxidized_cut_copper", extraCuttingInputs = listOf("oxidized_copper"))
+        buildingTrio("polished_andesite", extraCuttingInputs = listOf("andesite"))
+        buildingTrio("polished_blackstone", extraCuttingInputs = listOf("blackstone"))
+        buildingTrio("polished_blackstone_bricks", "polished_blackstone_brick",
+            extraCuttingInputs = listOf("blackstone", "polished_blackstone"))
+        buildingTrio("polished_deepslate", extraCuttingInputs = listOf("cobbled_deepslate"))
+        buildingTrio("polished_diorite", extraCuttingInputs = listOf("diorite"))
+        buildingTrio("polished_granite", extraCuttingInputs = listOf("granite"))
+        buildingTrio("polished_tuff", extraCuttingInputs = listOf("tuff"))
         buildingTrio("prismarine")
-        buildingTrio("prismarine_bricks", "prismarine_brick")
+        buildingTrio("prismarine_bricks", "prismarine_brick", extraCuttingInputs = listOf("prismarine"))
         buildingTrio("purpur_block", "purpur")
-        buildingTrio("quartz_block", "quartz")
+        buildingTrio("quartz_block", "quartz",
+            cuttingOutputs = listOf("quartz_slab_from_stonecutting", "quartz_stairs"))
         buildingTrio("red_nether_bricks", "red_nether_brick")
         buildingTrio("red_sandstone")
         buildingTrio("sandstone")
@@ -222,24 +228,38 @@ object MiscComponents {
         buildingTrio("smooth_sandstone")
         buildingTrio("smooth_stone")
         buildingTrio("stone")
-        buildingTrio("stone_bricks", "stone_brick")
+        buildingTrio("stone_bricks", "stone_brick",
+            cuttingOutputs = listOf("stone_brick_slab", "stone_brick_stairs", "stone_brick_wall", "stone_brick_walls"),
+            extraCuttingInputs = listOf("stone"))
         buildingTrio("tuff")
-        buildingTrio("tuff_bricks", "tuff_brick")
-        buildingTrio("waxed_cut_copper")
-        buildingTrio("waxed_exposed_cut_copper")
-        buildingTrio("waxed_oxidized_cut_copper")
-        buildingTrio("waxed_weathered_cut_copper")
-        buildingTrio("weathered_cut_copper")
+        buildingTrio("tuff_bricks", "tuff_brick", extraCuttingInputs = listOf("polished_tuff", "tuff"))
+        buildingTrio("waxed_cut_copper", extraCuttingInputs = listOf("waxed_copper_block"))
+        buildingTrio("waxed_exposed_cut_copper", extraCuttingInputs = listOf("waxed_exposed_copper"))
+        buildingTrio("waxed_oxidized_cut_copper", extraCuttingInputs = listOf("waxed_oxidized_copper"))
+        buildingTrio("waxed_weathered_cut_copper", extraCuttingInputs = listOf("waxed_weathered_copper"))
+        buildingTrio("weathered_cut_copper", extraCuttingInputs = listOf("weathered_copper"))
     }
 
-    private fun buildingTrio(baseId: String, stemId: String = baseId) {
+    private fun buildingTrio(baseId: String, stemId: String = baseId,
+        cuttingOutputs: List<String>? = null, extraCuttingInputs: List<String> = emptyList()) {
         val base = vanillaItem(baseId)
-        val slab = vanillaItemOrNull("${stemId}_slab")
-        val stairs = vanillaItemOrNull("${stemId}_stairs")
-        val wall = vanillaItemOrNull("${stemId}_wall")
+        val slabId = "${stemId}_slab"
+        val stairsId = "${stemId}_stairs"
+        val wallId = "${stemId}_wall"
+        val slab = vanillaItemOrNull(slabId)
+        val stairs = vanillaItemOrNull(stairsId)
+        val wall = vanillaItemOrNull(wallId)
+        val trioItems = listOfNotNull(slab, stairs, wall)
+        val trioOutputs = listOfNotNull(slab?.let { slabId }, stairs?.let { stairsId }, wall?.let { wallId })
 
         vanilla {
-            nullRecipe(*listOfNotNull(slab, stairs, wall).toTypedArray())
+            nullRecipe(*trioItems.toTypedArray())
+            for (output in cuttingOutputs ?: trioOutputs) {
+                for (input in listOf(baseId) + extraCuttingInputs) {
+                    nullRecipe(if (output.endsWith("_from_stonecutting")) output
+                        else "${output}_from_${input}_stonecutting")
+                }
+            }
         }
         cutter {
             if (slab != null) {
