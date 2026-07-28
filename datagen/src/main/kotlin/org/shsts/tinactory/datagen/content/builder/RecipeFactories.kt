@@ -11,7 +11,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinycorelib.api.recipe.IRecipe
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 
-typealias ProcessingRecipeFactoryBase<R, B> = RecipeFactory<R, B>
 typealias ProcessingRecipeFactory = RecipeFactory<ProcessingRecipe, SimpleProcessingBuilder>
 typealias CleanRecipeFactory = RecipeFactory<CleanRecipe, CleanRecipeBuilder>
 typealias GeneratorRecipeFactory = RecipeFactory<GeneratorRecipe, GeneratorRecipeBuilder>

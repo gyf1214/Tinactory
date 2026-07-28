@@ -544,7 +544,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     inner class ComposeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
-        private val factory: ProcessingRecipeFactoryBase<R, B>,
+        private val factory: RecipeFactory<R, B>,
         private val sub: String, private val suffix: String,
         private val voltage: Voltage, private val workTicks: Long,
         private val decompose: Boolean) {
@@ -590,7 +590,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> ProcessingRecipeFactoryBase<R, B>.compose(
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.compose(
         sub: String, voltage: Voltage, workTicks: Long, decompose: Boolean,
         suffix: String = "", block: ComposeBuilder<R, B>.() -> Unit) {
         ComposeBuilder(this, sub, suffix, voltage, workTicks, decompose).build(block)

@@ -1,5 +1,7 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.tags.ItemTags
+import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.getComponent
@@ -13,16 +15,20 @@ import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.autoclave
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.circuitAssembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.rocket
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
@@ -30,6 +36,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
 import org.shsts.tinactory.datagen.content.builder.SimpleAssemblyRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.SimpleProcessingBuilder
+import org.shsts.tinactory.datagen.content.builder.VanillaRecipeFactory
 import org.shsts.tinactory.datagen.content.component.CircuitComponents.chip
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
@@ -164,6 +171,7 @@ object MiscComponents {
         powers()
         rockets()
         nuclear()
+        colors()
     }
 
     fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.misc(
@@ -534,6 +542,126 @@ object MiscComponents {
                 output("naquadah", "bolt")
                 voltage(Voltage.IV)
                 workTicks(400)
+            }
+        }
+    }
+
+    private val COLORS = DyeColor.entries.map(DyeColor::getName)
+
+    private fun String.applyColor(color: String) = replace("#", color)
+
+    private fun VanillaRecipeFactory.nullColor(pattern: String) {
+        for (color in COLORS) {
+            nullRecipe(pattern.applyColor(color))
+        }
+    }
+
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.colorRecipe(
+        pattern: String, amount: Int = 1, dye: Int = 1, suffix: String = "", block: B.(String) -> Unit = {}) {
+        for (color in COLORS) {
+            output(vanillaItem(pattern.applyColor(color)), amount, suffix = suffix) {
+                block(color)
+                if (dye > 0) {
+                    input(vanillaItem("${color}_dye"), dye)
+                }
+            }
+        }
+    }
+
+    private fun colors() {
+        vanilla {
+            nullColor("#_banner")
+            nullColor("#_bed")
+            nullColor("dye_#_bed")
+            nullColor("#_candle")
+            nullColor("#_carpet")
+            nullColor("dye_#_carpet")
+            nullColor("#_concrete_powder")
+            nullColor("#_stained_glass")
+            nullColor("#_stained_glass_pane")
+            nullColor("#_stained_glass_pane_from_glass_pane")
+            nullColor("#_terracotta")
+            nullColor("dye_#_wool")
+        }
+
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.MV)
+                workTicks(64)
+                tech(Technologies.CHEMISTRY)
+            }
+            colorRecipe("#_bed") {
+                input(ItemTags.BEDS)
+            }
+            colorRecipe("#_candle") {
+                input(Items.CANDLE)
+            }
+            colorRecipe("#_carpet") {
+                input(ItemTags.WOOL_CARPETS)
+            }
+            colorRecipe("#_concrete", dye = 0) { color ->
+                input(vanillaItem("${color}_concrete_powder"))
+                input("water", amount = 1 / 8.0)
+            }
+            colorRecipe("#_stained_glass", 8) {
+                input(Items.GLASS, 8)
+            }
+            colorRecipe("#_stained_glass_pane", 8) {
+                input(Items.GLASS_PANE, 8)
+            }
+            colorRecipe("#_terracotta", 8) {
+                input(Items.TERRACOTTA, 8)
+            }
+            colorRecipe("#_wool") {
+                input(ItemTags.WOOL)
+            }
+        }
+
+        mixer {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            colorRecipe("#_concrete_powder", 8) {
+                input(Items.SAND, 4)
+                input(Items.GRAVEL, 4)
+            }
+        }
+
+        cutter {
+            defaults {
+                voltage(Voltage.LV)
+            }
+            output(Items.GLASS_PANE, 4) {
+                input(Items.GLASS)
+                input("water", amount = 0.2)
+                workTicks(128)
+            }
+            colorRecipe("#_stained_glass_pane", 4, dye = 0) { color ->
+                input(vanillaItem("${color}_stained_glass"))
+                input("water", amount = 0.2)
+                workTicks(128)
+            }
+            colorRecipe("#_carpet", 2, dye = 0) { color ->
+                input(vanillaItem("${color}_wool"))
+                input("water", amount = 0.05)
+                workTicks(64)
+            }
+        }
+
+        assembler {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+                tech(Technologies.SOLDERING)
+            }
+            colorRecipe("#_banner", dye = 0) { color ->
+                input(vanillaItem("${color}_wool"), 4)
+                input(TOOL_HANDLE)
+            }
+            colorRecipe("#_bed", dye = 0) { color ->
+                input(vanillaItem("${color}_wool"), 2)
+                input(ItemTags.PLANKS, 2)
             }
         }
     }
