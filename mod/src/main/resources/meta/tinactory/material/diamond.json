@@ -18,6 +18,7 @@
     "primary": "gem"
   },
   "existings": {
-    "gem": "minecraft:diamond"
+    "gem": "minecraft:diamond",
+    "block": "minecraft:diamond_block"
   }
 }

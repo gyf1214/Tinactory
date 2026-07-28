@@ -740,6 +740,7 @@ object Materials {
             smelt("tin")
         }
         material("redstone", DULL) {
+            machineProcess(Voltage.LV)
             oreProcess {
                 amount = 5
                 byProducts("glowstone", "glowstone", "rare_earth")
@@ -848,6 +849,7 @@ object Materials {
                 byProducts("certus_quartz", "silicon_dioxide", "certus_quartz")
             }
             machineProcess(Voltage.MV)
+            implosionBlock()
             crystallize("salt_water", Voltage.HV, 200, -1.0, idealCleanness = 0.0)
         }
         material("certus_quartz", CERTUS) {

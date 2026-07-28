@@ -363,6 +363,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             molten("gear", 2f)
             molten("rotor", 4.25f)
             molten("pipe", 3f)
+            molten("block", 9f)
         }
 
         private fun plasma() {
@@ -452,6 +453,17 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     input(material, "gem", 4)
                     input(material, "dust", 4)
                     tech(Technologies.MATERIAL_CUTTING)
+                }
+            }
+            if (material.hasItem("gem_flawless")) {
+                implosionCompressor {
+                    implosion("gem", 4, outAmount = 3)
+                    implosion("gem_flawless", 9, input = "gem")
+                }
+                if (material.hasItem("block")) {
+                    lathe {
+                        process("block", "gem_flawless", 128)
+                    }
                 }
             }
 
@@ -723,9 +735,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     fun implosionPrimary() {
         implosionCompressor {
             implosion("primary", 16, outAmount = 16, tntAmount = 1)
-            if (material.hasItem("block")) {
-                implosion("block", 18, input = "primary", outAmount = 2, tntAmount = 1)
-            }
+        }
+        if (material.hasItem("block")) {
+            implosionBlock()
+        }
+    }
+
+    fun implosionBlock() {
+        implosionCompressor {
+            implosion("block", 18, input = "primary", outAmount = 2, tntAmount = 1)
         }
     }
 
@@ -856,13 +874,6 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         voltage(Voltage.LV)
                         workTicks(64)
                     }
-                }
-            }
-
-            if (material.hasItem("gem_flawless")) {
-                implosionCompressor {
-                    implosion("gem", 4, outAmount = 3)
-                    implosion("gem_flawless", 9, input = "gem")
                 }
             }
 

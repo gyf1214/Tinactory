@@ -15,6 +15,7 @@
     "primary": "gem"
   },
   "existings": {
-    "gem": "minecraft:quartz"
+    "gem": "minecraft:quartz",
+    "block": "minecraft:quartz_block"
   }
 }

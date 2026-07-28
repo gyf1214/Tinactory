@@ -12,6 +12,7 @@
   "fluids": {},
   "aliases": {},
   "existings": {
-    "dust": "minecraft:redstone"
+    "dust": "minecraft:redstone",
+    "block": "minecraft:redstone_block"
   }
 }
