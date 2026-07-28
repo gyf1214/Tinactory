@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.Items
@@ -14,6 +15,7 @@ import org.shsts.tinactory.content.electric.CircuitTier
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
+import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
@@ -43,6 +45,7 @@ import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 object MiscComponents {
     fun init() {
         ulv()
+        buildingTrios()
 
         // buzzsaw
         lathe {
@@ -177,6 +180,99 @@ object MiscComponents {
     fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.misc(
         id: String, amount: Int = 1, block: B.() -> Unit) {
         output(getItem("component/$id"), amount, block = block)
+    }
+
+    private fun buildingTrios() {
+        buildingTrio("andesite")
+        buildingTrio("blackstone")
+        buildingTrio("bricks", "brick")
+        buildingTrio("cobbled_deepslate")
+        buildingTrio("cobblestone")
+        buildingTrio("cut_copper")
+        buildingTrio("cut_red_sandstone")
+        buildingTrio("cut_sandstone")
+        buildingTrio("dark_prismarine")
+        buildingTrio("deepslate_bricks", "deepslate_brick")
+        buildingTrio("deepslate_tiles", "deepslate_tile")
+        buildingTrio("diorite")
+        buildingTrio("end_stone_bricks", "end_stone_brick")
+        buildingTrio("exposed_cut_copper")
+        buildingTrio("granite")
+        buildingTrio("mossy_cobblestone")
+        buildingTrio("mossy_stone_bricks", "mossy_stone_brick")
+        buildingTrio("mud_bricks", "mud_brick")
+        buildingTrio("nether_bricks", "nether_brick")
+        buildingTrio("oxidized_cut_copper")
+        buildingTrio("polished_andesite")
+        buildingTrio("polished_blackstone")
+        buildingTrio("polished_blackstone_bricks", "polished_blackstone_brick")
+        buildingTrio("polished_deepslate")
+        buildingTrio("polished_diorite")
+        buildingTrio("polished_granite")
+        buildingTrio("polished_tuff")
+        buildingTrio("prismarine")
+        buildingTrio("prismarine_bricks", "prismarine_brick")
+        buildingTrio("purpur_block", "purpur")
+        buildingTrio("quartz_block", "quartz")
+        buildingTrio("red_nether_bricks", "red_nether_brick")
+        buildingTrio("red_sandstone")
+        buildingTrio("sandstone")
+        buildingTrio("smooth_quartz")
+        buildingTrio("smooth_red_sandstone")
+        buildingTrio("smooth_sandstone")
+        buildingTrio("smooth_stone")
+        buildingTrio("stone")
+        buildingTrio("stone_bricks", "stone_brick")
+        buildingTrio("tuff")
+        buildingTrio("tuff_bricks", "tuff_brick")
+        buildingTrio("waxed_cut_copper")
+        buildingTrio("waxed_exposed_cut_copper")
+        buildingTrio("waxed_oxidized_cut_copper")
+        buildingTrio("waxed_weathered_cut_copper")
+        buildingTrio("weathered_cut_copper")
+    }
+
+    private fun buildingTrio(baseId: String, stemId: String = baseId) {
+        val base = vanillaItem(baseId)
+        val slab = vanillaItemOrNull("${stemId}_slab")
+        val stairs = vanillaItemOrNull("${stemId}_stairs")
+        val wall = vanillaItemOrNull("${stemId}_wall")
+
+        vanilla {
+            nullRecipe(*listOfNotNull(slab, stairs, wall).toTypedArray())
+        }
+        cutter {
+            if (slab != null) {
+                output(slab, 2) {
+                    input(base)
+                    input("water", amount = 0.1)
+                    voltage(Voltage.LV)
+                    workTicks(80)
+                }
+            }
+        }
+        lathe {
+            if (stairs != null && slab != null) {
+                output(stairs) {
+                    input(slab, 2)
+                    voltage(Voltage.LV)
+                    workTicks(80)
+                }
+            }
+            if (wall != null) {
+                output(wall) {
+                    input(base)
+                    voltage(Voltage.LV)
+                    workTicks(80)
+                }
+            }
+        }
+    }
+
+    private fun vanillaItemOrNull(id: String) = if (BuiltInRegistries.ITEM.containsKey(mcLoc(id))) {
+        vanillaItem(id)
+    } else {
+        null
     }
 
     fun ProcessingRecipeBuilder<*, *>.misc(
