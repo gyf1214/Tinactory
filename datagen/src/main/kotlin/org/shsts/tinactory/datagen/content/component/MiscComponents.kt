@@ -17,6 +17,7 @@ import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.mcLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
@@ -743,8 +744,50 @@ object MiscComponents {
         }
     }
 
-    private fun colors() {
+    private fun mixDye(color: String, vararg inputs: Any, oldSuffix: String = "") {
         vanilla {
+            nullRecipe("${color}_dye${oldSuffix}")
+        }
+        var totalCount = 0
+        mixer {
+            val output = vanillaItem("${color}_dye")
+            recipe(itemLoc(output)) {
+                var i = 0
+                while (i < inputs.size) {
+                    val item = vanillaItem("${inputs[i]}_dye")
+                    val count: Int
+                    if (i + 1 < inputs.size && inputs[i + 1] is Int) {
+                        count = inputs[i + 1] as Int
+                        i++
+                    } else {
+                        count = 1
+                    }
+                    input(item, count)
+                    totalCount += count
+                    i++
+                }
+                output(output, totalCount)
+                voltage(Voltage.LV)
+                workTicks(64L * totalCount)
+            }
+        }
+    }
+
+    private fun colors() {
+        mixDye("cyan", "blue", "green")
+        mixDye("gray", "black", "white")
+        mixDye("light_blue", "blue", "white", oldSuffix = "_from_blue_white_dye")
+        mixDye("light_gray", "gray", "white", oldSuffix = "_from_gray_white_dye")
+        mixDye("lime", "green", "white")
+        mixDye("magenta", "purple", "pink", oldSuffix = "_from_purple_and_pink")
+        mixDye("orange", "red", "yellow", oldSuffix = "_from_red_yellow")
+        mixDye("pink", "red", "white", oldSuffix = "_from_red_white_dye")
+        mixDye("purple", "blue", "red")
+
+        vanilla {
+            nullRecipe("light_gray_dye_from_black_white_dye")
+            nullRecipe("magenta_dye_from_blue_red_pink", "magenta_dye_from_blue_red_white_dye")
+
             nullColor("#_banner")
             nullColor("#_bed")
             nullColor("dye_#_bed")
