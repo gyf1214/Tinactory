@@ -780,14 +780,114 @@ object MiscComponents {
     private val COPPERS = listOf("", "exposed_", "weathered_", "oxidized_")
 
     private fun coppers() {
-        for (prefix in COPPERS) {
+        assembler {
+            output(vanillaItem("copper_bulb")) {
+                circuit(1, Voltage.ULV)
+                input("redstone", "dust", 3)
+                input("copper", "plate", 3)
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+            output(vanillaItem("copper_door")) {
+                input("copper", "ingot", 2)
+                input("redstone", "dust")
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+            output(vanillaItem("copper_trapdoor")) {
+                input("copper", "plate", 2)
+                input("copper", "stick", 2)
+                input("redstone", "dust")
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+            output(Items.IRON_DOOR) {
+                input("iron", "ingot", 2)
+                input("redstone", "dust")
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+            output(Items.IRON_TRAPDOOR) {
+                input("iron", "plate", 2)
+                input("iron", "stick", 2)
+                input("redstone", "dust")
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+        }
+        vanilla {
+            nullRecipe(Items.IRON_DOOR, Items.IRON_TRAPDOOR)
+            nullRecipe("copper_door", "copper_trapdoor")
+        }
+        val forms = mutableListOf<String>()
+        for ((index, prefix) in COPPERS.withIndex()) {
             val baseId = if (prefix.isEmpty()) "copper_block" else "${prefix}copper"
             val cut = "${prefix}cut_copper"
+            val slab = "${cut}_slab"
+            val stairs = "${cut}_stairs"
+            val grate = "${prefix}copper_grate"
+            val bulb = "${prefix}copper_bulb"
+            val door = "${prefix}copper_door"
+            val trapdoor = "${prefix}copper_trapdoor"
 
             trio(cut, cuttingInputs = listOf(cut, baseId))
             trio("waxed_$cut", cuttingInputs = listOf("waxed_$cut", "waxed_$baseId"))
             polish(baseId, cut)
             polish("waxed_$baseId", "waxed_$cut")
+            for (waxed in listOf(false, true)) {
+                val input = if (waxed) "waxed_$baseId" else baseId
+                val output = if (waxed) "waxed_$grate" else grate
+
+                vanilla {
+                    nullRecipe(output, "${output}_from_${input}_stonecutting")
+                }
+                cutter {
+                    output(vanillaItem(output), 4) {
+                        input(vanillaItem(input))
+                        input("water", amount = 0.1)
+                        voltage(Voltage.LV)
+                        workTicks(80)
+                    }
+                }
+            }
+            vanilla {
+                nullRecipe(bulb, "waxed_$bulb")
+            }
+            val stateForms = listOf(baseId, cut, slab, stairs, grate, bulb, door, trapdoor)
+            forms += stateForms
+            if (index < COPPERS.lastIndex) {
+                val nextPrefix = COPPERS[index + 1]
+                val nextForms = listOf("${nextPrefix}copper", "${nextPrefix}cut_copper",
+                    "${nextPrefix}cut_copper_slab", "${nextPrefix}cut_copper_stairs",
+                    "${nextPrefix}copper_grate", "${nextPrefix}copper_bulb",
+                    "${nextPrefix}copper_door", "${nextPrefix}copper_trapdoor")
+                for ((form, next) in stateForms.zip(nextForms)) {
+
+                    chemicalReactor {
+                        output(vanillaItem(next)) {
+                            input(vanillaItem(form))
+                            input("oxygen", amount = 0.125)
+                            voltage(Voltage.MV)
+                            workTicks(160)
+                            tech(Technologies.CHEMISTRY)
+                        }
+                    }
+                }
+            }
+        }
+        chemicalReactor {
+            for (form in forms) {
+                output(vanillaItem("waxed_$form")) {
+                    input(vanillaItem(form))
+                    input(Items.HONEYCOMB)
+                    voltage(Voltage.MV)
+                    workTicks(80)
+                    tech(Technologies.CHEMISTRY)
+                }
+                vanilla {
+                    nullRecipe("waxed_${form}_from_honeycomb")
+                }
+            }
         }
     }
 
