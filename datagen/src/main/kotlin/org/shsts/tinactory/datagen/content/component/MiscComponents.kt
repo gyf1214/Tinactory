@@ -183,6 +183,7 @@ object MiscComponents {
     }
 
     private fun buildingTrios() {
+        buildingPolishes()
         buildingTrio("andesite")
         buildingTrio("blackstone")
         buildingTrio("bricks", "brick")
@@ -240,6 +241,44 @@ object MiscComponents {
         buildingTrio("weathered_cut_copper", extraCuttingInputs = listOf("weathered_copper"))
     }
 
+    private fun buildingPolishes() {
+        buildingPolish("amethyst_shard", "amethyst_block", emptyList())
+        buildingPolish("brick", "bricks", emptyList())
+        buildingPolish("copper_block", "cut_copper")
+        buildingPolish("red_sandstone", "cut_red_sandstone")
+        buildingPolish("sandstone", "cut_sandstone")
+        buildingPolish("polished_deepslate", "deepslate_bricks",
+            listOf("cobbled_deepslate", "polished_deepslate"))
+        buildingPolish("deepslate_bricks", "deepslate_tiles",
+            listOf("cobbled_deepslate", "deepslate_bricks", "polished_deepslate"))
+        buildingPolish("end_stone", "end_stone_bricks")
+        buildingPolish("exposed_copper", "exposed_cut_copper")
+        buildingPolish("iron_ingot", "iron_trapdoor", emptyList())
+        buildingPolish("packed_mud", "mud_bricks", emptyList())
+        buildingPolish("nether_brick", "nether_bricks", emptyList())
+        buildingPolish("oxidized_copper", "oxidized_cut_copper")
+        buildingPolish("andesite", "polished_andesite")
+        buildingPolish("basalt", "polished_basalt")
+        buildingPolish("blackstone", "polished_blackstone")
+        buildingPolish("polished_blackstone", "polished_blackstone_bricks",
+            listOf("blackstone", "polished_blackstone"))
+        buildingPolish("cobbled_deepslate", "polished_deepslate")
+        buildingPolish("diorite", "polished_diorite")
+        buildingPolish("granite", "polished_granite")
+        buildingPolish("tuff", "polished_tuff")
+        buildingPolish("prismarine_shard", "prismarine", emptyList())
+        buildingPolish("quartz_block", "quartz_bricks")
+        buildingPolish("red_sand", "red_sandstone", emptyList())
+        buildingPolish("sand", "sandstone", emptyList())
+        buildingPolish("stone", "stone_bricks")
+        buildingPolish("polished_tuff", "tuff_bricks", listOf("polished_tuff", "tuff"))
+        buildingPolish("waxed_copper_block", "waxed_cut_copper")
+        buildingPolish("waxed_exposed_copper", "waxed_exposed_cut_copper")
+        buildingPolish("waxed_oxidized_copper", "waxed_oxidized_cut_copper")
+        buildingPolish("waxed_weathered_copper", "waxed_weathered_cut_copper")
+        buildingPolish("weathered_copper", "weathered_cut_copper")
+    }
+
     private fun buildingTrio(baseId: String, stemId: String = baseId,
         cuttingOutputs: List<String>? = null, extraCuttingInputs: List<String> = emptyList()) {
         val base = vanillaItem(baseId)
@@ -285,6 +324,26 @@ object MiscComponents {
                     voltage(Voltage.LV)
                     workTicks(80)
                 }
+            }
+        }
+    }
+
+    private fun buildingPolish(inputId: String, outputId: String,
+        cuttingInputs: List<String> = listOf(inputId)) {
+        val input = vanillaItem(inputId)
+        val output = vanillaItem(outputId)
+
+        vanilla {
+            nullRecipe(output)
+            for (cuttingInput in cuttingInputs) {
+                nullRecipe("${outputId}_from_${cuttingInput}_stonecutting")
+            }
+        }
+        assembler {
+            output(output) {
+                input(input)
+                voltage(Voltage.LV)
+                workTicks(80)
             }
         }
     }
