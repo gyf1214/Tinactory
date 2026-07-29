@@ -710,8 +710,7 @@ object MiscComponents {
         }
     }
 
-    private fun trio(baseId: String, stemId: String = baseId,
-        cuttingOutputs: List<String>? = null, extraCuttingInputs: List<String> = emptyList()) {
+    private fun trio(baseId: String, stemId: String = baseId, cuttingInputs: List<String> = listOf(baseId)) {
         val base = vanillaItem(baseId)
         val slabId = "${stemId}_slab"
         val stairsId = "${stemId}_stairs"
@@ -724,10 +723,9 @@ object MiscComponents {
 
         vanilla {
             nullRecipe(*trioItems.toTypedArray())
-            for (output in cuttingOutputs ?: trioOutputs) {
-                for (input in listOf(baseId) + extraCuttingInputs) {
-                    nullRecipe(if (output.endsWith("_from_stonecutting")) output
-                    else "${output}_from_${input}_stonecutting")
+            for (output in trioOutputs) {
+                for (input in cuttingInputs) {
+                    nullRecipe("${output}_from_${input}_stonecutting")
                 }
             }
         }
@@ -779,97 +777,101 @@ object MiscComponents {
         }
     }
 
+    private val COPPERS = listOf("", "exposed_", "weathered_", "oxidized_")
+
+    private fun coppers() {
+        for (prefix in COPPERS) {
+            val baseId = if (prefix.isEmpty()) "copper_block" else "${prefix}copper"
+            val cut = "${prefix}cut_copper"
+
+            trio(cut, cuttingInputs = listOf(cut, baseId))
+            trio("waxed_$cut", cuttingInputs = listOf("waxed_$cut", "waxed_$baseId"))
+            polish(baseId, cut)
+            polish("waxed_$baseId", "waxed_$cut")
+        }
+    }
+
     private fun buildings() {
         trio("andesite")
+        trio("polished_andesite", cuttingInputs = listOf("andesite", "polished_andesite"))
         trio("blackstone")
+        trio("polished_blackstone", cuttingInputs = listOf("blackstone", "polished_blackstone"))
+        trio("polished_blackstone_bricks", "polished_blackstone_brick",
+            cuttingInputs = listOf("blackstone", "polished_blackstone", "polished_blackstone_bricks"))
         trio("bricks", "brick")
         trio("cobbled_deepslate")
-        trio("cobblestone")
-        trio("cut_copper", extraCuttingInputs = listOf("copper_block"))
-        trio("cut_red_sandstone", extraCuttingInputs = listOf("red_sandstone"))
-        trio("cut_sandstone", extraCuttingInputs = listOf("sandstone"))
-        trio("dark_prismarine")
+        trio("polished_deepslate", cuttingInputs = listOf("cobbled_deepslate", "polished_deepslate"))
         trio("deepslate_bricks", "deepslate_brick",
-            extraCuttingInputs = listOf("cobbled_deepslate", "polished_deepslate"))
+            cuttingInputs = listOf("cobbled_deepslate", "polished_deepslate", "deepslate_bricks"))
         trio("deepslate_tiles", "deepslate_tile",
-            extraCuttingInputs = listOf("cobbled_deepslate", "deepslate_bricks", "polished_deepslate"))
+            cuttingInputs = listOf("cobbled_deepslate", "polished_deepslate", "deepslate_bricks", "deepslate_tiles"))
+        trio("cobblestone")
+        trio("prismarine")
+        trio("prismarine_bricks", "prismarine_brick", cuttingInputs = listOf("prismarine", "prismarine_bricks"))
+        trio("dark_prismarine")
         trio("diorite")
-        trio("end_stone_bricks", "end_stone_brick",
-            extraCuttingInputs = listOf("end_stone", "end_stone_brick"))
-        trio("exposed_cut_copper", extraCuttingInputs = listOf("exposed_copper"))
+        trio("polished_diorite", cuttingInputs = listOf("diorite", "polished_diorite"))
+        trio("end_stone_bricks", "end_stone_brick", cuttingInputs = listOf("end_stone", "end_stone_brick"))
         trio("granite")
+        trio("polished_granite", cuttingInputs = listOf("granite", "polished_granite"))
         trio("mossy_cobblestone")
-        trio("mossy_stone_bricks", "mossy_stone_brick",
-            extraCuttingInputs = listOf("mossy_stone_brick"))
+        // special naming 1
+        trio("mossy_stone_bricks", "mossy_stone_brick", cuttingInputs = listOf("mossy_stone_brick"))
         trio("mud_bricks", "mud_brick")
         trio("nether_bricks", "nether_brick")
-        trio("oxidized_cut_copper", extraCuttingInputs = listOf("oxidized_copper"))
-        trio("polished_andesite", extraCuttingInputs = listOf("andesite"))
-        trio("polished_blackstone", extraCuttingInputs = listOf("blackstone"))
-        trio("polished_blackstone_bricks", "polished_blackstone_brick",
-            extraCuttingInputs = listOf("blackstone", "polished_blackstone"))
-        trio("polished_deepslate", extraCuttingInputs = listOf("cobbled_deepslate"))
-        trio("polished_diorite", extraCuttingInputs = listOf("diorite"))
-        trio("polished_granite", extraCuttingInputs = listOf("granite"))
-        trio("polished_tuff", extraCuttingInputs = listOf("tuff"))
-        trio("prismarine")
-        trio("prismarine_bricks", "prismarine_brick", extraCuttingInputs = listOf("prismarine"))
-        trio("purpur_block", "purpur")
-        trio("quartz_block", "quartz",
-            cuttingOutputs = listOf("quartz_slab_from_stonecutting", "quartz_stairs"))
         trio("red_nether_bricks", "red_nether_brick")
-        trio("red_sandstone")
-        trio("sandstone")
+        trio("purpur_block", "purpur")
+        trio("quartz_block", "quartz", cuttingInputs = emptyList())
+        // special naming 2
+        vanilla {
+            nullRecipe("quartz_slab_from_stonecutting", "quartz_stairs_from_quartz_block_stonecutting")
+        }
         trio("smooth_quartz")
-        trio("smooth_red_sandstone")
+        trio("sandstone")
+        trio("cut_sandstone", cuttingInputs = listOf("sandstone", "cut_sandstone"))
         trio("smooth_sandstone")
-        trio("smooth_stone")
+        trio("red_sandstone")
+        trio("cut_red_sandstone", cuttingInputs = listOf("red_sandstone", "cut_red_sandstone"))
+        trio("smooth_red_sandstone")
         trio("stone")
-        trio("stone_bricks", "stone_brick",
-            cuttingOutputs = listOf("stone_brick_slab", "stone_brick_stairs", "stone_brick_wall", "stone_brick_walls"),
-            extraCuttingInputs = listOf("stone"))
+        trio("stone_bricks", "stone_brick", cuttingInputs = emptyList())
+        // spacial naming 3
+        vanilla {
+            nullRecipe("stone_brick_slab_from_stone_bricks_stonecutting")
+            nullRecipe("stone_brick_slab_from_stone_stonecutting")
+            nullRecipe("stone_brick_stairs_from_stone_bricks_stonecutting")
+            nullRecipe("stone_brick_stairs_from_stone_stonecutting")
+            nullRecipe("stone_brick_wall_from_stone_bricks_stonecutting")
+            nullRecipe("stone_brick_walls_from_stone_stonecutting")
+        }
+        trio("smooth_stone")
         trio("tuff")
-        trio("tuff_bricks", "tuff_brick", extraCuttingInputs = listOf("polished_tuff", "tuff"))
-        trio("waxed_cut_copper", extraCuttingInputs = listOf("waxed_copper_block"))
-        trio("waxed_exposed_cut_copper", extraCuttingInputs = listOf("waxed_exposed_copper"))
-        trio("waxed_oxidized_cut_copper", extraCuttingInputs = listOf("waxed_oxidized_copper"))
-        trio("waxed_weathered_cut_copper", extraCuttingInputs = listOf("waxed_weathered_copper"))
-        trio("weathered_cut_copper", extraCuttingInputs = listOf("weathered_copper"))
+        trio("polished_tuff", cuttingInputs = listOf("tuff", "polished_tuff"))
+        trio("tuff_bricks", "tuff_brick", cuttingInputs = listOf("tuff", "polished_tuff", "tuff_bricks"))
 
-        polish("amethyst_shard", "amethyst_block", emptyList())
-        polish("brick", "bricks", emptyList())
-        polish("copper_block", "cut_copper")
-        polish("red_sandstone", "cut_red_sandstone")
-        polish("sandstone", "cut_sandstone")
-        polish("polished_deepslate", "deepslate_bricks",
-            listOf("cobbled_deepslate", "polished_deepslate"))
-        polish("deepslate_bricks", "deepslate_tiles",
-            listOf("cobbled_deepslate", "deepslate_bricks", "polished_deepslate"))
-        polish("end_stone", "end_stone_bricks")
-        polish("exposed_copper", "exposed_cut_copper")
-        polish("iron_ingot", "iron_trapdoor", emptyList())
-        polish("packed_mud", "mud_bricks", emptyList())
-        polish("nether_brick", "nether_bricks", emptyList())
-        polish("oxidized_copper", "oxidized_cut_copper")
         polish("andesite", "polished_andesite")
-        polish("basalt", "polished_basalt")
         polish("blackstone", "polished_blackstone")
         polish("polished_blackstone", "polished_blackstone_bricks",
             listOf("blackstone", "polished_blackstone"))
         polish("cobbled_deepslate", "polished_deepslate")
+        polish("polished_deepslate", "deepslate_bricks",
+            listOf("cobbled_deepslate", "polished_deepslate"))
+        polish("deepslate_bricks", "deepslate_tiles",
+            listOf("cobbled_deepslate", "polished_deepslate", "deepslate_bricks"))
         polish("diorite", "polished_diorite")
+        polish("end_stone", "end_stone_bricks")
         polish("granite", "polished_granite")
-        polish("tuff", "polished_tuff")
-        polish("prismarine_shard", "prismarine", emptyList())
+        polish("packed_mud", "mud_bricks", emptyList())
         polish("quartz_block", "quartz_bricks")
-        polish("red_sand", "red_sandstone", emptyList())
         polish("sand", "sandstone", emptyList())
+        polish("sandstone", "cut_sandstone")
+        polish("red_sand", "red_sandstone", emptyList())
+        polish("red_sandstone", "cut_red_sandstone")
         polish("stone", "stone_bricks")
-        polish("polished_tuff", "tuff_bricks", listOf("polished_tuff", "tuff"))
-        polish("waxed_copper_block", "waxed_cut_copper")
-        polish("waxed_exposed_copper", "waxed_exposed_cut_copper")
-        polish("waxed_oxidized_copper", "waxed_oxidized_cut_copper")
-        polish("waxed_weathered_copper", "waxed_weathered_cut_copper")
-        polish("weathered_copper", "weathered_cut_copper")
+        polish("tuff", "polished_tuff")
+        polish("polished_tuff", "tuff_bricks", listOf("tuff", "polished_tuff"))
+        polish("basalt", "polished_basalt")
+
+        coppers()
     }
 }
