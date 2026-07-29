@@ -807,7 +807,8 @@ object MiscComponents {
             cuttingInputs = listOf("cobbled_deepslate", "polished_deepslate", "deepslate_bricks", "deepslate_tiles"))
         trio("cobblestone")
         trio("prismarine")
-        trio("prismarine_bricks", "prismarine_brick", cuttingInputs = listOf("prismarine", "prismarine_bricks"))
+        // special naming 1
+        trio("prismarine_bricks", "prismarine_brick", cuttingInputs = listOf("prismarine"))
         trio("dark_prismarine")
         trio("diorite")
         trio("polished_diorite", cuttingInputs = listOf("diorite", "polished_diorite"))
@@ -815,14 +816,14 @@ object MiscComponents {
         trio("granite")
         trio("polished_granite", cuttingInputs = listOf("granite", "polished_granite"))
         trio("mossy_cobblestone")
-        // special naming 1
+        // special naming 2
         trio("mossy_stone_bricks", "mossy_stone_brick", cuttingInputs = listOf("mossy_stone_brick"))
         trio("mud_bricks", "mud_brick")
         trio("nether_bricks", "nether_brick")
         trio("red_nether_bricks", "red_nether_brick")
         trio("purpur_block", "purpur")
         trio("quartz_block", "quartz", cuttingInputs = emptyList())
-        // special naming 2
+        // special naming 3
         vanilla {
             nullRecipe("quartz_slab_from_stonecutting", "quartz_stairs_from_quartz_block_stonecutting")
         }
@@ -835,7 +836,7 @@ object MiscComponents {
         trio("smooth_red_sandstone")
         trio("stone")
         trio("stone_bricks", "stone_brick", cuttingInputs = emptyList())
-        // spacial naming 3
+        // spacial naming 4
         vanilla {
             nullRecipe("stone_brick_slab_from_stone_bricks_stonecutting")
             nullRecipe("stone_brick_slab_from_stone_stonecutting")
