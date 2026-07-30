@@ -3,6 +3,7 @@ package org.shsts.tinactory.datagen.content.component
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMaterials.getMaterial
@@ -599,6 +600,22 @@ object MiscComponents {
         }
     }
 
+    private fun dye(outputId: String, input: ItemLike, amount: Int = 1, oldSuffix: String = "",
+        newSuffix: String = "") {
+        vanilla {
+            nullRecipe("${outputId}_dye$oldSuffix")
+        }
+        chemicalReactor {
+            output(vanillaItem("${outputId}_dye"), amount, suffix = newSuffix) {
+                input(input)
+                input("sulfuric_acid", "dilute", amount * 0.1)
+                voltage(Voltage.MV)
+                workTicks(64L * amount)
+                tech(Technologies.CHEMISTRY)
+            }
+        }
+    }
+
     private fun colors() {
         mixDye("cyan", "blue", "green")
         mixDye("gray", "black", "white")
@@ -609,6 +626,35 @@ object MiscComponents {
         mixDye("orange", "red", "yellow", oldSuffix = "_from_red_yellow")
         mixDye("pink", "red", "white", oldSuffix = "_from_red_white_dye")
         mixDye("purple", "blue", "red")
+
+        dye("black", Items.INK_SAC)
+        dye("black", Items.WITHER_ROSE, oldSuffix = "_from_wither_rose", newSuffix = "_from_wither_rose")
+        dye("blue", Items.LAPIS_LAZULI)
+        dye("blue", Items.CORNFLOWER, oldSuffix = "_from_cornflower", newSuffix = "_from_cornflower")
+        dye("brown", Items.COCOA_BEANS)
+        dye("cyan", Items.PITCHER_PLANT, 2, "_from_pitcher_plant")
+        dye("green", Items.CACTUS)
+        dye("light_blue", Items.BLUE_ORCHID, oldSuffix = "_from_blue_orchid")
+        dye("light_gray", Items.AZURE_BLUET, oldSuffix = "_from_azure_bluet")
+        dye("light_gray", Items.OXEYE_DAISY, oldSuffix = "_from_oxeye_daisy", newSuffix = "_from_oxeye_daisy")
+        dye("light_gray", Items.WHITE_TULIP, oldSuffix = "_from_white_tulip", newSuffix = "_from_white_tulip")
+        dye("lime", Items.SEA_PICKLE, oldSuffix = "_from_smelting")
+        dye("magenta", Items.ALLIUM, oldSuffix = "_from_allium")
+        dye("magenta", Items.LILAC, 2, "_from_lilac", "_from_lilac")
+        dye("orange", Items.ORANGE_TULIP, oldSuffix = "_from_orange_tulip")
+        dye("orange", Items.TORCHFLOWER, oldSuffix = "_from_torchflower", newSuffix = "_from_torchflower")
+        dye("pink", Items.PEONY, 2, "_from_peony")
+        dye("pink", Items.PINK_PETALS, oldSuffix = "_from_pink_petals", newSuffix = "_from_pink_petals")
+        dye("pink", Items.PINK_TULIP, oldSuffix = "_from_pink_tulip", newSuffix = "_from_pink_tulip")
+        dye("red", Items.BEETROOT, oldSuffix = "_from_beetroot")
+        dye("red", Items.POPPY, oldSuffix = "_from_poppy", newSuffix = "_from_poppy")
+        dye("red", Items.ROSE_BUSH, 2, "_from_rose_bush", "_from_rose_bush")
+        dye("red", Items.RED_TULIP, oldSuffix = "_from_tulip", newSuffix = "_from_tulip")
+        dye("white", Items.BONE_MEAL)
+        dye("white", Items.LILY_OF_THE_VALLEY, oldSuffix = "_from_lily_of_the_valley",
+            newSuffix = "_from_lily_of_the_valley")
+        dye("yellow", Items.DANDELION, oldSuffix = "_from_dandelion")
+        dye("yellow", Items.SUNFLOWER, 2, "_from_sunflower", "_from_sunflower")
 
         vanilla {
             nullRecipe("light_gray_dye_from_black_white_dye")
