@@ -758,7 +758,7 @@ object MiscComponents {
     }
 
     private fun polish(inputId: String, outputId: String,
-        cuttingInputs: List<String> = listOf(inputId)) {
+        cuttingInputs: List<String> = listOf(inputId), lens: String = "ruby") {
         val input = vanillaItem(inputId)
         val output = vanillaItem(outputId)
 
@@ -768,18 +768,24 @@ object MiscComponents {
                 nullRecipe("${outputId}_from_${cuttingInput}_stonecutting")
             }
         }
-        assembler {
+
+        laserEngraver {
             output(output) {
                 input(input)
+                input(lens, "lens", 0, port = 1)
                 voltage(Voltage.LV)
                 workTicks(80)
+                requireCleanness(-1.0, 0.0)
             }
         }
     }
 
+    private fun chisel(inputId: String, outputId: String,
+        cuttingInputs: List<String> = listOf(inputId)) = polish(inputId, outputId, cuttingInputs, "sapphire")
+
     private val COPPERS = listOf("", "exposed_", "weathered_", "oxidized_")
     private val COPPER_FORMS = listOf("copper", "cut_copper", "cut_copper_slab", "cut_copper_stairs",
-        "copper_grate", "copper_bulb", "copper_door", "copper_trapdoor")
+        "copper_grate", "copper_bulb", "copper_door", "copper_trapdoor", "chiseled_copper")
 
     private fun coppers() {
         assembler {
@@ -821,11 +827,14 @@ object MiscComponents {
             val cut = "${prefix}cut_copper"
             val grate = "${prefix}copper_grate"
             val bulb = "${prefix}copper_bulb"
+            val chiseled = "${prefix}chiseled_copper"
 
             trio(cut, cuttingInputs = listOf(cut, base))
             trio("waxed_$cut", cuttingInputs = listOf("waxed_$cut", "waxed_$base"))
             polish(base, cut)
             polish("waxed_$base", "waxed_$cut")
+            chisel(base, chiseled, listOf(base, cut))
+            chisel("waxed_$base", "waxed_$chiseled", listOf("waxed_$base", "waxed_$cut"))
 
             vanilla {
                 nullRecipe("${prefix}copper_grate", "waxed_${prefix}copper_grate")
@@ -966,6 +975,24 @@ object MiscComponents {
         polish("tuff", "polished_tuff")
         polish("polished_tuff", "tuff_bricks", listOf("tuff", "polished_tuff"))
         polish("basalt", "polished_basalt")
+
+        chisel("cobbled_deepslate", "chiseled_deepslate")
+        chisel("polished_blackstone", "chiseled_polished_blackstone",
+            listOf("blackstone", "polished_blackstone"))
+        chisel("nether_bricks", "chiseled_nether_bricks")
+        chisel("quartz_block", "chiseled_quartz_block")
+        chisel("sandstone", "chiseled_sandstone")
+        chisel("red_sandstone", "chiseled_red_sandstone")
+        chisel("stone_bricks", "chiseled_stone_bricks")
+        vanilla {
+            nullRecipe("chiseled_stone_bricks_stone_from_stonecutting")
+        }
+        chisel("tuff", "chiseled_tuff")
+        chisel("tuff_bricks", "chiseled_tuff_bricks",
+            listOf("tuff", "polished_tuff", "tuff_bricks"))
+
+        polish("quartz_block", "quartz_pillar", lens = "topaz")
+        polish("purpur_block", "purpur_pillar", lens = "topaz")
 
         coppers()
     }
