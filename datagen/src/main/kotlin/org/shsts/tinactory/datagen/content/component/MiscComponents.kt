@@ -949,6 +949,11 @@ object MiscComponents {
         vanilla {
             nullRecipe(Items.AMETHYST_BLOCK, Items.BRICKS, Items.DARK_PRISMARINE, Items.NETHER_BRICKS,
                 Items.PACKED_MUD, Items.PRISMARINE, Items.RED_NETHER_BRICKS, Items.SEA_LANTERN)
+            nullRecipe(Items.ANDESITE, Items.CHAIN, Items.DIORITE, Items.GRANITE, Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
+                Items.IRON_BARS, Items.LIGHT_WEIGHTED_PRESSURE_PLATE, Items.POLISHED_BLACKSTONE_BUTTON,
+                Items.POLISHED_BLACKSTONE_PRESSURE_PLATE, Items.STONE_BUTTON, Items.STONE_PRESSURE_PLATE)
+            nullRecipe("mossy_cobblestone_from_moss_block", "mossy_cobblestone_from_vine",
+                "mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine")
         }
         assembler {
             defaults {
@@ -973,6 +978,41 @@ object MiscComponents {
                 input(Items.PRISMARINE_CRYSTALS, 4)
                 input(Items.PRISMARINE_SHARD, 4)
             }
+            output(Items.CHAIN) {
+                input("iron", "stick")
+                input("iron", "ring", 2)
+            }
+            output(Items.IRON_BARS, 4) {
+                input("iron", "stick", 2)
+                input("iron", "bolt", 2)
+            }
+        }
+        assembler {
+            defaults {
+                voltage(Voltage.ULV)
+                workTicks(128)
+                tech(Technologies.SOLDERING)
+            }
+            output(Items.HEAVY_WEIGHTED_PRESSURE_PLATE) {
+                input("iron", "plate")
+                input("iron", "ring")
+                input("redstone", "dust")
+            }
+            output(Items.LIGHT_WEIGHTED_PRESSURE_PLATE) {
+                input("gold", "plate")
+                input("iron", "ring")
+                input("redstone", "dust")
+            }
+            output(Items.POLISHED_BLACKSTONE_PRESSURE_PLATE) {
+                input(Items.POLISHED_BLACKSTONE_SLAB)
+                input("iron", "ring")
+                input("redstone", "dust")
+            }
+            output(Items.STONE_PRESSURE_PLATE) {
+                input(Items.STONE_SLAB)
+                input("iron", "ring")
+                input("redstone", "dust")
+            }
         }
         chemicalReactor {
             defaults {
@@ -988,13 +1028,52 @@ object MiscComponents {
                 input(Items.NETHER_BRICKS)
                 input(Items.NETHER_WART)
             }
+            output(Items.MOSSY_COBBLESTONE) {
+                input(Items.COBBLESTONE)
+                input(Items.MOSS_BLOCK)
+            }
+            output(Items.MOSSY_STONE_BRICKS) {
+                input(Items.STONE_BRICKS)
+                input(Items.MOSS_BLOCK)
+            }
         }
         mixer {
+            output(Items.ANDESITE, 2) {
+                input(Items.DIORITE)
+                input(Items.COBBLESTONE)
+                voltage(Voltage.LV)
+                workTicks(128)
+            }
+            output(Items.DIORITE) {
+                input(Items.COBBLESTONE)
+                input(Items.QUARTZ)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            output(Items.GRANITE) {
+                input(Items.DIORITE)
+                input(Items.QUARTZ)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
             output(Items.PACKED_MUD) {
                 input(Items.MUD)
                 input(Items.WHEAT)
                 voltage(Voltage.LV)
                 workTicks(64)
+            }
+        }
+        cutter {
+            defaults {
+                input("water", amount = 0.05)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            output(Items.POLISHED_BLACKSTONE_BUTTON, 8) {
+                input(Items.POLISHED_BLACKSTONE_PRESSURE_PLATE)
+            }
+            output(Items.STONE_BUTTON, 8) {
+                input(Items.STONE_PRESSURE_PLATE)
             }
         }
 
