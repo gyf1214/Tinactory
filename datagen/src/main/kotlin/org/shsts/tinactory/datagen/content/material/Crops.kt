@@ -13,6 +13,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object Crops {
@@ -36,7 +37,10 @@ object Crops {
         farm(Items.NETHER_WART)
         farm(Items.BAMBOO)
 
-        // cut melon
+        // melon
+        vanilla {
+            nullRecipe(Items.MELON)
+        }
         cutter {
             output(Items.MELON_SLICE, 9) {
                 input(Items.MELON)

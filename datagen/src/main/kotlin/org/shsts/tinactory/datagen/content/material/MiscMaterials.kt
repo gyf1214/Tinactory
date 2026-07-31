@@ -32,8 +32,10 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -206,6 +208,40 @@ object MiscMaterials {
                 input("naquadria", "molten", 1f / 36f)
                 voltage(Voltage.ZPM)
                 workTicks(96)
+            }
+        }
+
+        vanilla {
+            nullRecipe("bone_meal", "bone_meal_from_bone_block", "bone_block")
+        }
+
+        macerator {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(128)
+            }
+            output(Items.BONE_MEAL, 3) {
+                input(Items.BONE)
+            }
+            output(Items.BONE_MEAL, 9, suffix = "_from_bone_block") {
+                input(Items.BONE_BLOCK)
+            }
+        }
+
+        implosionCompressor {
+            output(Items.BONE_BLOCK, 2) {
+                input(Items.BONE_MEAL, 18)
+                input(Items.TNT, port = 1)
+                voltage(Voltage.LV)
+            }
+        }
+
+        cutter {
+            output(Items.BONE, 3) {
+                input(Items.BONE_BLOCK)
+                input("water", amount = 0.05)
+                voltage(Voltage.LV)
+                workTicks(64)
             }
         }
 
