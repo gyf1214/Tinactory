@@ -8,7 +8,6 @@ import org.shsts.tinactory.AllItems.RUBBER_LEAVES
 import org.shsts.tinactory.AllItems.RUBBER_LOG
 import org.shsts.tinactory.AllItems.RUBBER_SAPLING
 import org.shsts.tinactory.AllTags
-import org.shsts.tinactory.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.AllTags.TOOL_MORTAR
 import org.shsts.tinactory.AllTags.TOOL_SAW
 import org.shsts.tinactory.AllTags.TOOL_SHEARS
@@ -126,7 +125,7 @@ object Woods {
             }
             output(sign) {
                 input(planks)
-                input(TOOL_HANDLE)
+                input(Items.STICK)
             }
             output(hangingSign) {
                 input(planks)
@@ -140,11 +139,11 @@ object Woods {
             }
             output(fence) {
                 input(slab)
-                input(TOOL_HANDLE, 2)
+                input(Items.STICK, 2)
             }
             output(gate) {
                 input(slab, 2)
-                input(TOOL_HANDLE)
+                input(Items.STICK)
                 input("redstone", "dust")
             }
             output(door) {

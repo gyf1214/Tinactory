@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.machine
 
+import net.minecraft.data.recipes.RecipeCategory
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
@@ -10,6 +11,8 @@ import org.shsts.tinactory.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllRecipes.hasItem
+import org.shsts.tinactory.AllRecipes.hasTag
 import org.shsts.tinactory.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.AllTags.circuit
@@ -353,6 +356,10 @@ object MiscMachines {
             output(Items.CHEST) {
                 input(ItemTags.PLANKS, 8)
             }
+            output(Items.BARREL) {
+                input(ItemTags.PLANKS, 6)
+                input(ItemTags.WOODEN_SLABS, 2)
+            }
             output(Items.HOPPER) {
                 input(Items.CHEST)
                 input("iron", "plate", 4)
@@ -380,6 +387,53 @@ object MiscMachines {
                 input("iron", "plate", 2)
                 input(Items.STICK, 2)
                 input(Items.REDSTONE_TORCH)
+            }
+            output(Items.PAINTING) {
+                input(ItemTags.WOOL)
+                input(Items.STICK, 8)
+            }
+            output(Items.ITEM_FRAME) {
+                input(Items.LEATHER)
+                input(Items.STICK, 8)
+            }
+            output(Items.LEAD) {
+                input(Items.STRING, 2)
+                input("rubber", amount = 0.5)
+            }
+            output(Items.LADDER) {
+                input(Items.STICK, 2)
+                input("iron", "bolt")
+            }
+            output(Items.LOOM) {
+                input(ItemTags.PLANKS, 2)
+                input(Items.STRING, 2)
+                input("iron", "stick")
+                input("redstone", "dust")
+            }
+            output(Items.SCAFFOLDING, 6) {
+                input(Items.STICK, 6)
+                input(Items.STRING)
+            }
+            output(Items.BOOK) {
+                input(Items.PAPER, 3)
+                input(Items.LEATHER)
+                input(Items.STRING)
+            }
+            output(Items.BOOKSHELF) {
+                input(ItemTags.PLANKS, 6)
+                input(Items.BOOK, 3)
+            }
+            output(Items.LECTERN) {
+                input(Items.BOOKSHELF)
+                input(ItemTags.WOODEN_SLABS, 4)
+            }
+            output(Items.FLOWER_POT) {
+                input("iron", "ring")
+                input(Items.BRICKS, 2)
+            }
+            output(Items.GLASS_BOTTLE) {
+                input(Items.GLASS_PANE, 3)
+                voltage(Voltage.ULV)
             }
         }
 
@@ -465,7 +519,21 @@ object MiscMachines {
             }
         }
 
-        vanilla {
+        vanilla(replace = true) {
+            shapeless(Items.WRITABLE_BOOK) {
+                requires(Items.BOOK)
+                requires(Items.BLACK_DYE)
+                requires(Items.FEATHER)
+                unlockedBy("has_book", hasItem(Items.BOOK))
+            }
+
+            shapeless(Items.FLINT_AND_STEEL, category = RecipeCategory.TOOLS) {
+                val steel = getMaterial("steel").tag("ingot")
+                requires(steel)
+                requires(Items.FLINT)
+                unlockedBy("has_steel", hasTag(steel))
+            }
+
             nullRecipe(
                 Items.BLAST_FURNACE,
                 Items.SMOKER,
@@ -484,8 +552,6 @@ object MiscMachines {
                 Items.RESPAWN_ANCHOR,
                 Items.GLOWSTONE,
                 Items.BUCKET,
-                Items.SHEARS,
-                Items.FLINT_AND_STEEL,
                 Items.TNT,
                 Items.SPYGLASS,
                 Items.COMPASS,
@@ -529,7 +595,16 @@ object MiscMachines {
                 Items.ENDER_EYE,
                 Items.END_CRYSTAL,
                 Items.ENDER_CHEST,
-                Items.BEACON)
+                Items.BEACON,
+                Items.PAINTING,
+                Items.ITEM_FRAME,
+                Items.LEAD,
+                Items.LOOM,
+                Items.BOOK,
+                Items.BOOKSHELF,
+                Items.LECTERN,
+                Items.FLOWER_POT,
+                Items.GLASS_BOTTLE)
         }
     }
 

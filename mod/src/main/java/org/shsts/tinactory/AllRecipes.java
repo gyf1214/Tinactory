@@ -7,6 +7,7 @@ import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.content.recipe.BoilerRecipe;
 import org.shsts.tinactory.content.recipe.RecipeTypeInfo;
@@ -49,6 +50,10 @@ public final class AllRecipes {
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> hasTag(TagKey<Item> tag) {
         return hasItems(ItemPredicate.Builder.item().of(tag).build());
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> hasItem(ItemLike item) {
+        return hasItems(ItemPredicate.Builder.item().of(item).build());
     }
 
     public static void putTypeInfo(IRecipeType<?> recipeType, Layout layout,

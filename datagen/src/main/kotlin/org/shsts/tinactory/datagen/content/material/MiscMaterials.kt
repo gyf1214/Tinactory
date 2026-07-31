@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.tags.BlockTags
+import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllTags.FLUID_STORAGE_CELL
@@ -43,6 +44,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerato
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.integration.material.OreVariant
 
 object MiscMaterials {
@@ -213,6 +215,8 @@ object MiscMaterials {
 
         vanilla {
             nullRecipe("bone_meal", "bone_meal_from_bone_block", "bone_block")
+            nullRecipe(Items.MAGMA_BLOCK, Items.MAGMA_CREAM, Items.FIRE_CHARGE)
+            nullRecipe(Items.LEATHER)
         }
 
         macerator {
@@ -242,6 +246,56 @@ object MiscMaterials {
                 input("water", amount = 0.05)
                 voltage(Voltage.LV)
                 workTicks(64)
+            }
+            output(Items.MAGMA_CREAM, 4) {
+                input(Items.MAGMA_BLOCK)
+                input("water", amount = 0.1)
+                voltage(Voltage.LV)
+                workTicks(128)
+            }
+        }
+
+        centrifuge {
+            input(Items.MAGMA_CREAM) {
+                output(Items.SLIME_BALL)
+                output("lava", amount = 0.2)
+                voltage(Voltage.MV)
+                workTicks(120)
+            }
+        }
+
+        mixer {
+            defaults {
+                voltage(Voltage.MV)
+            }
+            output(Items.MAGMA_CREAM) {
+                input(Items.SLIME_BALL)
+                input("lava", amount = 0.2)
+                workTicks(40)
+            }
+            output(Items.FIRE_CHARGE, 3) {
+                input(Items.GUNPOWDER)
+                input(Items.BLAZE_POWDER)
+                input(ItemTags.COALS)
+                workTicks(192)
+            }
+        }
+
+        wiremill {
+            output(Items.STRING) {
+                input("rubber", "foil")
+                voltage(Voltage.LV)
+                workTicks(32)
+            }
+        }
+
+        chemicalReactor {
+            output(Items.LEATHER) {
+                input(Items.STRING)
+                input("pvc", amount = 0.5)
+                voltage(Voltage.MV)
+                workTicks(96)
+                tech(Technologies.ORGANIC_CHEMISTRY)
             }
         }
 
@@ -478,6 +532,7 @@ object MiscMaterials {
             tag(TOOL_WIRE_CUTTER, TOOL)
             tag(itemKey(Items.SHEARS), TOOL_SHEARS)
             tag(itemKey(Items.STICK), TOOL_HANDLE)
+            tag(getMaterial("iron").tag("stick"), TOOL_HANDLE)
             tag(getMaterial("iron").tag("screw"), TOOL_SCREW)
 
             for (base in OreVariant.entries) {
@@ -487,6 +542,8 @@ object MiscMaterials {
             tag(ITEM_STORAGE_CELL, STORAGE_CELL)
             tag(FLUID_STORAGE_CELL, STORAGE_CELL)
             tag(PATTERN_STORAGE_CELL, STORAGE_CELL)
+
+            tag(getMaterial("coke").tag("primary"), ItemTags.COALS)
         }
     }
 }

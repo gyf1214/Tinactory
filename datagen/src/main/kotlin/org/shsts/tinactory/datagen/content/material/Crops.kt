@@ -37,18 +37,6 @@ object Crops {
         farm(Items.NETHER_WART)
         farm(Items.BAMBOO)
 
-        // melon
-        vanilla {
-            nullRecipe(Items.MELON)
-        }
-        cutter {
-            output(Items.MELON_SLICE, 9) {
-                input(Items.MELON)
-                voltage(Voltage.LV)
-                workTicks(128)
-            }
-        }
-
         // crop to seed
         toSeed(Items.WHEAT, Items.WHEAT_SEEDS)
         toSeed(Items.BEETROOT, Items.BEETROOT_SEEDS)
@@ -95,6 +83,10 @@ object Crops {
         siftSeed(Items.SOUL_SOIL, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
 
         // misc
+        vanilla {
+            nullRecipe(Items.MELON)
+            nullRecipe("sugar_from_sugar_cane")
+        }
         assembler {
             defaults {
                 voltage(Voltage.ULV)
@@ -106,6 +98,26 @@ object Crops {
             }
             output(Items.WHEAT, 9) {
                 input(Items.HAY_BLOCK)
+            }
+            output(Items.DRIED_KELP_BLOCK) {
+                input(Items.DRIED_KELP, 9)
+            }
+            output(Items.DRIED_KELP, 9) {
+                input(Items.DRIED_KELP_BLOCK)
+            }
+        }
+        macerator {
+            output(Items.SUGAR) {
+                input(Items.SUGAR_CANE)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+        }
+        cutter {
+            output(Items.MELON_SLICE, 9) {
+                input(Items.MELON)
+                voltage(Voltage.LV)
+                workTicks(128)
             }
         }
     }
