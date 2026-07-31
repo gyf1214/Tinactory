@@ -808,8 +808,8 @@ object MiscComponents {
         }
     }
 
-    private fun polish(inputId: String, outputId: String, cuttingInputs: List<String> = listOf(inputId),
-        lens: String = "ruby", outputCount: Int = 1) {
+    private fun polish(inputId: String, outputId: String,
+        cuttingInputs: List<String> = listOf(inputId), lens: String = "ruby") {
         val input = vanillaItem(inputId)
         val output = vanillaItem(outputId)
 
@@ -821,7 +821,7 @@ object MiscComponents {
         }
 
         laserEngraver {
-            output(output, outputCount) {
+            output(output) {
                 input(input)
                 input(lens, "lens", 0, port = 1)
                 voltage(Voltage.LV)
@@ -1069,7 +1069,7 @@ object MiscComponents {
         polish("end_stone", "end_stone_bricks")
         polish("granite", "polished_granite")
         polish("packed_mud", "mud_bricks", cuttingInputs = emptyList())
-        polish("popped_chorus_fruit", "purpur_block", emptyList(), outputCount = 4)
+        polish("popped_chorus_fruit", "purpur_block", emptyList())
         polish("prismarine", "prismarine_bricks", cuttingInputs = emptyList())
         polish("quartz_block", "quartz_bricks")
         polish("sand", "sandstone", emptyList())
