@@ -808,8 +808,8 @@ object MiscComponents {
         }
     }
 
-    private fun polish(inputId: String, outputId: String,
-        cuttingInputs: List<String> = listOf(inputId), lens: String = "ruby") {
+    private fun polish(inputId: String, outputId: String, cuttingInputs: List<String> = listOf(inputId),
+        lens: String = "ruby", outputCount: Int = 1) {
         val input = vanillaItem(inputId)
         val output = vanillaItem(outputId)
 
@@ -821,7 +821,7 @@ object MiscComponents {
         }
 
         laserEngraver {
-            output(output) {
+            output(output, outputCount) {
                 input(input)
                 input(lens, "lens", 0, port = 1)
                 voltage(Voltage.LV)
@@ -946,6 +946,58 @@ object MiscComponents {
     }
 
     private fun buildings() {
+        vanilla {
+            nullRecipe(Items.AMETHYST_BLOCK, Items.BRICKS, Items.DARK_PRISMARINE, Items.NETHER_BRICKS,
+                Items.PACKED_MUD, Items.PRISMARINE, Items.RED_NETHER_BRICKS, Items.SEA_LANTERN)
+        }
+        assembler {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+                tech(Technologies.SOLDERING)
+            }
+            output(Items.AMETHYST_BLOCK) {
+                input(Items.AMETHYST_SHARD, 4)
+            }
+            output(Items.BRICKS) {
+                input(Items.BRICK, 4)
+            }
+            output(Items.NETHER_BRICKS) {
+                input(Items.NETHER_BRICK, 4)
+            }
+            output(Items.PRISMARINE) {
+                input(Items.PRISMARINE_SHARD, 4)
+            }
+            output(Items.SEA_LANTERN) {
+                circuit(1, Voltage.ULV)
+                input(Items.PRISMARINE_CRYSTALS, 4)
+                input(Items.PRISMARINE_SHARD, 4)
+            }
+        }
+        chemicalReactor {
+            defaults {
+                voltage(Voltage.MV)
+                workTicks(80)
+                tech(Technologies.CHEMISTRY)
+            }
+            output(Items.DARK_PRISMARINE) {
+                input(Items.PRISMARINE)
+                input(Items.BLACK_DYE)
+            }
+            output(Items.RED_NETHER_BRICKS) {
+                input(Items.NETHER_BRICKS)
+                input(Items.NETHER_WART)
+            }
+        }
+        mixer {
+            output(Items.PACKED_MUD) {
+                input(Items.MUD)
+                input(Items.WHEAT)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+        }
+
         trio("andesite")
         trio("polished_andesite", cuttingInputs = listOf("andesite", "polished_andesite"))
         trio("blackstone")
@@ -1016,7 +1068,9 @@ object MiscComponents {
         polish("diorite", "polished_diorite")
         polish("end_stone", "end_stone_bricks")
         polish("granite", "polished_granite")
-        polish("packed_mud", "mud_bricks", emptyList())
+        polish("packed_mud", "mud_bricks", cuttingInputs = emptyList())
+        polish("popped_chorus_fruit", "purpur_block", emptyList(), outputCount = 4)
+        polish("prismarine", "prismarine_bricks", cuttingInputs = emptyList())
         polish("quartz_block", "quartz_bricks")
         polish("sand", "sandstone", emptyList())
         polish("sandstone", "cut_sandstone")
