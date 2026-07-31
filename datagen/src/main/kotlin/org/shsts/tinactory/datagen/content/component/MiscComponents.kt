@@ -659,6 +659,7 @@ object MiscComponents {
         vanilla {
             nullRecipe("light_gray_dye_from_black_white_dye")
             nullRecipe("magenta_dye_from_blue_red_pink", "magenta_dye_from_blue_red_white_dye")
+            nullRecipe("glass_pane", "white_wool_from_string")
 
             nullColor("#_banner")
             nullColor("#_bed")
@@ -744,6 +745,10 @@ object MiscComponents {
                 voltage(Voltage.LV)
                 workTicks(64)
                 tech(Technologies.SOLDERING)
+            }
+            output(Items.WHITE_WOOL) {
+                input(Items.STRING, 4)
+                voltage(Voltage.ULV)
             }
             colorRecipe("#_banner", dye = 0) { color ->
                 input(vanillaItem("${color}_wool"), 4)
