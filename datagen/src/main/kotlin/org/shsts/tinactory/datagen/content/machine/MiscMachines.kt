@@ -429,11 +429,14 @@ object MiscMachines {
             }
             output(Items.FLOWER_POT) {
                 input("iron", "ring")
-                input(Items.BRICKS, 2)
+                input(Items.BRICK, 2)
             }
             output(Items.GLASS_BOTTLE) {
                 input(Items.GLASS_PANE, 3)
-                voltage(Voltage.ULV)
+            }
+            output(Items.FIREWORK_ROCKET, 3) {
+                input(Items.GUNPOWDER)
+                input(Items.PAPER)
             }
         }
 
@@ -461,6 +464,11 @@ object MiscMachines {
                 input("redstone", "dust", 2)
                 input("iron", "plate", 2)
             }
+            output(Items.COPPER_BULB) {
+                circuit(1)
+                input("redstone", "dust", 3)
+                input("copper", "plate", 3)
+            }
             output(Items.REDSTONE_BLOCK) {
                 circuit(1)
                 input("redstone", "dust", 9)
@@ -469,6 +477,11 @@ object MiscMachines {
                 circuit(1)
                 input(Items.CHEST)
                 input(Items.REDSTONE_TORCH)
+            }
+            output(Items.SEA_LANTERN) {
+                circuit(1)
+                input(Items.PRISMARINE_CRYSTALS, 4)
+                input(Items.PRISMARINE_SHARD, 4)
             }
 
             componentVoltage = Voltage.LV
@@ -583,12 +596,6 @@ object MiscMachines {
                 Items.DETECTOR_RAIL,
                 Items.ACTIVATOR_RAIL,
                 Items.LEVER,
-                Items.STONE_PRESSURE_PLATE,
-                Items.POLISHED_BLACKSTONE_PRESSURE_PLATE,
-                Items.LIGHT_WEIGHTED_PRESSURE_PLATE,
-                Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
-                Items.STONE_BUTTON,
-                Items.POLISHED_BLACKSTONE_BUTTON,
                 Items.PACKED_ICE,
                 Items.BLUE_ICE,
                 Items.BLAZE_POWDER,
@@ -604,7 +611,9 @@ object MiscMachines {
                 Items.BOOKSHELF,
                 Items.LECTERN,
                 Items.FLOWER_POT,
-                Items.GLASS_BOTTLE)
+                Items.GLASS_BOTTLE,
+                Items.SEA_LANTERN,
+                Items.FIREWORK_ROCKET)
         }
     }
 

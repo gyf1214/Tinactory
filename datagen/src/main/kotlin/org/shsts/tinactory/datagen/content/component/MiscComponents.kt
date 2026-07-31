@@ -843,11 +843,7 @@ object MiscComponents {
             defaults {
                 voltage(Voltage.LV)
                 workTicks(80)
-            }
-            output(Items.COPPER_BULB) {
-                circuit(1, Voltage.ULV)
-                input("redstone", "dust", 3)
-                input("copper", "plate", 3)
+                tech(Technologies.SOLDERING)
             }
             output(Items.COPPER_DOOR) {
                 input("copper", "ingot", 2)
@@ -947,18 +943,22 @@ object MiscComponents {
 
     private fun buildings() {
         vanilla {
-            nullRecipe(Items.AMETHYST_BLOCK, Items.BRICKS, Items.DARK_PRISMARINE, Items.NETHER_BRICKS,
-                Items.PACKED_MUD, Items.PRISMARINE, Items.RED_NETHER_BRICKS, Items.SEA_LANTERN)
-            nullRecipe(Items.ANDESITE, Items.CHAIN, Items.DIORITE, Items.GRANITE, Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
-                Items.IRON_BARS, Items.LIGHT_WEIGHTED_PRESSURE_PLATE, Items.POLISHED_BLACKSTONE_BUTTON,
-                Items.POLISHED_BLACKSTONE_PRESSURE_PLATE, Items.STONE_BUTTON, Items.STONE_PRESSURE_PLATE)
-            nullRecipe("mossy_cobblestone_from_moss_block", "mossy_cobblestone_from_vine",
-                "mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine")
+            nullRecipe(Items.BRICKS, Items.NETHER_BRICKS, Items.RED_NETHER_BRICKS)
+            nullRecipe(Items.AMETHYST_BLOCK, Items.PACKED_MUD, Items.PRISMARINE, Items.DARK_PRISMARINE)
+            nullRecipe(Items.ANDESITE, Items.DIORITE, Items.GRANITE)
+            nullRecipe(Items.CHAIN, Items.IRON_BARS)
+            nullRecipe(Items.STONE_PRESSURE_PLATE, Items.POLISHED_BLACKSTONE_PRESSURE_PLATE)
+            nullRecipe(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
+            nullRecipe(Items.STONE_BUTTON, Items.POLISHED_BLACKSTONE_BUTTON)
+            nullRecipe("mossy_cobblestone_from_moss_block", "mossy_cobblestone_from_vine")
+            nullRecipe("mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine")
+            nullRecipe(Items.MOSS_CARPET)
+            nullRecipe(Items.NETHER_BRICK_FENCE)
         }
         assembler {
             defaults {
                 voltage(Voltage.LV)
-                workTicks(64)
+                workTicks(80)
                 tech(Technologies.SOLDERING)
             }
             output(Items.AMETHYST_BLOCK) {
@@ -973,11 +973,6 @@ object MiscComponents {
             output(Items.PRISMARINE) {
                 input(Items.PRISMARINE_SHARD, 4)
             }
-            output(Items.SEA_LANTERN) {
-                circuit(1, Voltage.ULV)
-                input(Items.PRISMARINE_CRYSTALS, 4)
-                input(Items.PRISMARINE_SHARD, 4)
-            }
             output(Items.CHAIN) {
                 input("iron", "stick")
                 input("iron", "ring", 2)
@@ -986,32 +981,30 @@ object MiscComponents {
                 input("iron", "stick", 2)
                 input("iron", "bolt", 2)
             }
+            output(Items.NETHER_BRICK_FENCE) {
+                input(Items.NETHER_BRICK_SLAB)
+                input(Items.NETHER_BRICK, 2)
+            }
         }
         assembler {
             defaults {
+                input("iron", "ring")
+                input("redstone", "dust")
                 voltage(Voltage.ULV)
                 workTicks(128)
                 tech(Technologies.SOLDERING)
             }
             output(Items.HEAVY_WEIGHTED_PRESSURE_PLATE) {
                 input("iron", "plate")
-                input("iron", "ring")
-                input("redstone", "dust")
             }
             output(Items.LIGHT_WEIGHTED_PRESSURE_PLATE) {
                 input("gold", "plate")
-                input("iron", "ring")
-                input("redstone", "dust")
             }
             output(Items.POLISHED_BLACKSTONE_PRESSURE_PLATE) {
                 input(Items.POLISHED_BLACKSTONE_SLAB)
-                input("iron", "ring")
-                input("redstone", "dust")
             }
             output(Items.STONE_PRESSURE_PLATE) {
                 input(Items.STONE_SLAB)
-                input("iron", "ring")
-                input("redstone", "dust")
             }
         }
         chemicalReactor {
@@ -1038,42 +1031,45 @@ object MiscComponents {
             }
         }
         mixer {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
             output(Items.ANDESITE, 2) {
                 input(Items.DIORITE)
                 input(Items.COBBLESTONE)
-                voltage(Voltage.LV)
                 workTicks(128)
             }
             output(Items.DIORITE) {
                 input(Items.COBBLESTONE)
                 input(Items.QUARTZ)
-                voltage(Voltage.LV)
-                workTicks(64)
             }
             output(Items.GRANITE) {
                 input(Items.DIORITE)
                 input(Items.QUARTZ)
-                voltage(Voltage.LV)
-                workTicks(64)
             }
             output(Items.PACKED_MUD) {
                 input(Items.MUD)
                 input(Items.WHEAT)
-                voltage(Voltage.LV)
-                workTicks(64)
             }
         }
         cutter {
             defaults {
-                input("water", amount = 0.05)
                 voltage(Voltage.LV)
-                workTicks(64)
+                workTicks(120)
             }
             output(Items.POLISHED_BLACKSTONE_BUTTON, 8) {
                 input(Items.POLISHED_BLACKSTONE_PRESSURE_PLATE)
+                input("water", amount = 0.075)
             }
             output(Items.STONE_BUTTON, 8) {
                 input(Items.STONE_PRESSURE_PLATE)
+                input("water", amount = 0.075)
+            }
+            output(Items.MOSS_CARPET, 2) {
+                input(Items.MOSS_BLOCK)
+                input("water", amount = 0.05)
+                workTicks(64)
             }
         }
 
@@ -1147,9 +1143,9 @@ object MiscComponents {
         polish("diorite", "polished_diorite")
         polish("end_stone", "end_stone_bricks")
         polish("granite", "polished_granite")
-        polish("packed_mud", "mud_bricks", cuttingInputs = emptyList())
+        polish("packed_mud", "mud_bricks", emptyList())
         polish("popped_chorus_fruit", "purpur_block", emptyList())
-        polish("prismarine", "prismarine_bricks", cuttingInputs = emptyList())
+        polish("prismarine", "prismarine_bricks", emptyList())
         polish("quartz_block", "quartz_bricks")
         polish("sand", "sandstone", emptyList())
         polish("sandstone", "cut_sandstone")

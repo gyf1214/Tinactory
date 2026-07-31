@@ -132,9 +132,9 @@ object Woods {
                 input(Items.CHAIN)
             }
             output(pressurePlate) {
-                input(slab)
                 input("iron", "ring")
                 input("redstone", "dust")
+                input(slab)
                 workTicks(128)
             }
             output(fence) {
