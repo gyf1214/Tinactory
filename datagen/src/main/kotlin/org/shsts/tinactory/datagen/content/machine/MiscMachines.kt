@@ -434,10 +434,6 @@ object MiscMachines {
             output(Items.GLASS_BOTTLE) {
                 input(Items.GLASS_PANE, 3)
             }
-            output(Items.FIREWORK_ROCKET, 3) {
-                input(Items.GUNPOWDER)
-                input(Items.PAPER)
-            }
         }
 
         assembler {
@@ -612,8 +608,7 @@ object MiscMachines {
                 Items.LECTERN,
                 Items.FLOWER_POT,
                 Items.GLASS_BOTTLE,
-                Items.SEA_LANTERN,
-                Items.FIREWORK_ROCKET)
+                Items.SEA_LANTERN)
         }
     }
 
