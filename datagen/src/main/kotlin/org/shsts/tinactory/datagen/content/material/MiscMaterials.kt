@@ -71,6 +71,7 @@ object MiscMaterials {
             nullRecipe("quartz", "quartz_from_blasting", "quartz_block")
             nullRecipe("netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block")
             nullRecipe("netherite_scrap", "netherite_scrap_from_blasting")
+            nullRecipe(Items.NETHER_WART_BLOCK, Items.SLIME_BLOCK, Items.SLIME_BALL)
         }
 
         // smelt iron nugget to wrought iron
@@ -237,6 +238,11 @@ object MiscMaterials {
                 input(Items.BONE_MEAL, 18)
                 input(Items.TNT, port = 1)
                 voltage(Voltage.LV)
+            }
+            output(Items.SLIME_BLOCK, 2) {
+                input(Items.SLIME_BALL, 18)
+                input(Items.TNT, port = 1)
+                voltage(Voltage.HV)
             }
         }
 
