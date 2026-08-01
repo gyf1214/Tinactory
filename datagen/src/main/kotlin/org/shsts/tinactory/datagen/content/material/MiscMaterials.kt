@@ -68,10 +68,11 @@ object MiscMaterials {
         disableVanilla("lapis", "lazuli")
         disableVanilla("emerald", "")
         vanilla {
-            nullRecipe("quartz", "quartz_from_blasting", "quartz_block")
-            nullRecipe("netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block")
-            nullRecipe("netherite_scrap", "netherite_scrap_from_blasting")
-            nullRecipe(Items.NETHER_WART_BLOCK, Items.SLIME_BLOCK, Items.SLIME_BALL)
+            nullRecipe(
+                "quartz", "quartz_from_blasting", "quartz_block",
+                "netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block",
+                "netherite_scrap", "netherite_scrap_from_blasting",
+                Items.NETHER_WART_BLOCK, Items.SLIME_BLOCK, Items.SLIME_BALL)
         }
 
         // smelt iron nugget to wrought iron
@@ -215,9 +216,10 @@ object MiscMaterials {
         }
 
         vanilla {
-            nullRecipe("bone_meal", "bone_meal_from_bone_block", "bone_block")
-            nullRecipe(Items.MAGMA_BLOCK, Items.MAGMA_CREAM, Items.FIRE_CHARGE)
-            nullRecipe(Items.LEATHER, Items.CLAY, Items.MUDDY_MANGROVE_ROOTS, Items.SNOW, Items.SNOW_BLOCK)
+            nullRecipe(
+                "bone_meal", "bone_meal_from_bone_block", "bone_block",
+                Items.MAGMA_BLOCK, Items.MAGMA_CREAM, Items.FIRE_CHARGE,
+                Items.LEATHER, Items.CLAY, Items.MUDDY_MANGROVE_ROOTS, Items.SNOW, Items.SNOW_BLOCK)
         }
 
         macerator {
@@ -423,12 +425,12 @@ object MiscMaterials {
                 nullRecipe("raw_$name")
                 nullRecipe("raw_${name}_block")
                 if (name == "copper") {
-                    nullRecipe(fullName)
-                    nullRecipe("${fullName}_from_waxed_copper_block")
+                    nullRecipe(fullName, "${fullName}_from_waxed_copper_block")
                 } else {
-                    nullRecipe("${fullName}_from_${name}_block")
-                    nullRecipe("${fullName}_from_nuggets")
-                    nullRecipe("${name}_nugget")
+                    nullRecipe(
+                        "${fullName}_from_${name}_block",
+                        "${fullName}_from_nuggets",
+                        "${name}_nugget")
                     for (method in VANILLA_METHODS) {
                         nullRecipe("${name}_nugget_from_$method")
                     }

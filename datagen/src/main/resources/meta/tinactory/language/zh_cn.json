@@ -501,7 +501,8 @@
     "oil": "石油",
     "gem": "宝石",
     "uranium": "铀",
-    "nuclear_waste": "核废料"
+    "nuclear_waste": "核废料",
+    "honey": "蜂蜜"
   },
   "patterns": {
     "item[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",

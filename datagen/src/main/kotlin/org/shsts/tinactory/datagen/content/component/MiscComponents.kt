@@ -657,9 +657,11 @@ object MiscComponents {
         dye("yellow", Items.SUNFLOWER, 2, "_from_sunflower", "_from_sunflower")
 
         vanilla {
-            nullRecipe("light_gray_dye_from_black_white_dye")
-            nullRecipe("magenta_dye_from_blue_red_pink", "magenta_dye_from_blue_red_white_dye")
-            nullRecipe("glass_pane", "white_wool_from_string")
+            nullRecipe(
+                "light_gray_dye_from_black_white_dye",
+                "magenta_dye_from_blue_red_pink",
+                "magenta_dye_from_blue_red_white_dye",
+                "glass_pane", "white_wool_from_string")
 
             nullColor("#_banner")
             nullColor("#_bed")
@@ -884,10 +886,11 @@ object MiscComponents {
             chisel("waxed_$base", "waxed_$chiseled", listOf("waxed_$base", "waxed_$cut"))
 
             vanilla {
-                nullRecipe("${prefix}copper_grate", "waxed_${prefix}copper_grate")
-                nullRecipe("${prefix}copper_grate_from_${base}_stonecutting")
-                nullRecipe("waxed_${prefix}copper_grate_from_waxed_${base}_stonecutting")
-                nullRecipe(bulb, "waxed_$bulb")
+                nullRecipe(
+                    "${prefix}copper_grate", "waxed_${prefix}copper_grate",
+                    "${prefix}copper_grate_from_${base}_stonecutting",
+                    "waxed_${prefix}copper_grate_from_waxed_${base}_stonecutting",
+                    bulb, "waxed_$bulb")
             }
 
             cutter {
@@ -943,17 +946,19 @@ object MiscComponents {
 
     private fun buildings() {
         vanilla {
-            nullRecipe(Items.BRICKS, Items.NETHER_BRICKS, Items.RED_NETHER_BRICKS)
-            nullRecipe(Items.AMETHYST_BLOCK, Items.PACKED_MUD, Items.PRISMARINE, Items.DARK_PRISMARINE)
-            nullRecipe(Items.ANDESITE, Items.DIORITE, Items.GRANITE)
-            nullRecipe(Items.CHAIN, Items.IRON_BARS)
-            nullRecipe(Items.STONE_PRESSURE_PLATE, Items.POLISHED_BLACKSTONE_PRESSURE_PLATE)
-            nullRecipe(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
-            nullRecipe(Items.STONE_BUTTON, Items.POLISHED_BLACKSTONE_BUTTON)
-            nullRecipe("mossy_cobblestone_from_moss_block", "mossy_cobblestone_from_vine")
-            nullRecipe("mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine")
-            nullRecipe(Items.MOSS_CARPET)
-            nullRecipe(Items.NETHER_BRICK_FENCE)
+            nullRecipe(
+                Items.BRICKS, Items.NETHER_BRICKS, Items.RED_NETHER_BRICKS,
+                Items.AMETHYST_BLOCK, Items.PACKED_MUD, Items.PRISMARINE, Items.DARK_PRISMARINE,
+                Items.ANDESITE, Items.DIORITE, Items.GRANITE,
+                Items.CHAIN, Items.IRON_BARS,
+                Items.STONE_PRESSURE_PLATE, Items.POLISHED_BLACKSTONE_PRESSURE_PLATE,
+                Items.HEAVY_WEIGHTED_PRESSURE_PLATE, Items.LIGHT_WEIGHTED_PRESSURE_PLATE,
+                Items.STONE_BUTTON, Items.POLISHED_BLACKSTONE_BUTTON,
+                "mossy_cobblestone_from_moss_block", "mossy_cobblestone_from_vine",
+                "mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine",
+                Items.MOSS_CARPET, Items.NETHER_BRICK_FENCE,
+                Items.HONEY_BLOCK, Items.HONEY_BOTTLE, "sugar_from_honey_bottle",
+                Items.HONEYCOMB_BLOCK, Items.DRIPSTONE_BLOCK)
         }
         assembler {
             defaults {
@@ -972,6 +977,12 @@ object MiscComponents {
             }
             output(Items.PRISMARINE) {
                 input(Items.PRISMARINE_SHARD, 4)
+            }
+            output(Items.HONEYCOMB_BLOCK) {
+                input(Items.HONEYCOMB, 4)
+            }
+            output(Items.DRIPSTONE_BLOCK) {
+                input(Items.POINTED_DRIPSTONE, 4)
             }
             output(Items.CHAIN) {
                 input("iron", "stick")
@@ -1119,12 +1130,13 @@ object MiscComponents {
         trio("stone_bricks", "stone_brick", cuttingInputs = emptyList())
         // spacial naming 4
         vanilla {
-            nullRecipe("stone_brick_slab_from_stone_bricks_stonecutting")
-            nullRecipe("stone_brick_slab_from_stone_stonecutting")
-            nullRecipe("stone_brick_stairs_from_stone_bricks_stonecutting")
-            nullRecipe("stone_brick_stairs_from_stone_stonecutting")
-            nullRecipe("stone_brick_wall_from_stone_bricks_stonecutting")
-            nullRecipe("stone_brick_walls_from_stone_stonecutting")
+            nullRecipe(
+                "stone_brick_slab_from_stone_bricks_stonecutting",
+                "stone_brick_slab_from_stone_stonecutting",
+                "stone_brick_stairs_from_stone_bricks_stonecutting",
+                "stone_brick_stairs_from_stone_stonecutting",
+                "stone_brick_wall_from_stone_bricks_stonecutting",
+                "stone_brick_walls_from_stone_stonecutting")
         }
         trio("smooth_stone")
         trio("tuff")

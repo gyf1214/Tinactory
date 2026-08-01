@@ -849,8 +849,8 @@ object CircuitComponents {
                 }
             }
             extractor {
-                output(getItem("component/stem_cell")) {
-                    input("cultivated_bacteria", "fluid", 0.1)
+                input("cultivated_bacteria", "fluid", 0.1) {
+                    output(getItem("component/stem_cell"))
                     voltage(Voltage.LUV)
                     workTicks(160)
                 }

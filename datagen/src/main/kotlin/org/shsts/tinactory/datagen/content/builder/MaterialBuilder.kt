@@ -100,6 +100,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     private val name = material.name
     private var hasProcess = false
     private var hasOreProcess = false
+    var blockSize: Int = 9
 
     private fun <U : Item> toolModel(ctx: IEntryDataContext<U, ItemModelProvider>, sub: String) {
         val category = sub.substring("tool/".length)
@@ -314,7 +315,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 macerate("pipe", 3)
                 macerate("gem_flawless", 8)
                 macerate("gem_exquisite", 16)
-                macerate("block", 8)
+                macerate("block", blockSize - 1)
             }
         }
 
@@ -363,7 +364,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             molten("gear", 2f)
             molten("rotor", 4.25f)
             molten("pipe", 3f)
-            molten("block", 9f)
+            molten("block", blockSize.toFloat())
         }
 
         private fun plasma() {
@@ -743,7 +744,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
     fun implosionBlock() {
         implosionCompressor {
-            implosion("block", 18, input = "primary", outAmount = 2, tntAmount = 1)
+            implosion("block", 2 * blockSize, input = "primary", outAmount = 2, tntAmount = 1)
         }
     }
 

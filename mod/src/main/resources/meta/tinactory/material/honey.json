@@ -1,0 +1,16 @@
+{
+  "color": "0xFFFFC30B",
+  "items": [],
+  "fluids": {
+    "molten": {
+      "baseAmount": 1000,
+      "texture": "gregtech:block/material_sets/fluid/liquid"
+    }
+  },
+  "aliases": {
+    "fluid": "molten"
+  },
+  "existings": {
+    "block": "minecraft:honey_block"
+  }
+}

@@ -942,5 +942,9 @@ object Materials {
             }
         }
         material("nuclear_waste", DULL)
+        material("honey", DULL) {
+            blockSize = 1
+            machineProcess(Voltage.ULV)
+        }
     }
 }

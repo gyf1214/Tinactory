@@ -107,9 +107,9 @@ object Woods {
         val trapdoor = vanillaItem("${prefix}_trapdoor")
 
         vanilla {
-            nullRecipe(slab, stairs)
-            nullRecipe(sign, hangingSign, pressurePlate, button)
-            nullRecipe(fence, gate, door, trapdoor)
+            nullRecipe(
+                slab, stairs, sign, hangingSign, pressurePlate, button,
+                fence, gate, door, trapdoor)
         }
 
         toolCrafting {
@@ -337,8 +337,9 @@ object Woods {
 
         // bamboo stuff
         vanilla {
-            nullRecipe(Items.BAMBOO_BLOCK, Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, Items.BAMBOO_MOSAIC_STAIRS)
-            nullRecipe("stick_from_bamboo_item")
+            nullRecipe(
+                Items.BAMBOO_BLOCK, Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, Items.BAMBOO_MOSAIC_STAIRS,
+                "stick_from_bamboo_item")
         }
         toolCrafting {
             shapeless(Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, TOOL_SAW, 2)
