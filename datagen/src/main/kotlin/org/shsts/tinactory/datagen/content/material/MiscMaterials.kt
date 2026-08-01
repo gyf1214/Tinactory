@@ -49,8 +49,12 @@ import org.shsts.tinactory.integration.material.OreVariant
 
 object MiscMaterials {
     fun init() {
-        itemData("rubber_tree/sticky_resin") {
+        val woodPulp = getItem("wood/wood_pulp")
+        itemData("wood/sticky_resin") {
             model(basicItem("metaitems/rubber_drop"))
+        }
+        itemData("wood/wood_pulp") {
+            model(basicItem("material_sets/dull/dust"))
         }
 
         blockData("material/block/coke") {
@@ -72,7 +76,7 @@ object MiscMaterials {
                 "quartz", "quartz_from_blasting", "quartz_block",
                 "netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block",
                 "netherite_scrap", "netherite_scrap_from_blasting",
-                Items.NETHER_WART_BLOCK, Items.SLIME_BLOCK, Items.SLIME_BALL)
+                Items.NETHER_WART_BLOCK, Items.PAPER, Items.SLIME_BLOCK, Items.SLIME_BALL)
         }
 
         // smelt iron nugget to wrought iron
@@ -235,6 +239,24 @@ object MiscMaterials {
             }
             output(Items.GLOWSTONE_DUST, 4) {
                 input(Items.GLOWSTONE)
+            }
+            output(woodPulp, suffix = "_from_stick") {
+                input(Items.STICK)
+            }
+            output(woodPulp, 2, suffix = "_from_planks") {
+                input(ItemTags.PLANKS)
+            }
+            output(woodPulp, 8, suffix = "_from_logs") {
+                input(ItemTags.LOGS)
+            }
+        }
+
+        mixer {
+            output(Items.PAPER) {
+                input(woodPulp)
+                input("water", amount = 0.05)
+                voltage(Voltage.LV)
+                workTicks(64)
             }
         }
 

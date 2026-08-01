@@ -259,7 +259,7 @@ object Woods {
     }
 
     private fun rubber() {
-        val resin = getItem("rubber_tree/sticky_resin")
+        val resin = getItem("wood/sticky_resin")
 
         blockData {
             block(RUBBER_LOG) {

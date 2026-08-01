@@ -958,7 +958,7 @@ object MiscComponents {
                 "mossy_stone_bricks_from_moss_block", "mossy_stone_bricks_from_vine",
                 Items.MOSS_CARPET, Items.NETHER_BRICK_FENCE,
                 Items.HONEY_BLOCK, Items.HONEY_BOTTLE, "sugar_from_honey_bottle",
-                Items.HONEYCOMB_BLOCK, Items.DRIPSTONE_BLOCK)
+                Items.HONEYCOMB_BLOCK, Items.DRIPSTONE_BLOCK, Items.BEEHIVE, Items.TINTED_GLASS)
         }
         assembler {
             defaults {
@@ -983,6 +983,14 @@ object MiscComponents {
             }
             output(Items.DRIPSTONE_BLOCK) {
                 input(Items.POINTED_DRIPSTONE, 4)
+            }
+            output(Items.BEEHIVE) {
+                input(ItemTags.PLANKS, 6)
+                input(Items.HONEYCOMB, 3)
+            }
+            output(Items.TINTED_GLASS, 2) {
+                input(Items.GLASS)
+                input(Items.AMETHYST_SHARD, 4)
             }
             output(Items.CHAIN) {
                 input("iron", "stick")
