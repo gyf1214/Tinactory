@@ -455,6 +455,10 @@ object MiscMachines {
                 input(ItemTags.PLANKS, 6)
                 input(Items.BOOK, 3)
             }
+            output(Items.CHISELED_BOOKSHELF) {
+                input(ItemTags.PLANKS, 6)
+                input(ItemTags.WOODEN_SLABS, 3)
+            }
             output(Items.LECTERN) {
                 input(Items.BOOKSHELF)
                 input(ItemTags.WOODEN_SLABS, 4)
@@ -578,9 +582,9 @@ object MiscMachines {
             nullRecipe(
                 Items.BLAST_FURNACE,
                 Items.STONECUTTER,
-                Items.FLETCHING_TABLE,
-                Items.CARTOGRAPHY_TABLE,
                 Items.COMPOSTER,
+                Items.CRAFTER,
+                Items.CHISELED_BOOKSHELF,
                 Items.RESPAWN_ANCHOR,
                 Items.GLOWSTONE,
                 Items.BUCKET,
