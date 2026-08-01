@@ -19,9 +19,11 @@ import org.shsts.tinactory.AllTags.circuit
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
@@ -317,6 +319,33 @@ object MiscMachines {
         }
     }
 
+    private fun template(output: ItemLike, lens: String, mat: String? = null, base: ItemLike? = null) {
+        vanilla {
+            nullRecipe(output)
+        }
+        laserEngraver {
+            output(output) {
+                if (mat != null) {
+                    input(mat, "plate")
+                } else if (base != null) {
+                    input(base)
+                }
+                input(lens, "lens", 0, port = 1)
+                voltage(Voltage.MV)
+                workTicks(256)
+                requireCleanness(-0.5, 0.5)
+            }
+        }
+    }
+
+    private fun trim(output: String, mat: String, lens: String) {
+        template(vanillaItem("${output}_armor_trim_smithing_template"), lens, mat = mat)
+    }
+
+    private fun pattern(output: String, lens: String) {
+        template(vanillaItem("${output}_banner_pattern"), lens, base = Items.PAPER)
+    }
+
     private fun vanillas() {
         toolCrafting {
             result(Items.HOPPER) {
@@ -610,6 +639,36 @@ object MiscMachines {
                 Items.GLASS_BOTTLE,
                 Items.SEA_LANTERN)
         }
+
+        template(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE, "ender_eye", mat = "stainless_steel")
+
+        trim("sentry", "steel", "ruby")
+        trim("dune", "steel", "diamond")
+        trim("coast", "steel", "sapphire")
+        trim("wild", "steel", "emerald")
+        trim("ward", "steel", "topaz")
+        trim("eye", "steel", "blue_topaz")
+        trim("vex", "annealed_copper", "ruby")
+        trim("tide", "annealed_copper", "diamond")
+        trim("snout", "annealed_copper", "sapphire")
+        trim("rib", "annealed_copper", "emerald")
+        trim("spire", "annealed_copper", "topaz")
+        trim("wayfinder", "annealed_copper", "blue_topaz")
+        trim("shaper", "tungsten_steel", "ruby")
+        trim("silence", "tungsten_steel", "diamond")
+        trim("raiser", "tungsten_steel", "sapphire")
+        trim("host", "tungsten_steel", "emerald")
+        trim("flow", "tungsten_steel", "topaz")
+        trim("bolt", "tungsten_steel", "blue_topaz")
+
+        pattern("flower", "ruby")
+        pattern("globe", "diamond")
+        pattern("creeper", "sapphire")
+        pattern("skull", "emerald")
+        pattern("piglin", "topaz")
+        pattern("flow", "blue_topaz")
+        pattern("guster", "ender_eye")
+        pattern("mojang", "nether_star")
     }
 
     private fun misc() {
