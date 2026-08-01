@@ -217,7 +217,7 @@ object MiscMaterials {
         vanilla {
             nullRecipe("bone_meal", "bone_meal_from_bone_block", "bone_block")
             nullRecipe(Items.MAGMA_BLOCK, Items.MAGMA_CREAM, Items.FIRE_CHARGE)
-            nullRecipe(Items.LEATHER)
+            nullRecipe(Items.LEATHER, Items.CLAY, Items.MUDDY_MANGROVE_ROOTS, Items.SNOW, Items.SNOW_BLOCK)
         }
 
         macerator {
@@ -230,6 +230,9 @@ object MiscMaterials {
             }
             output(Items.BONE_MEAL, 9, suffix = "_from_bone_block") {
                 input(Items.BONE_BLOCK)
+            }
+            output(Items.GLOWSTONE_DUST, 4) {
+                input(Items.GLOWSTONE)
             }
         }
 
@@ -259,6 +262,12 @@ object MiscMaterials {
                 voltage(Voltage.LV)
                 workTicks(128)
             }
+            output(Items.SNOW, 2) {
+                input(Items.SNOW_BLOCK)
+                input("water", amount = 0.1)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
         }
 
         centrifuge {
@@ -284,6 +293,27 @@ object MiscMaterials {
                 input(Items.BLAZE_POWDER)
                 input(ItemTags.COALS)
                 workTicks(192)
+            }
+        }
+
+        mixer {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            output(Items.CLAY) {
+                input(Items.CLAY_BALL, 4)
+            }
+            output(Items.MUDDY_MANGROVE_ROOTS) {
+                input(Items.MUD)
+                input(Items.MANGROVE_ROOTS)
+            }
+            output(Items.SNOWBALL, 2) {
+                input(Items.ICE)
+                input("water", amount = 0.1)
+            }
+            output(Items.SNOW_BLOCK) {
+                input(Items.SNOWBALL, 4)
             }
         }
 

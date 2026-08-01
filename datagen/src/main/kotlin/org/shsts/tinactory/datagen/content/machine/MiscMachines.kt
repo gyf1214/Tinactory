@@ -405,6 +405,33 @@ object MiscMachines {
                 input("sulfur", "dust")
                 workTicks(64)
             }
+            output(Items.SOUL_TORCH, 6) {
+                input(Items.STICK)
+                input("sulfur", "dust")
+                input(ItemTags.SOUL_FIRE_BASE_BLOCKS)
+                workTicks(64)
+            }
+            output(Items.GLOWSTONE) {
+                input(Items.GLOWSTONE_DUST, 4)
+            }
+            output(Items.ARMOR_STAND) {
+                input(Items.STICK, 6)
+                input(Items.SMOOTH_STONE_SLAB)
+            }
+            output(Items.CANDLE) {
+                input(Items.STRING)
+                input(Items.HONEYCOMB)
+            }
+            output(Items.LANTERN) {
+                input(Items.TORCH)
+                input("iron", "ring", 2)
+                input("iron", "screw", 2)
+            }
+            output(Items.SOUL_LANTERN) {
+                input(Items.SOUL_TORCH)
+                input("iron", "ring", 2)
+                input("iron", "screw", 2)
+            }
             output(Items.REDSTONE_TORCH) {
                 input(Items.STICK)
                 input("redstone", "dust")
@@ -586,6 +613,12 @@ object MiscMachines {
                 Items.CRAFTER,
                 Items.CHISELED_BOOKSHELF,
                 Items.GLOWSTONE,
+                Items.SHULKER_BOX,
+                "shulker_box_coloring",
+                Items.ARMOR_STAND,
+                Items.CANDLE,
+                Items.LANTERN,
+                Items.SOUL_LANTERN,
                 Items.BUCKET,
                 Items.TNT,
                 Items.REDSTONE_TORCH,
