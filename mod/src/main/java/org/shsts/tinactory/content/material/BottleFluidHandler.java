@@ -103,6 +103,9 @@ public class BottleFluidHandler implements IFluidHandlerItem {
         }
 
         var stack1 = getFluid();
+        if (stack1.isEmpty()) {
+            return FluidStack.EMPTY;
+        }
         if (action.execute()) {
             container = new ItemStack(Items.GLASS_BOTTLE);
         }
