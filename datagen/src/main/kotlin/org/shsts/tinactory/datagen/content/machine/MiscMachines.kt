@@ -319,9 +319,12 @@ object MiscMachines {
         }
     }
 
-    private fun template(output: ItemLike, lens: String, mat: String? = null, base: ItemLike? = null) {
-        vanilla {
-            nullRecipe(output)
+    private fun template(output: ItemLike, lens: String, mat: String? = null, base: ItemLike? = null,
+        disable: Boolean = true) {
+        if (disable) {
+            vanilla {
+                nullRecipe(output)
+            }
         }
         laserEngraver {
             output(output) {
@@ -342,8 +345,8 @@ object MiscMachines {
         template(vanillaItem("${output}_armor_trim_smithing_template"), lens, mat = mat)
     }
 
-    private fun pattern(output: String, lens: String) {
-        template(vanillaItem("${output}_banner_pattern"), lens, base = Items.PAPER)
+    private fun pattern(output: String, lens: String, disable: Boolean) {
+        template(vanillaItem("${output}_banner_pattern"), lens, base = Items.PAPER, disable = disable)
     }
 
     private fun vanillas() {
@@ -661,14 +664,14 @@ object MiscMachines {
         trim("flow", "tungsten_steel", "topaz")
         trim("bolt", "tungsten_steel", "blue_topaz")
 
-        pattern("flower", "ruby")
-        pattern("globe", "diamond")
-        pattern("creeper", "sapphire")
-        pattern("skull", "emerald")
-        pattern("piglin", "topaz")
-        pattern("flow", "blue_topaz")
-        pattern("guster", "ender_eye")
-        pattern("mojang", "nether_star")
+        pattern("flower", "ruby", true)
+        pattern("globe", "diamond", false)
+        pattern("creeper", "sapphire", true)
+        pattern("skull", "emerald", true)
+        pattern("piglin", "topaz", false)
+        pattern("flow", "blue_topaz", false)
+        pattern("guster", "ender_eye", false)
+        pattern("mojang", "nether_star", true)
     }
 
     private fun misc() {
