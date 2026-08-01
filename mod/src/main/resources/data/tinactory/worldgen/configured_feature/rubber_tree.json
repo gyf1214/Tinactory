@@ -18,7 +18,7 @@
     "trunk_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "tinactory:rubber_tree/log",
+        "Name": "tinactory:wood/rubber_log",
         "Properties": {
           "axis": "y",
           "has_rubber": "true"
@@ -28,7 +28,7 @@
     "foliage_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "tinactory:rubber_tree/leaves",
+        "Name": "tinactory:wood/rubber_leaves",
         "Properties": {
           "persistent": "false",
           "distance": "7"

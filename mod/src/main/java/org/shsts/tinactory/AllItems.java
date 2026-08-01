@@ -42,13 +42,13 @@ public final class AllItems {
 
         Circuits.buildBoards();
 
-        RUBBER_LOG = REGISTRATE.block("rubber_tree/log", RubberLogBlock::new)
+        RUBBER_LOG = REGISTRATE.block("wood/rubber_log", RubberLogBlock::new)
             .properties(p -> p.mapColor(Blocks.OAK_LOG.defaultMapColor())
                 .strength(2f).sound(SoundType.WOOD))
             .creativeTab(CreativeModeTabs.BUILDING_BLOCKS)
             .register();
 
-        RUBBER_LEAVES = REGISTRATE.block("rubber_tree/leaves", LeavesBlock::new)
+        RUBBER_LEAVES = REGISTRATE.block("wood/rubber_leaves", LeavesBlock::new)
             .properties(p -> p.mapColor(Blocks.OAK_LEAVES.defaultMapColor())
                 .strength(0.2f).randomTicks()
                 .sound(SoundType.GRASS).noOcclusion()
@@ -59,7 +59,7 @@ public final class AllItems {
             .tint(0xFF55FF55)
             .register();
 
-        RUBBER_SAPLING = REGISTRATE.block("rubber_tree/sapling",
+        RUBBER_SAPLING = REGISTRATE.block("wood/rubber_sapling",
                 prop -> new SaplingBlock(RubberTreeGrower.INSTANCE, prop))
             .properties(p -> p.mapColor(Blocks.OAK_SAPLING.defaultMapColor())
                 .noCollission().randomTicks()
