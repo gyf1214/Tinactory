@@ -1,6 +1,8 @@
 package org.shsts.tinactory;
 
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -10,6 +12,7 @@ import org.shsts.tinactory.api.logistics.IFluidPort;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IProcessor;
+import org.shsts.tinactory.content.material.BottleFluidHandler;
 import org.shsts.tinactory.core.autocraft.api.IPatternCellPort;
 import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.logistics.IBytesProvider;
@@ -74,4 +77,9 @@ public final class AllCapabilities {
     }
 
     public static void init() {}
+
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerItem(FLUID_HANDLER_ITEM.get(), (stack, $) -> new BottleFluidHandler(stack),
+            Items.GLASS_BOTTLE, Items.POTION, Items.HONEY_BOTTLE);
+    }
 }

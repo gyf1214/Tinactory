@@ -72,6 +72,7 @@ public class Tinactory {
 
             REGISTRATE.register(modEventBus);
             modEventBus.addListener(Tinactory::init);
+            modEventBus.addListener(AllCapabilities::registerCapabilities);
             NeoForge.EVENT_BUS.register(AllForgeEvents.class);
         } catch (Throwable e) {
             LOGGER.error("Fatal error encountered during construct!", e);
