@@ -400,6 +400,30 @@ object MiscMachines {
                 input("iron", "plate", 2)
                 input("iron", "stick")
             }
+            output(Items.RAIL, 16) {
+                input(ItemTags.WOODEN_SLABS)
+                input("iron", "stick", 6)
+            }
+            output(Items.POWERED_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input("gold", "bolt", 6)
+                input("redstone", "dust")
+            }
+            output(Items.DETECTOR_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input(Items.STONE_PRESSURE_PLATE)
+                input("redstone", "dust")
+            }
+            output(Items.ACTIVATOR_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input("iron", "ring", 6)
+                input(Items.REDSTONE_TORCH)
+            }
+            output(Items.MINECART) {
+                input("iron", "plate", 2)
+                input("iron", "stick", 2)
+                input("iron", "ring", 4)
+            }
             output(Items.TORCH, 6) {
                 input(Items.STICK)
                 input("sulfur", "dust")
