@@ -1024,8 +1024,13 @@ object InorganicChemistry {
         }
 
         extractor {
-            output("nether_star", "molten") {
-                input("nether_star", "gem")
+            input("honey", amount = 0.075) {
+                output(Items.SUGAR)
+                voltage(Voltage.LV)
+                workTicks(96)
+            }
+            input("nether_star", "gem") {
+                output("nether_star", "molten")
                 voltage(Voltage.LUV)
                 workTicks(160)
             }

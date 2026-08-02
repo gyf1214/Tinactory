@@ -20,6 +20,7 @@
     "fluid": "molten"
   },
   "existings": {
-    "ingot": "minecraft:netherite_ingot"
+    "ingot": "minecraft:netherite_ingot",
+    "block": "minecraft:netherite_block"
   }
 }

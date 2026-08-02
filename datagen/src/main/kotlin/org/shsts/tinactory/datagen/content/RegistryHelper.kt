@@ -21,6 +21,12 @@ object RegistryHelper {
 
     fun vanillaItem(id: String) = ITEMS.getEntry<Item>(mcLoc(id)).get()!!
 
+    fun vanillaItemOrNull(id: String) = if (BuiltInRegistries.ITEM.containsKey(mcLoc(id))) {
+        vanillaItem(id)
+    } else {
+        null
+    }
+
     fun itemLoc(item: ItemLike) = BuiltInRegistries.ITEM.getKey(item.asItem())
 
     fun itemKey(item: ItemLike) = BuiltInRegistries.ITEM.getResourceKey(item.asItem()).orElseThrow()

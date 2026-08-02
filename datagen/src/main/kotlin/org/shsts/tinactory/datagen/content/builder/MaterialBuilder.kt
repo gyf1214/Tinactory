@@ -100,6 +100,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     private val name = material.name
     private var hasProcess = false
     private var hasOreProcess = false
+    var blockSize: Int = 9
 
     private fun <U : Item> toolModel(ctx: IEntryDataContext<U, ItemModelProvider>, sub: String) {
         val category = sub.substring("tool/".length)
@@ -314,7 +315,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 macerate("pipe", 3)
                 macerate("gem_flawless", 8)
                 macerate("gem_exquisite", 16)
-                macerate("block", 8)
+                macerate("block", blockSize - 1)
             }
         }
 
@@ -363,6 +364,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             molten("gear", 2f)
             molten("rotor", 4.25f)
             molten("pipe", 3f)
+            molten("block", blockSize.toFloat())
         }
 
         private fun plasma() {
@@ -454,6 +456,17 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     tech(Technologies.MATERIAL_CUTTING)
                 }
             }
+            if (material.hasItem("gem_flawless")) {
+                implosionCompressor {
+                    implosion("gem", 4, outAmount = 3)
+                    implosion("gem_flawless", 9, input = "gem")
+                }
+                if (material.hasItem("block")) {
+                    lathe {
+                        process("block", "gem_flawless", 128)
+                    }
+                }
+            }
 
             macerates()
             moltens()
@@ -532,7 +545,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     inner class ComposeBuilder<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>>(
-        private val factory: ProcessingRecipeFactoryBase<R, B>,
+        private val factory: RecipeFactory<R, B>,
         private val sub: String, private val suffix: String,
         private val voltage: Voltage, private val workTicks: Long,
         private val decompose: Boolean) {
@@ -578,7 +591,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> ProcessingRecipeFactoryBase<R, B>.compose(
+    private fun <R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>> RecipeFactory<R, B>.compose(
         sub: String, voltage: Voltage, workTicks: Long, decompose: Boolean,
         suffix: String = "", block: ComposeBuilder<R, B>.() -> Unit) {
         ComposeBuilder(this, sub, suffix, voltage, workTicks, decompose).build(block)
@@ -723,9 +736,15 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     fun implosionPrimary() {
         implosionCompressor {
             implosion("primary", 16, outAmount = 16, tntAmount = 1)
-            if (material.hasItem("block")) {
-                implosion("block", 18, input = "primary", outAmount = 2, tntAmount = 1)
-            }
+        }
+        if (material.hasItem("block")) {
+            implosionBlock()
+        }
+    }
+
+    fun implosionBlock() {
+        implosionCompressor {
+            implosion("block", 2 * blockSize, input = "primary", outAmount = 2, tntAmount = 1)
         }
     }
 
@@ -856,13 +875,6 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         voltage(Voltage.LV)
                         workTicks(64)
                     }
-                }
-            }
-
-            if (material.hasItem("gem_flawless")) {
-                implosionCompressor {
-                    implosion("gem", 4, outAmount = 3)
-                    implosion("gem_flawless", 9, input = "gem")
                 }
             }
 

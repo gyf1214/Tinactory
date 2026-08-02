@@ -8,7 +8,6 @@ import org.shsts.tinactory.AllItems.RUBBER_LEAVES
 import org.shsts.tinactory.AllItems.RUBBER_LOG
 import org.shsts.tinactory.AllItems.RUBBER_SAPLING
 import org.shsts.tinactory.AllTags
-import org.shsts.tinactory.AllTags.TOOL_HANDLE
 import org.shsts.tinactory.AllTags.TOOL_MORTAR
 import org.shsts.tinactory.AllTags.TOOL_SAW
 import org.shsts.tinactory.AllTags.TOOL_SHEARS
@@ -28,9 +27,9 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.pyrolyseOven
-import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.material.Crops.siftSeed
 
 object Woods {
     fun init() {
@@ -40,20 +39,26 @@ object Woods {
         vanilla("jungle")
         vanilla("acacia")
         vanilla("dark_oak")
-        vanilla("crimson")
-        vanilla("warped")
+        vanilla("cherry")
+        vanilla("mangrove", sapling = Items.MANGROVE_PROPAGULE)
+        vanilla("crimson", isNether = true, leaves = Items.NETHER_WART_BLOCK)
+        vanilla("warped", isNether = true)
+        vanilla("bamboo", isWood = false, logId = "bamboo_block", planksRate = 1, boat = Items.BAMBOO_RAFT)
 
         rubber()
         misc()
     }
 
-    private fun farm(sapling: ItemLike, log: ItemLike, leaves: ItemLike, isRubber: Boolean) {
-        val stickResin = getItem("rubber_tree/sticky_resin")
+    private fun farm(sapling: ItemLike, log: ItemLike, leaves: ItemLike, extra: ItemLike,
+        isRubber: Boolean = false) {
         autofarm {
             defaults {
-                output(log, 6)
                 if (isRubber) {
-                    output(stickResin, 6)
+                    output(log, 6)
+                    output(extra, 6)
+                } else {
+                    output(log, 4)
+                    output(extra, 2)
                 }
                 output(sapling, 2)
                 voltage(Voltage.LV)
@@ -73,9 +78,12 @@ object Woods {
             input(sapling, suffix = "_with_fertilizer") {
                 input("water")
                 input(getItem("misc/fertilizer"), 2, port = 2)
-                output(log, 12)
                 if (isRubber) {
-                    output(stickResin, 12)
+                    output(log, 12)
+                    output(extra, 12)
+                } else {
+                    output(log, 8)
+                    output(extra, 4)
                 }
                 output(sapling, 4)
                 output(leaves, 32)
@@ -85,62 +93,72 @@ object Woods {
         }
     }
 
-    private fun vanilla(prefix: String) {
-        val nether = prefix == "crimson" || prefix == "warped"
-
+    private fun components(prefix: String, isNether: Boolean = false, boat: ItemLike? = null) {
         val planks = vanillaItem("${prefix}_planks")
-        val logsTag = AllTags.item(mcLoc(prefix + if (nether) "_stems" else "_logs"))
-        val wood = prefix + if (nether) "_hyphae" else "_wood"
-        val woodStripped = "stripped_$wood"
-
-        // logs to planks
-        vanilla(replace = true) {
-            nullRecipe(wood, woodStripped)
-            shapeless(logsTag, planks, toAmount = 2, criteria = "has_logs") {
-                group("planks")
-            }
-        }
-        toolCrafting {
-            shapeless(logsTag, planks, TOOL_SAW, amount = 4)
-        }
-
-        // wood components
+        val slab = vanillaItem("${prefix}_slab")
+        val stairs = vanillaItem("${prefix}_stairs")
         val sign = vanillaItem("${prefix}_sign")
+        val hangingSign = vanillaItem("${prefix}_hanging_sign")
         val pressurePlate = vanillaItem("${prefix}_pressure_plate")
         val button = vanillaItem("${prefix}_button")
-        val slab = vanillaItem("${prefix}_slab")
+        val fence = vanillaItem("${prefix}_fence")
+        val gate = vanillaItem("${prefix}_fence_gate")
+        val door = vanillaItem("${prefix}_door")
+        val trapdoor = vanillaItem("${prefix}_trapdoor")
+
         vanilla {
-            nullRecipe(sign, pressurePlate, button, slab)
+            nullRecipe(
+                slab, stairs, sign, hangingSign, pressurePlate, button,
+                fence, gate, door, trapdoor)
         }
-        assembler {
-            defaults {
-                voltage(Voltage.ULV)
-                tech(Technologies.SOLDERING)
-            }
-            output(sign) {
-                input(planks)
-                input(TOOL_HANDLE)
-                workTicks(64)
-            }
-            output(pressurePlate) {
-                input(slab)
-                input("iron", "ring")
-                input("redstone", "dust")
-                workTicks(128)
-            }
-        }
+
         toolCrafting {
             shapeless(planks, slab, TOOL_SAW, amount = 2)
             shapeless(pressurePlate, button, TOOL_SAW, amount = 4)
         }
+
+        assembler {
+            defaults {
+                voltage(Voltage.ULV)
+                tech(Technologies.SOLDERING)
+                workTicks(64)
+            }
+            output(sign) {
+                input(planks)
+                input(Items.STICK)
+            }
+            output(hangingSign) {
+                input(planks)
+                input(Items.CHAIN)
+            }
+            output(pressurePlate) {
+                input("iron", "ring")
+                input("redstone", "dust")
+                input(slab)
+                workTicks(128)
+            }
+            output(fence) {
+                input(slab)
+                input(Items.STICK, 2)
+            }
+            output(gate) {
+                input(slab, 2)
+                input(Items.STICK)
+                input("redstone", "dust")
+            }
+            output(door) {
+                input(planks, 2)
+                input("redstone", "dust")
+            }
+            output(trapdoor) {
+                input(slab, 3)
+                input("redstone", "dust")
+            }
+        }
+
         cutter {
             defaults {
                 voltage(Voltage.LV)
-            }
-            output(planks, 6) {
-                input(logsTag)
-                input("water", amount = 0.6)
-                workTicks(240)
             }
             output(slab, 2) {
                 input(planks)
@@ -154,17 +172,94 @@ object Woods {
             }
         }
 
-        // farm
-        if (!nether) {
-            val sapling = vanillaItem("${prefix}_sapling")
-            val log = vanillaItem("${prefix}_log")
-            val leaves = vanillaItem("${prefix}_leaves")
-            farm(sapling, log, leaves, false)
+        lathe {
+            output(stairs) {
+                input(slab, 2)
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+        }
+
+        if (!isNether) {
+            val boat = boat ?: vanillaItem("${prefix}_boat")
+            vanilla {
+                nullRecipe(boat)
+            }
+            assembler {
+                output(boat) {
+                    input(planks, 2)
+                    input(slab)
+                    input("rubber", amount = 0.5)
+                    voltage(Voltage.LV)
+                    workTicks(128)
+                    tech(Technologies.HOT_WORKING)
+                }
+            }
         }
     }
 
+    private fun vanilla(prefix: String,
+        isNether: Boolean = false, isWood: Boolean = true, isFarm: Boolean = true,
+        logId: String? = null, planksRate: Int = 2, boat: ItemLike? = null,
+        sapling: ItemLike? = null, leaves: ItemLike? = null) {
+        val planks = vanillaItem("${prefix}_planks")
+        val logId = logId ?: (prefix + if (isNether) "_stem" else "_log")
+        val log = vanillaItem(logId)
+        val logStripped = vanillaItem("stripped_$logId")
+        val logsTag = AllTags.item(mcLoc("${logId}s"))
+
+        vanilla(replace = true) {
+            shapeless(logsTag, planks, toAmount = planksRate, criteria = "has_logs") {
+                group("planks")
+            }
+        }
+        toolCrafting {
+            shapeless(logsTag, planks, TOOL_SAW, amount = planksRate * 2)
+        }
+        cutter {
+            output(planks, planksRate * 3) {
+                input(logsTag)
+                input("water", amount = planksRate * 0.3)
+                voltage(Voltage.LV)
+                workTicks(240)
+            }
+        }
+        lathe {
+            output(logStripped) {
+                input(log)
+                voltage(Voltage.LV)
+                workTicks(120)
+            }
+        }
+
+        if (isWood) {
+            val woodId = prefix + if (isNether) "_hyphae" else "_wood"
+            val wood = vanillaItem(woodId)
+            val woodStripped = vanillaItem("stripped_$woodId")
+
+            vanilla {
+                nullRecipe(wood, woodStripped)
+            }
+            lathe {
+                output(woodStripped) {
+                    input(wood)
+                    voltage(Voltage.LV)
+                    workTicks(120)
+                }
+            }
+
+            if (isFarm) {
+                val sapling = sapling ?: vanillaItem(if (isNether) "${prefix}_fungus" else "${prefix}_sapling")
+                val leaves = leaves ?: vanillaItem(if (isNether) "${prefix}_wart_block" else "${prefix}_leaves")
+                farm(sapling, log, leaves, wood)
+            }
+        }
+
+        components(prefix, isNether, boat)
+    }
+
     private fun rubber() {
-        val resin = getItem("rubber_tree/sticky_resin")
+        val resin = getItem("wood/sticky_resin")
 
         blockData {
             block(RUBBER_LOG) {
@@ -198,7 +293,7 @@ object Woods {
             }
         }
 
-        farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), true)
+        farm(RUBBER_SAPLING.get(), RUBBER_LOG.get(), RUBBER_LEAVES.get(), resin, true)
 
         toolCrafting {
             result("raw_rubber", "dust") {
@@ -231,24 +326,75 @@ object Woods {
 
     private fun misc() {
         // azalea
-        farm(Items.AZALEA, Items.OAK_LOG, Items.AZALEA_LEAVES, false)
-        farm(Items.FLOWERING_AZALEA, Items.OAK_LOG, Items.FLOWERING_AZALEA_LEAVES, false)
+        farm(Items.AZALEA, Items.OAK_LOG, Items.AZALEA_LEAVES, Items.OAK_WOOD)
+        farm(Items.FLOWERING_AZALEA, Items.OAK_LOG, Items.FLOWERING_AZALEA_LEAVES, Items.OAK_WOOD)
 
-        sifter {
+        // seeding
+        siftSeed(Items.FLOWERING_AZALEA, Items.OAK_SAPLING, Items.BIRCH_SAPLING, Items.CHERRY_SAPLING,
+            RUBBER_SAPLING.get())
+        siftSeed(Items.AZALEA, Items.SPRUCE_SAPLING, Items.JUNGLE_SAPLING, Items.ACACIA_SAPLING,
+            Items.DARK_OAK_SAPLING)
+        siftSeed(Items.FLOWERING_AZALEA_LEAVES, Items.DANDELION, Items.POPPY, Items.BLUE_ORCHID,
+            Items.ALLIUM, Items.AZURE_BLUET, Items.OXEYE_DAISY)
+        siftSeed(Items.AZALEA_LEAVES, Items.RED_TULIP, Items.ORANGE_TULIP, Items.WHITE_TULIP,
+            Items.PINK_TULIP, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY)
+        siftSeed(Items.CHERRY_LEAVES, Items.WITHER_ROSE, Items.SUNFLOWER, Items.LILAC,
+            Items.PEONY, Items.ROSE_BUSH, Items.HONEYCOMB)
+
+        // bee
+        autofarm {
             defaults {
+                input("water")
                 voltage(Voltage.LV)
+            }
+            input(Items.HONEYCOMB) {
+                input(ItemTags.FLOWERS, 2, port = 2)
+                output(Items.HONEY_BLOCK)
+                output(Items.HONEYCOMB, 3)
+                workTicks(800)
+            }
+            input(Items.BEEHIVE, 0) {
+                input(ItemTags.FLOWERS, 6, port = 2)
+                output(Items.HONEY_BLOCK, 2)
+                output(Items.HONEYCOMB, 3)
+                workTicks(800)
+            }
+        }
+
+        // bamboo stuff
+        vanilla {
+            nullRecipe(
+                Items.BAMBOO_BLOCK, Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, Items.BAMBOO_MOSAIC_STAIRS,
+                "stick_from_bamboo_item")
+        }
+        toolCrafting {
+            shapeless(Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, TOOL_SAW, 2)
+        }
+        assembler {
+            output(Items.BAMBOO_BLOCK) {
+                input(Items.BAMBOO, 8)
+                voltage(Voltage.ULV)
                 workTicks(64)
             }
-            input(Items.FLOWERING_AZALEA_LEAVES) {
-                output(Items.OAK_SAPLING, rate = 0.1)
-                output(Items.BIRCH_SAPLING, rate = 0.1)
-                output(RUBBER_SAPLING.get(), rate = 0.1)
+            output(Items.BAMBOO_MOSAIC) {
+                input(Items.BAMBOO_SLAB, 2)
+                voltage(Voltage.ULV)
+                workTicks(64)
             }
-            input(Items.AZALEA_LEAVES) {
-                output(Items.SPRUCE_SAPLING, rate = 0.1)
-                output(Items.JUNGLE_SAPLING, rate = 0.1)
-                output(Items.ACACIA_SAPLING, rate = 0.1)
-                output(Items.DARK_OAK_SAPLING, rate = 0.1)
+        }
+        cutter {
+            output(Items.BAMBOO_MOSAIC_SLAB, 2) {
+                input(Items.BAMBOO_MOSAIC)
+                input("water", amount = 0.1)
+                voltage(Voltage.LV)
+                workTicks(80)
+            }
+        }
+        lathe {
+            output(Items.BAMBOO_MOSAIC_STAIRS) {
+                input(Items.BAMBOO_MOSAIC_SLAB, 2)
+                voltage(Voltage.LV)
+                workTicks(80)
             }
         }
 
@@ -270,10 +416,15 @@ object Woods {
             }
         }
         lathe {
-            output(Items.STICK, 2) {
-                input(ItemTags.PLANKS)
+            defaults {
                 voltage(Voltage.LV)
                 workTicks(32)
+            }
+            output(Items.STICK, 2) {
+                input(ItemTags.PLANKS)
+            }
+            output(Items.STICK, suffix = "_from_bamboo") {
+                input(Items.BAMBOO)
             }
         }
 

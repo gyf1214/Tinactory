@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
@@ -58,6 +59,7 @@ public final class ProcessingHelper {
         var ingredients = Map.of(
             ITEM_INGREDIENT_CODEC_NAME, itemIngredient,
             TagIngredient.CODEC_NAME, TagIngredient.CODEC,
+            NotConsumedItemIngredient.CODEC_NAME, NotConsumedItemIngredient.CODEC,
             FLUID_INGREDIENT_CODEC_NAME, fluidIngredient);
         INGREDIENT_CODEC = Codec.STRING.dispatch(IProcessingObject::codecName, ingredients::get);
 
@@ -116,6 +118,10 @@ public final class ProcessingHelper {
 
     public static StackIngredient<ItemStack> itemIngredient(ItemStack stack) {
         return new StackIngredient<>(ITEM_INGREDIENT_CODEC_NAME, PortType.ITEM, stack, StackHelper.ITEM_ADAPTER);
+    }
+
+    public static NotConsumedItemIngredient notConsumedItemIngredient(ItemLike item) {
+        return new NotConsumedItemIngredient(new ItemStack(item));
     }
 
     public static StackIngredient<FluidStack> fluidIngredient(FluidStack stack) {

@@ -23,6 +23,7 @@
   },
   "existings": {
     "nugget": "minecraft:iron_nugget",
-    "ingot": "minecraft:iron_ingot"
+    "ingot": "minecraft:iron_ingot",
+    "block": "minecraft:iron_block"
   }
 }

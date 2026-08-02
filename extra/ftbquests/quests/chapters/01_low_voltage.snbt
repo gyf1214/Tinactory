@@ -27,13 +27,13 @@
 		}
 		{
 			icon: {
-				id: "tinactory:rubber_tree/sticky_resin"
+				id: "tinactory:wood/sticky_resin"
 			}
 			id: "5C65ABBA0E7F23DC"
 			tasks: [
 				{
 					id: "42A3E089B753FE91"
-					item: { count: 1, id: "tinactory:rubber_tree/sticky_resin" }
+					item: { count: 1, id: "tinactory:wood/sticky_resin" }
 					type: "item"
 				}
 				{

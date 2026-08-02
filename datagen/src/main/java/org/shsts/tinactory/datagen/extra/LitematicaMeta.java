@@ -63,7 +63,7 @@ public class LitematicaMeta extends MetaConsumer {
         }
 
         private static final Map<ResourceLocation, ResourceLocation> TAG_MAP = Map.of(
-            ResourceLocation.fromNamespaceAndPath("forge", "glass"), mcLoc("glass"),
+            ResourceLocation.fromNamespaceAndPath("c", "glass_blocks"), mcLoc("glass"),
             modLoc("multiblock/coil"), modLoc("multiblock/coil/cupronickel"),
             modLoc("multiblock/power"), modLoc("multiblock/misc/power_block/hv"),
             modLoc("multiblock/glass_casing"), modLoc("multiblock/misc/hardened_glass"),

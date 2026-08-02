@@ -93,11 +93,11 @@
     "C": "tinactory:multiblock/solid/solid_steel",
     "G": {
       "type": "tag",
-      "tag": "forge:glass"
+      "tag": "c:glass_blocks"
     },
     "W": {
       "type": "tag_or_block",
-      "tag": "forge:glass",
+      "tag": "c:glass_blocks",
       "block": "tinactory:multiblock/solid/solid_steel"
     },
     "A": "air"

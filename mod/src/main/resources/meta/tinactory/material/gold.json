@@ -28,6 +28,7 @@
   "existings": {
     "nugget": "minecraft:gold_nugget",
     "raw": "minecraft:raw_gold",
-    "ingot": "minecraft:gold_ingot"
+    "ingot": "minecraft:gold_ingot",
+    "block": "minecraft:gold_block"
   }
 }

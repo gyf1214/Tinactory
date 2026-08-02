@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.material
 
 import net.minecraft.tags.BlockTags
+import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllTags.FLUID_STORAGE_CELL
@@ -32,8 +33,10 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.bacteriaVat
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.blastFurnace
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.centrifuge
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.chemicalReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.distillation
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fusionReactor
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -41,12 +44,17 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.stoneGenerato
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vacuumFreezer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.integration.material.OreVariant
 
 object MiscMaterials {
     fun init() {
-        itemData("rubber_tree/sticky_resin") {
+        val woodPulp = getItem("wood/wood_pulp")
+        itemData("wood/sticky_resin") {
             model(basicItem("metaitems/rubber_drop"))
+        }
+        itemData("wood/wood_pulp") {
+            model(basicItem("material_sets/dull/dust"))
         }
 
         blockData("material/block/coke") {
@@ -64,9 +72,11 @@ object MiscMaterials {
         disableVanilla("lapis", "lazuli")
         disableVanilla("emerald", "")
         vanilla {
-            nullRecipe("quartz", "quartz_from_blasting", "quartz_block")
-            nullRecipe("netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block")
-            nullRecipe("netherite_scrap", "netherite_scrap_from_blasting")
+            nullRecipe(
+                "quartz", "quartz_from_blasting", "quartz_block",
+                "netherite_block", "netherite_ingot", "netherite_ingot_from_netherite_block",
+                "netherite_scrap", "netherite_scrap_from_blasting",
+                Items.NETHER_WART_BLOCK, Items.PAPER, Items.SLIME_BLOCK, Items.SLIME_BALL)
         }
 
         // smelt iron nugget to wrought iron
@@ -209,6 +219,146 @@ object MiscMaterials {
             }
         }
 
+        vanilla {
+            nullRecipe(
+                "bone_meal", "bone_meal_from_bone_block", "bone_block",
+                Items.MAGMA_BLOCK, Items.MAGMA_CREAM, Items.FIRE_CHARGE,
+                Items.LEATHER, Items.CLAY, Items.MUDDY_MANGROVE_ROOTS, Items.SNOW, Items.SNOW_BLOCK)
+        }
+
+        macerator {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(128)
+            }
+            output(Items.BONE_MEAL, 3) {
+                input(Items.BONE)
+            }
+            output(Items.BONE_MEAL, 9, suffix = "_from_bone_block") {
+                input(Items.BONE_BLOCK)
+            }
+            output(Items.GLOWSTONE_DUST, 4) {
+                input(Items.GLOWSTONE)
+            }
+            output(woodPulp, suffix = "_from_stick") {
+                input(Items.STICK)
+            }
+            output(woodPulp, 2, suffix = "_from_planks") {
+                input(ItemTags.PLANKS)
+            }
+            output(woodPulp, 8, suffix = "_from_logs") {
+                input(ItemTags.LOGS)
+            }
+        }
+
+        mixer {
+            output(Items.PAPER) {
+                input(woodPulp)
+                input("water", amount = 0.05)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+        }
+
+        implosionCompressor {
+            output(Items.BONE_BLOCK, 2) {
+                input(Items.BONE_MEAL, 18)
+                input(Items.TNT, port = 1)
+                voltage(Voltage.LV)
+            }
+            output(Items.SLIME_BLOCK, 2) {
+                input(Items.SLIME_BALL, 18)
+                input(Items.TNT, port = 1)
+                voltage(Voltage.HV)
+            }
+        }
+
+        cutter {
+            output(Items.BONE, 3) {
+                input(Items.BONE_BLOCK)
+                input("water", amount = 0.05)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            output(Items.MAGMA_CREAM, 4) {
+                input(Items.MAGMA_BLOCK)
+                input("water", amount = 0.1)
+                voltage(Voltage.LV)
+                workTicks(128)
+            }
+            output(Items.SNOW, 2) {
+                input(Items.SNOW_BLOCK)
+                input("water", amount = 0.1)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+        }
+
+        centrifuge {
+            input(Items.MAGMA_CREAM) {
+                output(Items.SLIME_BALL)
+                output("lava", amount = 0.2)
+                voltage(Voltage.MV)
+                workTicks(120)
+            }
+        }
+
+        mixer {
+            defaults {
+                voltage(Voltage.MV)
+            }
+            output(Items.MAGMA_CREAM) {
+                input(Items.SLIME_BALL)
+                input("lava", amount = 0.2)
+                workTicks(40)
+            }
+            output(Items.FIRE_CHARGE, 3) {
+                input(Items.GUNPOWDER)
+                input(Items.BLAZE_POWDER)
+                input(ItemTags.COALS)
+                workTicks(192)
+            }
+        }
+
+        mixer {
+            defaults {
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+            output(Items.CLAY) {
+                input(Items.CLAY_BALL, 4)
+            }
+            output(Items.MUDDY_MANGROVE_ROOTS) {
+                input(Items.MUD)
+                input(Items.MANGROVE_ROOTS)
+            }
+            output(Items.SNOWBALL, 2) {
+                input(Items.ICE)
+                input("water", amount = 0.1)
+            }
+            output(Items.SNOW_BLOCK) {
+                input(Items.SNOWBALL, 4)
+            }
+        }
+
+        wiremill {
+            output(Items.STRING) {
+                input("rubber", "foil")
+                voltage(Voltage.LV)
+                workTicks(32)
+            }
+        }
+
+        chemicalReactor {
+            output(Items.LEATHER) {
+                input(Items.STRING)
+                input("pvc", amount = 0.5)
+                voltage(Voltage.MV)
+                workTicks(96)
+                tech(Technologies.ORGANIC_CHEMISTRY)
+            }
+        }
+
         generateStone()
         stone()
         naquadahProcessing()
@@ -297,12 +447,12 @@ object MiscMaterials {
                 nullRecipe("raw_$name")
                 nullRecipe("raw_${name}_block")
                 if (name == "copper") {
-                    nullRecipe(fullName)
-                    nullRecipe("${fullName}_from_waxed_copper_block")
+                    nullRecipe(fullName, "${fullName}_from_waxed_copper_block")
                 } else {
-                    nullRecipe("${fullName}_from_${name}_block")
-                    nullRecipe("${fullName}_from_nuggets")
-                    nullRecipe("${name}_nugget")
+                    nullRecipe(
+                        "${fullName}_from_${name}_block",
+                        "${fullName}_from_nuggets",
+                        "${name}_nugget")
                     for (method in VANILLA_METHODS) {
                         nullRecipe("${name}_nugget_from_$method")
                     }
@@ -442,6 +592,7 @@ object MiscMaterials {
             tag(TOOL_WIRE_CUTTER, TOOL)
             tag(itemKey(Items.SHEARS), TOOL_SHEARS)
             tag(itemKey(Items.STICK), TOOL_HANDLE)
+            tag(getMaterial("iron").tag("stick"), TOOL_HANDLE)
             tag(getMaterial("iron").tag("screw"), TOOL_SCREW)
 
             for (base in OreVariant.entries) {
@@ -451,6 +602,8 @@ object MiscMaterials {
             tag(ITEM_STORAGE_CELL, STORAGE_CELL)
             tag(FLUID_STORAGE_CELL, STORAGE_CELL)
             tag(PATTERN_STORAGE_CELL, STORAGE_CELL)
+
+            tag(getMaterial("coke").tag("primary"), ItemTags.COALS)
         }
     }
 }

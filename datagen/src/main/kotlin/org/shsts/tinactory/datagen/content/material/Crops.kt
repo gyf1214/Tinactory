@@ -13,6 +13,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.component.Components.COMPONENT_TICKS
 
 object Crops {
@@ -34,17 +35,9 @@ object Crops {
         farm(Items.BROWN_MUSHROOM)
         farm(Items.RED_MUSHROOM)
         farm(Items.NETHER_WART)
-        farm(Items.CRIMSON_FUNGUS)
-        farm(Items.WARPED_FUNGUS)
-
-        // cut melon
-        cutter {
-            output(Items.MELON_SLICE, 9) {
-                input(Items.MELON)
-                voltage(Voltage.LV)
-                workTicks(128)
-            }
-        }
+        farm(Items.BAMBOO)
+        farm(Items.TORCHFLOWER, Items.TORCHFLOWER_SEEDS, true)
+        farm(Items.PITCHER_PLANT, Items.PITCHER_POD, true)
 
         // crop to seed
         toSeed(Items.WHEAT, Items.WHEAT_SEEDS)
@@ -84,14 +77,18 @@ object Crops {
         biomass(Items.PUMPKIN_SEEDS, 16, 1.6, 64)
 
         // sifting seeds
-        siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT)
-        siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO)
-        siftSeed(Items.PODZOL, Items.COCOA_BEANS, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM)
+        siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT, Items.BAMBOO)
+        siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO, Items.TORCHFLOWER_SEEDS)
+        siftSeed(Items.PODZOL, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM, Items.MANGROVE_PROPAGULE, Items.PITCHER_POD)
         siftSeed(Items.SAND, Items.CACTUS, Items.SUGAR_CANE, Items.KELP, Items.SEA_PICKLE)
         siftSeed(Items.MOSS_BLOCK, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.AZALEA, Items.FLOWERING_AZALEA)
-        siftSeed(Items.SOUL_SOIL, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
+        siftSeed(Items.SOUL_SOIL, Items.COCOA_BEANS, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
 
         // misc
+        vanilla {
+            nullRecipe(Items.MELON)
+            nullRecipe("sugar_from_sugar_cane")
+        }
         assembler {
             defaults {
                 voltage(Voltage.ULV)
@@ -103,6 +100,26 @@ object Crops {
             }
             output(Items.WHEAT, 9) {
                 input(Items.HAY_BLOCK)
+            }
+            output(Items.DRIED_KELP_BLOCK) {
+                input(Items.DRIED_KELP, 9)
+            }
+            output(Items.DRIED_KELP, 9) {
+                input(Items.DRIED_KELP_BLOCK)
+            }
+        }
+        macerator {
+            output(Items.SUGAR) {
+                input(Items.SUGAR_CANE)
+                voltage(Voltage.LV)
+                workTicks(64)
+            }
+        }
+        cutter {
+            output(Items.MELON_SLICE, 9) {
+                input(Items.MELON)
+                voltage(Voltage.LV)
+                workTicks(128)
             }
         }
     }
@@ -160,7 +177,7 @@ object Crops {
         }
     }
 
-    private fun siftSeed(base: Item, vararg items: Item, rate: Double = 0.1) {
+    fun siftSeed(base: ItemLike, vararg items: ItemLike, rate: Double = 0.1) {
         sifter {
             input(base) {
                 for (item in items) {

@@ -22,6 +22,7 @@
     "fluid": "molten"
   },
   "existings": {
-    "ingot": "minecraft:copper_ingot"
+    "ingot": "minecraft:copper_ingot",
+    "block": "minecraft:copper_block"
   }
 }

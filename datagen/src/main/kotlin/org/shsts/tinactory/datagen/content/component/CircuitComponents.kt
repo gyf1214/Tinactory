@@ -386,7 +386,7 @@ object CircuitComponents {
 
     private fun circuitComponents() {
         componentTier(CircuitComponentTier.NORMAL) {
-            val resin = getItem("rubber_tree/sticky_resin")
+            val resin = getItem("wood/sticky_resin")
             vanilla {
                 shaped(getCircuitComponent("resistor").item(tier)) {
                     pattern(" R ")
@@ -671,7 +671,7 @@ object CircuitComponents {
 
     private fun boards() {
         circuitTier(CircuitTier.ELECTRONIC) {
-            val resin = getItem("rubber_tree/sticky_resin")
+            val resin = getItem("wood/sticky_resin")
             vanilla {
                 shaped(board, 3) {
                     pattern("SSS")
@@ -849,8 +849,8 @@ object CircuitComponents {
                 }
             }
             extractor {
-                output(getItem("component/stem_cell")) {
-                    input("cultivated_bacteria", "fluid", 0.1)
+                input("cultivated_bacteria", "fluid", 0.1) {
+                    output(getItem("component/stem_cell"))
                     voltage(Voltage.LUV)
                     workTicks(160)
                 }

@@ -80,7 +80,7 @@ public final class DependencyChecker {
     private static final ResourceLocation MINECRAFT_SMELTING = mcLoc("smelting");
     private static final ResourceLocation MULTI_SMELTER = modLoc("multi_smelter");
     private static final ResourceLocation NUCLEAR_REACTOR = modLoc("nuclear_reactor");
-    private static final ResourceLocation STICKY_RESIN = modLoc("rubber_tree/sticky_resin");
+    private static final ResourceLocation STICKY_RESIN = modLoc("wood/sticky_resin");
     private static final ResourceLocation TOOL_CRAFTING = modLoc("tool_crafting");
     private static final List<ResourceLocation> BOILER_BLOCKS = List.of(
         modLoc("machine/boiler/low"),

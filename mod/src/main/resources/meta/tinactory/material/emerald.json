@@ -18,6 +18,7 @@
     "primary": "gem"
   },
   "existings": {
-    "gem": "minecraft:emerald"
+    "gem": "minecraft:emerald",
+    "block": "minecraft:emerald_block"
   }
 }

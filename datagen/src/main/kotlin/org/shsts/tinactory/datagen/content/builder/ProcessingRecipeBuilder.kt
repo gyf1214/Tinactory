@@ -63,7 +63,11 @@ abstract class ProcessingRecipeBuilder<R : ProcessingRecipe, B : ProcessingRecip
 
     fun input(item: ItemLike, amount: Int = 1, port: Int = defaultInputItem!!) {
         recordItemInput(item, amount)
-        inputs += ProcessingRecipe.Input(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
+        inputs += if (amount > 0) {
+            ProcessingRecipe.Input(port, ProcessingHelper.itemIngredient(ItemStack(item, amount)))
+        } else {
+            ProcessingRecipe.Input(port, ProcessingHelper.notConsumedItemIngredient(item))
+        }
     }
 
     fun input(fluid: Fluid, amount: Int, port: Int = defaultInputFluid!!) {

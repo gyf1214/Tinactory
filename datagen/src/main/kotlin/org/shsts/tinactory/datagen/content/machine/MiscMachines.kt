@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.content.machine
 
+import net.minecraft.data.recipes.RecipeCategory
 import net.minecraft.data.recipes.ShapedRecipeBuilder
 import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
@@ -10,15 +11,19 @@ import org.shsts.tinactory.AllBlockEntities.WORKBENCH
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllRecipes.hasItem
+import org.shsts.tinactory.AllRecipes.hasTag
 import org.shsts.tinactory.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.AllTags.TOOL_WRENCH
 import org.shsts.tinactory.AllTags.circuit
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
+import org.shsts.tinactory.datagen.content.RegistryHelper.vanillaItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.ProcessingRecipeBuilder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.laserEngraver
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.toolCrafting
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactory
@@ -314,6 +319,36 @@ object MiscMachines {
         }
     }
 
+    private fun template(output: ItemLike, lens: String, mat: String? = null, base: ItemLike? = null,
+        disable: Boolean = true) {
+        if (disable) {
+            vanilla {
+                nullRecipe(output)
+            }
+        }
+        laserEngraver {
+            output(output) {
+                if (mat != null) {
+                    input(mat, "plate")
+                } else if (base != null) {
+                    input(base)
+                }
+                input(lens, "lens", 0, port = 1)
+                voltage(Voltage.MV)
+                workTicks(256)
+                requireCleanness(-0.5, 0.5)
+            }
+        }
+    }
+
+    private fun trim(output: String, mat: String, lens: String) {
+        template(vanillaItem("${output}_armor_trim_smithing_template"), lens, mat = mat)
+    }
+
+    private fun pattern(output: String, lens: String, disable: Boolean) {
+        template(vanillaItem("${output}_banner_pattern"), lens, base = Items.PAPER, disable = disable)
+    }
+
     private fun vanillas() {
         toolCrafting {
             result(Items.HOPPER) {
@@ -353,6 +388,10 @@ object MiscMachines {
             output(Items.CHEST) {
                 input(ItemTags.PLANKS, 8)
             }
+            output(Items.BARREL) {
+                input(ItemTags.PLANKS, 6)
+                input(ItemTags.WOODEN_SLABS, 2)
+            }
             output(Items.HOPPER) {
                 input(Items.CHEST)
                 input("iron", "plate", 4)
@@ -361,10 +400,61 @@ object MiscMachines {
                 input("iron", "plate", 2)
                 input("iron", "stick")
             }
+            output(Items.RAIL, 16) {
+                input(ItemTags.WOODEN_SLABS)
+                input("iron", "stick", 6)
+            }
+            output(Items.POWERED_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input("gold", "bolt", 6)
+                input("redstone", "dust")
+            }
+            output(Items.DETECTOR_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input(Items.STONE_PRESSURE_PLATE)
+                input("redstone", "dust")
+            }
+            output(Items.ACTIVATOR_RAIL, 8) {
+                input(Items.RAIL, 8)
+                input("iron", "ring", 6)
+                input(Items.REDSTONE_TORCH)
+            }
+            output(Items.MINECART) {
+                input("iron", "plate", 2)
+                input("iron", "stick", 2)
+                input("iron", "ring", 4)
+            }
             output(Items.TORCH, 6) {
                 input(Items.STICK)
                 input("sulfur", "dust")
                 workTicks(64)
+            }
+            output(Items.SOUL_TORCH, 6) {
+                input(Items.STICK)
+                input("sulfur", "dust")
+                input(ItemTags.SOUL_FIRE_BASE_BLOCKS)
+                workTicks(64)
+            }
+            output(Items.GLOWSTONE) {
+                input(Items.GLOWSTONE_DUST, 4)
+            }
+            output(Items.ARMOR_STAND) {
+                input(Items.STICK, 6)
+                input(Items.SMOOTH_STONE_SLAB)
+            }
+            output(Items.CANDLE) {
+                input(Items.STRING)
+                input(Items.HONEYCOMB)
+            }
+            output(Items.LANTERN) {
+                input(Items.TORCH)
+                input("iron", "ring", 2)
+                input("iron", "screw", 2)
+            }
+            output(Items.SOUL_LANTERN) {
+                input(Items.SOUL_TORCH)
+                input("iron", "ring", 2)
+                input("iron", "screw", 2)
             }
             output(Items.REDSTONE_TORCH) {
                 input(Items.STICK)
@@ -380,6 +470,56 @@ object MiscMachines {
                 input("iron", "plate", 2)
                 input(Items.STICK, 2)
                 input(Items.REDSTONE_TORCH)
+            }
+            output(Items.PAINTING) {
+                input(ItemTags.WOOL)
+                input(Items.STICK, 8)
+            }
+            output(Items.ITEM_FRAME) {
+                input(Items.LEATHER)
+                input(Items.STICK, 8)
+            }
+            output(Items.LEAD) {
+                input(Items.STRING, 2)
+                input("rubber", amount = 0.5)
+            }
+            output(Items.LADDER) {
+                input(Items.STICK, 2)
+                input("iron", "bolt")
+            }
+            output(Items.LOOM) {
+                input(ItemTags.PLANKS, 2)
+                input(Items.STRING, 2)
+                input("iron", "stick")
+                input("redstone", "dust")
+            }
+            output(Items.SCAFFOLDING, 6) {
+                input(Items.STICK, 6)
+                input(Items.STRING)
+            }
+            output(Items.BOOK) {
+                input(Items.PAPER, 3)
+                input(Items.LEATHER)
+                input(Items.STRING)
+            }
+            output(Items.BOOKSHELF) {
+                input(ItemTags.PLANKS, 6)
+                input(Items.BOOK, 3)
+            }
+            output(Items.CHISELED_BOOKSHELF) {
+                input(ItemTags.PLANKS, 6)
+                input(ItemTags.WOODEN_SLABS, 3)
+            }
+            output(Items.LECTERN) {
+                input(Items.BOOKSHELF)
+                input(ItemTags.WOODEN_SLABS, 4)
+            }
+            output(Items.FLOWER_POT) {
+                input("iron", "ring")
+                input(Items.BRICK, 2)
+            }
+            output(Items.GLASS_BOTTLE) {
+                input(Items.GLASS_PANE, 3)
             }
         }
 
@@ -407,6 +547,11 @@ object MiscMachines {
                 input("redstone", "dust", 2)
                 input("iron", "plate", 2)
             }
+            output(Items.COPPER_BULB) {
+                circuit(1)
+                input("redstone", "dust", 3)
+                input("copper", "plate", 3)
+            }
             output(Items.REDSTONE_BLOCK) {
                 circuit(1)
                 input("redstone", "dust", 9)
@@ -415,6 +560,11 @@ object MiscMachines {
                 circuit(1)
                 input(Items.CHEST)
                 input(Items.REDSTONE_TORCH)
+            }
+            output(Items.SEA_LANTERN) {
+                circuit(1)
+                input(Items.PRISMARINE_CRYSTALS, 4)
+                input(Items.PRISMARINE_SHARD, 4)
             }
 
             componentVoltage = Voltage.LV
@@ -465,32 +615,36 @@ object MiscMachines {
             }
         }
 
-        vanilla {
+        vanilla(replace = true) {
+            shapeless(Items.WRITABLE_BOOK) {
+                requires(Items.BOOK)
+                requires(Items.BLACK_DYE)
+                requires(Items.FEATHER)
+                unlockedBy("has_book", hasItem(Items.BOOK))
+            }
+
+            shapeless(Items.FLINT_AND_STEEL, category = RecipeCategory.TOOLS) {
+                val steel = getMaterial("steel").tag("ingot")
+                requires(steel)
+                requires(Items.FLINT)
+                unlockedBy("has_steel", hasTag(steel))
+            }
+
             nullRecipe(
                 Items.BLAST_FURNACE,
-                Items.SMOKER,
                 Items.STONECUTTER,
-                Items.FLETCHING_TABLE,
-                Items.CARTOGRAPHY_TABLE,
-                Items.GRINDSTONE,
-                Items.CAMPFIRE,
-                Items.SOUL_CAMPFIRE,
-                Items.ENCHANTING_TABLE,
-                Items.ANVIL,
-                Items.SMITHING_TABLE,
-                Items.CAULDRON,
-                Items.BREWING_STAND,
                 Items.COMPOSTER,
-                Items.RESPAWN_ANCHOR,
+                Items.CRAFTER,
+                Items.CHISELED_BOOKSHELF,
                 Items.GLOWSTONE,
+                Items.SHULKER_BOX,
+                "shulker_box_coloring",
+                Items.ARMOR_STAND,
+                Items.CANDLE,
+                Items.LANTERN,
+                Items.SOUL_LANTERN,
                 Items.BUCKET,
-                Items.SHEARS,
-                Items.FLINT_AND_STEEL,
                 Items.TNT,
-                Items.SPYGLASS,
-                Items.COMPASS,
-                Items.CROSSBOW,
-                Items.CLOCK,
                 Items.REDSTONE_TORCH,
                 Items.TARGET,
                 Items.NOTE_BLOCK,
@@ -508,29 +662,58 @@ object MiscMachines {
                 Items.OBSERVER,
                 Items.HOPPER,
                 Items.MINECART,
-                Items.CHEST_MINECART,
-                Items.TNT_MINECART,
-                Items.HOPPER_MINECART,
-                Items.FURNACE_MINECART,
                 Items.RAIL,
                 Items.POWERED_RAIL,
                 Items.DETECTOR_RAIL,
                 Items.ACTIVATOR_RAIL,
                 Items.LEVER,
-                Items.STONE_PRESSURE_PLATE,
-                Items.POLISHED_BLACKSTONE_PRESSURE_PLATE,
-                Items.LIGHT_WEIGHTED_PRESSURE_PLATE,
-                Items.HEAVY_WEIGHTED_PRESSURE_PLATE,
-                Items.STONE_BUTTON,
-                Items.POLISHED_BLACKSTONE_BUTTON,
                 Items.PACKED_ICE,
                 Items.BLUE_ICE,
                 Items.BLAZE_POWDER,
                 Items.ENDER_EYE,
                 Items.END_CRYSTAL,
                 Items.ENDER_CHEST,
-                Items.BEACON)
+                Items.PAINTING,
+                Items.ITEM_FRAME,
+                Items.LEAD,
+                Items.LOOM,
+                Items.BOOK,
+                Items.BOOKSHELF,
+                Items.LECTERN,
+                Items.FLOWER_POT,
+                Items.GLASS_BOTTLE,
+                Items.SEA_LANTERN)
         }
+
+        template(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE, "ender_eye", mat = "stainless_steel")
+
+        trim("sentry", "steel", "ruby")
+        trim("dune", "steel", "diamond")
+        trim("coast", "steel", "sapphire")
+        trim("wild", "steel", "emerald")
+        trim("ward", "steel", "topaz")
+        trim("eye", "steel", "blue_topaz")
+        trim("vex", "annealed_copper", "ruby")
+        trim("tide", "annealed_copper", "diamond")
+        trim("snout", "annealed_copper", "sapphire")
+        trim("rib", "annealed_copper", "emerald")
+        trim("spire", "annealed_copper", "topaz")
+        trim("wayfinder", "annealed_copper", "blue_topaz")
+        trim("shaper", "tungsten_steel", "ruby")
+        trim("silence", "tungsten_steel", "diamond")
+        trim("raiser", "tungsten_steel", "sapphire")
+        trim("host", "tungsten_steel", "emerald")
+        trim("flow", "tungsten_steel", "topaz")
+        trim("bolt", "tungsten_steel", "blue_topaz")
+
+        pattern("flower", "ruby", true)
+        pattern("globe", "diamond", false)
+        pattern("creeper", "sapphire", true)
+        pattern("skull", "emerald", true)
+        pattern("piglin", "topaz", false)
+        pattern("flow", "blue_topaz", false)
+        pattern("guster", "ender_eye", false)
+        pattern("mojang", "nether_star", true)
     }
 
     private fun misc() {
