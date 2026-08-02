@@ -36,6 +36,8 @@ object Crops {
         farm(Items.RED_MUSHROOM)
         farm(Items.NETHER_WART)
         farm(Items.BAMBOO)
+        farm(Items.TORCHFLOWER, Items.TORCHFLOWER_SEEDS, true)
+        farm(Items.PITCHER_PLANT, Items.PITCHER_POD, true)
 
         // crop to seed
         toSeed(Items.WHEAT, Items.WHEAT_SEEDS)
@@ -76,11 +78,11 @@ object Crops {
 
         // sifting seeds
         siftSeed(Items.GRASS_BLOCK, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.CARROT, Items.BAMBOO)
-        siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO)
-        siftSeed(Items.PODZOL, Items.COCOA_BEANS, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM, Items.MANGROVE_PROPAGULE)
+        siftSeed(Items.DIRT, Items.PUMPKIN_SEEDS, Items.MELON_SEEDS, Items.POTATO, Items.TORCHFLOWER_SEEDS)
+        siftSeed(Items.PODZOL, Items.RED_MUSHROOM, Items.BROWN_MUSHROOM, Items.MANGROVE_PROPAGULE, Items.PITCHER_POD)
         siftSeed(Items.SAND, Items.CACTUS, Items.SUGAR_CANE, Items.KELP, Items.SEA_PICKLE)
         siftSeed(Items.MOSS_BLOCK, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.AZALEA, Items.FLOWERING_AZALEA)
-        siftSeed(Items.SOUL_SOIL, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
+        siftSeed(Items.SOUL_SOIL, Items.COCOA_BEANS, Items.NETHER_WART, Items.CRIMSON_FUNGUS, Items.WARPED_FUNGUS)
 
         // misc
         vanilla {

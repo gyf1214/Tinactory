@@ -332,8 +332,34 @@ object Woods {
         // seeding
         siftSeed(Items.FLOWERING_AZALEA, Items.OAK_SAPLING, Items.BIRCH_SAPLING, Items.CHERRY_SAPLING,
             RUBBER_SAPLING.get())
-        siftSeed(Items.AZALEA_LEAVES, Items.SPRUCE_SAPLING, Items.JUNGLE_SAPLING, Items.ACACIA_SAPLING,
+        siftSeed(Items.AZALEA, Items.SPRUCE_SAPLING, Items.JUNGLE_SAPLING, Items.ACACIA_SAPLING,
             Items.DARK_OAK_SAPLING)
+        siftSeed(Items.FLOWERING_AZALEA_LEAVES, Items.DANDELION, Items.POPPY, Items.BLUE_ORCHID,
+            Items.ALLIUM, Items.AZURE_BLUET, Items.OXEYE_DAISY)
+        siftSeed(Items.AZALEA_LEAVES, Items.RED_TULIP, Items.ORANGE_TULIP, Items.WHITE_TULIP,
+            Items.PINK_TULIP, Items.CORNFLOWER, Items.LILY_OF_THE_VALLEY)
+        siftSeed(Items.CHERRY_LEAVES, Items.WITHER_ROSE, Items.SUNFLOWER, Items.LILAC,
+            Items.PEONY, Items.ROSE_BUSH, Items.HONEYCOMB)
+
+        // bee
+        autofarm {
+            defaults {
+                input("water")
+                voltage(Voltage.LV)
+            }
+            input(Items.HONEYCOMB) {
+                input(ItemTags.FLOWERS, 2, port = 2)
+                output(Items.HONEY_BLOCK)
+                output(Items.HONEYCOMB, 3)
+                workTicks(800)
+            }
+            input(Items.BEEHIVE, 0) {
+                input(ItemTags.FLOWERS, 6, port = 2)
+                output(Items.HONEY_BLOCK, 2)
+                output(Items.HONEYCOMB, 3)
+                workTicks(800)
+            }
+        }
 
         // bamboo stuff
         vanilla {
