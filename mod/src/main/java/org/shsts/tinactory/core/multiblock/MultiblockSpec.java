@@ -23,25 +23,9 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
     public static final char IGNORED_CHAR = ' ';
     public static final char CENTER_CHAR = '$';
 
-    public static class Layer {
-        private final List<String> rows;
-        private final int minHeight;
-        private final int maxHeight;
-
-        public Layer(LayerBuilder<?, ?> builder) {
-            this.rows = builder.rows;
-            this.minHeight = builder.minHeight;
-            this.maxHeight = builder.maxHeight;
-        }
-
-        public char get(int w, int d) {
-            return rows.get(d).charAt(w);
-        }
-    }
-
-    private final List<Layer> layers;
+    private final List<MultiblockLayer> layers;
     private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers;
-    private final Layer centerLayer;
+    private final MultiblockLayer centerLayer;
     private final int centerLayerIdx;
     private final int centerW;
     private final int centerD;
@@ -84,7 +68,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
         return true;
     }
 
-    private Optional<List<BlockPos>> checkLayer(IMultiblockCheckCtx<S> ctx, Layer layer, BlockPos base,
+    private Optional<List<BlockPos>> checkLayer(IMultiblockCheckCtx<S> ctx, MultiblockLayer layer, BlockPos base,
         int y, Direction dirW, Direction dirD) {
         var blocks = new ArrayList<BlockPos>();
         for (var d = 0; d < depth; d++) {
@@ -112,7 +96,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
         return Optional.of(blocks);
     }
 
-    private boolean checkLayer(IMultiblockCheckCtx<S> ctx, Layer layer, boolean reverse) {
+    private boolean checkLayer(IMultiblockCheckCtx<S> ctx, MultiblockLayer layer, boolean reverse) {
         var dirW = (Direction) ctx.getProperty("dirW");
         var dirD = (Direction) ctx.getProperty("dirD");
         var base = (BlockPos) ctx.getProperty("base");
@@ -175,7 +159,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
     }
 
     public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {
-        private final List<Layer> layers = new ArrayList<>();
+        private final List<MultiblockLayer> layers = new ArrayList<>();
         private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers = new HashMap<>();
         private int centerLayerIdx = -1;
         private int centerW;
@@ -187,12 +171,12 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
             super(parent);
         }
 
-        public LayerBuilder<S, P> layer() {
-            return new LayerBuilder<>(this)
+        public MultiblockLayer.Builder<Builder<S, P>> layer() {
+            return new MultiblockLayer.Builder<>(this)
                 .onCreateObject(l -> {
                     layers.add(l);
-                    var w = l.rows.getFirst().length();
-                    var d = l.rows.size();
+                    var w = l.width();
+                    var d = l.depth();
                     if (width == 0) {
                         width = w;
                         depth = d;
@@ -251,64 +235,6 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
         protected MultiblockSpec<S> createObject() {
             validate();
             return new MultiblockSpec<>(this);
-        }
-    }
-
-    public static class LayerBuilder<S, P> extends SimpleBuilder<Layer, Builder<S, P>, LayerBuilder<S, P>> {
-        private final List<String> rows = new ArrayList<>();
-        private int minHeight = 1;
-        private int maxHeight = 1;
-
-        private LayerBuilder(Builder<S, P> parent) {
-            super(parent);
-        }
-
-        public LayerBuilder<S, P> height(int val) {
-            minHeight = val;
-            maxHeight = val;
-            return this;
-        }
-
-        // TODO: deal with the problem that the "try" test will modify property
-        public LayerBuilder<S, P> height(int min, int max) {
-            minHeight = min;
-            maxHeight = max;
-            return this;
-        }
-
-        public LayerBuilder<S, P> row(String str) {
-            rows.add(str);
-            return this;
-        }
-
-        private int checkWidth() {
-            var width = 0;
-            for (var row : rows) {
-                if (row.isEmpty()) {
-                    continue;
-                }
-                if (width == 0) {
-                    width = row.length();
-                } else if (width != row.length()) {
-                    throw new IllegalArgumentException("layer rows are not same size");
-                }
-            }
-            if (width == 0) {
-                throw new IllegalArgumentException("has no row with width");
-            }
-            return width;
-        }
-
-        @Override
-        protected Layer createObject() {
-            var width = checkWidth();
-            var emptyRow = " ".repeat(width);
-            for (var i = 0; i < rows.size(); i++) {
-                if (rows.get(i).isEmpty()) {
-                    rows.set(i, emptyRow);
-                }
-            }
-            return new Layer(this);
         }
     }
 
