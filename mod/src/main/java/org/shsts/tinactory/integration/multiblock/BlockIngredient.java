@@ -9,6 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +21,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BlockIngredient implements Predicate<BlockState> {
+public final class BlockIngredient implements IBlockIngredient {
     private final List<Value> values;
     private List<Block> expanded = null;
 
