@@ -810,7 +810,7 @@ object Multiblocks {
             multiblock("prospecting_station", "stable_titanium", "blast_furnace")
             multiblock("electrochemical_processor", "stable_titanium", "blast_furnace")
             getMultiblock("large_turbine").apply {
-                block(block) {
+                block(controller) {
                     blockState { ctx ->
                         val prov = ctx.provider()
                         val models = prov.models()
@@ -844,7 +844,7 @@ object Multiblocks {
     private fun BlockDataFactory.multiblock(name: String, casing: ResourceLocation, overlay: ResourceLocation,
         block: IBlockDataBuilder<out Block, *>.() -> Unit = {}) {
         val set = getMultiblock(name)
-        block(set.block) {
+        block(set.controller) {
             machineModel {
                 casing(casing)
                 overlay(overlay)
@@ -1213,6 +1213,6 @@ object Multiblocks {
     }
 
     private fun AssemblyRecipeFactory.multiblock(name: String, block: SimpleAssemblyRecipeBuilder.() -> Unit) {
-        output(getMultiblock(name).block.get(), block = block)
+        output(getMultiblock(name).controller.get(), block = block)
     }
 }

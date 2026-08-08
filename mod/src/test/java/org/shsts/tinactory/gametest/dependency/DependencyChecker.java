@@ -25,6 +25,7 @@ import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingIngredient;
 import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.content.machine.ProcessingSet;
@@ -43,7 +44,6 @@ import org.shsts.tinactory.core.recipe.ProcessingRecipe;
 import org.shsts.tinactory.core.recipe.ResearchRecipe;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.multiblock.BlockIngredient;
 import org.shsts.tinactory.integration.recipe.ItemsIngredient;
 import org.shsts.tinactory.integration.recipe.ProcessingHelper;
 import org.shsts.tinactory.integration.recipe.TagIngredient;
@@ -403,7 +403,7 @@ public final class DependencyChecker {
             var multiblockId = modLoc(entry.getKey());
             var set = entry.getValue();
             var requirements = new ArrayList<IDependencyNode>();
-            stackNode(new ItemStack(set.block().get())).ifPresent(requirements::add);
+            stackNode(new ItemStack(set.controller().get())).ifPresent(requirements::add);
             for (var i = 0; i < set.structureIngredients().size(); i++) {
                 blockIngredientNode(set.structureIngredients().get(i), multiblockId, i).ifPresent(requirements::add);
             }
@@ -773,7 +773,7 @@ public final class DependencyChecker {
         return Optional.of(node);
     }
 
-    private Optional<IDependencyNode> blockIngredientNode(BlockIngredient ingredient,
+    private Optional<IDependencyNode> blockIngredientNode(IBlockIngredient ingredient,
         ResourceLocation multiblockId, int inputIndex) {
         var candidates = ingredient.expand(registryAccess).stream()
             .map(ItemStack::new)
