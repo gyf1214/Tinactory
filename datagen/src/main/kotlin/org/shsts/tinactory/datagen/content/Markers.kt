@@ -154,6 +154,7 @@ object Markers {
     private fun trackJEICategory() {
         val allTypes = buildList {
             add(modLoc("tool_crafting"))
+            add(modLoc("multiblock_structure"))
             for (type in PROCESSING_TYPES.values) {
                 add(type.recipeType.loc())
             }

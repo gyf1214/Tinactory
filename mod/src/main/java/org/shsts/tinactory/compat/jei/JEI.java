@@ -25,6 +25,7 @@ import org.shsts.tinactory.compat.jei.category.BlastFurnaceCategory;
 import org.shsts.tinactory.compat.jei.category.ChemicalReactorCategory;
 import org.shsts.tinactory.compat.jei.category.CleanCategory;
 import org.shsts.tinactory.compat.jei.category.DistillationCategory;
+import org.shsts.tinactory.compat.jei.category.MultiblockCategory;
 import org.shsts.tinactory.compat.jei.category.ProcessingCategory;
 import org.shsts.tinactory.compat.jei.category.RecipeCategory;
 import org.shsts.tinactory.compat.jei.category.ResearchCategory;
@@ -58,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.shsts.tinactory.AllMultiblocks.MULTIBLOCK_SETS;
 import static org.shsts.tinactory.AllRecipes.PROCESSING_TYPES;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
@@ -70,6 +72,8 @@ public class JEI implements IModPlugin {
 
     @Nullable
     private ToolCategory toolCategory = null;
+    @Nullable
+    private MultiblockCategory multiblockCategory = null;
     private final List<RecipeCategory<?>> categories;
 
     public JEI() {
@@ -130,6 +134,7 @@ public class JEI implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         categories.clear();
         toolCategory = new ToolCategory();
+        multiblockCategory = new MultiblockCategory(registration.getJeiHelpers().getGuiHelper());
         categories.add(toolCategory);
         for (var type : PROCESSING_TYPES.values()) {
             addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
@@ -137,6 +142,7 @@ public class JEI implements IModPlugin {
         for (var category : categories) {
             category.registerCategory(registration);
         }
+        registration.addRecipeCategories(multiblockCategory);
     }
 
     @Override
@@ -145,6 +151,7 @@ public class JEI implements IModPlugin {
         for (var category : categories) {
             category.registerRecipes(registration, recipeManager);
         }
+        registration.addRecipes(MultiblockCategory.TYPE, new ArrayList<>(MULTIBLOCK_SETS.values()));
     }
 
     @Override
