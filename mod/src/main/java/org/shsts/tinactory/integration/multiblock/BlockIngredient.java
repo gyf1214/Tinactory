@@ -10,6 +10,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
+import org.shsts.tinycorelib.api.core.Transformer;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +21,7 @@ import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value {
+public class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value {
     private final List<Value> values;
     private List<Block> expanded = null;
 
@@ -104,5 +105,41 @@ public final class BlockIngredient implements IBlockIngredient, IBlockIngredient
                 .map(Holder::value)
                 .forEach(consumer);
         }
+    }
+
+    public record Display(IBlockIngredient ingredient, IBlockIngredient displayBlock,
+        Transformer<BlockState> displayState)
+        implements IBlockIngredient {
+        @Override
+        public List<Block> expand(HolderLookup.Provider provider) {
+            return ingredient.expand(provider);
+        }
+
+        @Override
+        public BlockState display(HolderLookup.Provider provider) {
+            return displayState.apply(displayBlock.display(provider));
+        }
+
+        @Override
+        public boolean test(BlockState blockState) {
+            return ingredient.test(blockState);
+        }
+    }
+
+    public static Value blockValue(Supplier<Block> block) {
+        return new BlockValue(block);
+    }
+
+    public static Value tagValue(TagKey<Block> tag) {
+        return new TagValue(tag);
+    }
+
+    public static IBlockIngredient withDisplay(IBlockIngredient ingredient, IBlockIngredient display) {
+        return new Display(ingredient, display, $ -> $);
+    }
+
+    public static IBlockIngredient withDisplay(IBlockIngredient ingredient,
+        IBlockIngredient displayBlock, Transformer<BlockState> displayState) {
+        return new Display(ingredient, displayBlock, displayState);
     }
 }

@@ -27,8 +27,6 @@ import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.multiblock.BlockIngredient;
-import org.shsts.tinactory.integration.multiblock.BlockIngredient.BlockValue;
-import org.shsts.tinactory.integration.multiblock.BlockIngredient.TagValue;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -271,8 +269,9 @@ public class MultiblockMeta extends MachineMeta {
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(new TagValue(tag), new BlockValue(block)),
-                        null, false);
+                    var ingredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
+                        BlockIngredient.blockValue(block));
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
@@ -351,8 +350,8 @@ public class MultiblockMeta extends MachineMeta {
             var base = BlockIngredient.of(baseBlock);
             var ceiling = BlockIngredient.of(ceilingBlock);
             var wall = BlockIngredient.of(wallTag);
-            var connector = BlockIngredient.of(getBlockTag(jo1, "connector"));
-            var door = BlockIngredient.of(getBlockTag(jo1, "door"));
+            var door = getBlockTag(jo1, "door");
+            var connector = getBlockTag(jo1, "connector");
             var maxSize = GsonHelper.getAsInt(jo1, "maxSize");
             var maxHeight = GsonHelper.getAsInt(jo1, "maxHeight");
             var maxConnectors = GsonHelper.getAsInt(jo1, "maxConnectors");
@@ -360,8 +359,8 @@ public class MultiblockMeta extends MachineMeta {
             structureIngredients.add(base);
             structureIngredients.add(ceiling);
             structureIngredients.add(wall);
-            display = new CleanroomDisplay(base, ceiling, wall, door, connector, maxSize, maxHeight, maxDoors,
-                maxConnectors);
+            display = new CleanroomDisplay(base, ceiling, wall, door, connector,
+                5, 5, maxSize, maxHeight, maxDoors, maxConnectors);
 
             var layout = parseLayout().buildLayout();
 
@@ -376,8 +375,8 @@ public class MultiblockMeta extends MachineMeta {
                 .baseBlock(baseBlock)
                 .ceilingBlock(ceilingBlock)
                 .wallTag(wallTag)
-                .connectorTag(getBlockTag(jo1, "connector"))
-                .doorTag(getBlockTag(jo1, "door"))
+                .doorTag(door)
+                .connectorTag(connector)
                 .maxSize(maxSize)
                 .maxHeight(maxHeight)
                 .maxConnectors(maxConnectors)
