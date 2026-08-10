@@ -8,6 +8,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -76,7 +77,8 @@ public class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value
 
     @Override
     public BlockState display(HolderLookup.Provider provider) {
-        return expand(provider).getFirst().defaultBlockState();
+        var expanded = expand(provider);
+        return (expanded.isEmpty() ? Blocks.AIR : expanded.getFirst()).defaultBlockState();
     }
 
     public record BlockValue(Supplier<? extends Block> block) implements Value {
@@ -132,10 +134,6 @@ public class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value
 
     public static Value tagValue(TagKey<Block> tag) {
         return new TagValue(tag);
-    }
-
-    public static IBlockIngredient withDisplay(IBlockIngredient ingredient, IBlockIngredient display) {
-        return new Display(ingredient, display, $ -> $);
     }
 
     public static IBlockIngredient withDisplay(IBlockIngredient ingredient,
