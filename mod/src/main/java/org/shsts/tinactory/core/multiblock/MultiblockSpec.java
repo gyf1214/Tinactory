@@ -12,6 +12,7 @@ import org.shsts.tinactory.core.builder.SimpleBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     private final int depth;
     private final int height;
     private final BlockPos controllerPosition;
+    private final List<RequiredIngredient> requiredIngredients;
 
     private MultiblockSpec(Builder<S, ?> builder) {
         this.layers = List.copyOf(builder.layers);
@@ -50,6 +52,32 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
         this.controllerPosition = new BlockPos(centerW, layers.subList(0, centerLayerIdx).stream()
             .mapToInt(layer -> layer.minHeight)
             .sum(), centerD);
+        this.requiredIngredients = createRequiredIngredients();
+    }
+
+    private List<RequiredIngredient> createRequiredIngredients() {
+        var ingredientIndexes = new IdentityHashMap<IBlockIngredient, Integer>();
+        var result = new ArrayList<RequiredIngredient>();
+        for (var y = 0; y < height; y++) {
+            for (var z = 0; z < depth; z++) {
+                for (var x = 0; x < width; x++) {
+                    var ingredient = getIngredient(x, y, z);
+                    if (ingredient.isEmpty()) {
+                        continue;
+                    }
+                    var value = ingredient.get();
+                    var index = ingredientIndexes.get(value);
+                    if (index == null) {
+                        ingredientIndexes.put(value, result.size());
+                        result.add(new RequiredIngredient(value, 1));
+                    } else {
+                        var required = result.get(index);
+                        result.set(index, new RequiredIngredient(value, required.count() + 1));
+                    }
+                }
+            }
+        }
+        return List.copyOf(result);
     }
 
     private boolean getDirections(IMultiblockCheckCtx<S> ctx) {
@@ -203,6 +231,11 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
             layerY += layer.minHeight;
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<RequiredIngredient> getRequiredIngredients() {
+        return requiredIngredients;
     }
 
     public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {

@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.unit.fixture.TestBlock;
 import org.shsts.tinactory.unit.fixture.TestContainer;
@@ -84,6 +85,52 @@ public class MultiblockSpecTest {
         assertSame(ingredient, display.getIngredient(0, 0, 0).orElseThrow());
         assertTrue(display.getIngredient(1, 0, 1).isEmpty());
         assertTrue(display.getIngredient(1, 2, 0).isEmpty());
+    }
+
+    @Test
+    void aggregatesOrderedRequiredIngredientsWithoutMaterializingMatchers() {
+        IBlockIngredient first = new IBlockIngredient() {
+            @Override
+            public boolean test(BlockState state) {
+                throw new AssertionError("requirements must not match ingredients");
+            }
+
+            @Override
+            public List<Block> expand(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not expand ingredients");
+            }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not display ingredients");
+            }
+        };
+        IBlockIngredient second = new IBlockIngredient() {
+            @Override
+            public boolean test(BlockState state) {
+                throw new AssertionError("requirements must not match ingredients");
+            }
+
+            @Override
+            public List<Block> expand(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not expand ingredients");
+            }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not display ingredients");
+            }
+        };
+        var spec = MultiblockSpec.<TestBlock, Void>builder(null)
+            .check('A', (ctx, pos) -> {}, first)
+            .check('B', (ctx, pos) -> {}, second);
+        spec.layer().height(2, 3).row("ABA").row(" $ ").build();
+        var display = spec.buildObject();
+
+        assertEquals(List.of(new IMultiblockDisplay.RequiredIngredient(first, 4),
+            new IMultiblockDisplay.RequiredIngredient(second, 2)), display.getRequiredIngredients());
+        assertThrows(UnsupportedOperationException.class, () -> display.getRequiredIngredients().add(null));
+        assertTrue(display.getDetailLines().isEmpty());
     }
 
     @Test
