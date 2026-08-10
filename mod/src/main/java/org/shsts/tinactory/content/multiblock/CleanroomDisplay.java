@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -16,6 +17,7 @@ import org.shsts.tinactory.integration.multiblock.BlockIngredient;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
 
+import java.util.List;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -24,6 +26,7 @@ public class CleanroomDisplay implements IMultiblockDisplay {
     private final IBlockIngredient base;
     private final IBlockIngredient ceiling;
     private final IBlockIngredient wall;
+    private final IBlockIngredient displayWall;
     private final IBlockIngredient doorLower;
     private final IBlockIngredient doorUpper;
     private final IBlockIngredient connector;
@@ -45,15 +48,16 @@ public class CleanroomDisplay implements IMultiblockDisplay {
         this.base = base;
         this.ceiling = ceiling;
 
-        this.wall = BlockIngredient.of(wall, BlockIngredient.tagValue(door),
+        this.wall = BlockIngredient.of(wall);
+        this.displayWall = BlockIngredient.of(wall, BlockIngredient.tagValue(door),
             BlockIngredient.tagValue(connector));
 
         var doorDisplay = BlockIngredient.of(door);
-        this.doorLower = BlockIngredient.withDisplay(this.wall, doorDisplay,
+        this.doorLower = BlockIngredient.withDisplay(displayWall, doorDisplay,
             setState(DoorBlock.HALF, DoubleBlockHalf.LOWER));
-        this.doorUpper = BlockIngredient.withDisplay(this.wall, doorDisplay,
+        this.doorUpper = BlockIngredient.withDisplay(displayWall, doorDisplay,
             setState(DoorBlock.HALF, DoubleBlockHalf.UPPER));
-        this.connector = BlockIngredient.withDisplay(this.wall, BlockIngredient.of(connector),
+        this.connector = BlockIngredient.withDisplay(displayWall, BlockIngredient.of(connector),
             setState(MachineBlock.IO_FACING, Direction.EAST));
 
         this.displaySize = displaySize;
@@ -121,7 +125,24 @@ public class CleanroomDisplay implements IMultiblockDisplay {
             return Optional.of(connector);
         }
 
-        return Optional.of(wall);
+        return Optional.of(displayWall);
+    }
+
+    @Override
+    public List<RequiredIngredient> getRequiredIngredients() {
+        var perimeter = 4L * (displaySize - 1);
+        return List.of(
+            new RequiredIngredient(base, (long) displaySize * displaySize + perimeter),
+            new RequiredIngredient(ceiling, (long) (displaySize - 2) * (displaySize - 2) - 1),
+            new RequiredIngredient(wall, perimeter * (displayHeight - 2)));
+    }
+
+    @Override
+    public List<Component> getDetailLines() {
+        return List.of(
+            Component.translatable("tinactory.jei.multiblock.cleanroom.footprint", 3, maxSize),
+            Component.translatable("tinactory.jei.multiblock.cleanroom.height", 3, maxHeight),
+            Component.translatable("tinactory.jei.multiblock.cleanroom.optional", maxDoors, maxConnectors));
     }
 
     public int maxSize() {

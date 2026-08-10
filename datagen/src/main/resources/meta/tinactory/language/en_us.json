@@ -464,6 +464,15 @@
     "config.jade.plugin_tinactory.electric": "Electric",
     "config.jade.plugin_tinactory.multiblock": "Multiblock",
     "config.jade.plugin_tinactory.me_craft_cpu": "ME Craft CPU",
-    "config.jade.plugin_tinactory.fusion": "Fusion"
+    "config.jade.plugin_tinactory.fusion": "Fusion",
+    "tinactory.jei.multiblock.requirements": "Required Blocks",
+    "tinactory.jei.multiblock.requirement_count": "Required: %s",
+    "tinactory.jei.multiblock.reset": "Reset View",
+    "tinactory.jei.multiblock.layer.all": "Layer: all",
+    "tinactory.jei.multiblock.layer": "Layer: %s",
+    "tinactory.jei.multiblock.layer.tooltip": "Left-click: next layer; right-click: previous layer",
+    "tinactory.jei.multiblock.cleanroom.footprint": "Outer footprint: %s x %s through %s x %s",
+    "tinactory.jei.multiblock.cleanroom.height": "Total height: %s through %s",
+    "tinactory.jei.multiblock.cleanroom.optional": "Optional: up to %s doors and %s connector"
   }
 }
