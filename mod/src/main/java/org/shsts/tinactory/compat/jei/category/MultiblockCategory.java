@@ -4,20 +4,20 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
-import org.shsts.tinactory.compat.jei.gui.MultiblockStructureRenderer;
+import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
+import org.shsts.tinactory.compat.jei.gui.MultiblockStructureViewer;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.util.ClientUtil;
@@ -34,14 +34,19 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> {
     public static final ResourceLocation LOC = modLoc("multiblock_structure");
     public static final RecipeType<MultiblockSet> TYPE = new RecipeType<>(LOC, MultiblockSet.class);
-    private static final int WIDTH = 150;
-    private static final int HEIGHT = 100;
+    private static final int WIDTH = 220;
+    private static final int HEIGHT = 120;
+    private static final Rect VIEWPORT = new Rect(0, 0, 110, 86);
+    private static final Rect DETAILS = new Rect(0, 89, 110, 30);
+    private static final Rect RESET = new Rect(2, 2, 48, 14);
+    private static final Rect LAYER = new Rect(52, 2, 56, 14);
+    private static final int REQUIREMENTS_X = 120;
+    private static final int REQUIREMENTS_Y = 16;
+    private static final int REQUIREMENTS_COLUMNS = 5;
     private final IDrawable icon;
-    private final MultiblockStructureRenderer renderer;
 
     public MultiblockCategory(IGuiHelper guiHelper) {
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.BOOK));
-        renderer = new MultiblockStructureRenderer();
     }
 
     private static List<ItemStack> componentItems(MultiblockSet set) {
@@ -61,6 +66,13 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
             }
         }
         return items;
+    }
+
+    private static List<ItemStack> requiredItems(IMultiblockDisplay.RequiredIngredient required) {
+        var count = Math.toIntExact(required.count());
+        return required.ingredient().expand(ClientUtil.registryAccess()).stream()
+            .map(block -> new ItemStack(block, count))
+            .toList();
     }
 
     @Override
@@ -94,11 +106,22 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
             .addIngredients(VanillaTypes.ITEM_STACK, componentItems(set));
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
             .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(set.controller().get()));
+        var requiredIngredients = set.display().getRequiredIngredients();
+        for (var i = 0; i < requiredIngredients.size(); i++) {
+            var required = requiredIngredients.get(i);
+            var x = REQUIREMENTS_X + (i % REQUIREMENTS_COLUMNS) * 18;
+            var y = REQUIREMENTS_Y + (i / REQUIREMENTS_COLUMNS) * 18;
+            builder.addSlot(RecipeIngredientRole.INPUT, x, y)
+                .addIngredients(VanillaTypes.ITEM_STACK, requiredItems(required))
+                .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable(
+                    "tinactory.jei.multiblock.requirement_count", required.count())));
+        }
     }
 
     @Override
-    public void draw(MultiblockSet set, IRecipeSlotsView slotsView,
-        GuiGraphics graphics, double mouseX, double mouseY) {
-        renderer.render(graphics, set, new Rect(0, 0, WIDTH, HEIGHT));
+    public void createRecipeExtras(IRecipeExtrasBuilder builder, MultiblockSet set, IFocusGroup focuses) {
+        var viewer = new MultiblockStructureViewer(set, VIEWPORT, DETAILS, RESET, LAYER);
+        builder.addWidget(viewer);
+        builder.addGuiEventListener(viewer);
     }
 }
