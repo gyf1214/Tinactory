@@ -64,6 +64,11 @@ public class MultiblockSpecTest {
             public List<Block> expand(HolderLookup.Provider provider) {
                 throw new AssertionError("display must not expand ingredients");
             }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("display must not expand display");
+            }
         };
         var spec = MultiblockSpec.<TestBlock, Void>builder(null)
             .check('A', (ctx, pos) -> {}, ingredient)

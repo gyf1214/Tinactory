@@ -36,12 +36,10 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
     public static final RecipeType<MultiblockSet> TYPE = new RecipeType<>(LOC, MultiblockSet.class);
     private static final int WIDTH = 150;
     private static final int HEIGHT = 100;
-    private final IDrawable background;
     private final IDrawable icon;
     private final MultiblockStructureRenderer renderer;
 
     public MultiblockCategory(IGuiHelper guiHelper) {
-        background = guiHelper.createBlankDrawable(WIDTH, HEIGHT);
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.BOOK));
         renderer = new MultiblockStructureRenderer();
     }
@@ -76,8 +74,13 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public int getHeight() {
+        return HEIGHT;
     }
 
     @Override

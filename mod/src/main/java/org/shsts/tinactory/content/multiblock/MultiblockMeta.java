@@ -271,7 +271,7 @@ public class MultiblockMeta extends MachineMeta {
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(new BlockValue(block), new TagValue(tag)),
+                    return ingredient(ch, cons, BlockIngredient.of(new TagValue(tag), new BlockValue(block)),
                         null, false);
                 }
             }

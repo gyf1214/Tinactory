@@ -16,12 +16,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BlockIngredient implements IBlockIngredient {
+public final class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value {
     private final List<Value> values;
     private List<Block> expanded = null;
 
@@ -54,6 +53,7 @@ public final class BlockIngredient implements IBlockIngredient {
         return values.stream().anyMatch($ -> $.test(blockState));
     }
 
+    @Override
     public List<Block> expand(HolderLookup.Provider provider) {
         if (expanded != null) {
             return expanded;
@@ -66,8 +66,16 @@ public final class BlockIngredient implements IBlockIngredient {
         return expanded;
     }
 
-    public interface Value extends Predicate<BlockState> {
-        void expand(HolderLookup.Provider provider, Consumer<Block> consumer);
+    @Override
+    public void expand(HolderLookup.Provider provider, Consumer<Block> consumer) {
+        for (var block : expand(provider)) {
+            consumer.accept(block);
+        }
+    }
+
+    @Override
+    public BlockState display(HolderLookup.Provider provider) {
+        return expand(provider).getFirst().defaultBlockState();
     }
 
     public record BlockValue(Supplier<? extends Block> block) implements Value {

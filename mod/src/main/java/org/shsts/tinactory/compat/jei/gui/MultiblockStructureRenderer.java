@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
@@ -20,15 +19,17 @@ import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
-import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MultiblockStructureRenderer {
-    private static final float YAW = 45f;
+    private static final float YAW = -45f;
     private static final float PITCH = 30f;
+    private static final float WIDTH_SCALE = (float) Math.sqrt(2) / 2;
+    private static final float HEIGHT_SCALE1 = (float) Math.sqrt(3) / 2;
+    private static final float HEIGHT_SCALE2 = WIDTH_SCALE / 2f;
     private final Map<IMultiblockDisplay, Map<IBlockIngredient, BlockState>> stateCache;
 
     public MultiblockStructureRenderer() {
@@ -44,32 +45,27 @@ public final class MultiblockStructureRenderer {
         for (var y = 0; y < display.height(); y++) {
             for (var z = 0; z < display.depth(); z++) {
                 for (var x = 0; x < display.width(); x++) {
-                    display.getIngredient(x, y, z).ifPresent(ingredient -> states.computeIfAbsent(ingredient,
-                        this::representativeState));
+                    display.getIngredient(x, y, z).ifPresent(ingredient ->
+                        states.computeIfAbsent(ingredient, $ -> $.display(ClientUtil.registryAccess())));
                 }
             }
         }
         return states;
     }
 
-    private BlockState representativeState(IBlockIngredient ingredient) {
-        return ingredient.expand(ClientUtil.registryAccess()).stream()
-            .min(Comparator.comparing(BuiltInRegistries.BLOCK::getKey))
-            .map(block -> block.defaultBlockState())
-            .orElse(null);
-    }
-
     private static BlockState controllerState(MultiblockSet set) {
         var state = set.controller().get().defaultBlockState();
         if (state.hasProperty(PrimitiveBlock.FACING)) {
-            state = state.setValue(PrimitiveBlock.FACING, Direction.NORTH);
+            state = state.setValue(PrimitiveBlock.FACING, Direction.SOUTH);
         }
         return state;
     }
 
     private static float scale(IMultiblockDisplay display, Rect rect) {
-        var size = Math.max(display.width(), Math.max(display.depth(), display.height()));
-        return (float) Math.min(rect.width(), rect.height()) / (float) size;
+        var wd = display.width() + display.depth();
+        var width = wd * WIDTH_SCALE;
+        var height = display.height() * HEIGHT_SCALE1 + wd * HEIGHT_SCALE2;
+        return Math.min(rect.width() / width, rect.height() / height);
     }
 
     private static void renderState(PoseStack poseStack, GuiGraphics graphics, BlockState state,
