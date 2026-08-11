@@ -142,23 +142,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         poseStack.popPose();
     }
 
-    @Override
-    public ScreenPosition getPosition() {
-        return new ScreenPosition(area.x(), area.y());
-    }
-
-    @Override
-    public ScreenRectangle getArea() {
-        return new ScreenRectangle(area.x(), area.y(), area.width(), area.height());
-    }
-
-    @Override
-    public void drawWidget(GuiGraphics graphics, double mouseX, double mouseY) {
-        var poseStack = graphics.pose();
-        poseStack.pushPose();
-        transform(poseStack);
-        var transform = new Matrix4f(poseStack.last().pose());
-        graphics.enableScissor(viewport.x(), viewport.y(), viewport.endX(), viewport.endY());
+    private void renderStructure(PoseStack poseStack, GuiGraphics graphics) {
         RenderSystem.enableDepthTest();
         Lighting.setupFor3DItems();
         for (var y = 0; y < display.height(); y++) {
@@ -180,9 +164,33 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
                 controller.getZ());
         }
         graphics.flush();
-        graphics.disableScissor();
         Lighting.setupForFlatItems();
         RenderSystem.disableDepthTest();
+    }
+
+    @Override
+    public ScreenPosition getPosition() {
+        return new ScreenPosition(area.x(), area.y());
+    }
+
+    @Override
+    public ScreenRectangle getArea() {
+        return new ScreenRectangle(area.x(), area.y(), area.width(), area.height());
+    }
+
+    @Override
+    public void drawWidget(GuiGraphics graphics, double mouseX, double mouseY) {
+        var poseStack = graphics.pose();
+        poseStack.pushPose();
+        var guiPose = poseStack.last().pose();
+        var guiX = Math.round(guiPose.m30());
+        var guiY = Math.round(guiPose.m31());
+        transform(poseStack);
+        var transform = new Matrix4f(poseStack.last().pose());
+        graphics.enableScissor(guiX + viewport.x(), guiY + viewport.y(),
+            guiX + viewport.endX(), guiY + viewport.endY());
+        renderStructure(poseStack, graphics);
+        graphics.disableScissor();
         poseStack.popPose();
         hovered = viewport.in(mouseX, mouseY) ? pick(transform, mouseX, mouseY) : null;
         drawControls(graphics);
