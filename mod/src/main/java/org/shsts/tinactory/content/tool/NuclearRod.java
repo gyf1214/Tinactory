@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import org.shsts.tinactory.content.multiblock.INuclearCell;
-import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class NuclearRod extends Item implements INuclearItem {
     }
 
     private long getReactions(ItemStack stack) {
-        return MathUtil.clamp(stack.getOrDefault(REACTIONS, 0L), 0, maxReactions);
+        return Math.clamp(stack.getOrDefault(REACTIONS, 0L), 0, maxReactions);
     }
 
     @Override

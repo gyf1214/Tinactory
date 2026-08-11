@@ -21,18 +21,6 @@ public final class MathUtil {
         return Math.abs(sth) <= threshold ? 0 : (sth > threshold ? 1 : -1);
     }
 
-    public static double clamp(double x, double min, double max) {
-        return Math.max(Math.min(x, max), min);
-    }
-
-    public static int clamp(int x, int min, int max) {
-        return Math.max(Math.min(x, max), min);
-    }
-
-    public static long clamp(long x, long min, long max) {
-        return Math.max(Math.min(x, max), min);
-    }
-
     public static Vector3f mulVecf(Vector3f x, float k) {
         var y = new Vector3f(x);
         y.mul(k);
@@ -111,8 +99,7 @@ public final class MathUtil {
             var mean = n * p;
             var std = Math.sqrt(n * p * (1 - p));
             var r = random.nextGaussian() * std + mean;
-            var ret = clamp(Math.round(r), 0, n);
-            return (int) ret;
+            return Math.clamp(Math.round(r), 0, n);
         }
 
         // nothing we can do to get a good approximation, just sample directly

@@ -8,7 +8,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import static org.shsts.tinactory.AllMenus.DOUBLE_SYNC;
@@ -40,7 +39,7 @@ public class ProgressBar extends MenuWidget {
 
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        var progress = MathUtil.clamp(menu.getSyncPacket(syncName, DOUBLE_SYNC)
+        var progress = Math.clamp(menu.getSyncPacket(syncName, DOUBLE_SYNC)
             .map(SyncPackets.DoublePacket::getData).orElse(0d), 0d, 1d);
         var rect = rect();
         var h = rect.height();

@@ -8,7 +8,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.content.machine.Boiler;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.recipe.IRecipe;
 
@@ -70,7 +69,7 @@ public class BoilerRecipe implements IRecipe<Boiler> {
         }
 
         var inputStack1 = StackHelper.copyWithAmount(input, input.getAmount() * reaction1);
-        var decay = MathUtil.clamp(1 - (heat - optimalHeat) / (maxHeat - optimalHeat), 0, 1);
+        var decay = Math.clamp(1 - (heat - optimalHeat) / (maxHeat - optimalHeat), 0, 1);
         var outputAmount = (int) Math.floor(output.getAmount() * reaction1 * decay);
         var outputStack = StackHelper.copyWithAmount(output, outputAmount);
         inputPort.extract(inputStack1, false);
@@ -79,5 +78,4 @@ public class BoilerRecipe implements IRecipe<Boiler> {
 
         return absorbRate * reaction1;
     }
-
 }

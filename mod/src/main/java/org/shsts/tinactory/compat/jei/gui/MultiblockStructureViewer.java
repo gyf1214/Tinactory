@@ -19,11 +19,14 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
@@ -31,6 +34,7 @@ import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
@@ -186,12 +190,10 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         poseStack.popPose();
     }
 
-    private void renderStructure(GuiGraphics graphics, Consumer<PoseStack.Pose> poseCons) {
+    private void renderStructure(GuiGraphics graphics, int guiX, int guiY,
+        Consumer<PoseStack.Pose> poseCons) {
         var poseStack = graphics.pose();
         poseStack.pushPose();
-        var guiPose = poseStack.last().pose();
-        var guiX = Math.round(guiPose.m30());
-        var guiY = Math.round(guiPose.m31());
         transformView(poseStack);
         poseCons.accept(poseStack.last());
         graphics.enableScissor(guiX + viewport.x(), guiY + viewport.y(),
@@ -225,39 +227,52 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
 
     @Override
     public void drawWidget(GuiGraphics graphics, double mouseX, double mouseY) {
+        var guiPose = graphics.pose().last().pose();
+        var guiX = guiPose.m30();
+        var guiY = guiPose.m31();
         var inverse = new Matrix4f();
-        renderStructure(graphics, pose -> pose.pose().invert(inverse));
-        hovered = viewport.in(mouseX, mouseY) ? pick(inverse, mouseX, mouseY) : null;
+        var inverseNormal = new Matrix3f();
+        renderStructure(graphics, Math.round(guiX), Math.round(guiY), pose -> {
+            pose.pose().invert(inverse);
+            pose.normal().invert(inverseNormal);
+        });
+        hovered = viewport.in(mouseX, mouseY) ?
+            pick(inverse, inverseNormal, guiX + mouseX, guiY + mouseY) : null;
         drawControls(graphics, mouseX, mouseY);
     }
 
-    private static float axisMin(float origin, float direction, int bound) {
-        return direction == 0 ? (origin < bound ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY) :
-            (bound - origin) / direction;
+    private static float hitWall(float origin, float direction, int bound) {
+        if (MathUtil.compare(direction) == 0) {
+            return switch (MathUtil.compare(origin, bound)) {
+                case 0 -> 0f;
+                case 1 -> Float.POSITIVE_INFINITY;
+                case -1 -> Float.NEGATIVE_INFINITY;
+                default -> throw new IllegalStateException();
+            };
+        }
+        return (bound - origin) / direction;
     }
 
-    private static float axisMax(float origin, float direction, int bound) {
-        return direction == 0 ? (origin > bound ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY) :
-            (bound - origin) / direction;
+    private static Tuple<Float, Float> hitSlab(float origin, float direction, int bound1, int bound2) {
+        var t1 = hitWall(origin, direction, bound1);
+        var t2 = hitWall(origin, direction, bound2);
+        return new Tuple<>(Math.min(t1, t2), Math.max(t1, t2));
     }
 
-    private static float hit(Vector4f origin, float dx, float dy, float dz, int x, int y, int z) {
-        var min = Math.max(Math.max(axisMin(origin.x(), dx, x), axisMin(origin.y(), dy, y)),
-            axisMin(origin.z(), dz, z));
-        var max = Math.min(Math.min(axisMax(origin.x(), dx, x + 1), axisMax(origin.y(), dy, y + 1)),
-            axisMax(origin.z(), dz, z + 1));
-        return min <= max && max >= 0 ? Math.max(min, 0) : Float.POSITIVE_INFINITY;
+    private static float hitBlock(Vector4f origin, Vector3f dir, int x, int y, int z) {
+        var tx = hitSlab(origin.x(), dir.x(), x, x + 1);
+        var ty = hitSlab(origin.y(), dir.y(), y, y + 1);
+        var tz = hitSlab(origin.z(), dir.z(), z, z + 1);
+        var minT = Math.max(Math.max(tx.getA(), ty.getA()), tz.getA());
+        var maxT = Math.min(Math.min(tx.getB(), ty.getB()), tz.getB());
+        return MathUtil.compare(minT, maxT) <= 0 ? minT : Float.POSITIVE_INFINITY;
     }
 
     @Nullable
-    private BlockState pick(Matrix4f inverse, double mouseX, double mouseY) {
-        var near = inverse.transform(new Vector4f((float) mouseX, (float) mouseY, 0f, 1f));
-        var far = inverse.transform(new Vector4f((float) mouseX, (float) mouseY, 200f, 1f));
-        near.div(near.w());
-        far.div(far.w());
-        var dx = far.x() - near.x();
-        var dy = far.y() - near.y();
-        var dz = far.z() - near.z();
+    private BlockState pick(Matrix4f inverse, Matrix3f inverseNormal, double mouseX, double mouseY) {
+        var pos = inverse.transform(new Vector4f((float) mouseX, (float) mouseY, 200f, 1f));
+        var dir = inverseNormal.transform(new Vector3f(0f, 0f, -1f));
+
         var nearest = Float.POSITIVE_INFINITY;
         BlockState result = null;
         for (var y = 0; y < display.height(); y++) {
@@ -267,7 +282,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
             for (var z = 0; z < display.depth(); z++) {
                 for (var x = 0; x < display.width(); x++) {
                     var blockState = display.getIngredient(x, y, z).map(blockStates::get).orElse(null);
-                    var hit = blockState == null ? Float.POSITIVE_INFINITY : hit(near, dx, dy, dz, x, y, z);
+                    var hit = blockState == null ? Float.POSITIVE_INFINITY : hitBlock(pos, dir, x, y, z);
                     if (hit < nearest) {
                         nearest = hit;
                         result = blockState;
@@ -277,7 +292,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         }
         var controller = display.controllerPosition();
         if (visible(controller.getY())) {
-            var hit = hit(near, dx, dy, dz, controller.getX(), controller.getY(), controller.getZ());
+            var hit = hitBlock(pos, dir, controller.getX(), controller.getY(), controller.getZ());
             if (hit < nearest) {
                 result = controllerState(set);
             }

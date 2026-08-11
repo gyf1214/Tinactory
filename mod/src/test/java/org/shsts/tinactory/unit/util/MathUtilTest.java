@@ -13,9 +13,6 @@ class MathUtilTest {
         assertEquals(1, MathUtil.compare(0.2d));
         assertEquals(-1, MathUtil.compare(-0.2d));
         assertEquals(0, MathUtil.compare(0.3d, 0.5d));
-        assertEquals(10d, MathUtil.clamp(11d, 0d, 10d));
-        assertEquals(2, MathUtil.clamp(1, 2, 5));
-        assertEquals(7L, MathUtil.clamp(9L, 0L, 7L));
     }
 
     @Test

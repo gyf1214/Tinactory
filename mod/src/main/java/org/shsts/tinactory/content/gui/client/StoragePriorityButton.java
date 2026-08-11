@@ -9,7 +9,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -41,7 +40,7 @@ public class StoragePriorityButton extends Button {
     }
 
     private int getValue() {
-        return MathUtil.clamp(config.getInt(key, defaultVal), -1, 4);
+        return Math.clamp(config.getInt(key, defaultVal), -1, 4);
     }
 
     @Override
