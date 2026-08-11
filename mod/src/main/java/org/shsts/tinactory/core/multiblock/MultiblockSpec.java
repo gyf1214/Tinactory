@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
@@ -236,6 +237,11 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     @Override
     public List<RequiredIngredient> getRequiredIngredients() {
         return requiredIngredients;
+    }
+
+    @Override
+    public List<Component> getDetailLines() {
+        return List.of();
     }
 
     public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {

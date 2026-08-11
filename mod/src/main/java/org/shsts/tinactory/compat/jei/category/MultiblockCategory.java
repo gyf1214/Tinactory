@@ -27,6 +27,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.CONTENT_WIDTH;
+import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 @ParametersAreNonnullByDefault
@@ -34,15 +39,13 @@ import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> {
     public static final ResourceLocation LOC = modLoc("multiblock_structure");
     public static final RecipeType<MultiblockSet> TYPE = new RecipeType<>(LOC, MultiblockSet.class);
-    private static final int WIDTH = 220;
-    private static final int HEIGHT = 120;
-    private static final Rect VIEWPORT = new Rect(0, 0, 110, 86);
-    private static final Rect DETAILS = new Rect(0, 89, 110, 30);
-    private static final Rect RESET = new Rect(2, 2, 48, 14);
-    private static final Rect LAYER = new Rect(52, 2, 56, 14);
-    private static final int REQUIREMENTS_X = 120;
-    private static final int REQUIREMENTS_Y = 16;
-    private static final int REQUIREMENTS_COLUMNS = 5;
+    public static final int WIDTH = CONTENT_WIDTH;
+    public static final int HEIGHT = 120;
+    private static final int REQUIREMENTS_COLUMNS = 3;
+    private static final int REQUIREMENTS_X = WIDTH - REQUIREMENTS_COLUMNS * SLOT_SIZE;
+    private static final int REQUIREMENTS_Y = BUTTON_SIZE * 2 + SPACING * 3;
+    private static final Rect VIEWPORT = new Rect(0, 0, REQUIREMENTS_X - SPACING, HEIGHT);
+    private static final Rect CONTROLS = new Rect(REQUIREMENTS_X, 0, REQUIREMENTS_COLUMNS * SLOT_SIZE, HEIGHT);
     private final IDrawable icon;
 
     public MultiblockCategory(IGuiHelper guiHelper) {
@@ -107,20 +110,19 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
             .addIngredient(VanillaTypes.ITEM_STACK, new ItemStack(set.controller().get()));
         var requiredIngredients = set.display().getRequiredIngredients();
+        var lines = set.display().getDetailLines().size();
         for (var i = 0; i < requiredIngredients.size(); i++) {
             var required = requiredIngredients.get(i);
-            var x = REQUIREMENTS_X + (i % REQUIREMENTS_COLUMNS) * 18;
-            var y = REQUIREMENTS_Y + (i / REQUIREMENTS_COLUMNS) * 18;
+            var x = REQUIREMENTS_X + (i % REQUIREMENTS_COLUMNS) * SLOT_SIZE;
+            var y = REQUIREMENTS_Y + lines * FONT_HEIGHT + (i / REQUIREMENTS_COLUMNS) * SLOT_SIZE;
             builder.addSlot(RecipeIngredientRole.INPUT, x, y)
-                .addIngredients(VanillaTypes.ITEM_STACK, requiredItems(required))
-                .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable(
-                    "tinactory.jei.multiblock.requirement_count", required.count())));
+                .addIngredients(VanillaTypes.ITEM_STACK, requiredItems(required));
         }
     }
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, MultiblockSet set, IFocusGroup focuses) {
-        var viewer = new MultiblockStructureViewer(set, VIEWPORT, DETAILS, RESET, LAYER);
+        var viewer = new MultiblockStructureViewer(set, VIEWPORT, CONTROLS);
         builder.addWidget(viewer);
         builder.addGuiEventListener(viewer);
     }

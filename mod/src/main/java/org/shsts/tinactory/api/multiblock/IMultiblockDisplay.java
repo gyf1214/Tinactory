@@ -23,11 +23,7 @@ public interface IMultiblockDisplay {
 
     Optional<IBlockIngredient> getIngredient(int x, int y, int z);
 
-    default List<RequiredIngredient> getRequiredIngredients() {
-        return List.of();
-    }
+    List<RequiredIngredient> getRequiredIngredients();
 
-    default List<Component> getDetailLines() {
-        return List.of();
-    }
+    List<Component> getDetailLines();
 }

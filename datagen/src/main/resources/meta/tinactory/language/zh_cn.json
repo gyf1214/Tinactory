@@ -788,6 +788,12 @@
     "tinactory.jei.processing.requireLargeChemicalReactor": "需要大型化学反应器",
     "tinactory.jei.rate": "概率：%s",
     "tinactory.jei.not_consumed": "过程中不消耗",
+    "tinactory.jei.multiblock.reset": "重置视角",
+    "tinactory.jei.multiblock.layer.all": "层：全部",
+    "tinactory.jei.multiblock.layer": "层：%s",
+    "tinactory.jei.multiblock.cleanroom.footprint": "外部尺寸：%s x %s 至 %s x %s",
+    "tinactory.jei.multiblock.cleanroom.height": "总高度：%s 至 %s",
+    "tinactory.jei.multiblock.cleanroom.optional": "可选：最多 %s 扇门和 %s 个接口",
     "tinactory.recipe.marker.centrifuge.material.dust_pure": "离心洁净粉",
     "tinactory.recipe.marker.centrifuge.material.raw_fluid": "离心粗矿",
     "tinactory.recipe.marker.macerator.material.crushed": "粉碎碎矿石",
@@ -970,15 +976,6 @@
     "config.jade.plugin_tinactory.electric": "用电",
     "config.jade.plugin_tinactory.multiblock": "多方块",
     "config.jade.plugin_tinactory.me_craft_cpu": "ME合成CPU",
-    "config.jade.plugin_tinactory.fusion": "聚变",
-    "tinactory.jei.multiblock.requirements": "所需方块",
-    "tinactory.jei.multiblock.requirement_count": "所需数量：%s",
-    "tinactory.jei.multiblock.reset": "重置视角",
-    "tinactory.jei.multiblock.layer.all": "层：全部",
-    "tinactory.jei.multiblock.layer": "层：%s",
-    "tinactory.jei.multiblock.layer.tooltip": "左键切换至下一层；右键切换至上一层",
-    "tinactory.jei.multiblock.cleanroom.footprint": "外部尺寸：%s x %s 至 %s x %s",
-    "tinactory.jei.multiblock.cleanroom.height": "总高度：%s 至 %s",
-    "tinactory.jei.multiblock.cleanroom.optional": "可选：最多 %s 扇门和 %s 个接口"
+    "config.jade.plugin_tinactory.fusion": "聚变"
   }
 }

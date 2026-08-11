@@ -34,18 +34,27 @@ public class VanillaButton extends Button {
         textWidth = font.width(val);
     }
 
+    public static void renderButton(GuiGraphics graphics, Texture texture, Rect rect,
+        Font font, Component label, int textWidth) {
+        var w = rect.width() / 2;
+        var rect1 = new Rect(rect.x(), rect.y(), w, rect.height());
+        RenderUtil.blit(graphics, texture, rect1);
+        RenderUtil.blit(graphics, texture, rect1.offset(w, 0), texture.width() - w, 0);
+        graphics.drawString(font, label, rect.x() + (rect.width() - textWidth) / 2,
+            rect.y() + (rect.height() - font.lineHeight) / 2, RenderUtil.WHITE, true);
+    }
+
+    public static void renderButton(GuiGraphics graphics, Texture texture, Rect rect, Component label) {
+        var font = ClientUtil.getFont();
+        renderButton(graphics, texture, rect, font, label, font.width(label));
+    }
+
     @Override
     public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         var rect = rect();
         var texture = disabled ? Texture.VANILLA_BUTTON_DISABLED :
             isHovered(mouseX, mouseY) ? Texture.VANILLA_BUTTON_HOVERED : Texture.VANILLA_BUTTON;
-        var w = rect.width() / 2;
-        var rect1 = new Rect(rect.x(), rect.y(), w, rect.height());
-        RenderUtil.blit(graphics, texture, rect1);
-        RenderUtil.blit(graphics, texture, rect1.offset(w, 0), texture.width() - w, 0);
-
-        graphics.drawString(font, label, rect.x() + w - textWidth / 2,
-            rect.y() + (rect.height() - font.lineHeight) / 2, RenderUtil.WHITE, true);
+        renderButton(graphics, texture, rect, font, label, textWidth);
     }
 
     @Override

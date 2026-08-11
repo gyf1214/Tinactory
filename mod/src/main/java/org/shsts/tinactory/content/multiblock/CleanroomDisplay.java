@@ -144,20 +144,4 @@ public class CleanroomDisplay implements IMultiblockDisplay {
             Component.translatable("tinactory.jei.multiblock.cleanroom.height", 3, maxHeight),
             Component.translatable("tinactory.jei.multiblock.cleanroom.optional", maxDoors, maxConnectors));
     }
-
-    public int maxSize() {
-        return maxSize;
-    }
-
-    public int maxHeight() {
-        return maxHeight;
-    }
-
-    public int maxDoors() {
-        return maxDoors;
-    }
-
-    public int maxConnectors() {
-        return maxConnectors;
-    }
 }
