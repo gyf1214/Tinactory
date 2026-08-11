@@ -58,6 +58,8 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     private static final float WIDTH_SCALE = (float) Math.sqrt(2) / 2;
     private static final float HEIGHT_SCALE1 = (float) Math.sqrt(3) / 2;
     private static final float HEIGHT_SCALE2 = WIDTH_SCALE / 2f;
+    private static final float ZOOM_MIN = 1f;
+    private static final float ZOOM_MAX = 64f;
     private final MultiblockSet set;
     private final IMultiblockDisplay display;
     private final Rect viewport;
@@ -71,8 +73,16 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     private boolean dragging = false;
     private float yaw = DEFAULT_YAW;
     private float pitch = DEFAULT_PITCH;
-    private float zoom = 1f;
+    private float zoom;
     private int selectedLayer = 0;
+
+    private static float fittedZoom(IMultiblockDisplay display, Rect viewport) {
+        var wd = display.width() + display.depth();
+        var width = wd * WIDTH_SCALE;
+        var height = display.height() * HEIGHT_SCALE1 + wd * HEIGHT_SCALE2;
+        var zoom = Math.min(viewport.width() / width, viewport.height() / height) * .9f;
+        return Math.clamp(zoom, ZOOM_MIN, ZOOM_MAX);
+    }
 
     public MultiblockStructureViewer(MultiblockSet set, Rect viewport, Rect controls) {
         this.set = set;
@@ -89,6 +99,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         var height = Math.max(viewport.endY(), controls.endY());
         this.area = new ScreenRectangle(0, 0, width, height);
         this.blockStates = createStates();
+        this.zoom = fittedZoom(display, viewport);
     }
 
     @Override
@@ -129,7 +140,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     private void reset() {
         yaw = DEFAULT_YAW;
         pitch = DEFAULT_PITCH;
-        zoom = 1f;
+        zoom = fittedZoom(display, viewport);
         selectedLayer = 0;
     }
 
@@ -165,17 +176,9 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         }
     }
 
-    private float fittedZoom() {
-        var wd = display.width() + display.depth();
-        var width = wd * WIDTH_SCALE;
-        var height = display.height() * HEIGHT_SCALE1 + wd * HEIGHT_SCALE2;
-        return Math.min(viewport.width() / width, viewport.height() / height) * .9f;
-    }
-
     private void transformView(PoseStack poseStack) {
         poseStack.translate(viewport.x() + viewport.width() / 2f, viewport.y() + viewport.height() / 2f, 100f);
-        var scale = fittedZoom() * zoom;
-        poseStack.scale(scale, -scale, scale);
+        poseStack.scale(zoom, -zoom, zoom);
         poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
         poseStack.translate(-display.width() / 2f, -display.height() / 2f, -display.depth() / 2f);
@@ -345,7 +348,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         if (!viewport.in(mouseX, mouseY)) {
             return false;
         }
-        zoom = Math.clamp(zoom * (deltaY > 0 ? 1.1f : .9f), .5f, 3f);
+        zoom = Math.clamp(zoom * (deltaY > 0 ? 1.1f : .9f), ZOOM_MIN, ZOOM_MAX);
         return true;
     }
 }
