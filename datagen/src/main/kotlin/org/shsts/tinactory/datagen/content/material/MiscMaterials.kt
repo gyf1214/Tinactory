@@ -172,7 +172,7 @@ object MiscMaterials {
                 voltage(Voltage.HV)
                 requireCleanness(0.85, 1.35)
             }
-            output("cultivated_bacteria", amount = 0.02, suffix = "_from_reproduction") {
+            output("cultivated_bacteria", amount = 0.002, suffix = "_from_reproduction") {
                 input("cultivated_bacteria", amount = 0.001)
                 input("enriched_growth_medium", amount = 0.001)
                 voltage(Voltage.MV)
