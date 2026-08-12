@@ -180,10 +180,11 @@ public final class RenderUtil {
         }
     }
 
+    @SuppressWarnings("DataFlowIssue")
     public static void renderBlockInGui(PoseStack poseStack, MultiBufferSource bufferSource,
         BlockState blockState, int packedLight, int packedOverlay) {
         Minecraft.getInstance().getBlockRenderer().renderSingleBlock(blockState, poseStack, bufferSource,
-            packedLight, packedOverlay);
+            packedLight, packedOverlay, ModelData.EMPTY, null);
     }
 
     public static void renderItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
