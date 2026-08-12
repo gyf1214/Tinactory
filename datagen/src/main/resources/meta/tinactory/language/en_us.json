@@ -358,6 +358,7 @@
     "tinactory.jei.multiblock.reset": "Reset",
     "tinactory.jei.multiblock.layer.all": "Layer: all",
     "tinactory.jei.multiblock.layer": "Layer: %s",
+    "tinactory.jei.multiblock.alternatives": "Alternatives:",
     "tinactory.jei.multiblock.size": "Size: %s×%s×%s - %s×%s×%s",
     "tinactory.jei.multiblock.sizeFixed": "Size: %s×%s×%s",
     "tinactory.jei.multiblock.cleanroom.optional": "0 - %s doors, 0 - %s connector",

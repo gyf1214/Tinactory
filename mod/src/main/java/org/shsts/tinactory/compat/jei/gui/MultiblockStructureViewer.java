@@ -9,6 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.inputs.IJeiGuiEventListener;
 import mezz.jei.api.gui.widgets.IRecipeWidget;
+import mezz.jei.library.gui.ingredients.TagContentTooltipComponent;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,6 +31,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
+import org.shsts.tinactory.compat.jei.ingredient.ItemIngredientRenderer;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
@@ -68,12 +70,14 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     private final ScreenRectangle area;
     private final Map<IBlockIngredient, BlockState> blockStates;
     @Nullable
-    private BlockState hovered = null;
+    private Hover hovered = null;
     private boolean dragging = false;
     private float yaw = DEFAULT_YAW;
     private float pitch = DEFAULT_PITCH;
     private float zoom;
     private int selectedLayer = 0;
+
+    private record Hover(BlockState state, @Nullable IBlockIngredient ingredient) {}
 
     private static float fittedZoom(IMultiblockDisplay display, Rect viewport) {
         var wd = display.width() + display.depth();
@@ -262,23 +266,24 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     }
 
     @Nullable
-    private BlockState pick(Matrix4f inverse, Matrix3f inverseNormal, double mouseX, double mouseY) {
+    private Hover pick(Matrix4f inverse, Matrix3f inverseNormal, double mouseX, double mouseY) {
         var pos = inverse.transform(new Vector4f((float) mouseX, (float) mouseY, 200f, 1f));
         var dir = inverseNormal.transform(new Vector3f(0f, 0f, -1f));
 
         var nearest = Float.POSITIVE_INFINITY;
-        BlockState result = null;
+        Hover result = null;
         for (var y = 0; y < display.height(); y++) {
             if (!visible(y)) {
                 continue;
             }
             for (var z = 0; z < display.depth(); z++) {
                 for (var x = 0; x < display.width(); x++) {
-                    var blockState = display.getIngredient(x, y, z).map(blockStates::get).orElse(null);
+                    var ingredient = display.getIngredient(x, y, z).orElse(null);
+                    var blockState = ingredient == null ? null : blockStates.get(ingredient);
                     var hit = blockState == null ? Float.POSITIVE_INFINITY : hitBlock(pos, dir, x, y, z);
                     if (hit < nearest) {
                         nearest = hit;
-                        result = blockState;
+                        result = new Hover(blockState, ingredient);
                     }
                 }
             }
@@ -287,7 +292,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         if (visible(controller.getY())) {
             var hit = hitBlock(pos, dir, controller.getX(), controller.getY(), controller.getZ());
             if (hit < nearest) {
-                result = controllerState(set);
+                result = new Hover(controllerState(set), null);
             }
         }
         return result;
@@ -296,9 +301,15 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     @Override
     public void getTooltip(ITooltipBuilder tooltip, double mouseX, double mouseY) {
         if (hovered != null) {
-            var stack = new ItemStack(hovered.getBlock());
+            var stack = new ItemStack(hovered.state().getBlock());
             tooltip.addAll(stack.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player,
                 TooltipFlag.NORMAL));
+            var ingredient = hovered.ingredient();
+            if (ingredient != null) {
+                var alternatives = ingredient.expand(ClientUtil.registryAccess()).stream().map(ItemStack::new).toList();
+                tooltip.add(tr("alternatives"));
+                tooltip.add(new TagContentTooltipComponent<>(new ItemIngredientRenderer(), alternatives));
+            }
         }
     }
 

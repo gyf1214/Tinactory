@@ -791,6 +791,7 @@
     "tinactory.jei.multiblock.reset": "重置",
     "tinactory.jei.multiblock.layer.all": "层：全部",
     "tinactory.jei.multiblock.layer": "层：%s",
+    "tinactory.jei.multiblock.alternatives": "可选方块：",
     "tinactory.jei.multiblock.size": "尺寸：%s×%s×%s - %s×%s×%s",
     "tinactory.jei.multiblock.sizeFixed": "尺寸：%s×%s×%s",
     "tinactory.jei.multiblock.cleanroom.optional": "0 - %s 扇门和 0 - %s 个接口",
