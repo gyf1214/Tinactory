@@ -103,10 +103,13 @@ public class CleanroomDisplay implements IMultiblockDisplay {
             return Optional.empty();
         }
 
-        if (y == 0 ||
-            (y == displayHeight - 1 && atWall(x, z)) ||
-            ((x == 0 || x == displaySize - 1) && (z == 0 || z == displaySize - 1))) {
+        if (y == displayHeight - 1 && atWall(x, z)) {
             return Optional.of(base);
+        }
+
+        if (y == 0 ||
+            ((x == 0 || x == displaySize - 1) && (z == 0 || z == displaySize - 1))) {
+            return Optional.of(baseWithInterface);
         }
 
         if (y == displayHeight - 1) {
