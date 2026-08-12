@@ -17,7 +17,6 @@ import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -128,22 +127,18 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         return result;
     }
 
-    private static boolean hasIngredient(IMultiblockDisplay display, BlockPos pos) {
-        return display.getIngredient(pos.getX(), pos.getY(), pos.getZ()).isPresent();
-    }
-
     private static Direction controllerFacing(IMultiblockDisplay display) {
         var pos = display.controllerPosition();
-        if (pos.getZ() == 0 && hasIngredient(display, pos.south())) {
+        if (pos.getZ() == display.depth() - 1) {
             return Direction.SOUTH;
         }
-        if (pos.getZ() == display.depth() - 1 && hasIngredient(display, pos.north())) {
+        if (pos.getZ() == 0) {
             return Direction.NORTH;
         }
-        if (pos.getX() == 0 && hasIngredient(display, pos.east())) {
+        if (pos.getX() == display.width() - 1) {
             return Direction.EAST;
         }
-        if (pos.getX() == display.width() - 1 && hasIngredient(display, pos.west())) {
+        if (pos.getX() == 0) {
             return Direction.WEST;
         }
         return Direction.SOUTH;
