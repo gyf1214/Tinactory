@@ -306,9 +306,13 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
                 TooltipFlag.NORMAL));
             var ingredient = hovered.ingredient();
             if (ingredient != null) {
-                var alternatives = ingredient.expand(ClientUtil.registryAccess()).stream().map(ItemStack::new).toList();
-                tooltip.add(tr("alternatives"));
-                tooltip.add(new TagContentTooltipComponent<>(new ItemIngredientRenderer(), alternatives));
+                var alternatives = ingredient.expand(ClientUtil.registryAccess()).stream()
+                    .map(ItemStack::new)
+                    .toList();
+                if (alternatives.size() > 1) {
+                    tooltip.add(tr("alternatives"));
+                    tooltip.add(new TagContentTooltipComponent<>(new ItemIngredientRenderer(), alternatives));
+                }
             }
         }
     }

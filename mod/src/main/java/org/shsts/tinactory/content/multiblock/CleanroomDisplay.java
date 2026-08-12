@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.util.I18n;
@@ -25,9 +26,9 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public class CleanroomDisplay implements IMultiblockDisplay {
     private final IBlockIngredient base;
+    private final IBlockIngredient baseWithInterface;
     private final IBlockIngredient ceiling;
     private final IBlockIngredient wall;
-    private final IBlockIngredient displayWall;
     private final IBlockIngredient doorLower;
     private final IBlockIngredient doorUpper;
     private final IBlockIngredient connector;
@@ -43,22 +44,23 @@ public class CleanroomDisplay implements IMultiblockDisplay {
         return $ -> $.hasProperty(property) ? $.setValue(property, value) : $;
     }
 
-    public CleanroomDisplay(IBlockIngredient base, IBlockIngredient ceiling, IBlockIngredient.Value wall,
+    public CleanroomDisplay(BlockIngredient base, IBlockIngredient ceiling, IBlockIngredient.Value wall,
         TagKey<Block> door, TagKey<Block> connector, int displaySize, int displayHeight,
         int maxSize, int maxHeight, int maxDoors, int maxConnectors) {
         this.base = base;
+        this.baseWithInterface = BlockIngredient.of(base,
+            BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
         this.ceiling = ceiling;
-
-        this.wall = BlockIngredient.of(wall);
-        this.displayWall = BlockIngredient.of(wall, BlockIngredient.tagValue(door),
-            BlockIngredient.tagValue(connector));
+        this.wall = BlockIngredient.of(wall, BlockIngredient.tagValue(door),
+            BlockIngredient.tagValue(connector),
+            BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
 
         var doorDisplay = BlockIngredient.of(door);
-        this.doorLower = BlockIngredient.withDisplay(displayWall, doorDisplay,
+        this.doorLower = BlockIngredient.withDisplay(this.wall, doorDisplay,
             setState(DoorBlock.HALF, DoubleBlockHalf.LOWER));
-        this.doorUpper = BlockIngredient.withDisplay(displayWall, doorDisplay,
+        this.doorUpper = BlockIngredient.withDisplay(this.wall, doorDisplay,
             setState(DoorBlock.HALF, DoubleBlockHalf.UPPER));
-        this.connector = BlockIngredient.withDisplay(displayWall, BlockIngredient.of(connector),
+        this.connector = BlockIngredient.withDisplay(this.wall, BlockIngredient.of(connector),
             setState(MachineBlock.IO_FACING, Direction.EAST));
 
         this.displaySize = displaySize;
@@ -126,16 +128,16 @@ public class CleanroomDisplay implements IMultiblockDisplay {
             return Optional.of(connector);
         }
 
-        return Optional.of(displayWall);
+        return Optional.of(wall);
     }
 
     @Override
     public List<StructureIngredient> getStructureIngredients() {
-        var perimeter = 4L * (displaySize - 1);
         return List.of(
-            new StructureIngredient(base, (long) displaySize * displaySize + perimeter),
+            new StructureIngredient(base, 4L * (displaySize - 1)),
+            new StructureIngredient(baseWithInterface, (long) displaySize * displaySize + 4L * (displayHeight - 2)),
             new StructureIngredient(ceiling, (long) (displaySize - 2) * (displaySize - 2) - 1),
-            new StructureIngredient(wall, perimeter * (displayHeight - 2)));
+            new StructureIngredient(wall, 4L * (displaySize - 2) * (displayHeight - 2)));
     }
 
     @Override

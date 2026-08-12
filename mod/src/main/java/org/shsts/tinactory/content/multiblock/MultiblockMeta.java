@@ -156,15 +156,18 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         private static <P> Transformer<MultiblockSpec.Builder<BlockState, P>> ingredient(
-            char ch, Consumer<BlockIngredient> cons, BlockIngredient requiredIngredient,
-            BlockIngredient structureIngredient, @Nullable String key, boolean allowInterface) {
-            cons.accept(requiredIngredient);
+            char ch, Consumer<BlockIngredient> cons, BlockIngredient ingredient,
+            @Nullable String key, boolean allowInterface) {
+            cons.accept(ingredient);
+            var structureIngredient = allowInterface ?
+                BlockIngredient.of(ingredient, BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE)) :
+                ingredient;
             return $ -> $.check(ch, (ctx, pos) -> {
                 if (allowInterface && MultiblockSpec.checkInterface(ctx, pos)) {
                     return;
                 }
                 var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !requiredIngredient.test(block1.get())) {
+                if (block1.isEmpty() || !ingredient.test(block1.get())) {
                     ctx.setFailed();
                     return;
                 }
@@ -243,7 +246,7 @@ public class MultiblockMeta extends MachineMeta {
                 } else {
                     var block = BLOCKS.getEntry(ResourceLocation.parse(s));
                     var ingredient = BlockIngredient.of(block);
-                    return ingredient(ch, cons, ingredient, ingredient, null, false);
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
             }
 
@@ -253,34 +256,30 @@ public class MultiblockMeta extends MachineMeta {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
                     var ingredient = BlockIngredient.of(block);
-                    var displayIngredient = BlockIngredient.of(BlockIngredient.blockValue(block),
-                        BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
-                    return ingredient(ch, cons, ingredient, displayIngredient, null, true);
+                    return ingredient(ch, cons, ingredient, null, true);
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
                     var ingredient = BlockIngredient.of(tag);
-                    return ingredient(ch, cons, ingredient, ingredient, null, false);
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
                 case "tag_or_interface" -> {
                     var tag = getBlockTag(jo, "tag");
                     var ingredient = BlockIngredient.of(tag);
-                    var displayIngredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
-                        BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
-                    return ingredient(ch, cons, ingredient, displayIngredient, null, true);
+                    return ingredient(ch, cons, ingredient, null, true);
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
                     var ingredient = BlockIngredient.of(tag);
-                    return ingredient(ch, cons, ingredient, ingredient, key, false);
+                    return ingredient(ch, cons, ingredient, key, false);
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
                     var ingredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
                         BlockIngredient.blockValue(block));
-                    return ingredient(ch, cons, ingredient, ingredient, null, false);
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
