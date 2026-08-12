@@ -13,6 +13,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
@@ -162,7 +163,7 @@ public class TechMenu extends MenuBase {
             if (StringUtils.isBlank(name)) {
                 renameResult.remove(DataComponents.CUSTOM_NAME);
             } else {
-                renameResult.set(DataComponents.CUSTOM_NAME, Component.literal(name));
+                renameResult.set(DataComponents.CUSTOM_NAME, I18n.raw(name));
             }
         } else {
             renameResult = ItemStack.EMPTY;

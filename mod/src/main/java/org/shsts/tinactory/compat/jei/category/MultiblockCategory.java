@@ -22,6 +22,7 @@ import org.shsts.tinactory.compat.jei.gui.MultiblockStructureViewer;
 import org.shsts.tinactory.content.multiblock.MultiblockSet;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -37,7 +38,7 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> {
-    public static final ResourceLocation LOC = modLoc("multiblock_structure");
+    public static final ResourceLocation LOC = modLoc("jei/category/multiblock_structure");
     public static final RecipeType<MultiblockSet> TYPE = new RecipeType<>(LOC, MultiblockSet.class);
     private static final int WIDTH = CONTENT_WIDTH;
     private static final int VIEW_Y = FONT_HEIGHT + SPACING;
@@ -73,7 +74,7 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
 
     @Override
     public Component getTitle() {
-        return Component.translatable("tinactory.jei.category.multiblock_structure");
+        return I18n.tr("tinactory.jei.category.multiblock_structure");
     }
 
     @Override

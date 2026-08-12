@@ -31,6 +31,10 @@ public final class I18n {
         return tr(block.getDescriptionId());
     }
 
+    public static MutableComponent raw(String str) {
+        return Component.literal(str);
+    }
+
     public static MutableComponent raw(String format, Object... args) {
         return Component.literal(format.formatted(args));
     }

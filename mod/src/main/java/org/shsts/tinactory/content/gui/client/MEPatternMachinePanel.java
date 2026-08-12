@@ -10,6 +10,7 @@ import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.client.IViewNode;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
@@ -84,7 +85,7 @@ public class MEPatternMachinePanel extends Panel {
         }
         if (draft.voltageTier() != null) {
             var v = Voltage.fromRank(draft.voltageTier());
-            voltageButton.setLabel(Component.literal(v.displayName()));
+            voltageButton.setLabel(I18n.raw(v.displayName()));
         } else {
             voltageButton.setLabel(tr("ignoreVoltage"));
         }

@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.multiblock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestBlock;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
@@ -133,7 +133,7 @@ public class MultiblockSpecTest {
         assertEquals(List.of(new IMultiblockDisplay.StructureIngredient(first, 4),
             new IMultiblockDisplay.StructureIngredient(second, 2)), display.getStructureIngredients());
         assertThrows(UnsupportedOperationException.class, () -> display.getStructureIngredients().add(null));
-        assertEquals(List.of(Component.translatable("tinactory.jei.multiblock.size", 3, 2, 2, 3, 3, 2)),
+        assertEquals(List.of(I18n.tr("tinactory.jei.multiblock.size", 3, 2, 2, 3, 3, 2)),
             display.getDetailLines());
     }
 

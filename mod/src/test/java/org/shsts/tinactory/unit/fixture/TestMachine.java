@@ -27,6 +27,7 @@ import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -128,7 +129,7 @@ public final class TestMachine implements IMachine {
 
     @Override
     public Component title() {
-        return Component.literal("test-machine");
+        return I18n.raw("test-machine");
     }
 
     @Override
@@ -481,6 +482,5 @@ public final class TestMachine implements IMachine {
         public IRenderDescriptor getDisplay() {
             return EmptyRenderDescriptor.INSTANCE;
         }
-
     }
 }
