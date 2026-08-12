@@ -59,9 +59,9 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
         icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Items.BOOK));
     }
 
-    private static List<ItemStack> ingredientToItems(IMultiblockDisplay.RequiredIngredient required) {
-        var count = Math.toIntExact(required.count());
-        return required.ingredient().expand(ClientUtil.registryAccess()).stream()
+    private static List<ItemStack> ingredientToItems(IMultiblockDisplay.StructureIngredient structure) {
+        var count = Math.toIntExact(structure.count());
+        return structure.ingredient().expand(ClientUtil.registryAccess()).stream()
             .map(block -> new ItemStack(block, count))
             .toList();
     }
@@ -98,9 +98,9 @@ public final class MultiblockCategory implements IRecipeCategory<MultiblockSet> 
             .addIngredient(VanillaTypes.ITEM_STACK, controller);
         builder.addSlot(RecipeIngredientRole.INPUT, SLOTS_X + 1, SLOTS_Y + 1)
             .addIngredient(VanillaTypes.ITEM_STACK, controller);
-        var requiredIngredients = set.display().getRequiredIngredients();
-        for (var i = 0; i < requiredIngredients.size(); i++) {
-            var ingredient = requiredIngredients.get(i);
+        var structureIngredients = set.display().getStructureIngredients();
+        for (var i = 0; i < structureIngredients.size(); i++) {
+            var ingredient = structureIngredients.get(i);
             var x = SLOTS_X + (i + 1) % SLOTS_COLUMNS * SLOT_SIZE + 1;
             var y = SLOTS_Y + (i + 1) / SLOTS_COLUMNS * SLOT_SIZE + 1;
             builder.addSlot(RecipeIngredientRole.INPUT, x, y)

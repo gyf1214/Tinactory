@@ -89,7 +89,7 @@ public class MultiblockSpecTest {
     }
 
     @Test
-    void aggregatesOrderedRequiredIngredientsWithoutMaterializingMatchers() {
+    void aggregatesOrderedStructureIngredientsWithoutMaterializingMatchers() {
         IBlockIngredient first = new IBlockIngredient() {
             @Override
             public boolean test(BlockState state) {
@@ -123,14 +123,16 @@ public class MultiblockSpecTest {
             }
         };
         var spec = MultiblockSpec.<TestBlock, Void>builder(null)
-            .check('A', (ctx, pos) -> {}, first)
+            .check('A', (ctx, pos) -> {
+                throw new AssertionError("aggregation must not validate matchers");
+            }, first)
             .check('B', (ctx, pos) -> {}, second);
         spec.layer().height(2, 3).row("ABA").row(" $ ").build();
         var display = spec.buildObject();
 
-        assertEquals(List.of(new IMultiblockDisplay.RequiredIngredient(first, 4),
-            new IMultiblockDisplay.RequiredIngredient(second, 2)), display.getRequiredIngredients());
-        assertThrows(UnsupportedOperationException.class, () -> display.getRequiredIngredients().add(null));
+        assertEquals(List.of(new IMultiblockDisplay.StructureIngredient(first, 4),
+            new IMultiblockDisplay.StructureIngredient(second, 2)), display.getStructureIngredients());
+        assertThrows(UnsupportedOperationException.class, () -> display.getStructureIngredients().add(null));
         assertEquals(List.of(Component.translatable("tinactory.jei.multiblock.size", 3, 2, 2, 3, 3, 2)),
             display.getDetailLines());
     }

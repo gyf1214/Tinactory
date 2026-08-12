@@ -130,12 +130,12 @@ public class CleanroomDisplay implements IMultiblockDisplay {
     }
 
     @Override
-    public List<RequiredIngredient> getRequiredIngredients() {
+    public List<StructureIngredient> getStructureIngredients() {
         var perimeter = 4L * (displaySize - 1);
         return List.of(
-            new RequiredIngredient(base, (long) displaySize * displaySize + perimeter),
-            new RequiredIngredient(ceiling, (long) (displaySize - 2) * (displaySize - 2) - 1),
-            new RequiredIngredient(wall, perimeter * (displayHeight - 2)));
+            new StructureIngredient(base, (long) displaySize * displaySize + perimeter),
+            new StructureIngredient(ceiling, (long) (displaySize - 2) * (displaySize - 2) - 1),
+            new StructureIngredient(wall, perimeter * (displayHeight - 2)));
     }
 
     @Override

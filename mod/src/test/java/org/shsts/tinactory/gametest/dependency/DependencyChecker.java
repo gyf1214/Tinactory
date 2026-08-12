@@ -404,8 +404,8 @@ public final class DependencyChecker {
             var set = entry.getValue();
             var requirements = new ArrayList<IDependencyNode>();
             stackNode(new ItemStack(set.controller().get())).ifPresent(requirements::add);
-            for (var i = 0; i < set.structureIngredients().size(); i++) {
-                blockIngredientNode(set.structureIngredients().get(i), multiblockId, i).ifPresent(requirements::add);
+            for (var i = 0; i < set.requiredIngredients().size(); i++) {
+                blockIngredientNode(set.requiredIngredients().get(i), multiblockId, i).ifPresent(requirements::add);
             }
             var multiblock = new MultiblockNode(multiblockId);
             addMethodIfUseful("multiblock/" + multiblock.id(), requirements, List.of(multiblock), "multiblock bridge");

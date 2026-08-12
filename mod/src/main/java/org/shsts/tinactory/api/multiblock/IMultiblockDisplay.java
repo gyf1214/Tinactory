@@ -11,7 +11,7 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IMultiblockDisplay {
-    record RequiredIngredient(IBlockIngredient ingredient, long count) {}
+    record StructureIngredient(IBlockIngredient ingredient, long count) {}
 
     int width();
 
@@ -23,7 +23,7 @@ public interface IMultiblockDisplay {
 
     Optional<IBlockIngredient> getIngredient(int x, int y, int z);
 
-    List<RequiredIngredient> getRequiredIngredients();
+    List<StructureIngredient> getStructureIngredients();
 
     List<Component> getDetailLines();
 }

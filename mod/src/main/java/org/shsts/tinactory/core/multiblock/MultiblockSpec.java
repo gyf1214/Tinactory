@@ -39,7 +39,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     private final int minHeight;
     private final int maxHeight;
     private final BlockPos controllerPosition;
-    private final List<RequiredIngredient> requiredIngredients;
+    private final List<StructureIngredient> structureIngredients;
 
     private MultiblockSpec(Builder<S, ?> builder) {
         this.layers = List.copyOf(builder.layers);
@@ -56,12 +56,12 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
         this.controllerPosition = new BlockPos(centerW, layers.subList(0, centerLayerIdx).stream()
             .mapToInt(layer -> layer.minHeight)
             .sum(), centerD);
-        this.requiredIngredients = createRequiredIngredients();
+        this.structureIngredients = createStructureIngredients();
     }
 
-    private List<RequiredIngredient> createRequiredIngredients() {
+    private List<StructureIngredient> createStructureIngredients() {
         var ingredientIndexes = new IdentityHashMap<IBlockIngredient, Integer>();
-        var result = new ArrayList<RequiredIngredient>();
+        var result = new ArrayList<StructureIngredient>();
         for (var y = 0; y < minHeight; y++) {
             for (var z = 0; z < depth; z++) {
                 for (var x = 0; x < width; x++) {
@@ -73,10 +73,10 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
                     var index = ingredientIndexes.get(value);
                     if (index == null) {
                         ingredientIndexes.put(value, result.size());
-                        result.add(new RequiredIngredient(value, 1));
+                        result.add(new StructureIngredient(value, 1));
                     } else {
-                        var required = result.get(index);
-                        result.set(index, new RequiredIngredient(value, required.count() + 1));
+                        var structure = result.get(index);
+                        result.set(index, new StructureIngredient(value, structure.count() + 1));
                     }
                 }
             }
@@ -238,8 +238,8 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     }
 
     @Override
-    public List<RequiredIngredient> getRequiredIngredients() {
-        return requiredIngredients;
+    public List<StructureIngredient> getStructureIngredients() {
+        return structureIngredients;
     }
 
     @Override

@@ -13,9 +13,9 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record MultiblockSet(List<IRecipeType<?>> types, IEntry<? extends Block> controller, IMultiblockDisplay display,
-    List<IBlockIngredient> structureIngredients) {
+    List<IBlockIngredient> requiredIngredients) {
     public MultiblockSet {
         types = List.copyOf(types);
-        structureIngredients = List.copyOf(structureIngredients);
+        requiredIngredients = List.copyOf(requiredIngredients);
     }
 }
