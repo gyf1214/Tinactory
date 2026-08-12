@@ -85,7 +85,7 @@ public class MultiblockMeta extends MachineMeta {
     private static class Executor extends MachineMeta.Executor {
         private final List<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
-        private final Set<IBlockIngredient> structureIngredients = new LinkedHashSet<>();
+        private final Set<IBlockIngredient> requiredIngredients = new LinkedHashSet<>();
         @Nullable
         private IMultiblockDisplay display = null;
 
@@ -156,15 +156,15 @@ public class MultiblockMeta extends MachineMeta {
         }
 
         private static <P> Transformer<MultiblockSpec.Builder<BlockState, P>> ingredient(
-            char ch, Consumer<BlockIngredient> cons, BlockIngredient ingredient,
-            @Nullable String key, boolean allowInterface) {
-            cons.accept(ingredient);
+            char ch, Consumer<BlockIngredient> cons, BlockIngredient requiredIngredient,
+            BlockIngredient structureIngredient, @Nullable String key, boolean allowInterface) {
+            cons.accept(requiredIngredient);
             return $ -> $.check(ch, (ctx, pos) -> {
                 if (allowInterface && MultiblockSpec.checkInterface(ctx, pos)) {
                     return;
                 }
                 var block1 = ctx.getBlock(pos);
-                if (block1.isEmpty() || !ingredient.test(block1.get())) {
+                if (block1.isEmpty() || !requiredIngredient.test(block1.get())) {
                     ctx.setFailed();
                     return;
                 }
@@ -177,7 +177,7 @@ public class MultiblockMeta extends MachineMeta {
                         ctx.setProperty(key, block1.get().getBlock());
                     }
                 }
-            }, ingredient);
+            }, structureIngredient);
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je,
@@ -242,7 +242,8 @@ public class MultiblockMeta extends MachineMeta {
                     });
                 } else {
                     var block = BLOCKS.getEntry(ResourceLocation.parse(s));
-                    return ingredient(ch, cons, BlockIngredient.of(block), null, false);
+                    var ingredient = BlockIngredient.of(block);
+                    return ingredient(ch, cons, ingredient, ingredient, null, false);
                 }
             }
 
@@ -251,27 +252,35 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
-                    return ingredient(ch, cons, BlockIngredient.of(block), null, true);
+                    var ingredient = BlockIngredient.of(block);
+                    var displayIngredient = BlockIngredient.of(BlockIngredient.blockValue(block),
+                        BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
+                    return ingredient(ch, cons, ingredient, displayIngredient, null, true);
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), null, false);
+                    var ingredient = BlockIngredient.of(tag);
+                    return ingredient(ch, cons, ingredient, ingredient, null, false);
                 }
                 case "tag_or_interface" -> {
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), null, true);
+                    var ingredient = BlockIngredient.of(tag);
+                    var displayIngredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
+                        BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE));
+                    return ingredient(ch, cons, ingredient, displayIngredient, null, true);
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), key, false);
+                    var ingredient = BlockIngredient.of(tag);
+                    return ingredient(ch, cons, ingredient, ingredient, key, false);
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
                     var ingredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
                         BlockIngredient.blockValue(block));
-                    return ingredient(ch, cons, ingredient, null, false);
+                    return ingredient(ch, cons, ingredient, ingredient, null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
@@ -297,7 +306,7 @@ public class MultiblockMeta extends MachineMeta {
             for (var ch : mandatorySymbols) {
                 var ingredient = ingredientsBySymbol.get(ch);
                 if (ingredient != null) {
-                    structureIngredients.add(ingredient);
+                    requiredIngredients.add(ingredient);
                 }
             }
 
@@ -356,9 +365,9 @@ public class MultiblockMeta extends MachineMeta {
             var maxHeight = GsonHelper.getAsInt(jo1, "maxHeight");
             var maxConnectors = GsonHelper.getAsInt(jo1, "maxConnectors");
             var maxDoors = GsonHelper.getAsInt(jo1, "maxDoors");
-            structureIngredients.add(base);
-            structureIngredients.add(ceiling);
-            structureIngredients.add(wall);
+            requiredIngredients.add(base);
+            requiredIngredients.add(ceiling);
+            requiredIngredients.add(wall);
             display = new CleanroomDisplay(base, ceiling, wall, door, connector,
                 5, 5, maxSize, maxHeight, maxDoors, maxConnectors);
 
@@ -444,7 +453,7 @@ public class MultiblockMeta extends MachineMeta {
             var block = buildBlock();
 
             var set = new MultiblockSet(recipeTypes, block, Objects.requireNonNull(display),
-                List.copyOf(structureIngredients));
+                List.copyOf(requiredIngredients));
             MULTIBLOCK_SETS.put(id, set);
         }
     }

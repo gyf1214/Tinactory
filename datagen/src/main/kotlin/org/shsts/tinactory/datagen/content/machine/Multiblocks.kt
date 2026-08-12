@@ -18,6 +18,7 @@ import org.shsts.tinactory.AllTags.ELECTRIC_FURNACE
 import org.shsts.tinactory.AllTags.FUSION_SHELL
 import org.shsts.tinactory.AllTags.GLASS_CASING
 import org.shsts.tinactory.AllTags.MINEABLE_WITH_WRENCH
+import org.shsts.tinactory.AllTags.MULTIBLOCK_INTERFACE
 import org.shsts.tinactory.AllTags.POWER_BLOCK
 import org.shsts.tinactory.AllTags.machine
 import org.shsts.tinactory.content.multiblock.TurbineBlock.CENTER_BLADE
@@ -770,6 +771,7 @@ object Multiblocks {
                     blockState { ctx ->
                         multiblockInterface(ctx, IO_TEX)
                     }
+                    tag(MULTIBLOCK_INTERFACE)
                 }
             }
             for (entry in getMachine("multiblock/digital_interface").entries()) {
@@ -777,6 +779,7 @@ object Multiblocks {
                     blockState { ctx ->
                         multiblockInterface(ctx, ME_BUS)
                     }
+                    tag(MULTIBLOCK_INTERFACE)
                 }
             }
             multiblock("blast_furnace", "heatproof")
