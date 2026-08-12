@@ -17,6 +17,7 @@ import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -127,10 +128,31 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         return result;
     }
 
-    private static BlockState controllerState(MultiblockSet set) {
+    private static boolean hasIngredient(IMultiblockDisplay display, BlockPos pos) {
+        return display.getIngredient(pos.getX(), pos.getY(), pos.getZ()).isPresent();
+    }
+
+    private static Direction controllerFacing(IMultiblockDisplay display) {
+        var pos = display.controllerPosition();
+        if (pos.getZ() == 0 && hasIngredient(display, pos.south())) {
+            return Direction.SOUTH;
+        }
+        if (pos.getZ() == display.depth() - 1 && hasIngredient(display, pos.north())) {
+            return Direction.NORTH;
+        }
+        if (pos.getX() == 0 && hasIngredient(display, pos.east())) {
+            return Direction.EAST;
+        }
+        if (pos.getX() == display.width() - 1 && hasIngredient(display, pos.west())) {
+            return Direction.WEST;
+        }
+        return Direction.SOUTH;
+    }
+
+    private static BlockState controllerState(MultiblockSet set, IMultiblockDisplay display) {
         var state = set.controller().get().defaultBlockState();
         if (state.hasProperty(PrimitiveBlock.FACING)) {
-            state = state.setValue(PrimitiveBlock.FACING, Direction.SOUTH);
+            state = state.setValue(PrimitiveBlock.FACING, controllerFacing(display));
         }
         return state;
     }
@@ -212,7 +234,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         }
         var controller = display.controllerPosition();
         if (visible(controller.getY())) {
-            renderBlock(poseStack, graphics, controllerState(set), controller.getX(), controller.getY(),
+            renderBlock(poseStack, graphics, controllerState(set, display), controller.getX(), controller.getY(),
                 controller.getZ());
         }
         graphics.flush();
@@ -292,7 +314,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         if (visible(controller.getY())) {
             var hit = hitBlock(pos, dir, controller.getX(), controller.getY(), controller.getZ());
             if (hit < nearest) {
-                result = new Hover(controllerState(set), null);
+                result = new Hover(controllerState(set, display), null);
             }
         }
         return result;
