@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import org.shsts.tinactory.AllTags;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
+import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.content.machine.FireBoiler;
 import org.shsts.tinactory.content.machine.MachineMeta;
 import org.shsts.tinactory.content.machine.RecipeProcessors;
@@ -25,8 +27,6 @@ import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.multiblock.BlockIngredient;
-import org.shsts.tinactory.integration.multiblock.BlockIngredient.BlockValue;
-import org.shsts.tinactory.integration.multiblock.BlockIngredient.TagValue;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -84,7 +85,9 @@ public class MultiblockMeta extends MachineMeta {
     private static class Executor extends MachineMeta.Executor {
         private final List<Function<BlockEntity, ? extends IRecipeProcessor<?>>> processors = new ArrayList<>();
         private final List<IRecipeType<?>> recipeTypes = new ArrayList<>();
-        private final Set<BlockIngredient> structureIngredients = new LinkedHashSet<>();
+        private final Set<IBlockIngredient> requiredIngredients = new LinkedHashSet<>();
+        @Nullable
+        private IMultiblockDisplay display = null;
 
         public Executor(ResourceLocation loc, JsonObject jo) {
             super(loc, jo);
@@ -156,6 +159,9 @@ public class MultiblockMeta extends MachineMeta {
             char ch, Consumer<BlockIngredient> cons, BlockIngredient ingredient,
             @Nullable String key, boolean allowInterface) {
             cons.accept(ingredient);
+            var structureIngredient = allowInterface ?
+                BlockIngredient.of(ingredient, BlockIngredient.tagValue(AllTags.MULTIBLOCK_INTERFACE)) :
+                ingredient;
             return $ -> $.check(ch, (ctx, pos) -> {
                 if (allowInterface && MultiblockSpec.checkInterface(ctx, pos)) {
                     return;
@@ -174,7 +180,7 @@ public class MultiblockMeta extends MachineMeta {
                         ctx.setProperty(key, block1.get().getBlock());
                     }
                 }
-            });
+            }, structureIngredient);
         }
 
         private <P> Transformer<MultiblockSpec.Builder<BlockState, P>> parseLayer(JsonElement je,
@@ -239,7 +245,8 @@ public class MultiblockMeta extends MachineMeta {
                     });
                 } else {
                     var block = BLOCKS.getEntry(ResourceLocation.parse(s));
-                    return ingredient(ch, cons, BlockIngredient.of(block), null, false);
+                    var ingredient = BlockIngredient.of(block);
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
             }
 
@@ -248,26 +255,31 @@ public class MultiblockMeta extends MachineMeta {
             switch (type) {
                 case "block_or_interface" -> {
                     var block = getBlock(jo, "block");
-                    return ingredient(ch, cons, BlockIngredient.of(block), null, true);
+                    var ingredient = BlockIngredient.of(block);
+                    return ingredient(ch, cons, ingredient, null, true);
                 }
                 case "tag" -> {
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), null, false);
+                    var ingredient = BlockIngredient.of(tag);
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
                 case "tag_or_interface" -> {
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), null, true);
+                    var ingredient = BlockIngredient.of(tag);
+                    return ingredient(ch, cons, ingredient, null, true);
                 }
                 case "tag_with_same_block" -> {
                     var tag = getBlockTag(jo, "tag");
                     var key = GsonHelper.getAsString(jo, "key");
-                    return ingredient(ch, cons, BlockIngredient.of(tag), key, false);
+                    var ingredient = BlockIngredient.of(tag);
+                    return ingredient(ch, cons, ingredient, key, false);
                 }
                 case "tag_or_block" -> {
                     var block = getBlock(jo, "block");
                     var tag = getBlockTag(jo, "tag");
-                    return ingredient(ch, cons, BlockIngredient.of(new BlockValue(block), new TagValue(tag)),
-                        null, false);
+                    var ingredient = BlockIngredient.of(BlockIngredient.tagValue(tag),
+                        BlockIngredient.blockValue(block));
+                    return ingredient(ch, cons, ingredient, null, false);
                 }
             }
             throw new UnsupportedTypeException("defines", type);
@@ -293,10 +305,11 @@ public class MultiblockMeta extends MachineMeta {
             for (var ch : mandatorySymbols) {
                 var ingredient = ingredientsBySymbol.get(ch);
                 if (ingredient != null) {
-                    structureIngredients.add(ingredient);
+                    requiredIngredients.add(ingredient);
                 }
             }
 
+            spec.onCreateObject($ -> display = $);
             return spec.build();
         }
 
@@ -342,9 +355,20 @@ public class MultiblockMeta extends MachineMeta {
             var baseBlock = getBlock(jo1, "base");
             var ceilingBlock = getBlock(jo1, "ceiling");
             var wallTag = getBlockTag(jo1, "wall");
-            structureIngredients.add(BlockIngredient.of(baseBlock));
-            structureIngredients.add(BlockIngredient.of(ceilingBlock));
-            structureIngredients.add(BlockIngredient.of(wallTag));
+            var base = BlockIngredient.of(baseBlock);
+            var ceiling = BlockIngredient.of(ceilingBlock);
+            var wall = BlockIngredient.of(wallTag);
+            var door = getBlockTag(jo1, "door");
+            var connector = getBlockTag(jo1, "connector");
+            var maxSize = GsonHelper.getAsInt(jo1, "maxSize");
+            var maxHeight = GsonHelper.getAsInt(jo1, "maxHeight");
+            var maxConnectors = GsonHelper.getAsInt(jo1, "maxConnectors");
+            var maxDoors = GsonHelper.getAsInt(jo1, "maxDoors");
+            requiredIngredients.add(base);
+            requiredIngredients.add(ceiling);
+            requiredIngredients.add(wall);
+            display = new CleanroomDisplay(base, ceiling, wall, door, connector,
+                5, 5, maxSize, maxHeight, maxDoors, maxConnectors);
 
             var layout = parseLayout().buildLayout();
 
@@ -359,12 +383,12 @@ public class MultiblockMeta extends MachineMeta {
                 .baseBlock(baseBlock)
                 .ceilingBlock(ceilingBlock)
                 .wallTag(wallTag)
-                .connectorTag(getBlockTag(jo1, "connector"))
-                .doorTag(getBlockTag(jo1, "door"))
-                .maxSize(GsonHelper.getAsInt(jo1, "maxSize"))
-                .maxHeight(GsonHelper.getAsInt(jo1, "maxHeight"))
-                .maxConnectors(GsonHelper.getAsInt(jo1, "maxConnectors"))
-                .maxDoors(GsonHelper.getAsInt(jo1, "maxDoors"))
+                .doorTag(door)
+                .connectorTag(connector)
+                .maxSize(maxSize)
+                .maxHeight(maxHeight)
+                .maxConnectors(maxConnectors)
+                .maxDoors(maxDoors)
                 .build()
                 .build()
                 .end()
@@ -427,7 +451,8 @@ public class MultiblockMeta extends MachineMeta {
 
             var block = buildBlock();
 
-            var set = new MultiblockSet(recipeTypes, block, List.copyOf(structureIngredients));
+            var set = new MultiblockSet(recipeTypes, block, Objects.requireNonNull(display),
+                List.copyOf(requiredIngredients));
             MULTIBLOCK_SETS.put(id, set);
         }
     }

@@ -10,7 +10,6 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.client.GridViewGroup;
 import org.shsts.tinactory.core.gui.client.IViewNode;
-import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
@@ -86,7 +85,7 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
         var itemCount = getItemCount();
         var slotCount = gridViewGroup.getSlotCount();
         var maxPage = Math.max(1, (itemCount + slotCount - 1) / slotCount);
-        page = MathUtil.clamp(val, 0, maxPage - 1);
+        page = Math.clamp(val, 0, maxPage - 1);
         leftPageButton.setActive(page != 0);
         rightPageButton.setActive(page != maxPage - 1);
         for (var i = 0; i < gridViewGroup.getSlotCount(); i++) {

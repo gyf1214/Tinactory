@@ -918,7 +918,7 @@
 		""
 		"The multiblock must be placed in the required shape. After building it, connect the Multiblock Interface to power, then right-click the interface to open the machine GUI."
 		""
-		"Tip: Tinactory includes litematica schematics for all multiblock machines. Load one to see where each block belongs."
+		"Tip: Use JEI's Multiblock Structure viewer to see where each block belongs."
 	]
 	quest.1E207E3075739472.quest_subtitle: "Build your first multiblock machine"
 	quest.1E207E3075739472.title: "Electric Blast Furnace"
@@ -1354,7 +1354,7 @@
 		""
 		"To build it, prepare one controller, 18 sifter casings, 63 solid steel machine casings, and one multiblock interface. Sifter casings need electric motors, rotors, and zinc filters, plus soldering alloy. The solid steel casings may nearly empty your steel stock."
 		""
-		"Use litematica while building to place the structure correctly. This is both a construction challenge and proof that your industry can handle large automation."
+		"Use JEI's Multiblock Structure viewer while building to place the structure correctly. This is both a construction challenge and proof that your industry can handle large automation."
 	]
 	quest.39ADA30CF82902BE.quest_subtitle: "Build a Large Sifter"
 	quest.39ADA30CF82902BE.title: "Huge Sifter"

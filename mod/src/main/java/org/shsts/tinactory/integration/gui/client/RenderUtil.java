@@ -7,6 +7,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -177,6 +178,13 @@ public final class RenderUtil {
             renderBlockQuad(quad, blockColors, blockState, pose, vertexConsumer,
                 packedLight, packedOverlay);
         }
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    public static void renderBlockInGui(PoseStack poseStack, MultiBufferSource bufferSource,
+        BlockState blockState, int packedLight, int packedOverlay) {
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(blockState, poseStack, bufferSource,
+            packedLight, packedOverlay, ModelData.EMPTY, null);
     }
 
     public static void renderItem(GuiGraphics graphics, ItemStack stack, int x, int y) {

@@ -2,9 +2,15 @@ package org.shsts.tinactory.unit.multiblock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.multiblock.MultiblockSpec;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestBlock;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestMachine;
@@ -25,10 +31,18 @@ public class MultiblockSpecTest {
 
     private static MultiblockSpec.Builder<TestBlock, Void> builder() {
         return MultiblockSpec.<TestBlock, Void>builder(null)
-            .checkBlock('A', block -> block == TestBlock.BASE)
-            .checkBlock('B', block -> block == TestBlock.CASING)
-            .checkBlock('C', block -> block == TestBlock.COIL)
-            .checkBlock('G', block -> block == TestBlock.GLASS);
+            .check('A', blockChecker(TestBlock.BASE))
+            .check('B', blockChecker(TestBlock.CASING))
+            .check('C', blockChecker(TestBlock.COIL))
+            .check('G', blockChecker(TestBlock.GLASS));
+    }
+
+    private static BiConsumer<IMultiblockCheckCtx<TestBlock>, BlockPos> blockChecker(TestBlock expected) {
+        return (ctx, pos) -> {
+            if (ctx.getBlock(pos).filter(block -> block == expected).isEmpty()) {
+                ctx.setFailed();
+            }
+        };
     }
 
     private static TestMultiblockCheckCtx contextWithCenter() {
@@ -38,6 +52,89 @@ public class MultiblockSpecTest {
 
     private static void assertInvalid(IllegalArgumentException exception, String message) {
         assertEquals(message, exception.getMessage());
+    }
+
+    @Test
+    void materializesImmutableDisplayIngredientsAtMinimumHeight() {
+        IBlockIngredient ingredient = new IBlockIngredient() {
+            @Override
+            public boolean test(BlockState state) {
+                throw new AssertionError("display must not match ingredients");
+            }
+
+            @Override
+            public List<Block> expand(HolderLookup.Provider provider) {
+                throw new AssertionError("display must not expand ingredients");
+            }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("display must not expand display");
+            }
+        };
+        var spec = MultiblockSpec.<TestBlock, Void>builder(null)
+            .check('A', (ctx, pos) -> {}, ingredient)
+            .check('B', (ctx, pos) -> {});
+        spec.layer().height(2, 3).row("A  ").row(" B ").build();
+        spec.layer().row(" $ ").row("   ").build();
+        var display = spec.buildObject();
+
+        assertEquals(3, display.width());
+        assertEquals(2, display.depth());
+        assertEquals(3, display.height());
+        assertEquals(new BlockPos(1, 2, 0), display.controllerPosition());
+        assertSame(ingredient, display.getIngredient(0, 0, 0).orElseThrow());
+        assertTrue(display.getIngredient(1, 0, 1).isEmpty());
+        assertTrue(display.getIngredient(1, 2, 0).isEmpty());
+    }
+
+    @Test
+    void aggregatesOrderedStructureIngredientsWithoutMaterializingMatchers() {
+        IBlockIngredient first = new IBlockIngredient() {
+            @Override
+            public boolean test(BlockState state) {
+                throw new AssertionError("requirements must not match ingredients");
+            }
+
+            @Override
+            public List<Block> expand(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not expand ingredients");
+            }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not display ingredients");
+            }
+        };
+        IBlockIngredient second = new IBlockIngredient() {
+            @Override
+            public boolean test(BlockState state) {
+                throw new AssertionError("requirements must not match ingredients");
+            }
+
+            @Override
+            public List<Block> expand(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not expand ingredients");
+            }
+
+            @Override
+            public BlockState display(HolderLookup.Provider provider) {
+                throw new AssertionError("requirements must not display ingredients");
+            }
+        };
+        var spec = MultiblockSpec.<TestBlock, Void>builder(null)
+            .check('A', (ctx, pos) -> {
+                throw new AssertionError("aggregation must not validate matchers");
+            }, first)
+            .check('B', (ctx, pos) -> {}, second);
+        spec.layer().height(2, 3).row("ABA").row(" $ ").build();
+        var display = spec.buildObject();
+
+        assertEquals(List.of(new IMultiblockDisplay.StructureIngredient(first, 4),
+            new IMultiblockDisplay.StructureIngredient(second, 2)), display.getStructureIngredients());
+        assertThrows(UnsupportedOperationException.class, () -> display.getStructureIngredients().add(null));
+        assertEquals(List.of(I18n.tr("tinactory.jei.multiblock.size", 3, 2, 2, 3, 3, 2)),
+            display.getDetailLines());
     }
 
     @Test

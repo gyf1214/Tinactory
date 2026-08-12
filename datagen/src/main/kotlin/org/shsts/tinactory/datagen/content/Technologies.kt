@@ -207,12 +207,12 @@ object Technologies {
 
             VACUUM_FREEZER = tech("vacuum_freezer") {
                 maxProgress(50)
-                displayItem(getMultiblock("vacuum_freezer").block)
+                displayItem(getMultiblock("vacuum_freezer").controller)
             }
 
             DISTILLATION = tech("distillation") {
                 maxProgress(50)
-                displayItem(getMultiblock("distillation_tower").block)
+                displayItem(getMultiblock("distillation_tower").controller)
             }
 
             CHEMISTRY = child("chemistry") {
@@ -222,7 +222,7 @@ object Technologies {
 
             PYROLYSE_OVEN = tech("pyrolyse_oven") {
                 maxProgress(40)
-                displayItem(getMultiblock("pyrolyse_oven").block)
+                displayItem(getMultiblock("pyrolyse_oven").controller)
             }
 
             OIL_PROCESSING = tech("oil_processing") {
@@ -252,7 +252,7 @@ object Technologies {
 
             OIL_CRACKING = tech("oil_cracking") {
                 maxProgress(100)
-                displayItem(getMultiblock("oil_cracking_unit").block)
+                displayItem(getMultiblock("oil_cracking_unit").controller)
                 depends(OIL_PROCESSING)
             }
 
@@ -277,7 +277,7 @@ object Technologies {
 
             ADVANCED_CHEMISTRY = tech("advanced_chemistry") {
                 maxProgress(200)
-                displayItem(getMultiblock("large_chemical_reactor").block)
+                displayItem(getMultiblock("large_chemical_reactor").controller)
             }
 
             TNT = tech("tnt") {
@@ -351,19 +351,19 @@ object Technologies {
 
             MULTI_SMELTER = tech("multi_smelter") {
                 maxProgress(200)
-                displayItem(getMultiblock("multi_smelter").block)
+                displayItem(getMultiblock("multi_smelter").controller)
             }
 
             base = ADVANCED_CHEMISTRY
 
             POWER_SUBSTATION = tech("power_substation") {
                 maxProgress(240)
-                displayItem(getMultiblock("power_substation").block)
+                displayItem(getMultiblock("power_substation").controller)
             }
 
             LARGE_TURBINE = tech("large_turbine") {
                 maxProgress(220)
-                displayItem(getMultiblock("large_turbine").block)
+                displayItem(getMultiblock("large_turbine").controller)
             }
 
             voltage = Voltage.EV
@@ -381,30 +381,30 @@ object Technologies {
 
             METAL_FORMER = child("metal_former") {
                 maxProgress(140)
-                displayItem(getMultiblock("metal_former").block)
+                displayItem(getMultiblock("metal_former").controller)
             }
 
             EXTRUSION_PRESS = tech("extrusion_press") {
                 maxProgress(200)
-                displayItem(getMultiblock("extrusion_press").block)
+                displayItem(getMultiblock("extrusion_press").controller)
             }
 
             base = TUNGSTEN_STEEL
 
             MINERAL_BENEFICIATION = tech("mineral_beneficiation") {
                 maxProgress(200)
-                displayItem(getMultiblock("ore_processing_unit").block)
+                displayItem(getMultiblock("ore_processing_unit").controller)
                 depends(MULTI_SMELTER)
             }
 
             MATERIAL_CONDITIONING = child("material_conditioning") {
                 maxProgress(220)
-                displayItem(getMultiblock("phase_exchange_chamber").block)
+                displayItem(getMultiblock("phase_exchange_chamber").controller)
             }
 
             ELECTROCHEMICAL_PROCESSING = tech("electrochemical_processing") {
                 maxProgress(260)
-                displayItem(getMultiblock("electrochemical_processor").block)
+                displayItem(getMultiblock("electrochemical_processor").controller)
                 depends(ELECTROLYZING, LITHOGRAPHY)
             }
 
@@ -412,7 +412,7 @@ object Technologies {
 
             LARGE_BOILER = tech("large_boiler") {
                 maxProgress(140)
-                displayItem(getMultiblock("large_boiler").block)
+                displayItem(getMultiblock("large_boiler").controller)
             }
 
             ROCKET_T2 = child("rocket_t2") {
@@ -429,7 +429,7 @@ object Technologies {
 
             PROSPECTING_STATION = tech("prospecting_station") {
                 maxProgress(220)
-                displayItem(getMultiblock("prospecting_station").block)
+                displayItem(getMultiblock("prospecting_station").controller)
                 depends(MINERAL_BENEFICIATION)
             }
 
@@ -442,7 +442,7 @@ object Technologies {
 
             ASSEMBLY_LINE = tech("assembly_line") {
                 maxProgress(220)
-                displayItem(getMultiblock("assembly_line").block)
+                displayItem(getMultiblock("assembly_line").controller)
             }
 
             base = PLATINUM_GROUP_METAL
@@ -459,7 +459,7 @@ object Technologies {
 
             FUSION = tech("fusion") {
                 maxProgress(400)
-                displayItem(getMultiblock("fusion_reactor").block)
+                displayItem(getMultiblock("fusion_reactor").controller)
                 depends(NUCLEAR_PHYSICS)
             }
 
@@ -488,7 +488,7 @@ object Technologies {
 
             INTERSTELLAR_TRAVEL = tech("interstellar_travel") {
                 maxProgress(1000)
-                displayItem(getMultiblock("rocket_launch_site").block)
+                displayItem(getMultiblock("rocket_launch_site").controller)
                 noResearch()
             }
         }

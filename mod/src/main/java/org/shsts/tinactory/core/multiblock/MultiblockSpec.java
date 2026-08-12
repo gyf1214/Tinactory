@@ -4,43 +4,84 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
+public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMultiblockDisplay {
     public static final char IGNORED_CHAR = ' ';
     public static final char CENTER_CHAR = '$';
 
     private final List<MultiblockLayer> layers;
     private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers;
+    private final Map<Character, IBlockIngredient> ingredients;
     private final MultiblockLayer centerLayer;
     private final int centerLayerIdx;
     private final int centerW;
     private final int centerD;
     private final int width;
     private final int depth;
+    private final int minHeight;
+    private final int maxHeight;
+    private final BlockPos controllerPosition;
+    private final List<StructureIngredient> structureIngredients;
 
     private MultiblockSpec(Builder<S, ?> builder) {
-        this.layers = builder.layers;
-        this.checkers = builder.checkers;
+        this.layers = List.copyOf(builder.layers);
+        this.checkers = Map.copyOf(builder.checkers);
+        this.ingredients = Map.copyOf(builder.ingredients);
         this.centerLayerIdx = builder.centerLayerIdx;
         this.centerLayer = layers.get(centerLayerIdx);
         this.centerW = builder.centerW;
         this.centerD = builder.centerD;
         this.width = builder.width;
         this.depth = builder.depth;
+        this.minHeight = layers.stream().mapToInt(layer -> layer.minHeight).sum();
+        this.maxHeight = layers.stream().mapToInt(layer -> layer.maxHeight).sum();
+        this.controllerPosition = new BlockPos(centerW, layers.subList(0, centerLayerIdx).stream()
+            .mapToInt(layer -> layer.minHeight)
+            .sum(), centerD);
+        this.structureIngredients = createStructureIngredients();
+    }
+
+    private List<StructureIngredient> createStructureIngredients() {
+        var ingredientIndexes = new IdentityHashMap<IBlockIngredient, Integer>();
+        var result = new ArrayList<StructureIngredient>();
+        for (var y = 0; y < minHeight; y++) {
+            for (var z = 0; z < depth; z++) {
+                for (var x = 0; x < width; x++) {
+                    var ingredient = getIngredient(x, y, z);
+                    if (ingredient.isEmpty()) {
+                        continue;
+                    }
+                    var value = ingredient.get();
+                    var index = ingredientIndexes.get(value);
+                    if (index == null) {
+                        ingredientIndexes.put(value, result.size());
+                        result.add(new StructureIngredient(value, 1));
+                    } else {
+                        var structure = result.get(index);
+                        result.set(index, new StructureIngredient(value, structure.count() + 1));
+                    }
+                }
+            }
+        }
+        return List.copyOf(result);
     }
 
     private boolean getDirections(IMultiblockCheckCtx<S> ctx) {
@@ -158,9 +199,60 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
         return true;
     }
 
+    @Override
+    public int width() {
+        return width;
+    }
+
+    @Override
+    public int depth() {
+        return depth;
+    }
+
+    @Override
+    public int height() {
+        return minHeight;
+    }
+
+    @Override
+    public BlockPos controllerPosition() {
+        return controllerPosition;
+    }
+
+    @Override
+    public Optional<IBlockIngredient> getIngredient(int x, int y, int z) {
+        if (x < 0 || x >= width || y < 0 || y >= minHeight || z < 0 || z >= depth) {
+            return Optional.empty();
+        }
+        var layerY = 0;
+        for (var layer : layers) {
+            if (y < layerY + layer.minHeight) {
+                if (x == centerW && z == centerD && layer == centerLayer) {
+                    return Optional.empty();
+                }
+                return Optional.ofNullable(ingredients.get(layer.get(x, z)));
+            }
+            layerY += layer.minHeight;
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<StructureIngredient> getStructureIngredients() {
+        return structureIngredients;
+    }
+
+    @Override
+    public List<Component> getDetailLines() {
+        return List.of(minHeight == maxHeight ?
+            I18n.tr("tinactory.jei.multiblock.sizeFixed", width, minHeight, depth) :
+            I18n.tr("tinactory.jei.multiblock.size", width, minHeight, depth, width, maxHeight, depth));
+    }
+
     public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {
         private final List<MultiblockLayer> layers = new ArrayList<>();
         private final Map<Character, BiConsumer<IMultiblockCheckCtx<S>, BlockPos>> checkers = new HashMap<>();
+        private final Map<Character, IBlockIngredient> ingredients = new HashMap<>();
         private int centerLayerIdx = -1;
         private int centerW;
         private int centerD;
@@ -191,13 +283,11 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>> {
             return this;
         }
 
-        public Builder<S, P> checkBlock(char ch, Predicate<S> pred) {
-            return check(ch, (ctx, pos) -> {
-                var block = ctx.getBlock(pos);
-                if (block.isEmpty() || !pred.test(block.get())) {
-                    ctx.setFailed();
-                }
-            });
+        public Builder<S, P> check(char ch, BiConsumer<IMultiblockCheckCtx<S>, BlockPos> checker,
+            IBlockIngredient ingredient) {
+            checkers.put(ch, checker);
+            ingredients.put(ch, ingredient);
+            return this;
         }
 
         public Builder<S, P> interfaceSlot(char ch) {

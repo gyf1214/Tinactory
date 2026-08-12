@@ -7,7 +7,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import org.shsts.tinactory.core.electric.Voltage;
-import org.shsts.tinactory.core.util.MathUtil;
 
 import java.util.List;
 
@@ -53,7 +52,7 @@ public class BatteryItem extends Item {
     }
 
     public void charge(ItemStack stack, long delta) {
-        var value = MathUtil.clamp(getPower(stack) + delta, 0L, capacity);
+        var value = Math.clamp(getPower(stack) + delta, 0L, capacity);
         setPower(stack, value);
     }
 

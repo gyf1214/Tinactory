@@ -8,19 +8,21 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.api.multiblock.IBlockIngredient;
+import org.shsts.tinycorelib.api.core.Transformer;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class BlockIngredient implements Predicate<BlockState> {
+public class BlockIngredient implements IBlockIngredient, IBlockIngredient.Value {
     private final List<Value> values;
     private List<Block> expanded = null;
 
@@ -53,6 +55,7 @@ public final class BlockIngredient implements Predicate<BlockState> {
         return values.stream().anyMatch($ -> $.test(blockState));
     }
 
+    @Override
     public List<Block> expand(HolderLookup.Provider provider) {
         if (expanded != null) {
             return expanded;
@@ -65,8 +68,17 @@ public final class BlockIngredient implements Predicate<BlockState> {
         return expanded;
     }
 
-    public interface Value extends Predicate<BlockState> {
-        void expand(HolderLookup.Provider provider, Consumer<Block> consumer);
+    @Override
+    public void expand(HolderLookup.Provider provider, Consumer<Block> consumer) {
+        for (var block : expand(provider)) {
+            consumer.accept(block);
+        }
+    }
+
+    @Override
+    public BlockState display(HolderLookup.Provider provider) {
+        var expanded = expand(provider);
+        return (expanded.isEmpty() ? Blocks.AIR : expanded.getFirst()).defaultBlockState();
     }
 
     public record BlockValue(Supplier<? extends Block> block) implements Value {
@@ -95,5 +107,37 @@ public final class BlockIngredient implements Predicate<BlockState> {
                 .map(Holder::value)
                 .forEach(consumer);
         }
+    }
+
+    public record Display(IBlockIngredient ingredient, IBlockIngredient displayBlock,
+        Transformer<BlockState> displayState)
+        implements IBlockIngredient {
+        @Override
+        public List<Block> expand(HolderLookup.Provider provider) {
+            return ingredient.expand(provider);
+        }
+
+        @Override
+        public BlockState display(HolderLookup.Provider provider) {
+            return displayState.apply(displayBlock.display(provider));
+        }
+
+        @Override
+        public boolean test(BlockState blockState) {
+            return ingredient.test(blockState);
+        }
+    }
+
+    public static Value blockValue(Supplier<Block> block) {
+        return new BlockValue(block);
+    }
+
+    public static Value tagValue(TagKey<Block> tag) {
+        return new TagValue(tag);
+    }
+
+    public static IBlockIngredient withDisplay(IBlockIngredient ingredient,
+        IBlockIngredient displayBlock, Transformer<BlockState> displayState) {
+        return new Display(ingredient, displayBlock, displayState);
     }
 }

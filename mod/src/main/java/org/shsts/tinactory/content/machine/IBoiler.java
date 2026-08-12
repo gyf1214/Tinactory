@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
-import org.shsts.tinactory.core.util.MathUtil;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -22,12 +21,11 @@ public interface IBoiler extends IMachineProcessor {
     double heat();
 
     default double heatProgress() {
-        return MathUtil.clamp((heat() - minHeat()) / (maxHeat() - minHeat()), 0d, 1d);
+        return Math.clamp((heat() - minHeat()) / (maxHeat() - minHeat()), 0d, 1d);
     }
 
     @Override
     default boolean supportsRecipeType(ResourceLocation recipeTypeId) {
         return false;
     }
-
 }

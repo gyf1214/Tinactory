@@ -16,7 +16,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
@@ -187,7 +186,7 @@ public final class AllCommands {
 
         team.setTechProgress(tech, progress);
         var msg = "Set tech %s process of %s to %d".formatted(techName, team.getName(), progress);
-        player.sendSystemMessage(Component.literal(msg));
+        player.sendSystemMessage(I18n.raw(msg));
         return Command.SINGLE_SUCCESS;
     }
 

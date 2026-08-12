@@ -25,7 +25,7 @@ public class FusionMenu extends MachineMenu {
         if (MathUtil.compare(capacity) <= 0) {
             return 0d;
         }
-        return MathUtil.clamp(runtime.startupEnergy() / capacity, 0d, 1d);
+        return Math.clamp(runtime.startupEnergy() / capacity, 0d, 1d);
     }
 
     public static void addProgressSlots(MachineMenu menu) {

@@ -38,6 +38,7 @@ public final class AllTags {
 
     public static final TagKey<Item> MACHINE = modItem("machine");
     public static final TagKey<Item> ELECTRIC_FURNACE = extend(MACHINE, "electric_furnace");
+    public static final TagKey<Block> MULTIBLOCK_INTERFACE = modBlock("multiblock/interface");
     public static final TagKey<Block> COIL = modBlock("multiblock/coil");
     public static final TagKey<Block> CLEANROOM_WALL = modBlock("multiblock/cleanroom_wall");
     public static final TagKey<Block> CLEANROOM_CONNECTOR = modBlock("multiblock/cleanroom_connector");

@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import java.io.StringReader;
@@ -47,7 +47,7 @@ class CodecHelperTest {
 
     @Test
     void componentCodecRoundTripsText() {
-        var component = Component.literal("core util");
+        var component = I18n.raw("core util");
         var buf = TestCodecHelper.buf();
         CodecHelper.encodeComponentToBuf(buf, component);
 

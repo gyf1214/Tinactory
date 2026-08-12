@@ -82,13 +82,13 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
         }
 
         var cap = sign > 0 ? getPowerCons() : getPowerGen();
-        power = MathUtil.clamp(power + (long) Math.floor(cap * factor), 0, capacity);
+        power = Math.clamp(power + (long) Math.floor(cap * factor), 0, capacity);
         blockEntity.setChanged();
     }
 
     @Override
     public long powerLevel() {
-        return MathUtil.clamp(power, 0, capacity);
+        return Math.clamp(power, 0, capacity);
     }
 
     @Override
