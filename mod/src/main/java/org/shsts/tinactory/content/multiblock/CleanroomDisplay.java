@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.multiblock.BlockIngredient;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -139,9 +140,9 @@ public class CleanroomDisplay implements IMultiblockDisplay {
 
     @Override
     public List<Component> getDetailLines() {
-        return List.of(
-            Component.translatable("tinactory.jei.multiblock.cleanroom.footprint", 3, maxSize),
-            Component.translatable("tinactory.jei.multiblock.cleanroom.height", 3, maxHeight),
-            Component.translatable("tinactory.jei.multiblock.cleanroom.optional", maxDoors, maxConnectors));
+        var line1 = maxSize == 3 && maxHeight == 3 ?
+            I18n.tr("tinactory.jei.multiblock.sizeFixed", 3, 3, 3) :
+            I18n.tr("tinactory.jei.multiblock.size", 3, 3, 3, maxSize, maxHeight, maxSize);
+        return List.of(line1, I18n.tr("tinactory.jei.multiblock.cleanroom.optional", maxDoors, maxConnectors));
     }
 }

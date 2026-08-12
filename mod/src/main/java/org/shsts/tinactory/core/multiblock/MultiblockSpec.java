@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.multiblock.IBlockIngredient;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
 import org.shsts.tinactory.core.builder.SimpleBuilder;
+import org.shsts.tinactory.core.util.I18n;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +36,8 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     private final int centerD;
     private final int width;
     private final int depth;
-    private final int height;
+    private final int minHeight;
+    private final int maxHeight;
     private final BlockPos controllerPosition;
     private final List<RequiredIngredient> requiredIngredients;
 
@@ -49,7 +51,8 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
         this.centerD = builder.centerD;
         this.width = builder.width;
         this.depth = builder.depth;
-        this.height = layers.stream().mapToInt(layer -> layer.minHeight).sum();
+        this.minHeight = layers.stream().mapToInt(layer -> layer.minHeight).sum();
+        this.maxHeight = layers.stream().mapToInt(layer -> layer.maxHeight).sum();
         this.controllerPosition = new BlockPos(centerW, layers.subList(0, centerLayerIdx).stream()
             .mapToInt(layer -> layer.minHeight)
             .sum(), centerD);
@@ -59,7 +62,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
     private List<RequiredIngredient> createRequiredIngredients() {
         var ingredientIndexes = new IdentityHashMap<IBlockIngredient, Integer>();
         var result = new ArrayList<RequiredIngredient>();
-        for (var y = 0; y < height; y++) {
+        for (var y = 0; y < minHeight; y++) {
             for (var z = 0; z < depth; z++) {
                 for (var x = 0; x < width; x++) {
                     var ingredient = getIngredient(x, y, z);
@@ -208,7 +211,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
 
     @Override
     public int height() {
-        return height;
+        return minHeight;
     }
 
     @Override
@@ -218,7 +221,7 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
 
     @Override
     public Optional<IBlockIngredient> getIngredient(int x, int y, int z) {
-        if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth) {
+        if (x < 0 || x >= width || y < 0 || y >= minHeight || z < 0 || z >= depth) {
             return Optional.empty();
         }
         var layerY = 0;
@@ -241,7 +244,9 @@ public class MultiblockSpec<S> implements Consumer<IMultiblockCheckCtx<S>>, IMul
 
     @Override
     public List<Component> getDetailLines() {
-        return List.of();
+        return List.of(minHeight == maxHeight ?
+            I18n.tr("tinactory.jei.multiblock.sizeFixed", width, minHeight, depth) :
+            I18n.tr("tinactory.jei.multiblock.size", width, minHeight, depth, width, maxHeight, depth));
     }
 
     public static class Builder<S, P> extends SimpleBuilder<MultiblockSpec<S>, P, Builder<S, P>> {

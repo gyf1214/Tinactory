@@ -44,7 +44,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
@@ -65,7 +64,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     private final Rect viewport;
     private final Rect layerButton;
     private final Rect resetButton;
-    private final Rect detailLabel;
+    private final ScreenPosition pos;
     private final ScreenRectangle area;
     private final Map<IBlockIngredient, BlockState> blockStates;
     @Nullable
@@ -84,27 +83,26 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         return Math.clamp(zoom, ZOOM_MIN, ZOOM_MAX);
     }
 
-    public MultiblockStructureViewer(MultiblockSet set, Rect viewport, Rect controls) {
+    public MultiblockStructureViewer(MultiblockSet set, Rect viewport, Rect buttons) {
         this.set = set;
         this.display = set.display();
         this.viewport = viewport;
 
-        this.layerButton = controls.resize(controls.width(), BUTTON_HEIGHT);
-        var y = BUTTON_HEIGHT + SPACING;
-        this.resetButton = controls.offset(0, y).resize(controls.width(), BUTTON_HEIGHT);
-        y += BUTTON_HEIGHT + SPACING;
-        this.detailLabel = controls.offset(0, y).resize(0, 0);
+        this.layerButton = buttons.resize(buttons.width(), BUTTON_HEIGHT);
+        this.resetButton = buttons.offset(0, BUTTON_HEIGHT + SPACING).resize(buttons.width(), BUTTON_HEIGHT);
 
-        var width = Math.max(viewport.endX(), controls.endX());
-        var height = Math.max(viewport.endY(), controls.endY());
-        this.area = new ScreenRectangle(0, 0, width, height);
-        this.blockStates = createStates();
+        var endX = Math.max(viewport.endX(), buttons.endX());
+        var endY = Math.max(viewport.endY(), buttons.endY());
+        this.pos = new ScreenPosition(0, 0);
+        this.area = new ScreenRectangle(0, 0, endX, endY);
+
+        this.blockStates = createBlockStates();
         this.zoom = fittedZoom(display, viewport);
     }
 
     @Override
     public ScreenPosition getPosition() {
-        return new ScreenPosition(0, 0);
+        return pos;
     }
 
     @Override
@@ -112,7 +110,7 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
         return area;
     }
 
-    private Map<IBlockIngredient, BlockState> createStates() {
+    private Map<IBlockIngredient, BlockState> createBlockStates() {
         var result = new IdentityHashMap<IBlockIngredient, BlockState>();
         for (var y = 0; y < display.height(); y++) {
             for (var z = 0; z < display.depth(); z++) {
@@ -163,17 +161,9 @@ public final class MultiblockStructureViewer implements IRecipeWidget, IJeiGuiEv
     }
 
     private void drawControls(GuiGraphics graphics, double mouseX, double mouseY) {
-        var font = ClientUtil.getFont();
-
         var layerLabel = selectedLayer == 0 ? tr("layer.all") : tr("layer", selectedLayer);
         drawButton(graphics, layerButton, layerLabel, mouseX, mouseY);
         drawButton(graphics, resetButton, tr("reset"), mouseX, mouseY);
-
-        var detailLines = display.getDetailLines();
-        for (var i = 0; i < display.getDetailLines().size(); i++) {
-            graphics.drawString(font, detailLines.get(i), detailLabel.x(),
-                detailLabel.y() + FONT_HEIGHT * i, RenderUtil.TEXT_COLOR);
-        }
     }
 
     private void transformView(PoseStack poseStack) {
