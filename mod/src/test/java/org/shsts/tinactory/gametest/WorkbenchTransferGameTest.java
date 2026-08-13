@@ -6,7 +6,9 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
@@ -16,6 +18,7 @@ import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.WorkbenchTransferResult;
 import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
+import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinycorelib.api.gui.IMenuHelper;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
@@ -93,9 +96,115 @@ public final class WorkbenchTransferGameTest {
         helper.succeed();
     }
 
+    @GameTest
+    public static void testCraftingShapelessRecipeConsumesOneIngredient(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.materialSlots().getFirst().set(new ItemStack(Items.OAK_LOG, 2));
+        var workbench = Workbench.get(helper.getBlockEntity(pos));
+        var result = workbench.getResult();
+
+        if (!result.is(Items.OAK_PLANKS) || result.getCount() != 2) {
+            helper.fail("Workbench did not find the oak planks shapeless recipe");
+            return;
+        }
+        workbench.onTake(player, result.copy());
+        if (menu.materialSlots().getFirst().getItem().getCount() != 1) {
+            helper.fail("Workbench consumed more than one shapeless ingredient");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testCraftsToolRecipe(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        var saw = testSaw();
+        menu.toolSlots().getFirst().set(saw);
+        menu.materialSlots().get(4).set(new ItemStack(Items.OAK_PLANKS));
+        menu.materialSlots().get(7).set(new ItemStack(Items.OAK_PLANKS));
+        var workbench = Workbench.get(helper.getBlockEntity(pos));
+        var result = workbench.getResult();
+
+        if (!result.is(Items.STICK) || result.getCount() != 4) {
+            helper.fail("Workbench did not find the stick tool recipe");
+            return;
+        }
+        workbench.onTake(player, result.copy());
+        if (menu.materialSlots().get(4).hasItem() || menu.materialSlots().get(7).hasItem()) {
+            helper.fail("Workbench did not consume tool recipe materials");
+            return;
+        }
+        if (saw.getDamageValue() != 1) {
+            helper.fail("Workbench did not damage the required tool");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testCraftsShapedRecipe(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.materialSlots().get(4).set(new ItemStack(Items.OAK_PLANKS));
+        menu.materialSlots().get(7).set(new ItemStack(Items.OAK_PLANKS));
+        var workbench = Workbench.get(helper.getBlockEntity(pos));
+        var result = workbench.getResult();
+
+        if (!result.is(Items.STICK) || result.getCount() != 2) {
+            helper.fail("Workbench did not find the vanilla shaped stick recipe");
+            return;
+        }
+        workbench.onTake(player, result.copy());
+        if (menu.materialSlots().get(4).hasItem() || menu.materialSlots().get(7).hasItem()) {
+            helper.fail("Workbench did not consume shaped recipe materials");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testCraftsShapelessRecipe(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.materialSlots().get(8).set(new ItemStack(Items.OAK_LOG));
+        var workbench = Workbench.get(helper.getBlockEntity(pos));
+        var result = workbench.getResult();
+
+        if (!result.is(Items.OAK_PLANKS) || result.getCount() != 2) {
+            helper.fail("Workbench did not find the vanilla shapeless oak planks recipe");
+            return;
+        }
+        workbench.onTake(player, result.copy());
+        if (menu.materialSlots().get(8).hasItem()) {
+            helper.fail("Workbench did not consume the shapeless recipe ingredient");
+            return;
+        }
+        helper.succeed();
+    }
+
     private static ToolRecipe recipe(WorkbenchMenu menu) {
         return CORE.recipeManager(menu.world()).byLoc(AllRecipes.TOOL_CRAFTING, STICK_RECIPE)
             .orElseThrow().get();
+    }
+
+    private static WorkbenchMenu menu(GameTestHelper helper, BlockPos pos, Player player) {
+        return new WorkbenchMenu(new MenuBase.Properties(MENU_HELPER, AllMenus.WORKBENCH.get(), 0,
+            player.getInventory(), helper.getBlockEntity(pos)));
+    }
+
+    private static ItemStack testSaw() {
+        return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("tinactory",
+            "tool/saw/test")));
     }
 
     private static final IMenuHelper MENU_HELPER = new IMenuHelper() {
