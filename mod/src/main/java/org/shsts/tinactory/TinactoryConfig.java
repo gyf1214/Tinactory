@@ -10,6 +10,16 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class TinactoryConfig {
+    public enum TeamProvider {
+        SINGLE_PLAYER,
+        FTB_TEAMS
+    }
+
+    public enum FtbUnaffiliatedPlayerPolicy {
+        PERSONAL,
+        NO_TEAM
+    }
+
     public final ConfigValue<Integer> fluidSlotSize;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
@@ -24,6 +34,8 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
+    public final ModConfigSpec.EnumValue<TeamProvider> teamProvider;
+    public final ModConfigSpec.EnumValue<FtbUnaffiliatedPlayerPolicy> ftbUnaffiliatedPlayerPolicy;
 
     public TinactoryConfig(ModConfigSpec.Builder builder) {
         builder.push("logistics");
@@ -67,6 +79,16 @@ public final class TinactoryConfig {
         builder.push("multiblock");
         multiblockCheckCycle = builder.comment("Interval for multiblock to do check")
             .defineInRange("check_cycle", 20, 1, Integer.MAX_VALUE);
+        builder.pop();
+
+        builder.push("technology");
+        teamProvider = builder.comment("Provider used to resolve technology profiles. Requires a game restart.")
+            .gameRestart()
+            .defineEnum("team_provider", TeamProvider.SINGLE_PLAYER);
+        ftbUnaffiliatedPlayerPolicy = builder
+            .comment("FTB Teams policy for unaffiliated players. Requires a game restart.")
+            .gameRestart()
+            .defineEnum("ftb_unaffiliated_player_policy", FtbUnaffiliatedPlayerPolicy.PERSONAL);
         builder.pop();
     }
 

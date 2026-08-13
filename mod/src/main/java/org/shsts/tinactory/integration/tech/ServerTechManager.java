@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.tech;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -11,11 +12,11 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.resource.ContextAwareReloadListener;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
@@ -86,6 +87,15 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     private final PreparableReloadListener reloadListener = new ReloadListener();
+    @Nullable
+    private ITeamProvider teamProvider;
+
+    public void initializeTeamProvider(ITeamProvider provider) {
+        if (teamProvider != null) {
+            throw new IllegalStateException("Team provider is already initialized");
+        }
+        teamProvider = provider;
+    }
 
     public void addReloadListener(AddReloadListenerEvent event) {
         event.addListener(reloadListener);
@@ -111,15 +121,14 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
     @Override
     public Optional<TeamProfile> teamByPlayer(Player player) {
-        return TechHelper.playerTeam(player)
-            .map(PlayerTeam::getName)
+        return provider().teamIdByPlayer(player)
             .map(name -> TechManagers.savedData().getTeamProfile(name));
     }
 
     @Override
     public Optional<TeamProfile> teamByName(String name) {
-        return TechHelper.scoreboardTeam(name)
-            .map(playerTeam -> TechManagers.savedData().getTeamProfile(playerTeam.getName()));
+        return provider().teamIdById(name)
+            .map(id -> TechManagers.savedData().getTeamProfile(id));
     }
 
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
@@ -134,5 +143,12 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     public void onPlayerJoin(ServerPlayer player) {
         CORE.sendToPlayer(player, TECH_INIT, TechInitPacket.fromMap(technologies));
         syncTeam(player);
+    }
+
+    private ITeamProvider provider() {
+        if (teamProvider == null) {
+            throw new IllegalStateException("Team provider has not been initialized");
+        }
+        return teamProvider;
     }
 }

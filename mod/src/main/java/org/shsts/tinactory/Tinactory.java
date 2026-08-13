@@ -90,6 +90,7 @@ public class Tinactory {
     }
 
     private static void init(FMLCommonSetupEvent event) {
+        TechManagers.initializeTeamProvider();
         LOGGER.info("hello Tinactory!");
     }
 

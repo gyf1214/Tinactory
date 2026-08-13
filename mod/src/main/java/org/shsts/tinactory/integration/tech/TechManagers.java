@@ -6,7 +6,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.neoforged.fml.ModList;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
@@ -17,6 +19,7 @@ import org.shsts.tinycorelib.api.network.PacketDirection;
 import java.util.Optional;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -73,6 +76,21 @@ public final class TechManagers {
 
     public static void initClient() {
         client = new ClientTechManager();
+    }
+
+    public static void initializeTeamProvider() {
+        var provider = switch (CONFIG.teamProvider.get()) {
+            case SINGLE_PLAYER -> new SinglePlayerTeamProvider();
+            case FTB_TEAMS -> createFtbTeamsProvider();
+        };
+        server().initializeTeamProvider(provider);
+    }
+
+    private static ITeamProvider createFtbTeamsProvider() {
+        if (!ModList.get().isLoaded("ftbteams")) {
+            throw new IllegalStateException("FTB Teams provider requires the ftbteams mod");
+        }
+        throw new IllegalStateException("FTB Teams provider is not available until Phase 2");
     }
 
     public static void loadSavedData(ServerLevel world) {
