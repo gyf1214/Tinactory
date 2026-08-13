@@ -45,6 +45,7 @@ import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
+import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
@@ -88,6 +89,7 @@ public final class AllMenus {
     public static final IPacketType<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
     public static final IPacketType<MECraftEventPacket> ME_CRAFT_ACTION;
     public static final IPacketType<MEPatternEventPacket> ME_PATTERN_ACTION;
+    public static final IPacketType<WorkbenchTransferEventPacket> WORKBENCH_TRANSFER;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType TECH_MENU;
@@ -138,6 +140,8 @@ public final class AllMenus {
             MEStorageInterfaceEventPacket::new);
         ME_CRAFT_ACTION = REGISTRATE.menuEventPacket("event/me_craft_action", MECraftEventPacket::new);
         ME_PATTERN_ACTION = REGISTRATE.menuEventPacket("event/me_pattern_action", MEPatternEventPacket::new);
+        WORKBENCH_TRANSFER = REGISTRATE.menuEventPacket("event/workbench_transfer",
+            WorkbenchTransferEventPacket::new);
 
         OPEN_TECH = REGISTRATE.packet("open_tech", () -> OpenTechPacket.INSTANCE)
             .direction(PacketDirection.SERVERBOUND)

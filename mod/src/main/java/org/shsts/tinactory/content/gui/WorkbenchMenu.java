@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.api.logistics.SlotType;
+import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
 import org.shsts.tinactory.content.machine.Workbench;
 import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.integration.gui.LayoutMenu;
@@ -15,10 +16,14 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static net.minecraft.world.item.ItemStack.isSameItemSameComponents;
+import static org.shsts.tinactory.AllMenus.WORKBENCH_TRANSFER;
+import static org.shsts.tinactory.AllRecipes.TOOL_CRAFTING;
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
-import static net.minecraft.world.item.ItemStack.isSameItemSameComponents;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -79,6 +84,7 @@ public class WorkbenchMenu extends LayoutMenu {
         addLayoutSlots(layout);
 
         this.workbench = Workbench.get(blockEntity());
+        onEventPacket(WORKBENCH_TRANSFER, this::transferEvent);
         for (var slot : layout.slots) {
             if (slot.type() == SlotType.NONE) {
                 var x = slot.x() + layout.getXOffset() + MARGIN_X + 1;
@@ -86,6 +92,11 @@ public class WorkbenchMenu extends LayoutMenu {
                 addSlot(new ResultSlot(x, y));
             }
         }
+    }
+
+    private void transferEvent(WorkbenchTransferEventPacket packet) {
+        CORE.recipeManager(world()).byLoc(TOOL_CRAFTING, packet.getRecipeId())
+            .ifPresent(recipe -> transfer(recipe.get(), packet.isMaxTransfer()));
     }
 
     public List<Slot> playerSlots() {
@@ -234,7 +245,8 @@ public class WorkbenchMenu extends LayoutMenu {
         ItemStack requiredVariant) {
         for (var i = begin; i < end; i++) {
             var stack = stacks.get(i);
-            if (ingredient.test(stack) && (requiredVariant == null || isSameItemSameComponents(stack, requiredVariant))) {
+            if (ingredient.test(stack) &&
+                (requiredVariant == null || isSameItemSameComponents(stack, requiredVariant))) {
                 return i;
             }
         }
@@ -251,7 +263,7 @@ public class WorkbenchMenu extends LayoutMenu {
     }
 
     private static ArrayList<ItemStack> copyStacks(List<ItemStack> stacks) {
-        return stacks.stream().map(ItemStack::copy).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        return stacks.stream().map(ItemStack::copy).collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

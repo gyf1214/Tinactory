@@ -1,13 +1,13 @@
 package org.shsts.tinactory.gametest;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllMenus;
@@ -15,11 +15,11 @@ import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.WorkbenchTransferResult;
-import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
-import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinactory.content.recipe.ToolRecipe;
 import org.shsts.tinycorelib.api.gui.IMenuHelper;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
+import org.shsts.tinycorelib.api.gui.MenuBase;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.shsts.tinycorelib.api.network.IPacketType;
 
