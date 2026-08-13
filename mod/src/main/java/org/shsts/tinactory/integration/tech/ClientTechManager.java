@@ -4,14 +4,12 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.scores.PlayerTeam;
 import org.shsts.tinactory.api.tech.IClientTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
-import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
@@ -23,11 +21,8 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final class ClientTeamProfile extends TeamProfile {
-        private final PlayerTeam playerTeam;
-
-        private ClientTeamProfile(ClientTechManager techManager, PlayerTeam playerTeam) {
-            super(techManager, playerTeam.getName());
-            this.playerTeam = playerTeam;
+        private ClientTeamProfile(ClientTechManager techManager, String profileId) {
+            super(techManager, profileId);
         }
     }
 
@@ -36,12 +31,6 @@ public class ClientTechManager extends TechManager implements IClientTechManager
 
     @Nullable
     private ClientTeamProfile getLocalTeam() {
-        var team = ClientUtil.getPlayer().getTeam();
-        var curTeam = localTeam == null ? null : localTeam.playerTeam;
-        if (team != curTeam) {
-            localTeam = team == null ? null : new ClientTeamProfile(this, team);
-            LOGGER.debug("reset local client team to {}", localTeam);
-        }
         return localTeam;
     }
 
@@ -68,8 +57,22 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     }
 
     public void handleTechUpdate(TechUpdatePacket packet) {
+        if (packet.getUpdateType() == TechUpdatePacket.UpdateType.CLEAR) {
+            localTeam = null;
+            LOGGER.debug("clear local client team");
+            return;
+        }
+        var profileId = packet.getProfileId().orElse(null);
+        if (profileId == null) {
+            LOGGER.warn("ignore tech update without a profile ID");
+            return;
+        }
         var team = getLocalTeam();
-        if (team == null) {
+        if (packet.getUpdateType() == TechUpdatePacket.UpdateType.FULL) {
+            team = new ClientTeamProfile(this, profileId);
+            localTeam = team;
+        } else if (team == null || !team.getName().equals(profileId)) {
+            LOGGER.debug("ignore tech update for non-current profile {}", profileId);
             return;
         }
         for (var progress : packet.getProgress().entrySet()) {

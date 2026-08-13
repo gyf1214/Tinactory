@@ -80,7 +80,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
             onTechComplete(tech);
         }
 
-        broadcastUpdate(TechUpdatePacket.progress(loc, progress));
+        broadcastUpdate(TechUpdatePacket.progress(name, loc, progress));
     }
 
     public void applyProgressUpdate(ResourceLocation tech, long progress) {
@@ -148,13 +148,13 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     @Override
     public void setTargetTech(ITechnology tech) {
         targetTech = tech;
-        broadcastUpdate(TechUpdatePacket.target(techKey(tech)));
+        broadcastUpdate(TechUpdatePacket.target(name, techKey(tech)));
     }
 
     @Override
     public void resetTargetTech() {
         targetTech = null;
-        broadcastUpdate(TechUpdatePacket.target(null));
+        broadcastUpdate(TechUpdatePacket.target(name, null));
     }
 
     public void applyTargetTechUpdate(@Nullable ITechnology tech) {
@@ -167,7 +167,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     public TechUpdatePacket fullUpdatePacket() {
-        return TechUpdatePacket.full(technologies, targetTech == null ? null : techKey(targetTech));
+        return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech));
     }
 
     @Override

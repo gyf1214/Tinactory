@@ -14,39 +14,63 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechUpdatePacket implements IPacket {
-    private Map<ResourceLocation, Long> progress;
+    public enum UpdateType {
+        FULL,
+        INCREMENTAL,
+        CLEAR
+    }
+
+    @Nullable
+    private String profileId;
+    private UpdateType updateType;
+    private Map<ResourceLocation, Long> progress = Map.of();
     private boolean updateTarget;
     @Nullable
     private ResourceLocation targetTech;
 
     public TechUpdatePacket() {}
 
-    private TechUpdatePacket(Map<ResourceLocation, Long> progress, boolean updateTarget,
+    private TechUpdatePacket(@Nullable String profileId, UpdateType updateType,
+        Map<ResourceLocation, Long> progress, boolean updateTarget,
         @Nullable ResourceLocation targetTech) {
+        this.profileId = profileId;
+        this.updateType = updateType;
         this.progress = progress;
         this.updateTarget = updateTarget;
         this.targetTech = targetTech;
     }
 
-    public static TechUpdatePacket progress(Map<ResourceLocation, Long> progress) {
-        return new TechUpdatePacket(progress, false, null);
+    public static TechUpdatePacket incremental(String profileId, Map<ResourceLocation, Long> progress) {
+        return new TechUpdatePacket(profileId, UpdateType.INCREMENTAL, progress, false, null);
     }
 
-    public static TechUpdatePacket progress(ResourceLocation tech, long progress) {
-        return progress(Map.of(tech, progress));
+    public static TechUpdatePacket progress(String profileId, ResourceLocation tech, long progress) {
+        return incremental(profileId, Map.of(tech, progress));
     }
 
-    public static TechUpdatePacket target(@Nullable ResourceLocation tech) {
-        return new TechUpdatePacket(Map.of(), true, tech);
+    public static TechUpdatePacket target(String profileId, @Nullable ResourceLocation tech) {
+        return new TechUpdatePacket(profileId, UpdateType.INCREMENTAL, Map.of(), true, tech);
     }
 
-    public static TechUpdatePacket full(Map<ResourceLocation, Long> progress,
+    public static TechUpdatePacket full(String profileId, Map<ResourceLocation, Long> progress,
         @Nullable ResourceLocation targetTech) {
-        return new TechUpdatePacket(progress, true, targetTech);
+        return new TechUpdatePacket(profileId, UpdateType.FULL, progress, true, targetTech);
+    }
+
+    public static TechUpdatePacket clear() {
+        return new TechUpdatePacket(null, UpdateType.CLEAR, Map.of(), false, null);
     }
 
     public Map<ResourceLocation, Long> getProgress() {
         return progress;
+    }
+
+    public Optional<String> getProfileId() {
+        return Optional.ofNullable(profileId);
+    }
+
+    public UpdateType getUpdateType() {
+        return updateType;
     }
 
     public Optional<ResourceLocation> getTargetTech() {
@@ -59,6 +83,8 @@ public class TechUpdatePacket implements IPacket {
 
     @Override
     public void serializeToBuf(RegistryFriendlyByteBuf buf) {
+        buf.writeOptional(Optional.ofNullable(profileId), FriendlyByteBuf::writeUtf);
+        buf.writeEnum(updateType);
         buf.writeMap(progress, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeLong);
         buf.writeBoolean(updateTarget);
         if (updateTarget) {
@@ -68,6 +94,8 @@ public class TechUpdatePacket implements IPacket {
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
+        profileId = buf.readOptional(FriendlyByteBuf::readUtf).orElse(null);
+        updateType = buf.readEnum(UpdateType.class);
         progress = buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readLong);
         updateTarget = buf.readBoolean();
         if (updateTarget) {

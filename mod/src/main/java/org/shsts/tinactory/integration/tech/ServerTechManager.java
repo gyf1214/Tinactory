@@ -137,7 +137,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
 
     @Override
     public void syncTeam(ServerPlayer player) {
-        teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
+        teamByPlayer(player).ifPresentOrElse(profile -> sendFullUpdatePacket(player, profile),
+            () -> CORE.sendToPlayer(player, TECH_UPDATE, TechUpdatePacket.clear()));
     }
 
     public void onPlayerJoin(ServerPlayer player) {
