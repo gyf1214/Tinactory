@@ -136,11 +136,14 @@ public class WorkbenchMenu extends LayoutMenu {
             grid.add(ItemStack.EMPTY);
             stacks.add(getSlot(MATERIAL_SLOT_BEGIN + i).getItem().copy());
         }
-        var missing = allocateTools(stacks, recipe.toolIngredients);
-        if (!missing.isEmpty()) {
-            return new TransferPlan(WorkbenchTransferResult.missingInput(missing), List.of());
+        var toolMissing = allocateTools(stacks, recipe.toolIngredients);
+        if (!toolMissing.isEmpty()) {
+            var materialMissing = allocateMaterials(stacks, grid, recipe);
+            toolMissing.addAll(materialMissing);
+            return new TransferPlan(WorkbenchTransferResult.missingInput(toolMissing), List.of());
         }
         var sets = 0;
+        List<Integer> missing;
         while (true) {
             var nextStacks = copyStacks(stacks);
             var nextGrid = copyStacks(grid);

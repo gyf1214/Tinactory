@@ -59,6 +59,24 @@ public final class WorkbenchTransferGameTest {
     }
 
     @GameTest
+    public static void testMissingTransferReportsToolsAndMaterials(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = new WorkbenchMenu(new MenuBase.Properties(MENU_HELPER, AllMenus.WORKBENCH.get(), 0,
+            player.getInventory(), helper.getBlockEntity(pos)));
+
+        var result = menu.planTransfer(recipe(menu), false);
+
+        if (result.code() != WorkbenchTransferResult.Code.MISSING_INPUT ||
+            !result.missingIndexes().contains(1) || !result.missingIndexes().contains(10)) {
+            helper.fail("Missing transfer did not report both material and tool slots");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testTransferEventUsesAuthoritativeRecipe(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
