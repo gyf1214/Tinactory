@@ -2,11 +2,10 @@ package org.shsts.tinactory.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.BeforeBatch;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -48,16 +47,6 @@ import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class TinactoryGameTest {
-    private static final String TEAM_NAME = "gametest";
-
-    @BeforeBatch(batch = "defaultBatch")
-    public static void setupGameTestTeam(ServerLevel world) {
-        var scoreboard = world.getScoreboard();
-        if (scoreboard.getPlayerTeam(TEAM_NAME) == null) {
-            scoreboard.addPlayerTeam(TEAM_NAME);
-        }
-    }
-
     @GameTest
     public static void testSucceed(GameTestHelper helper) {
         helper.succeed();
@@ -76,7 +65,7 @@ public final class TinactoryGameTest {
     public static void testMockPlayerUseCreatesMachineNetwork(GameTestHelper helper) {
         var machinePos = new BlockPos(1, 1, 1);
         helper.setBlock(machinePos, machineState(Direction.EAST));
-        useWithTeamMockPlayer(helper, machinePos);
+        useWithMockPlayer(helper, machinePos);
         helper.runAfterDelay(12, () -> {
             var manager = WorldNetworkManagers.get(helper.getLevel());
             var absoluteMachinePos = helper.absolutePos(machinePos);
@@ -93,10 +82,6 @@ public final class TinactoryGameTest {
         var floorPos = machinePos.below();
         helper.setBlock(floorPos, Blocks.STONE);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        var scoreboard = helper.getLevel().getScoreboard();
-        var team = scoreboard.getPlayerTeam(TEAM_NAME);
-        assert team != null;
-        scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
         var machineStack = new ItemStack(machineState(Direction.EAST).getBlock());
         player.setItemInHand(InteractionHand.MAIN_HAND, machineStack);
         var absoluteFloorPos = helper.absolutePos(floorPos);
@@ -112,12 +97,32 @@ public final class TinactoryGameTest {
             if (machine.network().orElseThrow() != placementNetwork) {
                 helper.fail("Machine replaced its placement network during server load", machinePos);
             }
-            useWithTeamMockPlayer(helper, machinePos);
+            useWithMockPlayer(helper, player, machinePos);
             if (machine.network().orElseThrow() != placementNetwork) {
                 helper.fail("Machine replaced its placement network during first use", machinePos);
             }
             helper.succeed();
         });
+    }
+
+    @GameTest(timeoutTicks = 40)
+    public static void testIndividualProfilesCannotUseOtherMachines(GameTestHelper helper) {
+        var machinePos = new BlockPos(1, 1, 1);
+        helper.setBlock(machinePos, machineState(Direction.EAST));
+        var owner = helper.makeMockPlayer(GameType.SURVIVAL);
+        useWithMockPlayer(helper, owner, machinePos);
+        var machine = MACHINE.get(helper.getBlockEntity(machinePos));
+        var network = machine.network().orElseThrow();
+        var other = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        if (machine.canPlayerInteract(other)) {
+            helper.fail("An individual profile accessed another player's machine", machinePos);
+        }
+        useWithMockPlayer(helper, other, machinePos);
+        if (machine.network().orElseThrow() != network) {
+            helper.fail("A denied player changed the owner's network", machinePos);
+        }
+        helper.succeed();
     }
 
     @GameTest(timeoutTicks = 40)
@@ -135,7 +140,7 @@ public final class TinactoryGameTest {
         helper.setBlock(machinePos, machineState(Direction.EAST));
         helper.setBlock(cablePos, cableState);
         helper.setBlock(subnetPos, subnetState);
-        useWithTeamMockPlayer(helper, machinePos);
+        useWithMockPlayer(helper, machinePos);
 
         helper.runAfterDelay(12, () -> {
             var manager = WorldNetworkManagers.get(helper.getLevel());
@@ -177,7 +182,7 @@ public final class TinactoryGameTest {
         var bridgePos = new BlockPos(1, 1, 1);
         helper.setBlock(bridgePos, componentBlock("network_bridge").defaultBlockState()
             .setValue(MachineBlock.IO_FACING, Direction.EAST));
-        useWithTeamMockPlayer(helper, bridgePos);
+        useWithMockPlayer(helper, bridgePos);
 
         helper.runAfterDelay(12, () -> {
             var manager = WorldNetworkManagers.get(helper.getLevel());
@@ -203,7 +208,7 @@ public final class TinactoryGameTest {
             .setValue(MachineBlock.IO_FACING, Direction.EAST));
         helper.setBlock(childCablePos, cableState(Voltage.LV, true, true));
         helper.setBlock(childMachinePos, machineState(Direction.WEST));
-        useWithTeamMockPlayer(helper, parentMachinePos);
+        useWithMockPlayer(helper, parentMachinePos);
 
         helper.runAfterDelay(16, () -> {
             var manager = WorldNetworkManagers.get(helper.getLevel());
@@ -257,7 +262,7 @@ public final class TinactoryGameTest {
             .setValue(MachineBlock.IO_FACING, Direction.EAST));
         helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
         helper.setBlock(childWorkerPos, machineState("logistics/logistic_worker", Voltage.MV, Direction.WEST));
-        useWithTeamMockPlayer(helper, parentStoragePos);
+        useWithMockPlayer(helper, parentStoragePos);
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(parentStoragePos))
@@ -293,7 +298,7 @@ public final class TinactoryGameTest {
             .setValue(MachineBlock.IO_FACING, Direction.EAST));
         helper.setBlock(childCablePos, cableState(Voltage.MV, true, true));
         helper.setBlock(childStoragePos, machineState("logistics/electric_chest", Voltage.MV, Direction.WEST));
-        useWithTeamMockPlayer(helper, parentWorkerPos);
+        useWithMockPlayer(helper, parentWorkerPos);
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(parentWorkerPos))
@@ -343,7 +348,7 @@ public final class TinactoryGameTest {
             .set(DISCHARGE_KEY, true)
             .get());
         MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
-        useWithTeamMockPlayer(helper, consumerPos);
+        useWithMockPlayer(helper, consumerPos);
 
         helper.runAfterDelay(24, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(consumerPos))
@@ -418,7 +423,7 @@ public final class TinactoryGameTest {
         battery.setPower(batteryStack, battery.capacity);
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
-        useWithTeamMockPlayer(helper, batteryBoxPos);
+        useWithMockPlayer(helper, batteryBoxPos);
 
         helper.runAfterDelay(80, () -> {
             var network = MACHINE.tryGet(helper.getBlockEntity(batteryBoxPos))
@@ -505,13 +510,12 @@ public final class TinactoryGameTest {
         return (BatteryItem) AllItems.getComponent("battery").get(voltage).get();
     }
 
-    private static void useWithTeamMockPlayer(GameTestHelper helper, BlockPos pos) {
+    private static void useWithMockPlayer(GameTestHelper helper, BlockPos pos) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        var scoreboard = helper.getLevel().getScoreboard();
-        var team = scoreboard.getPlayerTeam(TEAM_NAME);
-        assert team != null;
-        scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
+        useWithMockPlayer(helper, player, pos);
+    }
 
+    private static void useWithMockPlayer(GameTestHelper helper, Player player, BlockPos pos) {
         var absolutePos = helper.absolutePos(pos);
         var state = helper.getLevel().getBlockState(absolutePos);
         state.useItemOn(ItemStack.EMPTY, helper.getLevel(), player, InteractionHand.MAIN_HAND,

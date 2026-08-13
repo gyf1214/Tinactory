@@ -6,7 +6,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 @ParametersAreNonnullByDefault
@@ -20,10 +19,6 @@ public final class ServerUtil {
 
     public static PlayerList getPlayerList() {
         return getServer().getPlayerList();
-    }
-
-    public static Scoreboard getScoreboard() {
-        return getServer().getScoreboard();
     }
 
     public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> key) {

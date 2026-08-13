@@ -23,11 +23,12 @@ import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.util.ServerUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -108,15 +109,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
         }
         TechManagers.savedData().setDirty();
         invokeChange(team);
-        var playerList = ServerUtil.getPlayerList();
-        TechHelper.scoreboardTeam(team.getName()).ifPresent(playerTeam -> {
-            for (var playerName : playerTeam.getPlayers()) {
-                var player = playerList.getPlayerByName(playerName);
-                if (player != null) {
-                    CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket);
-                }
-            }
-        });
+        provider().onlineMembers(team.getName())
+            .forEach(player -> CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket));
     }
 
     @Override
@@ -129,6 +123,13 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     public Optional<TeamProfile> teamByName(String name) {
         return provider().teamIdById(name)
             .map(id -> TechManagers.savedData().getTeamProfile(id));
+    }
+
+    @Override
+    public Collection<ServerPlayer> onlineMembers(String profileId) {
+        return provider().teamIdById(profileId)
+            .map(provider()::onlineMembers)
+            .orElseGet(List::of);
     }
 
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
