@@ -57,6 +57,10 @@ public final class FtbTeamsTeamProvider implements ITeamProvider {
         }
     }
 
+    public static boolean isFtbProfileId(String profileId) {
+        return profileId.startsWith(PREFIX);
+    }
+
     private Optional<Team> teamByProfileId(String profileId) {
         return profileIdToTeamId(profileId)
             .flatMap(teamId -> FTBTeamsAPI.api().getManager().getTeamByID(teamId))
