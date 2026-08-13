@@ -78,12 +78,16 @@ public final class TechManagers {
         client = new ClientTechManager();
     }
 
-    public static void initializeTeamProvider() {
+    public static void installTeamProvider() {
         var provider = switch (CONFIG.teamProvider.get()) {
             case SINGLE_PLAYER -> new SinglePlayerTeamProvider();
             case FTB_TEAMS -> createFtbTeamsProvider();
         };
-        server().initializeTeamProvider(provider);
+        server().installTeamProvider(provider);
+    }
+
+    public static void uninstallTeamProvider() {
+        server().uninstallTeamProvider();
     }
 
     private static ITeamProvider createFtbTeamsProvider() {

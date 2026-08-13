@@ -11,6 +11,8 @@ import java.util.Optional;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface ITeamProvider {
+    default void unregister() {}
+
     Optional<String> teamIdByPlayer(Player player);
 
     Optional<String> teamIdById(String teamId);

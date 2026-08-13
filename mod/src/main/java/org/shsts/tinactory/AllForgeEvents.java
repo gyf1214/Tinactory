@@ -13,6 +13,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -22,6 +24,16 @@ import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllForgeEvents {
+    @SubscribeEvent
+    public static void onServerAboutToStart(ServerAboutToStartEvent event) {
+        TechManagers.installTeamProvider();
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        TechManagers.uninstallTeamProvider();
+    }
+
     @SubscribeEvent
     public static void onAddReloadListener(AddReloadListenerEvent event) {
         TechManagers.server().addReloadListener(event);

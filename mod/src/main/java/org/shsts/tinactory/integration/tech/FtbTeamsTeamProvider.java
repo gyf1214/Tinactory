@@ -2,6 +2,7 @@ package org.shsts.tinactory.integration.tech;
 
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.Team;
+import dev.ftb.mods.ftbteams.api.event.PlayerChangedTeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamEvent;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -14,17 +15,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class FtbTeamsTeamProvider implements ITeamProvider {
     private static final String PREFIX = "ftb_teams:";
     private final FtbUnaffiliatedPlayerPolicy unaffiliatedPlayerPolicy;
+    private final Consumer<PlayerChangedTeamEvent> playerChangedListener;
 
     public FtbTeamsTeamProvider(ServerTechManager techManager,
         FtbUnaffiliatedPlayerPolicy unaffiliatedPlayerPolicy) {
         this.unaffiliatedPlayerPolicy = unaffiliatedPlayerPolicy;
-        TeamEvent.PLAYER_CHANGED.register(event -> techManager.syncTeam(event.getPlayer()));
+        playerChangedListener = event -> techManager.syncTeam(event.getPlayer());
+        TeamEvent.PLAYER_CHANGED.register(playerChangedListener);
+    }
+
+    @Override
+    public void unregister() {
+        TeamEvent.PLAYER_CHANGED.unregister(playerChangedListener);
     }
 
     @Override

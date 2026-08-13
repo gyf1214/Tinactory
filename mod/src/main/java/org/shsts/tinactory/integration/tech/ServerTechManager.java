@@ -91,11 +91,18 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     @Nullable
     private ITeamProvider teamProvider;
 
-    public void initializeTeamProvider(ITeamProvider provider) {
+    public void installTeamProvider(ITeamProvider provider) {
         if (teamProvider != null) {
             throw new IllegalStateException("Team provider is already initialized");
         }
         teamProvider = provider;
+    }
+
+    public void uninstallTeamProvider() {
+        if (teamProvider != null) {
+            teamProvider.unregister();
+            teamProvider = null;
+        }
     }
 
     public void addReloadListener(AddReloadListenerEvent event) {
