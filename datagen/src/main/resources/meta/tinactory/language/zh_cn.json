@@ -720,7 +720,7 @@
     "tinactory.tooltip.invalidMultiblock": "结构不完整",
     "tinactory.tooltip.multiblock": "多方块结构：%s",
     "tinactory.gui.techMenu.title": "科研",
-    "tinactory.gui.techMenu.welcome": "加入一个队伍，开始玩 Tinactory！",
+    "tinactory.gui.techMenu.welcome": "加入 FTB Teams 队伍后即可开始游玩 Tinactory！",
     "tinactory.gui.techMenu.currentTechLabel": "当前研究",
     "tinactory.gui.techMenu.availableTechLabel": "可用研究",
     "tinactory.gui.techMenu.techRequirementsLabel": "要求",

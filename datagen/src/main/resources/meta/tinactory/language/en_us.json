@@ -287,7 +287,7 @@
     "tinactory.tooltip.invalidMultiblock": "Invalid Structure",
     "tinactory.tooltip.multiblock": "Multiblock: %s",
     "tinactory.gui.techMenu.title": "Technologies",
-    "tinactory.gui.techMenu.welcome": "Join a Team to Start Playing Tinactory!",
+    "tinactory.gui.techMenu.welcome": "Join an FTB Teams party to start playing Tinactory!",
     "tinactory.gui.techMenu.currentTechLabel": "Current Research",
     "tinactory.gui.techMenu.availableTechLabel": "Available Technologies",
     "tinactory.gui.techMenu.techRequirementsLabel": "Requirements",
