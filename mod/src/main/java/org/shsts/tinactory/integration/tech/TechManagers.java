@@ -90,7 +90,7 @@ public final class TechManagers {
         if (!ModList.get().isLoaded("ftbteams")) {
             throw new IllegalStateException("FTB Teams provider requires the ftbteams mod");
         }
-        throw new IllegalStateException("FTB Teams provider is not available until Phase 2");
+        return new FtbTeamsTeamProvider(server(), CONFIG.ftbUnaffiliatedPlayerPolicy.get());
     }
 
     public static void loadSavedData(ServerLevel world) {
