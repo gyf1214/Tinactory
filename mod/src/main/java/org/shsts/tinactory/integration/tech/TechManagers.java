@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
@@ -73,6 +74,14 @@ public final class TechManagers {
 
     public static void initClient() {
         client = new ClientTechManager();
+    }
+
+    public static void installTeamProvider(ITeamProvider provider) {
+        server().installTeamProvider(provider);
+    }
+
+    public static void uninstallTeamProvider() {
+        server().uninstallTeamProvider();
     }
 
     public static void loadSavedData(ServerLevel world) {

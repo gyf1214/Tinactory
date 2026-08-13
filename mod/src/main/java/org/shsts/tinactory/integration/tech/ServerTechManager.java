@@ -1,6 +1,7 @@
 package org.shsts.tinactory.integration.tech;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
@@ -11,22 +12,23 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.resource.ContextAwareReloadListener;
 import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.integration.util.ServerUtil;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -86,6 +88,22 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     private final PreparableReloadListener reloadListener = new ReloadListener();
+    @Nullable
+    private ITeamProvider teamProvider;
+
+    public void installTeamProvider(ITeamProvider provider) {
+        if (teamProvider != null) {
+            throw new IllegalStateException("Team provider is already initialized");
+        }
+        teamProvider = provider;
+    }
+
+    public void uninstallTeamProvider() {
+        if (teamProvider != null) {
+            teamProvider.unregister();
+            teamProvider = null;
+        }
+    }
 
     public void addReloadListener(AddReloadListenerEvent event) {
         event.addListener(reloadListener);
@@ -98,33 +116,27 @@ public class ServerTechManager extends TechManager implements IServerTechManager
         }
         TechManagers.savedData().setDirty();
         invokeChange(team);
-        var playerList = ServerUtil.getPlayerList();
-        TechHelper.scoreboardTeam(team.getName()).ifPresent(playerTeam -> {
-            for (var playerName : playerTeam.getPlayers()) {
-                var player = playerList.getPlayerByName(playerName);
-                if (player != null) {
-                    CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket);
-                }
-            }
-        });
+        provider().onlineMembers(team.getName())
+            .forEach(player -> CORE.sendToPlayer(player, TECH_UPDATE, techUpdatePacket));
     }
 
     @Override
     public Optional<TeamProfile> teamByPlayer(Player player) {
-        return TechHelper.playerTeam(player)
-            .map(PlayerTeam::getName)
+        return provider().teamIdByPlayer(player)
             .map(name -> TechManagers.savedData().getTeamProfile(name));
     }
 
     @Override
     public Optional<TeamProfile> teamByName(String name) {
-        return TechHelper.scoreboardTeam(name)
-            .map(playerTeam -> TechManagers.savedData().getTeamProfile(playerTeam.getName()));
+        return provider().teamIdById(name)
+            .map(id -> TechManagers.savedData().getTeamProfile(id));
     }
 
     @Override
-    public int nextId() {
-        return TechManagers.savedData().nextId();
+    public Collection<ServerPlayer> onlineMembers(String profileId) {
+        return provider().teamIdById(profileId)
+            .map(provider()::onlineMembers)
+            .orElseGet(List::of);
     }
 
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
@@ -132,37 +144,20 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     @Override
-    public void addPlayerToTeam(ServerPlayer player, ITeamProfile team) {
-        var playerTeam = TechHelper.scoreboardTeam(team.getName()).orElseThrow();
-        ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), playerTeam);
-        sendFullUpdatePacket(player, TechManagers.savedData().getTeamProfile(team.getName()));
-    }
-
-    @Override
-    public void newTeam(ServerPlayer player, String name) {
-        var scoreboard = ServerUtil.getScoreboard();
-        var playerTeam = scoreboard.addPlayerTeam(name);
-        scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
-        var team = TechManagers.savedData().getTeamProfile(playerTeam.getName());
-        sendFullUpdatePacket(player, team);
-    }
-
-    @Override
-    public void leaveTeam(ServerPlayer player) {
-        ServerUtil.getScoreboard().removePlayerFromTeam(player.getScoreboardName());
-    }
-
-    public void removeTeam(PlayerTeam playerTeam) {
-        TechManagers.savedData().removeTeamProfile(playerTeam.getName());
-        ServerUtil.getScoreboard().removePlayerTeam(playerTeam);
-    }
-
     public void syncTeam(ServerPlayer player) {
-        teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
+        teamByPlayer(player).ifPresentOrElse(profile -> sendFullUpdatePacket(player, profile),
+            () -> CORE.sendToPlayer(player, TECH_UPDATE, TechUpdatePacket.clear()));
     }
 
     public void onPlayerJoin(ServerPlayer player) {
         CORE.sendToPlayer(player, TECH_INIT, TechInitPacket.fromMap(technologies));
         syncTeam(player);
+    }
+
+    private ITeamProvider provider() {
+        if (teamProvider == null) {
+            throw new IllegalStateException("Team provider has not been initialized");
+        }
+        return teamProvider;
     }
 }

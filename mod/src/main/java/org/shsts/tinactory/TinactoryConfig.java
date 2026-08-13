@@ -10,6 +10,16 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class TinactoryConfig {
+    public enum TeamProvider {
+        SINGLE_PLAYER,
+        FTB_TEAMS
+    }
+
+    public enum FtbUnaffiliatedPlayerPolicy {
+        PERSONAL,
+        NO_TEAM
+    }
+
     public final ConfigValue<Integer> fluidSlotSize;
     public final ConfigValue<Integer> bytesPerItem;
     public final ConfigValue<Integer> bytesPerItemType;
@@ -24,57 +34,61 @@ public final class TinactoryConfig {
     public final ConfigValue<Integer> networkConnectDelay;
     public final ConfigValue<Integer> networkMaxConnectsPerTick;
     public final ConfigValue<Integer> multiblockCheckCycle;
-    public final ConfigValue<Boolean> allowTeamSpawnCommands;
-    public final ConfigValue<Integer> teamSpread;
+    public final ModConfigSpec.EnumValue<TeamProvider> teamProvider;
+    public final ModConfigSpec.EnumValue<FtbUnaffiliatedPlayerPolicy> ftbUnaffiliatedPlayerPolicy;
 
     public TinactoryConfig(ModConfigSpec.Builder builder) {
         builder.push("logistics");
-        fluidSlotSize = builder.comment("Default size of a fluid slot.")
+        fluidSlotSize = builder.worldRestart().comment("Default size of a fluid slot.")
             .defineInRange("fluid_slot_size", 16000, 0, Integer.MAX_VALUE);
 
-        bytesPerItem = builder.comment("Bytes used per item by digital storage")
+        bytesPerItem = builder.worldRestart().comment("Bytes used per item by digital storage")
             .defineInRange("bytes_per_item", 256, 1, Integer.MAX_VALUE);
-        bytesPerItemType = builder.comment("Bytes used per item type by digital storage")
+        bytesPerItemType = builder.worldRestart().comment("Bytes used per item type by digital storage")
             .defineInRange("bytes_per_item_type", 4096, 1, Integer.MAX_VALUE);
-        bytesPerFluid = builder.comment("Bytes used per fluid by digital storage")
+        bytesPerFluid = builder.worldRestart().comment("Bytes used per fluid by digital storage")
             .defineInRange("bytes_per_fluid", 1, 1, Integer.MAX_VALUE);
-        bytesPerFluidType = builder.comment("Bytes used per fluid type by digital storage")
+        bytesPerFluidType = builder.worldRestart().comment("Bytes used per fluid type by digital storage")
             .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
-        bytesPerPattern = builder.comment("Bytes used per pattern by pattern storage")
+        bytesPerPattern = builder.worldRestart().comment("Bytes used per pattern by pattern storage")
             .defineInRange("bytes_per_pattern", 32768L, 1L, Long.MAX_VALUE);
-        bytesPerCraftStep = builder.comment("Bytes used per autocraft step")
+        bytesPerCraftStep = builder.worldRestart().comment("Bytes used per autocraft step")
             .defineInRange("bytes_per_craft_step", 8192L, 0L, Long.MAX_VALUE);
 
         builder.pop();
 
         builder.push("machine");
-        primitiveWorkSpeed = builder.comment("Work speed multiplier of primitive machines")
+        primitiveWorkSpeed = builder.worldRestart().comment("Work speed multiplier of primitive machines")
             .defineInRange("primitive_work_speed", 0.25d, 0d, 1d);
-        machineResistanceFactor = builder.comment("Machine resistance factor")
+        machineResistanceFactor = builder.worldRestart().comment("Machine resistance factor")
             .defineList("machine_resistance_factor", List.of(0d), () -> 0d,
                 i -> ((Number) i).doubleValue() >= 0d);
-        workFactorExponent = builder.comment("Work factor exponent")
+        workFactorExponent = builder.worldRestart().comment("Work factor exponent")
             .defineInRange("work_factor_exponent", 2d, 0d, Double.POSITIVE_INFINITY);
-        coilTemperatureFactor = builder.comment("Temperature energy factor for coil machines")
+        coilTemperatureFactor = builder.worldRestart().comment("Temperature energy factor for coil machines")
             .defineInRange("coil_temperature_factor", 1000d, 0d, Double.POSITIVE_INFINITY);
         builder.pop();
 
         builder.push("network");
-        networkConnectDelay = builder.comment("Delay in ticks when network reconnects")
+        networkConnectDelay = builder.worldRestart().comment("Delay in ticks when network reconnects")
             .defineInRange("connect_delay", 5, 0, Integer.MAX_VALUE);
-        networkMaxConnectsPerTick = builder.comment("Max connection iteration for network reconnects per tick")
+        networkMaxConnectsPerTick = builder.worldRestart()
+            .comment("Max connection iteration for network reconnects per tick")
             .defineInRange("max_connects", 100, 1, Integer.MAX_VALUE);
         builder.pop();
 
         builder.push("multiblock");
-        multiblockCheckCycle = builder.comment("Interval for multiblock to do check")
+        multiblockCheckCycle = builder.worldRestart().comment("Interval for multiblock to do check")
             .defineInRange("check_cycle", 20, 1, Integer.MAX_VALUE);
         builder.pop();
 
-        builder.push("team");
-        allowTeamSpawnCommands = builder.comment("Allow commands to manage team spawn points")
-            .define("allow_team_spawn_commands", false);
-        teamSpread = builder.comment("Spread of teams").define("team_spread", 1024);
+        builder.push("technology");
+        teamProvider = builder.worldRestart()
+            .comment("Provider used to resolve technology profiles. Requires a world restart.")
+            .defineEnum("team_provider", TeamProvider.SINGLE_PLAYER);
+        ftbUnaffiliatedPlayerPolicy = builder.worldRestart()
+            .comment("FTB Teams policy for unaffiliated players. Requires a world restart.")
+            .defineEnum("ftb_unaffiliated_player_policy", FtbUnaffiliatedPlayerPolicy.PERSONAL);
         builder.pop();
     }
 

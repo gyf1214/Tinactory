@@ -12,15 +12,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
-import org.shsts.tinactory.integration.tech.TechHelper;
 import org.shsts.tinactory.integration.tech.TechManagers;
-import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -106,11 +103,7 @@ public final class TechQuestIntegration {
             return;
         }
         refreshActiveQuestFile();
-        var player = findOnlineTinactoryTeamMember(team);
-        if (player.isEmpty()) {
-            return;
-        }
-        var teamData = ServerQuestFile.INSTANCE.getTeamData(player.get());
+        var teamData = findQuestTeamData(team);
         if (teamData.isEmpty()) {
             return;
         }
@@ -123,12 +116,16 @@ public final class TechQuestIntegration {
     }
 
     private Optional<ServerPlayer> findOnlineTinactoryTeamMember(ITeamProfile team) {
-        return TechHelper.scoreboardTeam(team.getName())
-            .stream()
-            .flatMap(playerTeam -> playerTeam.getPlayers().stream())
-            .map(playerName -> ServerUtil.getPlayerList().getPlayerByName(playerName))
-            .filter(Objects::nonNull)
-            .findFirst();
+        return TechManagers.server().onlineMembers(team.getName()).stream().findFirst();
+    }
+
+    private Optional<TeamData> findQuestTeamData(ITeamProfile team) {
+        if (FtbTeamsTeamProvider.isFtbProfileId(team.getName())) {
+            return FtbTeamsTeamProvider.profileIdToTeamId(team.getName())
+                .map(teamId -> ServerQuestFile.INSTANCE.getNullableTeamData(teamId));
+        }
+        return findOnlineTinactoryTeamMember(team)
+            .flatMap(player -> ServerQuestFile.INSTANCE.getTeamData(player));
     }
 
     private void setTaskProgressIfChanged(TeamData teamData, CustomTask task, long progress) {

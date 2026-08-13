@@ -8,8 +8,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
@@ -32,7 +30,7 @@ public class Tinactory {
     private final IEventBus modEventBus;
 
     public Tinactory(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.COMMON, TinactoryConfig.CONFIG_SPEC);
+        modContainer.registerConfig(ModConfig.Type.SERVER, TinactoryConfig.CONFIG_SPEC);
         this.modEventBus = modEventBus;
         modEventBus.addListener(this::onConstructEvent);
     }
@@ -71,7 +69,6 @@ public class Tinactory {
             AllWorldGens.init();
 
             REGISTRATE.register(modEventBus);
-            modEventBus.addListener(Tinactory::init);
             modEventBus.addListener(AllCapabilities::registerCapabilities);
             NeoForge.EVENT_BUS.register(AllForgeEvents.class);
         } catch (Throwable e) {
@@ -83,17 +80,8 @@ public class Tinactory {
         TechManagers.initClient();
 
         REGISTRATE.registerClient(modEventBus);
-        modEventBus.addListener(Tinactory::initClient);
         modEventBus.addListener(AllClientEvents::initKeys);
         modEventBus.addListener(AllClientEvents::registerClientExtensions);
         NeoForge.EVENT_BUS.register(AllClientEvents.class);
-    }
-
-    private static void init(FMLCommonSetupEvent event) {
-        LOGGER.info("hello Tinactory!");
-    }
-
-    private static void initClient(FMLClientSetupEvent event) {
-        LOGGER.info("hello Tinactory client!");
     }
 }

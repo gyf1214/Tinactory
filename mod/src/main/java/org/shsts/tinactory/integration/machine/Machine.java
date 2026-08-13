@@ -36,7 +36,6 @@ import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.UpdatableCapabilityProvider;
 import org.shsts.tinactory.integration.network.Network;
-import org.shsts.tinactory.integration.tech.TechHelper;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
@@ -124,7 +123,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public boolean canPlayerInteract(Player player) {
-        return team != null && TechHelper.isPlayerOnTeam(player, team);
+        return team != null && TechManagers.server().teamByPlayer(player)
+            .map(profile -> profile.getName().equals(team.getName()))
+            .orElse(false);
     }
 
     @Override

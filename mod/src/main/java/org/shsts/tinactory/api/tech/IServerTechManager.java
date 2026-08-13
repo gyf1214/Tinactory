@@ -3,6 +3,7 @@ package org.shsts.tinactory.api.tech;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface IServerTechManager extends ITechManager {
@@ -10,11 +11,7 @@ public interface IServerTechManager extends ITechManager {
 
     Optional<? extends IServerTeamProfile> teamByName(String name);
 
-    int nextId();
+    Collection<ServerPlayer> onlineMembers(String profileId);
 
-    void addPlayerToTeam(ServerPlayer player, ITeamProfile team);
-
-    void newTeam(ServerPlayer player, String name);
-
-    void leaveTeam(ServerPlayer player);
+    void syncTeam(ServerPlayer player);
 }
