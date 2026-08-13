@@ -36,6 +36,7 @@ import org.shsts.tinactory.compat.jei.gui.ProcessingHandler;
 import org.shsts.tinactory.compat.jei.gui.ResearchHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchHandler;
+import org.shsts.tinactory.compat.jei.gui.WorkbenchTransferHandler;
 import org.shsts.tinactory.compat.jei.ingredient.BatterySubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
@@ -184,6 +185,9 @@ public class JEI implements IModPlugin {
         registration.addRecipeTransferHandler(new MEPatternTransferHandler<>(
             RecipeTypes.SMELTING, MEPatternTransferHandler::fromSmelting,
             registration.getTransferHelper()), RecipeTypes.SMELTING);
+        assert toolCategory != null;
+        registration.addRecipeTransferHandler(new WorkbenchTransferHandler(toolCategory.type,
+            registration.getTransferHelper()), toolCategory.type);
     }
 
     private static <R extends ProcessingRecipe> void addProcessingTransferHandler(
