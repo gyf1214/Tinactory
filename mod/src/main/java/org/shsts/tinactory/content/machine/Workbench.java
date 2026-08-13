@@ -66,10 +66,6 @@ public class Workbench extends CapabilityProvider implements
             return List.copyOf(getMutableItems());
         }
 
-        public CraftingInput asCraftInput() {
-            return CraftingInput.of(width, height, getMutableItems());
-        }
-
         private List<ItemStack> getMutableItems() {
             return IntStream.range(0, getContainerSize())
                 .mapToObj(items::getStackInSlot)
@@ -197,7 +193,7 @@ public class Workbench extends CapabilityProvider implements
         var vanillaRecipes = world.getRecipeManager();
 
         currentRecipe = recipeManager.getRecipeFor(TOOL_CRAFTING, this)
-            .map($ -> (Object) $)
+            .map($ -> (Object) $.get())
             .or(() -> vanillaRecipes.getRecipeFor(CRAFTING, craftingStack.asCraftInput(), world))
             .orElse(null);
 
@@ -248,7 +244,8 @@ public class Workbench extends CapabilityProvider implements
         // vanilla logic of crafting triggers
         stack.onCraftedBy(player.level(), player, amount);
         EventHooks.firePlayerCraftingEvent(player, stack, craftingStack);
-        if (currentRecipe instanceof RecipeHolder<?> holder && holder.value() instanceof CraftingRecipe crafting &&
+        if (currentRecipe instanceof RecipeHolder<?> holder &&
+            holder.value() instanceof CraftingRecipe crafting &&
             !crafting.isSpecial()) {
             player.awardRecipes(List.of(holder));
         }
@@ -264,8 +261,28 @@ public class Workbench extends CapabilityProvider implements
         }
         CommonHooks.setCraftingPlayer(null);
 
+        // vanilla logic of decreasing material and set remaining items
+        var input = craftingStack.asCraftInput();
+        var positioned = craftingStack.asPositionedCraftInput();
+        var t = positioned.top();
+        var l = positioned.left();
+        for (var i = 0; i < input.height(); i++) {
+            for (var j = 0; j < input.width(); j++) {
+                var v1 = (t + i) * craftingStack.getWidth() + l + j;
+                var v2 = i * input.width() + j;
+                var slotItem = craftingView.getStackInSlot(v1);
+                var remainingItem = remaining.get(v2);
+                if (!slotItem.isEmpty()) {
+                    craftingView.extractItem(v1, 1, false);
+                }
+                if (!remainingItem.isEmpty()) {
+                    var remainingItem1 = craftingView.insertItem(v1, remainingItem, false);
+                    player.drop(remainingItem1, false);
+                }
+            }
+        }
+
         for (var i = 0; i < remaining.size(); i++) {
-            // vanilla logic of decreasing material and set remaining items
             var slotItem = craftingView.getStackInSlot(i);
             var remainingItem = remaining.get(i);
             if (!slotItem.isEmpty()) {
