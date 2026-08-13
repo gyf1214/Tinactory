@@ -1,16 +1,12 @@
 package org.shsts.tinactory.content.gui.client;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
@@ -23,7 +19,6 @@ import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.Tab;
-import org.shsts.tinactory.integration.gui.client.VanillaButton;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.slf4j.Logger;
@@ -42,17 +37,14 @@ import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Texture.CRAFTING_ARROW;
 import static org.shsts.tinactory.integration.gui.client.Tab.TAB_OFFSET;
-import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_HEIGHT;
 
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class TechScreen extends MenuScreen<TechMenu> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final int WELCOME_BUTTON_WIDTH = 72;
 
     private final Panel welcomePanel;
-    private final EditBox welcomeEdit;
     private final Tab tab;
     private final TechPanel techPanel;
     private final Consumer<ITeamProfile> onTechChange = $ -> refreshTeam();
@@ -78,13 +70,9 @@ public class TechScreen extends MenuScreen<TechMenu> {
 
         this.welcomePanel = new Panel(this);
         var welcomeLabel = new Label(menu, tr("welcome"));
-        welcomeLabel.horizontalAlign = Label.Alignment.END;
-        this.welcomeEdit = Widgets.editBox();
-        var welcomeButton = new VanillaButton(menu, tr("welcomeButton"), null, this::onWelcomePressed);
+        welcomeLabel.horizontalAlign = Label.Alignment.MIDDLE;
+        welcomeLabel.verticalAlign = Label.Alignment.MIDDLE;
         welcomePanel.addChild(welcomeLabel);
-        welcomePanel.addVanillaWidget(RectD.ZERO, new Rect(0, -1, 64, EDIT_HEIGHT), 0, welcomeEdit);
-        welcomePanel.addChild(new Rect(-WELCOME_BUTTON_WIDTH / 2, 20, WELCOME_BUTTON_WIDTH, BUTTON_HEIGHT),
-            welcomeButton);
 
         this.techPanel = new TechPanel(this);
 
@@ -104,7 +92,7 @@ public class TechScreen extends MenuScreen<TechMenu> {
             techPanel, getComponent("research_equipment").get(Voltage.LV),
             renamePanel, Items.NAME_TAG);
 
-        rootPanel.addChild(RectD.corners(0.5, 0d, 0.5, 1d), Rect.ZERO, welcomePanel);
+        rootPanel.addChild(RectD.corners(0.5, 0.5d, 0.5, 0.5d), Rect.ZERO, welcomePanel);
         rootPanel.addGroup(techPanel);
         rootPanel.addGroup(renamePanel);
         rootPanel.addGroup(TAB_OFFSET, tab);
@@ -143,14 +131,6 @@ public class TechScreen extends MenuScreen<TechMenu> {
         } else {
             welcomePanel.setActive(true);
             tab.setActive(false);
-        }
-    }
-
-    private void onWelcomePressed() {
-        if (menu.player() instanceof LocalPlayer player) {
-            var name = welcomeEdit.getValue();
-            var command = TinactoryKeys.ID + " createTeam " + StringArgumentType.escapeIfRequired(name);
-            player.connection.sendCommand(command);
         }
     }
 }

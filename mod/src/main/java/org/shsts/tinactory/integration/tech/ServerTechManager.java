@@ -122,41 +122,11 @@ public class ServerTechManager extends TechManager implements IServerTechManager
             .map(playerTeam -> TechManagers.savedData().getTeamProfile(playerTeam.getName()));
     }
 
-    @Override
-    public int nextId() {
-        return TechManagers.savedData().nextId();
-    }
-
     private void sendFullUpdatePacket(ServerPlayer player, TeamProfile team) {
         CORE.sendToPlayer(player, TECH_UPDATE, team.fullUpdatePacket());
     }
 
     @Override
-    public void addPlayerToTeam(ServerPlayer player, ITeamProfile team) {
-        var playerTeam = TechHelper.scoreboardTeam(team.getName()).orElseThrow();
-        ServerUtil.getScoreboard().addPlayerToTeam(player.getScoreboardName(), playerTeam);
-        sendFullUpdatePacket(player, TechManagers.savedData().getTeamProfile(team.getName()));
-    }
-
-    @Override
-    public void newTeam(ServerPlayer player, String name) {
-        var scoreboard = ServerUtil.getScoreboard();
-        var playerTeam = scoreboard.addPlayerTeam(name);
-        scoreboard.addPlayerToTeam(player.getScoreboardName(), playerTeam);
-        var team = TechManagers.savedData().getTeamProfile(playerTeam.getName());
-        sendFullUpdatePacket(player, team);
-    }
-
-    @Override
-    public void leaveTeam(ServerPlayer player) {
-        ServerUtil.getScoreboard().removePlayerFromTeam(player.getScoreboardName());
-    }
-
-    public void removeTeam(PlayerTeam playerTeam) {
-        TechManagers.savedData().removeTeamProfile(playerTeam.getName());
-        ServerUtil.getScoreboard().removePlayerTeam(playerTeam);
-    }
-
     public void syncTeam(ServerPlayer player) {
         teamByPlayer(player).ifPresent(profile -> sendFullUpdatePacket(player, profile));
     }

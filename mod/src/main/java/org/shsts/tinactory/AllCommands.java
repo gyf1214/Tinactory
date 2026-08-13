@@ -3,7 +3,6 @@ package org.shsts.tinactory;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
@@ -12,132 +11,23 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.TicketType;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.tech.TechManagers;
-import org.shsts.tinactory.integration.util.ServerUtil;
 
 import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllCommands {
-    public static final SimpleCommandExceptionType PLAYER_HAS_TEAM = new SimpleCommandExceptionType(
-        I18n.tr("tinactory.chat.exception.hasTeam"));
     public static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
         I18n.tr("tinactory.chat.exception.noTeam"));
-    public static final SimpleCommandExceptionType CANNOT_REMOVE_TEAM = new SimpleCommandExceptionType(
-        I18n.tr("tinactory.chat.exception.cannotRemoveTeam"));
-    public static final DynamicCommandExceptionType TEAM_ALREADY_EXISTS = new DynamicCommandExceptionType(
-        t -> I18n.tr("tinactory.chat.exception.teamExists", t));
     public static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
         t -> I18n.tr("tinactory.chat.exception.noTech", t));
-
-    private static int createTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var name = StringArgumentType.getString(ctx, "name");
-        var manager = TechManagers.server();
-
-        if (manager.teamByPlayer(player).isPresent()) {
-            throw PLAYER_HAS_TEAM.create();
-        }
-        if (manager.teamByName(name).isPresent()) {
-            throw TEAM_ALREADY_EXISTS.create(name);
-        }
-
-        manager.newTeam(player, name);
-
-        if (CONFIG.allowTeamSpawnCommands.get()) {
-            var world = player.serverLevel();
-
-            var id = manager.nextId();
-            var radius = (int) Math.floor(Math.sqrt(id) / 2);
-            var base = 4 * radius * radius;
-            var base1 = 4 * (radius + 1) * (radius + 1);
-            var angle = 2 * Math.PI * ((double) (id - base)) / ((double) (base1 - base));
-            var radius1 = (radius + 1) * CONFIG.teamSpread.get();
-
-            var x = (int) Math.round(Math.cos(angle) * radius1);
-            var z = (int) Math.round(Math.sin(angle) * radius1);
-            var pos = new BlockPos(x, 64, z);
-
-            PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
-                world.getChunkSource().getGenerator(), world.random, pos);
-            var pos1 = pos.above();
-            player.setRespawnPosition(world.dimension(), pos1, 0, true, true);
-            teleport(world, player, pos1);
-        }
-
-        player.sendSystemMessage(I18n.tr("tinactory.chat.createTeam.success",
-            name, player.getDisplayName()));
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int addPlayerToTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var player2 = EntityArgument.getPlayer(ctx, "player");
-        var manager = TechManagers.server();
-        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-
-        if (manager.teamByPlayer(player2).isPresent()) {
-            throw PLAYER_HAS_TEAM.create();
-        }
-
-        manager.addPlayerToTeam(player2, team);
-
-        if (CONFIG.allowTeamSpawnCommands.get()) {
-            var world = player.serverLevel();
-            var pos = player.getRespawnPosition();
-            if (pos != null) {
-                player2.setRespawnPosition(world.dimension(), pos, 0, true, true);
-                teleport(world, player2, pos);
-            }
-        }
-
-        player.sendSystemMessage(I18n.tr("tinactory.chat.addPlayerToTeam.success",
-            player2.getDisplayName(), team.getName()));
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int leaveTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManagers.server();
-        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-
-        manager.leaveTeam(player);
-        player.sendSystemMessage(I18n.tr("tinactory.chat.leaveTeam.success",
-            player.getDisplayName(), team.getName()));
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static int removeTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        var player = ctx.getSource().getPlayerOrException();
-        var manager = TechManagers.server();
-        var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
-        var playerTeam = player.getTeam();
-        assert playerTeam != null;
-
-        if (playerTeam.getPlayers().size() != 1) {
-            throw CANNOT_REMOVE_TEAM.create();
-        }
-
-        manager.leaveTeam(player);
-        manager.removeTeam(playerTeam);
-        player.sendSystemMessage(I18n.tr("tinactory.chat.removeTeam.success",
-            player.getDisplayName(), team.getName()));
-        return Command.SINGLE_SUCCESS;
-    }
 
     private static int syncTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         TechManagers.server().syncTeam(ctx.getSource().getPlayerOrException());
@@ -190,40 +80,8 @@ public final class AllCommands {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int removeTeamAdmin(CommandContext<CommandSourceStack> ctx) {
-        var teamName = StringArgumentType.getString(ctx, "team");
-        var manager = TechManagers.server();
-        manager.teamByName(teamName).ifPresent($ -> {
-            var playerTeam = ServerUtil.getScoreboard().getPlayerTeam($.getName());
-            if (playerTeam != null) {
-                manager.removeTeam(playerTeam);
-            }
-        });
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private static void teleport(ServerLevel world, ServerPlayer player, BlockPos pos) {
-        ChunkPos chunkpos = new ChunkPos(pos);
-        world.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, chunkpos, 1, player.getId());
-        player.stopRiding();
-        if (player.isSleeping()) {
-            player.stopSleepInBed(true, true);
-        }
-        player.connection.teleport(pos.getX(), pos.getY(), pos.getZ(), 0f, 0f);
-        player.setYHeadRot(0f);
-    }
-
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var builder = Commands.literal(TinactoryKeys.ID)
-            .then(Commands.literal("createTeam")
-                .then(Commands.argument("name", StringArgumentType.string())
-                    .executes(AllCommands::createTeam)))
-            .then(Commands.literal("addPlayerToTeam")
-                .then(Commands.argument("player", EntityArgument.player())
-                    .executes(AllCommands::addPlayerToTeam)))
-            .then(Commands.literal("leaveTeam").executes(AllCommands::leaveTeam))
-            .then(Commands.literal("removeTeam").executes(AllCommands::removeTeam))
             .then(Commands.literal("syncTeam").executes(AllCommands::syncTeam))
             .then(Commands.literal("setTargetTech")
                 .then(Commands.argument("tech", ResourceLocationArgument.id())
@@ -236,10 +94,7 @@ public final class AllCommands {
                 .then(Commands.literal("setTechProgress")
                     .then(Commands.argument("tech", ResourceLocationArgument.id())
                         .then(Commands.argument("progress", LongArgumentType.longArg(0))
-                            .executes(AllCommands::setTechProgress))))
-                .then(Commands.literal("removeTeam")
-                    .then(Commands.argument("team", StringArgumentType.string())
-                        .executes(AllCommands::removeTeamAdmin))));
+                            .executes(AllCommands::setTechProgress)))));
 
         dispatcher.register(builder);
     }
