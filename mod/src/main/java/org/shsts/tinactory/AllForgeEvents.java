@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -15,18 +16,34 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import org.shsts.tinactory.api.tech.ITeamProvider;
+import org.shsts.tinactory.compat.ftbquests.FtbTeamsTeamProvider;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
+import org.shsts.tinactory.integration.tech.SinglePlayerTeamProvider;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
 import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllForgeEvents {
+    private static ITeamProvider createFtbTeamsProvider() {
+        if (!ModList.get().isLoaded("ftbteams")) {
+            throw new IllegalStateException("FTB Teams provider requires the ftbteams mod");
+        }
+        return new FtbTeamsTeamProvider(TechManagers.server(),
+            CONFIG.ftbUnaffiliatedPlayerPolicy.get());
+    }
+
     @SubscribeEvent
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-        TechManagers.installTeamProvider();
+        var provider = switch (CONFIG.teamProvider.get()) {
+            case SINGLE_PLAYER -> new SinglePlayerTeamProvider();
+            case FTB_TEAMS -> createFtbTeamsProvider();
+        };
+        TechManagers.installTeamProvider(provider);
     }
 
     @SubscribeEvent

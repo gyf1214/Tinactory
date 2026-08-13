@@ -1,4 +1,4 @@
-package org.shsts.tinactory.integration.tech;
+package org.shsts.tinactory.compat.ftbquests;
 
 import dev.ftb.mods.ftbteams.api.FTBTeamsAPI;
 import dev.ftb.mods.ftbteams.api.Team;
@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.TinactoryConfig.FtbUnaffiliatedPlayerPolicy;
 import org.shsts.tinactory.api.tech.ITeamProvider;
+import org.shsts.tinactory.integration.tech.ServerTechManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +28,11 @@ public final class FtbTeamsTeamProvider implements ITeamProvider {
     public FtbTeamsTeamProvider(ServerTechManager techManager,
         FtbUnaffiliatedPlayerPolicy unaffiliatedPlayerPolicy) {
         this.unaffiliatedPlayerPolicy = unaffiliatedPlayerPolicy;
-        playerChangedListener = event -> techManager.syncTeam(event.getPlayer());
+        playerChangedListener = event -> {
+            if (event.getPlayer() != null) {
+                techManager.syncTeam(event.getPlayer());
+            }
+        };
         TeamEvent.PLAYER_CHANGED.register(playerChangedListener);
     }
 
@@ -77,8 +82,8 @@ public final class FtbTeamsTeamProvider implements ITeamProvider {
     }
 
     private boolean isAcceptedTeam(Team team) {
-        return team.isPartyTeam() || unaffiliatedPlayerPolicy == FtbUnaffiliatedPlayerPolicy.PERSONAL &&
-            team.isPlayerTeam();
+        return team.isPartyTeam() || (unaffiliatedPlayerPolicy == FtbUnaffiliatedPlayerPolicy.PERSONAL &&
+            team.isPlayerTeam());
     }
 
     private static String profileId(UUID teamId) {

@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechManager;
-import org.shsts.tinactory.integration.tech.FtbTeamsTeamProvider;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
 import java.util.ArrayList;
@@ -123,8 +122,7 @@ public final class TechQuestIntegration {
     private Optional<TeamData> findQuestTeamData(ITeamProfile team) {
         if (FtbTeamsTeamProvider.isFtbProfileId(team.getName())) {
             return FtbTeamsTeamProvider.profileIdToTeamId(team.getName())
-                .map(teamId -> Optional.ofNullable(ServerQuestFile.INSTANCE.getNullableTeamData(teamId)))
-                .orElseGet(Optional::empty);
+                .map(teamId -> ServerQuestFile.INSTANCE.getNullableTeamData(teamId));
         }
         return findOnlineTinactoryTeamMember(team)
             .flatMap(player -> ServerQuestFile.INSTANCE.getTeamData(player));

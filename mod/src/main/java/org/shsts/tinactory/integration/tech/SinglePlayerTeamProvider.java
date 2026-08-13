@@ -17,6 +17,9 @@ public final class SinglePlayerTeamProvider implements ITeamProvider {
     private static final String PREFIX = "single_player:";
 
     @Override
+    public void unregister() {}
+
+    @Override
     public Optional<String> teamIdByPlayer(Player player) {
         return Optional.of(teamId(player.getUUID()));
     }

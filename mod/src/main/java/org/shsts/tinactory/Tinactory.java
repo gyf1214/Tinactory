@@ -8,7 +8,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
@@ -81,13 +80,8 @@ public class Tinactory {
         TechManagers.initClient();
 
         REGISTRATE.registerClient(modEventBus);
-        modEventBus.addListener(Tinactory::initClient);
         modEventBus.addListener(AllClientEvents::initKeys);
         modEventBus.addListener(AllClientEvents::registerClientExtensions);
         NeoForge.EVENT_BUS.register(AllClientEvents.class);
-    }
-
-    private static void initClient(FMLClientSetupEvent event) {
-        LOGGER.info("hello Tinactory client!");
     }
 }
