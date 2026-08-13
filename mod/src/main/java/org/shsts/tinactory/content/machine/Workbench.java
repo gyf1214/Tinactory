@@ -282,18 +282,6 @@ public class Workbench extends CapabilityProvider implements
             }
         }
 
-        for (var i = 0; i < remaining.size(); i++) {
-            var slotItem = craftingView.getStackInSlot(i);
-            var remainingItem = remaining.get(i);
-            if (!slotItem.isEmpty()) {
-                craftingView.extractItem(i, 1, false);
-            }
-            if (!remainingItem.isEmpty()) {
-                var remainingItem1 = craftingView.insertItem(i, remainingItem, false);
-                player.drop(remainingItem1, false);
-            }
-        }
-
         if (currentRecipe instanceof ToolRecipe toolRecipe) {
             // damage tool recipe
             toolRecipe.doDamage(toolStorage);
