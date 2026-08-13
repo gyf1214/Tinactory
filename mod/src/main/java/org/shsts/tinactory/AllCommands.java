@@ -27,7 +27,7 @@ public final class AllCommands {
     public static final SimpleCommandExceptionType PLAYER_NO_TEAM = new SimpleCommandExceptionType(
         I18n.tr("tinactory.chat.exception.noTeam"));
     public static final DynamicCommandExceptionType TECH_NOT_FOUND = new DynamicCommandExceptionType(
-        t -> I18n.tr("tinactory.chat.exception.noTech", t));
+        t -> I18n.tr("tinactory.chat.exception.noTech", t.toString()));
 
     private static int syncTeam(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
         TechManagers.server().syncTeam(ctx.getSource().getPlayerOrException());
@@ -42,7 +42,7 @@ public final class AllCommands {
         var tech = manager.techByKey(techName).orElseThrow(() -> TECH_NOT_FOUND.create(techName));
 
         team.setTargetTech(tech);
-        player.sendSystemMessage(I18n.tr("tinactory.chat.setTargetTech.success", team.getName(),
+        player.sendSystemMessage(I18n.tr("tinactory.chat.setTargetTech.success",
             I18n.tr(ITechnology.getDescriptionId(techName))));
         return Command.SINGLE_SUCCESS;
     }
@@ -53,7 +53,7 @@ public final class AllCommands {
         var team = manager.teamByPlayer(player).orElseThrow(PLAYER_NO_TEAM::create);
 
         team.resetTargetTech();
-        player.sendSystemMessage(I18n.tr("tinactory.chat.resetTargetTech.success", team.getName()));
+        player.sendSystemMessage(I18n.tr("tinactory.chat.resetTargetTech.success"));
         return Command.SINGLE_SUCCESS;
     }
 
