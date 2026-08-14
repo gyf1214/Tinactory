@@ -9,7 +9,7 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public record WorkbenchTransferResult(Code code, List<Integer> missingIndexes) {
     public enum Code {
-        SUCCESS, MISSING_INPUT, INVENTORY_FULL
+        SUCCESS, MISSING_INPUT, INVENTORY_FULL, UNSUPPORTED_RECIPE
     }
 
     public WorkbenchTransferResult {
@@ -26,5 +26,9 @@ public record WorkbenchTransferResult(Code code, List<Integer> missingIndexes) {
 
     public static WorkbenchTransferResult inventoryFull() {
         return new WorkbenchTransferResult(Code.INVENTORY_FULL, List.of());
+    }
+
+    public static WorkbenchTransferResult unsupportedRecipe() {
+        return new WorkbenchTransferResult(Code.UNSUPPORTED_RECIPE, List.of());
     }
 }

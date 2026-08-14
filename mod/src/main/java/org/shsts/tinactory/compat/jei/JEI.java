@@ -186,8 +186,10 @@ public class JEI implements IModPlugin {
             RecipeTypes.SMELTING, MEPatternTransferHandler::fromSmelting,
             registration.getTransferHelper()), RecipeTypes.SMELTING);
         assert toolCategory != null;
-        registration.addRecipeTransferHandler(new WorkbenchTransferHandler(toolCategory.type,
+        registration.addRecipeTransferHandler(WorkbenchTransferHandler.tool(toolCategory.type,
             registration.getTransferHelper()), toolCategory.type);
+        registration.addRecipeTransferHandler(WorkbenchTransferHandler.crafting(registration.getTransferHelper()),
+            RecipeTypes.CRAFTING);
     }
 
     private static <R extends ProcessingRecipe> void addProcessingTransferHandler(

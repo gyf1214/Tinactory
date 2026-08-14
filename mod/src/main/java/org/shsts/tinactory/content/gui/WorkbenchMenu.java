@@ -5,7 +5,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import org.shsts.tinactory.AllLayouts;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
@@ -95,8 +98,16 @@ public class WorkbenchMenu extends LayoutMenu {
     }
 
     private void transferEvent(WorkbenchTransferEventPacket packet) {
-        CORE.recipeManager(world()).byLoc(TOOL_CRAFTING, packet.getRecipeId())
-            .ifPresent(recipe -> transfer(recipe.get(), packet.isMaxTransfer()));
+        var toolRecipe = CORE.recipeManager(world()).byLoc(TOOL_CRAFTING, packet.getRecipeId());
+        if (toolRecipe.isPresent()) {
+            transfer(toolRecipe.get().get(), packet.isMaxTransfer());
+            return;
+        }
+        world().getRecipeManager().byKey(packet.getRecipeId()).ifPresent(holder -> {
+            if (holder.value() instanceof CraftingRecipe recipe) {
+                transfer(recipe, packet.isMaxTransfer());
+            }
+        });
     }
 
     public List<Slot> playerSlots() {
@@ -112,11 +123,26 @@ public class WorkbenchMenu extends LayoutMenu {
     }
 
     public WorkbenchTransferResult planTransfer(ToolRecipe recipe, boolean maxTransfer) {
-        return plan(recipe, maxTransfer).result();
+        var shaped = recipe.shapedRecipe;
+        return plan(shaped.getIngredients(), shaped.getWidth(), shaped.getHeight(), recipe.toolIngredients,
+            maxTransfer).result();
     }
 
     public void transfer(ToolRecipe recipe, boolean maxTransfer) {
-        var plan = plan(recipe, maxTransfer);
+        var shaped = recipe.shapedRecipe;
+        transfer(plan(shaped.getIngredients(), shaped.getWidth(), shaped.getHeight(), recipe.toolIngredients,
+            maxTransfer));
+    }
+
+    public WorkbenchTransferResult planTransfer(CraftingRecipe recipe, boolean maxTransfer) {
+        return planCrafting(recipe, maxTransfer).result();
+    }
+
+    public void transfer(CraftingRecipe recipe, boolean maxTransfer) {
+        transfer(planCrafting(recipe, maxTransfer));
+    }
+
+    private void transfer(TransferPlan plan) {
         if (plan.result().code() != WorkbenchTransferResult.Code.SUCCESS) {
             return;
         }
@@ -126,7 +152,21 @@ public class WorkbenchMenu extends LayoutMenu {
         broadcastChanges();
     }
 
-    private TransferPlan plan(ToolRecipe recipe, boolean maxTransfer) {
+    private TransferPlan planCrafting(CraftingRecipe recipe, boolean maxTransfer) {
+        if (recipe instanceof ShapedRecipe shaped) {
+            return plan(shaped.getIngredients(), shaped.getWidth(), shaped.getHeight(), List.of(), maxTransfer);
+        }
+        if (recipe instanceof ShapelessRecipe shapeless) {
+            return plan(shapeless.getIngredients(), 0, 0, List.of(), maxTransfer);
+        }
+        return new TransferPlan(WorkbenchTransferResult.unsupportedRecipe(), List.of());
+    }
+
+    private TransferPlan plan(List<Ingredient> materialIngredients, int width, int height,
+        List<Ingredient> toolIngredients, boolean maxTransfer) {
+        if ((width == 0) != (height == 0) || width > 3 || height > 3 || width < 0 || height < 0) {
+            return new TransferPlan(WorkbenchTransferResult.unsupportedRecipe(), List.of());
+        }
         var stacks = new ArrayList<ItemStack>();
         for (var i = 0; i < MATERIAL_SLOT_BEGIN + MATERIAL_SLOT_COUNT; i++) {
             stacks.add(getSlot(i).getItem().copy());
@@ -136,9 +176,9 @@ public class WorkbenchMenu extends LayoutMenu {
             grid.add(ItemStack.EMPTY);
             stacks.add(getSlot(MATERIAL_SLOT_BEGIN + i).getItem().copy());
         }
-        var toolMissing = allocateTools(stacks, recipe.toolIngredients);
+        var toolMissing = allocateTools(stacks, toolIngredients);
         if (!toolMissing.isEmpty()) {
-            var materialMissing = allocateMaterials(stacks, grid, recipe);
+            var materialMissing = allocateMaterials(stacks, grid, materialIngredients, width, height);
             toolMissing.addAll(materialMissing);
             return new TransferPlan(WorkbenchTransferResult.missingInput(toolMissing), List.of());
         }
@@ -147,7 +187,7 @@ public class WorkbenchMenu extends LayoutMenu {
         while (true) {
             var nextStacks = copyStacks(stacks);
             var nextGrid = copyStacks(grid);
-            missing = allocateMaterials(nextStacks, nextGrid, recipe);
+            missing = allocateMaterials(nextStacks, nextGrid, materialIngredients, width, height);
             if (!missing.isEmpty()) {
                 if (sets == 0) {
                     return new TransferPlan(WorkbenchTransferResult.missingInput(missing), List.of());
@@ -191,33 +231,41 @@ public class WorkbenchMenu extends LayoutMenu {
     }
 
     private static List<Integer> allocateMaterials(List<ItemStack> stacks, List<ItemStack> grid,
-        ToolRecipe recipe) {
+        List<Ingredient> ingredients, int width, int height) {
         var missing = new ArrayList<Integer>();
-        var shaped = recipe.shapedRecipe;
-        for (var row = 0; row < shaped.getHeight(); row++) {
-            for (var column = 0; column < shaped.getWidth(); column++) {
-                var gridIndex = row * 3 + column;
-                var ingredient = shaped.getIngredients().get(row * shaped.getWidth() + column);
-                if (ingredient.isEmpty()) {
-                    continue;
-                }
-                var selected = grid.get(gridIndex);
-                var source = findMatching(stacks, 0, PLAYER_SLOT_COUNT + MATERIAL_SLOT_COUNT, ingredient,
-                    selected.isEmpty() ? null : selected);
-                if (source < 0) {
-                    missing.add(1 + gridIndex);
-                    continue;
-                }
-                var sourceStack = stacks.get(source);
-                if (selected.isEmpty()) {
-                    grid.set(gridIndex, sourceStack.copyWithCount(1));
-                } else {
-                    selected.grow(1);
-                }
-                sourceStack.shrink(1);
+        for (var index = 0; index < ingredients.size(); index++) {
+            var gridIndex = width == 0 ? shapelessGridIndex(index, ingredients.size()) :
+                index / width * 3 + index % width;
+            var ingredient = ingredients.get(index);
+            if (ingredient.isEmpty()) {
+                continue;
             }
+            var selected = grid.get(gridIndex);
+            var source = findMatching(stacks, 0, PLAYER_SLOT_COUNT + MATERIAL_SLOT_COUNT, ingredient,
+                selected.isEmpty() ? null : selected);
+            if (source < 0) {
+                missing.add(1 + gridIndex);
+                continue;
+            }
+            var sourceStack = stacks.get(source);
+            if (selected.isEmpty()) {
+                grid.set(gridIndex, sourceStack.copyWithCount(1));
+            } else {
+                selected.grow(1);
+            }
+            sourceStack.shrink(1);
         }
         return missing;
+    }
+
+    private static int shapelessGridIndex(int index, int ingredientCount) {
+        if (ingredientCount == 1) {
+            return 4;
+        }
+        if (ingredientCount <= 4) {
+            return new int[] {0, 1, 3, 4}[index];
+        }
+        return index;
     }
 
     private static boolean stowOldGrid(List<ItemStack> stacks) {

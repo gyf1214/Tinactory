@@ -1,6 +1,7 @@
 package org.shsts.tinactory.compat.jei.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.AllLayouts;
@@ -23,6 +24,6 @@ public final class WorkbenchHandler {
         var y = rect.y() + MARGIN_TOP;
 
         registration.addRecipeClickArea(WorkbenchScreen.class,
-            x, y, rect.width(), rect.height(), category.type);
+            x, y, rect.width(), rect.height(), category.type, RecipeTypes.CRAFTING);
     }
 }
