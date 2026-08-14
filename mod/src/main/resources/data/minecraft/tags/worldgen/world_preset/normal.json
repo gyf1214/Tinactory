@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "tinactory:void"
+    "tinactory:void",
+    "tinactory:void_with_start"
   ]
 }

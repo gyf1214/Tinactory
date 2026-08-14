@@ -1,0 +1,17 @@
+{
+  "dimensions": {
+    "minecraft:overworld": {
+      "type": "minecraft:overworld",
+      "generator": {
+        "type": "minecraft:flat",
+        "settings": {
+          "structure_overrides": [],
+          "layers": [],
+          "lakes": false,
+          "features": false,
+          "biome": "tinactory:void_with_start"
+        }
+      }
+    }
+  }
+}

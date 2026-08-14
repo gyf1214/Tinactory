@@ -60,11 +60,12 @@ public final class AllForgeEvents {
     public static void onCreateWorldSpawn(LevelEvent.CreateSpawnPosition event) {
         if (event.getLevel() instanceof ServerLevel world) {
             var spawn = new BlockPos(0, 64, 0);
-            if (!world.getBiome(spawn).is(AllWorldGens.VOID_BIOME)) {
+            if (!world.getBiome(spawn).is(AllWorldGens.VOID_WITH_START_BIOME)) {
                 return;
             }
+            var pos = spawn.offset(-1, 0, -1);
             PLAYER_START_FEATURE.get().place(FeatureConfiguration.NONE, world,
-                world.getChunkSource().getGenerator(), world.random, spawn);
+                world.getChunkSource().getGenerator(), world.random, pos);
             event.getSettings().setSpawn(spawn, 0f);
             event.setCanceled(true);
         }
