@@ -1,0 +1,16 @@
+{
+  "id": "tinactory:player_start",
+  "display": {
+    "description": "tinactory.ftb_team_bases.player_start",
+    "author": "Tiny",
+    "preview_image": "ftbteambases:textures/spawn/default.png"
+  },
+  "construction": {
+    "structure_location": "tinactory:player_start",
+    "y_pos": 64
+  },
+  "dimension": {
+    "private": false,
+    "dimension_id": "minecraft:overworld"
+  }
+}

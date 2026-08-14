@@ -1,0 +1,8 @@
+{
+    autoclaiming: {
+        lobby_radius: 2
+    }
+    lobby: {
+        lobby_y_pos: 64
+    }
+}
