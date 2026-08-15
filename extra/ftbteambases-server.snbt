@@ -3,6 +3,7 @@
         lobby_radius: 2
     }
     lobby: {
+        lobby_game_mode: "survival"
         lobby_y_pos: 64
     }
 }
