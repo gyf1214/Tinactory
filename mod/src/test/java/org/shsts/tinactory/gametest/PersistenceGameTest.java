@@ -14,16 +14,22 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricTank;
+import org.shsts.tinactory.content.machine.IBoiler;
 
+import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class PersistenceGameTest {
     @GameTest
-    public static void testIdleBoilerCanBeSaved(GameTestHelper helper) {
+    public static void testIdleBoilerHasNoProcessingInfo(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("machine/boiler/low"));
-        helper.getBlockEntity(pos).saveWithFullMetadata(helper.getLevel().registryAccess());
+        var boiler = (IBoiler) PROCESSOR.get(helper.getBlockEntity(pos));
+        if (!boiler.getAllInfo().isEmpty()) {
+            helper.fail("Idle boiler reported processing info", pos);
+            return;
+        }
         helper.succeed();
     }
 

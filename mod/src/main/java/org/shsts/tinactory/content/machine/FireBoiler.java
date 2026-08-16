@@ -200,13 +200,17 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
         return maxBurn > 0;
     }
 
+    private Optional<IProcessingObject> fuelInfo() {
+        return burningItem.isEmpty() ? Optional.empty() : Optional.of(ProcessingHelper.itemIngredient(burningItem));
+    }
+
     @Override
     public Optional<IProcessingObject> getInfo(int port, int index) {
         if (index > 0) {
             return Optional.empty();
         }
         return switch (port) {
-            case 0 -> Optional.of(ProcessingHelper.itemIngredient(burningItem));
+            case 0 -> fuelInfo();
             case 1 -> inputInfo();
             case 2 -> outputInfo();
             default -> Optional.empty();
@@ -216,7 +220,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
     @Override
     public List<IProcessingObject> getAllInfo() {
         var ret = new ArrayList<IProcessingObject>();
-        ret.add(ProcessingHelper.itemIngredient(burningItem));
+        fuelInfo().ifPresent(ret::add);
         addAllInfo(ret::add);
         return ret;
     }
