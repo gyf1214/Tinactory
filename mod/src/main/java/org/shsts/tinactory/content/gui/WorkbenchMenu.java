@@ -174,7 +174,6 @@ public class WorkbenchMenu extends LayoutMenu {
         var grid = new ArrayList<ItemStack>();
         for (var i = 0; i < MATERIAL_SLOT_COUNT; i++) {
             grid.add(ItemStack.EMPTY);
-            stacks.add(getSlot(MATERIAL_SLOT_BEGIN + i).getItem().copy());
         }
         var toolMissing = allocateTools(stacks, toolIngredients);
         if (!toolMissing.isEmpty()) {
@@ -241,7 +240,7 @@ public class WorkbenchMenu extends LayoutMenu {
                 continue;
             }
             var selected = grid.get(gridIndex);
-            var source = findMatching(stacks, 0, PLAYER_SLOT_COUNT + MATERIAL_SLOT_COUNT, ingredient,
+            var source = findMatching(stacks, 0, stacks.size(), ingredient,
                 selected.isEmpty() ? null : selected);
             if (source < 0) {
                 missing.add(1 + gridIndex);
@@ -269,7 +268,7 @@ public class WorkbenchMenu extends LayoutMenu {
     }
 
     private static boolean stowOldGrid(List<ItemStack> stacks) {
-        for (var i = MATERIAL_SLOT_BEGIN + MATERIAL_SLOT_COUNT; i < stacks.size(); i++) {
+        for (var i = MATERIAL_SLOT_BEGIN; i < stacks.size(); i++) {
             var source = stacks.get(i);
             for (var slot = 0; slot < PLAYER_SLOT_COUNT && !source.isEmpty(); slot++) {
                 var target = stacks.get(slot);

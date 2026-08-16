@@ -238,6 +238,29 @@ public final class WorkbenchTransferGameTest {
     }
 
     @GameTest
+    public static void testTransferUsesGridMaterialsAndStowsRemainder(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.materialSlots().getFirst().set(new ItemStack(Items.OAK_PLANKS, 3));
+
+        menu.transfer(craftingRecipe(menu, VANILLA_STICK_RECIPE), false);
+
+        if (!menu.materialSlots().getFirst().getItem().is(Items.OAK_PLANKS) ||
+            !menu.materialSlots().get(3).getItem().is(Items.OAK_PLANKS)) {
+            helper.fail("Transfer did not use materials already in the crafting grid");
+            return;
+        }
+        var remainder = menu.playerSlots().getFirst().getItem();
+        if (!remainder.is(Items.OAK_PLANKS) || remainder.getCount() != 1) {
+            helper.fail("Transfer did not stow only the unused grid materials");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testTransfersVanillaShapelessRecipe(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
