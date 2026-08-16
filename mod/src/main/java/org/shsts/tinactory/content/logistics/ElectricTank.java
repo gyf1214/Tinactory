@@ -85,7 +85,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
     }
 
     public void setFilter(int index, FluidStack stack) {
-        filters[index] = stack.copy();
+        filters[index] = stack.isEmpty() ? null : stack.copy();
         onSlotChange();
     }
 
@@ -129,9 +129,8 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
         tag.put("tanks", port.serializeNBT(provider));
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
-            if (filters[i] != null) {
-                var tag2 = new CompoundTag();
-                filters[i].save(provider, tag2);
+            if (filters[i] != null && !filters[i].isEmpty()) {
+                var tag2 = (CompoundTag) filters[i].save(provider, new CompoundTag());
                 tag2.putInt("Slot", i);
                 tag1.add(tag2);
             }
@@ -149,7 +148,7 @@ public class ElectricTank extends ElectricStorage implements INBTSerializable<Co
             var tag3 = (CompoundTag) tag2;
             var slot = tag3.getInt("Slot");
             var stack = FluidStack.parseOptional(provider, tag3);
-            filters[slot] = stack;
+            filters[slot] = stack.isEmpty() ? null : stack;
         }
     }
 }

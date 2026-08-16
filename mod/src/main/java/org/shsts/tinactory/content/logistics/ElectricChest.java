@@ -138,7 +138,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
     }
 
     public void setFilter(int slot, ItemStack stack) {
-        filters[slot] = StackHelper.copyWithCount(stack, 1);
+        filters[slot] = stack.isEmpty() ? null : StackHelper.copyWithCount(stack, 1);
         onSlotChange();
     }
 
@@ -192,9 +192,8 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
         tag.put("items", StackHelper.serializeItemHandler(provider, internalItems));
         var tag1 = new ListTag();
         for (var i = 0; i < size; i++) {
-            if (filters[i] != null) {
-                var tag2 = new CompoundTag();
-                filters[i].save(provider, tag2);
+            if (filters[i] != null && !filters[i].isEmpty()) {
+                var tag2 = (CompoundTag) filters[i].save(provider, new CompoundTag());
                 tag2.putInt("Slot", i);
                 tag1.add(tag2);
             }
@@ -212,7 +211,7 @@ public class ElectricChest extends ElectricStorage implements INBTSerializable<C
             var tag3 = (CompoundTag) tag2;
             var slot = tag3.getInt("Slot");
             var item = ItemStack.parseOptional(provider, tag3);
-            filters[slot] = item;
+            filters[slot] = item.isEmpty() ? null : item;
         }
     }
 }

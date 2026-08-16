@@ -226,7 +226,7 @@ public abstract class FireBoiler extends Boiler implements IBoiler {
         var tag = super.serializeNBT(provider);
         tag.putLong("maxBurn", maxBurn);
         tag.putLong("currentBurn", currentBurn);
-        tag.put("burningItem", burningItem.save(provider));
+        tag.put("burningItem", burningItem.saveOptional(provider));
         return tag;
     }
 
