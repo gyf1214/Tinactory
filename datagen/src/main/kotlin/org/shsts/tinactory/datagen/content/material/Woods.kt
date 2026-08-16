@@ -371,15 +371,16 @@ object Woods {
             shapeless(Items.BAMBOO_MOSAIC, Items.BAMBOO_MOSAIC_SLAB, TOOL_SAW, 2)
         }
         assembler {
-            output(Items.BAMBOO_BLOCK) {
-                input(Items.BAMBOO, 8)
+            defaults {
                 voltage(Voltage.ULV)
                 workTicks(64)
+                tech(Technologies.SOLDERING)
+            }
+            output(Items.BAMBOO_BLOCK) {
+                input(Items.BAMBOO, 8)
             }
             output(Items.BAMBOO_MOSAIC) {
                 input(Items.BAMBOO_SLAB, 2)
-                voltage(Voltage.ULV)
-                workTicks(64)
             }
         }
         cutter {
