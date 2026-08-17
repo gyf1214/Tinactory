@@ -19,12 +19,14 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.AllRecipes;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
+import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
@@ -33,6 +35,7 @@ import org.shsts.tinactory.gametest.dependency.DependencyChecker;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
+import org.shsts.tinycorelib.api.registrate.entry.IRecipeType;
 
 import java.util.Objects;
 
@@ -43,6 +46,7 @@ import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -71,6 +75,28 @@ public final class TinactoryGameTest {
             var absoluteMachinePos = helper.absolutePos(machinePos);
             if (manager.getNetworkAtPos(absoluteMachinePos).isEmpty()) {
                 helper.fail("Mock player use did not create a ticking machine network", machinePos);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 40)
+    public static void testOreAnalyzerFindsMatchingRecipes(GameTestHelper helper) {
+        var machinePos = new BlockPos(1, 1, 1);
+        helper.setBlock(machinePos, machineState("ore_analyzer", Direction.EAST));
+        var machine = MACHINE.get(helper.getBlockEntity(machinePos));
+        var input = machine.container().orElseThrow().getPort(0, ContainerAccess.INTERNAL).asItem();
+        var remaining = input.insert(new ItemStack(Items.COBBLESTONE), false);
+        if (!remaining.isEmpty()) {
+            helper.fail("Ore Analyzer rejected cobblestone input", machinePos);
+        }
+        @SuppressWarnings("unchecked")
+        IRecipeType<OreAnalyzerRecipe> recipeType = (IRecipeType<OreAnalyzerRecipe>)
+            Objects.requireNonNull(AllRecipes.getTypeInfo("ore_analyzer")).recipeType();
+        helper.runAfterDelay(2, () -> {
+            var recipes = CORE.recipeManager(helper.getLevel()).getRecipesFor(recipeType, machine);
+            if (recipes.size() < 3) {
+                helper.fail("Ore Analyzer found only " + recipes.size() + " cobblestone recipes", machinePos);
             }
             helper.succeed();
         });

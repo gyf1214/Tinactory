@@ -1,0 +1,33 @@
+{
+  "type": "tinactory:ore_analyzer",
+  "inputs": [
+    {
+      "ingredient": {
+        "type": "item_ingredient",
+        "stack": {
+          "count": 1,
+          "id": "minecraft:cobblestone"
+        }
+      },
+      "port": 0
+    }
+  ],
+  "outputs": [
+    {
+      "port": 1,
+      "result": {
+        "type": "item_result",
+        "rate": 1.0,
+        "stack": {
+          "count": 1,
+          "id": "tinactory:material/raw/chalcopyrite"
+        }
+      }
+    }
+  ],
+  "power": 1,
+  "rate": 1.0,
+  "required_tech": [],
+  "voltage": 0,
+  "work_ticks": 1
+}
