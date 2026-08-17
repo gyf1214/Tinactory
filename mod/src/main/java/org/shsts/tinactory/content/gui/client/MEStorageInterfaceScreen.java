@@ -12,9 +12,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
+import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
+import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
@@ -29,10 +30,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SLOT;
+import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.MEStorageInterfaceMenu.SLOT_SYNC;
-import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
+import static org.shsts.tinactory.content.gui.sync.StorageEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 
@@ -85,16 +86,13 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
             if (index < items.size()) {
                 var item = items.get(index);
                 var button1 = ClientUtil.shiftDown() ? QUICK_MOVE_BUTTON : button;
-                menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
-                    () -> new MEStorageInterfaceEventPacket(item, button1));
+                menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(item, button1));
             } else if (index - items.size() < fluids.size()) {
                 ClientUtil.playSound(SoundEvents.BUCKET_FILL);
                 var fluid = fluids.get(index - items.size());
-                menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
-                    () -> new MEStorageInterfaceEventPacket(fluid, button));
+                menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(fluid, button));
             } else {
-                menu.triggerEvent(ME_STORAGE_INTERFACE_SLOT,
-                    () -> new MEStorageInterfaceEventPacket(button));
+                menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button));
             }
         }
 
@@ -123,30 +121,34 @@ public class MEStorageInterfaceScreen extends MenuScreen<MEStorageInterfaceMenu>
         menu.onSyncPacket(SLOT_SYNC, this::onSync);
     }
 
-    private void onSync(MEStorageInterfaceSyncPacket packet) {
+    private void onSync(StorageSyncPacket packet) {
         var itemsMap = new HashMap<IStackKey, ItemStack>();
-        for (var newItem : packet.items()) {
-            var key = StackHelper.ITEM_ADAPTER.keyOf(newItem);
-            if (itemsMap.containsKey(key)) {
-                itemsMap.get(key).grow(newItem.getCount());
-            } else {
-                itemsMap.put(key, newItem);
+        var fluidsMap = new HashMap<IStackKey, FluidStack>();
+
+        for (var entry : packet.entries()) {
+            if (entry.isFilter()) {
+                continue;
+            }
+            var key = entry.key();
+            if (key.type() == PortType.ITEM) {
+                if (itemsMap.containsKey(key)) {
+                    itemsMap.get(key).grow(entry.amount());
+                } else {
+                    itemsMap.put(key, StackHelper.ITEM_ADAPTER.stackOf(key, entry.amount()));
+                }
+            } else if (key.type() == PortType.FLUID) {
+                if (fluidsMap.containsKey(key)) {
+                    fluidsMap.get(key).grow(entry.amount());
+                } else {
+                    fluidsMap.put(key, StackHelper.FLUID_ADAPTER.stackOf(key, entry.amount()));
+                }
             }
         }
+
         items.clear();
         items.addAll(itemsMap.values());
         items.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.ITEM, $.getItem()),
             ResourceLocation::compareNamespaced));
-
-        var fluidsMap = new HashMap<IStackKey, FluidStack>();
-        for (var newFluid : packet.fluids()) {
-            var key = StackHelper.FLUID_ADAPTER.keyOf(newFluid);
-            if (fluidsMap.containsKey(key)) {
-                fluidsMap.get(key).grow(newFluid.getAmount());
-            } else {
-                fluidsMap.put(key, newFluid);
-            }
-        }
         fluids.clear();
         fluids.addAll(fluidsMap.values());
         fluids.sort(Comparator.comparing($ -> ClientUtil.getRegistryKey(Registries.FLUID, $.getFluid()),

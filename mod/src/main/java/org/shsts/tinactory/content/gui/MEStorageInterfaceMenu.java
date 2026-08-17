@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.gui;
 
 import com.mojang.logging.LogUtils;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
@@ -11,21 +12,21 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
+import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
+import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SLOT;
-import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SYNC;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
+import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
+import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
+import static org.shsts.tinactory.content.gui.sync.StorageEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
@@ -39,17 +40,15 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     public static final int PANEL_HEIGHT = 7 * SLOT_SIZE + SPACING;
 
     private final IMachine machine;
-    private final IMachineConfig machineConfig;
     private final MEStorageInterface storageInterface;
     private final Runnable updateListener;
 
     public MEStorageInterfaceMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
-        this.machineConfig = machine.config();
         this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
 
-        var scheduler = new ActiveScheduler<>(ME_STORAGE_INTERFACE_SYNC, () -> new MEStorageInterfaceSyncPacket(
+        var scheduler = new ActiveScheduler<>(STORAGE_SYNC, () -> new StorageSyncPacket(
             storageInterface.getAllItems(), storageInterface.getAllFluids()));
         this.updateListener = scheduler::invokeUpdate;
 
@@ -58,7 +57,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             storageInterface.onUpdate(updateListener);
         }
 
-        onEventPacket(ME_STORAGE_INTERFACE_SLOT, this::onSlotClick);
+        onEventPacket(STORAGE_SLOT, this::onSlotClick);
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
     }
 
@@ -75,36 +74,31 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         }
     }
 
-    public IMachineConfig machineConfig() {
-        return machineConfig;
-    }
-
     private FluidClickResult doClickFluidSlot(ItemStack carried, IPort<FluidStack> port,
-        FluidStack fluid, boolean mayDrain, boolean mayFill) {
+        IStackKey key, boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
             return new FluidClickResult();
         }
         var handler = cap.get();
+        var fluid1 = StackHelper.FLUID_ADAPTER.stackOf(key, Integer.MAX_VALUE);
         if (mayFill) {
-            var fluid1 = StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE);
             var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.SIMULATE);
             if (StackHelper.transmitFluidFromHandler(handler, port, fluid2)) {
                 return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
             }
         }
         if (mayDrain) {
-            var fluid1 = port.extract(fluid, true);
-            int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
+            var fluid2 = port.extract(fluid1, true);
+            int amount = handler.fill(fluid2, IFluidHandler.FluidAction.SIMULATE);
             if (amount > 0) {
-                var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                var fluid3 = port.extract(fluid2, false);
-                var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
+                var fluid3 = StackHelper.copyWithAmount(fluid2, amount);
+                var fluid4 = port.extract(fluid3, false);
+                var amount1 = handler.fill(fluid4, IFluidHandler.FluidAction.EXECUTE);
                 if (amount1 != amount) {
                     LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
                 }
-                return new FluidClickResult(FluidClickAction.DRAIN,
-                    handler.getContainer());
+                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
             }
         }
         return new FluidClickResult();
@@ -126,7 +120,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private void clickItemSlot(ItemStack carried, ItemStack item, IPort<ItemStack> port, int button) {
+    private void clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, int button) {
         if (!carried.isEmpty()) {
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
@@ -141,8 +135,9 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             } else {
                 setCarried(port.insert(carried, false));
             }
-        } else {
-            var count = Math.min(item.getCount(), item.getMaxStackSize());
+        } else if (key != null) {
+            var item = StackHelper.ITEM_ADAPTER.stackOf(key);
+            var count = Math.min((int) port.getStorageAmount(item), item.getMaxStackSize());
             var count1 = button == 1 ? (count + 1) / 2 : count;
             var item1 = StackHelper.copyWithCount(item, count1);
             var extracted = port.extract(item1, false);
@@ -150,20 +145,20 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         }
     }
 
-    private void onSlotClick(MEStorageInterfaceEventPacket packet) {
+    private void onSlotClick(StorageEventPacket packet) {
         var button = packet.button();
         var fluidPort = storageInterface.fluidPort();
 
         if (packet.isItem() && packet.button() == QUICK_MOVE_BUTTON) {
-            quickMoveStack(packet.item());
+            quickMoveStack(packet.key());
             return;
         }
 
         boolean success;
         if (packet.isFluid()) {
-            var fluid = packet.fluid();
+            var key = packet.key();
             success = clickFluidSlot((carried, mayDrain, mayFill) ->
-                doClickFluidSlot(carried, fluidPort, fluid, mayDrain, mayFill), button);
+                doClickFluidSlot(carried, fluidPort, key, mayDrain, mayFill), button);
         } else if (button == 1) {
             success = clickFluidSlot((carried, mayDrain, mayFill) ->
                 doClickEmptyFluidSlot(carried, fluidPort, mayFill), button);
@@ -171,15 +166,15 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
             success = false;
         }
         if (!success) {
-            var item = packet.isItem() ? packet.item() : ItemStack.EMPTY;
             var itemPort = storageInterface.itemPort();
-            clickItemSlot(getCarried(), item, itemPort, button);
+            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
         }
     }
 
-    private void quickMoveStack(ItemStack stack) {
+    private void quickMoveStack(IStackKey key) {
         var inv = new PlayerMainInvWrapper(inventory);
         var target = storageInterface.itemPort();
+        var stack = StackHelper.ITEM_ADAPTER.stackOf(key, Integer.MAX_VALUE);
         var extracted = target.extract(stack, true);
         var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
         var inserted = extracted.getCount() - remaining.getCount();
