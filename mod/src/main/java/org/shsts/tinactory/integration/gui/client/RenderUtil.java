@@ -220,6 +220,20 @@ public final class RenderUtil {
         }
     }
 
+    public static void renderDescriptorWithDecoration(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
+        switch (descriptor) {
+            case EmptyRenderDescriptor ignored -> {}
+            case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
+            case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
+                .ifPresent(item -> renderItemWithDecoration(graphics, new ItemStack(item), rect.x(), rect.y()));
+            case ItemRenderDescriptor(ItemStack stack) -> renderItemWithDecoration(
+                graphics, stack, rect.x(), rect.y());
+            case FluidRenderDescriptor(FluidStack stack) -> renderFluidWithDecoration(graphics, stack, rect);
+            default -> throw new IllegalArgumentException(
+                "Unsupported render descriptor: " + descriptor.getClass().getName());
+        }
+    }
+
     public static void renderGhostDescriptor(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
         switch (descriptor) {
             case EmptyRenderDescriptor ignored -> {}

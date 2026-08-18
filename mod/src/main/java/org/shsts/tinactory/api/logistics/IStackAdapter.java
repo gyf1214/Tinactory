@@ -37,6 +37,10 @@ public interface IStackAdapter<T> {
         return display(stackOf(key));
     }
 
+    default IRenderDescriptor display(IStackKey key, long amount) {
+        return display(stackOf(key, amount));
+    }
+
     Component name(T stack);
 
     default Component name(IStackKey key) {
@@ -47,5 +51,9 @@ public interface IStackAdapter<T> {
 
     default Optional<List<Component>> tooltip(IStackKey key) {
         return tooltip(stackOf(key));
+    }
+
+    default Optional<List<Component>> tooltip(IStackKey key, long amount) {
+        return tooltip(stackOf(key, amount));
     }
 }

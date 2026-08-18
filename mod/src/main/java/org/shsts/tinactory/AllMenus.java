@@ -10,8 +10,8 @@ import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
-import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
+import org.shsts.tinactory.content.gui.StorageMenu;
 import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
@@ -25,11 +25,11 @@ import org.shsts.tinactory.content.gui.client.MEDriveScreen;
 import org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen;
 import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageDetectorScreen;
-import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NuclearReactorScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.gui.client.StorageScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
@@ -177,8 +177,8 @@ public final class AllMenus {
             .screen(() -> () -> MEDriveScreen::new)
             .register();
 
-        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::new)
-            .screen(() -> () -> MEStorageInterfaceScreen::new)
+        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", StorageMenu::factory)
+            .screen(() -> () -> StorageScreen::new)
             .register();
 
         ME_SIGNAL_CONTROLLER = processing("logistics/me_signal_controller", MESignalControllerMenu::new)

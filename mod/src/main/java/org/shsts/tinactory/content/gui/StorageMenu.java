@@ -26,14 +26,13 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
-import static org.shsts.tinactory.content.gui.sync.StorageEventPacket.QUICK_MOVE_BUTTON;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEStorageInterfaceMenu extends InventoryMenu {
+public class StorageMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
@@ -43,7 +42,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
     private final MEStorageInterface storageInterface;
     private final Runnable updateListener;
 
-    public MEStorageInterfaceMenu(Properties properties) {
+    public StorageMenu(Properties properties) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
         this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
@@ -59,6 +58,10 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
 
         onEventPacket(STORAGE_SLOT, this::onSlotClick);
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    }
+
+    public static InventoryMenu factory(Properties properties) {
+        return new StorageMenu(properties);
     }
 
     @Override
@@ -149,7 +152,7 @@ public class MEStorageInterfaceMenu extends InventoryMenu {
         var button = packet.button();
         var fluidPort = storageInterface.fluidPort();
 
-        if (packet.isItem() && packet.button() == QUICK_MOVE_BUTTON) {
+        if (packet.isItem() && packet.isQuickMove()) {
             quickMoveStack(packet.key());
             return;
         }

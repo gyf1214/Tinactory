@@ -17,16 +17,16 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StorageSyncPacket implements IPacket {
-    public record Entry(IStackKey key, int amount, boolean isFilter) {
+    public record Entry(IStackKey key, long amount, boolean isFilter) {
         public static void serialize(RegistryFriendlyByteBuf buf, Entry entry) {
             StackHelper.KEY_STREAM_CODEC.encode(buf, entry.key());
-            buf.writeVarInt(entry.amount());
+            buf.writeVarLong(entry.amount());
             buf.writeBoolean(entry.isFilter());
         }
 
         public static Entry deserialize(RegistryFriendlyByteBuf buf) {
             return new Entry(StackHelper.KEY_STREAM_CODEC.decode(buf),
-                buf.readVarInt(),
+                buf.readVarLong(),
                 buf.readBoolean());
         }
     }

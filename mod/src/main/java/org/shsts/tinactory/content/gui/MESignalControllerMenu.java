@@ -19,7 +19,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.ME_SIGNAL_CONTROLLER_SYNC;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
-import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.MACHINE_COMPARATOR;
+import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.MACHINE_DISPLAY_ORDER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -71,7 +71,7 @@ public class MESignalControllerMenu extends MenuBase {
         }
 
         var infos = signals.getVisibleSignals(machine).stream()
-            .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_COMPARATOR))
+            .sorted(Comparator.comparing(SignalComponent.SignalInfo::machine, MACHINE_DISPLAY_ORDER))
             .toList();
 
         var ret = new ArrayList<MESignalControllerSyncPacket.SignalInfo>();

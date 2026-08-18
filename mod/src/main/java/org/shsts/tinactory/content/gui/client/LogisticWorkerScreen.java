@@ -10,7 +10,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +27,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
@@ -207,8 +207,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
                             var tagList = config.itemFilter().getItemHolder().tags()
-                                .sorted(Comparator.comparing(TagKey::location,
-                                    ResourceLocation::compareNamespaced))
+                                .sorted(Comparator.comparing(TagKey::location, LocHelper.LOC_DISPLAY_ORDER))
                                 .toList();
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;

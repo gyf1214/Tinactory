@@ -3,7 +3,6 @@ package org.shsts.tinactory.content.gui;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
@@ -11,6 +10,7 @@ import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.core.gui.Menu;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 
 import java.util.ArrayList;
@@ -32,10 +32,10 @@ import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 public class LogisticWorkerMenu extends InventoryMenu {
     public static final int CONFIG_WIDTH = BUTTON_SIZE * 4 + 2;
     public static final String SLOT_SYNC = "info";
-    public static final Comparator<IMachine> MACHINE_COMPARATOR =
+    public static final Comparator<IMachine> MACHINE_DISPLAY_ORDER =
         Comparator.<IMachine>comparingLong($ -> $.electric().map(IElectricMachine::getVoltage).orElse(0L))
             .thenComparing($ -> Objects.requireNonNull($.icon().getItemHolder().getKey()).location(),
-                ResourceLocation::compareNamespaced)
+                LocHelper.LOC_DISPLAY_ORDER)
             .thenComparing($ -> $.title().getString());
 
     public final IMachine machine;
@@ -83,7 +83,7 @@ public class LogisticWorkerMenu extends InventoryMenu {
         }
 
         var infos = logistic.getVisiblePorts(machine).stream()
-            .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_COMPARATOR))
+            .sorted(Comparator.comparing(LogisticComponent.PortInfo::machine, MACHINE_DISPLAY_ORDER))
             .toList();
 
         var ret = new ArrayList<LogisticWorkerSyncPacket.PortInfo>();

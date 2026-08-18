@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
@@ -18,6 +19,7 @@ import org.shsts.tinactory.integration.gui.client.ItemRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -61,7 +63,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
     @Override
     public ItemStack stackOf(IStackKey key, long amount) {
         var typed = (ItemKey) key;
-        return new ItemStack(Holder.direct(typed.item()), Math.toIntExact(amount), typed.components());
+        return new ItemStack(typed.item(), Math.toIntExact(amount), typed.components());
     }
 
     @Override
@@ -79,14 +81,19 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
         return stack.isEmpty() ? Optional.empty() : Optional.of(ClientUtil.itemTooltip(stack));
     }
 
-    private record ItemKey(Item item, DataComponentPatch components) implements IStackKey {
+    private record ItemKey(Holder<Item> item, DataComponentPatch components) implements IStackKey {
         private static ItemKey of(ItemStack stack) {
-            return new ItemKey(stack.getItem(), stack.getComponentsPatch());
+            return new ItemKey(stack.getItemHolder(), stack.getComponentsPatch());
         }
 
         @Override
         public PortType type() {
             return PortType.ITEM;
+        }
+
+        @Override
+        public ResourceLocation loc() {
+            return Objects.requireNonNull(item.getKey()).location();
         }
 
         @Override
@@ -97,7 +104,7 @@ public final class ItemPortAdapter implements IStackAdapter<ItemStack> {
 
     public static final MapCodec<? extends IStackKey> KEY_CODEC =
         RecordCodecBuilder.<ItemKey>mapCodec(instance -> instance.group(
-            BuiltInRegistries.ITEM.byNameCodec().fieldOf("id").forGetter(ItemKey::item),
+            BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("id").forGetter(ItemKey::item),
             DataComponentPatch.CODEC.fieldOf("components").forGetter(ItemKey::components)
         ).apply(instance, ItemKey::new));
 }
