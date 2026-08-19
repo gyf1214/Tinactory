@@ -54,7 +54,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         StackHelper.KEY_DISPLAY_ORDER);
 
     public static final String UNLOCK_KEY = "unlockChest";
-    public static final boolean UNLOCK_DEFAULT = false;
+    public static final boolean UNLOCK_DEFAULT = true;
     public static final String PRIORITY_KEY = "priority";
     public static final int PRIORITY_DEFAULT = 2;
     public static final String VOID_KEY = "void";
@@ -153,6 +153,18 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
             return false;
         }
         entries.remove(key);
+        changed();
+        return true;
+    }
+
+    public boolean replaceFilter(IStackKey oldKey, IStackKey newKey) {
+        var existing = entries.get(oldKey);
+        if (existing == null || !existing.isFilter() || existing.amount() > 0 || newKey.type() != type() ||
+            entries.containsKey(newKey)) {
+            return false;
+        }
+        entries.remove(oldKey);
+        entries.put(newKey, new StorageEntry(newKey, 0, true));
         changed();
         return true;
     }

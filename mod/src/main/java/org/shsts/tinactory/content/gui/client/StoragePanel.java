@@ -56,9 +56,6 @@ public class StoragePanel extends ButtonPanel {
             } else {
                 var display = entry.key().display(entry.amount());
                 RenderUtil.renderDescriptorWithDecoration(graphics, display, rect1);
-                if (entry.isFilter()) {
-                    graphics.fill(rect1.x(), rect1.y(), rect1.x() + 3, rect1.y() + 3, 0xFF55FFFF);
-                }
             }
         }
         if (isHovering) {
@@ -78,7 +75,7 @@ public class StoragePanel extends ButtonPanel {
     protected void onSelect(int index, double mouseX, double mouseY, int button) {
         if (index < entries.size()) {
             var entry = entries.get(index);
-            var isQuickMove = ClientUtil.shiftDown();
+            var isQuickMove = button == 0 && ClientUtil.shiftDown();
             menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), button, isQuickMove));
         } else {
             menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button));

@@ -47,6 +47,15 @@ public final class PersistenceGameTest {
     }
 
     @GameTest
+    public static void testElectricStorageIsUnlockedByDefault(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var chest = getContainer(helper.getBlockEntity(pos), ElectricChest.ID, ElectricChest.class);
+        require(helper, chest.isUnlocked(), "Electric Chest was not unlocked by default", pos);
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testElectricChestMapStorage(GameTestHelper helper) {
         var sourcePos = new BlockPos(1, 1, 1);
         var destinationPos = new BlockPos(3, 1, 1);
@@ -58,6 +67,8 @@ public final class PersistenceGameTest {
         chest.deserializeNBT(provider, storageTag(provider,
             entryTag(provider, new ItemStack(Items.DIAMOND), 65, false),
             entryTag(provider, new ItemStack(Items.EMERALD), 0, true)));
+        MACHINE.get(sourceEntity).setConfig(SetMachineConfigPacket.builder()
+            .set(ElectricStorage.UNLOCK_KEY, false).get());
 
         var handler = ITEM_HANDLER.get(sourceEntity);
         require(helper, handler.getSlots() == 54, "ULV Electric Chest did not expose 54 virtual slots", sourcePos);

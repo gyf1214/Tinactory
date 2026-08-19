@@ -58,6 +58,11 @@ public final class ElectricStorageMenu extends StorageMenu {
         return storage.resetFilter(key);
     }
 
+    @Override
+    protected boolean replaceFilter(IStackKey oldKey, IStackKey newKey) {
+        return storage.replaceFilter(oldKey, newKey);
+    }
+
     public IMachineConfig machineConfig() {
         return storage.machineConfig();
     }

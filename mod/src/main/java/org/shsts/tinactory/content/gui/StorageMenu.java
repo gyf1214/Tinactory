@@ -141,8 +141,9 @@ public abstract class StorageMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private void clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, int button) {
+    private boolean clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, int button) {
         if (!carried.isEmpty()) {
+            var count = carried.getCount();
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
                 carried.shrink(1);
@@ -156,6 +157,7 @@ public abstract class StorageMenu extends InventoryMenu {
             } else {
                 setCarried(port.insert(carried, false));
             }
+            return getCarried().getCount() < count;
         } else if (key != null) {
             var item = StackHelper.ITEM_ADAPTER.stackOf(key);
             var count = Math.min((int) port.getStorageAmount(item), item.getMaxStackSize());
@@ -163,49 +165,71 @@ public abstract class StorageMenu extends InventoryMenu {
             var item1 = StackHelper.copyWithCount(item, count1);
             var extracted = port.extract(item1, false);
             setCarried(extracted);
+            return !extracted.isEmpty();
         }
+        return false;
     }
 
     private void onSlotClick(StorageEventPacket packet) {
         var button = packet.button();
-        if (packet.isItem() && packet.isQuickMove()) {
+        if (button == 0 && packet.isItem() && packet.isQuickMove()) {
             quickMoveStack(packet.key());
             return;
         }
 
         var carried = getCarried();
-        var carriedFluid = StackHelper.getFluidFromItem(carried);
-        IStackKey carriedKey = carried.isEmpty() ? null :
-            (carriedFluid.isEmpty() ? StackHelper.ITEM_ADAPTER.keyOf(carried) :
-                StackHelper.FLUID_ADAPTER.keyOf(carriedFluid));
+        var carriedKey = filterKey(carried);
         if (!packet.isEmpty() && filters().contains(packet.key()) && storageAmount(packet.key()) == 0) {
             if (carriedKey == null) {
                 resetFilter(packet.key());
                 return;
-            } else if (!carriedKey.equals(packet.key())) {
-                resetFilter(packet.key());
-                setFilter(carriedKey);
+            } else if (button == 1 && !carriedKey.equals(packet.key())) {
+                replaceFilter(packet.key(), carriedKey);
                 return;
             }
-        } else if (packet.isEmpty() && !isUnlocked() && carriedKey != null) {
+        } else if (packet.isEmpty() && !isUnlocked() && carriedKey != null && !filters().contains(carriedKey)) {
             setFilter(carriedKey);
             return;
         }
 
         boolean success;
+        if (button == 1) {
+            success = clickFluidEntry(packet, button);
+            if (!success) {
+                clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+            }
+        } else {
+            success = clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+            if (!success) {
+                clickFluidEntry(packet, button);
+            }
+        }
+    }
+
+    private boolean clickFluidEntry(StorageEventPacket packet, int button) {
         if (packet.isFluid()) {
             var key = packet.key();
-            success = clickFluidSlot((carried1, mayDrain, mayFill) ->
+            return clickFluidSlot((carried1, mayDrain, mayFill) ->
                 doClickFluidSlot(carried1, fluidPort, key, mayDrain, mayFill), button);
-        } else if (button == 1) {
-            success = clickFluidSlot((carried1, mayDrain, mayFill) ->
-                doClickEmptyFluidSlot(carried1, fluidPort, mayFill), button);
         } else {
-            success = false;
+            return clickFluidSlot((carried1, mayDrain, mayFill) ->
+                doClickEmptyFluidSlot(carried1, fluidPort, mayFill), button);
         }
-        if (!success) {
-            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+    }
+
+    @Nullable
+    private IStackKey filterKey(ItemStack carried) {
+        if (carried.isEmpty()) {
+            return null;
         }
+        if (itemStackLimit > 0) {
+            return StackHelper.ITEM_ADAPTER.keyOf(carried);
+        }
+        if (fluidStackLimit > 0) {
+            var fluid = StackHelper.getFluidFromItem(carried);
+            return fluid.isEmpty() ? null : StackHelper.FLUID_ADAPTER.keyOf(fluid);
+        }
+        return null;
     }
 
     private long storageAmount(IStackKey key) {
@@ -284,6 +308,10 @@ public abstract class StorageMenu extends InventoryMenu {
     }
 
     protected boolean resetFilter(IStackKey key) {
+        return false;
+    }
+
+    protected boolean replaceFilter(IStackKey oldKey, IStackKey newKey) {
         return false;
     }
 
