@@ -12,15 +12,22 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
-import org.shsts.tinactory.content.logistics.MEStorageInterface;
+import org.shsts.tinactory.core.logistics.StorageEntry;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
@@ -28,40 +35,46 @@ import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StorageMenu extends InventoryMenu {
+public abstract class StorageMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
     public static final int PANEL_HEIGHT = 7 * SLOT_SIZE + SPACING;
 
     private final IMachine machine;
-    private final MEStorageInterface storageInterface;
+    private final IPort<ItemStack> itemPort;
+    private final IPort<FluidStack> fluidPort;
+    private final int itemStackLimit;
+    private final int fluidStackLimit;
     private final Runnable updateListener;
 
-    public StorageMenu(Properties properties) {
+    protected StorageMenu(Properties properties, IPort<ItemStack> itemPort, int itemStackLimit,
+        IPort<FluidStack> fluidPort, int fluidStackLimit) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
-        this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
+        this.itemPort = itemPort;
+        this.itemStackLimit = itemStackLimit;
+        this.fluidPort = fluidPort;
+        this.fluidStackLimit = fluidStackLimit;
 
-        var scheduler = new ActiveScheduler<>(STORAGE_SYNC, () -> new StorageSyncPacket(
-            storageInterface.getAllItems(), storageInterface.getAllFluids()));
+        var scheduler = new ActiveScheduler<>(STORAGE_SYNC, this::storageEntries);
         this.updateListener = scheduler::invokeUpdate;
 
         addSyncSlot(SLOT_SYNC, scheduler);
         if (!world.isClientSide) {
-            storageInterface.onUpdate(updateListener);
+            if (itemPort instanceof IPortNotifier notifier) {
+                notifier.onUpdate(updateListener);
+            }
+            if (fluidPort instanceof IPortNotifier notifier && fluidPort != (Object) itemPort) {
+                notifier.onUpdate(updateListener);
+            }
         }
 
         onEventPacket(STORAGE_SLOT, this::onSlotClick);
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
-    }
-
-    public static InventoryMenu factory(Properties properties) {
-        return new StorageMenu(properties);
     }
 
     @Override
@@ -73,7 +86,12 @@ public class StorageMenu extends InventoryMenu {
     public void removed(Player pPlayer) {
         super.removed(player);
         if (!world.isClientSide) {
-            storageInterface.unregisterListener(updateListener);
+            if (itemPort instanceof IPortNotifier notifier) {
+                notifier.unregisterListener(updateListener);
+            }
+            if (fluidPort instanceof IPortNotifier notifier && fluidPort != (Object) itemPort) {
+                notifier.unregisterListener(updateListener);
+            }
         }
     }
 
@@ -150,8 +168,6 @@ public class StorageMenu extends InventoryMenu {
 
     private void onSlotClick(StorageEventPacket packet) {
         var button = packet.button();
-        var fluidPort = storageInterface.fluidPort();
-
         if (packet.isItem() && packet.isQuickMove()) {
             quickMoveStack(packet.key());
             return;
@@ -169,14 +185,13 @@ public class StorageMenu extends InventoryMenu {
             success = false;
         }
         if (!success) {
-            var itemPort = storageInterface.itemPort();
             clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
         }
     }
 
     private void quickMoveStack(IStackKey key) {
         var inv = new PlayerMainInvWrapper(inventory);
-        var target = storageInterface.itemPort();
+        var target = itemPort;
         var stack = StackHelper.ITEM_ADAPTER.stackOf(key, Integer.MAX_VALUE);
         var extracted = target.extract(stack, true);
         var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
@@ -211,7 +226,7 @@ public class StorageMenu extends InventoryMenu {
 
         var index = slot.getContainerSlot();
         var stack = inv.getStackInSlot(index);
-        var target = storageInterface.itemPort();
+        var target = itemPort;
         if (!target.acceptInput(stack)) {
             return false;
         }
@@ -227,5 +242,50 @@ public class StorageMenu extends InventoryMenu {
                 stack1.getCount() - remaining1.getCount(), stack1.getCount());
         }
         return false;
+    }
+
+    protected Collection<IStackKey> filters() {
+        return List.of();
+    }
+
+    protected boolean isUnlocked() {
+        return true;
+    }
+
+    protected boolean setFilter(IStackKey key) {
+        return false;
+    }
+
+    protected boolean resetFilter(IStackKey key) {
+        return false;
+    }
+
+    private StorageSyncPacket storageEntries() {
+        var amounts = new HashMap<IStackKey, Long>();
+        itemPort.getAllStorages().forEach(stack -> amounts.put(StackHelper.ITEM_ADAPTER.keyOf(stack),
+            (long) stack.getCount()));
+        fluidPort.getAllStorages().forEach(stack -> amounts.put(StackHelper.FLUID_ADAPTER.keyOf(stack),
+            (long) stack.getAmount()));
+        var entries = new ArrayList<StorageEntry>();
+        for (var key : filters()) {
+            addEntries(entries, key, amounts.remove(key), true);
+        }
+        amounts.forEach((key, amount) -> addEntries(entries, key, amount, false));
+        return new StorageSyncPacket(entries);
+    }
+
+    private void addEntries(Collection<StorageEntry> entries, IStackKey key, Long amount, boolean isFilter) {
+        var remaining = amount == null ? 0L : amount;
+        var limit = key.type() == PortType.ITEM ? itemStackLimit : fluidStackLimit;
+        if (limit == 0) {
+            entries.add(new StorageEntry(key, remaining, isFilter));
+            return;
+        }
+        do {
+            var entryAmount = Math.min(remaining, limit);
+            entries.add(new StorageEntry(key, entryAmount, isFilter));
+            remaining -= entryAmount;
+            isFilter = false;
+        } while (remaining > 0);
     }
 }

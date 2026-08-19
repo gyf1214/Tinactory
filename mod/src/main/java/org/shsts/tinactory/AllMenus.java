@@ -10,8 +10,8 @@ import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
+import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
-import org.shsts.tinactory.content.gui.StorageMenu;
 import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
@@ -177,7 +177,7 @@ public final class AllMenus {
             .screen(() -> () -> MEDriveScreen::new)
             .register();
 
-        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", StorageMenu::factory)
+        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::factory)
             .screen(() -> () -> StorageScreen::new)
             .register();
 
