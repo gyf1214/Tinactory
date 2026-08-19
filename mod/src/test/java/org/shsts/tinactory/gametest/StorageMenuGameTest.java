@@ -238,6 +238,43 @@ public final class StorageMenuGameTest {
         helper.succeed();
     }
 
+    @GameTest
+    public static void testTankEmptyFilterNoFluidKeyOnlyRightClickClears(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var tank = getContainer(blockEntity, ElectricTank.ID, ElectricTank.class);
+        var water = new FluidStack(Fluids.WATER, 1);
+        var waterKey = StackHelper.FLUID_ADAPTER.keyOf(water);
+        tank.setFilter(waterKey);
+        MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder()
+            .set(ElectricStorage.UNLOCK_KEY, false).get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = tankMenu(helper, pos, player);
+        menu.setCarried(new ItemStack(Items.BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 0, false));
+
+        if (!tank.filters().contains(waterKey)) {
+            helper.fail("Tank left-click with an empty container cleared the filter", pos);
+            return;
+        }
+        menu.setCarried(new ItemStack(Items.DIAMOND));
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 0, false));
+
+        if (!tank.filters().contains(waterKey)) {
+            helper.fail("Tank left-click with a non-container item cleared the filter", pos);
+            return;
+        }
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 1, false));
+
+        if (tank.filters().contains(waterKey)) {
+            helper.fail("Tank right-click with a non-container item did not clear the filter", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
     private static ElectricStorageMenu chestMenu(GameTestHelper helper, BlockPos pos, Player player) {
         return ElectricStorageMenu.chest(new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
             player.getInventory(), helper.getBlockEntity(pos)));

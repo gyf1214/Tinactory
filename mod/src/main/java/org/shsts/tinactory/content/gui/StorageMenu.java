@@ -180,7 +180,7 @@ public abstract class StorageMenu extends InventoryMenu {
         var carried = getCarried();
         var carriedKey = filterKey(carried);
         if (!packet.isEmpty() && filters().contains(packet.key()) && storageAmount(packet.key()) == 0) {
-            if (carriedKey == null) {
+            if (carriedKey == null && (carried.isEmpty() || itemStackLimit > 0 || isUnlocked() || button == 1)) {
                 resetFilter(packet.key());
                 return;
             } else if (button == 1 && !carriedKey.equals(packet.key())) {
