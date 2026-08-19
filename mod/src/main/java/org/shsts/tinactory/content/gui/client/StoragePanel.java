@@ -9,6 +9,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.logistics.StorageEntry;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
@@ -28,10 +29,10 @@ import static org.shsts.tinactory.core.gui.Texture.SLOT_BACKGROUND;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StoragePanel extends ButtonPanel {
-    private static final Comparator<StorageSyncPacket.Entry> DISPLAY_ORDER =
-        Comparator.comparing(StorageSyncPacket.Entry::key, StackHelper.KEY_DISPLAY_ORDER);
+    private static final Comparator<StorageEntry> DISPLAY_ORDER =
+        Comparator.comparing(StorageEntry::key, StackHelper.KEY_DISPLAY_ORDER);
 
-    private final List<StorageSyncPacket.Entry> entries = new ArrayList<>();
+    private final List<StorageEntry> entries = new ArrayList<>();
 
     public StoragePanel(MenuScreen<?> screen) {
         super(screen, SLOT_SIZE, SLOT_SIZE, 0);
@@ -50,11 +51,14 @@ public class StoragePanel extends ButtonPanel {
         var rect1 = rect.offset(1, 1).enlarge(-2, -2);
         if (index < entries.size()) {
             var entry = entries.get(index);
-            if (entry.isFilter()) {
+            if (entry.isFilter() && entry.amount() == 0) {
                 RenderUtil.renderGhostDescriptor(graphics, entry.key().display(), rect1);
             } else {
                 var display = entry.key().display(entry.amount());
                 RenderUtil.renderDescriptorWithDecoration(graphics, display, rect1);
+                if (entry.isFilter()) {
+                    graphics.fill(rect1.x(), rect1.y(), rect1.x() + 3, rect1.y() + 3, 0xFF55FFFF);
+                }
             }
         }
         if (isHovering) {
@@ -85,7 +89,8 @@ public class StoragePanel extends ButtonPanel {
     protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
         if (index < entries.size()) {
             var entry = entries.get(index);
-            return entry.isFilter() ? entry.key().tooltip() : entry.key().tooltip(entry.amount());
+            return entry.isFilter() && entry.amount() == 0 ? entry.key().tooltip() :
+                entry.key().tooltip(entry.amount());
         } else {
             return Optional.empty();
         }
