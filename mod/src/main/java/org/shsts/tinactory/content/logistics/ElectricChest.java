@@ -1,217 +1,119 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.core.gui.Layout;
-import org.shsts.tinactory.core.util.MathUtil;
-import org.shsts.tinactory.integration.logistics.ItemHandlerPort;
+import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.logistics.StorageEntry;
 import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.logistics.WrapperItemHandler;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
-
-import java.util.Arrays;
-import java.util.Optional;
+import org.slf4j.Logger;
 
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricChest extends ElectricStorage implements INBTSerializable<CompoundTag> {
+public class ElectricChest extends ElectricStorage<ItemStack> implements INBTSerializable<CompoundTag> {
+    private static final Logger LOGGER = LogUtils.getLogger();
     public static final String ID = "machine/chest";
 
-    public final int capacity;
-    private final int size;
-    private final WrapperItemHandler internalItems;
-    private final IPort<ItemStack> externalPort;
-    private final ItemStack[] filters;
-    private final IItemHandler externalHandler;
-
-    private class VoidableItemHandler extends WrapperItemHandler {
-        public VoidableItemHandler(IItemHandlerModifiable compose) {
-            super(compose);
-        }
-
-        @Override
-        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!isItemValid(slot, stack)) {
-                return stack;
-            }
-            var ret = super.insertItem(slot, stack, simulate);
-            return isVoid() ? ItemStack.EMPTY : ret;
-        }
-    }
-
-    private class ExternalItemHandler implements IItemHandler {
+    private final IItemHandler itemHandler = new IItemHandler() {
         @Override
         public int getSlots() {
-            return size;
+            return storageSlots();
         }
 
         @Override
         public ItemStack getStackInSlot(int slot) {
-            return internalItems.getStackInSlot(slot);
+            return stack(virtualEntries().get(slot));
         }
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            return internalItems.insertItem(slot, stack, simulate);
+            var accepted = insertIntoVirtualSlot(slot, stack, simulate);
+            return StackHelper.copyWithCount(stack, stack.getCount() - accepted);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            var item = internalItems.getStackInSlot(slot);
-            if (item.isEmpty()) {
-                return ItemStack.EMPTY;
-            }
-            if (amount > item.getMaxStackSize()) {
-                amount = item.getMaxStackSize();
-            }
-            return internalItems.extractItem(slot, amount, simulate);
+            var stack = getStackInSlot(slot);
+            var limit = stack.isEmpty() ? 0 : Math.min(amount, stack.getMaxStackSize());
+            return extractFromVirtualSlot(slot, limit, simulate);
         }
 
         @Override
         public int getSlotLimit(int slot) {
-            return 64;
+            return stackLimit();
         }
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return internalItems.isItemValid(slot, stack);
+            return validForVirtualSlot(slot, stack);
         }
-    }
+    };
 
-    public ElectricChest(BlockEntity blockEntity, Layout layout, int capacity, double power) {
-        super(blockEntity, layout, power);
-        this.size = layout.slots.size() / 2;
-        this.capacity = capacity;
-        this.filters = new ItemStack[size];
-
-        var inner = new ItemSlotHandler(size, capacity);
-        this.internalItems = new VoidableItemHandler(inner);
-        internalItems.onUpdate(this::onSlotChange);
-        for (var i = 0; i < size; i++) {
-            var slot = i;
-            internalItems.setFilter(i, stack -> allowStackInSlot(slot, stack));
-        }
-
-        this.externalHandler = new ExternalItemHandler();
-        this.externalPort = new ItemHandlerPort(internalItems);
+    public ElectricChest(BlockEntity blockEntity, int storageSlots, int stackLimit, double power) {
+        super(blockEntity, StackHelper.ITEM_ADAPTER, storageSlots, stackLimit, power);
     }
 
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        Layout layout, int slotSize, double power) {
-        return $ -> $.container(ID, be -> new ElectricChest(be, layout, slotSize, power));
-    }
-
-    public ItemStack getStackInSlot(int slot) {
-        return internalItems.getStackInSlot(slot).copy();
-    }
-
-    public void setStackInSlot(int slot, ItemStack stack) {
-        internalItems.setStackInSlot(slot, stack.copy());
-    }
-
-    public void insertItem(int slot, ItemStack stack) {
-        internalItems.insertItem(slot, stack, false);
-    }
-
-    public void extractItem(int slot, int amount) {
-        internalItems.extractItem(slot, amount, false);
-    }
-
-    public Optional<ItemStack> getFilter(int slot) {
-        return Optional.ofNullable(filters[slot]);
-    }
-
-    public void setFilter(int slot, ItemStack stack) {
-        filters[slot] = stack.isEmpty() ? null : StackHelper.copyWithCount(stack, 1);
-        onSlotChange();
-    }
-
-    public void resetFilter(int slot) {
-        filters[slot] = null;
-        onSlotChange();
-    }
-
-    public boolean allowStackInSlot(int slot, ItemStack stack) {
-        if (filters[slot] != null) {
-            return StackHelper.canItemsStack(stack, filters[slot]);
-        }
-        var stack1 = internalItems.getStackInSlot(slot);
-        return (stack1.isEmpty() && isUnlocked()) || StackHelper.canItemsStack(stack, stack1);
+        int storageSlots, int stackLimit, double power) {
+        return $ -> $.container(ID, be -> new ElectricChest(be, storageSlots, stackLimit, power));
     }
 
     @Override
-    protected void onMachineConfig() {
-        machine().network().ifPresent(network -> registerPort(network, externalPort));
-    }
-
-    @Override
-    protected int updateSignal() {
-        var totalCapacity = 0;
-        var totalCount = 0;
-        for (var i = 0; i < size; i++) {
-            if (filters[i] != null) {
-                totalCapacity += capacity;
-                totalCount += internalItems.getStackInSlot(i).getCount();
-            }
-        }
-        return totalCapacity == 0 ? 0 : MathUtil.toSignal((double) totalCount / totalCapacity);
+    public PortType type() {
+        return PortType.ITEM;
     }
 
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
         eventManager.subscribe(REMOVED_IN_WORLD.get(), world ->
-            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), internalItems));
+            StackHelper.dropItemHandler(world, blockEntity.getBlockPos(), itemHandler));
     }
 
     @Override
     public void attachCapability(ICapabilityBuilder builder) {
         super.attachCapability(builder);
-        builder.attach(ITEM_HANDLER, externalHandler);
+        builder.attach(ITEM_HANDLER, itemHandler);
     }
 
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        var tag = new CompoundTag();
-        tag.put("items", StackHelper.serializeItemHandler(provider, internalItems));
-        var tag1 = new ListTag();
-        for (var i = 0; i < size; i++) {
-            if (filters[i] != null && !filters[i].isEmpty()) {
-                var tag2 = (CompoundTag) filters[i].save(provider, new CompoundTag());
-                tag2.putInt("Slot", i);
-                tag1.add(tag2);
-            }
-        }
-        tag.put("filters", tag1);
-        return tag;
+        return serializeEntries(provider);
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        StackHelper.deserializeItemHandler(provider, internalItems, tag.getCompound("items"));
-        var tag1 = tag.getList("filters", Tag.TAG_COMPOUND);
-        Arrays.fill(filters, null);
-        for (var tag2 : tag1) {
-            var tag3 = (CompoundTag) tag2;
-            var slot = tag3.getInt("Slot");
-            var item = ItemStack.parseOptional(provider, tag3);
-            filters[slot] = item.isEmpty() ? null : item;
+        if (deserializeEntries(provider, tag)) {
+            return;
+        }
+        var items = tag.getCompound("items").getList("Items", Tag.TAG_COMPOUND);
+        for (var value : items) {
+            var item = StackHelper.deserializeItemStack(provider, (CompoundTag) value);
+            if (!item.isEmpty() && !loadEntry(new StorageEntry(StackHelper.ITEM_ADAPTER.keyOf(item),
+                item.getCount(), false))) {
+                LOGGER.warn("Discarding overflowing legacy Electric Chest item {}", item);
+            }
+        }
+        var filters = tag.getList("filters", Tag.TAG_COMPOUND);
+        for (var value : filters) {
+            var item = ItemStack.parseOptional(provider, (CompoundTag) value);
+            if (!item.isEmpty() && !loadEntry(new StorageEntry(StackHelper.ITEM_ADAPTER.keyOf(item), 0, true))) {
+                LOGGER.warn("Discarding overflowing legacy Electric Chest filter {}", item);
+            }
         }
     }
 }

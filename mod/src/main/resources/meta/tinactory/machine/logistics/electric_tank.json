@@ -4,73 +4,18 @@
   "voltages": {
     "ulv": {
       "power": 1,
-      "slotSize": 256000
+      "storageSlots": 54,
+      "stackLimit": 16000
     },
     "mv": {
       "power": 2,
-      "slotSize": 1024000
+      "storageSlots": 81,
+      "stackLimit": 32000
     },
     "ev": {
       "power": 4,
-      "slotSize": 4096000
+      "storageSlots": 108,
+      "stackLimit": 64000
     }
-  },
-  "layout": {
-    "slots": [
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 0,
-        "y": 10
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 20,
-        "y": 10
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 40,
-        "y": 10,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 60,
-        "y": 10,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 80,
-        "y": 10,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 100,
-        "y": 10,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 120,
-        "y": 10,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "fluid_input",
-        "x": 140,
-        "y": 10,
-        "voltages": "ev-max"
-      }
-    ]
   }
 }

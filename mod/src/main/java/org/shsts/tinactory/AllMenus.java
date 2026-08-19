@@ -3,8 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.ElectricChestMenu;
-import org.shsts.tinactory.content.gui.ElectricTankMenu;
+import org.shsts.tinactory.content.gui.ElectricStorageMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
@@ -16,8 +15,7 @@ import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
 import org.shsts.tinactory.content.gui.client.BoilerScreen;
-import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
-import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
+import org.shsts.tinactory.content.gui.client.ElectricStorageScreen;
 import org.shsts.tinactory.content.gui.client.FusionScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MECraftTerminalScreen;
@@ -156,12 +154,12 @@ public final class AllMenus {
             .screen(() -> () -> WorkbenchScreen::new)
             .register();
 
-        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricChestMenu::new)
-            .screen(() -> () -> ElectricChestScreen::new)
+        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricStorageMenu::chest)
+            .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
-        ELECTRIC_TANK = processing("machine/electric_tank", ElectricTankMenu::new)
-            .screen(() -> () -> ElectricTankScreen::new)
+        ELECTRIC_TANK = processing("machine/electric_tank", ElectricStorageMenu::tank)
+            .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
         TECH_MENU = REGISTRATE.menu("network/controller", TechMenu::new)

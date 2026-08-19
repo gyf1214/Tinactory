@@ -375,20 +375,20 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
-            var layout = getLayout(v);
-            var slotSize = GsonHelper.getAsInt(jo, "slotSize");
+            var storageSlots = GsonHelper.getAsInt(jo, "storageSlots");
+            var stackLimit = GsonHelper.getAsInt(jo, "stackLimit");
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(slotSize),
-                            NUMBER_FORMAT.format(layout.slots.size()));
+                        addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(storageSlots),
+                            NUMBER_FORMAT.format(stackLimit));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
                     }))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
-                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, ITEM_HANDLER)
-                .transform(ElectricChest.factory(layout, slotSize, power))
+                .capability(MACHINE, ELECTRIC_MACHINE, ITEM_HANDLER)
+                .transform(ElectricChest.factory(storageSlots, stackLimit, power))
                 .end()
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
@@ -397,21 +397,21 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
-            var layout = getLayout(v);
-            var slotSize = GsonHelper.getAsInt(jo, "slotSize");
+            var storageSlots = GsonHelper.getAsInt(jo, "storageSlots");
+            var stackLimit = GsonHelper.getAsInt(jo, "stackLimit");
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(slotSize),
-                            NUMBER_FORMAT.format(layout.slots.size()));
+                        addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(storageSlots),
+                            NUMBER_FORMAT.format(stackLimit));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
                     }))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
-                .capability(MACHINE, ELECTRIC_MACHINE, LAYOUT_PROVIDER, FLUID_HANDLER,
+                .capability(MACHINE, ELECTRIC_MACHINE, FLUID_HANDLER,
                     MENU_FLUID_HANDLER)
-                .transform(ElectricTank.factory(layout, slotSize, power))
+                .transform(ElectricTank.factory(storageSlots, stackLimit, power))
                 .end()
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)

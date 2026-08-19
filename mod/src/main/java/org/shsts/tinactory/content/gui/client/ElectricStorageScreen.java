@@ -8,8 +8,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.content.gui.ElectricStorageMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
-import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 
+import static org.shsts.tinactory.content.gui.StorageMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_DEFAULT;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_KEY;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.UNLOCK_DEFAULT;
@@ -24,13 +24,12 @@ import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStorageScreen<M extends ElectricStorageMenu> extends LayoutScreen<M> {
-    public ElectricStorageScreen(M menu, Component title) {
+public final class ElectricStorageScreen extends StorageScreen<ElectricStorageMenu> {
+    public ElectricStorageScreen(ElectricStorageMenu menu, Component title) {
         super(menu, title);
 
         var config = menu.machineConfig();
-        var buttonY = menu.layout().rect.endY() + SPACING;
-        var offset = new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE);
+        var offset = new Rect(-SLOT_SIZE, PANEL_HEIGHT - SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
         rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, UNLOCK_KEY, UNLOCK_DEFAULT,
             LOCK_BUTTON, 18, 0, "chestLock", "chestUnlock"));

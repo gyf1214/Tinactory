@@ -16,8 +16,8 @@ import static org.shsts.tinactory.content.gui.StorageMenu.SLOT_SYNC;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class StorageScreen extends MenuScreen<InventoryMenu> {
-    public StorageScreen(InventoryMenu menu, Component title) {
+public class StorageScreen<M extends InventoryMenu> extends MenuScreen<M> {
+    public StorageScreen(M menu, Component title) {
         super(menu, title);
         this.contentHeight = menu.endY();
 

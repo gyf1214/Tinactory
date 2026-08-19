@@ -83,7 +83,7 @@ public abstract class StorageMenu extends InventoryMenu {
     }
 
     @Override
-    public void removed(Player pPlayer) {
+    public void removed(Player player) {
         super.removed(player);
         if (!world.isClientSide) {
             if (itemPort instanceof IPortNotifier notifier) {
@@ -173,20 +173,47 @@ public abstract class StorageMenu extends InventoryMenu {
             return;
         }
 
+        var carried = getCarried();
+        var carriedFluid = StackHelper.getFluidFromItem(carried);
+        IStackKey carriedKey = carried.isEmpty() ? null :
+            (carriedFluid.isEmpty() ? StackHelper.ITEM_ADAPTER.keyOf(carried) :
+                StackHelper.FLUID_ADAPTER.keyOf(carriedFluid));
+        if (!packet.isEmpty() && filters().contains(packet.key()) && storageAmount(packet.key()) == 0) {
+            if (carriedKey == null) {
+                resetFilter(packet.key());
+                return;
+            } else if (!carriedKey.equals(packet.key())) {
+                resetFilter(packet.key());
+                setFilter(carriedKey);
+                return;
+            }
+        } else if (packet.isEmpty() && !isUnlocked() && carriedKey != null) {
+            setFilter(carriedKey);
+            return;
+        }
+
         boolean success;
         if (packet.isFluid()) {
             var key = packet.key();
-            success = clickFluidSlot((carried, mayDrain, mayFill) ->
-                doClickFluidSlot(carried, fluidPort, key, mayDrain, mayFill), button);
+            success = clickFluidSlot((carried1, mayDrain, mayFill) ->
+                doClickFluidSlot(carried1, fluidPort, key, mayDrain, mayFill), button);
         } else if (button == 1) {
-            success = clickFluidSlot((carried, mayDrain, mayFill) ->
-                doClickEmptyFluidSlot(carried, fluidPort, mayFill), button);
+            success = clickFluidSlot((carried1, mayDrain, mayFill) ->
+                doClickEmptyFluidSlot(carried1, fluidPort, mayFill), button);
         } else {
             success = false;
         }
         if (!success) {
             clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
         }
+    }
+
+    private long storageAmount(IStackKey key) {
+        return switch (key.type()) {
+            case ITEM -> itemPort.getStorageAmount(StackHelper.ITEM_ADAPTER.stackOf(key));
+            case FLUID -> fluidPort.getStorageAmount(StackHelper.FLUID_ADAPTER.stackOf(key));
+            case NONE -> 0;
+        };
     }
 
     private void quickMoveStack(IStackKey key) {
