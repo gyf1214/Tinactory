@@ -120,6 +120,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 return;
             }
 
+            if (selectedConfig == index) {
+                selectedConfig = -1;
+            }
             var packet = SetMachineConfigPacket.builder();
             for (var slot = index + 1; slot < itemCount; slot++) {
                 var source = PREFIX + slot;

@@ -73,13 +73,13 @@ public class StoragePanel extends ButtonPanel {
 
     @Override
     protected void onSelect(int index, double mouseX, double mouseY, int button) {
+        var shiftPressed = ClientUtil.shiftDown();
         if (index < entries.size()) {
             var entry = entries.get(index);
-            var shiftPressed = ClientUtil.shiftDown();
             menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), entry.amount(), button,
                 shiftPressed));
         } else {
-            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button));
+            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button, shiftPressed));
         }
     }
 
@@ -98,5 +98,6 @@ public class StoragePanel extends ButtonPanel {
         entries.clear();
         entries.addAll(packet.entries());
         entries.sort(DISPLAY_ORDER);
+        refresh();
     }
 }

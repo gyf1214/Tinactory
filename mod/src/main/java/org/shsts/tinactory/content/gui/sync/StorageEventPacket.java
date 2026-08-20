@@ -43,11 +43,15 @@ public class StorageEventPacket implements IPacket {
         this.shiftPressed = shiftPressed;
     }
 
-    public StorageEventPacket(int button) {
+    public StorageEventPacket(int button, boolean shiftPressed) {
         this.key = null;
         this.amount = 0;
         this.button = button;
-        this.shiftPressed = false;
+        this.shiftPressed = shiftPressed;
+    }
+
+    public StorageEventPacket(int button) {
+        this(button, false);
     }
 
     public StorageEventPacket() {}
