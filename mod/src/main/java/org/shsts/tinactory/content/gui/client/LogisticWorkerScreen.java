@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -102,7 +103,30 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected int getItemCount() {
-            return workerSlots;
+            var highestSlot = -1;
+            for (var slot = 0; slot < workerSlots; slot++) {
+                if (machineConfig.contains(PREFIX + slot, Tag.TAG_COMPOUND)) {
+                    highestSlot = slot;
+                }
+            }
+            return Math.min(highestSlot + 2, workerSlots);
+        }
+
+        private void deleteConfig(int index) {
+            var itemCount = getItemCount();
+            if (index == itemCount - 1 && !machineConfig.contains(PREFIX + index, Tag.TAG_COMPOUND)) {
+                return;
+            }
+
+            var packet = SetMachineConfigPacket.builder();
+            for (var slot = index + 1; slot < itemCount; slot++) {
+                var source = PREFIX + slot;
+                var destination = PREFIX + (slot - 1);
+                machineConfig.getCompound(source).ifPresentOrElse(
+                    tag -> packet.set(destination, tag), () -> packet.reset(destination));
+            }
+            packet.reset(PREFIX + (itemCount - 1));
+            menu.triggerEvent(SET_MACHINE_CONFIG, packet);
         }
 
         private Optional<ItemStack> getIcon(LogisticComponent.PortKey key) {
@@ -193,10 +217,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 if (button == 0) {
                     config.setValid(!config.isValid());
                 } else {
-                    config.setValid(false);
-                    config.resetFrom();
-                    config.resetTo();
-                    config.clearFilter();
+                    deleteConfig(index);
+                    return;
                 }
                 needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
