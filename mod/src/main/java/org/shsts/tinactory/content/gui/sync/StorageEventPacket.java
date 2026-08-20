@@ -19,7 +19,7 @@ public class StorageEventPacket implements IPacket {
     @Nullable
     private IStackKey key;
     private int button;
-    private boolean isQuickMove;
+    private boolean shiftPressed;
 
     public StorageEventPacket(ItemStack item, int button) {
         this.key = StackHelper.ITEM_ADAPTER.keyOf(item);
@@ -31,16 +31,16 @@ public class StorageEventPacket implements IPacket {
         this.button = button;
     }
 
-    public StorageEventPacket(IStackKey key, int button, boolean isQuickMove) {
+    public StorageEventPacket(IStackKey key, int button, boolean shiftPressed) {
         this.key = key;
         this.button = button;
-        this.isQuickMove = isQuickMove;
+        this.shiftPressed = shiftPressed;
     }
 
     public StorageEventPacket(int button) {
         this.key = null;
         this.button = button;
-        this.isQuickMove = false;
+        this.shiftPressed = false;
     }
 
     public StorageEventPacket() {}
@@ -49,8 +49,8 @@ public class StorageEventPacket implements IPacket {
         return button;
     }
 
-    public boolean isQuickMove() {
-        return isQuickMove;
+    public boolean shiftPressed() {
+        return shiftPressed;
     }
 
     public boolean isEmpty() {
@@ -82,13 +82,13 @@ public class StorageEventPacket implements IPacket {
             StackHelper.KEY_STREAM_CODEC.encode(buf, key);
         }
         buf.writeVarInt(button);
-        buf.writeBoolean(isQuickMove);
+        buf.writeBoolean(shiftPressed);
     }
 
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         key = buf.readBoolean() ? StackHelper.KEY_STREAM_CODEC.decode(buf) : null;
         button = buf.readVarInt();
-        isQuickMove = buf.readBoolean();
+        shiftPressed = buf.readBoolean();
     }
 }

@@ -75,8 +75,8 @@ public class StoragePanel extends ButtonPanel {
     protected void onSelect(int index, double mouseX, double mouseY, int button) {
         if (index < entries.size()) {
             var entry = entries.get(index);
-            var isQuickMove = button == 0 && ClientUtil.shiftDown();
-            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), button, isQuickMove));
+            var shiftPressed = ClientUtil.shiftDown();
+            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), button, shiftPressed));
         } else {
             menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button));
         }

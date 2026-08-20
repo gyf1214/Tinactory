@@ -172,7 +172,7 @@ public abstract class StorageMenu extends InventoryMenu {
 
     private void onSlotClick(StorageEventPacket packet) {
         var button = packet.button();
-        if (button == 0 && packet.isItem() && packet.isQuickMove()) {
+        if (getCarried().isEmpty() && button == 0 && packet.isItem() && packet.shiftPressed()) {
             quickMoveStack(packet.key());
             return;
         }
@@ -192,18 +192,23 @@ public abstract class StorageMenu extends InventoryMenu {
             return;
         }
 
-        boolean success;
-        if (button == 1) {
-            success = clickFluidEntry(packet, button);
-            if (!success) {
+        var fluidBearing = hasDrainableFluid(getCarried());
+        if (fluidBearing && packet.shiftPressed()) {
+            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+        } else if (fluidBearing || button == 1) {
+            if (!clickFluidEntry(packet, button)) {
                 clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
             }
-        } else {
-            success = clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
-            if (!success) {
-                clickFluidEntry(packet, button);
-            }
+        } else if (!clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button)) {
+            clickFluidEntry(packet, button);
         }
+    }
+
+    private boolean hasDrainableFluid(ItemStack carried) {
+        var stack = StackHelper.copyWithCount(carried, 1);
+        return StackHelper.getFluidHandlerFromItem(stack)
+            .map(handler -> !handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty())
+            .orElse(false);
     }
 
     private boolean clickFluidEntry(StorageEventPacket packet, int button) {

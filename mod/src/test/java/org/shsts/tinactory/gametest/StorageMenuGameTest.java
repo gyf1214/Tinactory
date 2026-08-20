@@ -17,6 +17,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.ElectricStorageMenu;
+import org.shsts.tinactory.content.gui.StorageMenu;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricStorage;
@@ -239,6 +240,75 @@ public final class StorageMenuGameTest {
     }
 
     @GameTest
+    public static void testShiftLeftClickWithFluidContainerDoesNotQuickMove(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var diamond = new ItemStack(Items.DIAMOND);
+        var diamondKey = StackHelper.ITEM_ADAPTER.keyOf(diamond);
+        chest.insert(diamond, false);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = chestMenu(helper, pos, player);
+        menu.setCarried(new ItemStack(Items.WATER_BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(diamondKey, 0, true));
+
+        if (chest.getStorageAmount(diamond) != 1 || chest.getStorageAmount(new ItemStack(Items.WATER_BUCKET)) != 1 ||
+            !menu.getCarried().isEmpty() || player.getInventory().countItem(Items.DIAMOND) != 0) {
+            helper.fail("Shift-left-click with a fluid container quick moved instead of inserting the item", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testLeftClickFluidContainerPrefersFluidTransfer(GameTestHelper helper) {
+        var chestPos = new BlockPos(1, 1, 1);
+        var tankPos = new BlockPos(2, 1, 1);
+        helper.setBlock(chestPos, block("logistics/ulv/electric_chest"));
+        helper.setBlock(tankPos, block("logistics/ulv/electric_tank"));
+        var chest = getContainer(helper.getBlockEntity(chestPos), ElectricChest.ID, ElectricChest.class);
+        var tank = getContainer(helper.getBlockEntity(tankPos), ElectricTank.ID, ElectricTank.class);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = dualStorageMenu(helper, chestPos, player, chest, tank);
+        menu.setCarried(new ItemStack(Items.WATER_BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(0));
+
+        if (chest.getStorageAmount(new ItemStack(Items.WATER_BUCKET)) != 0 ||
+            tank.getStorageAmount(new FluidStack(Fluids.WATER, 1)) != 1000 || !menu.getCarried().is(Items.BUCKET)) {
+            helper.fail("Left-click did not prefer fluid transfer for a fluid container", chestPos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testLockedShiftClickFluidContainerUsesOnlyItem(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var tank = getContainer(blockEntity, ElectricTank.ID, ElectricTank.class);
+        var water = new FluidStack(Fluids.WATER, 1);
+        var waterKey = StackHelper.FLUID_ADAPTER.keyOf(water);
+        tank.setFilter(waterKey);
+        MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder()
+            .set(ElectricStorage.UNLOCK_KEY, false).get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = tankMenu(helper, pos, player);
+        menu.setCarried(new ItemStack(Items.WATER_BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 0, true));
+
+        if (tank.getStorageAmount(water) != 0 || !menu.getCarried().is(Items.WATER_BUCKET)) {
+            helper.fail("Locked shift-click transferred fluid instead of preserving the container as an item", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testTankEmptyFilterNoFluidKeyOnlyRightClickClears(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_tank"));
@@ -285,6 +355,12 @@ public final class StorageMenuGameTest {
             player.getInventory(), helper.getBlockEntity(pos)));
     }
 
+    private static StorageMenu dualStorageMenu(GameTestHelper helper, BlockPos pos, Player player,
+        ElectricChest chest, ElectricTank tank) {
+        return new DualStorageMenu(new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
+            player.getInventory(), helper.getBlockEntity(pos)), chest, tank);
+    }
+
     private static Block block(String id) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, id));
     }
@@ -324,4 +400,10 @@ public final class StorageMenuGameTest {
         @Override
         public void requireMenuEventPacket(IPacketType<?> type) {}
     };
+
+    private static final class DualStorageMenu extends StorageMenu {
+        private DualStorageMenu(Properties properties, ElectricChest itemPort, ElectricTank fluidPort) {
+            super(properties, itemPort, 0, fluidPort, 0);
+        }
+    }
 }
