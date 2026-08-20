@@ -285,6 +285,31 @@ public final class StorageMenuGameTest {
     }
 
     @GameTest
+    public static void testLeftClickEmptyFluidContainerDrainsFluidEntry(GameTestHelper helper) {
+        var chestPos = new BlockPos(1, 1, 1);
+        var tankPos = new BlockPos(2, 1, 1);
+        helper.setBlock(chestPos, block("logistics/ulv/electric_chest"));
+        helper.setBlock(tankPos, block("logistics/ulv/electric_tank"));
+        var chest = getContainer(helper.getBlockEntity(chestPos), ElectricChest.ID, ElectricChest.class);
+        var tank = getContainer(helper.getBlockEntity(tankPos), ElectricTank.ID, ElectricTank.class);
+        var water = new FluidStack(Fluids.WATER, 1000);
+        var waterKey = StackHelper.FLUID_ADAPTER.keyOf(water);
+        tank.insert(water, false);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = dualStorageMenu(helper, chestPos, player, chest, tank);
+        menu.setCarried(new ItemStack(Items.BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 0, false));
+
+        if (chest.getStorageAmount(new ItemStack(Items.BUCKET)) != 0 || tank.getStorageAmount(water) != 0 ||
+            !menu.getCarried().is(Items.WATER_BUCKET)) {
+            helper.fail("Left-click with an empty fluid container did not drain the clicked fluid entry", chestPos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testLockedShiftClickFluidContainerUsesOnlyItem(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_tank"));
