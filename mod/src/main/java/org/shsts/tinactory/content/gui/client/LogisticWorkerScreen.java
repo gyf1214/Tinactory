@@ -80,6 +80,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private int selectedConfig = -1;
     private boolean selectedFrom;
+    private final Runnable onConfigUpdate = this::refreshConfig;
 
     private class ConfigPanel extends ButtonPanel {
         private static final Texture BACKGROUND = new Texture(
@@ -364,6 +365,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
+    private final ConfigPanel configPanel;
     private final MachineSelectPanel<Void> machinePanel;
     private final PortSelectPanel portPanel;
 
@@ -381,7 +383,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.machineConfig = menu.machine.config();
         this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
 
-        var configPanel = new ConfigPanel();
+        this.configPanel = new ConfigPanel();
         this.machinePanel = new MachineSelectPanel<>(this) {
             @Override
             public void select(UUID machine) {
@@ -408,6 +410,21 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         rootPanel.addChild(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
+        LogisticWorker.get(blockEntity).onConfigUpdate(onConfigUpdate);
+    }
+
+    @Override
+    public void removed() {
+        LogisticWorker.get(menu.blockEntity()).unregisterConfigUpdateCallback(onConfigUpdate);
+        super.removed();
+    }
+
+    private void refreshConfig() {
+        configPanel.refresh();
+        if (selectedConfig >= configPanel.getItemCount()) {
+            selectedConfig = -1;
+        }
+        portPanel.refresh();
     }
 
     private void refreshVisiblePorts(LogisticWorkerSyncPacket p) {

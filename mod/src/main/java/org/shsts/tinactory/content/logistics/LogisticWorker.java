@@ -26,7 +26,9 @@ import org.shsts.tinycorelib.api.core.Transformer;
 import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
@@ -61,6 +63,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     private boolean stopped = false;
     private boolean noValidSlot = true;
     private boolean needRevalidate = true;
+    private final Set<Runnable> configUpdateCallbacks = new HashSet<>();
 
     private final IElectricMachine electric;
 
@@ -260,11 +263,24 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
     }
 
+    private void onConfigUpdate() {
+        needRevalidate = true;
+        configUpdateCallbacks.forEach(Runnable::run);
+    }
+
+    public void onConfigUpdate(Runnable callback) {
+        configUpdateCallbacks.add(callback);
+    }
+
+    public void unregisterConfigUpdateCallback(Runnable callback) {
+        configUpdateCallbacks.remove(callback);
+    }
+
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
-        eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> needRevalidate = true);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> onConfigUpdate());
     }
 
     @Override
