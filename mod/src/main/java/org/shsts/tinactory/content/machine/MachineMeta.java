@@ -380,8 +380,8 @@ public class MachineMeta extends MetaConsumer {
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(storageSlots),
-                            NUMBER_FORMAT.format(stackLimit));
+                        addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(stackLimit),
+                            NUMBER_FORMAT.format(storageSlots));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
                     }))
                 .transform(MachineSet::baseMachine)
@@ -402,8 +402,8 @@ public class MachineMeta extends MetaConsumer {
             var power = getPower(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(storageSlots),
-                            NUMBER_FORMAT.format(stackLimit));
+                        addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(stackLimit),
+                            NUMBER_FORMAT.format(storageSlots));
                         addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
                     }))
                 .transform(MachineSet::baseMachine)
