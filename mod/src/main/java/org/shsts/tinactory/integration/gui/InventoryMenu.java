@@ -138,19 +138,19 @@ public class InventoryMenu extends MenuBase {
         NONE, FILL, DRAIN
     }
 
-    public record FluidClickResult(FluidClickAction action, ItemStack stack) {
+    public record FluidClickResult(FluidClickAction action, ItemStack stack, int amount) {
         public FluidClickResult() {
-            this(FluidClickAction.NONE, ItemStack.EMPTY);
+            this(FluidClickAction.NONE, ItemStack.EMPTY, 0);
         }
     }
 
     @FunctionalInterface
     protected interface IFluidClickExecutor {
-        FluidClickResult click(ItemStack carried, boolean mayDrain, boolean mayFill);
+        FluidClickResult click(ItemStack carried, int maxDrain, boolean mayDrain, boolean mayFill);
     }
 
     private FluidClickResult doClickFluidSlot(ItemStack carried, IFluidTank tank,
-        boolean mayDrain, boolean mayFill) {
+        int maxDrain, boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
             return new FluidClickResult();
@@ -169,12 +169,12 @@ public class InventoryMenu extends MenuBase {
                         LOGGER.warn("Failed to execute fluid fill inserted={}/{}", amount1, amount);
                     }
                     return new FluidClickResult(FluidClickAction.FILL,
-                        handler.getContainer());
+                        handler.getContainer(), amount1);
                 }
             }
         }
         if (mayDrain && tank.getFluidAmount() > 0) {
-            var fluid1 = tank.drain(tank.getFluidAmount(), IFluidHandler.FluidAction.SIMULATE);
+            var fluid1 = tank.drain(Math.min(tank.getFluidAmount(), maxDrain), IFluidHandler.FluidAction.SIMULATE);
             int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
             if (amount > 0) {
                 var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
@@ -184,27 +184,33 @@ public class InventoryMenu extends MenuBase {
                     LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
                 }
                 return new FluidClickResult(FluidClickAction.DRAIN,
-                    handler.getContainer());
+                    handler.getContainer(), amount1);
             }
         }
         return new FluidClickResult();
     }
 
     protected boolean clickFluidSlot(IFluidClickExecutor clickExecutor, int button) {
+        return clickFluidSlot(clickExecutor, Integer.MAX_VALUE, button);
+    }
+
+    protected boolean clickFluidSlot(IFluidClickExecutor clickExecutor, int maxDrain, int button) {
         var item = getCarried();
         var outputItem = ItemStack.EMPTY;
+        var remainingDrain = maxDrain;
         var mayDrain = true;
         var mayFill = true;
         var success = false;
         while (!item.isEmpty()) {
             var item1 = StackHelper.copyWithCount(item, 1);
-            var clickResult = clickExecutor.click(item1, mayDrain, mayFill);
+            var clickResult = clickExecutor.click(item1, remainingDrain, mayDrain, mayFill);
             if (clickResult.action == FluidClickAction.NONE) {
                 break;
             } else if (clickResult.action == FluidClickAction.FILL) {
                 mayDrain = false;
             } else {
                 mayFill = false;
+                remainingDrain -= clickResult.amount;
             }
             success = true;
             item.shrink(1);
@@ -229,7 +235,7 @@ public class InventoryMenu extends MenuBase {
 
     protected void clickFluidSlot(IFluidTanksHandler container, int tankIndex, int button) {
         var tank = container.getTank(tankIndex);
-        clickFluidSlot((carried, mayDrain, mayFill) ->
-            doClickFluidSlot(carried, tank, mayDrain, mayFill), button);
+        clickFluidSlot((carried, maxDrain, mayDrain, mayFill) ->
+            doClickFluidSlot(carried, tank, maxDrain, mayDrain, mayFill), button);
     }
 }

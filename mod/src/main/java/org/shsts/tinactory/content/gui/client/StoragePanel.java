@@ -76,7 +76,8 @@ public class StoragePanel extends ButtonPanel {
         if (index < entries.size()) {
             var entry = entries.get(index);
             var shiftPressed = ClientUtil.shiftDown();
-            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), button, shiftPressed));
+            menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(entry.key(), entry.amount(), button,
+                shiftPressed));
         } else {
             menu.triggerEvent(STORAGE_SLOT, () -> new StorageEventPacket(button));
         }

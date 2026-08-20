@@ -310,6 +310,74 @@ public final class StorageMenuGameTest {
     }
 
     @GameTest
+    public static void testItemExtractionUsesClickedVirtualSlotAmount(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/mv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var diamond = new ItemStack(Items.DIAMOND);
+        var diamondKey = StackHelper.ITEM_ADAPTER.keyOf(diamond);
+        chest.insert(new ItemStack(Items.DIAMOND, 64), false);
+        chest.insert(new ItemStack(Items.DIAMOND, 64), false);
+        chest.insert(new ItemStack(Items.DIAMOND, 4), false);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = chestMenu(helper, pos, player);
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(diamondKey, 4, 0, false));
+
+        if (chest.getStorageAmount(diamond) != 128 || menu.getCarried().getCount() != 4) {
+            helper.fail("Item extraction did not use the clicked virtual slot amount", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testRightClickItemExtractionHalvesClickedVirtualSlotAmount(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/mv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var diamond = new ItemStack(Items.DIAMOND);
+        var diamondKey = StackHelper.ITEM_ADAPTER.keyOf(diamond);
+        chest.insert(new ItemStack(Items.DIAMOND, 64), false);
+        chest.insert(new ItemStack(Items.DIAMOND, 64), false);
+        chest.insert(new ItemStack(Items.DIAMOND, 4), false);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = chestMenu(helper, pos, player);
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(diamondKey, 4, 1, false));
+
+        if (chest.getStorageAmount(diamond) != 130 || menu.getCarried().getCount() != 2) {
+            helper.fail("Right-click item extraction did not halve the clicked virtual slot amount", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testFluidDrainUsesClickedVirtualSlotAmount(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var tank = getContainer(helper.getBlockEntity(pos), ElectricTank.ID, ElectricTank.class);
+        var water = new FluidStack(Fluids.WATER, 20000);
+        var waterKey = StackHelper.FLUID_ADAPTER.keyOf(water);
+        tank.insert(water, false);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = tankMenu(helper, pos, player);
+        menu.setCarried(new ItemStack(Items.BUCKET, 16));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(waterKey, 4000, 0, false));
+
+        if (tank.getStorageAmount(water) != 16000 || !menu.getCarried().is(Items.BUCKET) ||
+            menu.getCarried().getCount() != 12 || player.getInventory().countItem(Items.WATER_BUCKET) != 4) {
+            helper.fail("Fluid drain did not use the clicked virtual slot amount", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testLockedShiftClickFluidContainerUsesOnlyItem(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_tank"));

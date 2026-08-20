@@ -68,7 +68,7 @@ public class MachineMenu extends ProcessingMenu {
         }
     }
 
-    private boolean tryDrain(IFluidHandlerItem handler, IPort<FluidStack> port, FluidStack fluid) {
+    private int tryDrain(IFluidHandlerItem handler, IPort<FluidStack> port, FluidStack fluid) {
         var fluid1 = fluid.isEmpty() ? port.extract(Integer.MAX_VALUE, true) :
             port.extract(StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE), true);
         int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
@@ -79,12 +79,12 @@ public class MachineMenu extends ProcessingMenu {
             if (amount1 != amount) {
                 LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
             }
-            return true;
+            return amount1;
         }
-        return false;
+        return 0;
     }
 
-    private FluidClickResult doClickFluidPort(ItemStack carried, IPort<FluidStack> port,
+    private FluidClickResult doClickFluidPort(ItemStack carried, IPort<FluidStack> port, int maxDrain,
         boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
@@ -94,18 +94,20 @@ public class MachineMenu extends ProcessingMenu {
         if (mayFill) {
             var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
             if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
-                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer(), 0);
             }
         }
         if (mayDrain) {
             for (var i = 0; i < handler.getTanks(); i++) {
                 var fluid1 = handler.getFluidInTank(i);
-                if (!fluid1.isEmpty() && tryDrain(handler, port, fluid1)) {
-                    return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
+                var amount = fluid1.isEmpty() ? 0 : tryDrain(handler, port, fluid1);
+                if (amount > 0) {
+                    return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer(), amount);
                 }
             }
-            if (tryDrain(handler, port, FluidStack.EMPTY)) {
-                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
+            var amount = tryDrain(handler, port, FluidStack.EMPTY);
+            if (amount > 0) {
+                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer(), amount);
             }
         }
         return new FluidClickResult();
@@ -122,8 +124,8 @@ public class MachineMenu extends ProcessingMenu {
                 var carried1 = clickItemPort(getCarried(), port1.asItem(), button);
                 setCarried(carried1);
             } else if (port1.type() == PortType.FLUID) {
-                clickFluidSlot((carried, mayDrain, mayFill) ->
-                    doClickFluidPort(carried, port1.asFluid(), mayDrain, mayFill), button);
+                clickFluidSlot((carried, maxDrain, mayDrain, mayFill) ->
+                    doClickFluidPort(carried, port1.asFluid(), maxDrain, mayDrain, mayFill), button);
             }
         });
     }

@@ -96,20 +96,21 @@ public abstract class StorageMenu extends InventoryMenu {
     }
 
     private FluidClickResult doClickFluidSlot(ItemStack carried, IPort<FluidStack> port,
-        IStackKey key, boolean mayDrain, boolean mayFill) {
+        IStackKey key, int maxDrain, boolean mayDrain, boolean mayFill) {
         var cap = StackHelper.getFluidHandlerFromItem(carried);
         if (cap.isEmpty()) {
             return new FluidClickResult();
         }
         var handler = cap.get();
-        var fluid1 = StackHelper.FLUID_ADAPTER.stackOf(key, Integer.MAX_VALUE);
+        var fluid = StackHelper.FLUID_ADAPTER.stackOf(key, Integer.MAX_VALUE);
         if (mayFill) {
-            var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.SIMULATE);
+            var fluid2 = handler.drain(fluid, IFluidHandler.FluidAction.SIMULATE);
             if (StackHelper.transmitFluidFromHandler(handler, port, fluid2)) {
-                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
+                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer(), 0);
             }
         }
         if (mayDrain) {
+            var fluid1 = StackHelper.FLUID_ADAPTER.stackOf(key, maxDrain);
             var fluid2 = port.extract(fluid1, true);
             int amount = handler.fill(fluid2, IFluidHandler.FluidAction.SIMULATE);
             if (amount > 0) {
@@ -119,7 +120,7 @@ public abstract class StorageMenu extends InventoryMenu {
                 if (amount1 != amount) {
                     LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
                 }
-                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer());
+                return new FluidClickResult(FluidClickAction.DRAIN, handler.getContainer(), amount1);
             }
         }
         return new FluidClickResult();
@@ -136,12 +137,13 @@ public abstract class StorageMenu extends InventoryMenu {
         var handler = cap.get();
         var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
         if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
-            return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
+            return new FluidClickResult(FluidClickAction.FILL, handler.getContainer(), 0);
         }
         return new FluidClickResult();
     }
 
-    private boolean clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, int button) {
+    private boolean clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, long amount,
+        int button) {
         if (!carried.isEmpty()) {
             var count = carried.getCount();
             if (button == 1) {
@@ -160,7 +162,7 @@ public abstract class StorageMenu extends InventoryMenu {
             return getCarried().getCount() < count;
         } else if (key != null) {
             var item = StackHelper.ITEM_ADAPTER.stackOf(key);
-            var count = Math.min((int) port.getStorageAmount(item), item.getMaxStackSize());
+            var count = (int) Math.min(port.getStorageAmount(item), Math.min(amount, item.getMaxStackSize()));
             var count1 = button == 1 ? (count + 1) / 2 : count;
             var item1 = StackHelper.copyWithCount(item, count1);
             var extracted = port.extract(item1, false);
@@ -196,12 +198,13 @@ public abstract class StorageMenu extends InventoryMenu {
         var fluidBearing = hasDrainableFluid(carried1);
         var fluidClick = fluidBearing || packet.isFluid() && hasFluidHandler(carried1);
         if (fluidClick && packet.shiftPressed()) {
-            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
         } else if (fluidClick || button == 1) {
             if (!clickFluidEntry(packet, button)) {
-                clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button);
+                clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
             }
-        } else if (!clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, button)) {
+        } else if (!clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(),
+            button)) {
             clickFluidEntry(packet, button);
         }
     }
@@ -219,13 +222,14 @@ public abstract class StorageMenu extends InventoryMenu {
     }
 
     private boolean clickFluidEntry(StorageEventPacket packet, int button) {
+        var maxDrain = fluidStackLimit > 0 ? (int) Math.min(packet.amount(), Integer.MAX_VALUE) : Integer.MAX_VALUE;
         if (packet.isFluid()) {
             var key = packet.key();
-            return clickFluidSlot((carried1, mayDrain, mayFill) ->
-                doClickFluidSlot(carried1, fluidPort, key, mayDrain, mayFill), button);
+            return clickFluidSlot((carried1, maxDrain1, mayDrain, mayFill) ->
+                doClickFluidSlot(carried1, fluidPort, key, maxDrain1, mayDrain, mayFill), maxDrain, button);
         } else {
-            return clickFluidSlot((carried1, mayDrain, mayFill) ->
-                doClickEmptyFluidSlot(carried1, fluidPort, mayFill), button);
+            return clickFluidSlot((carried1, maxDrain1, mayDrain, mayFill) ->
+                doClickEmptyFluidSlot(carried1, fluidPort, mayFill), maxDrain, button);
         }
     }
 

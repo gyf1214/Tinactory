@@ -18,6 +18,7 @@ public class StorageEventPacket implements IPacket {
 
     @Nullable
     private IStackKey key;
+    private long amount;
     private int button;
     private boolean shiftPressed;
 
@@ -32,13 +33,19 @@ public class StorageEventPacket implements IPacket {
     }
 
     public StorageEventPacket(IStackKey key, int button, boolean shiftPressed) {
+        this(key, Long.MAX_VALUE, button, shiftPressed);
+    }
+
+    public StorageEventPacket(IStackKey key, long amount, int button, boolean shiftPressed) {
         this.key = key;
+        this.amount = amount;
         this.button = button;
         this.shiftPressed = shiftPressed;
     }
 
     public StorageEventPacket(int button) {
         this.key = null;
+        this.amount = 0;
         this.button = button;
         this.shiftPressed = false;
     }
@@ -47,6 +54,10 @@ public class StorageEventPacket implements IPacket {
 
     public int button() {
         return button;
+    }
+
+    public long amount() {
+        return amount;
     }
 
     public boolean shiftPressed() {
@@ -81,6 +92,7 @@ public class StorageEventPacket implements IPacket {
         if (key != null) {
             StackHelper.KEY_STREAM_CODEC.encode(buf, key);
         }
+        buf.writeVarLong(amount);
         buf.writeVarInt(button);
         buf.writeBoolean(shiftPressed);
     }
@@ -88,6 +100,7 @@ public class StorageEventPacket implements IPacket {
     @Override
     public void deserializeFromBuf(RegistryFriendlyByteBuf buf) {
         key = buf.readBoolean() ? StackHelper.KEY_STREAM_CODEC.decode(buf) : null;
+        amount = buf.readVarLong();
         button = buf.readVarInt();
         shiftPressed = buf.readBoolean();
     }
