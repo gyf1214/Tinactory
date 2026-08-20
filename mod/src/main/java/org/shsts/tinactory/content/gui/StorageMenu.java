@@ -339,14 +339,15 @@ public abstract class StorageMenu extends InventoryMenu {
             (long) stack.getAmount()));
         var entries = new ArrayList<StorageEntry>();
         for (var key : filters()) {
-            addEntries(entries, key, amounts.remove(key), true);
+            addEntries(entries, key, amounts.getOrDefault(key, 0L), true);
+            amounts.remove(key);
         }
         amounts.forEach((key, amount) -> addEntries(entries, key, amount, false));
         return new StorageSyncPacket(entries);
     }
 
-    private void addEntries(Collection<StorageEntry> entries, IStackKey key, Long amount, boolean isFilter) {
-        var remaining = amount == null ? 0L : amount;
+    private void addEntries(Collection<StorageEntry> entries, IStackKey key, long amount, boolean isFilter) {
+        var remaining = amount;
         var limit = key.type() == PortType.ITEM ? itemStackLimit : fluidStackLimit;
         if (limit == 0) {
             entries.add(new StorageEntry(key, remaining, isFilter));

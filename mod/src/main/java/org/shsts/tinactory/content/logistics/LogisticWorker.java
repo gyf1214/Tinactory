@@ -263,7 +263,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         builder.add(LOGISTICS_SCHEDULING.get(), this::onTick);
     }
 
-    private void onConfigUpdate() {
+    private void invokeConfigUpdate() {
         needRevalidate = true;
         configUpdateCallbacks.forEach(Runnable::run);
     }
@@ -280,7 +280,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     public void subscribeEvents(IEventManager eventManager) {
         eventManager.subscribe(CONNECT.get(), this::onConnect);
         eventManager.subscribe(BUILD_SCHEDULING.get(), this::buildScheduling);
-        eventManager.subscribe(SET_MACHINE_CONFIG.get(), () -> onConfigUpdate());
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::invokeConfigUpdate);
     }
 
     @Override

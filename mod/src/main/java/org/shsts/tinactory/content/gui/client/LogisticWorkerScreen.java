@@ -73,6 +73,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private final HolderLookup.Provider provider;
     private final int workerSlots;
     private final IMachineConfig machineConfig;
+    private final LogisticWorker worker;
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
         new HashMap<>();
     private final ListMultimap<UUID, LogisticWorkerSyncPacket.PortInfo> machinePorts =
@@ -381,7 +382,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         var blockEntity = menu.blockEntity();
         this.provider = menu.world().registryAccess();
         this.machineConfig = menu.machine.config();
-        this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
+        this.worker = LogisticWorker.get(blockEntity);
+        this.workerSlots = worker.workerSlots;
 
         this.configPanel = new ConfigPanel();
         this.machinePanel = new MachineSelectPanel<>(this) {
@@ -410,12 +412,12 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         rootPanel.addChild(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
-        LogisticWorker.get(blockEntity).onConfigUpdate(onConfigUpdate);
+        worker.onConfigUpdate(onConfigUpdate);
     }
 
     @Override
     public void removed() {
-        LogisticWorker.get(menu.blockEntity()).unregisterConfigUpdateCallback(onConfigUpdate);
+        worker.unregisterConfigUpdateCallback(onConfigUpdate);
         super.removed();
     }
 
