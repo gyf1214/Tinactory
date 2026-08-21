@@ -195,8 +195,8 @@ object Components {
                 model(basicItem("metaitems/energy.lapotronic_orb_cluster/1"))
             }
 
-            for (entry in STORAGE_CELLS) {
-                val k = name(entry.component.id(), -1).replace('m', 'k')
+            for ((index, entry) in STORAGE_CELLS.withIndex()) {
+                val k = "${1 shl (index * 2)}k"
                 item(entry.component) {
                     model(basicItem(ae2("item/material_cell${k}_part")))
                 }
