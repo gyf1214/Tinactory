@@ -130,7 +130,7 @@
 			size: 2.0d
 			tasks: [{
 				id: "78515AB8B77327B6"
-				item: { count: 1, id: "tinactory:component/storage_component/1m" }
+				item: { count: 1, id: "tinactory:component/storage_component/tier_1" }
 				type: "item"
 			}]
 			x: 6.0d
@@ -155,7 +155,7 @@
 			id: "4F97D1CF666FB365"
 			tasks: [{
 				id: "46612088A2590B00"
-				item: { count: 1, id: "tinactory:logistics/item_storage_cell/1m" }
+				item: { count: 1, id: "tinactory:logistics/item_storage_cell/tier_1" }
 				type: "item"
 			}]
 			x: 2.0d
@@ -205,7 +205,7 @@
 			id: "6017FD3A9A7ADBFC"
 			tasks: [{
 				id: "76640E908F83E787"
-				item: { count: 1, id: "tinactory:logistics/fluid_storage_cell/1m" }
+				item: { count: 1, id: "tinactory:logistics/fluid_storage_cell/tier_1" }
 				type: "item"
 			}]
 			x: 2.0d
@@ -216,7 +216,7 @@
 			id: "340A59CCBC050E4A"
 			tasks: [{
 				id: "7BAE68761D1A1DCA"
-				item: { count: 1, id: "tinactory:component/storage_component/4m" }
+				item: { count: 1, id: "tinactory:component/storage_component/tier_2" }
 				type: "item"
 			}]
 			x: 6.0d
@@ -230,7 +230,7 @@
 			id: "41B2E83E7E86A9A6"
 			tasks: [{
 				id: "6F81858A92A85A94"
-				item: { count: 1, id: "tinactory:component/storage_component/16m" }
+				item: { count: 1, id: "tinactory:component/storage_component/tier_3" }
 				type: "item"
 			}]
 			x: 6.0d
@@ -241,7 +241,7 @@
 			id: "2669AE71AD768BC1"
 			tasks: [{
 				id: "13A65F1E77DE3E44"
-				item: { count: 1, id: "tinactory:component/storage_component/64m" }
+				item: { count: 1, id: "tinactory:component/storage_component/tier_4" }
 				type: "item"
 			}]
 			x: 6.0d
@@ -391,7 +391,7 @@
 			id: "7617169E5734A74B"
 			tasks: [{
 				id: "1C716FC7E9EE5689"
-				item: { count: 1, id: "tinactory:logistics/pattern_cell/1m" }
+				item: { count: 1, id: "tinactory:logistics/pattern_cell/tier_1" }
 				type: "item"
 			}]
 			x: 10.0d
