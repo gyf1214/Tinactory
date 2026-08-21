@@ -2,12 +2,15 @@ package org.shsts.tinactory.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -16,6 +19,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.logistics.ElectricChest;
@@ -26,14 +30,60 @@ import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class PersistenceGameTest {
+    @GameTest
+    public static void testStorageCellCapacities(GameTestHelper helper) {
+        var capacities = new long[] {4L << 20, 16L << 20, 64L << 20, 256L << 20};
+        var patternLimits = new long[] {16L, 64L, 256L, 1024L};
+        for (var index = 0; index < capacities.length; index++) {
+            var tier = "tier_" + (index + 1);
+            var itemCell = new ItemStack(item("logistics/item_storage_cell/" + tier));
+            var fluidCell = new ItemStack(item("logistics/fluid_storage_cell/" + tier));
+            var patternCell = new ItemStack(item("logistics/pattern_cell/" + tier));
+            require(helper, BYTES_PROVIDER_ITEM.tryGet(itemCell).orElseThrow().bytesCapacity() == capacities[index] &&
+                BYTES_PROVIDER_ITEM.tryGet(fluidCell).orElseThrow().bytesCapacity() == capacities[index] &&
+                PATTERN_CELL_ITEM.tryGet(patternCell).orElseThrow().bytesCapacity() == capacities[index] &&
+                capacities[index] / TinactoryConfig.CONFIG.bytesPerPattern.get() == patternLimits[index],
+                "Storage tier " + tier + " did not expose its expected capacity or pattern limit", BlockPos.ZERO);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testStorageCellsMigrateLegacyIds(GameTestHelper helper) {
+        var provider = helper.getLevel().registryAccess();
+        var families = new String[] {"component/storage_component", "logistics/item_storage_cell",
+            "logistics/fluid_storage_cell", "logistics/pattern_cell"};
+        var legacyNames = new String[] {"1m", "4m", "16m", "64m"};
+        for (var family : families) {
+            for (var index = 0; index < legacyNames.length; index++) {
+                var currentId = ResourceLocation.fromNamespaceAndPath("tinactory", family + "/tier_" + (index + 1));
+                var legacyId = ResourceLocation.fromNamespaceAndPath("tinactory", family + "/" + legacyNames[index]);
+                var current = BuiltInRegistries.ITEM.get(currentId);
+                var stack = new ItemStack(current);
+                stack.set(DataComponents.CUSTOM_NAME, Component.literal("migration-" + family + '-' + index));
+                var serialized = (CompoundTag) stack.save(provider);
+                serialized.putString("id", legacyId.toString());
+                var restored = ItemStack.parseOptional(provider, serialized);
+                require(helper, restored.is(current) && restored.has(DataComponents.CUSTOM_NAME),
+                    "Legacy " + legacyId + " did not resolve to " + currentId + " with components", BlockPos.ZERO);
+                require(helper, BuiltInRegistries.ITEM.get(legacyId) == current &&
+                    BuiltInRegistries.ITEM.getKey(current).equals(currentId),
+                    "Legacy " + legacyId + " was registered instead of aliased to " + currentId, BlockPos.ZERO);
+            }
+        }
+        helper.succeed();
+    }
+
     @GameTest
     public static void testIdleBoilerHasNoProcessingInfo(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
@@ -310,5 +360,9 @@ public final class PersistenceGameTest {
 
     private static Block block(String path) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("tinactory", path));
+    }
+
+    private static Item item(String path) {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("tinactory", path));
     }
 }

@@ -2,17 +2,17 @@
   "type": "me_storage_cell",
   "componentPrefix": "component/storage_component",
   "items": {
-    "1m": {
-      "bytes": 1048576
-    },
-    "4m": {
+    "tier_1": {
       "bytes": 4194304
     },
-    "16m": {
+    "tier_2": {
       "bytes": 16777216
     },
-    "64m": {
+    "tier_3": {
       "bytes": 67108864
+    },
+    "tier_4": {
+      "bytes": 268435456
     }
   }
 }
