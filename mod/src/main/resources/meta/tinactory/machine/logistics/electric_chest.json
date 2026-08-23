@@ -4,127 +4,18 @@
   "voltages": {
     "ulv": {
       "power": 1,
-      "slotSize": 1024
+      "storageSlots": 54,
+      "stackLimit": 64
     },
     "mv": {
       "power": 2,
-      "slotSize": 4096
+      "storageSlots": 81,
+      "stackLimit": 128
     },
     "ev": {
       "power": 4,
-      "slotSize": 16384
+      "storageSlots": 108,
+      "stackLimit": 256
     }
-  },
-  "layout": {
-    "slots": [
-      {
-        "port": 0,
-        "type": "none",
-        "x": 0,
-        "y": 0
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 20,
-        "y": 0
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 40,
-        "y": 0,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 60,
-        "y": 0,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 80,
-        "y": 0,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 100,
-        "y": 0,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 120,
-        "y": 0,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 140,
-        "y": 0,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 0,
-        "y": 48
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 20,
-        "y": 48
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 40,
-        "y": 48,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 60,
-        "y": 48,
-        "voltages": "mv-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 80,
-        "y": 48,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 100,
-        "y": 48,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 120,
-        "y": 48,
-        "voltages": "ev-max"
-      },
-      {
-        "port": 0,
-        "type": "none",
-        "x": 140,
-        "y": 48,
-        "voltages": "ev-max"
-      }
-    ]
   }
 }

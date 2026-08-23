@@ -13,7 +13,5 @@ import java.util.Optional;
 public interface IProcessingDisplay {
     IRenderDescriptor display();
 
-    default Optional<List<Component>> tooltip() {
-        return Optional.empty();
-    }
+    Optional<List<Component>> tooltip();
 }

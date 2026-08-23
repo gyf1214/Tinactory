@@ -2,36 +2,68 @@ package org.shsts.tinactory.content.gui;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.entity.player.Player;
-import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.machine.IMachineConfig;
-import org.shsts.tinactory.integration.gui.LayoutMenu;
+import org.shsts.tinactory.content.logistics.ElectricChest;
+import org.shsts.tinactory.content.logistics.ElectricStorage;
+import org.shsts.tinactory.content.logistics.ElectricTank;
 
-import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
+import java.util.Collection;
+
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ElectricStorageMenu extends LayoutMenu {
-    private final IMachine machine;
-    private final IMachineConfig machineConfig;
+public final class ElectricStorageMenu extends StorageMenu {
+    private final ElectricStorage<?> storage;
 
-    protected ElectricStorageMenu(Properties properties) {
-        super(properties, SLOT_SIZE + SPACING);
-        this.machine = MACHINE.get(blockEntity());
-        this.machineConfig = machine.config();
+    private ElectricStorageMenu(Properties properties, ElectricChest storage) {
+        super(properties, storage, storage.stackLimit(), IPort.empty(), 0);
+        this.storage = storage;
+    }
 
-        onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    private ElectricStorageMenu(Properties properties, ElectricTank storage) {
+        super(properties, IPort.empty(), 0, storage, storage.stackLimit());
+        this.storage = storage;
+    }
+
+    public static ElectricStorageMenu chest(Properties properties) {
+        return new ElectricStorageMenu(properties,
+            getContainer(properties.blockEntity(), ElectricChest.ID, ElectricChest.class));
+    }
+
+    public static ElectricStorageMenu tank(Properties properties) {
+        return new ElectricStorageMenu(properties,
+            getContainer(properties.blockEntity(), ElectricTank.ID, ElectricTank.class));
     }
 
     @Override
-    public boolean stillValid(Player player) {
-        return super.stillValid(player) && machine.canPlayerInteract(player);
+    protected Collection<IStackKey> filters() {
+        return storage.filters();
+    }
+
+    @Override
+    protected boolean isUnlocked() {
+        return storage.isUnlocked();
+    }
+
+    @Override
+    protected boolean setFilter(IStackKey key) {
+        return storage.setFilter(key);
+    }
+
+    @Override
+    protected boolean resetFilter(IStackKey key) {
+        return storage.resetFilter(key);
+    }
+
+    @Override
+    protected boolean replaceFilter(IStackKey oldKey, IStackKey newKey) {
+        return storage.replaceFilter(oldKey, newKey);
     }
 
     public IMachineConfig machineConfig() {
-        return machineConfig;
+        return storage.machineConfig();
     }
 }

@@ -6,11 +6,16 @@ import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 import org.shsts.tinactory.api.TinactoryKeys;
 
+import java.util.Comparator;
 import java.util.Locale;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class LocHelper {
+    public static final Comparator<ResourceLocation> LOC_DISPLAY_ORDER = Comparator
+        .<ResourceLocation, Boolean>comparing($ -> !$.getNamespace().equals("minecraft"))
+        .thenComparing(ResourceLocation::compareNamespaced);
+
     public static ResourceLocation mcLoc(String id) {
         return ResourceLocation.parse(id);
     }

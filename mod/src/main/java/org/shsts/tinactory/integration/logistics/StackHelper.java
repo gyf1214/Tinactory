@@ -31,8 +31,11 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.util.LocHelper;
+import org.shsts.tinycorelib.api.core.ILoc;
 import org.slf4j.Logger;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -66,6 +69,10 @@ public final class StackHelper {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
+
+    public static final Comparator<IStackKey> KEY_DISPLAY_ORDER = Comparator
+        .comparing(IStackKey::type)
+        .thenComparing(ILoc::loc, LocHelper.LOC_DISPLAY_ORDER);
 
     /**
      * Use this if the itemStack can have more than 99 items.

@@ -13,6 +13,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
+import org.shsts.tinactory.content.logistics.MEStorageCellAliases;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
@@ -33,6 +34,7 @@ public class Tinactory {
         modContainer.registerConfig(ModConfig.Type.SERVER, TinactoryConfig.CONFIG_SPEC);
         this.modEventBus = modEventBus;
         modEventBus.addListener(this::onConstructEvent);
+        modEventBus.addListener(MEStorageCellAliases::registerAliases);
     }
 
     private void onConstructEvent(FMLConstructModEvent event) {

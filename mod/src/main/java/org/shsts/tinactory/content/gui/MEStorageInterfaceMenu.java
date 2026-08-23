@@ -1,233 +1,24 @@
 package org.shsts.tinactory.content.gui;
 
-import com.mojang.logging.LogUtils;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.wrapper.PlayerMainInvWrapper;
-import org.shsts.tinactory.api.logistics.IPort;
-import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.api.machine.IMachineConfig;
-import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.logistics.MEStorageInterface;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
-import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.slf4j.Logger;
-
-import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SLOT;
-import static org.shsts.tinactory.AllMenus.ME_STORAGE_INTERFACE_SYNC;
-import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket.QUICK_MOVE_BUTTON;
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class MEStorageInterfaceMenu extends InventoryMenu {
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    public static final String SLOT_SYNC = "slots";
-    public static final int PANEL_HEIGHT = 7 * SLOT_SIZE + SPACING;
-
-    private final IMachine machine;
-    private final IMachineConfig machineConfig;
-    private final MEStorageInterface storageInterface;
-    private final Runnable updateListener;
-
+public final class MEStorageInterfaceMenu extends StorageMenu {
     public MEStorageInterfaceMenu(Properties properties) {
-        super(properties, PANEL_HEIGHT);
-        this.machine = MACHINE.get(blockEntity());
-        this.machineConfig = machine.config();
-        this.storageInterface = getContainer(blockEntity(), MEStorageInterface.ID, MEStorageInterface.class);
-
-        var scheduler = new ActiveScheduler<>(ME_STORAGE_INTERFACE_SYNC, () -> new MEStorageInterfaceSyncPacket(
-            storageInterface.getAllItems(), storageInterface.getAllFluids()));
-        this.updateListener = scheduler::invokeUpdate;
-
-        addSyncSlot(SLOT_SYNC, scheduler);
-        if (!world.isClientSide) {
-            storageInterface.onUpdate(updateListener);
-        }
-
-        onEventPacket(ME_STORAGE_INTERFACE_SLOT, this::onSlotClick);
-        onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+        this(properties, CapabilityProvider.getContainer(properties.blockEntity(), MEStorageInterface.ID,
+            MEStorageInterface.class));
     }
 
-    @Override
-    public boolean stillValid(Player player) {
-        return super.stillValid(player) && machine.canPlayerInteract(player);
+    private MEStorageInterfaceMenu(Properties properties, MEStorageInterface storage) {
+        super(properties, storage.itemPort(), 0, storage.fluidPort(), 0);
     }
 
-    @Override
-    public void removed(Player pPlayer) {
-        super.removed(player);
-        if (!world.isClientSide) {
-            storageInterface.unregisterListener(updateListener);
-        }
-    }
-
-    public IMachineConfig machineConfig() {
-        return machineConfig;
-    }
-
-    private FluidClickResult doClickFluidSlot(ItemStack carried, IPort<FluidStack> port,
-        FluidStack fluid, boolean mayDrain, boolean mayFill) {
-        var cap = StackHelper.getFluidHandlerFromItem(carried);
-        if (cap.isEmpty()) {
-            return new FluidClickResult();
-        }
-        var handler = cap.get();
-        if (mayFill) {
-            var fluid1 = StackHelper.copyWithAmount(fluid, Integer.MAX_VALUE);
-            var fluid2 = handler.drain(fluid1, IFluidHandler.FluidAction.SIMULATE);
-            if (StackHelper.transmitFluidFromHandler(handler, port, fluid2)) {
-                return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
-            }
-        }
-        if (mayDrain) {
-            var fluid1 = port.extract(fluid, true);
-            int amount = handler.fill(fluid1, IFluidHandler.FluidAction.SIMULATE);
-            if (amount > 0) {
-                var fluid2 = StackHelper.copyWithAmount(fluid1, amount);
-                var fluid3 = port.extract(fluid2, false);
-                var amount1 = handler.fill(fluid3, IFluidHandler.FluidAction.EXECUTE);
-                if (amount1 != amount) {
-                    LOGGER.warn("Failed to execute fluid drain extracted={}/{}", amount1, amount);
-                }
-                return new FluidClickResult(FluidClickAction.DRAIN,
-                    handler.getContainer());
-            }
-        }
-        return new FluidClickResult();
-    }
-
-    private FluidClickResult doClickEmptyFluidSlot(ItemStack carried, IPort<FluidStack> port, boolean mayFill) {
-        if (!mayFill) {
-            return new FluidClickResult();
-        }
-        var cap = StackHelper.getFluidHandlerFromItem(carried);
-        if (cap.isEmpty()) {
-            return new FluidClickResult();
-        }
-        var handler = cap.get();
-        var fluid = handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
-        if (StackHelper.transmitFluidFromHandler(handler, port, fluid)) {
-            return new FluidClickResult(FluidClickAction.FILL, handler.getContainer());
-        }
-        return new FluidClickResult();
-    }
-
-    private void clickItemSlot(ItemStack carried, ItemStack item, IPort<ItemStack> port, int button) {
-        if (!carried.isEmpty()) {
-            if (button == 1) {
-                var carried1 = StackHelper.copyWithCount(carried, 1);
-                carried.shrink(1);
-                var remaining = port.insert(carried1, false);
-                var combined = StackHelper.combineStack(carried, remaining);
-                if (combined.isEmpty()) {
-                    ItemHandlerHelper.giveItemToPlayer(player, remaining);
-                } else {
-                    setCarried(combined.get());
-                }
-            } else {
-                setCarried(port.insert(carried, false));
-            }
-        } else {
-            var count = Math.min(item.getCount(), item.getMaxStackSize());
-            var count1 = button == 1 ? (count + 1) / 2 : count;
-            var item1 = StackHelper.copyWithCount(item, count1);
-            var extracted = port.extract(item1, false);
-            setCarried(extracted);
-        }
-    }
-
-    private void onSlotClick(MEStorageInterfaceEventPacket packet) {
-        var button = packet.button();
-        var fluidPort = storageInterface.fluidPort();
-
-        if (packet.isItem() && packet.button() == QUICK_MOVE_BUTTON) {
-            quickMoveStack(packet.item());
-            return;
-        }
-
-        boolean success;
-        if (packet.isFluid()) {
-            var fluid = packet.fluid();
-            success = clickFluidSlot((carried, mayDrain, mayFill) ->
-                doClickFluidSlot(carried, fluidPort, fluid, mayDrain, mayFill), button);
-        } else if (button == 1) {
-            success = clickFluidSlot((carried, mayDrain, mayFill) ->
-                doClickEmptyFluidSlot(carried, fluidPort, mayFill), button);
-        } else {
-            success = false;
-        }
-        if (!success) {
-            var item = packet.isItem() ? packet.item() : ItemStack.EMPTY;
-            var itemPort = storageInterface.itemPort();
-            clickItemSlot(getCarried(), item, itemPort, button);
-        }
-    }
-
-    private void quickMoveStack(ItemStack stack) {
-        var inv = new PlayerMainInvWrapper(inventory);
-        var target = storageInterface.itemPort();
-        var extracted = target.extract(stack, true);
-        var remaining = ItemHandlerHelper.insertItemStacked(inv, extracted, true);
-        var inserted = extracted.getCount() - remaining.getCount();
-        if (inserted <= 0) {
-            return;
-        }
-        var extracted1 = StackHelper.copyWithCount(extracted, inserted);
-        var extracted2 = target.extract(extracted1, false);
-        var remaining1 = ItemHandlerHelper.insertItemStacked(inv, extracted2, false);
-        if (!remaining1.isEmpty()) {
-            LOGGER.warn("{}: Failed to quick move inventory, extracted {}/{}", blockEntity,
-                extracted2.getCount() - remaining1.getCount(), extracted2.getCount());
-        }
-    }
-
-    /**
-     * This only handles quick move clicking on vanilla slots, i.e. inventory.
-     * <p>
-     * Only deals with item for now.
-     */
-    @Override
-    protected boolean quickMoveStack(Slot slot) {
-        if (world.isClientSide) {
-            return false;
-        }
-        if (!slot.hasItem()) {
-            return false;
-        }
-        var inv = new PlayerMainInvWrapper(inventory);
-        assert slot.index >= beginInvSlot && slot.index < endInvSlot;
-
-        var index = slot.getContainerSlot();
-        var stack = inv.getStackInSlot(index);
-        var target = storageInterface.itemPort();
-        if (!target.acceptInput(stack)) {
-            return false;
-        }
-        var remaining = target.insert(stack, true);
-        var inserted = stack.getCount() - remaining.getCount();
-        if (inserted <= 0) {
-            return false;
-        }
-        var stack1 = inv.extractItem(index, inserted, false);
-        var remaining1 = target.insert(stack1, false);
-        if (!remaining1.isEmpty()) {
-            LOGGER.warn("{}: Failed to quick move inventory, inserted {}/{}", blockEntity,
-                stack1.getCount() - remaining1.getCount(), stack1.getCount());
-        }
-        return false;
+    public static InventoryMenu factory(Properties properties) {
+        return new MEStorageInterfaceMenu(properties);
     }
 }

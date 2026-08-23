@@ -3,8 +3,7 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.ElectricChestMenu;
-import org.shsts.tinactory.content.gui.ElectricTankMenu;
+import org.shsts.tinactory.content.gui.ElectricStorageMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
@@ -16,8 +15,7 @@ import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
 import org.shsts.tinactory.content.gui.client.BoilerScreen;
-import org.shsts.tinactory.content.gui.client.ElectricChestScreen;
-import org.shsts.tinactory.content.gui.client.ElectricTankScreen;
+import org.shsts.tinactory.content.gui.client.ElectricStorageScreen;
 import org.shsts.tinactory.content.gui.client.FusionScreen;
 import org.shsts.tinactory.content.gui.client.LogisticWorkerScreen;
 import org.shsts.tinactory.content.gui.client.MECraftTerminalScreen;
@@ -25,11 +23,11 @@ import org.shsts.tinactory.content.gui.client.MEDriveScreen;
 import org.shsts.tinactory.content.gui.client.MEPatternTerminalScreen;
 import org.shsts.tinactory.content.gui.client.MESignalControllerScreen;
 import org.shsts.tinactory.content.gui.client.MEStorageDetectorScreen;
-import org.shsts.tinactory.content.gui.client.MEStorageInterfaceScreen;
 import org.shsts.tinactory.content.gui.client.MachineScreen;
 import org.shsts.tinactory.content.gui.client.NuclearReactorScreen;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
+import org.shsts.tinactory.content.gui.client.StorageScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
@@ -41,10 +39,10 @@ import org.shsts.tinactory.content.gui.sync.MECraftRequestSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MESignalControllerSyncPacket;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceEventPacket;
-import org.shsts.tinactory.content.gui.sync.MEStorageInterfaceSyncPacket;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.gui.sync.RenameEventPacket;
+import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
+import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.content.gui.sync.WorkbenchTransferEventPacket;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
@@ -71,7 +69,7 @@ public final class AllMenus {
     public static final IPacketType<FluidSyncPacket> FLUID_STACK_SYNC;
     public static final IPacketType<ChestItemSyncPacket> CHEST_ITEM_SYNC;
     public static final IPacketType<LogisticWorkerSyncPacket> LOGISTIC_WORKER_SYNC;
-    public static final IPacketType<MEStorageInterfaceSyncPacket> ME_STORAGE_INTERFACE_SYNC;
+    public static final IPacketType<StorageSyncPacket> STORAGE_SYNC;
     public static final IPacketType<MESignalControllerSyncPacket> ME_SIGNAL_CONTROLLER_SYNC;
     public static final IPacketType<MECraftRequestSyncPacket> ME_CRAFT_REQUEST_SYNC;
     public static final IPacketType<MECraftCpuSyncPacket> ME_CRAFT_CPU_SYNC;
@@ -86,7 +84,7 @@ public final class AllMenus {
     public static final IPacketType<SlotEventPacket> PORT_CLICK;
     public static final IPacketType<ISetMachineConfigPacket> SET_MACHINE_CONFIG;
     public static final IPacketType<RenameEventPacket> RENAME;
-    public static final IPacketType<MEStorageInterfaceEventPacket> ME_STORAGE_INTERFACE_SLOT;
+    public static final IPacketType<StorageEventPacket> STORAGE_SLOT;
     public static final IPacketType<MECraftEventPacket> ME_CRAFT_ACTION;
     public static final IPacketType<MEPatternEventPacket> ME_PATTERN_ACTION;
     public static final IPacketType<WorkbenchTransferEventPacket> WORKBENCH_TRANSFER;
@@ -122,8 +120,7 @@ public final class AllMenus {
         FLUID_STACK_SYNC = REGISTRATE.menuSyncPacket("sync/fluid", FluidSyncPacket::new);
         CHEST_ITEM_SYNC = REGISTRATE.menuSyncPacket("sync/chest_item", ChestItemSyncPacket::new);
         LOGISTIC_WORKER_SYNC = REGISTRATE.menuSyncPacket("sync/logistic_worker", LogisticWorkerSyncPacket::new);
-        ME_STORAGE_INTERFACE_SYNC = REGISTRATE.menuSyncPacket("sync/me_storage_interface",
-            MEStorageInterfaceSyncPacket::new);
+        STORAGE_SYNC = REGISTRATE.menuSyncPacket("sync/storage", StorageSyncPacket::new);
         ME_SIGNAL_CONTROLLER_SYNC = REGISTRATE.menuSyncPacket("sync/me_signal_controller",
             MESignalControllerSyncPacket::new);
         ME_CRAFT_REQUEST_SYNC = REGISTRATE.menuSyncPacket("sync/me_craft_request", MECraftRequestSyncPacket::new);
@@ -136,8 +133,8 @@ public final class AllMenus {
         PORT_CLICK = REGISTRATE.menuEventPacket("event/port_click", SlotEventPacket::new);
         SET_MACHINE_CONFIG = REGISTRATE.menuEventPacket("event/set_machine_config", SetMachineConfigPacket::new);
         RENAME = REGISTRATE.menuEventPacket("event/rename", RenameEventPacket::new);
-        ME_STORAGE_INTERFACE_SLOT = REGISTRATE.menuEventPacket("event/me_storage_interface_slot",
-            MEStorageInterfaceEventPacket::new);
+        STORAGE_SLOT = REGISTRATE.menuEventPacket("event/me_storage_interface_slot",
+            StorageEventPacket::new);
         ME_CRAFT_ACTION = REGISTRATE.menuEventPacket("event/me_craft_action", MECraftEventPacket::new);
         ME_PATTERN_ACTION = REGISTRATE.menuEventPacket("event/me_pattern_action", MEPatternEventPacket::new);
         WORKBENCH_TRANSFER = REGISTRATE.menuEventPacket("event/workbench_transfer",
@@ -157,12 +154,12 @@ public final class AllMenus {
             .screen(() -> () -> WorkbenchScreen::new)
             .register();
 
-        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricChestMenu::new)
-            .screen(() -> () -> ElectricChestScreen::new)
+        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricStorageMenu::chest)
+            .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
-        ELECTRIC_TANK = processing("machine/electric_tank", ElectricTankMenu::new)
-            .screen(() -> () -> ElectricTankScreen::new)
+        ELECTRIC_TANK = processing("machine/electric_tank", ElectricStorageMenu::tank)
+            .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
         TECH_MENU = REGISTRATE.menu("network/controller", TechMenu::new)
@@ -178,8 +175,8 @@ public final class AllMenus {
             .screen(() -> () -> MEDriveScreen::new)
             .register();
 
-        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::new)
-            .screen(() -> () -> MEStorageInterfaceScreen::new)
+        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::factory)
+            .screen(() -> () -> StorageScreen::new)
             .register();
 
         ME_SIGNAL_CONTROLLER = processing("logistics/me_signal_controller", MESignalControllerMenu::new)

@@ -100,7 +100,7 @@ public final class ClientUtil {
     }
 
     public static List<Component> tagTooltip(TagKey<Item> tag) {
-        return List.of(I18n.tr("tinactory.tooltip.tag", tag.location()));
+        return List.of(I18n.tr("tinactory.tooltip.tag", tag.location().toString()));
     }
 
     public static Optional<ItemStack> selectItemFromItems(List<ItemStack> items) {

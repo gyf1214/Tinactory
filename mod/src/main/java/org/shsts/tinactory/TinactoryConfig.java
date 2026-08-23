@@ -51,7 +51,7 @@ public final class TinactoryConfig {
         bytesPerFluidType = builder.worldRestart().comment("Bytes used per fluid type by digital storage")
             .defineInRange("bytes_per_fluid_type", 4096, 1, Integer.MAX_VALUE);
         bytesPerPattern = builder.worldRestart().comment("Bytes used per pattern by pattern storage")
-            .defineInRange("bytes_per_pattern", 32768L, 1L, Long.MAX_VALUE);
+            .defineInRange("bytes_per_pattern", 262144L, 1L, Long.MAX_VALUE);
         bytesPerCraftStep = builder.worldRestart().comment("Bytes used per autocraft step")
             .defineInRange("bytes_per_craft_step", 8192L, 0L, Long.MAX_VALUE);
 

@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.fixture;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
@@ -53,6 +54,11 @@ public record TestStackKey(PortType type, String id, String nbt) implements ISta
     @Override
     public IStackAdapter<?> adapter() {
         return TestStack.ADAPTER;
+    }
+
+    @Override
+    public ResourceLocation loc() {
+        return ResourceLocation.parse(id);
     }
 
     @Override

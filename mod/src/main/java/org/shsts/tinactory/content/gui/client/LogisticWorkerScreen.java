@@ -9,8 +9,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,6 +28,7 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
@@ -72,6 +73,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private final HolderLookup.Provider provider;
     private final int workerSlots;
     private final IMachineConfig machineConfig;
+    private final LogisticWorker worker;
     private final Map<LogisticComponent.PortKey, LogisticWorkerSyncPacket.PortInfo> ports =
         new HashMap<>();
     private final ListMultimap<UUID, LogisticWorkerSyncPacket.PortInfo> machinePorts =
@@ -79,6 +81,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
     private int selectedConfig = -1;
     private boolean selectedFrom;
+    private final Runnable onConfigUpdate = this::refreshConfig;
 
     private class ConfigPanel extends ButtonPanel {
         private static final Texture BACKGROUND = new Texture(
@@ -102,7 +105,33 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected int getItemCount() {
-            return workerSlots;
+            var highestSlot = -1;
+            for (var slot = 0; slot < workerSlots; slot++) {
+                if (machineConfig.contains(PREFIX + slot, Tag.TAG_COMPOUND)) {
+                    highestSlot = slot;
+                }
+            }
+            return Math.min(highestSlot + 2, workerSlots);
+        }
+
+        private void deleteConfig(int index) {
+            var itemCount = getItemCount();
+            if (index == itemCount - 1 && !machineConfig.contains(PREFIX + index, Tag.TAG_COMPOUND)) {
+                return;
+            }
+
+            if (selectedConfig == index) {
+                selectedConfig = -1;
+            }
+            var packet = SetMachineConfigPacket.builder();
+            for (var slot = index + 1; slot < itemCount; slot++) {
+                var source = PREFIX + slot;
+                var destination = PREFIX + (slot - 1);
+                machineConfig.getCompound(source).ifPresentOrElse(
+                    tag -> packet.set(destination, tag), () -> packet.reset(destination));
+            }
+            packet.reset(PREFIX + (itemCount - 1));
+            menu.triggerEvent(SET_MACHINE_CONFIG, packet);
         }
 
         private Optional<ItemStack> getIcon(LogisticComponent.PortKey key) {
@@ -193,10 +222,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 if (button == 0) {
                     config.setValid(!config.isValid());
                 } else {
-                    config.setValid(false);
-                    config.resetFrom();
-                    config.resetTo();
-                    config.clearFilter();
+                    deleteConfig(index);
+                    return;
                 }
                 needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
@@ -207,8 +234,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                         var filterType = config.filterType();
                         if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
                             var tagList = config.itemFilter().getItemHolder().tags()
-                                .sorted(Comparator.comparing(TagKey::location,
-                                    ResourceLocation::compareNamespaced))
+                                .sorted(Comparator.comparing(TagKey::location, LocHelper.LOC_DISPLAY_ORDER))
                                 .toList();
                             if (!tagList.isEmpty()) {
                                 tagSelectList = tagList;
@@ -343,6 +369,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         }
     }
 
+    private final ConfigPanel configPanel;
     private final MachineSelectPanel<Void> machinePanel;
     private final PortSelectPanel portPanel;
 
@@ -358,9 +385,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         var blockEntity = menu.blockEntity();
         this.provider = menu.world().registryAccess();
         this.machineConfig = menu.machine.config();
-        this.workerSlots = LogisticWorker.get(blockEntity).workerSlots;
+        this.worker = LogisticWorker.get(blockEntity);
+        this.workerSlots = worker.workerSlots;
 
-        var configPanel = new ConfigPanel();
+        this.configPanel = new ConfigPanel();
         this.machinePanel = new MachineSelectPanel<>(this) {
             @Override
             public void select(UUID machine) {
@@ -387,6 +415,21 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         rootPanel.addChild(anchor3, offset3, portPanel);
 
         menu.onSyncPacket(SLOT_SYNC, this::refreshVisiblePorts);
+        worker.onConfigUpdate(onConfigUpdate);
+    }
+
+    @Override
+    public void removed() {
+        worker.unregisterConfigUpdateCallback(onConfigUpdate);
+        super.removed();
+    }
+
+    private void refreshConfig() {
+        configPanel.refresh();
+        if (selectedConfig >= configPanel.getItemCount()) {
+            selectedConfig = -1;
+        }
+        portPanel.refresh();
     }
 
     private void refreshVisiblePorts(LogisticWorkerSyncPacket p) {
