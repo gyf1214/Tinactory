@@ -165,7 +165,7 @@ public class ProcessingCategory<R extends ProcessingRecipe> extends RecipeCatego
         var x = ClientUtil.getFont().width(tr("requiredTech")) + SPACING - layout.getXOffset();
         var y = layout.rect.endY() + SLOT_SIZE / 2;
         for (var tech : techs) {
-            addTechIngredient(builder, RecipeIngredientRole.OUTPUT, x, y, tech);
+            addTechIngredient(builder, RecipeIngredientRole.INPUT, x, y, tech);
             x += TECH_SIZE;
         }
     }
