@@ -1,4 +1,5 @@
 import org.gradle.jvm.tasks.Jar
+import org.slf4j.event.Level
 
 plugins {
     checkstyle
@@ -50,8 +51,7 @@ neoForge {
 
     runs {
         configureEach {
-            systemProperty("forge.logging.markers", "REGISTRIES")
-            systemProperty("forge.logging.console.level", "debug")
+            logLevel = Level.DEBUG
             jvmArgument("-ea")
             disableIdeRun()
         }
