@@ -96,6 +96,10 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         return type;
     }
 
+    public IRecipeType<R> recipeType() {
+        return recipeType;
+    }
+
     public ResourceLocation recipeTypeId() {
         return recipeType.loc();
     }

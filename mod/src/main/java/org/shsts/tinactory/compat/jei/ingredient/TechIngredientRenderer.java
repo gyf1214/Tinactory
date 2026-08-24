@@ -18,10 +18,10 @@ import static org.shsts.tinactory.core.gui.Menu.TECH_SIZE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TechIngredientRenderer implements IIngredientRenderer<TechIngredient> {
-    private static final Rect RECT = new Rect(0, 0, TECH_SIZE, TECH_SIZE);
+public enum TechIngredientRenderer implements IIngredientRenderer<TechIngredient> {
+    INSTANCE;
 
-    private TechIngredientRenderer() {}
+    private static final Rect RECT = new Rect(0, 0, TECH_SIZE, TECH_SIZE);
 
     @Override
     public void render(GuiGraphics graphics, TechIngredient ingredient) {
@@ -47,6 +47,4 @@ public class TechIngredientRenderer implements IIngredientRenderer<TechIngredien
     public int getHeight() {
         return TECH_SIZE;
     }
-
-    public static final TechIngredientRenderer INSTANCE = new TechIngredientRenderer();
 }

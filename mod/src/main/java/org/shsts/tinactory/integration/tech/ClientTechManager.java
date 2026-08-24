@@ -13,7 +13,9 @@ import org.shsts.tinactory.core.tech.TechUpdatePacket;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -28,21 +30,34 @@ public class ClientTechManager extends TechManager implements IClientTechManager
 
     @Nullable
     private ClientTeamProfile localTeam = null;
-
-    @Nullable
-    private ClientTeamProfile getLocalTeam() {
-        return localTeam;
-    }
+    private boolean techInitialized = false;
+    private final Set<Runnable> initCallbacks = new HashSet<>();
 
     @Override
     public Optional<ITeamProfile> localTeamProfile() {
-        return Optional.ofNullable(getLocalTeam());
+        return Optional.ofNullable(localTeam);
+    }
+
+    @Override
+    public boolean techInitialized() {
+        return techInitialized;
+    }
+
+    @Override
+    public void onTechInit(Runnable callback) {
+        initCallbacks.add(callback);
+    }
+
+    @Override
+    public void removeTechInitListener(Runnable callback) {
+        initCallbacks.remove(callback);
     }
 
     @Override
     public void unload() {
         super.unload();
         localTeam = null;
+        techInitialized = false;
     }
 
     public void handleTechInit(TechInitPacket packet) {
@@ -53,7 +68,11 @@ public class ClientTechManager extends TechManager implements IClientTechManager
         for (var entry : packet.entries()) {
             entry.technology().resolve(this);
         }
+        techInitialized = true;
         LOGGER.debug("reload {} techs", technologies.size());
+        for (var cb : initCallbacks) {
+            cb.run();
+        }
     }
 
     public void handleTechUpdate(TechUpdatePacket packet) {
@@ -67,7 +86,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
             LOGGER.warn("ignore tech update without a profile ID");
             return;
         }
-        var team = getLocalTeam();
+        var team = localTeam;
         if (packet.getUpdateType() == TechUpdatePacket.UpdateType.FULL) {
             team = new ClientTeamProfile(this, profileId);
             localTeam = team;

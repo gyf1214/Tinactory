@@ -6,6 +6,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.registration.IAdvancedRegistration;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -41,6 +42,8 @@ import org.shsts.tinactory.compat.jei.ingredient.BatterySubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
+import org.shsts.tinactory.compat.jei.ingredient.TechIngredientIndex;
+import org.shsts.tinactory.compat.jei.ingredient.TechIngredientPlugin;
 import org.shsts.tinactory.content.gui.client.ProcessingScreen;
 import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
@@ -73,8 +76,6 @@ public class JEI implements IModPlugin {
 
     @Nullable
     private ToolCategory toolCategory = null;
-    @Nullable
-    private MultiblockCategory multiblockCategory = null;
     private final List<RecipeCategory<?>> categories;
 
     public JEI() {
@@ -135,7 +136,7 @@ public class JEI implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         categories.clear();
         toolCategory = new ToolCategory();
-        multiblockCategory = new MultiblockCategory(registration.getJeiHelpers().getGuiHelper());
+        var multiblock = new MultiblockCategory(registration.getJeiHelpers().getGuiHelper());
         categories.add(toolCategory);
         for (var type : PROCESSING_TYPES.values()) {
             addProcessingCategory(type.recipeType(), type.layout(), type.icon().get());
@@ -143,7 +144,7 @@ public class JEI implements IModPlugin {
         for (var category : categories) {
             category.registerCategory(registration);
         }
-        registration.addRecipeCategories(multiblockCategory);
+        registration.addRecipeCategories(multiblock);
     }
 
     @Override
@@ -198,5 +199,17 @@ public class JEI implements IModPlugin {
             category.jeiRecipeType(),
             recipe -> MEPatternTransferHandler.fromProcessing(recipe, category.recipeTypeId()),
             registration.getTransferHelper()), category.jeiRecipeType());
+    }
+
+    @Override
+    public void registerAdvanced(IAdvancedRegistration registration) {
+        for (var category : categories) {
+            if (category instanceof ResearchCategory researchCategory) {
+                // at this point, recipe manager is already initialized
+                var index = TechIngredientIndex.getInstance(true);
+                registration.addTypedRecipeManagerPlugin(researchCategory.jeiRecipeType(),
+                    new TechIngredientPlugin(index, category.recipeType()));
+            }
+        }
     }
 }
