@@ -89,17 +89,14 @@ public final class AllForgeEvents {
     @SubscribeEvent
     public static void onUnloadWorld(LevelEvent.Unload event) {
         var world = (Level) event.getLevel();
-        if (!world.isClientSide) {
-            WorldNetworkManagers.onUnload(world);
-            WorldMultiblockManagers.onUnload(world);
+        if (world.isClientSide) {
+            return;
         }
+        WorldNetworkManagers.onUnload(world);
+        WorldMultiblockManagers.onUnload(world);
         if (world.dimension() == Level.OVERWORLD) {
-            if (!world.isClientSide) {
-                TechManagers.unloadSavedData();
-                TechManagers.server().unload();
-            } else {
-                TechManagers.client().unload();
-            }
+            TechManagers.unloadSavedData();
+            TechManagers.server().unload();
         }
     }
 

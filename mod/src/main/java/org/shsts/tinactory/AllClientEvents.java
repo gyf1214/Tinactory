@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
@@ -18,6 +19,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.sync.OpenTechPacket;
 import org.shsts.tinactory.content.tool.WrenchOutlineRenderer;
+import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinactory.integration.tool.IWrenchable;
 import org.shsts.tinactory.integration.tool.UsableToolItem;
 
@@ -56,6 +58,11 @@ public final class AllClientEvents {
         if (OPEN_TECH.consumeClick()) {
             CORE.sendToServer(AllMenus.OPEN_TECH, OpenTechPacket.INSTANCE);
         }
+    }
+
+    @SubscribeEvent
+    public static void onClientLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        TechManagers.client().unload();
     }
 
     public static KeyMapping OPEN_TECH;
