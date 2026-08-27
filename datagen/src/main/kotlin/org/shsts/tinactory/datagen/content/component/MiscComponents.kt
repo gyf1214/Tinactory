@@ -192,7 +192,7 @@ object MiscComponents {
 
         vanilla {
             shapeless(getMaterial("iron").tag("wire"),
-                cable, fromAmount = 4, criteria = "has_wire")
+                cable, fromAmount = 2, criteria = "has_wire")
         }
 
         toolCrafting {
@@ -226,7 +226,7 @@ object MiscComponents {
                 component("cable")
             }
             component("cable") {
-                input("iron", "wire", 4)
+                input("iron", "wire", 2)
             }
             component("fluid_cell") {
                 input("iron", "plate", 4)

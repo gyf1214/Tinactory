@@ -25,9 +25,8 @@ object MachineComponents {
 
         toolCrafting {
             result(items.item(Voltage.LV)) {
-                pattern("WWR")
-                pattern("WWR")
-                pattern("RR ")
+                pattern("WW")
+                pattern("RR")
                 define('W', "tin", "wire")
                 define('R', "rubber", "sheet")
                 toolTag(TOOL_WIRE_CUTTER)
@@ -45,11 +44,11 @@ object MachineComponents {
                 }
                 val cable = entry.get() as CableBlock
                 output(cable) {
-                    input(cable.cableMaterial, "wire", 4)
+                    input(cable.cableMaterial, "wire", 2)
                     if (v.rank >= Voltage.EV.rank) {
                         input("silicone_rubber", "foil", 2)
                     }
-                    input("rubber", amount = 2)
+                    input("rubber")
                     voltage(Voltage.fromRank(v.rank - 1))
                 }
             }
