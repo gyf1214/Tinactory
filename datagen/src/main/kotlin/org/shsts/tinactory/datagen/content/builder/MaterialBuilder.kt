@@ -892,11 +892,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     workTicks((variant.destroyTime * 120).toLong())
                 }
                 if (material.hasItem("gem_flawless") || siftAndHammer || siftPrimary) {
-                    output(material, "primary") {
+                    output(material, "primary", amount) {
                         input(material, "raw")
                     }
                 } else {
-                    output(material, "crushed") {
+                    output(material, "crushed", amount) {
                         input(material, "raw")
                     }
                 }
@@ -910,11 +910,11 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
             oreProcessingUnit {
                 input(material, "raw") {
-                    input("water", amount = 2)
-                    output(material, "dust", 2)
-                    output(material.oreVariant().material, "dust", 2)
+                    input("water", amount = 2 * amount)
+                    output(material, "dust", 2 * amount)
+                    output(material.oreVariant().material, "dust", 2 * amount)
                     for (i in 0..2) {
-                        output(byProduct(i), "dust", 2, rate = 0.3)
+                        output(byProduct(i), "dust", 2 * amount, rate = 0.3)
                     }
                     voltage(Voltage.HV)
                     workTicks((variant.destroyTime * 60).toLong())
