@@ -51,6 +51,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionComp
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.mixer
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreProcessingUnit
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.oreWasher
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.polarizer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.sifter
@@ -904,6 +905,19 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 }
                 output(material, "dust_impure") {
                     input(material, "crushed")
+                }
+            }
+
+            oreProcessingUnit {
+                input(material, "raw") {
+                    input("water", amount = 2)
+                    output(material, "dust", 2)
+                    output(material.oreVariant().material, "dust", 2)
+                    for (i in 0..2) {
+                        output(byProduct(i), "dust", 2, rate = 0.3)
+                    }
+                    voltage(Voltage.HV)
+                    workTicks((variant.destroyTime * 60).toLong())
                 }
             }
 

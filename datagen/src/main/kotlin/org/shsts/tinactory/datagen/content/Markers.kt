@@ -42,6 +42,7 @@ object Markers {
             baseMarker("polarizer")
             baseMarker("thermal_centrifuge")
             baseMarker("wiremill")
+            baseMarker("ore_processing_unit")
 
             wash("crushed", "crushed_purified") {
                 output(AllTags.ORE_BASE_DUST, port = 2)

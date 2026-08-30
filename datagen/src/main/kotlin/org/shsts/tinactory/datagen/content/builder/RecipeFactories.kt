@@ -404,6 +404,15 @@ object RecipeFactories {
         }.block()
     }
 
+    fun oreProcessingUnit(block: ProcessingRecipeFactory.() -> Unit) {
+        processing("ore_processing_unit") {
+            defaultInputItem = 0
+            defaultInputFluid = 1
+            defaultOutputItem = 2
+            amperage = 1.5
+        }.block()
+    }
+
     fun marker(block: MarkerFactory.() -> Unit) {
         MarkerFactory().block()
     }

@@ -3,7 +3,8 @@
   "recipes": {
     "tinactory:macerator": {},
     "tinactory:ore_washer": {},
-    "tinactory:thermal_centrifuge": {}
+    "tinactory:thermal_centrifuge": {},
+    "default": {}
   },
   "autoRecipe": false,
   "layout": {
@@ -12,37 +13,55 @@
         "port": 0,
         "type": "item_input",
         "x": 0,
-        "y": 10
+        "y": 9
       },
       {
         "port": 1,
         "type": "fluid_input",
         "x": 18,
-        "y": 10
+        "y": 9
       },
       {
         "port": 2,
         "type": "item_output",
         "x": 72,
-        "y": 10
+        "y": 0
       },
       {
         "port": 2,
         "type": "item_output",
         "x": 90,
-        "y": 10
+        "y": 0
       },
       {
         "port": 2,
         "type": "item_output",
         "x": 108,
-        "y": 10
+        "y": 0
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 72,
+        "y": 18
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 90,
+        "y": 18
+      },
+      {
+        "port": 2,
+        "type": "item_output",
+        "x": 108,
+        "y": 18
       }
     ],
     "progressBar": {
       "texture": "gregtech:gui/progress_bar/progress_bar_macerate",
       "x": 44,
-      "y": 9,
+      "y": 8,
       "width": 20,
       "height": 20
     }
