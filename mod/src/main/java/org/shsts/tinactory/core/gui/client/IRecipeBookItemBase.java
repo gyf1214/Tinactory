@@ -14,6 +14,10 @@ import java.util.stream.Stream;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IRecipeBookItemBase extends IRecipeBookItem {
+    static boolean matchText(String text, String query) {
+        return text.contains(query.toLowerCase(Locale.ROOT));
+    }
+
     @Override
     default boolean matchSearch(String query) {
         if (query.isEmpty()) {
@@ -23,6 +27,6 @@ public interface IRecipeBookItemBase extends IRecipeBookItem {
             .map(I18n::flattenComponent)
             .filter($ -> !$.isEmpty());
         return Stream.concat(Stream.of(loc().toString().toLowerCase(Locale.ROOT)), tooltips)
-            .anyMatch($ -> $.contains(query.toLowerCase(Locale.ROOT)));
+            .anyMatch($ -> matchText($, query));
     }
 }

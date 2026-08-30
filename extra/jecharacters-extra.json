@@ -1,0 +1,8 @@
+{
+  "contains": {
+    "additional": [
+      "org.shsts.tinactory.content.gui.client.MachineSelectPanel$MachineInfo:matchSearch(Ljava/lang/String;)Z",
+      "org.shsts.tinactory.core.gui.client.IRecipeBookItemBase:matchText(Ljava/lang/String;Ljava/lang/String;)Z"
+    ]
+  }
+}
