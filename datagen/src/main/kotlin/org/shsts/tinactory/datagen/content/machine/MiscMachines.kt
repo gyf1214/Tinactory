@@ -173,8 +173,12 @@ object MiscMachines {
             output(item) {
                 input(ulvHull)
                 input(ulvCircuit, 2)
-                input(ulvCable, 2)
-                input(base, 2)
+                if (base != ulvCable) {
+                    input(ulvCable, 2)
+                    input(base, 2)
+                } else {
+                    input(ulvCable, 4)
+                }
                 voltage(Voltage.ULV)
                 workTicks(MACHINE_TICKS)
                 tech(Technologies.SOLDERING)

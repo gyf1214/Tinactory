@@ -35,7 +35,7 @@ public final class ElectricStorageScreen extends StorageScreen<ElectricStorageMe
             LOCK_BUTTON, 18, 0, "chestLock", "chestUnlock"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
-            VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
+            VOID_BUTTON, 18, 0, "noAutoVoid", "autoVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
         rootPanel.addChild(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
     }

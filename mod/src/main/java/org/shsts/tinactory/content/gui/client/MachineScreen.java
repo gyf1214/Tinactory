@@ -51,7 +51,7 @@ public class MachineScreen extends ProcessingScreen {
         var config = machine.config();
         var offset = new Rect(-SLOT_SIZE * 2 - SPACING, buttonY, SLOT_SIZE, SLOT_SIZE);
         rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
-            VOID_DEFAULT, VOID_BUTTON, 18, 0, "autoVoid", "noAutoVoid"));
+            VOID_DEFAULT, VOID_BUTTON, 18, 0, "noAutoVoid", "autoVoid"));
 
         if (recipeBook != null) {
             rootPanel.addChild(RectD.FULL, Rect.ZERO, MACHINE_BOOK_Z, recipeBook);
