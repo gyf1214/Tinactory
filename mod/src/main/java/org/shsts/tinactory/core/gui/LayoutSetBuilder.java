@@ -27,7 +27,7 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     private int curPort = -1;
     private int curSlot = 0;
     @Nullable
-    private Layout.WidgetInfo progressBar = null;
+    private Layout.ProgressBarInfo progressBar = null;
 
     public LayoutSetBuilder(P parent) {
         super(parent);
@@ -100,13 +100,8 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return image(new Rect(x, y, tex.width(), tex.height()), tex);
     }
 
-    public LayoutSetBuilder<P> progressBar(Rect rect, Texture tex) {
-        progressBar = new Layout.WidgetInfo(rect, tex);
-        return this;
-    }
-
-    public LayoutSetBuilder<P> progressBar(Texture tex, int x, int y) {
-        progressBar = new Layout.WidgetInfo(new Rect(x, y, tex.width(), tex.height() / 2), tex);
+    public LayoutSetBuilder<P> progressBar(Rect rect, Texture tex, ProgressDirection dir) {
+        progressBar = new Layout.ProgressBarInfo(rect, tex, dir);
         return this;
     }
 

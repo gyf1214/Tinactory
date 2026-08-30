@@ -27,6 +27,9 @@
     },
     "reinforced_alloy": {
       "mapColor": 41
+    },
+    "cast_iron": {
+      "mapColor": 6
     }
   }
 }

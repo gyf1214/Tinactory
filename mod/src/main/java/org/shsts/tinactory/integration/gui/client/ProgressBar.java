@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.gui.ProgressDirection;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SyncPackets;
@@ -20,11 +21,7 @@ public class ProgressBar extends MenuWidget {
     private final Texture texture2;
     private final String syncName;
 
-    public enum Direction {
-        HORIZONTAL, VERTICAL
-    }
-
-    public Direction direction = Direction.HORIZONTAL;
+    public ProgressDirection direction = ProgressDirection.HORIZONTAL;
 
     public ProgressBar(MenuBase menu, Texture texture, Texture texture2, String syncName) {
         super(menu);
@@ -44,7 +41,7 @@ public class ProgressBar extends MenuWidget {
         var rect = rect();
         var h = rect.height();
 
-        if (direction == Direction.HORIZONTAL) {
+        if (direction == ProgressDirection.HORIZONTAL) {
             var w1 = (int) (progress * (double) rect.width());
             var uh = texture == texture2 ? h : 0;
             RenderUtil.blit(graphics, texture, rect);

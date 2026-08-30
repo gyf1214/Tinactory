@@ -396,6 +396,14 @@ object RecipeFactories {
         }.block()
     }
 
+    fun forgeHammer(block: ProcessingRecipeFactory.() -> Unit) {
+        processing("forge_hammer") {
+            defaultInputItem = 0
+            defaultOutputItem = 1
+            amperage = 0.375
+        }.block()
+    }
+
     fun marker(block: MarkerFactory.() -> Unit) {
         MarkerFactory().block()
     }

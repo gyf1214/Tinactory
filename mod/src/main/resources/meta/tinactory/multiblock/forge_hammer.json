@@ -1,0 +1,66 @@
+{
+  "sound": "tinactory:tick.forge_hammer",
+  "layout": {
+    "slots": [
+      {
+        "port": 0,
+        "type": "item_input",
+        "x": 0,
+        "y": 10
+      },
+      {
+        "port": 1,
+        "type": "item_output",
+        "x": 54,
+        "y": 10
+      }
+    ],
+    "images": [
+      {
+        "texture": "gregtech:gui/progress_bar/progress_bar_hammer_base",
+        "x": 26,
+        "y": 29,
+        "width": 20,
+        "height": 6
+      }
+    ],
+    "progressBar": {
+      "texture": "gregtech:gui/progress_bar/progress_bar_hammer",
+      "x": 26,
+      "y": 9,
+      "width": 20,
+      "height": 20,
+      "direction": "vertical"
+    }
+  },
+  "appearance": "tinactory:multiblock/solid/heatproof",
+  "layers": [
+    [
+      "BBB",
+      "BCB",
+      "B$B"
+    ],
+    [
+      "P P",
+      "HHH",
+      "P P"
+    ],
+    [
+      "P P",
+      "HHH",
+      "P P"
+    ]
+  ],
+  "defines": {
+    "B": {
+      "type": "block_or_interface",
+      "block": "tinactory:multiblock/solid/heatproof"
+    },
+    "P": "tinactory:multiblock/solid/heatproof",
+    "C": {
+      "type": "tag",
+      "tag": "tinactory:multiblock/coil"
+    },
+    "H": "tinactory:multiblock/solid/cast_iron"
+  }
+}

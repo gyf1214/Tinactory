@@ -92,6 +92,11 @@ object Multiblocks {
                 }
             }
 
+            block("multiblock/solid/cast_iron") {
+                blockState { ctx -> solidBlock(ctx, gregtech("block/casings/voltage/ulv/side")) }
+                noDrop()
+            }
+
             block("multiblock/solid/insulated_battery") {
                 blockState { ctx -> solidBlock(ctx, ic2("block/wiring/storage/mfe_bottomtop")) }
                 noDrop()
@@ -316,7 +321,8 @@ object Multiblocks {
     private fun componentRecipes() {
         assembler {
             solid("heatproof", Voltage.ULV, "invar", Technologies.STEEL)
-            solid("solid_steel", Voltage.LV, "steel", Technologies.STEEL)
+            solid("cast_iron", Voltage.ULV, "wrought_iron", Technologies.SOLDERING)
+            solid("solid_steel", Voltage.LV, "steel", Technologies.SOLDERING)
             solid("frost_proof", Voltage.LV, "aluminium", Technologies.VACUUM_FREEZER)
             solid("clean_stainless_steel", Voltage.MV, "stainless_steel", Technologies.DISTILLATION)
             solid("stable_titanium", Voltage.HV, "titanium", Technologies.ADVANCED_CHEMISTRY)
@@ -841,6 +847,7 @@ object Multiblocks {
             multiblock("assembly_line", "solid_steel", "blast_furnace")
             multiblock("fusion_reactor", gregtech("block/casings/fusion/machine_casing_fusion"),
                 gregtech("block/multiblock/fusion_reactor"))
+            multiblock("forge_hammer", "heatproof", "blast_furnace")
         }
     }
 
@@ -881,6 +888,13 @@ object Multiblocks {
                 circuit(3)
                 component("cable", 2)
                 tech(Technologies.STEEL)
+            }
+            multiblock("forge_hammer") {
+                solid("cast_iron")
+                circuit(3)
+                component("cable", 2)
+                input("iron", "plate", 16)
+                tech(Technologies.SOLDERING)
             }
         }
 

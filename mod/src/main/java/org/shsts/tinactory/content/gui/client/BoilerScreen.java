@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.shsts.tinactory.core.gui.ProgressDirection;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.gui.client.ProgressBar;
@@ -23,11 +24,11 @@ public class BoilerScreen extends MachineScreen {
     public BoilerScreen(ProcessingMenu menu, Component title) {
         super(menu, title, false);
         var burnBar = new ProgressBar(menu, PROGRESS_BURN, BURN_SYNC);
-        burnBar.direction = ProgressBar.Direction.VERTICAL;
+        burnBar.direction = ProgressDirection.VERTICAL;
         layoutPanel.addChild(new Rect(1, 1 + SLOT_SIZE, 16, 16), burnBar);
 
         var heatBar = new ProgressBar(menu, HEAT_EMPTY, HEAT_FULL, HEAT_SYNC);
-        heatBar.direction = ProgressBar.Direction.VERTICAL;
+        heatBar.direction = ProgressDirection.VERTICAL;
         var rect = new Rect(SLOT_SIZE * 2, 1, HEAT_EMPTY.width(), HEAT_EMPTY.height());
         layoutPanel.addChild(rect, heatBar);
     }

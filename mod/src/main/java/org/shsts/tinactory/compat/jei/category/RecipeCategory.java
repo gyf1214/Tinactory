@@ -128,13 +128,14 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
 
             if (layout.progressBar != null) {
                 var texture = layout.progressBar.texture();
+                var dir = layout.progressBar.direction();
                 this.progressBarRect = layout.progressBar.rect().offset(xOffset, 0);
                 this.cachedProgressBar = CacheBuilder.newBuilder()
                     .maximumSize(25)
                     .build(new CacheLoader<>() {
                         @Override
                         public IDrawable load(Integer key) {
-                            return DrawableHelper.createProgressBar(guiHelper, texture, key);
+                            return DrawableHelper.createProgressBar(guiHelper, texture, key, dir);
                         }
                     });
             } else {

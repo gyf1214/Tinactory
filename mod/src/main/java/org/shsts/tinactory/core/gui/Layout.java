@@ -33,17 +33,19 @@ public class Layout {
         }
     }
 
+    public record ProgressBarInfo(Rect rect, Texture texture, ProgressDirection direction) {}
+
     public record PortInfo(int slots, SlotType type) {}
 
     public final List<SlotInfo> slots;
     public final List<WidgetInfo> images;
     @Nullable
-    public final WidgetInfo progressBar;
+    public final ProgressBarInfo progressBar;
     public final Rect rect;
     public final List<PortInfo> ports = new ArrayList<>();
     public final List<List<SlotInfo>> portSlots = new ArrayList<>();
 
-    public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable WidgetInfo progressBar) {
+    public Layout(List<SlotInfo> slots, List<WidgetInfo> images, @Nullable ProgressBarInfo progressBar) {
         this.slots = slots;
         for (var slot : slots) {
             while (slot.port >= portSlots.size()) {

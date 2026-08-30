@@ -3,6 +3,7 @@ package org.shsts.tinactory.unit.gui;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.core.gui.Layout;
+import org.shsts.tinactory.core.gui.ProgressDirection;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.recipe.MarkerRecipe;
@@ -33,7 +34,7 @@ class LayoutTest {
             .slot(90, 20)
             .slot(108, 20)
             .image(new Rect(120, 4, 20, 10), imageTexture)
-            .progressBar(new Rect(140, 50, 8, 40), progressTexture)
+            .progressBar(new Rect(140, 50, 8, 40), progressTexture, ProgressDirection.HORIZONTAL)
             .buildLayout();
 
         assertEquals(new Rect(0, 0, 148, 90), layout.rect);
@@ -50,6 +51,9 @@ class LayoutTest {
         assertEquals(List.of(
             new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT),
             new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT)), layout.portSlots.get(2));
+        assertEquals(
+            new Layout.ProgressBarInfo(new Rect(140, 50, 8, 40), progressTexture, ProgressDirection.HORIZONTAL),
+            layout.progressBar);
 
         var recipe = new ProcessingRecipe(
             List.of(input(0, "ore", 1), input(0, "dust", 2), input(1, "catalyst", 1)),

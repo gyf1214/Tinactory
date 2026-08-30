@@ -39,6 +39,7 @@ import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.LayoutSetBuilder;
+import org.shsts.tinactory.core.gui.ProgressDirection;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
@@ -65,6 +66,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -154,7 +156,9 @@ public class MachineMeta extends MetaConsumer {
 
         if (jo.has("progressBar")) {
             var jo4 = GsonHelper.getAsJsonObject(jo, "progressBar");
-            parseImage(jo4, 2, builder::progressBar);
+            var dir = GsonHelper.getAsString(jo4, "direction", "horizontal");
+            var dir1 = ProgressDirection.valueOf(dir.toUpperCase(Locale.ROOT));
+            parseImage(jo4, 2, (rect, texture) -> builder.progressBar(rect, texture, dir1));
         }
 
         return builder;

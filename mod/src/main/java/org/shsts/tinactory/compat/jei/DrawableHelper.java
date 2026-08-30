@@ -6,6 +6,7 @@ import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.helpers.IGuiHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import org.shsts.tinactory.core.gui.ProgressDirection;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.Texture;
 
@@ -26,14 +27,19 @@ public final class DrawableHelper {
         return createStatic(helper, texture, new Rect(0, 0, texture.width(), texture.height()));
     }
 
-    public static IDrawable createProgressBar(IGuiHelper helper, Texture texture, int cycle) {
+    public static IDrawable createProgressBar(IGuiHelper helper, Texture texture, int cycle,
+        ProgressDirection dir) {
         var h = texture.height() / 2;
         var rect = new Rect(0, 0, texture.width(), h);
         var uncompleted = createStatic(helper, texture, rect);
         var completed = createStatic(helper, texture, rect.offset(0, h));
+        var dir1 = switch (dir) {
+            case HORIZONTAL -> IDrawableAnimated.StartDirection.LEFT;
+            case VERTICAL -> IDrawableAnimated.StartDirection.BOTTOM;
+        };
         return ComposeDrawable.builder()
-            .add(helper.createAnimatedDrawable(uncompleted, cycle, IDrawableAnimated.StartDirection.LEFT, true))
-            .add(helper.createAnimatedDrawable(completed, cycle, IDrawableAnimated.StartDirection.LEFT, false))
+            .add(helper.createAnimatedDrawable(uncompleted, cycle, dir1, true))
+            .add(helper.createAnimatedDrawable(completed, cycle, dir1, false))
             .build();
     }
 }

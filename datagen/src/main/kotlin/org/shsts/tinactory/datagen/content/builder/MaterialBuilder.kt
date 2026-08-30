@@ -46,6 +46,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.cutter
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extractor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.extruder
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.fluidSolidifier
+import org.shsts.tinactory.datagen.content.builder.RecipeFactories.forgeHammer
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.implosionCompressor
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.lathe
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.macerator
@@ -467,6 +468,12 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     }
                 }
             }
+            forgeHammer {
+                val v = if (voltage.rank < Voltage.LV.rank) Voltage.ULV else Voltage.fromRank(voltage.rank - 1)
+                process("plate", "ingot", 144, inputAmount = 2, voltage = v)
+                process("foil", "plate", 80, amount = 2, voltage = v)
+                process("foil", "sheet", 80, amount = 2, voltage = v)
+            }
 
             macerates()
             moltens()
@@ -875,6 +882,28 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                         voltage(Voltage.LV)
                         workTicks(64)
                     }
+                }
+            }
+
+            forgeHammer {
+                defaults {
+                    voltage(Voltage.ULV)
+                    workTicks((variant.destroyTime * 120).toLong())
+                }
+                if (material.hasItem("gem_flawless") || siftAndHammer || siftPrimary) {
+                    output(material, "primary") {
+                        input(material, "raw")
+                    }
+                } else {
+                    output(material, "crushed") {
+                        input(material, "raw")
+                    }
+                }
+                output(material, "dust_pure") {
+                    input(material, "crushed_purified")
+                }
+                output(material, "dust_impure") {
+                    input(material, "crushed")
                 }
             }
 
