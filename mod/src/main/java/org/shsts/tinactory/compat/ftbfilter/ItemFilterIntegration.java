@@ -20,7 +20,14 @@ public final class ItemFilterIntegration {
 
     static {
         if (ModList.get().isLoaded("ftbfiltersystem")) {
-            MATCHER = FTBFilterSystemAPI.api()::doesFilterMatch;
+            MATCHER = (filter, stack, provider) -> {
+                var api = FTBFilterSystemAPI.api();
+                if (api.isFilterItem(filter)) {
+                    return api.doesFilterMatch(filter, stack, provider);
+                } else {
+                    return StackHelper.canItemsStack(filter, stack);
+                }
+            };
         } else {
             MATCHER = (filter, stack, provider) -> StackHelper.canItemsStack(filter, stack);
         }
