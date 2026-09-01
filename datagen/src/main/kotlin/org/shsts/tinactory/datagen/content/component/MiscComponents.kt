@@ -6,6 +6,7 @@ import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
+import net.neoforged.neoforge.common.conditions.ModLoadedCondition
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMaterials.getMaterial
@@ -177,7 +178,8 @@ object MiscComponents {
             nullRecipe(smartFilter)
         }
         assembler {
-            output(ITEMS.getEntry<Item>(smartFilter).get()!!) {
+            output(ITEMS.getEntry<Item>(smartFilter).get()!!,
+                conditions = listOf(ModLoadedCondition("ftbfiltersystem"))) {
                 input(getItem("component/item_filter"))
                 circuit(1, voltage = Voltage.ULV)
                 voltage(Voltage.ULV)

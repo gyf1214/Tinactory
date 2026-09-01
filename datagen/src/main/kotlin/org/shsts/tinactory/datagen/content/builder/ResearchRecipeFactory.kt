@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import net.neoforged.neoforge.common.conditions.ICondition
 import org.shsts.tinactory.core.recipe.ResearchRecipe
 import org.shsts.tinycorelib.api.registrate.entry.IRecipeType
 import org.shsts.tinycorelib.datagen.api.recipe.IRecipeFactory
@@ -32,8 +33,9 @@ class ResearchRecipeBuilder(parent: IRecipeFactory<ResearchRecipe, ResearchRecip
 class ResearchRecipeFactory(recipeType: IRecipeType<ResearchRecipe>,
     defaults: ResearchRecipeBuilder.() -> Unit = {}) :
     RecipeFactory<ResearchRecipe, ResearchRecipeBuilder>(recipeType, ::ResearchRecipeBuilder, defaults) {
-    fun target(loc: ResourceLocation, block: ResearchRecipeBuilder.() -> Unit) {
-        recipe(loc) {
+    fun target(loc: ResourceLocation, conditions: List<ICondition> = emptyList(),
+        block: ResearchRecipeBuilder.() -> Unit) {
+        recipe(loc, conditions) {
             target(loc)
             block()
         }

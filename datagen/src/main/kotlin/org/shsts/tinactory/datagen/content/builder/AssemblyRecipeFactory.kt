@@ -1,6 +1,7 @@
 package org.shsts.tinactory.datagen.content.builder
 
 import net.minecraft.resources.ResourceLocation
+import net.neoforged.neoforge.common.conditions.ICondition
 import org.shsts.tinactory.AllBlockEntities.getMachine
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.core.electric.Voltage
@@ -26,24 +27,26 @@ class AssemblyRecipeFactory(
     }
 
     fun component(name: String, voltage: Voltage = this.componentVoltage!!,
+        conditions: List<ICondition> = emptyList(),
         block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         val component = getComponent(name)
         if (!component.containsKey(voltage)) {
             return
         }
-        output(component.item(voltage)) {
+        output(component.item(voltage), conditions = conditions) {
             componentVoltage = voltage
             block()
         }
     }
 
     fun machine(name: String, voltage: Voltage = this.componentVoltage!!,
+        conditions: List<ICondition> = emptyList(),
         block: SimpleAssemblyRecipeBuilder.() -> Unit = {}) {
         val machine = getMachine(name)
         if (!machine.hasVoltage(voltage)) {
             return
         }
-        output(machine.block(voltage)) {
+        output(machine.block(voltage), conditions = conditions) {
             componentVoltage = voltage
             block()
         }

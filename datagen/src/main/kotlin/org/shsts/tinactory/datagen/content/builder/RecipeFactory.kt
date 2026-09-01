@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.ItemLike
+import net.neoforged.neoforge.common.conditions.ICondition
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.core.recipe.ProcessingRecipe
 import org.shsts.tinactory.core.util.LocHelper.modLoc
@@ -41,9 +42,9 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
 
     protected open fun onBuild(loc: ResourceLocation, builder: B) {}
 
-    fun recipe(loc: ResourceLocation, block: B.() -> Unit) {
+    fun recipe(loc: ResourceLocation, conditions: List<ICondition> = emptyList(), block: B.() -> Unit) {
         val recipeId = recipeLoc(recipeType, loc)
-        factory.recipe(recipeId).apply {
+        factory.recipe(recipeId, *conditions.toTypedArray()).apply {
             defaults()
             classDefaults(this)
             userDefaults()
@@ -53,66 +54,66 @@ open class RecipeFactory<R : ProcessingRecipe, B : ProcessingRecipeBuilder<R, B>
         }
     }
 
-    fun recipe(id: String, block: B.() -> Unit) {
-        recipe(modLoc(id), block)
+    fun recipe(id: String, conditions: List<ICondition> = emptyList(), block: B.() -> Unit) {
+        recipe(modLoc(id), conditions, block)
     }
 
-    fun recipe(mat: MaterialSet, sub: String = defaultSub(mat),
-        suffix: String = "", block: B.() -> Unit) {
-        recipe(matLoc(mat, sub, suffix), block)
+    fun recipe(mat: MaterialSet, sub: String = defaultSub(mat), suffix: String = "",
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit) {
+        recipe(matLoc(mat, sub, suffix), conditions, block)
     }
 
     fun defaults(value: B.() -> Unit) {
         userDefaults = value
     }
 
-    fun input(tag: TagKey<Item>, amount: Int = 1,
-        suffix: String = "", block: B.() -> Unit = {}) {
-        recipe(suffix(tag.location, suffix)) {
+    fun input(tag: TagKey<Item>, amount: Int = 1, suffix: String = "",
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        recipe(suffix(tag.location, suffix), conditions) {
             input(tag, amount)
             block()
         }
     }
 
-    fun input(item: ItemLike, amount: Int = 1,
-        suffix: String = "", block: B.() -> Unit = {}) {
-        recipe(suffix(itemLoc(item), suffix)) {
+    fun input(item: ItemLike, amount: Int = 1, suffix: String = "",
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        recipe(suffix(itemLoc(item), suffix), conditions) {
             input(item, amount)
             block()
         }
     }
 
-    fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1,
-        suffix: String = "", block: B.() -> Unit = {}) {
-        recipe(matLoc(mat, sub, suffix)) {
+    fun input(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, suffix: String = "",
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        recipe(matLoc(mat, sub, suffix), conditions) {
             input(mat, sub, amount)
             block()
         }
     }
 
-    fun input(name: String, sub: String = defaultSub(name), amount: Number = 1,
-        suffix: String = "", block: B.() -> Unit = {}) {
-        input(getMaterial(name), sub, amount, suffix, block)
+    fun input(name: String, sub: String = defaultSub(name), amount: Number = 1, suffix: String = "",
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        input(getMaterial(name), sub, amount, suffix, conditions, block)
     }
 
-    fun output(item: ItemLike, amount: Int = 1, suffix: String = "",
-        rate: Double = 1.0, block: B.() -> Unit = {}) {
-        recipe(suffix(itemLoc(item), suffix)) {
+    fun output(item: ItemLike, amount: Int = 1, suffix: String = "", rate: Double = 1.0,
+        conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        recipe(suffix(itemLoc(item), suffix), conditions) {
             output(item, amount, rate = rate)
             block()
         }
     }
 
-    fun output(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1,
-        suffix: String = "", rate: Double = 1.0, block: B.() -> Unit = {}) {
-        recipe(matLoc(mat, sub, suffix)) {
+    fun output(mat: MaterialSet, sub: String = defaultSub(mat), amount: Number = 1, suffix: String = "",
+        rate: Double = 1.0, conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        recipe(matLoc(mat, sub, suffix), conditions) {
             output(mat, sub, amount, rate = rate)
             block()
         }
     }
 
-    fun output(name: String, sub: String = defaultSub(name), amount: Number = 1,
-        suffix: String = "", rate: Double = 1.0, block: B.() -> Unit = {}) {
-        output(getMaterial(name), sub, amount, suffix, rate, block)
+    fun output(name: String, sub: String = defaultSub(name), amount: Number = 1, suffix: String = "",
+        rate: Double = 1.0, conditions: List<ICondition> = emptyList(), block: B.() -> Unit = {}) {
+        output(getMaterial(name), sub, amount, suffix, rate, conditions, block)
     }
 }
