@@ -12,6 +12,7 @@ import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.compat.ftbfilter.ItemFilterIntegration;
 import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
 import org.shsts.tinactory.content.logistics.MEStorageCellAliases;
 import org.shsts.tinactory.integration.tech.TechManagers;
@@ -68,6 +69,7 @@ public class Tinactory {
             if (ModList.get().isLoaded("ftbquests")) {
                 new TechQuestIntegration().register();
             }
+            ItemFilterIntegration.init();
             AllWorldGens.init();
 
             REGISTRATE.register(modEventBus);

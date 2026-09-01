@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
+import org.shsts.tinactory.compat.ftbfilter.ItemFilterIntegration;
 import org.shsts.tinactory.core.logistics.PortTransmitter;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
@@ -173,13 +174,13 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private ItemStack selectTransmittedItem(IPort<ItemStack> from, IPort<ItemStack> to,
         LogisticWorkerConfig config) {
-        var filterType = config.filterType();
-        if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-            return ITEM_TRANSMITTER.probeIdentity(from, to, config.itemFilter(), itemBandwidth);
-        }
-
-        Predicate<ItemStack> filter = filterType == LogisticWorkerConfig.FilterType.TAG ?
-            stack -> stack.is(config.tagFilter()) : StackHelper.TRUE_FILTER;
+        var world = blockEntity.getLevel();
+        assert world != null;
+        Predicate<ItemStack> filter = switch (config.filterType()) {
+            case TAG -> stack -> stack.is(config.tagFilter());
+            case ITEM -> stack -> ItemFilterIntegration.matches(config.itemFilter(), stack, world.registryAccess());
+            default -> StackHelper.TRUE_FILTER;
+        };
         return ITEM_TRANSMITTER.select(from, to,
             from.getAllStorages().stream().filter(filter).toList(), itemBandwidth);
     }

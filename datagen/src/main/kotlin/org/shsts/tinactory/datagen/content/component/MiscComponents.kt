@@ -1,12 +1,15 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.DyeColor
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllItems.STORAGE_CELLS
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllRegistries.ITEMS
 import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.TOOL_HAMMER
 import org.shsts.tinactory.AllTags.TOOL_HANDLE
@@ -166,6 +169,20 @@ object MiscComponents {
                 voltage(Voltage.LUV)
                 workTicks(3200)
                 requireCleanness(0.5, 2.0)
+            }
+        }
+
+        val smartFilter = ResourceLocation.fromNamespaceAndPath("ftbfiltersystem", "smart_filter")
+        vanilla {
+            nullRecipe(smartFilter)
+        }
+        assembler {
+            output(ITEMS.getEntry<Item>(smartFilter).get()!!) {
+                input(getItem("component/item_filter"))
+                circuit(1, voltage = Voltage.ULV)
+                voltage(Voltage.ULV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.SOLDERING)
             }
         }
 
