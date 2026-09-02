@@ -73,7 +73,9 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             infoList.clear();
             processor.onWorkBegin(recipe, machine, maxParallel, info -> {
                 infoList.add(info);
-                onReportObject.accept(PortDirection.INPUT, info.object());
+                if (machine.container().orElseThrow().portDirection(info.port()) == PortDirection.INPUT) {
+                    onReportObject.accept(PortDirection.INPUT, info.object());
+                }
             });
         }
 

@@ -22,6 +22,7 @@ import org.shsts.tinactory.core.recipe.ProcessingInfo;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
+import org.shsts.tinactory.unit.fixture.TestPort;
 import org.shsts.tinactory.unit.fixture.TestProcessingHelper;
 import org.shsts.tinactory.unit.fixture.TestResult;
 import org.shsts.tinycorelib.api.core.DistLazy;
@@ -85,14 +86,18 @@ class ProcessingRuntimeTest {
     }
 
     @Test
-    void shouldReportConsumedAndProducedObjectsThroughCallback() {
+    void shouldReportOnlyActualConsumedAndProducedObjectsThroughCallback() {
         var reportedObjects = new ArrayList<Report>();
-        var machine = new TestMachine(new TestContainer());
+        var container = new TestContainer()
+            .port(0, PortDirection.INPUT, new TestPort("ore", 64, 0))
+            .port(1, PortDirection.OUTPUT, new TestPort("dust", 64, 0));
+        var machine = new TestMachine(container);
         var ingredient = new TestIngredient("ore", 2);
+        var outputPreview = new TestResult("dust", 1);
         var result = new TestResult("dust", 1);
         var processor = new TestRecipeProcessor()
             .recipe(RECIPE_ID)
-            .inputInfo(new ProcessingInfo(0, ingredient))
+            .inputInfo(new ProcessingInfo(0, ingredient), new ProcessingInfo(1, outputPreview))
             .doneResult(result);
         var runtime = runtimeBuilder(machine, processor)
             .onReportObject((direction, object) -> reportedObjects.add(new Report(direction, object)))
