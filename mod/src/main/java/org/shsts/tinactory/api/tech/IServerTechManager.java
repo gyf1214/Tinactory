@@ -16,5 +16,5 @@ public interface IServerTechManager extends ITechManager {
 
     void syncTeam(ServerPlayer player);
 
-    Component teamDisplayName(String name);
+    Optional<Component> teamDisplayName(String name);
 }

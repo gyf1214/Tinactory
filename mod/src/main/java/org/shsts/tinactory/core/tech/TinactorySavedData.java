@@ -40,8 +40,7 @@ public class TinactorySavedData extends SavedData {
         for (var rawTag : tag.getList("teams", Tag.TAG_COMPOUND)) {
             var teamTag = (CompoundTag) rawTag;
             var name = teamTag.getString("name");
-            var displayName = techManager.teamDisplayName(name);
-            var team = new TeamProfile(techManager, name, displayName);
+            var team = new TeamProfile(techManager, name);
             team.deserializeNBT(provider, teamTag);
             teams.put(team.getName(), team);
         }
@@ -49,8 +48,7 @@ public class TinactorySavedData extends SavedData {
 
     public TeamProfile getTeamProfile(String name) {
         if (!teams.containsKey(name)) {
-            var displayName = techManager.teamDisplayName(name);
-            teams.put(name, new TeamProfile(techManager, name, displayName));
+            teams.put(name, new TeamProfile(techManager, name));
             setDirty();
         }
         return teams.get(name);

@@ -21,7 +21,7 @@ class TeamProfileTest {
     void progressClampsAndCompletionModifierAppliesOnlyOnce() {
         var tech = technology("tinactory:progress", List.of(), 10L, Map.of("speed", 2), 1);
         var manager = new TestTechManager(Map.of(loc("progress"), tech));
-        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
+        var profile = new TeamProfile(manager, "alpha");
 
         profile.setTechProgress(tech, 15L);
         profile.setTechProgress(tech, 30L);
@@ -35,7 +35,7 @@ class TeamProfileTest {
         var dependency = technology("tinactory:dependency", List.of(), 5L, Map.of(), 1);
         var target = technology("tinactory:target", List.of(loc("dependency")), 10L, Map.of(), 2);
         var manager = new TestTechManager(Map.of(loc("dependency"), dependency, loc("target"), target));
-        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
+        var profile = new TeamProfile(manager, "alpha");
 
         assertFalse(profile.isTechAvailable(target));
 
@@ -52,7 +52,7 @@ class TeamProfileTest {
     void targetTechCanBeSetAndReset() {
         var tech = technology("tinactory:target", List.of(), 10L, Map.of(), 1);
         var manager = new TestTechManager(Map.of(loc("target"), tech));
-        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
+        var profile = new TeamProfile(manager, "alpha");
 
         profile.setTargetTech(tech);
         assertSame(tech, profile.getTargetTech().orElseThrow());
@@ -62,12 +62,15 @@ class TeamProfileTest {
     }
 
     @Test
-    void hasNameAndDisplayName() {
+    void hasDisplayNameIfProvidedOrResolveFromManager() {
         var manager = new TestTechManager();
-        var profile = new TeamProfile(manager, "alpha1", I18n.raw("alpha2"));
+        var profile1 = new TeamProfile(manager, "alpha1", I18n.raw("alpha2"));
 
-        assertEquals("alpha1", profile.getName());
-        assertEquals(I18n.raw("alpha2"), profile.getDisplayName());
+        assertEquals("alpha1", profile1.getName());
+        assertEquals(I18n.raw("alpha2"), profile1.getDisplayName());
+
+        var profile2 = new TeamProfile(manager, "alpha3");
+        assertEquals(I18n.raw("alpha3"), profile2.getDisplayName());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends,

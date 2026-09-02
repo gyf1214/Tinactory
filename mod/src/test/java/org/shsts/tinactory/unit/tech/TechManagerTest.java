@@ -5,7 +5,6 @@ import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.Technology;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 import org.shsts.tinycorelib.api.network.IPacket;
 
@@ -42,7 +41,7 @@ class TechManagerTest {
     @Test
     void progressChangeListenersCanBeAddedInvokedAndRemoved() {
         var manager = new StubTechManager();
-        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
+        var profile = new TeamProfile(manager, "alpha");
         var invocations = new AtomicInteger();
         ITeamProfile[] changedProfile = new ITeamProfile[1];
         Consumer<ITeamProfile> callback = changed -> {

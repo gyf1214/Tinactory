@@ -84,7 +84,7 @@ public final class TestTechManager implements IServerTechManager {
     public void syncTeam(ServerPlayer player) {}
 
     @Override
-    public Component teamDisplayName(String name) {
-        return I18n.raw(name);
+    public Optional<Component> teamDisplayName(String name) {
+        return Optional.of(I18n.raw(name));
     }
 }

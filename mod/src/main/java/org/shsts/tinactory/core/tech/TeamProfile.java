@@ -11,9 +11,12 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.gametest.GameTestHooks;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
+import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.shsts.tinactory.api.tech.ITechManager;
 import org.shsts.tinactory.api.tech.ITechnology;
+import org.shsts.tinactory.core.util.I18n;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -27,11 +30,18 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     protected final ITechManager techManager;
     protected final String name;
+    @Nullable
     protected final Component displayName;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
     protected final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     protected ITechnology targetTech = null;
+
+    public TeamProfile(ITechManager techManager, String name) {
+        this.techManager = techManager;
+        this.name = name;
+        this.displayName = null;
+    }
 
     public TeamProfile(ITechManager techManager, String name, Component displayName) {
         this.techManager = techManager;
@@ -46,7 +56,19 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     @Override
     public Component getDisplayName() {
-        return displayName;
+        if (displayName != null) {
+            return displayName;
+        }
+        if (techManager instanceof IServerTechManager server) {
+            var displayName = server.teamDisplayName(name);
+            if (displayName.isPresent()) {
+                return displayName.get();
+            }
+        }
+        if (!GameTestHooks.isGametestServer()) {
+            LOGGER.warn("cannot resolve display name team={}", name);
+        }
+        return I18n.raw(name);
     }
 
     @Override
@@ -176,7 +198,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     public TechUpdatePacket fullUpdatePacket() {
         return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech),
-            displayName);
+            getDisplayName());
     }
 
     @Override

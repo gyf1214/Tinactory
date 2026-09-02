@@ -151,8 +151,8 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     }
 
     @Override
-    public Component teamDisplayName(String name) {
-        return provider().teamDisplayName(name).orElseThrow();
+    public Optional<Component> teamDisplayName(String name) {
+        return provider().teamDisplayName(name);
     }
 
     public void onPlayerJoin(ServerPlayer player) {
