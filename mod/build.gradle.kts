@@ -127,7 +127,7 @@ configurations {
     maybeCreate("api")
 }
 
-val apiJar by tasks.registering(Jar::class) {
+val apiJar = tasks.register<Jar>("apiJar") {
     archiveClassifier = "api"
     include("org/shsts/tinactory/api/**")
     from(sourceSets.main.get().output)

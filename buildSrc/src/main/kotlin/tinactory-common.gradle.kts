@@ -84,7 +84,7 @@ val modMetadataProperties = mapOf(
     "tinycorelib_version" to "${property("minecraft_version")}-${property("tinycorelib_version")}"
 )
 
-val generateModMetadata by tasks.registering(ProcessResources::class) {
+val generateModMetadata = tasks.register<ProcessResources>("generateModMetadata") {
     inputs.properties(modMetadataProperties)
     expand(modMetadataProperties)
     from("src/main/templates")
@@ -97,7 +97,7 @@ sourceSets.main {
 
 neoForge.ideSyncTask(generateModMetadata)
 
-val sourcesJar by tasks.registering(Jar::class) {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     dependsOn(tasks.classes)
     archiveClassifier = "sources"
     from(sourceSets.main.get().allSource)
