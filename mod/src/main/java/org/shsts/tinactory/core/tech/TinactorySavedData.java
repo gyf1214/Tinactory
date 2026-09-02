@@ -18,16 +18,11 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private int nextId = 0;
     private final ITechManager techManager;
     private final Map<String, TeamProfile> teams = new HashMap<>();
 
     public TinactorySavedData(ITechManager techManager) {
         this.techManager = techManager;
-    }
-
-    public int nextId() {
-        return nextId;
     }
 
     @Override
@@ -37,7 +32,6 @@ public class TinactorySavedData extends SavedData {
             .map($ -> $.serializeNBT(provider))
             .forEach(teamsTag::add);
         tag.put("teams", teamsTag);
-        tag.putInt("nextId", nextId);
         return tag;
     }
 
@@ -49,13 +43,11 @@ public class TinactorySavedData extends SavedData {
             team.deserializeNBT(provider, teamTag);
             teams.put(team.getName(), team);
         }
-        nextId = tag.getInt("nextId");
     }
 
     public TeamProfile getTeamProfile(String name) {
         if (!teams.containsKey(name)) {
             teams.put(name, new TeamProfile(techManager, name));
-            nextId++;
             setDirty();
         }
         return teams.get(name);

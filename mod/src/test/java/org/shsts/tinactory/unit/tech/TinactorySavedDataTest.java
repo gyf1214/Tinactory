@@ -28,7 +28,6 @@ class TinactorySavedDataTest {
         assertSame(first, second);
         assertEquals("beta", third.getName());
         assertEquals("alpha", recreated.getName());
-        assertEquals(3, data.nextId());
     }
 
     @Test
@@ -55,7 +54,6 @@ class TinactorySavedDataTest {
 
         assertEquals(6L, loadedProfile.getTechProgress(known));
         assertTrue(loadedProfile.getTargetTech().isEmpty());
-        assertEquals(1, loaded.nextId());
     }
 
     private static Technology technology(String loc, long maxProgress, int rank) {
