@@ -4,13 +4,13 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.network.chat.Component;
 import org.shsts.tinactory.api.tech.IClientTechManager;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.TechInitPacket;
 import org.shsts.tinactory.core.tech.TechManager;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.slf4j.Logger;
 
@@ -24,8 +24,8 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final class ClientTeamProfile extends TeamProfile {
-        private ClientTeamProfile(ClientTechManager techManager, String profileId, Component displayName) {
-            super(techManager, profileId, displayName);
+        private ClientTeamProfile(ClientTechManager techManager, String profileId) {
+            super(techManager, profileId, I18n.raw(profileId));
         }
     }
 
@@ -89,7 +89,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
         }
         var team = localTeam;
         if (packet.getUpdateType() == TechUpdatePacket.UpdateType.FULL) {
-            team = new ClientTeamProfile(this, profileId, packet.getDisplayName());
+            team = new ClientTeamProfile(this, profileId);
             localTeam = team;
         } else if (team == null || !team.getName().equals(profileId)) {
             LOGGER.debug("ignore tech update for non-current profile {}", profileId);

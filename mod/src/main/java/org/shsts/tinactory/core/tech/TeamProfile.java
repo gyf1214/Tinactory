@@ -197,8 +197,7 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     public TechUpdatePacket fullUpdatePacket() {
-        return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech),
-            getDisplayName());
+        return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech));
     }
 
     @Override
