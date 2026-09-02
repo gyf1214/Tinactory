@@ -39,7 +39,7 @@ public class MetricsManager {
 
     public static void reportItem(String name, IMachine machine, ItemStack item) {
         if (!item.isEmpty()) {
-            report(name, List.of(ownerName(machine), item.getDisplayName().getString()), item.getCount());
+            report(name, List.of(ownerName(machine), item.getHoverName().getString()), item.getCount());
         }
     }
 
