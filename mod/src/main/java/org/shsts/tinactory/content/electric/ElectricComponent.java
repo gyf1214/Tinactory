@@ -209,7 +209,7 @@ public class ElectricComponent extends NetworkComponent {
             buffer = bufferGen * bufferFactor;
         }
 
-        var team = network.owner().getName();
+        var team = network.owner().getDisplayName().getString();
         reportMetrics(team, gen, workCons, buffer);
     }
 

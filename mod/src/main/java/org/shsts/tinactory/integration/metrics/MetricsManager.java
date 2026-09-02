@@ -9,7 +9,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
-import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.recipe.StackIngredient;
 import org.shsts.tinactory.core.recipe.StackResult;
 
@@ -33,18 +32,20 @@ public class MetricsManager {
     }
 
     public static String ownerName(IMachine machine) {
-        return machine.owner().map(ITeamProfile::getName).orElse("unknown");
+        return machine.owner()
+            .map(profile -> profile.getDisplayName().getString())
+            .orElse("unknown");
     }
 
     public static void reportItem(String name, IMachine machine, ItemStack item) {
         if (!item.isEmpty()) {
-            report(name, List.of(ownerName(machine), item.getDescriptionId()), item.getCount());
+            report(name, List.of(ownerName(machine), item.getDisplayName().getString()), item.getCount());
         }
     }
 
     public static void reportFluid(String name, IMachine machine, FluidStack fluid) {
         if (!fluid.isEmpty()) {
-            report(name, List.of(ownerName(machine), fluid.getDescriptionId()), fluid.getAmount());
+            report(name, List.of(ownerName(machine), fluid.getHoverName().getString()), fluid.getAmount());
         }
     }
 

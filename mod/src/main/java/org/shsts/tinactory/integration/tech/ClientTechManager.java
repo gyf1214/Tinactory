@@ -24,6 +24,7 @@ public class ClientTechManager extends TechManager implements IClientTechManager
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final class ClientTeamProfile extends TeamProfile {
+        // TODO: once client needs team display name, implement syncing
         private ClientTeamProfile(ClientTechManager techManager, String profileId) {
             super(techManager, profileId, I18n.raw(profileId));
         }
