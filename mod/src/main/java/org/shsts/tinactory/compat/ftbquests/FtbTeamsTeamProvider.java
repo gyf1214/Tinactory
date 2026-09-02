@@ -86,6 +86,6 @@ public final class FtbTeamsTeamProvider implements ITeamProvider {
     }
 
     private static String profileId(UUID teamId) {
-        return PREFIX + teamId;
+        return SinglePlayerTeamProvider.uuidToTeamId(PREFIX, teamId);
     }
 }

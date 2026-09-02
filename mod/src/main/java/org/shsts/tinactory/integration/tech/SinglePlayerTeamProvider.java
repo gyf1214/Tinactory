@@ -27,13 +27,17 @@ public final class SinglePlayerTeamProvider implements ITeamProvider {
         return Optional.of(teamId(player.getUUID()));
     }
 
+    public static String uuidToTeamId(String prefix, UUID uuid) {
+        return prefix + uuid;
+    }
+
     public static Optional<UUID> teamIdToUuid(String prefix, String teamId) {
         if (!teamId.startsWith(prefix)) {
             return Optional.empty();
         }
         try {
-            var playerId = UUID.fromString(teamId.substring(prefix.length()));
-            return Optional.of(playerId);
+            var uuid = UUID.fromString(teamId.substring(prefix.length()));
+            return uuidToTeamId(prefix, uuid).equals(teamId) ? Optional.of(uuid) : Optional.empty();
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
@@ -62,6 +66,6 @@ public final class SinglePlayerTeamProvider implements ITeamProvider {
     }
 
     private static String teamId(UUID uuid) {
-        return PREFIX + uuid;
+        return uuidToTeamId(PREFIX, uuid);
     }
 }
