@@ -1,5 +1,6 @@
 package org.shsts.tinactory.api.tech;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -14,4 +15,6 @@ public interface IServerTechManager extends ITechManager {
     Collection<ServerPlayer> onlineMembers(String profileId);
 
     void syncTeam(ServerPlayer player);
+
+    Component teamDisplayName(String name);
 }

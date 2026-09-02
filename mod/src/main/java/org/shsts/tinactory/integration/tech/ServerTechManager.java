@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -147,6 +148,11 @@ public class ServerTechManager extends TechManager implements IServerTechManager
     public void syncTeam(ServerPlayer player) {
         teamByPlayer(player).ifPresentOrElse(profile -> sendFullUpdatePacket(player, profile),
             () -> CORE.sendToPlayer(player, TECH_UPDATE, TechUpdatePacket.clear()));
+    }
+
+    @Override
+    public Component teamDisplayName(String name) {
+        return provider().teamDisplayName(name).orElseThrow();
     }
 
     public void onPlayerJoin(ServerPlayer player) {

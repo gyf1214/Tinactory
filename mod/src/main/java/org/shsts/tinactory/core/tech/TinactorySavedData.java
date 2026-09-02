@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.saveddata.SavedData;
-import org.shsts.tinactory.api.tech.ITechManager;
+import org.shsts.tinactory.api.tech.IServerTechManager;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import java.util.Map;
 @MethodsReturnNonnullByDefault
 public class TinactorySavedData extends SavedData {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final ITechManager techManager;
+    private final IServerTechManager techManager;
     private final Map<String, TeamProfile> teams = new HashMap<>();
 
-    public TinactorySavedData(ITechManager techManager) {
+    public TinactorySavedData(IServerTechManager techManager) {
         this.techManager = techManager;
     }
 
@@ -39,7 +39,9 @@ public class TinactorySavedData extends SavedData {
         teams.clear();
         for (var rawTag : tag.getList("teams", Tag.TAG_COMPOUND)) {
             var teamTag = (CompoundTag) rawTag;
-            var team = new TeamProfile(techManager, teamTag.getString("name"));
+            var name = teamTag.getString("name");
+            var displayName = techManager.teamDisplayName(name);
+            var team = new TeamProfile(techManager, name, displayName);
             team.deserializeNBT(provider, teamTag);
             teams.put(team.getName(), team);
         }
@@ -47,7 +49,8 @@ public class TinactorySavedData extends SavedData {
 
     public TeamProfile getTeamProfile(String name) {
         if (!teams.containsKey(name)) {
-            teams.put(name, new TeamProfile(techManager, name));
+            var displayName = techManager.teamDisplayName(name);
+            teams.put(name, new TeamProfile(techManager, name, displayName));
             setDirty();
         }
         return teams.get(name);
@@ -65,7 +68,7 @@ public class TinactorySavedData extends SavedData {
     }
 
     public static TinactorySavedData fromTag(CompoundTag tag, HolderLookup.Provider provider,
-        ITechManager techManager) {
+        IServerTechManager techManager) {
         var data = new TinactorySavedData(techManager);
         data.load(tag, provider);
         return data;

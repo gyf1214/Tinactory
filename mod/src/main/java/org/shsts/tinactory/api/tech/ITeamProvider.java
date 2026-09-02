@@ -2,6 +2,7 @@ package org.shsts.tinactory.api.tech;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -18,4 +19,6 @@ public interface ITeamProvider {
     Optional<String> teamIdById(String teamId);
 
     Collection<ServerPlayer> onlineMembers(String teamId);
+
+    Optional<Component> teamDisplayName(String teamId);
 }

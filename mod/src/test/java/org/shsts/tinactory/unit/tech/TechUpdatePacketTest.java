@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.tech;
 
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.TechUpdatePacket;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import java.util.Map;
@@ -33,7 +34,8 @@ class TechUpdatePacketTest {
     @Test
     void roundTripsFullUpdateWithTarget() {
         var target = modLoc("target");
-        var packet = TechUpdatePacket.full("single_player:alpha", Map.of(target, 11L), target);
+        var packet = TechUpdatePacket.full("single_player:alpha", Map.of(target, 11L), target,
+            I18n.raw("alpha"));
         var buf = TestCodecHelper.buf();
 
         packet.serializeToBuf(buf);
@@ -45,6 +47,7 @@ class TechUpdatePacketTest {
         assertEquals(TechUpdatePacket.UpdateType.FULL, decoded.getUpdateType());
         assertEquals(Map.of(target, 11L), decoded.getProgress());
         assertEquals(target, decoded.getTargetTech().orElseThrow());
+        assertEquals(I18n.raw("alpha"), decoded.getDisplayName());
     }
 
     @Test

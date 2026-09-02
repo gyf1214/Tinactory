@@ -8,6 +8,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.tech.IServerTeamProfile;
@@ -26,19 +27,26 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
 
     protected final ITechManager techManager;
     protected final String name;
+    protected final Component displayName;
     protected final Map<ResourceLocation, Long> technologies = new HashMap<>();
     protected final Map<String, Integer> modifiers = new HashMap<>();
     @Nullable
     protected ITechnology targetTech = null;
 
-    public TeamProfile(ITechManager techManager, String name) {
+    public TeamProfile(ITechManager techManager, String name, Component displayName) {
         this.techManager = techManager;
         this.name = name;
+        this.displayName = displayName;
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return displayName;
     }
 
     @Override
@@ -167,7 +175,8 @@ public class TeamProfile implements INBTSerializable<CompoundTag>, IServerTeamPr
     }
 
     public TechUpdatePacket fullUpdatePacket() {
-        return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech));
+        return TechUpdatePacket.full(name, technologies, targetTech == null ? null : techKey(targetTech),
+            displayName);
     }
 
     @Override

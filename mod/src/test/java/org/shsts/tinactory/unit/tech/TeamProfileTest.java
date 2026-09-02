@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.TeamProfile;
 import org.shsts.tinactory.core.tech.Technology;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
@@ -20,7 +21,7 @@ class TeamProfileTest {
     void progressClampsAndCompletionModifierAppliesOnlyOnce() {
         var tech = technology("tinactory:progress", List.of(), 10L, Map.of("speed", 2), 1);
         var manager = new TestTechManager(Map.of(loc("progress"), tech));
-        var profile = new TeamProfile(manager, "alpha");
+        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
 
         profile.setTechProgress(tech, 15L);
         profile.setTechProgress(tech, 30L);
@@ -33,8 +34,8 @@ class TeamProfileTest {
     void availabilityAndCanResearchFollowDependencyAndProgressRules() {
         var dependency = technology("tinactory:dependency", List.of(), 5L, Map.of(), 1);
         var target = technology("tinactory:target", List.of(loc("dependency")), 10L, Map.of(), 2);
-        var profile = new TeamProfile(new TestTechManager(Map.of(loc("dependency"), dependency, loc("target"), target)),
-            "alpha");
+        var manager = new TestTechManager(Map.of(loc("dependency"), dependency, loc("target"), target));
+        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
 
         assertFalse(profile.isTechAvailable(target));
 
@@ -50,13 +51,23 @@ class TeamProfileTest {
     @Test
     void targetTechCanBeSetAndReset() {
         var tech = technology("tinactory:target", List.of(), 10L, Map.of(), 1);
-        var profile = new TeamProfile(new TestTechManager(Map.of(loc("target"), tech)), "alpha");
+        var manager = new TestTechManager(Map.of(loc("target"), tech));
+        var profile = new TeamProfile(manager, "alpha", I18n.raw("alpha"));
 
         profile.setTargetTech(tech);
         assertSame(tech, profile.getTargetTech().orElseThrow());
 
         profile.resetTargetTech();
         assertTrue(profile.getTargetTech().isEmpty());
+    }
+
+    @Test
+    void hasNameAndDisplayName() {
+        var manager = new TestTechManager();
+        var profile = new TeamProfile(manager, "alpha1", I18n.raw("alpha2"));
+
+        assertEquals("alpha1", profile.getName());
+        assertEquals(I18n.raw("alpha2"), profile.getDisplayName());
     }
 
     private static Technology technology(String loc, List<ResourceLocation> depends,

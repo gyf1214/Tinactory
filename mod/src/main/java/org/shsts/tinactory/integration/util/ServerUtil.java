@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.util;
 
+import com.mojang.authlib.GameProfile;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
@@ -7,6 +8,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -19,6 +23,11 @@ public final class ServerUtil {
 
     public static PlayerList getPlayerList() {
         return getServer().getPlayerList();
+    }
+
+    public static Optional<GameProfile> getPlayerProfile(UUID uuid) {
+        var cache = getServer().getProfileCache();
+        return cache == null ? Optional.empty() : cache.get(uuid);
     }
 
     public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<? extends T>> key) {

@@ -1,10 +1,13 @@
 package org.shsts.tinactory.integration.tech;
 
+import com.mojang.authlib.GameProfile;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.api.tech.ITeamProvider;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.util.ServerUtil;
 
 import java.util.Collection;
@@ -24,18 +27,25 @@ public final class SinglePlayerTeamProvider implements ITeamProvider {
         return Optional.of(teamId(player.getUUID()));
     }
 
-    @Override
-    public Optional<String> teamIdById(String teamId) {
-        if (!teamId.startsWith(PREFIX)) {
+    public static Optional<UUID> teamIdToUuid(String prefix, String teamId) {
+        if (!teamId.startsWith(prefix)) {
             return Optional.empty();
         }
         try {
-            var uuid = UUID.fromString(teamId.substring(PREFIX.length()));
-            var canonicalId = teamId(uuid);
-            return teamId.equals(canonicalId) ? Optional.of(canonicalId) : Optional.empty();
+            var playerId = UUID.fromString(teamId.substring(prefix.length()));
+            return Optional.of(playerId);
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
+    }
+
+    private static Optional<GameProfile> teamIdToGameProfile(String teamId) {
+        return teamIdToUuid(PREFIX, teamId).flatMap(ServerUtil::getPlayerProfile);
+    }
+
+    @Override
+    public Optional<String> teamIdById(String teamId) {
+        return teamIdToGameProfile(teamId).map(profile -> teamId(profile.getId()));
     }
 
     @Override
@@ -44,6 +54,11 @@ public final class SinglePlayerTeamProvider implements ITeamProvider {
             .flatMap(id -> ServerUtil.getPlayerList().getPlayers().stream()
                 .filter(player -> teamId(player.getUUID()).equals(id)))
             .toList();
+    }
+
+    @Override
+    public Optional<Component> teamDisplayName(String teamId) {
+        return teamIdToGameProfile(teamId).map(profile -> I18n.raw(profile.getName()));
     }
 
     private static String teamId(UUID uuid) {

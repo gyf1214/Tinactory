@@ -2,6 +2,7 @@ package org.shsts.tinactory.api.tech;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
@@ -10,6 +11,8 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public interface ITeamProfile {
     String getName();
+
+    Component getDisplayName();
 
     long getTechProgress(ITechnology tech);
 

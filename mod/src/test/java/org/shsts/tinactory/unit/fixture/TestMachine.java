@@ -370,6 +370,11 @@ public final class TestMachine implements IMachine {
         }
 
         @Override
+        public Component getDisplayName() {
+            return I18n.raw("test-team");
+        }
+
+        @Override
         public long getTechProgress(ResourceLocation tech) {
             return progress.getOrDefault(tech, 0L);
         }

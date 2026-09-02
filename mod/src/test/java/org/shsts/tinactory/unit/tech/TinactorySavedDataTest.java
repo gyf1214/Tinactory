@@ -5,6 +5,7 @@ import net.minecraft.nbt.Tag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.tech.Technology;
 import org.shsts.tinactory.core.tech.TinactorySavedData;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestTechManager;
 import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 
@@ -54,6 +55,15 @@ class TinactorySavedDataTest {
 
         assertEquals(6L, loadedProfile.getTechProgress(known));
         assertTrue(loadedProfile.getTargetTech().isEmpty());
+    }
+
+    @Test
+    void resolvesDisplayNameThroughManager() {
+        var manager = new TestTechManager();
+        var data = new TinactorySavedData(manager);
+        var team = data.getTeamProfile("alpha");
+
+        assertEquals(I18n.raw("alpha"), team.getDisplayName());
     }
 
     private static Technology technology(String loc, long maxProgress, int rank) {

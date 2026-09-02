@@ -6,11 +6,13 @@ import dev.ftb.mods.ftbteams.api.event.PlayerChangedTeamEvent;
 import dev.ftb.mods.ftbteams.api.event.TeamEvent;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.shsts.tinactory.TinactoryConfig.FtbUnaffiliatedPlayerPolicy;
 import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.integration.tech.ServerTechManager;
+import org.shsts.tinactory.integration.tech.SinglePlayerTeamProvider;
 
 import java.util.Collection;
 import java.util.List;
@@ -59,16 +61,13 @@ public final class FtbTeamsTeamProvider implements ITeamProvider {
         return teamByProfileId(teamId).map(Team::getOnlineMembers).orElseGet(List::of);
     }
 
+    @Override
+    public Optional<Component> teamDisplayName(String teamId) {
+        return teamByProfileId(teamId).map(Team::getName);
+    }
+
     public static Optional<UUID> profileIdToTeamId(String profileId) {
-        if (!profileId.startsWith(PREFIX)) {
-            return Optional.empty();
-        }
-        try {
-            var teamId = UUID.fromString(profileId.substring(PREFIX.length()));
-            return profileId.equals(profileId(teamId)) ? Optional.of(teamId) : Optional.empty();
-        } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
-        }
+        return SinglePlayerTeamProvider.teamIdToUuid(PREFIX, profileId);
     }
 
     public static boolean isFtbProfileId(String profileId) {
