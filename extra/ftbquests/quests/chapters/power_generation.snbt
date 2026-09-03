@@ -55,6 +55,7 @@
 			tasks: [{
 				id: "57FB78E31B79AC5E"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/lpg" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 4.0d
@@ -70,6 +71,7 @@
 			tasks: [{
 				id: "2BFC051A13D24AAC"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/rocket_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 4.0d
@@ -95,6 +97,7 @@
 			tasks: [{
 				id: "2A523B6BE50429B6"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/diesel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 8.0d
@@ -110,6 +113,7 @@
 			tasks: [{
 				id: "128300FA7CB727A4"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/cetane_boosted_diesel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 8.0d
@@ -153,6 +157,7 @@
 			tasks: [{
 				id: "7E996DDA0AEF09EF"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/coolant" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: -2.0d

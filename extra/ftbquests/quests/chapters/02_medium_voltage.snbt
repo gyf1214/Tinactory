@@ -221,6 +221,7 @@
 			tasks: [{
 				id: "7F39C7B7D2F70593"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/chlorine" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: -4.0d
@@ -246,6 +247,7 @@
 			tasks: [{
 				id: "75EEDFA5E51384D5"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/air" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 4.0d
@@ -257,6 +259,7 @@
 			tasks: [{
 				id: "24E82D6DAC19C159"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/nitrogen" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 4.0d
@@ -281,16 +284,19 @@
 				{
 					id: "6D60806882209B1B"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/natural_gas" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "26D85A3E0FCE3832"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/light_oil" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "6DFC981152DF2E33"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/heavy_oil" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 			]
@@ -316,21 +322,25 @@
 				{
 					id: "104F5E262734012D"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/sulfuric/refinery_gas" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "21846348ACBD89B3"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/sulfuric/naphtha" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "37FCDADB84849CFF"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/sulfuric/light_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "264A3C819091E52C"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/sulfuric/heavy_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 			]
@@ -356,21 +366,25 @@
 				{
 					id: "6123DB8BFE7318DD"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/refinery_gas" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "32E0FEF0824146B0"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/naphtha" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "46ED1DDF55854B23"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/light_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 				{
 					id: "17564D9E72D7F032"
 					item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/heavy_fuel" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+					match_components: "fuzzy"
 					type: "item"
 				}
 			]
@@ -383,6 +397,7 @@
 			tasks: [{
 				id: "452C9FA9C8E098F1"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/fluid/biomass" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 6.0d
@@ -397,6 +412,7 @@
 			tasks: [{
 				id: "21B9A9C7609B515E"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/ethanol" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 6.0d
@@ -408,6 +424,7 @@
 			tasks: [{
 				id: "0D571DEE2FFF0070"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/liquid/sulfuric_acid" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 4.0d
@@ -438,6 +455,7 @@
 			tasks: [{
 				id: "0105D665DF2F9DBA"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/ethylene" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 8.0d
@@ -469,6 +487,7 @@
 			tasks: [{
 				id: "1BEF32E374CA002D"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/hydrogen" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: -6.0d
@@ -485,6 +504,7 @@
 			tasks: [{
 				id: "13E9A7D2D41A5A92"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/methane" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 8.0d
@@ -501,6 +521,7 @@
 			tasks: [{
 				id: "4FAC6B5EAEEAD8FD"
 				item: { components: { "tinactory:fluid_cell_content": { amount: 4000, id: "tinactory:material/gas/oxygen" } }, count: 1, id: "tinactory:tool/fluid_cell/iron" }
+				match_components: "fuzzy"
 				type: "item"
 			}]
 			x: 6.0d
