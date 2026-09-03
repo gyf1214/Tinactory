@@ -221,7 +221,7 @@ object MachineComponents {
                 workTicks(COMPONENT_TICKS)
                 tech(Technologies.BATTERY)
             }
-            battery(Voltage.LV, "cadmium")
+            battery(Voltage.LV, "cadmium", soldering = false)
             battery(Voltage.MV, "sodium_hydroxide")
             battery(Voltage.HV, "lithium")
         }
@@ -343,14 +343,17 @@ object MachineComponents {
         }
     }
 
-    private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust") {
+    private fun AssemblyRecipeFactory.battery(v: Voltage, mat: String, sub: String = "dust",
+        soldering: Boolean = true) {
         val wires = v.rank - 1
         val plates = wires * wires
         component("battery", voltage = v) {
             component("cable", wires)
             input("battery_alloy", "plate", plates)
             input(mat, sub, plates)
-            input("soldering_alloy", amount = wires)
+            if (soldering) {
+                input("soldering_alloy", amount = wires)
+            }
             voltage(Voltage.fromRank(v.rank - 1))
         }
     }
