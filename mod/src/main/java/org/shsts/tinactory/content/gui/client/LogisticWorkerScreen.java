@@ -86,10 +86,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private class ConfigPanel extends ButtonPanel {
         private static final Texture BACKGROUND = new Texture(
             mcLoc("gui/sprites/container/enchanting_table/enchantment_slot_disabled"), 108, 19);
-        private static final Rect FROM_RECT = new Rect(1, 1, BUTTON_SIZE, BUTTON_SIZE);
-        private static final Rect TO_RECT = new Rect(BUTTON_SIZE * 2 + 2, 1, BUTTON_SIZE, BUTTON_SIZE);
-        private static final Rect VALID_RECT = new Rect(BUTTON_SIZE + 2, 1, 20, 20);
-        private static final Rect FILTER_RECT = new Rect(BUTTON_SIZE * 3 + 4, 3, 16, 16);
+        private static final Rect FROM_RECT = new Rect(1, 0, BUTTON_SIZE, BUTTON_SIZE);
+        private static final Rect TO_RECT = new Rect(BUTTON_SIZE * 2 + 2, 0, BUTTON_SIZE, BUTTON_SIZE);
+        private static final Rect VALID_RECT = new Rect(BUTTON_SIZE + 2, 0, 20, 20);
+        private static final Rect FILTER_RECT = new Rect(BUTTON_SIZE * 3 + 4, 2, 16, 16);
+        private static final Rect BACKGROUND_TEX_RECT = new Rect(0, 1, 108, 18);
 
         @Nullable
         private TagKey<Item> tagFilter = null;
@@ -100,7 +101,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         private int nextSelectTag = 0;
 
         public ConfigPanel() {
-            super(LogisticWorkerScreen.this, CONFIG_WIDTH, BUTTON_SIZE + 1, 0);
+            super(LogisticWorkerScreen.this, CONFIG_WIDTH, BUTTON_SIZE, 0);
         }
 
         @Override
@@ -156,7 +157,11 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             var toRect = rect.offsetLike(TO_RECT);
             var filterRect = rect.offsetLike(FILTER_RECT);
 
-            StretchImage.render(graphics, BACKGROUND, rect, 1);
+            if (index - page * gridViewGroup.getSlotCount() == 0) {
+                StretchImage.render(graphics, BACKGROUND, rect.offset(0, -1).enlarge(0, 1), 1);
+            } else {
+                StretchImage.render(graphics, BACKGROUND, rect, BACKGROUND_TEX_RECT, 1);
+            }
             RenderUtil.blit(graphics, RECIPE_BUTTON, fromRect, isFrom ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(graphics, RECIPE_BUTTON, toRect, isTo ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(graphics,
@@ -398,7 +403,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         };
         this.portPanel = new PortSelectPanel();
 
-        var offset1 = Rect.corners(0, TOP_MARGIN, CONFIG_WIDTH, 0);
+        var offset1 = Rect.corners(0, TOP_MARGIN + 1, CONFIG_WIDTH, 0);
         var offset2 = Rect.corners(MARGIN_X + CONFIG_WIDTH + 1, TOP_MARGIN + 1,
             -MARGIN_X - PORT_WIDTH - 1, -1 - INVENTORY_HEIGHT);
         var offset3 = Rect.corners(-PORT_WIDTH, TOP_MARGIN, 0, 0);
