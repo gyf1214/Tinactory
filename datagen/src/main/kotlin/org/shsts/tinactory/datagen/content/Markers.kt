@@ -65,6 +65,10 @@ object Markers {
                 output(AllTags.material("crushed_centrifuged"), port = 2)
                 output(AllTags.material("dust"), port = 2)
             }
+            oreProcess("forge_hammer", "raw")
+            oreProcess("forge_hammer", "crushed")
+            oreProcess("forge_hammer", "crushed_purified")
+            oreProcess("forge_hammer", "crushed_centrifuged")
 
             extrude("stick", "rod")
             extrude("plate")

@@ -268,16 +268,25 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             RecipeFactory<R, B>.process(result: String, input: String,
             workTicks: Long, amount: Int = 1, inputAmount: Int = 1, suffix: String = "",
             voltage: Voltage = this@ProcessBuilder.voltage,
-            block: B.() -> Unit = {}) {
+            asInput: Boolean = false, block: B.() -> Unit = {}) {
             if (!valid(result, input)) {
                 return
             }
 
-            output(material, result, amount, suffix) {
-                input(material, input, inputAmount)
-                voltage(voltage)
-                workTicks(ticks(workTicks))
-                block()
+            if (asInput) {
+                input(material, input, inputAmount, suffix) {
+                    output(material, result, amount)
+                    voltage(voltage)
+                    workTicks(ticks(workTicks))
+                    block()
+                }
+            } else {
+                output(material, result, amount, suffix) {
+                    input(material, input, inputAmount)
+                    voltage(voltage)
+                    workTicks(ticks(workTicks))
+                    block()
+                }
             }
         }
 
@@ -471,9 +480,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             }
             forgeHammer {
                 val v = if (voltage.rank < Voltage.LV.rank) Voltage.ULV else Voltage.fromRank(voltage.rank - 1)
-                process("plate", "ingot", 144, inputAmount = 2, voltage = v)
-                process("foil", "plate", 80, amount = 2, voltage = v)
-                process("foil", "sheet", 80, amount = 2, voltage = v)
+                process("plate", "ingot", 144, inputAmount = 2, voltage = v, asInput = true)
+                process("foil", "plate", 80, amount = 2, voltage = v, asInput = true)
+                process("foil", "sheet", 80, amount = 2, voltage = v, asInput = true)
             }
 
             macerates()
@@ -892,19 +901,22 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     workTicks((variant.destroyTime * 120).toLong())
                 }
                 if (material.hasItem("gem_flawless") || siftAndHammer || siftPrimary) {
-                    output(material, "primary", amount) {
-                        input(material, "raw")
+                    input(material, "raw") {
+                        output(material, "primary", amount)
                     }
                 } else {
-                    output(material, "crushed", amount) {
-                        input(material, "raw")
+                    input(material, "raw") {
+                        output(material, "crushed", amount)
                     }
                 }
-                output(material, "dust_pure") {
-                    input(material, "crushed_purified")
+                input(material, "crushed") {
+                    output(material, "dust_impure")
                 }
-                output(material, "dust_impure") {
-                    input(material, "crushed")
+                input(material, "crushed_purified") {
+                    output(material, "dust_pure")
+                }
+                input(material, "crushed_centrifuged") {
+                    output(material, "dust")
                 }
             }
 

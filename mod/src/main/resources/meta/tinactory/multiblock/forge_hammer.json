@@ -1,5 +1,6 @@
 {
   "sound": "tinactory:tick.forge_hammer",
+  "recipe": "display_input",
   "layout": {
     "slots": [
       {
