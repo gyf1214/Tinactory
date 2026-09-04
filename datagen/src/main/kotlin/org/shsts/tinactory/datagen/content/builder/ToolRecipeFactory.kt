@@ -13,6 +13,7 @@ import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllRecipes.TOOL_CRAFTING
 import org.shsts.tinactory.content.recipe.ToolRecipe
 import org.shsts.tinactory.core.builder.Builder
+import org.shsts.tinactory.core.util.LocHelper.suffix
 import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemLoc
 import org.shsts.tinactory.datagen.content.RegistryHelper.recipeLoc
@@ -29,31 +30,35 @@ class ToolRecipeFactory {
         }
     }
 
-    fun result(item: ItemLike, amount: Int = 1, block: ToolRecipeBuilder.() -> Unit) {
-        recipe(itemLoc(item)) {
+    fun result(item: ItemLike, amount: Int = 1,
+        suffix: String = "", block: ToolRecipeBuilder.() -> Unit) {
+        recipe(suffix(itemLoc(item), suffix)) {
             result(item, amount)
             block()
         }
     }
 
-    fun result(name: String, sub: String, amount: Int = 1, block: ToolRecipeBuilder.() -> Unit) {
+    fun result(name: String, sub: String, amount: Int = 1,
+        suffix: String = "", block: ToolRecipeBuilder.() -> Unit) {
         val mat = getMaterial(name)
-        recipe(mat.loc(sub)) {
+        recipe(suffix(mat.loc(sub), suffix)) {
             result(mat.item(sub), amount)
             block()
         }
     }
 
-    fun shapeless(from: ItemLike, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
-        result(to, amount) {
+    fun shapeless(from: ItemLike, to: ItemLike, tool: TagKey<Item>, amount: Int = 1,
+        suffix: String = "") {
+        result(to, amount, suffix) {
             pattern("#")
             define('#') { from }
             toolTag(tool)
         }
     }
 
-    fun shapeless(from: TagKey<Item>, to: ItemLike, tool: TagKey<Item>, amount: Int = 1) {
-        result(to, amount) {
+    fun shapeless(from: TagKey<Item>, to: ItemLike, tool: TagKey<Item>, amount: Int = 1,
+        suffix: String = "") {
+        result(to, amount, suffix) {
             pattern("#")
             define('#', from)
             toolTag(tool)

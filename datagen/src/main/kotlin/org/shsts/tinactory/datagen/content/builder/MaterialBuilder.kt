@@ -170,8 +170,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private inner class CraftingBuilder(
-        val result: String, val amount: Int) {
+    private inner class CraftingBuilder(val result: String, val amount: Int, val suffix: String) {
         val patterns = mutableListOf<String>()
         val inputs = mutableListOf<TagKey<Item>>()
         val tools = mutableListOf<TagKey<Item>>()
@@ -205,7 +204,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
         private fun buildVanilla() {
             vanilla {
-                shaped(material.item(result), amount) {
+                shaped(material.item(result), amount, suffix) {
                     for (pattern in patterns) {
                         pattern(pattern)
                     }
@@ -219,7 +218,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
 
         private fun buildTools() {
             toolCrafting {
-                result(name, result, amount) {
+                result(name, result, amount, suffix) {
                     for (pattern in patterns) {
                         pattern(pattern)
                     }
@@ -243,15 +242,17 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun crafting(result: String, amount: Int = 1, block: CraftingBuilder.() -> Unit) {
-        CraftingBuilder(result, amount).apply {
+    private fun crafting(result: String, amount: Int = 1,
+        suffix: String = "", block: CraftingBuilder.() -> Unit) {
+        CraftingBuilder(result, amount, suffix).apply {
             block()
             build()
         }
     }
 
-    private fun crafting(result: String, input: String, tool: TagKey<Item>, amount: Int = 1) {
-        crafting(result, amount) {
+    private fun crafting(result: String, input: String, tool: TagKey<Item>, amount: Int = 1,
+        suffix: String = "") {
+        crafting(result, amount, suffix) {
             pattern("A")
             input(input)
             tool(tool)
@@ -838,6 +839,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 }
                 crafting("dust_pure", "crushed_purified", TOOL_HAMMER)
                 crafting("dust_impure", "crushed", TOOL_HAMMER)
+                crafting("dust", "crushed_centrifuged", TOOL_HAMMER, suffix = "_from_centrifuged")
             }
 
             if (siftAndHammer) {
