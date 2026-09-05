@@ -183,7 +183,7 @@ def save_dependency_lock(path, neoforge_version, resolved_files):
     try:
         os.makedirs(directory, exist_ok=True)
         temporary_path = path + ".part"
-        with open(temporary_path, "w", encoding="utf-8") as output_file:
+        with open(temporary_path, "w", encoding="utf-8", newline="\n") as output_file:
             json.dump(data, output_file, indent=2, sort_keys=True)
             output_file.write("\n")
         os.replace(temporary_path, path)

@@ -5,7 +5,9 @@ if [ -z "$base_dir" ]; then
 fi
 mod_dir="$(dirname $base_dir)"
 
-source $base_dir/env.sh
+if [ -f "$base_dir/env.sh" ]; then
+  source $base_dir/env.sh
+fi
 
 get_property() {
   local var=${2:-$1}
