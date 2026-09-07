@@ -5,6 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackAdapter;
 
+import java.util.function.Predicate;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class PortTransmitter<T> {
@@ -12,14 +14,6 @@ public final class PortTransmitter<T> {
 
     public PortTransmitter(IStackAdapter<T> stackAdapter) {
         this.stackAdapter = stackAdapter;
-    }
-
-    public T probe(IPort<T> from, IPort<T> to, T stack, int limit) {
-        return probe(from, to, stack, limit, true);
-    }
-
-    public T probeIdentity(IPort<T> from, IPort<T> to, T stack, int limit) {
-        return probe(from, to, stack, limit, false);
     }
 
     private T probe(IPort<T> from, IPort<T> to, T stack, int limit, boolean amountAware) {
@@ -31,21 +25,40 @@ public final class PortTransmitter<T> {
         return moved > 0 ? stackAdapter.withAmount(extracted, moved) : stackAdapter.empty();
     }
 
-    public T select(IPort<T> from, IPort<T> to, Iterable<T> candidates, int limit) {
-        for (var stack : candidates) {
-            var moved = probe(from, to, stack, limit);
-            if (!stackAdapter.isEmpty(moved)) {
-                return moved;
-            }
+    public int transmit(IPort<T> from, IPort<T> to, Predicate<T> filter, int limit) {
+        if (limit <= 0) {
+            return 0;
         }
-        return stackAdapter.empty();
+        var moved = 0;
+        var candidates = from.getAllStorages().stream().filter(filter).toList();
+        for (var stack : candidates) {
+            if (moved >= limit) {
+                break;
+            }
+            var transferable = probe(from, to, stack, limit - moved, true);
+            if (stackAdapter.isEmpty(transferable)) {
+                continue;
+            }
+            moved += transmitCandidate(from, to, transferable);
+        }
+        return moved;
     }
 
-    public T transmit(IPort<T> from, IPort<T> to, T stack) {
-        if (stackAdapter.isEmpty(stack)) {
-            return stackAdapter.empty();
+    public int transmitIdentity(IPort<T> from, IPort<T> to, T identity, int limit) {
+        if (limit <= 0) {
+            return 0;
         }
-        var extracted = from.extract(stack, false);
-        return to.insert(extracted, false);
+        var transferable = probe(from, to, identity, limit, false);
+        return stackAdapter.isEmpty(transferable) ? 0 : transmitCandidate(from, to, transferable);
     }
+
+    private int transmitCandidate(IPort<T> from, IPort<T> to, T stack) {
+        var extracted = from.extract(stack, false);
+        if (stackAdapter.isEmpty(extracted)) {
+            return 0;
+        }
+        var remaining = to.insert(extracted, false);
+        return stackAdapter.amount(extracted) - stackAdapter.amount(remaining);
+    }
+
 }

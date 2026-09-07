@@ -172,8 +172,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private ItemStack selectTransmittedItem(IPort<ItemStack> from, IPort<ItemStack> to,
-        LogisticWorkerConfig config) {
+    private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
         var world = blockEntity.getLevel();
         assert world != null;
         Predicate<ItemStack> filter = switch (config.filterType()) {
@@ -181,34 +180,14 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             case ITEM -> stack -> ItemFilterIntegration.matches(config.itemFilter(), stack, world.registryAccess());
             default -> StackHelper.TRUE_FILTER;
         };
-        return ITEM_TRANSMITTER.select(from, to,
-            from.getAllStorages().stream().filter(filter).toList(), itemBandwidth);
-    }
-
-    private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
-        var stack = selectTransmittedItem(from, to, config);
-        if (stack.isEmpty()) {
-            return;
-        }
-        var remaining = ITEM_TRANSMITTER.transmit(from, to, stack);
-        if (!remaining.isEmpty()) {
-            LOGGER.warn("transmit item failed from={} to={} content={}", from, to, stack);
-        }
-    }
-
-    private FluidStack selectTransmittedFluid(IPort<FluidStack> from, IPort<FluidStack> to,
-        FluidStack filter) {
-        if (!filter.isEmpty()) {
-            return FLUID_TRANSMITTER.probeIdentity(from, to, filter, fluidBandwidth);
-        }
-        return FLUID_TRANSMITTER.select(from, to, from.getAllStorages(), fluidBandwidth);
+        ITEM_TRANSMITTER.transmit(from, to, filter, itemBandwidth);
     }
 
     private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
-        var stack = selectTransmittedFluid(from, to, filter);
-        var remaining = FLUID_TRANSMITTER.transmit(from, to, stack);
-        if (!remaining.isEmpty()) {
-            LOGGER.warn("transmit fluid failed from={} to={} content={}", from, to, stack);
+        if (filter.isEmpty()) {
+            FLUID_TRANSMITTER.transmit(from, to, StackHelper.TRUE_FLUID_FILTER, fluidBandwidth);
+        } else {
+            FLUID_TRANSMITTER.transmitIdentity(from, to, filter, fluidBandwidth);
         }
     }
 
