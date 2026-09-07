@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.commons.lang3.StringUtils;
@@ -129,7 +128,6 @@ public class TechMenu extends MenuBase {
     public TechMenu(Properties properties) {
         super(properties);
 
-        renameItem.setFilter(0, stack -> stack.is(Items.NAME_TAG));
         renameItem.onUpdate(this::refreshRenameItem);
 
         onEventPacket(RENAME, p -> refreshName(p.getName(), false));
@@ -158,7 +156,7 @@ public class TechMenu extends MenuBase {
 
     private void refreshResult() {
         var item = renameItem.getStackInSlot(0);
-        if (item.is(Items.NAME_TAG)) {
+        if (!item.isEmpty()) {
             renameResult = item.copy();
             if (StringUtils.isBlank(name)) {
                 renameResult.remove(DataComponents.CUSTOM_NAME);
