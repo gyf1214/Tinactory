@@ -1,6 +1,5 @@
 package org.shsts.tinactory.compat.ftbfilter;
 
-import dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
@@ -11,30 +10,32 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class ItemFilterIntegration {
-    @FunctionalInterface
-    private interface Matcher {
-        boolean matches(ItemStack filter, ItemStack stack, HolderLookup.Provider provider);
-    }
-
-    private static final Matcher MATCHER;
+    private static final IFilterProvider PROVIDER;
 
     static {
         if (ModList.get().isLoaded("ftbfiltersystem")) {
-            MATCHER = (filter, stack, provider) -> {
-                var api = FTBFilterSystemAPI.api();
-                if (api.isFilterItem(filter)) {
-                    return api.doesFilterMatch(filter, stack, provider);
-                } else {
+            PROVIDER = new FtbFilterProvider();
+        } else {
+            PROVIDER = new IFilterProvider() {
+                @Override
+                public boolean isFilter(ItemStack stack) {
+                    return false;
+                }
+
+                @Override
+                public boolean matches(ItemStack filter, ItemStack stack, HolderLookup.Provider provider) {
                     return StackHelper.canItemsStack(filter, stack);
                 }
             };
-        } else {
-            MATCHER = (filter, stack, provider) -> StackHelper.canItemsStack(filter, stack);
         }
     }
 
     public static boolean matches(ItemStack filter, ItemStack stack, HolderLookup.Provider provider) {
-        return MATCHER.matches(filter, stack, provider);
+        return PROVIDER.matches(filter, stack, provider);
+    }
+
+    public static boolean isFilter(ItemStack stack) {
+        return PROVIDER.isFilter(stack);
     }
 
     public static void init() {}

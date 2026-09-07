@@ -28,9 +28,9 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import org.slf4j.Logger;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -173,14 +173,22 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
-        var world = blockEntity.getLevel();
-        assert world != null;
-        Predicate<ItemStack> filter = switch (config.filterType()) {
-            case TAG -> stack -> stack.is(config.tagFilter());
-            case ITEM -> stack -> ItemFilterIntegration.matches(config.itemFilter(), stack, world.registryAccess());
-            default -> StackHelper.TRUE_FILTER;
-        };
-        ITEM_TRANSMITTER.transmit(from, to, filter, itemBandwidth);
+        switch (config.filterType()) {
+            case TAG -> ITEM_TRANSMITTER.transmit(from, to, stack -> stack.is(config.tagFilter()),
+                itemBandwidth);
+            case ITEM -> {
+                var item = config.itemFilter();
+                if (ItemFilterIntegration.isFilter(item)) {
+                    var registry = Objects.requireNonNull(blockEntity.getLevel()).registryAccess();
+                    ITEM_TRANSMITTER.transmit(from, to,
+                        stack -> ItemFilterIntegration.matches(item, stack, registry),
+                        itemBandwidth);
+                } else {
+                    ITEM_TRANSMITTER.transmitIdentity(from, to, item, itemBandwidth);
+                }
+            }
+            default -> ITEM_TRANSMITTER.transmit(from, to, StackHelper.TRUE_FILTER, itemBandwidth);
+        }
     }
 
     private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
