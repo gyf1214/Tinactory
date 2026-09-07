@@ -3,8 +3,11 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -12,17 +15,20 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.compat.ftbquests.FtbTeamsTeamProvider;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.SinglePlayerTeamProvider;
 import org.shsts.tinactory.integration.tech.TechManagers;
 
+import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllWorldGens.PLAYER_START_FEATURE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
@@ -112,5 +118,29 @@ public final class AllForgeEvents {
             return;
         }
         WorldMultiblockManagers.get(world).invalidate(event.getPos());
+    }
+
+    @SubscribeEvent
+    public static void onBlockDrops(BlockDropsEvent event) {
+        var blockEntity = event.getBlockEntity();
+        if (blockEntity == null) {
+            return;
+        }
+        var customName = MACHINE.tryGet(blockEntity)
+            .flatMap(machine -> machine.config().getTag("name"))
+            .map(tag -> CodecHelper.parseTag(event.getLevel().registryAccess(),
+                ComponentSerialization.CODEC, tag))
+            .orElse(null);
+        if (customName == null) {
+            return;
+        }
+        var blockItem = event.getState().getBlock().asItem();
+        for (ItemEntity drop : event.getDrops()) {
+            var stack = drop.getItem();
+            if (stack.is(blockItem)) {
+                stack.set(DataComponents.CUSTOM_NAME, customName);
+                return;
+            }
+        }
     }
 }
