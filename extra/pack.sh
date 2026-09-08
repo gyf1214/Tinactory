@@ -39,6 +39,7 @@ echo "Build mod"
 mod_jar="$mod_dir/mod/build/libs/tinactory-$mc_version-$version.jar"
 pushd $mod_dir >/dev/null
 ./gradlew clean >$log_dir/clean.log 2>&1 && \
+  rm -fr $mod_dir/mod/src/generated/* && \
   ./gradlew runData >$log_dir/runData.log 2>&1 && \
   ./gradlew build >$log_dir/build.log 2>&1
 stat=$?
