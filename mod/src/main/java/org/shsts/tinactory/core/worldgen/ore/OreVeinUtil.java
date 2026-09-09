@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -29,19 +30,8 @@ public final class OreVeinUtil {
         if (definitions.isEmpty()) {
             throw new IllegalArgumentException("definitions must not be empty");
         }
-        var totalWeight = 0L;
-        for (var definition : definitions) {
-            totalWeight += definition.selectionWeight();
-        }
-        var target = (long) (hashToUnit(selectionSeed, SELECTION_SALT) * totalWeight);
-        var cumulative = 0L;
-        for (var definition : definitions) {
-            cumulative += definition.selectionWeight();
-            if (target < cumulative) {
-                return definition;
-            }
-        }
-        return definitions.getLast();
+        var veinChoice = hashToUnit(selectionSeed, SELECTION_SALT);
+        return weightedChoice(veinChoice, definitions, OreVeinDefinition::selectionWeight);
     }
 
     public static OreVeinInstance sample(OreVeinDefinition definition, long veinSeed, BlockPos center) {
@@ -65,8 +55,9 @@ public final class OreVeinUtil {
         if (hashToUnit(instance.veinSeed(), position, FILL_SALT) >= fillChance) {
             return Optional.empty();
         }
-        return Optional.of(weightedChoice(
-            hashToUnit(instance.veinSeed(), position, ORE_SALT), instance.ores()).block());
+        var oreChoice = hashToUnit(instance.veinSeed(), position, ORE_SALT);
+        var ore = weightedChoice(oreChoice, instance.ores(), OreEntry::weight);
+        return Optional.of(ore.block());
     }
 
     public static BoundingBox bounds(OreVeinInstance instance) {
@@ -91,15 +82,12 @@ public final class OreVeinUtil {
         return instance.shape().bounds(center, instance.instance());
     }
 
-    private static OreEntry weightedChoice(double unit, List<OreEntry> entries) {
-        var totalWeight = 0L;
+    private static <T> T weightedChoice(double unit, List<T> entries, ToIntFunction<T> weightFunc) {
+        var totalWeight = entries.stream().mapToInt(weightFunc).sum();
+        var target = unit * totalWeight;
+        var cumulative = 0;
         for (var entry : entries) {
-            totalWeight += entry.weight();
-        }
-        var target = (long) (unit * totalWeight);
-        var cumulative = 0L;
-        for (var entry : entries) {
-            cumulative += entry.weight();
+            cumulative += weightFunc.applyAsInt(entry);
             if (target < cumulative) {
                 return entry;
             }
