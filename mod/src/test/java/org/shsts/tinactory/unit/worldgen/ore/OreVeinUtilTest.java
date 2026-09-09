@@ -25,6 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.GOLD_ORE;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
 import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
 
 class OreVeinUtilTest {
@@ -49,7 +52,7 @@ class OreVeinUtilTest {
     void sampleShouldBeDeterministicAndSampleEachRadiusWithinItsRange() {
         var definition = new OreVeinDefinition(
             modLoc("definition"), 1, -32, 32, shapeDefinition(2, 5, 1, 4, 3, 7), 0.75d,
-            modLoc("host"), ores());
+            HOST, ores());
         var center = new BlockPos(10, 20, 30);
         var first = OreVeinUtil.sample(definition, 123L, center);
         var second = OreVeinUtil.sample(definition, 123L, center);
@@ -75,8 +78,8 @@ class OreVeinUtilTest {
     void oreAtShouldBeStableRegardlessOfCoordinateIterationOrder() {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 123L, new BlockPos(0, 0, 0),
-            shapeInstance(4, 4, 4), 0.6d, modLoc("host"),
-            List.of(new OreEntry(modLoc("ore/iron"), 1), new OreEntry(modLoc("ore/gold"), 1)));
+            shapeInstance(4, 4, 4), 0.6d, HOST,
+            List.of(new OreEntry(IRON_ORE, 1), new OreEntry(GOLD_ORE, 1)));
         var forward = new HashMap<BlockPos, Optional<?>>();
         var reverse = new HashMap<BlockPos, Optional<?>>();
 
@@ -99,8 +102,8 @@ class OreVeinUtilTest {
 
         var results = new HashSet<>(forward.values());
         assertEquals(forward, reverse);
-        assertTrue(results.contains(Optional.of(modLoc("ore/iron"))));
-        assertTrue(results.contains(Optional.of(modLoc("ore/gold"))));
+        assertTrue(results.contains(Optional.of(IRON_ORE)));
+        assertTrue(results.contains(Optional.of(GOLD_ORE)));
         assertTrue(results.contains(Optional.empty()));
     }
 
@@ -108,7 +111,7 @@ class OreVeinUtilTest {
     void oreAtShouldApplyEllipsoidBoundsAndDensityFade() {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 321L, new BlockPos(10, 20, 30),
-            shapeInstance(3, 2, 4), 1d, modLoc("host"), List.of(new OreEntry(modLoc("ore/iron"), 1)));
+            shapeInstance(3, 2, 4), 1d, HOST, List.of(new OreEntry(IRON_ORE, 1)));
         var bounds = OreVeinUtil.bounds(instance);
 
         assertEquals(7, bounds.minX());
@@ -141,7 +144,7 @@ class OreVeinUtilTest {
         var shape = new InvalidFactorShape();
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 1L, new BlockPos(0, 0, 0),
-            new OreShapeInstance<>(shape, 1), 1d, modLoc("host"), ores());
+            new OreShapeInstance<>(shape, 1), 1d, HOST, ores());
 
         assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
     }
@@ -156,7 +159,7 @@ class OreVeinUtilTest {
     private static OreVeinDefinition definition(String path, int selectionWeight) {
         return new OreVeinDefinition(
             modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1, 1, 1, 1, 1, 1), 1d,
-            modLoc("host"), ores());
+            HOST, ores());
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
@@ -173,7 +176,7 @@ class OreVeinUtilTest {
     }
 
     private static List<OreEntry> ores() {
-        return List.of(new OreEntry(modLoc("ore/iron"), 1));
+        return List.of(new OreEntry(IRON_ORE, 1));
     }
 
     private static final class InvalidFactorShape implements IOreShape<Integer, Integer> {

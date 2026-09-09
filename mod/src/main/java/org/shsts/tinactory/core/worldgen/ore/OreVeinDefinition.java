@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
 
 import java.util.List;
@@ -20,10 +21,12 @@ public record OreVeinDefinition(
     int maxY,
     OreShapeDefinition<?> shape,
     double density,
-    ResourceLocation hostBlock,
+    Block hostBlock,
     List<OreEntry> ores
 ) {
-    public static MapCodec<OreVeinDefinition> codec(MapCodec<OreShapeDefinition<?>> shapeCodec) {
+    public static MapCodec<OreVeinDefinition> codec(Codec<Block> blockCodec,
+        MapCodec<OreShapeDefinition<?>> shapeCodec) {
+        Objects.requireNonNull(blockCodec, "blockCodec");
         Objects.requireNonNull(shapeCodec, "shapeCodec");
         return RecordCodecBuilder.mapCodec(instance -> instance.group(
             ResourceLocation.CODEC.fieldOf("id").forGetter(OreVeinDefinition::id),
@@ -32,8 +35,8 @@ public record OreVeinDefinition(
             Codec.INT.fieldOf("max_y").forGetter(OreVeinDefinition::maxY),
             shapeCodec.fieldOf("shape").forGetter(OreVeinDefinition::shape),
             Codec.DOUBLE.fieldOf("density").forGetter(OreVeinDefinition::density),
-            ResourceLocation.CODEC.fieldOf("host_block").forGetter(OreVeinDefinition::hostBlock),
-            OreEntry.CODEC.listOf().fieldOf("ores").forGetter(OreVeinDefinition::ores)
+            blockCodec.fieldOf("host_block").forGetter(OreVeinDefinition::hostBlock),
+            OreEntry.codec(blockCodec).listOf().fieldOf("ores").forGetter(OreVeinDefinition::ores)
         ).apply(instance, OreVeinDefinition::new));
     }
 

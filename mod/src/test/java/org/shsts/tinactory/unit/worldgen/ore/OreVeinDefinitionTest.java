@@ -14,6 +14,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.BLOCK_CODEC;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
+import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
 import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
 import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.SHAPE_CODEC;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
@@ -30,8 +33,8 @@ class OreVeinDefinitionTest {
         assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 5, 1, 3, 2, 4)),
             definition.shape());
         assertEquals(0.75d, definition.density());
-        assertEquals(modLoc("host/stone"), definition.hostBlock());
-        assertEquals(List.of(new OreEntry(modLoc("ore/iron"), 3)), definition.ores());
+        assertEquals(HOST, definition.hostBlock());
+        assertEquals(List.of(new OreEntry(IRON_ORE, 3)), definition.ores());
     }
 
     @Test
@@ -40,19 +43,19 @@ class OreVeinDefinitionTest {
         assertThrows(IllegalArgumentException.class, () -> definition(1, 64, -32, 0.75d));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
             modLoc("ore"), 1, 0, 1, new OreShapeDefinition<>(ELLIPSOID,
-                new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1)), 0.75d, modLoc("host"), ores()));
+                new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
             modLoc("ore"), 1, 0, 1, new OreShapeDefinition<>(ELLIPSOID,
-                new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1)), 0.75d, modLoc("host"), ores()));
+                new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 0d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, -0.1d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 1.1d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.NaN));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.POSITIVE_INFINITY));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"), List.of()));
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, HOST, List.of()));
         assertThrows(NullPointerException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"),
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, HOST,
             new ArrayList<>(List.of((OreEntry) null))));
     }
 
@@ -60,18 +63,18 @@ class OreVeinDefinitionTest {
     void definitionShouldOwnAnImmutableOreList() {
         var ores = new ArrayList<>(ores());
         var definition = new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"), ores);
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, HOST, ores);
         ores.clear();
 
         assertEquals(1, definition.ores().size());
         assertThrows(UnsupportedOperationException.class,
-            () -> definition.ores().add(new OreEntry(modLoc("ore/gold"), 1)));
+            () -> definition.ores().add(new OreEntry(IRON_ORE, 1)));
     }
 
     @Test
-    void codecShouldRoundTripDefinitionThroughJsonAndNbtWithoutRegistryResolution() {
+    void codecShouldRoundTripDefinitionThroughBlockRegistry() {
         var definition = definition();
-        var codec = OreVeinDefinition.codec(OreShapeUtil.definitionCodec(SHAPE_CODEC));
+        var codec = OreVeinDefinition.codec(BLOCK_CODEC, OreShapeUtil.definitionCodec(SHAPE_CODEC));
         var json = CodecHelper.encodeJson(TEST_REGISTRY, codec.codec(), definition);
         var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec.codec(), definition);
 
@@ -82,13 +85,13 @@ class OreVeinDefinitionTest {
     private static OreVeinDefinition definition() {
         return new OreVeinDefinition(
             modLoc("ore/iron"), 7, -32, 64, shapeDefinition(2, 5, 1, 3, 2, 4), 0.75d,
-            modLoc("host/stone"), ores());
+            HOST, ores());
     }
 
     private static OreVeinDefinition definition(int selectionWeight, int minY, int maxY, double density) {
         return new OreVeinDefinition(
             modLoc("ore"), selectionWeight, minY, maxY, shapeDefinition(), density,
-            modLoc("host"), ores());
+            HOST, ores());
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {
@@ -101,6 +104,6 @@ class OreVeinDefinitionTest {
     }
 
     private static List<OreEntry> ores() {
-        return List.of(new OreEntry(modLoc("ore/iron"), 3));
+        return List.of(new OreEntry(IRON_ORE, 3));
     }
 }

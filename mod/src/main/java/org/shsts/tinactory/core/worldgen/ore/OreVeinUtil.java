@@ -3,7 +3,7 @@ package org.shsts.tinactory.core.worldgen.ore;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
 import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
@@ -70,7 +70,7 @@ public final class OreVeinUtil {
             definition.ores());
     }
 
-    public static Optional<ResourceLocation> oreAt(
+    public static Optional<Block> oreAt(
         OreVeinInstance instance, BlockPos position) {
         Objects.requireNonNull(instance, "instance");
         Objects.requireNonNull(position, "position");
