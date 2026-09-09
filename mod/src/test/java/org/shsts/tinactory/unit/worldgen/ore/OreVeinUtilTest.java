@@ -1,11 +1,18 @@
 package org.shsts.tinactory.unit.worldgen.ore;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
+import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
 
 class OreVeinUtilTest {
     @Test
@@ -40,7 +48,8 @@ class OreVeinUtilTest {
     @Test
     void sampleShouldBeDeterministicAndSampleEachRadiusWithinItsRange() {
         var definition = new OreVeinDefinition(
-            modLoc("definition"), 1, -32, 32, 2, 5, 1, 4, 3, 7, 0.75d, modLoc("host"), ores());
+            modLoc("definition"), 1, -32, 32, shapeDefinition(2, 5, 1, 4, 3, 7), 0.75d,
+            modLoc("host"), ores());
         var center = new BlockPos(10, 20, 30);
         var first = OreVeinUtil.sample(definition, 123L, center);
         var second = OreVeinUtil.sample(definition, 123L, center);
@@ -49,10 +58,11 @@ class OreVeinUtilTest {
         assertEquals(first, second);
         for (var seed = 0L; seed < 100L; seed++) {
             var instance = OreVeinUtil.sample(definition, seed, center);
-            assertTrue(instance.radiusX() >= 2 && instance.radiusX() <= 5);
-            assertTrue(instance.radiusY() >= 1 && instance.radiusY() <= 4);
-            assertTrue(instance.radiusZ() >= 3 && instance.radiusZ() <= 7);
-            sawNonMinimumRadius |= instance.radiusX() > 2 || instance.radiusY() > 1 || instance.radiusZ() > 3;
+            var ellipsoid = ellipsoidInstance(instance);
+            assertTrue(ellipsoid.radiusX() >= 2 && ellipsoid.radiusX() <= 5);
+            assertTrue(ellipsoid.radiusY() >= 1 && ellipsoid.radiusY() <= 4);
+            assertTrue(ellipsoid.radiusZ() >= 3 && ellipsoid.radiusZ() <= 7);
+            sawNonMinimumRadius |= ellipsoid.radiusX() > 2 || ellipsoid.radiusY() > 1 || ellipsoid.radiusZ() > 3;
         }
         assertTrue(sawNonMinimumRadius);
         assertEquals(OreVeinUtil.ALGORITHM_VERSION, first.algorithmVersion());
@@ -65,7 +75,7 @@ class OreVeinUtilTest {
     void oreAtShouldBeStableRegardlessOfCoordinateIterationOrder() {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 123L, new BlockPos(0, 0, 0),
-            4, 4, 4, 0.6d, modLoc("host"),
+            shapeInstance(4, 4, 4), 0.6d, modLoc("host"),
             List.of(new OreEntry(modLoc("ore/iron"), 1), new OreEntry(modLoc("ore/gold"), 1)));
         var forward = new HashMap<BlockPos, Optional<?>>();
         var reverse = new HashMap<BlockPos, Optional<?>>();
@@ -98,7 +108,7 @@ class OreVeinUtilTest {
     void oreAtShouldApplyEllipsoidBoundsAndDensityFade() {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 321L, new BlockPos(10, 20, 30),
-            3, 2, 4, 1d, modLoc("host"), List.of(new OreEntry(modLoc("ore/iron"), 1)));
+            shapeInstance(3, 2, 4), 1d, modLoc("host"), List.of(new OreEntry(modLoc("ore/iron"), 1)));
         var bounds = OreVeinUtil.bounds(instance);
 
         assertEquals(7, bounds.minX());
@@ -127,6 +137,16 @@ class OreVeinUtilTest {
     }
 
     @Test
+    void oreAtShouldRejectAnInvalidShapeFillFactor() {
+        var shape = new InvalidFactorShape();
+        var instance = new OreVeinInstance(
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 1L, new BlockPos(0, 0, 0),
+            new OreShapeInstance<>(shape, 1), 1d, modLoc("host"), ores());
+
+        assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
+    }
+
+    @Test
     void selectShouldRejectTotalWeightOverflow() {
         var huge = definition("huge", Integer.MAX_VALUE);
 
@@ -135,11 +155,51 @@ class OreVeinUtilTest {
 
     private static OreVeinDefinition definition(String path, int selectionWeight) {
         return new OreVeinDefinition(
-            modLoc("definition/" + path), selectionWeight, 0, 1, 1, 1, 1, 1, 1, 1, 1d,
+            modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1, 1, 1, 1, 1, 1), 1d,
             modLoc("host"), ores());
+    }
+
+    private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
+        int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        return new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(minX, maxX, minY, maxY, minZ, maxZ));
+    }
+
+    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(int radiusX, int radiusY, int radiusZ) {
+        return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusX, radiusY, radiusZ));
+    }
+
+    private static EllipsoidShape.Instance ellipsoidInstance(OreVeinInstance instance) {
+        return (EllipsoidShape.Instance) instance.shape().instance();
     }
 
     private static List<OreEntry> ores() {
         return List.of(new OreEntry(modLoc("ore/iron"), 1));
+    }
+
+    private static final class InvalidFactorShape implements IOreShape<Integer, Integer> {
+        @Override
+        public MapCodec<Integer> definitionCodec() {
+            return Codec.INT.fieldOf("value");
+        }
+
+        @Override
+        public MapCodec<Integer> instanceCodec() {
+            return Codec.INT.fieldOf("value");
+        }
+
+        @Override
+        public Integer sample(Integer definition, long veinSeed) {
+            return definition;
+        }
+
+        @Override
+        public BoundingBox bounds(BlockPos center, Integer instance) {
+            return new BoundingBox(center);
+        }
+
+        @Override
+        public double fillFactor(long veinSeed, BlockPos center, BlockPos position, Integer instance) {
+            return 2d;
+        }
     }
 }

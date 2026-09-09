@@ -18,6 +18,7 @@ import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISubnetLabel;
+import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
 import org.shsts.tinactory.integration.common.SimpleFluid;
 import org.shsts.tinactory.integration.common.SimpleFluidType;
 import org.shsts.tinactory.integration.metrics.MetricsManager;
@@ -39,6 +40,7 @@ public final class AllRegistries {
     public static final IRegistry<IComponentType<?>> COMPONENT_TYPES;
     public static final IRegistry<ISubnetLabel> SUBNET_LABELS;
     public static final IRegistry<IMetricsCallback> METRICS_CALLBACKS;
+    public static final IRegistry<IOreShape<?, ?>> ORE_SHAPES;
 
     public static final IEntryHandler<IEvent<?>> EVENTS;
     public static final IEntryHandler<Block> BLOCKS;
@@ -61,6 +63,7 @@ public final class AllRegistries {
         METRICS_CALLBACKS = REGISTRATE.registry(TinactoryKeys.METRICS_CALLBACKS, IMetricsCallback.class)
             .onBake(MetricsManager::onBake)
             .register();
+        ORE_SHAPES = REGISTRATE.<IOreShape<?, ?>>genericRegistry("ore_shape", IOreShape.class).register();
 
         EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY);
         BLOCKS = REGISTRATE.getHandler(Registries.BLOCK, BuiltInRegistries.BLOCK);

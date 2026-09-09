@@ -5,6 +5,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +20,6 @@ public final class OreVeinUtil {
 
     private static final long MAX_SELECTION_WEIGHT = Integer.MAX_VALUE;
     private static final long SELECTION_SALT = 0x4F1BBCDCBFA54001L;
-    private static final long RADIUS_X_SALT = 0x9E3779B97F4A7C15L;
-    private static final long RADIUS_Y_SALT = 0xD1B54A32D192ED03L;
-    private static final long RADIUS_Z_SALT = 0x94D049BB133111EBL;
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;
     private static final long ORE_SALT = 0xA5A3564E27F2C9B1L;
     private static final long X_HASH = 0x632BE59BD9B4E019L;
@@ -64,9 +64,7 @@ public final class OreVeinUtil {
             definition.id(),
             veinSeed,
             center,
-            sampleRadius(veinSeed, definition.minRadiusX(), definition.maxRadiusX(), RADIUS_X_SALT),
-            sampleRadius(veinSeed, definition.minRadiusY(), definition.maxRadiusY(), RADIUS_Y_SALT),
-            sampleRadius(veinSeed, definition.minRadiusZ(), definition.maxRadiusZ(), RADIUS_Z_SALT),
+            sampleShape(definition.shape(), veinSeed),
             definition.density(),
             definition.hostBlock(),
             definition.ores());
@@ -76,17 +74,11 @@ public final class OreVeinUtil {
         OreVeinInstance instance, BlockPos position) {
         Objects.requireNonNull(instance, "instance");
         Objects.requireNonNull(position, "position");
-        var center = instance.center();
-        var dx = (double) position.getX() - center.getX();
-        var dy = (double) position.getY() - center.getY();
-        var dz = (double) position.getZ() - center.getZ();
-        var distance = square(dx / instance.radiusX()) +
-            square(dy / instance.radiusY()) +
-            square(dz / instance.radiusZ());
-        if (distance > 1d) {
-            return Optional.empty();
+        var shapeFactor = fillFactor(instance.shape(), instance.veinSeed(), instance.center(), position);
+        if (!Double.isFinite(shapeFactor) || shapeFactor < 0d || shapeFactor > 1d) {
+            throw new IllegalArgumentException("shape fill factor must be finite and in the range [0, 1]");
         }
-        var fillChance = instance.density() * (1d - distance);
+        var fillChance = instance.density() * shapeFactor;
         if (hashToUnit(instance.veinSeed(), position, FILL_SALT) >= fillChance) {
             return Optional.empty();
         }
@@ -96,19 +88,38 @@ public final class OreVeinUtil {
 
     public static BoundingBox bounds(OreVeinInstance instance) {
         Objects.requireNonNull(instance, "instance");
-        var center = instance.center();
-        return new BoundingBox(
-            lowerBound(center.getX(), instance.radiusX()),
-            lowerBound(center.getY(), instance.radiusY()),
-            lowerBound(center.getZ(), instance.radiusZ()),
-            upperBound(center.getX(), instance.radiusX()),
-            upperBound(center.getY(), instance.radiusY()),
-            upperBound(center.getZ(), instance.radiusZ()));
+        return bounds(instance.shape(), instance.center());
     }
 
-    private static int sampleRadius(long seed, int min, int max, long salt) {
-        var range = (long) max - min + 1L;
-        return min + (int) (hashToUnit(seed, 0, 0, 0, salt) * range);
+    private static OreShapeInstance<?> sampleShape(OreShapeDefinition<?> definition, long veinSeed) {
+        return sampleShapeTyped(definition, veinSeed);
+    }
+
+    private static <D> OreShapeInstance<?> sampleShapeTyped(OreShapeDefinition<D> definition, long veinSeed) {
+        return sampleShapeTyped(definition, definition.shape(), veinSeed);
+    }
+
+    private static <D, I> OreShapeInstance<I> sampleShapeTyped(
+        OreShapeDefinition<D> definition, IOreShape<D, I> shape, long veinSeed) {
+        return new OreShapeInstance<>(shape, shape.sample(definition.definition(), veinSeed));
+    }
+
+    private static double fillFactor(OreShapeInstance<?> instance, long veinSeed, BlockPos center,
+        BlockPos position) {
+        return fillFactorTyped(instance, veinSeed, center, position);
+    }
+
+    private static <I> double fillFactorTyped(OreShapeInstance<I> instance, long veinSeed, BlockPos center,
+        BlockPos position) {
+        return instance.shape().fillFactor(veinSeed, center, position, instance.instance());
+    }
+
+    private static BoundingBox bounds(OreShapeInstance<?> instance, BlockPos center) {
+        return boundsTyped(instance, center);
+    }
+
+    private static <I> BoundingBox boundsTyped(OreShapeInstance<I> instance, BlockPos center) {
+        return instance.shape().bounds(center, instance.instance());
     }
 
     private static OreEntry weightedChoice(double unit, List<OreEntry> entries) {
@@ -131,10 +142,6 @@ public final class OreVeinUtil {
         return entries.get(entries.size() - 1);
     }
 
-    private static double square(double value) {
-        return value * value;
-    }
-
     private static double hashToUnit(long seed, BlockPos position, long salt) {
         return hashToUnit(seed, position.getX(), position.getY(), position.getZ(), salt);
     }
@@ -151,13 +158,5 @@ public final class OreVeinUtil {
         value = (value ^ (value >>> 30)) * 0xBF58476D1CE4E5B9L;
         value = (value ^ (value >>> 27)) * 0x94D049BB133111EBL;
         return value ^ (value >>> 31);
-    }
-
-    private static int lowerBound(int center, int radius) {
-        return (int) Math.max(Integer.MIN_VALUE, (long) center - radius);
-    }
-
-    private static int upperBound(int center, int radius) {
-        return (int) Math.min(Integer.MAX_VALUE, (long) center + radius);
     }
 }

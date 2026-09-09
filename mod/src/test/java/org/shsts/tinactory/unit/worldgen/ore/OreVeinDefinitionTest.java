@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
+import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
+import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +14,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
+import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.SHAPE_CODEC;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class OreVeinDefinitionTest {
@@ -22,12 +27,8 @@ class OreVeinDefinitionTest {
         assertEquals(7, definition.selectionWeight());
         assertEquals(-32, definition.minY());
         assertEquals(64, definition.maxY());
-        assertEquals(2, definition.minRadiusX());
-        assertEquals(5, definition.maxRadiusX());
-        assertEquals(1, definition.minRadiusY());
-        assertEquals(3, definition.maxRadiusY());
-        assertEquals(2, definition.minRadiusZ());
-        assertEquals(4, definition.maxRadiusZ());
+        assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 5, 1, 3, 2, 4)),
+            definition.shape());
         assertEquals(0.75d, definition.density());
         assertEquals(modLoc("host/stone"), definition.hostBlock());
         assertEquals(List.of(new OreEntry(modLoc("ore/iron"), 3)), definition.ores());
@@ -38,18 +39,20 @@ class OreVeinDefinitionTest {
         assertThrows(IllegalArgumentException.class, () -> definition(0, -32, 64, 0.75d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, 64, -32, 0.75d));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, 0, 1, 1, 1, 1, 1, 0.75d, modLoc("host"), ores()));
+            modLoc("ore"), 1, 0, 1, new OreShapeDefinition<>(ELLIPSOID,
+                new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1)), 0.75d, modLoc("host"), ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, 2, 1, 1, 1, 1, 1, 0.75d, modLoc("host"), ores()));
+            modLoc("ore"), 1, 0, 1, new OreShapeDefinition<>(ELLIPSOID,
+                new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1)), 0.75d, modLoc("host"), ores()));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 0d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, -0.1d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 1.1d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.NaN));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.POSITIVE_INFINITY));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.75d, modLoc("host"), List.of()));
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"), List.of()));
         assertThrows(NullPointerException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.75d, modLoc("host"),
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"),
             new ArrayList<>(List.of((OreEntry) null))));
     }
 
@@ -57,7 +60,7 @@ class OreVeinDefinitionTest {
     void definitionShouldOwnAnImmutableOreList() {
         var ores = new ArrayList<>(ores());
         var definition = new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.75d, modLoc("host"), ores);
+            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, modLoc("host"), ores);
         ores.clear();
 
         assertEquals(1, definition.ores().size());
@@ -68,23 +71,33 @@ class OreVeinDefinitionTest {
     @Test
     void codecShouldRoundTripDefinitionThroughJsonAndNbtWithoutRegistryResolution() {
         var definition = definition();
-        var json = CodecHelper.encodeJson(TEST_REGISTRY, OreVeinDefinition.CODEC, definition);
-        var tag = CodecHelper.encodeTag(TEST_REGISTRY, OreVeinDefinition.CODEC, definition);
+        var codec = OreVeinDefinition.codec(OreShapeUtil.definitionCodec(SHAPE_CODEC));
+        var json = CodecHelper.encodeJson(TEST_REGISTRY, codec.codec(), definition);
+        var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec.codec(), definition);
 
-        assertEquals(definition, CodecHelper.parseJson(TEST_REGISTRY, OreVeinDefinition.CODEC, json));
-        assertEquals(definition, CodecHelper.parseTag(TEST_REGISTRY, OreVeinDefinition.CODEC, tag));
+        assertEquals(definition, CodecHelper.parseJson(TEST_REGISTRY, codec.codec(), json));
+        assertEquals(definition, CodecHelper.parseTag(TEST_REGISTRY, codec.codec(), tag));
     }
 
     private static OreVeinDefinition definition() {
         return new OreVeinDefinition(
-            modLoc("ore/iron"), 7, -32, 64, 2, 5, 1, 3, 2, 4, 0.75d,
+            modLoc("ore/iron"), 7, -32, 64, shapeDefinition(2, 5, 1, 3, 2, 4), 0.75d,
             modLoc("host/stone"), ores());
     }
 
     private static OreVeinDefinition definition(int selectionWeight, int minY, int maxY, double density) {
         return new OreVeinDefinition(
-            modLoc("ore"), selectionWeight, minY, maxY, 1, 1, 1, 1, 1, 1, density,
+            modLoc("ore"), selectionWeight, minY, maxY, shapeDefinition(), density,
             modLoc("host"), ores());
+    }
+
+    private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {
+        return shapeDefinition(1, 1, 1, 1, 1, 1);
+    }
+
+    private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
+        int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
+        return new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(minX, maxX, minY, maxY, minZ, maxZ));
     }
 
     private static List<OreEntry> ores() {
