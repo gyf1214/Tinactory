@@ -4,10 +4,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import org.shsts.tinactory.AllRegistries;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 
@@ -17,9 +18,10 @@ public final class OreVeinStructureType implements StructureType<OreVeinStructur
     private final MapCodec<OreVeinStructure> codec;
 
     public OreVeinStructureType() {
-        var shapeCodec = AllRegistries.ORE_SHAPES.get().byNameCodec();
+        var shapeCodec = CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.get().key());
         var shapeDefinitionCodec = OreVeinUtil.definitionCodec(shapeCodec);
-        var definitionCodec = OreVeinDefinition.codec(BuiltInRegistries.BLOCK.byNameCodec(), shapeDefinitionCodec);
+        var definitionCodec = OreVeinDefinition.codec(
+            CodecHelper.registryValueCodec(Registries.BLOCK), shapeDefinitionCodec);
         this.codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Structure.settingsCodec(instance),
             definitionCodec.codec().listOf().fieldOf("definitions").forGetter(OreVeinStructure::definitions)

@@ -29,7 +29,7 @@ public final class AllWorldGens {
     public static final IEntry<PlayerStartFeature> PLAYER_START_FEATURE;
     public static final IEntry<EllipsoidShape> ELLIPSOID_SHAPE;
     public static final IEntry<StructureType<OreVeinStructure>> ORE_VEIN_STRUCTURE_TYPE;
-    public static final IEntry<StructurePieceType.ContextlessType> ORE_VEIN_PIECE_TYPE;
+    public static final IEntry<StructurePieceType> ORE_VEIN_PIECE_TYPE;
     public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER_TREE_GROWER;
 
     private static final IEntryHandler<StructureType<?>> STRUCTURE_TYPES =

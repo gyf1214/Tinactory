@@ -44,8 +44,8 @@ public final class OreVeinGameTest {
             helper.fail("Ore vein structure type is not registered");
             return;
         }
-        if (!(pieceType instanceof StructurePieceType.ContextlessType)) {
-            helper.fail("Ore vein piece type is not registered as contextless");
+        if (pieceType instanceof StructurePieceType.ContextlessType) {
+            helper.fail("Ore vein piece type is registered without serialization context");
             return;
         }
         if (AllWorldGens.ORE_VEIN_STRUCTURE_TYPE.get() != type || AllWorldGens.ORE_VEIN_PIECE_TYPE.get() != pieceType) {
@@ -86,7 +86,7 @@ public final class OreVeinGameTest {
             helper.fail("Ore vein piece did not write its registered payload");
             return;
         }
-        var loaded = loadPiece(tag);
+        var loaded = loadPiece(context, tag);
         if (!instance.equals(loaded.instance())) {
             helper.fail("Ore vein piece did not preserve its complete instance");
             return;
@@ -105,7 +105,7 @@ public final class OreVeinGameTest {
         var payload = tag.getCompound("ore_vein");
         payload.putInt("algorithm_version", OreVeinUtil.ALGORITHM_VERSION + 1);
         try {
-            loadPiece(tag);
+            loadPiece(StructurePieceSerializationContext.fromLevel(helper.getLevel()), tag);
             helper.fail("Ore vein piece accepted an unsupported algorithm version");
         } catch (IllegalArgumentException expected) {
             helper.succeed();
@@ -151,8 +151,8 @@ public final class OreVeinGameTest {
         helper.succeed();
     }
 
-    private static OreVeinPiece loadPiece(CompoundTag tag) {
-        return (OreVeinPiece) AllWorldGens.ORE_VEIN_PIECE_TYPE.get().load(tag);
+    private static OreVeinPiece loadPiece(StructurePieceSerializationContext context, CompoundTag tag) {
+        return (OreVeinPiece) AllWorldGens.ORE_VEIN_PIECE_TYPE.get().load(context, tag);
     }
 
     private static OreVeinInstance sampledInstance() {

@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.RandomSource;
@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.AllWorldGens;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 
@@ -32,9 +33,9 @@ public final class OreVeinPiece extends StructurePiece {
         this.instance = instance;
     }
 
-    public OreVeinPiece(CompoundTag tag) {
+    public OreVeinPiece(StructurePieceSerializationContext context, CompoundTag tag) {
         super(AllWorldGens.ORE_VEIN_PIECE_TYPE.get(), tag);
-        this.instance = decodeInstance(tag.getCompound(PAYLOAD_KEY));
+        this.instance = decodeInstance(context, tag.getCompound(PAYLOAD_KEY));
         this.boundingBox = OreVeinUtil.bounds(instance);
     }
 
@@ -44,7 +45,7 @@ public final class OreVeinPiece extends StructurePiece {
 
     @Override
     protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tag) {
-        tag.put(PAYLOAD_KEY, instanceCodec().encodeStart(NbtOps.INSTANCE, instance).getOrThrow());
+        tag.put(PAYLOAD_KEY, CodecHelper.encodeTag(context.registryAccess(), instanceCodec(), instance));
     }
 
     @Override
@@ -74,15 +75,15 @@ public final class OreVeinPiece extends StructurePiece {
 
     private static Codec<OreVeinInstance> instanceCodec() {
         if (instanceCodec == null) {
-            var shapeCodec = AllRegistries.ORE_SHAPES.get().byNameCodec();
-            instanceCodec = OreVeinInstance.codec(BuiltInRegistries.BLOCK.byNameCodec(),
+            var shapeCodec = CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.get().key());
+            instanceCodec = OreVeinInstance.codec(CodecHelper.registryValueCodec(Registries.BLOCK),
                 OreVeinUtil.instanceCodec(shapeCodec));
         }
         return instanceCodec;
     }
 
-    private static OreVeinInstance decodeInstance(CompoundTag tag) {
-        return instanceCodec().parse(NbtOps.INSTANCE, tag)
+    private static OreVeinInstance decodeInstance(StructurePieceSerializationContext context, CompoundTag tag) {
+        return instanceCodec().parse(context.registryAccess().createSerializationContext(NbtOps.INSTANCE), tag)
             .getOrThrow(error -> new IllegalArgumentException("Invalid ore vein payload: " + error));
     }
 }
