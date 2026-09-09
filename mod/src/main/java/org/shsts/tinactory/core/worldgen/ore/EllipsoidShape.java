@@ -53,12 +53,12 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
     @Override
     public BoundingBox bounds(BlockPos center, Instance instance) {
         return new BoundingBox(
-            lowerBound(center.getX(), instance.radiusX()),
-            lowerBound(center.getY(), instance.radiusY()),
-            lowerBound(center.getZ(), instance.radiusZ()),
-            upperBound(center.getX(), instance.radiusX()),
-            upperBound(center.getY(), instance.radiusY()),
-            upperBound(center.getZ(), instance.radiusZ()));
+            center.getX() - instance.radiusX(),
+            center.getY() - instance.radiusY(),
+            center.getZ() - instance.radiusZ(),
+            center.getX() + instance.radiusX(),
+            center.getY() + instance.radiusY(),
+            center.getZ() + instance.radiusZ());
     }
 
     @Override
@@ -74,33 +74,11 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
 
     private static int sampleRadius(long seed, int min, int max, long salt) {
         var range = (long) max - min + 1L;
-        return min + (int) (hashToUnit(seed, salt) * range);
+        return min + (int) (OreVeinUtil.hashToUnit(seed, salt) * range);
     }
 
     private static double square(double value) {
         return value * value;
-    }
-
-    private static double hashToUnit(long seed, long salt) {
-        var hash = seed ^ salt;
-        hash = mix64(hash);
-        hash = mix64(hash);
-        hash = mix64(hash);
-        return (hash >>> 11) * 0x1.0p-53;
-    }
-
-    private static long mix64(long value) {
-        value = (value ^ (value >>> 30)) * 0xBF58476D1CE4E5B9L;
-        value = (value ^ (value >>> 27)) * 0x94D049BB133111EBL;
-        return value ^ (value >>> 31);
-    }
-
-    private static int lowerBound(int center, int radius) {
-        return (int) Math.max(Integer.MIN_VALUE, (long) center - radius);
-    }
-
-    private static int upperBound(int center, int radius) {
-        return (int) Math.min(Integer.MAX_VALUE, (long) center + radius);
     }
 
     public record Definition(

@@ -49,6 +49,13 @@ class OreVeinUtilTest {
     }
 
     @Test
+    void hashToUnitShouldPreserveSeedAndPositionFixtures() {
+        assertEquals(0.2758902365283412d, OreVeinUtil.hashToUnit(123L, 456L));
+        assertEquals(0.7128817798791227d,
+            OreVeinUtil.hashToUnit(123L, new BlockPos(10, 20, 30), 456L));
+    }
+
+    @Test
     void sampleShouldBeDeterministicAndSampleEachRadiusWithinItsRange() {
         var definition = new OreVeinDefinition(
             modLoc("definition"), 1, -32, 32, shapeDefinition(2, 5, 1, 4, 3, 7), 0.75d,
@@ -147,13 +154,6 @@ class OreVeinUtilTest {
             new OreShapeInstance<>(shape, 1), 1d, HOST, ores());
 
         assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
-    }
-
-    @Test
-    void selectShouldRejectTotalWeightOverflow() {
-        var huge = definition("huge", Integer.MAX_VALUE);
-
-        assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.select(List.of(huge, huge), 1L));
     }
 
     private static OreVeinDefinition definition(String path, int selectionWeight) {

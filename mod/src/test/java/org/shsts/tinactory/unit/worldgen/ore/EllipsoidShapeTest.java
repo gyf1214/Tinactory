@@ -85,26 +85,4 @@ class EllipsoidShapeTest {
         assertEquals(0d, shape.fillFactor(123L, center, new BlockPos(15, 20, 30), instance));
     }
 
-    @Test
-    void boundsShouldClampIntegerOverflow() {
-        var maxCenter = new BlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-        var minCenter = new BlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
-        var instance = new EllipsoidShape.Instance(4, 2, 6);
-
-        var maxBounds = shape.bounds(maxCenter, instance);
-        var minBounds = shape.bounds(minCenter, instance);
-
-        assertEquals(Integer.MAX_VALUE - 4, maxBounds.minX());
-        assertEquals(Integer.MAX_VALUE, maxBounds.maxX());
-        assertEquals(Integer.MAX_VALUE - 2, maxBounds.minY());
-        assertEquals(Integer.MAX_VALUE, maxBounds.maxY());
-        assertEquals(Integer.MAX_VALUE - 6, maxBounds.minZ());
-        assertEquals(Integer.MAX_VALUE, maxBounds.maxZ());
-        assertEquals(Integer.MIN_VALUE, minBounds.minX());
-        assertEquals(Integer.MIN_VALUE + 4, minBounds.maxX());
-        assertEquals(Integer.MIN_VALUE, minBounds.minY());
-        assertEquals(Integer.MIN_VALUE + 2, minBounds.maxY());
-        assertEquals(Integer.MIN_VALUE, minBounds.minZ());
-        assertEquals(Integer.MIN_VALUE + 6, minBounds.maxZ());
-    }
 }

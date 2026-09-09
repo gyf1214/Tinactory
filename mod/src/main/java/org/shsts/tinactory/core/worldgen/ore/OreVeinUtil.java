@@ -16,7 +16,6 @@ import java.util.Optional;
 public final class OreVeinUtil {
     public static final int ALGORITHM_VERSION = 1;
 
-    private static final long MAX_SELECTION_WEIGHT = Integer.MAX_VALUE;
     private static final long SELECTION_SALT = 0x4F1BBCDCBFA54001L;
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;
     private static final long ORE_SALT = 0xA5A3564E27F2C9B1L;
@@ -32,16 +31,9 @@ public final class OreVeinUtil {
         }
         var totalWeight = 0L;
         for (var definition : definitions) {
-            try {
-                totalWeight = Math.addExact(totalWeight, definition.selectionWeight());
-            } catch (ArithmeticException exception) {
-                throw new IllegalArgumentException("selection weight total overflowed", exception);
-            }
-            if (totalWeight > MAX_SELECTION_WEIGHT) {
-                throw new IllegalArgumentException("selection weight total is too large");
-            }
+            totalWeight += definition.selectionWeight();
         }
-        var target = (long) (hashToUnit(selectionSeed, 0, 0, 0, SELECTION_SALT) * totalWeight);
+        var target = (long) (hashToUnit(selectionSeed, SELECTION_SALT) * totalWeight);
         var cumulative = 0L;
         for (var definition : definitions) {
             cumulative += definition.selectionWeight();
@@ -102,11 +94,7 @@ public final class OreVeinUtil {
     private static OreEntry weightedChoice(double unit, List<OreEntry> entries) {
         var totalWeight = 0L;
         for (var entry : entries) {
-            try {
-                totalWeight = Math.addExact(totalWeight, entry.weight());
-            } catch (ArithmeticException exception) {
-                throw new IllegalArgumentException("ore weight total overflowed", exception);
-            }
+            totalWeight += entry.weight();
         }
         var target = (long) (unit * totalWeight);
         var cumulative = 0L;
@@ -119,7 +107,11 @@ public final class OreVeinUtil {
         return entries.getLast();
     }
 
-    private static double hashToUnit(long seed, BlockPos position, long salt) {
+    public static double hashToUnit(long seed, long salt) {
+        return hashToUnit(seed, 0, 0, 0, salt);
+    }
+
+    public static double hashToUnit(long seed, BlockPos position, long salt) {
         return hashToUnit(seed, position.getX(), position.getY(), position.getZ(), salt);
     }
 
