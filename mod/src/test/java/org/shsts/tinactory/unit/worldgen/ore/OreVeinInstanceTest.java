@@ -32,7 +32,7 @@ class OreVeinInstanceTest {
         assertEquals(new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(4, 2, 6)), instance.shape());
         assertEquals(0.75d, instance.density());
         assertEquals(HOST, instance.hostBlock());
-        assertEquals(List.of(new OreEntry(IRON_ORE, 3)), instance.ores());
+        assertEquals(List.of(new OreEntry(IRON_ORE, 3.5d)), instance.ores());
     }
 
     @Test
@@ -79,6 +79,6 @@ class OreVeinInstanceTest {
     }
 
     private static List<OreEntry> ores() {
-        return List.of(new OreEntry(IRON_ORE, 3));
+        return List.of(new OreEntry(IRON_ORE, 3.5d));
     }
 }

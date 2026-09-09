@@ -25,25 +25,28 @@ class OreVeinDefinitionTest {
         var definition = definition();
 
         assertEquals(modLoc("ore/iron"), definition.id());
-        assertEquals(7, definition.selectionWeight());
+        assertEquals(7.25d, definition.selectionWeight());
         assertEquals(-32, definition.minY());
         assertEquals(64, definition.maxY());
         assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 5, 1, 3, 2, 4)),
             definition.shape());
         assertEquals(0.75d, definition.density());
         assertEquals(HOST, definition.hostBlock());
-        assertEquals(List.of(new OreEntry(IRON_ORE, 3)), definition.ores());
+        assertEquals(List.of(new OreEntry(IRON_ORE, 3.5d)), definition.ores());
     }
 
     @Test
     void definitionShouldRejectInvalidRangesWeightsDensityAndComposition() {
-        assertThrows(IllegalArgumentException.class, () -> definition(0, -32, 64, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, 64, -32, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> definition(0d, -32, 64, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> definition(-0.1d, -32, 64, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> definition(Double.NaN, -32, 64, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> definition(Double.POSITIVE_INFINITY, -32, 64, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> definition(1d, 64, -32, 0.75d));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1,
+            modLoc("ore"), 1d, 0, 1,
             new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1,
+            modLoc("ore"), 1d, 0, 1,
             new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 0d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, -0.1d));
@@ -67,11 +70,11 @@ class OreVeinDefinitionTest {
 
     private static OreVeinDefinition definition() {
         return new OreVeinDefinition(
-            modLoc("ore/iron"), 7, -32, 64, shapeDefinition(2, 5, 1, 3, 2, 4), 0.75d,
+            modLoc("ore/iron"), 7.25d, -32, 64, shapeDefinition(2, 5, 1, 3, 2, 4), 0.75d,
             HOST, ores());
     }
 
-    private static OreVeinDefinition definition(int selectionWeight, int minY, int maxY, double density) {
+    private static OreVeinDefinition definition(double selectionWeight, int minY, int maxY, double density) {
         return new OreVeinDefinition(
             modLoc("ore"), selectionWeight, minY, maxY, shapeDefinition(), density,
             HOST, ores());
@@ -87,6 +90,6 @@ class OreVeinDefinitionTest {
     }
 
     private static List<OreEntry> ores() {
-        return List.of(new OreEntry(IRON_ORE, 3));
+        return List.of(new OreEntry(IRON_ORE, 3.5d));
     }
 }

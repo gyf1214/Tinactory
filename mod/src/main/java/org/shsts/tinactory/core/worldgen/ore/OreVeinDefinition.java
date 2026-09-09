@@ -16,7 +16,7 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public record OreVeinDefinition(
     ResourceLocation id,
-    int selectionWeight,
+    double selectionWeight,
     int minY,
     int maxY,
     OreShapeDefinition<?> shape,
@@ -26,7 +26,7 @@ public record OreVeinDefinition(
 ) {
     public static final MapCodec<OreVeinDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(OreVeinDefinition::id),
-        Codec.INT.fieldOf("selection_weight").forGetter(OreVeinDefinition::selectionWeight),
+        Codec.DOUBLE.fieldOf("selection_weight").forGetter(OreVeinDefinition::selectionWeight),
         Codec.INT.fieldOf("min_y").forGetter(OreVeinDefinition::minY),
         Codec.INT.fieldOf("max_y").forGetter(OreVeinDefinition::maxY),
         OreVeinUtil.DEFINITION_CODEC.fieldOf("shape").forGetter(OreVeinDefinition::shape),
@@ -36,7 +36,7 @@ public record OreVeinDefinition(
     ).apply(instance, OreVeinDefinition::new));
 
     public OreVeinDefinition {
-        if (selectionWeight <= 0) {
+        if (!Double.isFinite(selectionWeight) || selectionWeight <= 0d) {
             throw new IllegalArgumentException("selectionWeight must be positive");
         }
         if (minY > maxY) {

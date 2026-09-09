@@ -39,7 +39,7 @@ class OreVeinUtilTest {
     @Test
     void selectShouldReachFirstMiddleAndLastWeightedDefinitions() {
         var definitions = List.of(
-            definition("first", 1), definition("middle", 2), definition("last", 3));
+            definition("first", 0.5d), definition("middle", 1.25d), definition("last", 2.75d));
         var selected = new HashSet<String>();
         for (var seed = 0L; seed < 10_000L; seed++) {
             selected.add(OreVeinUtil.select(definitions, seed).id().getPath());
@@ -86,7 +86,7 @@ class OreVeinUtilTest {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 123L, new BlockPos(0, 0, 0),
             shapeInstance(4, 4, 4), 0.6d, HOST,
-            List.of(new OreEntry(IRON_ORE, 1), new OreEntry(GOLD_ORE, 1)));
+            List.of(new OreEntry(IRON_ORE, 0.25d), new OreEntry(GOLD_ORE, 0.75d)));
         var forward = new HashMap<BlockPos, Optional<?>>();
         var reverse = new HashMap<BlockPos, Optional<?>>();
 
@@ -156,7 +156,7 @@ class OreVeinUtilTest {
         assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
     }
 
-    private static OreVeinDefinition definition(String path, int selectionWeight) {
+    private static OreVeinDefinition definition(String path, double selectionWeight) {
         return new OreVeinDefinition(
             modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1, 1, 1, 1, 1, 1), 1d,
             HOST, ores());
@@ -176,7 +176,7 @@ class OreVeinUtilTest {
     }
 
     private static List<OreEntry> ores() {
-        return List.of(new OreEntry(IRON_ORE, 1));
+        return List.of(new OreEntry(IRON_ORE, 1d));
     }
 
     private static final class InvalidFactorShape implements IOreShape<Integer, Integer> {

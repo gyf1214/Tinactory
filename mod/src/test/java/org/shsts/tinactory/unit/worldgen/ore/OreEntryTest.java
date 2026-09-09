@@ -13,21 +13,23 @@ import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 class OreEntryTest {
     @Test
     void entryShouldRetainBlockAndWeight() {
-        var entry = new OreEntry(IRON_ORE, 3);
+        var entry = new OreEntry(IRON_ORE, 3.25d);
 
         assertEquals(IRON_ORE, entry.block());
-        assertEquals(3, entry.weight());
+        assertEquals(3.25d, entry.weight());
     }
 
     @Test
     void entryShouldRejectNonPositiveWeight() {
-        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, 0));
-        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, -1));
+        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, 0d));
+        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, -0.1d));
+        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, Double.NaN));
+        assertThrows(IllegalArgumentException.class, () -> new OreEntry(IRON_ORE, Double.POSITIVE_INFINITY));
     }
 
     @Test
     void codecShouldRoundTripEntryThroughBlockRegistry() {
-        var entry = new OreEntry(IRON_ORE, 3);
+        var entry = new OreEntry(IRON_ORE, 3.25d);
         var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS);
         var encoded = CodecHelper.encodeTag(registryAccess, OreEntry.CODEC, entry);
 

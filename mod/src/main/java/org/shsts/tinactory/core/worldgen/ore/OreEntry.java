@@ -10,14 +10,14 @@ import org.shsts.tinactory.core.util.CodecHelper;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record OreEntry(Block block, int weight) {
+public record OreEntry(Block block, double weight) {
     public static final Codec<OreEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         CodecHelper.registryValueCodec(Registries.BLOCK).fieldOf("block").forGetter(OreEntry::block),
-        Codec.INT.fieldOf("weight").forGetter(OreEntry::weight)
+        Codec.DOUBLE.fieldOf("weight").forGetter(OreEntry::weight)
     ).apply(instance, OreEntry::new));
 
     public OreEntry {
-        if (weight <= 0) {
+        if (!Double.isFinite(weight) || weight <= 0d) {
             throw new IllegalArgumentException("weight must be positive");
         }
     }

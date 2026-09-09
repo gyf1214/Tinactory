@@ -11,7 +11,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -89,12 +89,12 @@ public final class OreVeinUtil {
         return instance.shape().bounds(center, instance.instance());
     }
 
-    private static <T> T weightedChoice(double unit, List<T> entries, ToIntFunction<T> weightFunc) {
-        var totalWeight = entries.stream().mapToInt(weightFunc).sum();
+    private static <T> T weightedChoice(double unit, List<T> entries, ToDoubleFunction<T> weightFunc) {
+        var totalWeight = entries.stream().mapToDouble(weightFunc).sum();
         var target = unit * totalWeight;
-        var cumulative = 0;
+        var cumulative = 0d;
         for (var entry : entries) {
-            cumulative += weightFunc.applyAsInt(entry);
+            cumulative += weightFunc.applyAsDouble(entry);
             if (target < cumulative) {
                 return entry;
             }
