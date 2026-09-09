@@ -10,6 +10,7 @@ import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -29,6 +30,10 @@ public final class TestCodecHelper {
             throw new UnsupportedOperationException();
         }
     };
+
+    public static RegistryAccess createRegistry(Registry<?>... registries) {
+        return new RegistryAccess.ImmutableRegistryAccess(List.of(registries));
+    }
 
     public static RegistryFriendlyByteBuf buf() {
         return new RegistryFriendlyByteBuf(Unpooled.buffer(), TEST_REGISTRY, ConnectionType.NEOFORGE);
