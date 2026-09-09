@@ -6,11 +6,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.logistics.StorageEntry;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
+import org.shsts.tinactory.integration.gui.client.IFluidSlot;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -34,8 +37,32 @@ public class StoragePanel extends ButtonPanel {
 
     private final List<StorageEntry> entries = new ArrayList<>();
 
+    private class StorageButton extends ItemButton implements IFluidSlot {
+        public StorageButton(int slotIndex) {
+            super(slotIndex);
+        }
+
+        @Override
+        public FluidStack getFluidStack() {
+            var index = itemIndex();
+            if (index >= entries.size()) {
+                return FluidStack.EMPTY;
+            }
+            var entry = entries.get(index);
+            if (entry.key().type() != PortType.FLUID || entry.amount() <= 0L) {
+                return FluidStack.EMPTY;
+            }
+            return StackHelper.FLUID_ADAPTER.stackOf(entry.key(), entry.amount());
+        }
+    }
+
     public StoragePanel(MenuScreen<?> screen) {
         super(screen, SLOT_SIZE, SLOT_SIZE, 0);
+    }
+
+    @Override
+    protected ItemButton createSlot(int index) {
+        return new StorageButton(index);
     }
 
     @Override

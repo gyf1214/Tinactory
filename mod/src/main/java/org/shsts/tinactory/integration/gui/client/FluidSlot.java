@@ -23,7 +23,7 @@ import static org.shsts.tinactory.AllMenus.FLUID_STACK_SYNC;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidSlot extends MenuWidget {
+public class FluidSlot extends MenuWidget implements IFluidSlot {
     private final int tank;
     private final int syncSlot;
     @Nullable

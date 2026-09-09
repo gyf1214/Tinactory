@@ -7,7 +7,7 @@ import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.runtime.IClickableIngredient;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import org.shsts.tinactory.integration.gui.client.FluidSlot;
+import org.shsts.tinactory.integration.gui.client.IFluidSlot;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
@@ -32,10 +32,10 @@ public class FluidScreenHandler implements IGuiContainerHandler<AbstractContaine
 
         if (screen instanceof MenuScreen<?> menuScreen) {
             var hovered = menuScreen.getHovered((int) mouseX, (int) mouseY);
-            if (hovered.isEmpty() || !(hovered.get() instanceof FluidSlot slot1)) {
+            if (hovered.isEmpty() || !(hovered.get() instanceof IFluidSlot fluidSlot)) {
                 return Optional.empty();
             }
-            var stack = slot1.getFluidStack();
+            var stack = fluidSlot.getFluidStack();
             if (stack.isEmpty()) {
                 return Optional.empty();
             }
