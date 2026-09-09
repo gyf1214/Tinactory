@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.worldgen.ore.shape;
+package org.shsts.tinactory.core.worldgen.ore;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -7,8 +7,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-
-import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -25,6 +23,7 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
         Codec.INT.fieldOf("min_radius_z").forGetter(Definition::minRadiusZ),
         Codec.INT.fieldOf("max_radius_z").forGetter(Definition::maxRadiusZ)
     ).apply(instance, Definition::new));
+
     private static final MapCodec<Instance> INSTANCE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Codec.INT.fieldOf("radius_x").forGetter(Instance::radiusX),
         Codec.INT.fieldOf("radius_y").forGetter(Instance::radiusY),
@@ -45,7 +44,6 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
 
     @Override
     public Instance sample(Definition definition, long veinSeed) {
-        Objects.requireNonNull(definition, "definition");
         return new Instance(
             sampleRadius(veinSeed, definition.minRadiusX(), definition.maxRadiusX(), RADIUS_X_SALT),
             sampleRadius(veinSeed, definition.minRadiusY(), definition.maxRadiusY(), RADIUS_Y_SALT),
@@ -54,8 +52,6 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
 
     @Override
     public BoundingBox bounds(BlockPos center, Instance instance) {
-        Objects.requireNonNull(center, "center");
-        Objects.requireNonNull(instance, "instance");
         return new BoundingBox(
             lowerBound(center.getX(), instance.radiusX()),
             lowerBound(center.getY(), instance.radiusY()),
@@ -67,9 +63,6 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
 
     @Override
     public double fillFactor(long veinSeed, BlockPos center, BlockPos position, Instance instance) {
-        Objects.requireNonNull(center, "center");
-        Objects.requireNonNull(position, "position");
-        Objects.requireNonNull(instance, "instance");
         var dx = (double) position.getX() - center.getX();
         var dy = (double) position.getY() - center.getY();
         var dz = (double) position.getZ() - center.getZ();

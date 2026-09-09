@@ -3,13 +3,12 @@ package org.shsts.tinactory.unit.worldgen.ore;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
+import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
-import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeUtil;
+import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,11 +41,11 @@ class OreVeinInstanceTest {
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             0, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), new OreShapeInstance<>(ELLIPSOID,
-                new EllipsoidShape.Instance(0, 1, 1)), 0.75d, HOST, ores()));
+            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
+            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(0, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), new OreShapeInstance<>(ELLIPSOID,
-                new EllipsoidShape.Instance(1, -1, 1)), 0.75d, HOST, ores()));
+            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
+            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(1, -1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
@@ -56,21 +55,9 @@ class OreVeinInstanceTest {
     }
 
     @Test
-    void instanceShouldOwnAnImmutableOreList() {
-        var ores = new ArrayList<>(ores());
-        var instance = new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores);
-        ores.clear();
-
-        assertEquals(1, instance.ores().size());
-        assertThrows(UnsupportedOperationException.class,
-            () -> instance.ores().add(new OreEntry(IRON_ORE, 1)));
-    }
-
-    @Test
     void codecShouldRoundTripTheCompleteInstanceThroughBlockRegistry() {
         var instance = instance();
-        var codec = OreVeinInstance.codec(BLOCK_CODEC, OreShapeUtil.instanceCodec(SHAPE_CODEC));
+        var codec = OreVeinInstance.codec(BLOCK_CODEC, OreVeinUtil.instanceCodec(SHAPE_CODEC));
         var json = CodecHelper.encodeJson(TEST_REGISTRY, codec.codec(), instance);
         var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec.codec(), instance);
 

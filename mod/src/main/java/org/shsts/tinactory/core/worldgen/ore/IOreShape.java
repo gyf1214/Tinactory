@@ -1,4 +1,4 @@
-package org.shsts.tinactory.core.worldgen.ore.shape;
+package org.shsts.tinactory.core.worldgen.ore;
 
 import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;

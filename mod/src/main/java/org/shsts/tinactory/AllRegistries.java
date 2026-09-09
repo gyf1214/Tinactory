@@ -18,7 +18,7 @@ import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISubnetLabel;
-import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
+import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 import org.shsts.tinactory.integration.common.SimpleFluid;
 import org.shsts.tinactory.integration.common.SimpleFluidType;
 import org.shsts.tinactory.integration.metrics.MetricsManager;

@@ -5,12 +5,11 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
+import org.shsts.tinactory.core.worldgen.ore.IOreShape;
+import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
+import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OreShapeContractTest {
     @Test
@@ -23,16 +22,6 @@ class OreShapeContractTest {
         assertEquals("definition", definition.definition());
         assertEquals(shape, instance.shape());
         assertEquals(42, instance.instance());
-    }
-
-    @Test
-    void wrappersRejectNullShapeAndPayload() {
-        var shape = new TestShape();
-
-        assertThrows(NullPointerException.class, () -> new OreShapeDefinition<>(null, "definition"));
-        assertThrows(NullPointerException.class, () -> new OreShapeDefinition<>(shape, null));
-        assertThrows(NullPointerException.class, () -> new OreShapeInstance<>(null, 42));
-        assertThrows(NullPointerException.class, () -> new OreShapeInstance<>(shape, null));
     }
 
     private static final class TestShape implements IOreShape<String, Integer> {

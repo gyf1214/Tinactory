@@ -3,7 +3,7 @@ package org.shsts.tinactory.unit.worldgen.ore;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

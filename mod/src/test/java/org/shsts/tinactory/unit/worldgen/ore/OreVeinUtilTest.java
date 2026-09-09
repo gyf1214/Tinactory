@@ -5,14 +5,14 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Test;
+import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
+import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
+import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
-import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
 
 import java.util.HashMap;
 import java.util.HashSet;

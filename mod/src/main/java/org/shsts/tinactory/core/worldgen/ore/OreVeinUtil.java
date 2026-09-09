@@ -1,16 +1,14 @@
 package org.shsts.tinactory.core.worldgen.ore;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeDefinition;
-import org.shsts.tinactory.core.worldgen.ore.shape.OreShapeInstance;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -29,13 +27,11 @@ public final class OreVeinUtil {
     private OreVeinUtil() {}
 
     public static OreVeinDefinition select(List<OreVeinDefinition> definitions, long selectionSeed) {
-        Objects.requireNonNull(definitions, "definitions");
         if (definitions.isEmpty()) {
             throw new IllegalArgumentException("definitions must not be empty");
         }
         var totalWeight = 0L;
         for (var definition : definitions) {
-            Objects.requireNonNull(definition, "definition");
             try {
                 totalWeight = Math.addExact(totalWeight, definition.selectionWeight());
             } catch (ArithmeticException exception) {
@@ -53,12 +49,10 @@ public final class OreVeinUtil {
                 return definition;
             }
         }
-        return definitions.get(definitions.size() - 1);
+        return definitions.getLast();
     }
 
     public static OreVeinInstance sample(OreVeinDefinition definition, long veinSeed, BlockPos center) {
-        Objects.requireNonNull(definition, "definition");
-        Objects.requireNonNull(center, "center");
         return new OreVeinInstance(
             ALGORITHM_VERSION,
             definition.id(),
@@ -70,10 +64,7 @@ public final class OreVeinUtil {
             definition.ores());
     }
 
-    public static Optional<Block> oreAt(
-        OreVeinInstance instance, BlockPos position) {
-        Objects.requireNonNull(instance, "instance");
-        Objects.requireNonNull(position, "position");
+    public static Optional<Block> oreAt(OreVeinInstance instance, BlockPos position) {
         var shapeFactor = fillFactor(instance.shape(), instance.veinSeed(), instance.center(), position);
         if (!Double.isFinite(shapeFactor) || shapeFactor < 0d || shapeFactor > 1d) {
             throw new IllegalArgumentException("shape fill factor must be finite and in the range [0, 1]");
@@ -87,38 +78,24 @@ public final class OreVeinUtil {
     }
 
     public static BoundingBox bounds(OreVeinInstance instance) {
-        Objects.requireNonNull(instance, "instance");
         return bounds(instance.shape(), instance.center());
     }
 
-    private static OreShapeInstance<?> sampleShape(OreShapeDefinition<?> definition, long veinSeed) {
-        return sampleShapeTyped(definition, veinSeed);
+    private static <D> OreShapeInstance<?> sampleShape(OreShapeDefinition<D> definition, long veinSeed) {
+        return sampleShape(definition, definition.shape(), veinSeed);
     }
 
-    private static <D> OreShapeInstance<?> sampleShapeTyped(OreShapeDefinition<D> definition, long veinSeed) {
-        return sampleShapeTyped(definition, definition.shape(), veinSeed);
-    }
-
-    private static <D, I> OreShapeInstance<I> sampleShapeTyped(
-        OreShapeDefinition<D> definition, IOreShape<D, I> shape, long veinSeed) {
+    private static <D, I> OreShapeInstance<I> sampleShape(OreShapeDefinition<D> definition,
+        IOreShape<D, I> shape, long veinSeed) {
         return new OreShapeInstance<>(shape, shape.sample(definition.definition(), veinSeed));
     }
 
-    private static double fillFactor(OreShapeInstance<?> instance, long veinSeed, BlockPos center,
-        BlockPos position) {
-        return fillFactorTyped(instance, veinSeed, center, position);
-    }
-
-    private static <I> double fillFactorTyped(OreShapeInstance<I> instance, long veinSeed, BlockPos center,
+    private static <I> double fillFactor(OreShapeInstance<I> instance, long veinSeed, BlockPos center,
         BlockPos position) {
         return instance.shape().fillFactor(veinSeed, center, position, instance.instance());
     }
 
-    private static BoundingBox bounds(OreShapeInstance<?> instance, BlockPos center) {
-        return boundsTyped(instance, center);
-    }
-
-    private static <I> BoundingBox boundsTyped(OreShapeInstance<I> instance, BlockPos center) {
+    private static <I> BoundingBox bounds(OreShapeInstance<I> instance, BlockPos center) {
         return instance.shape().bounds(center, instance.instance());
     }
 
@@ -139,7 +116,7 @@ public final class OreVeinUtil {
                 return entry;
             }
         }
-        return entries.get(entries.size() - 1);
+        return entries.getLast();
     }
 
     private static double hashToUnit(long seed, BlockPos position, long salt) {
@@ -158,5 +135,29 @@ public final class OreVeinUtil {
         value = (value ^ (value >>> 30)) * 0xBF58476D1CE4E5B9L;
         value = (value ^ (value >>> 27)) * 0x94D049BB133111EBL;
         return value ^ (value >>> 31);
+    }
+
+    public static MapCodec<OreShapeDefinition<?>> definitionCodec(Codec<IOreShape<?, ?>> shapeCodec) {
+        return shapeCodec.dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);
+    }
+
+    public static MapCodec<OreShapeInstance<?>> instanceCodec(Codec<IOreShape<?, ?>> shapeCodec) {
+        return shapeCodec.dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MapCodec<? extends OreShapeDefinition<?>> definitionCodecFor(IOreShape<?, ?> shape) {
+        var typedShape = (IOreShape<Object, Object>) shape;
+        return typedShape.definitionCodec().xmap(
+            definition -> new OreShapeDefinition<>(typedShape, definition),
+            OreShapeDefinition::definition);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static MapCodec<? extends OreShapeInstance<?>> instanceCodecFor(IOreShape<?, ?> shape) {
+        var typedShape = (IOreShape<Object, Object>) shape;
+        return typedShape.instanceCodec().xmap(
+            instance -> new OreShapeInstance<>(typedShape, instance),
+            OreShapeInstance::instance);
     }
 }

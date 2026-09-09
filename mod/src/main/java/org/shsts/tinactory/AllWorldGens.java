@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
-import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.AllRegistries.FEATURES;

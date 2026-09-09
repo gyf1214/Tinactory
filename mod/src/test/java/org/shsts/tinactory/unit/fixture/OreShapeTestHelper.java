@@ -5,8 +5,8 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import org.shsts.tinactory.core.worldgen.ore.shape.EllipsoidShape;
-import org.shsts.tinactory.core.worldgen.ore.shape.IOreShape;
+import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
