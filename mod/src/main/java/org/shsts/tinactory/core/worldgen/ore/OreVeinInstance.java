@@ -23,9 +23,9 @@ public record OreVeinInstance(
     Block hostBlock,
     List<OreEntry> ores
 ) {
-    public static MapCodec<OreVeinInstance> codec(Codec<Block> blockCodec,
+    public static Codec<OreVeinInstance> codec(Codec<Block> blockCodec,
         MapCodec<OreShapeInstance<?>> shapeCodec) {
-        return RecordCodecBuilder.mapCodec(instance -> instance.group(
+        return RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("algorithm_version").forGetter(OreVeinInstance::algorithmVersion),
             ResourceLocation.CODEC.fieldOf("definition_id").forGetter(OreVeinInstance::definitionId),
             Codec.LONG.fieldOf("vein_seed").forGetter(OreVeinInstance::veinSeed),

@@ -58,11 +58,11 @@ class OreVeinInstanceTest {
     void codecShouldRoundTripTheCompleteInstanceThroughBlockRegistry() {
         var instance = instance();
         var codec = OreVeinInstance.codec(BLOCK_CODEC, OreVeinUtil.instanceCodec(SHAPE_CODEC));
-        var json = CodecHelper.encodeJson(TEST_REGISTRY, codec.codec(), instance);
-        var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec.codec(), instance);
+        var json = CodecHelper.encodeJson(TEST_REGISTRY, codec, instance);
+        var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec, instance);
 
-        assertEquals(instance, CodecHelper.parseJson(TEST_REGISTRY, codec.codec(), json));
-        assertEquals(instance, CodecHelper.parseTag(TEST_REGISTRY, codec.codec(), tag));
+        assertEquals(instance, CodecHelper.parseJson(TEST_REGISTRY, codec, json));
+        assertEquals(instance, CodecHelper.parseTag(TEST_REGISTRY, codec, tag));
     }
 
     private static OreVeinInstance instance() {

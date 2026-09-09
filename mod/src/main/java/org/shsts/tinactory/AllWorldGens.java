@@ -42,15 +42,11 @@ public final class AllWorldGens {
         PLAYER_START_FEATURE = REGISTRATE.registryEntry(FEATURES, "player_start", PlayerStartFeature::new);
         ELLIPSOID_SHAPE = REGISTRATE.registryEntry(ORE_SHAPES.getHandler(), "ellipsoid", EllipsoidShape::new);
         ORE_VEIN_STRUCTURE_TYPE = REGISTRATE.registryEntry(
-            STRUCTURE_TYPES, "ore_vein", AllWorldGens::oreVeinStructureType);
+            STRUCTURE_TYPES, "ore_vein", OreVeinStructureType::new);
         ORE_VEIN_PIECE_TYPE = REGISTRATE.registryEntry(
-            STRUCTURE_PIECES, "ore_vein", () -> tag -> new OreVeinPiece(tag));
+            STRUCTURE_PIECES, "ore_vein", () -> OreVeinPiece::new);
         RUBBER_TREE_GROWER = ResourceKey.create(Registries.CONFIGURED_FEATURE, modLoc("rubber_tree"));
     }
 
     public static void init() {}
-
-    private static StructureType<OreVeinStructure> oreVeinStructureType() {
-        return new OreVeinStructureType();
-    }
 }

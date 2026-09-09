@@ -17,7 +17,6 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.AllWorldGens;
-import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 
@@ -75,9 +74,9 @@ public final class OreVeinPiece extends StructurePiece {
 
     private static Codec<OreVeinInstance> instanceCodec() {
         if (instanceCodec == null) {
-            Codec<IOreShape<?, ?>> shapeCodec = AllRegistries.ORE_SHAPES.get().byNameCodec();
-            instanceCodec = OreVeinInstance.codec(
-                BuiltInRegistries.BLOCK.byNameCodec(), OreVeinUtil.instanceCodec(shapeCodec)).codec();
+            var shapeCodec = AllRegistries.ORE_SHAPES.get().byNameCodec();
+            instanceCodec = OreVeinInstance.codec(BuiltInRegistries.BLOCK.byNameCodec(),
+                OreVeinUtil.instanceCodec(shapeCodec));
         }
         return instanceCodec;
     }
