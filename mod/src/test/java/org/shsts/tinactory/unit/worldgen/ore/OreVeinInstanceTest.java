@@ -7,19 +7,18 @@ import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
-import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
+import org.shsts.tinactory.unit.fixture.OreBlockTestHelper;
+import org.shsts.tinactory.unit.fixture.OreShapeTestHelper;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.BLOCK_CODEC;
 import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
 import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
 import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
-import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.SHAPE_CODEC;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 
 class OreVeinInstanceTest {
     @Test
@@ -57,12 +56,12 @@ class OreVeinInstanceTest {
     @Test
     void codecShouldRoundTripTheCompleteInstanceThroughBlockRegistry() {
         var instance = instance();
-        var codec = OreVeinInstance.codec(BLOCK_CODEC, OreVeinUtil.instanceCodec(SHAPE_CODEC));
-        var json = CodecHelper.encodeJson(TEST_REGISTRY, codec, instance);
-        var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec, instance);
+        var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS, OreShapeTestHelper.SHAPES);
+        var json = CodecHelper.encodeJson(registryAccess, OreVeinInstance.CODEC, instance);
+        var tag = CodecHelper.encodeTag(registryAccess, OreVeinInstance.CODEC, instance);
 
-        assertEquals(instance, CodecHelper.parseJson(TEST_REGISTRY, codec, json));
-        assertEquals(instance, CodecHelper.parseTag(TEST_REGISTRY, codec, tag));
+        assertEquals(instance, CodecHelper.parseJson(registryAccess, OreVeinInstance.CODEC, json));
+        assertEquals(instance, CodecHelper.parseTag(registryAccess, OreVeinInstance.CODEC, tag));
     }
 
     private static OreVeinInstance instance() {

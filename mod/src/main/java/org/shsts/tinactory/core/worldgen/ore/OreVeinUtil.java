@@ -1,12 +1,13 @@
 package org.shsts.tinactory.core.worldgen.ore;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.shsts.tinactory.AllRegistries;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,12 @@ import java.util.function.ToIntFunction;
 @MethodsReturnNonnullByDefault
 public final class OreVeinUtil {
     public static final int ALGORITHM_VERSION = 1;
+    public static final MapCodec<OreShapeDefinition<?>> DEFINITION_CODEC =
+        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
+            .dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);
+    public static final MapCodec<OreShapeInstance<?>> INSTANCE_CODEC =
+        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
+            .dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
 
     private static final long SELECTION_SALT = 0x4F1BBCDCBFA54001L;
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;
@@ -115,14 +122,6 @@ public final class OreVeinUtil {
         value = (value ^ (value >>> 30)) * 0xBF58476D1CE4E5B9L;
         value = (value ^ (value >>> 27)) * 0x94D049BB133111EBL;
         return value ^ (value >>> 31);
-    }
-
-    public static MapCodec<OreShapeDefinition<?>> definitionCodec(Codec<IOreShape<?, ?>> shapeCodec) {
-        return shapeCodec.dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);
-    }
-
-    public static MapCodec<OreShapeInstance<?>> instanceCodec(Codec<IOreShape<?, ?>> shapeCodec) {
-        return shapeCodec.dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
     }
 
     @SuppressWarnings("unchecked")

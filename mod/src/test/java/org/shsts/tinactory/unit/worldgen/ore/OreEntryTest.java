@@ -3,12 +3,12 @@ package org.shsts.tinactory.unit.worldgen.ore;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
+import org.shsts.tinactory.unit.fixture.OreBlockTestHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.BLOCK_CODEC;
 import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 
 class OreEntryTest {
     @Test
@@ -28,9 +28,9 @@ class OreEntryTest {
     @Test
     void codecShouldRoundTripEntryThroughBlockRegistry() {
         var entry = new OreEntry(IRON_ORE, 3);
-        var codec = OreEntry.codec(BLOCK_CODEC);
-        var encoded = CodecHelper.encodeTag(TEST_REGISTRY, codec, entry);
+        var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS);
+        var encoded = CodecHelper.encodeTag(registryAccess, OreEntry.CODEC, entry);
 
-        assertEquals(entry, CodecHelper.parseTag(TEST_REGISTRY, codec, encoded));
+        assertEquals(entry, CodecHelper.parseTag(registryAccess, OreEntry.CODEC, encoded));
     }
 }

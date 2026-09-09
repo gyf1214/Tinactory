@@ -1,13 +1,14 @@
 package org.shsts.tinactory.core.worldgen.ore;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 
@@ -23,19 +24,16 @@ public record OreVeinInstance(
     Block hostBlock,
     List<OreEntry> ores
 ) {
-    public static Codec<OreVeinInstance> codec(Codec<Block> blockCodec,
-        MapCodec<OreShapeInstance<?>> shapeCodec) {
-        return RecordCodecBuilder.create(instance -> instance.group(
-            Codec.INT.fieldOf("algorithm_version").forGetter(OreVeinInstance::algorithmVersion),
-            ResourceLocation.CODEC.fieldOf("definition_id").forGetter(OreVeinInstance::definitionId),
-            Codec.LONG.fieldOf("vein_seed").forGetter(OreVeinInstance::veinSeed),
-            BlockPos.CODEC.fieldOf("center").forGetter(OreVeinInstance::center),
-            shapeCodec.fieldOf("shape").forGetter(OreVeinInstance::shape),
-            Codec.DOUBLE.fieldOf("density").forGetter(OreVeinInstance::density),
-            blockCodec.fieldOf("host_block").forGetter(OreVeinInstance::hostBlock),
-            OreEntry.codec(blockCodec).listOf().fieldOf("ores").forGetter(OreVeinInstance::ores)
-        ).apply(instance, OreVeinInstance::new));
-    }
+    public static final Codec<OreVeinInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Codec.INT.fieldOf("algorithm_version").forGetter(OreVeinInstance::algorithmVersion),
+        ResourceLocation.CODEC.fieldOf("definition_id").forGetter(OreVeinInstance::definitionId),
+        Codec.LONG.fieldOf("vein_seed").forGetter(OreVeinInstance::veinSeed),
+        BlockPos.CODEC.fieldOf("center").forGetter(OreVeinInstance::center),
+        OreVeinUtil.INSTANCE_CODEC.fieldOf("shape").forGetter(OreVeinInstance::shape),
+        Codec.DOUBLE.fieldOf("density").forGetter(OreVeinInstance::density),
+        CodecHelper.registryValueCodec(Registries.BLOCK).fieldOf("host_block").forGetter(OreVeinInstance::hostBlock),
+        OreEntry.CODEC.listOf().fieldOf("ores").forGetter(OreVeinInstance::ores)
+    ).apply(instance, OreVeinInstance::new));
 
     public OreVeinInstance {
         if (algorithmVersion != OreVeinUtil.ALGORITHM_VERSION) {

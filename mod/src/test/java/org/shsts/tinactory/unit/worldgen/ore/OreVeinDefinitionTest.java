@@ -6,19 +6,18 @@ import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
-import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
+import org.shsts.tinactory.unit.fixture.OreBlockTestHelper;
+import org.shsts.tinactory.unit.fixture.OreShapeTestHelper;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.BLOCK_CODEC;
 import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
 import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
 import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
-import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.SHAPE_CODEC;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 
 class OreVeinDefinitionTest {
     @Test
@@ -58,12 +57,12 @@ class OreVeinDefinitionTest {
     @Test
     void codecShouldRoundTripDefinitionThroughBlockRegistry() {
         var definition = definition();
-        var codec = OreVeinDefinition.codec(BLOCK_CODEC, OreVeinUtil.definitionCodec(SHAPE_CODEC));
-        var json = CodecHelper.encodeJson(TEST_REGISTRY, codec.codec(), definition);
-        var tag = CodecHelper.encodeTag(TEST_REGISTRY, codec.codec(), definition);
+        var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS, OreShapeTestHelper.SHAPES);
+        var json = CodecHelper.encodeJson(registryAccess, OreVeinDefinition.CODEC.codec(), definition);
+        var tag = CodecHelper.encodeTag(registryAccess, OreVeinDefinition.CODEC.codec(), definition);
 
-        assertEquals(definition, CodecHelper.parseJson(TEST_REGISTRY, codec.codec(), json));
-        assertEquals(definition, CodecHelper.parseTag(TEST_REGISTRY, codec.codec(), tag));
+        assertEquals(definition, CodecHelper.parseJson(registryAccess, OreVeinDefinition.CODEC.codec(), json));
+        assertEquals(definition, CodecHelper.parseTag(registryAccess, OreVeinDefinition.CODEC.codec(), tag));
     }
 
     private static OreVeinDefinition definition() {

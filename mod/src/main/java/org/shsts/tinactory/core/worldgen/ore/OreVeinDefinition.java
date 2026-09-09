@@ -5,8 +5,10 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 
@@ -22,19 +24,16 @@ public record OreVeinDefinition(
     Block hostBlock,
     List<OreEntry> ores
 ) {
-    public static MapCodec<OreVeinDefinition> codec(Codec<Block> blockCodec,
-        MapCodec<OreShapeDefinition<?>> shapeCodec) {
-        return RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("id").forGetter(OreVeinDefinition::id),
-            Codec.INT.fieldOf("selection_weight").forGetter(OreVeinDefinition::selectionWeight),
-            Codec.INT.fieldOf("min_y").forGetter(OreVeinDefinition::minY),
-            Codec.INT.fieldOf("max_y").forGetter(OreVeinDefinition::maxY),
-            shapeCodec.fieldOf("shape").forGetter(OreVeinDefinition::shape),
-            Codec.DOUBLE.fieldOf("density").forGetter(OreVeinDefinition::density),
-            blockCodec.fieldOf("host_block").forGetter(OreVeinDefinition::hostBlock),
-            OreEntry.codec(blockCodec).listOf().fieldOf("ores").forGetter(OreVeinDefinition::ores)
-        ).apply(instance, OreVeinDefinition::new));
-    }
+    public static final MapCodec<OreVeinDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ResourceLocation.CODEC.fieldOf("id").forGetter(OreVeinDefinition::id),
+        Codec.INT.fieldOf("selection_weight").forGetter(OreVeinDefinition::selectionWeight),
+        Codec.INT.fieldOf("min_y").forGetter(OreVeinDefinition::minY),
+        Codec.INT.fieldOf("max_y").forGetter(OreVeinDefinition::maxY),
+        OreVeinUtil.DEFINITION_CODEC.fieldOf("shape").forGetter(OreVeinDefinition::shape),
+        Codec.DOUBLE.fieldOf("density").forGetter(OreVeinDefinition::density),
+        CodecHelper.registryValueCodec(Registries.BLOCK).fieldOf("host_block").forGetter(OreVeinDefinition::hostBlock),
+        OreEntry.CODEC.listOf().fieldOf("ores").forGetter(OreVeinDefinition::ores)
+    ).apply(instance, OreVeinDefinition::new));
 
     public OreVeinDefinition {
         if (selectionWeight <= 0) {
