@@ -27,7 +27,7 @@ object Technologies {
     val BASE_ORE = Factory().run {
         OreVariant.entries.associateWith {
             child("ore/${it.serializedName}") {
-                maxProgress(20)
+                maxProgress(10)
                 displayItem(it.baseItem)
                 researchVoltage(it.voltage)
                 rank(VEIN_TECH_RANK)

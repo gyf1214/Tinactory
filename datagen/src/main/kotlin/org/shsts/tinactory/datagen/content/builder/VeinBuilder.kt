@@ -62,7 +62,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             baseTech
         } else {
             TECHS.builder("ore/$id1", TechBuilder.Companion::factory).run {
-                maxProgress(30)
+                maxProgress(10)
                 val mat = ores[0]
                 if (mat.hasItem("raw")) {
                     displayItem(mat.item("raw"))
