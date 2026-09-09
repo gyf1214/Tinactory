@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * The main purpose of this is to redirect itemStack ingredient to fluidStack ones when the item contains fluid.
- * In AbstractContainerScreen this is handled by FluidScreenHandler. However, when some mods call JEI APIs directly,
+ * In AbstractContainerScreen this is handled by SlotScreenHandler. However, when some mods call JEI APIs directly,
  * we also want to do that.
  */
 @Mixin(Focus.class)

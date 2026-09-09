@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.api.gui.IFluidSlot;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
 import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.util.ClientUtil;

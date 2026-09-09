@@ -4,16 +4,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.api.gui.IFluidSlot;
+import org.shsts.tinactory.api.gui.IItemSlot;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.logistics.StorageEntry;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
-import org.shsts.tinactory.integration.gui.client.IFluidSlot;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -37,7 +39,7 @@ public class StoragePanel extends ButtonPanel {
 
     private final List<StorageEntry> entries = new ArrayList<>();
 
-    private class StorageButton extends ItemButton implements IFluidSlot {
+    private class StorageButton extends ItemButton implements IFluidSlot, IItemSlot {
         public StorageButton(int slotIndex) {
             super(slotIndex);
         }
@@ -53,6 +55,19 @@ public class StoragePanel extends ButtonPanel {
                 return FluidStack.EMPTY;
             }
             return StackHelper.FLUID_ADAPTER.stackOf(entry.key(), entry.amount());
+        }
+
+        @Override
+        public ItemStack getItemStack() {
+            var index = itemIndex();
+            if (index >= entries.size()) {
+                return ItemStack.EMPTY;
+            }
+            var entry = entries.get(index);
+            if (entry.key().type() != PortType.ITEM || entry.amount() <= 0L) {
+                return ItemStack.EMPTY;
+            }
+            return StackHelper.ITEM_ADAPTER.stackOf(entry.key());
         }
     }
 

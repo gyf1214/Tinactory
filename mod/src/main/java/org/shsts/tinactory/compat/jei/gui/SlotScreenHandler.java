@@ -7,7 +7,8 @@ import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.runtime.IClickableIngredient;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import org.shsts.tinactory.integration.gui.client.IFluidSlot;
+import org.shsts.tinactory.api.gui.IFluidSlot;
+import org.shsts.tinactory.api.gui.IItemSlot;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FluidScreenHandler implements IGuiContainerHandler<AbstractContainerScreen<?>> {
+public class SlotScreenHandler implements IGuiContainerHandler<AbstractContainerScreen<?>> {
     @Override
     public Optional<? extends IClickableIngredient<?>> getClickableIngredientUnderMouse(
         IClickableIngredientFactory builder, AbstractContainerScreen<?> screen,
@@ -32,16 +33,25 @@ public class FluidScreenHandler implements IGuiContainerHandler<AbstractContaine
 
         if (screen instanceof MenuScreen<?> menuScreen) {
             var hovered = menuScreen.getHovered((int) mouseX, (int) mouseY);
-            if (hovered.isEmpty() || !(hovered.get() instanceof IFluidSlot fluidSlot)) {
+            if (hovered.isEmpty()) {
                 return Optional.empty();
             }
-            var stack = fluidSlot.getFluidStack();
-            if (stack.isEmpty()) {
-                return Optional.empty();
+            var view = hovered.get();
+            var rect = view.rect();
+            if (view instanceof IFluidSlot fluidSlot) {
+                var fluid = fluidSlot.getFluidStack();
+                if (!fluid.isEmpty()) {
+                    return builder.createBuilder(NeoForgeTypes.FLUID_STACK, fluid)
+                        .buildWithArea(rect.x(), rect.y(), rect.width(), rect.height());
+                }
             }
-            var rect = hovered.get().rect();
-            return builder.createBuilder(NeoForgeTypes.FLUID_STACK, stack)
-                .buildWithArea(rect.x(), rect.y(), rect.width(), rect.height());
+            if (view instanceof IItemSlot itemSlot) {
+                var item = itemSlot.getItemStack();
+                if (!item.isEmpty()) {
+                    return builder.createBuilder(item)
+                        .buildWithArea(rect.x(), rect.y(), rect.width(), rect.height());
+                }
+            }
         }
         return Optional.empty();
     }
