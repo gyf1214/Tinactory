@@ -6,18 +6,17 @@ import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
-import org.shsts.tinactory.unit.fixture.OreBlockTestHelper;
-import org.shsts.tinactory.unit.fixture.OreShapeTestHelper;
+import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
-import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.HOST;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.IRON_ORE;
 
 class OreVeinDefinitionTest {
     @Test
@@ -60,7 +59,7 @@ class OreVeinDefinitionTest {
     @Test
     void codecShouldRoundTripDefinitionThroughBlockRegistry() {
         var definition = definition();
-        var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS, OreShapeTestHelper.SHAPES);
+        var registryAccess = createRegistry(TestOreHelper.BLOCKS, TestOreHelper.SHAPES);
         var json = CodecHelper.encodeJson(registryAccess, OreVeinDefinition.CODEC.codec(), definition);
         var tag = CodecHelper.encodeTag(registryAccess, OreVeinDefinition.CODEC.codec(), definition);
 

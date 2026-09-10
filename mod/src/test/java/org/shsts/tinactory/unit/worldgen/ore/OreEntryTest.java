@@ -3,12 +3,12 @@ package org.shsts.tinactory.unit.worldgen.ore;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
-import org.shsts.tinactory.unit.fixture.OreBlockTestHelper;
+import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.IRON_ORE;
 
 class OreEntryTest {
     @Test
@@ -30,7 +30,7 @@ class OreEntryTest {
     @Test
     void codecShouldRoundTripEntryThroughBlockRegistry() {
         var entry = new OreEntry(IRON_ORE, 3.25d);
-        var registryAccess = createRegistry(OreBlockTestHelper.BLOCKS);
+        var registryAccess = createRegistry(TestOreHelper.BLOCKS);
         var encoded = CodecHelper.encodeTag(registryAccess, OreEntry.CODEC, entry);
 
         assertEquals(entry, CodecHelper.parseTag(registryAccess, OreEntry.CODEC, encoded));

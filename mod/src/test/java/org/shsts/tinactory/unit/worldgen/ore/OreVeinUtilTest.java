@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.GOLD_ORE;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.HOST;
-import static org.shsts.tinactory.unit.fixture.OreBlockTestHelper.IRON_ORE;
-import static org.shsts.tinactory.unit.fixture.OreShapeTestHelper.ELLIPSOID;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.GOLD_ORE;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.HOST;
+import static org.shsts.tinactory.unit.fixture.TestOreHelper.IRON_ORE;
 
 class OreVeinUtilTest {
     @Test
