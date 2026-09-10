@@ -1,5 +1,6 @@
 package org.shsts.tinactory.datagen.provider;
 
+import com.mojang.serialization.JsonOps;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
@@ -115,9 +116,13 @@ public final class OreVeinDataProvider implements DataProvider {
         var structureFuture = DataProvider.saveStable(
             output, structureJson, structurePathProvider.json(config.structureId()));
 
+        var serializationOps = registries.createSerializationContext(JsonOps.INSTANCE);
+        var structureOwner = serializationOps.lookupProvider.lookup(Registries.STRUCTURE)
+            .orElseThrow(() -> new IllegalStateException("Structure registry is missing from datagen lookup"))
+            .owner();
         var structureKey = ResourceKey.create(Registries.STRUCTURE, config.structureId());
         var structureHolder = Holder.Reference.createStandAlone(
-            registries.lookupOrThrow(Registries.STRUCTURE), structureKey);
+            structureOwner, structureKey);
         var placement = new RandomSpreadStructurePlacement(
             Vec3i.ZERO,
             StructurePlacement.FrequencyReductionMethod.DEFAULT,
@@ -128,7 +133,7 @@ public final class OreVeinDataProvider implements DataProvider {
             3,
             RandomSpreadType.LINEAR);
         var structureSet = new StructureSet(structureHolder, placement);
-        var structureSetJson = CodecHelper.encodeJson(registries, StructureSet.DIRECT_CODEC, structureSet);
+        var structureSetJson = StructureSet.DIRECT_CODEC.encodeStart(serializationOps, structureSet).getOrThrow();
         var structureSetFuture = DataProvider.saveStable(
             output, structureSetJson, structureSetPathProvider.json(config.structureId()));
         return CompletableFuture.allOf(structureFuture, structureSetFuture);
