@@ -62,6 +62,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.model.IconSet
 import org.shsts.tinactory.integration.material.MaterialSet
+import org.shsts.tinactory.integration.material.OreVariant
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext
 import kotlin.math.round
@@ -155,10 +156,9 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun buildOre() {
-        val variant = material.oreVariant()
+    private fun buildOre(variant: OreVariant) {
         val tierTag = variant.mineTag
-        blockData(material.blockEntry("ore") as IEntry<out Block>) {
+        blockData(material.oreEntry(variant) as IEntry<out Block>) {
             blockState { oreBlock(it, variant) }
             tag(BlockTags.MINEABLE_WITH_PICKAXE)
             tag(tierTag)
@@ -771,7 +771,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         var primitive = false
         var siftAndHammer = false
         var siftPrimary = false
-        private val variant = material.oreVariant()
+        private val variant = material.oreMain()
         private val byProducts = mutableListOf<MaterialSet>()
 
         fun byProducts(vararg value: Any) {
@@ -814,7 +814,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, to)
                     if (from == "crushed") {
                         input("water")
-                        output(material.oreVariant().material, "dust")
+                        output(variant.material, "dust")
                         output(byProduct(0), "dust", rate = 0.3)
                         workTicks(200)
                     } else {
@@ -866,7 +866,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             thermalCentrifuge {
                 input(material, "crushed") {
                     output(material, "crushed_centrifuged")
-                    output(material.oreVariant().material, "dust")
+                    output(variant.material, "dust")
                     output(byProduct(2), "dust", rate = 0.3)
                     workTicks(400)
                 }
@@ -926,7 +926,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 input(material, "raw") {
                     input("water", amount = 2 * amount)
                     output(material, "dust", 2 * amount)
-                    output(material.oreVariant().material, "dust", 2 * amount)
+                    output(variant.material, "dust", 2 * amount)
                     for (i in 0..2) {
                         output(byProduct(i), "dust", 2 * amount, rate = 0.3)
                     }
@@ -1012,8 +1012,10 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         for (sub in material.itemSubs()) {
             buildItem(sub)
         }
-        if (material.hasBlock("ore")) {
-            buildOre()
+        for (variant in material.ores()) {
+            if (!material.isExistingOre(variant)) {
+                buildOre(variant)
+            }
         }
         dustWithTiny()
         toolRecipes()

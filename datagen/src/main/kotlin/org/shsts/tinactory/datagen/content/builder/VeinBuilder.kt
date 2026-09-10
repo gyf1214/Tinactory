@@ -39,7 +39,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
     fun ore(name: String, rate: Double) {
         val mat = getMaterial(name)
         if (variant == null) {
-            variant(mat.oreVariant())
+            variant(mat.oreMain())
         }
         chain {
             if (mat.hasItem("raw")) {

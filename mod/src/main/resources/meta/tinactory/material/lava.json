@@ -1,6 +1,9 @@
 {
   "color": "0xFFEC0000",
-  "ore": "netherrack",
+  "ore": {
+    "variant": "netherrack",
+    "existing": "minecraft:magma_block"
+  },
   "items": [],
   "fluids": {
     "fluid": {

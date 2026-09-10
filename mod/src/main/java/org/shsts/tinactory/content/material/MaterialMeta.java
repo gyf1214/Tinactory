@@ -19,6 +19,7 @@ import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 
 import java.util.Locale;
 
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 import static org.shsts.tinactory.AllRegistries.FLUIDS;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
@@ -145,8 +146,30 @@ public class MaterialMeta extends MetaConsumer {
         buildItems(builder, jo);
         buildFluids(builder, jo);
         if (jo.has("ore")) {
-            var variant = OreVariant.fromName(GsonHelper.getAsString(jo, "ore"));
-            builder.oreOnly(variant);
+            var je = jo.get("ore");
+            if (je.isJsonObject()) {
+                var jo1 = je.getAsJsonObject();
+                var variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
+                builder.oreMain(variant);
+                if (jo1.has("existing")) {
+                    var block = BLOCKS.getEntry(ResourceLocation.parse(GsonHelper.getAsString(jo1, "existing")));
+                    builder.oreExisting(variant, block);
+                }
+            } else if (je.isJsonArray()) {
+                var first = true;
+                for (var je1 : je.getAsJsonArray()) {
+                    var variant = OreVariant.fromName(GsonHelper.convertToString(je1, "ore"));
+                    if (first) {
+                        builder.ore(variant);
+                        first = false;
+                    } else {
+                        builder.ore(variant, "ore_" + variant.getSerializedName());
+                    }
+                }
+            } else {
+                var variant = OreVariant.fromName(GsonHelper.convertToString(je, "ore"));
+                builder.ore(variant);
+            }
         }
         buildAliases(builder, jo);
         if (jo.has("tools")) {

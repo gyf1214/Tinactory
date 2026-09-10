@@ -1,5 +1,9 @@
 {
   "color": "0xFF4B4042",
+  "ore": {
+    "variant": "end_stone",
+    "existing": "minecraft:ancient_debris"
+  },
   "items": [],
   "fluids": {
     "molten": {
