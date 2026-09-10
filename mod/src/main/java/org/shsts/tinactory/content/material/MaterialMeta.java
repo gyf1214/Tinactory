@@ -134,20 +134,25 @@ public class MaterialMeta extends MetaConsumer {
     }
 
     private void buildOre(MaterialSet.Builder<?> builder, JsonElement je, boolean first) {
+        OreVariant variant;
         if (je.isJsonObject()) {
             var jo1 = je.getAsJsonObject();
-            var variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
+            variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
             if (jo1.has("existing")) {
                 var block = BLOCKS.getEntry(ResourceLocation.parse(GsonHelper.getAsString(jo1, "existing")));
                 if (first) {
                     builder.oreMain(variant);
                 }
                 builder.oreExisting(variant, block);
-            } else if (first) {
-                builder.ore(variant);
-            } else {
-                builder.ore(variant, "ore_" + variant.getSerializedName());
+                return;
             }
+        } else {
+            variant = OreVariant.fromName(GsonHelper.convertToString(je, "ore"));
+        }
+        if (first) {
+            builder.ore(variant);
+        } else {
+            builder.ore(variant, "ore_" + variant.getSerializedName());
         }
     }
 
