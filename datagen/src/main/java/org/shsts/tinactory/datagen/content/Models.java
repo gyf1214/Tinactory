@@ -158,9 +158,11 @@ public final class Models {
         return ctx -> {
             var models = ctx.provider().models();
             var loc = BuiltInRegistries.BLOCK.getKey(variant.baseBlock);
-            var baseModel = new ConfiguredModel(models.getExistingFile(prepend(loc, "block")));
-            var overlay = new ConfiguredModel(models.getExistingFile(modLoc("block/material/ore_overlay")));
-            ctx.provider().simpleBlock(ctx.object(), baseModel, overlay);
+            var baseModel = models.getExistingFile(prepend(loc, "block"));
+            var overlay = models.getExistingFile(modLoc("block/material/ore_overlay"));
+            ctx.provider().getMultipartBuilder(ctx.object())
+                .part().modelFile(baseModel).addModel().end()
+                .part().modelFile(overlay).addModel().end();
         };
     }
 
