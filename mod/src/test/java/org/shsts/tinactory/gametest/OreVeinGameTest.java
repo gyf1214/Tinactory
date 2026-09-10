@@ -60,7 +60,7 @@ public final class OreVeinGameTest {
         var definition = new OreVeinDefinition(
             modLoc("test/ore"), 1, -32, 48,
             new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
-                new EllipsoidShape.Definition(2, 4, 1, 3, 2, 4)),
+                new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
         var structure = new OreVeinStructure(
             new Structure.StructureSettings(HolderSet.direct(helper.getLevel().registryAccess()
@@ -159,7 +159,7 @@ public final class OreVeinGameTest {
         var definition = new OreVeinDefinition(
             modLoc("test/ore"), 1, -32, 48,
             new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
-                new EllipsoidShape.Definition(2, 4, 1, 3, 2, 4)),
+                new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1), new OreEntry(Blocks.GOLD_ORE, 2)));
         return OreVeinUtil.sample(definition, 12345L, new BlockPos(10, 20, 30));
     }

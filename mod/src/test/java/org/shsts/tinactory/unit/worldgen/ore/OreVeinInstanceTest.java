@@ -7,6 +7,7 @@ import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreEntry;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinInstance;
+import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import java.util.List;
@@ -24,7 +25,7 @@ class OreVeinInstanceTest {
     void instanceShouldRetainTheCompleteSampledPayload() {
         var instance = instance();
 
-        assertEquals(1, instance.algorithmVersion());
+        assertEquals(OreVeinUtil.ALGORITHM_VERSION, instance.algorithmVersion());
         assertEquals(modLoc("ore/iron"), instance.definitionId());
         assertEquals(12345L, instance.veinSeed());
         assertEquals(new BlockPos(10, 20, 30), instance.center());
@@ -35,21 +36,30 @@ class OreVeinInstanceTest {
     }
 
     @Test
+    void instanceShouldRejectThePriorAlgorithmVersion() {
+        assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
+            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
+    }
+
+    @Test
     void instanceShouldRejectInvalidAlgorithmRadiiDensityAndComposition() {
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             0, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
             new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(0, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
             new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(1, -1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0d, HOST, ores()));
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0d, HOST,
+            ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 1.1d, HOST, ores()));
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 1.1d, HOST,
+            ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
-            1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, List.of()));
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST,
+            List.of()));
     }
 
     @Test
@@ -65,7 +75,8 @@ class OreVeinInstanceTest {
 
     private static OreVeinInstance instance() {
         return new OreVeinInstance(
-            1, modLoc("ore/iron"), 12345L, new BlockPos(10, 20, 30), shapeInstance(4, 2, 6), 0.75d,
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore/iron"), 12345L, new BlockPos(10, 20, 30), shapeInstance(4, 2, 6),
+            0.75d,
             HOST, ores());
     }
 

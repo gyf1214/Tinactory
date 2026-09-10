@@ -27,7 +27,7 @@ class OreVeinDefinitionTest {
         assertEquals(7.25d, definition.selectionWeight());
         assertEquals(-32, definition.minY());
         assertEquals(64, definition.maxY());
-        assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 5, 1, 3, 2, 4)),
+        assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             definition.shape());
         assertEquals(0.75d, definition.density());
         assertEquals(HOST, definition.hostBlock());
@@ -43,10 +43,10 @@ class OreVeinDefinitionTest {
         assertThrows(IllegalArgumentException.class, () -> definition(1d, 64, -32, 0.75d));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
             modLoc("ore"), 1d, 0, 1,
-            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
+            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(0, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
             modLoc("ore"), 1d, 0, 1,
-            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1)), 0.75d, HOST, ores()));
+            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 0d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, -0.1d));
         assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 1.1d));
@@ -69,7 +69,7 @@ class OreVeinDefinitionTest {
 
     private static OreVeinDefinition definition() {
         return new OreVeinDefinition(
-            modLoc("ore/iron"), 7.25d, -32, 64, shapeDefinition(2, 5, 1, 3, 2, 4), 0.75d,
+            modLoc("ore/iron"), 7.25d, -32, 64, shapeDefinition(100d, 200d, 0.6d, 1d, 3d), 0.75d,
             HOST, ores());
     }
 
@@ -80,12 +80,13 @@ class OreVeinDefinitionTest {
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {
-        return shapeDefinition(1, 1, 1, 1, 1, 1);
+        return shapeDefinition(1d, 1d, 0d, 1d, 1d);
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
-        int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
-        return new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(minX, maxX, minY, maxY, minZ, maxZ));
+        double minArea, double maxArea, double maxEccentric, double minY, double maxY) {
+        return new OreShapeDefinition<>(ELLIPSOID,
+            new EllipsoidShape.Definition(minArea, maxArea, maxEccentric, minY, maxY));
     }
 
     private static List<OreEntry> ores() {

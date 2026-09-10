@@ -11,23 +11,22 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition, EllipsoidShape.Instance> {
-    private static final long RADIUS_X_SALT = 0x9E3779B97F4A7C15L;
+    private static final long AREA_SALT = 0x9E3779B97F4A7C15L;
     private static final long RADIUS_Y_SALT = 0xD1B54A32D192ED03L;
-    private static final long RADIUS_Z_SALT = 0x94D049BB133111EBL;
+    private static final long ECCENTRIC_SALT = 0x94D049BB133111EBL;
 
     private static final MapCodec<Definition> DEFINITION_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.INT.fieldOf("min_radius_x").forGetter(Definition::minRadiusX),
-        Codec.INT.fieldOf("max_radius_x").forGetter(Definition::maxRadiusX),
-        Codec.INT.fieldOf("min_radius_y").forGetter(Definition::minRadiusY),
-        Codec.INT.fieldOf("max_radius_y").forGetter(Definition::maxRadiusY),
-        Codec.INT.fieldOf("min_radius_z").forGetter(Definition::minRadiusZ),
-        Codec.INT.fieldOf("max_radius_z").forGetter(Definition::maxRadiusZ)
+        Codec.DOUBLE.fieldOf("min_area").forGetter(Definition::minArea),
+        Codec.DOUBLE.fieldOf("max_area").forGetter(Definition::maxArea),
+        Codec.DOUBLE.fieldOf("max_eccentric").forGetter(Definition::maxEccentric),
+        Codec.DOUBLE.fieldOf("min_radius_y").forGetter(Definition::minRadiusY),
+        Codec.DOUBLE.fieldOf("max_radius_y").forGetter(Definition::maxRadiusY)
     ).apply(instance, Definition::new));
 
     private static final MapCodec<Instance> INSTANCE_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.INT.fieldOf("radius_x").forGetter(Instance::radiusX),
-        Codec.INT.fieldOf("radius_y").forGetter(Instance::radiusY),
-        Codec.INT.fieldOf("radius_z").forGetter(Instance::radiusZ)
+        Codec.DOUBLE.fieldOf("radius_x").forGetter(Instance::radiusX),
+        Codec.DOUBLE.fieldOf("radius_y").forGetter(Instance::radiusY),
+        Codec.DOUBLE.fieldOf("radius_z").forGetter(Instance::radiusZ)
     ).apply(instance, Instance::new));
 
     public EllipsoidShape() {}
@@ -44,21 +43,24 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
 
     @Override
     public Instance sample(Definition definition, long veinSeed) {
+        var area = sampleRange(veinSeed, definition.minArea(), definition.maxArea(), AREA_SALT);
+        var eccentric = sampleRange(veinSeed, -definition.maxEccentric(), definition.maxEccentric(), ECCENTRIC_SALT);
+        var scale = Math.sqrt(area / (1d - eccentric * eccentric));
         return new Instance(
-            sampleRadius(veinSeed, definition.minRadiusX(), definition.maxRadiusX(), RADIUS_X_SALT),
-            sampleRadius(veinSeed, definition.minRadiusY(), definition.maxRadiusY(), RADIUS_Y_SALT),
-            sampleRadius(veinSeed, definition.minRadiusZ(), definition.maxRadiusZ(), RADIUS_Z_SALT));
+            scale * (1d + eccentric),
+            sampleRange(veinSeed, definition.minRadiusY(), definition.maxRadiusY(), RADIUS_Y_SALT),
+            scale * (1d - eccentric));
     }
 
     @Override
     public BoundingBox bounds(BlockPos center, Instance instance) {
         return new BoundingBox(
-            center.getX() - instance.radiusX(),
-            center.getY() - instance.radiusY(),
-            center.getZ() - instance.radiusZ(),
-            center.getX() + instance.radiusX(),
-            center.getY() + instance.radiusY(),
-            center.getZ() + instance.radiusZ());
+            (int) Math.ceil(center.getX() - instance.radiusX()),
+            (int) Math.ceil(center.getY() - instance.radiusY()),
+            (int) Math.ceil(center.getZ() - instance.radiusZ()),
+            (int) Math.floor(center.getX() + instance.radiusX()),
+            (int) Math.floor(center.getY() + instance.radiusY()),
+            (int) Math.floor(center.getZ() + instance.radiusZ()));
     }
 
     @Override
@@ -72,9 +74,8 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
         return distance > 1d ? 0d : 1d - distance;
     }
 
-    private static int sampleRadius(long seed, int min, int max, long salt) {
-        var range = (long) max - min + 1L;
-        return min + (int) (OreVeinUtil.hashToUnit(seed, salt) * range);
+    private static double sampleRange(long seed, double min, double max, long salt) {
+        return min + OreVeinUtil.hashToUnit(seed, salt) * (max - min);
     }
 
     private static double square(double value) {
@@ -82,35 +83,36 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
     }
 
     public record Definition(
-        int minRadiusX,
-        int maxRadiusX,
-        int minRadiusY,
-        int maxRadiusY,
-        int minRadiusZ,
-        int maxRadiusZ
+        double minArea,
+        double maxArea,
+        double maxEccentric,
+        double minRadiusY,
+        double maxRadiusY
     ) {
         public Definition {
-            validateRadiusRange("X", minRadiusX, maxRadiusX);
-            validateRadiusRange("Y", minRadiusY, maxRadiusY);
-            validateRadiusRange("Z", minRadiusZ, maxRadiusZ);
+            validateRange("area", minArea, maxArea);
+            validateRange("Y radius", minRadiusY, maxRadiusY);
+            if (!Double.isFinite(maxEccentric) || maxEccentric < 0d || maxEccentric >= 1d) {
+                throw new IllegalArgumentException("maximum eccentricity must be finite and in the range [0, 1)");
+            }
         }
 
-        private static void validateRadiusRange(String axis, int min, int max) {
-            if (min <= 0 || min > max) {
-                throw new IllegalArgumentException("radius " + axis + " range is invalid");
+        private static void validateRange(String name, double min, double max) {
+            if (!Double.isFinite(min) || !Double.isFinite(max) || min <= 0d || min > max) {
+                throw new IllegalArgumentException(name + " range is invalid");
             }
         }
     }
 
-    public record Instance(int radiusX, int radiusY, int radiusZ) {
+    public record Instance(double radiusX, double radiusY, double radiusZ) {
         public Instance {
             validateRadius("X", radiusX);
             validateRadius("Y", radiusY);
             validateRadius("Z", radiusZ);
         }
 
-        private static void validateRadius(String axis, int radius) {
-            if (radius <= 0) {
+        private static void validateRadius(String axis, double radius) {
+            if (!Double.isFinite(radius) || radius <= 0d) {
                 throw new IllegalArgumentException("radius " + axis + " must be positive");
             }
         }

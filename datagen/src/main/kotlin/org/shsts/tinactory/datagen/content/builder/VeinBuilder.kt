@@ -35,7 +35,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
 
         private val ORE_SHAPE = OreShapeDefinition(
             AllWorldGens.ELLIPSOID_SHAPE.get(),
-            EllipsoidShape.Definition(12, 18, 2, 5, 12, 18))
+            EllipsoidShape.Definition(100.0, 200.0, 0.6, 2.0, 5.0))
     }
 
     private fun chain(another: OreAnalyzerRecipeBuilder.() -> Unit) {

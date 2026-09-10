@@ -14,13 +14,13 @@ class EllipsoidShapeTest {
     private final EllipsoidShape shape = new EllipsoidShape();
 
     @Test
-    void definitionShouldRejectInvalidRadiusRanges() {
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(0, 1, 1, 1, 1, 1));
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(2, 1, 1, 1, 1, 1));
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 1, 0, 1, 1, 1));
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 1, 2, 1, 1, 1));
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 1, 1, 1, 0, 1));
-        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 1, 1, 1, 2, 1));
+    void definitionShouldRejectInvalidRanges() {
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(0, 1, 0.6, 1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(2, 1, 0.6, 1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 2, -0.1, 1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 2, 1, 1, 2));
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 2, 0.6, 0, 2));
+        assertThrows(IllegalArgumentException.class, () -> new EllipsoidShape.Definition(1, 2, 0.6, 2, 1));
     }
 
     @Test
@@ -32,8 +32,8 @@ class EllipsoidShapeTest {
 
     @Test
     void definitionAndInstanceCodecsShouldRoundTripThroughJsonAndNbt() {
-        var definition = new EllipsoidShape.Definition(2, 5, 1, 4, 3, 7);
-        var instance = new EllipsoidShape.Instance(4, 2, 6);
+        var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 2d, 5d);
+        var instance = new EllipsoidShape.Instance(4.25d, 2.5d, 6.75d);
         var definitionCodec = shape.definitionCodec().codec();
         var instanceCodec = shape.instanceCodec().codec();
 
@@ -50,28 +50,46 @@ class EllipsoidShapeTest {
 
     @Test
     void samplingShouldBeDeterministicAndStayWithinConfiguredRanges() {
-        var definition = new EllipsoidShape.Definition(2, 5, 1, 4, 3, 7);
+        var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 4d);
         var first = shape.sample(definition, 123L);
         var second = shape.sample(definition, 123L);
 
         assertEquals(first, second);
         for (var seed = 0L; seed < 100L; seed++) {
             var instance = shape.sample(definition, seed);
-            assertTrue(instance.radiusX() >= 2 && instance.radiusX() <= 5);
-            assertTrue(instance.radiusY() >= 1 && instance.radiusY() <= 4);
-            assertTrue(instance.radiusZ() >= 3 && instance.radiusZ() <= 7);
+            var area = instance.radiusX() * instance.radiusZ();
+            var eccentricity = (instance.radiusX() - instance.radiusZ()) /
+                (instance.radiusX() + instance.radiusZ());
+            assertTrue(area >= 100d && area < 200d);
+            assertTrue(eccentricity >= -0.6d && eccentricity < 0.6d);
+            assertTrue(instance.radiusY() >= 1d && instance.radiusY() < 4d);
         }
     }
 
     @Test
-    void samplingShouldPreservePriorRadiusFixtures() {
-        var definition = new EllipsoidShape.Definition(2, 5, 1, 4, 3, 7);
+    void samplingShouldDeriveRadiiFromAreaAndEccentricity() {
+        var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 2d, 5d);
 
-        assertEquals(new EllipsoidShape.Instance(2, 4, 7), shape.sample(definition, 0L));
-        assertEquals(new EllipsoidShape.Instance(2, 3, 5), shape.sample(definition, 1L));
-        assertEquals(new EllipsoidShape.Instance(5, 4, 4), shape.sample(definition, 123L));
-        assertEquals(new EllipsoidShape.Instance(3, 1, 7), shape.sample(definition, 12345L));
-        assertEquals(new EllipsoidShape.Instance(4, 3, 4), shape.sample(definition, -1L));
+        var instance = shape.sample(definition, 0L);
+
+        assertEquals(21.207360995089804d, instance.radiusX(), 1e-12d);
+        assertEquals(4.442336555171429d, instance.radiusY(), 1e-12d);
+        assertEquals(5.673043512265947d, instance.radiusZ(), 1e-12d);
+        assertEquals(120.3102817054761d, instance.radiusX() * instance.radiusZ(), 1e-12d);
+        assertEquals(0.5779049001503281d,
+            (instance.radiusX() - instance.radiusZ()) / (instance.radiusX() + instance.radiusZ()), 1e-12d);
+    }
+
+    @Test
+    void boundsShouldContainTheIntegerLatticePointsOfFractionalRadii() {
+        var bounds = shape.bounds(new BlockPos(10, 20, 30), new EllipsoidShape.Instance(2.2d, 1.2d, 3.8d));
+
+        assertEquals(8, bounds.minX());
+        assertEquals(19, bounds.minY());
+        assertEquals(27, bounds.minZ());
+        assertEquals(12, bounds.maxX());
+        assertEquals(21, bounds.maxY());
+        assertEquals(33, bounds.maxZ());
     }
 
     @Test

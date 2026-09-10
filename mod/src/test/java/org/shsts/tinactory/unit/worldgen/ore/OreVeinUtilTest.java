@@ -58,7 +58,7 @@ class OreVeinUtilTest {
     @Test
     void sampleShouldBeDeterministicAndSampleEachRadiusWithinItsRange() {
         var definition = new OreVeinDefinition(
-            modLoc("definition"), 1, -32, 32, shapeDefinition(2, 5, 1, 4, 3, 7), 0.75d,
+            modLoc("definition"), 1, -32, 32, shapeDefinition(100d, 200d, 0.6d, 1d, 4d), 0.75d,
             HOST, ores());
         var center = new BlockPos(10, 20, 30);
         var first = OreVeinUtil.sample(definition, 123L, center);
@@ -69,10 +69,13 @@ class OreVeinUtilTest {
         for (var seed = 0L; seed < 100L; seed++) {
             var instance = OreVeinUtil.sample(definition, seed, center);
             var ellipsoid = ellipsoidInstance(instance);
-            assertTrue(ellipsoid.radiusX() >= 2 && ellipsoid.radiusX() <= 5);
-            assertTrue(ellipsoid.radiusY() >= 1 && ellipsoid.radiusY() <= 4);
-            assertTrue(ellipsoid.radiusZ() >= 3 && ellipsoid.radiusZ() <= 7);
-            sawNonMinimumRadius |= ellipsoid.radiusX() > 2 || ellipsoid.radiusY() > 1 || ellipsoid.radiusZ() > 3;
+            var area = ellipsoid.radiusX() * ellipsoid.radiusZ();
+            var eccentricity = (ellipsoid.radiusX() - ellipsoid.radiusZ()) /
+                (ellipsoid.radiusX() + ellipsoid.radiusZ());
+            assertTrue(area >= 100d && area < 200d);
+            assertTrue(eccentricity >= -0.6d && eccentricity < 0.6d);
+            assertTrue(ellipsoid.radiusY() >= 1d && ellipsoid.radiusY() < 4d);
+            sawNonMinimumRadius |= area > 100d || ellipsoid.radiusY() > 1d;
         }
         assertTrue(sawNonMinimumRadius);
         assertEquals(OreVeinUtil.ALGORITHM_VERSION, first.algorithmVersion());
@@ -158,16 +161,18 @@ class OreVeinUtilTest {
 
     private static OreVeinDefinition definition(String path, double selectionWeight) {
         return new OreVeinDefinition(
-            modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1, 1, 1, 1, 1, 1), 1d,
+            modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1d, 1d, 0d, 1d, 1d), 1d,
             HOST, ores());
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
-        int minX, int maxX, int minY, int maxY, int minZ, int maxZ) {
-        return new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(minX, maxX, minY, maxY, minZ, maxZ));
+        double minArea, double maxArea, double maxEccentric, double minY, double maxY) {
+        return new OreShapeDefinition<>(ELLIPSOID,
+            new EllipsoidShape.Definition(minArea, maxArea, maxEccentric, minY, maxY));
     }
 
-    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(int radiusX, int radiusY, int radiusZ) {
+    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(
+        double radiusX, double radiusY, double radiusZ) {
         return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusX, radiusY, radiusZ));
     }
 
