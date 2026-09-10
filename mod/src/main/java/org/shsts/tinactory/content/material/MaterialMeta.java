@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.material;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -132,6 +133,24 @@ public class MaterialMeta extends MetaConsumer {
         toolBuilder.build();
     }
 
+    private void buildOre(MaterialSet.Builder<?> builder, JsonElement je, boolean first) {
+        if (je.isJsonObject()) {
+            var jo1 = je.getAsJsonObject();
+            var variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
+            if (jo1.has("existing")) {
+                var block = BLOCKS.getEntry(ResourceLocation.parse(GsonHelper.getAsString(jo1, "existing")));
+                if (first) {
+                    builder.oreMain(variant);
+                }
+                builder.oreExisting(variant, block);
+            } else if (first) {
+                builder.ore(variant);
+            } else {
+                builder.ore(variant, "ore_" + variant.getSerializedName());
+            }
+        }
+    }
+
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         if (jo.has("alias")) {
@@ -147,28 +166,14 @@ public class MaterialMeta extends MetaConsumer {
         buildFluids(builder, jo);
         if (jo.has("ore")) {
             var je = jo.get("ore");
-            if (je.isJsonObject()) {
-                var jo1 = je.getAsJsonObject();
-                var variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
-                builder.oreMain(variant);
-                if (jo1.has("existing")) {
-                    var block = BLOCKS.getEntry(ResourceLocation.parse(GsonHelper.getAsString(jo1, "existing")));
-                    builder.oreExisting(variant, block);
-                }
-            } else if (je.isJsonArray()) {
+            if (je.isJsonArray()) {
                 var first = true;
                 for (var je1 : je.getAsJsonArray()) {
-                    var variant = OreVariant.fromName(GsonHelper.convertToString(je1, "ore"));
-                    if (first) {
-                        builder.ore(variant);
-                        first = false;
-                    } else {
-                        builder.ore(variant, "ore_" + variant.getSerializedName());
-                    }
+                    buildOre(builder, je1, first);
+                    first = false;
                 }
             } else {
-                var variant = OreVariant.fromName(GsonHelper.convertToString(je, "ore"));
-                builder.ore(variant);
+                buildOre(builder, je, true);
             }
         }
         buildAliases(builder, jo);
