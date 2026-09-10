@@ -9,11 +9,13 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
 import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinPiece;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructure;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructureType;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
+import org.shsts.tinactory.core.worldgen.placement.MultiscaleStructurePlacement;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
 
@@ -30,12 +32,15 @@ public final class AllWorldGens {
     public static final IEntry<EllipsoidShape> ELLIPSOID_SHAPE;
     public static final IEntry<StructureType<OreVeinStructure>> ORE_VEIN_STRUCTURE_TYPE;
     public static final IEntry<StructurePieceType> ORE_VEIN_PIECE_TYPE;
+    public static final IEntry<StructurePlacementType<MultiscaleStructurePlacement>> MULTISCALE_PLACEMENT_TYPE;
     public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER_TREE_GROWER;
 
     private static final IEntryHandler<StructureType<?>> STRUCTURE_TYPES =
         REGISTRATE.getHandler(Registries.STRUCTURE_TYPE, BuiltInRegistries.STRUCTURE_TYPE);
     private static final IEntryHandler<StructurePieceType> STRUCTURE_PIECES =
         REGISTRATE.getHandler(Registries.STRUCTURE_PIECE, BuiltInRegistries.STRUCTURE_PIECE);
+    private static final IEntryHandler<StructurePlacementType<?>> STRUCTURE_PLACEMENTS =
+        REGISTRATE.getHandler(Registries.STRUCTURE_PLACEMENT, BuiltInRegistries.STRUCTURE_PLACEMENT);
 
     static {
         VOID_WITH_START_BIOME = ResourceKey.create(Registries.BIOME, modLoc("void_with_start"));
@@ -45,6 +50,8 @@ public final class AllWorldGens {
             STRUCTURE_TYPES, "ore_vein", OreVeinStructureType::new);
         ORE_VEIN_PIECE_TYPE = REGISTRATE.registryEntry(
             STRUCTURE_PIECES, "ore_vein", () -> OreVeinPiece::new);
+        MULTISCALE_PLACEMENT_TYPE = REGISTRATE.registryEntry(
+            STRUCTURE_PLACEMENTS, "multiscale", () -> () -> MultiscaleStructurePlacement.CODEC);
         RUBBER_TREE_GROWER = ResourceKey.create(Registries.CONFIGURED_FEATURE, modLoc("rubber_tree"));
     }
 

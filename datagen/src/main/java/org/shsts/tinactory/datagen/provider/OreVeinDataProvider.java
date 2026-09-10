@@ -19,13 +19,12 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
-import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
-import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructure;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
+import org.shsts.tinactory.core.worldgen.placement.MultiscaleStructurePlacement;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
@@ -123,15 +122,17 @@ public final class OreVeinDataProvider implements DataProvider {
         var structureKey = ResourceKey.create(Registries.STRUCTURE, config.structureId());
         var structureHolder = Holder.Reference.createStandAlone(
             structureOwner, structureKey);
-        var placement = new RandomSpreadStructurePlacement(
+        var placement = new MultiscaleStructurePlacement(
             Vec3i.ZERO,
             StructurePlacement.FrequencyReductionMethod.DEFAULT,
             0.75F,
             config.salt(),
             Optional.empty(),
+            1,
+            1,
             4,
-            3,
-            RandomSpreadType.LINEAR);
+            1,
+            2);
         var structureSet = new StructureSet(structureHolder, placement);
         var structureSetJson = StructureSet.DIRECT_CODEC.encodeStart(serializationOps, structureSet).getOrThrow();
         var structureSetFuture = DataProvider.saveStable(
