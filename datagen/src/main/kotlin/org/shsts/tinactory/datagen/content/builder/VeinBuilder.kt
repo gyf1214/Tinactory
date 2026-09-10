@@ -1,7 +1,11 @@
 package org.shsts.tinactory.datagen.content.builder
 
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.biome.Biome
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllWorldGens
 import org.shsts.tinactory.core.electric.Voltage
@@ -36,6 +40,14 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         private val ORE_SHAPE = OreShapeDefinition(
             AllWorldGens.ELLIPSOID_SHAPE.get(),
             EllipsoidShape.Definition(100.0, 200.0, 0.6, 2.0, 5.0))
+
+        private val BIOME_TAGS = mapOf(
+            Level.OVERWORLD to TagKey.create(
+                Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "is_overworld")),
+            Level.NETHER to TagKey.create(
+                Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "is_nether")),
+            Level.END to TagKey.create(
+                Registries.BIOME, ResourceLocation.fromNamespaceAndPath("minecraft", "is_end")))
     }
 
     private fun chain(another: OreAnalyzerRecipeBuilder.() -> Unit) {
@@ -87,6 +99,8 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
     fun build() {
         val variant1 = checkNotNull(variant) { "Vein $id must specify a host variant" }
         val dimension1 = checkNotNull(dimension) { "Vein $id must specify a dimension" }
+        val biomeTag1 = BIOME_TAGS[dimension1] ?: error(
+            "Vein $id has no biome tag for dimension ${dimension1.location()}")
         val minY1 = checkNotNull(minY) { "Vein $id must specify a minimum Y" }
         val maxY1 = checkNotNull(maxY) { "Vein $id must specify a maximum Y" }
         check(rate > 0) { "Vein $id must have a positive selection weight" }
@@ -134,6 +148,6 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             0.5,
             variant1.baseBlock,
             oreEntries.toList())
-        VEIN_DATA.addCallback { provider -> provider.addVein(dimension1, definition) }
+        VEIN_DATA.addCallback { provider -> provider.addVein(variant1.serializedName, biomeTag1, definition) }
     }
 }
