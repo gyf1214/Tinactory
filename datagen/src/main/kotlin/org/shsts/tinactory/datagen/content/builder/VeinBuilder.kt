@@ -105,6 +105,8 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         check(rate > 0) { "Vein $id must have a positive selection weight" }
         check(ores.isNotEmpty()) { "Vein $id must contain at least one ore" }
         val id1 = "${variant1.serializedName}/$id"
+        val weight = (weightMultiple * rate).toInt()
+        check(weight > 0) { "Vein $id must have a positive weight" }
 
         val baseTech = BASE_ORE.getValue(variant1)
         val tech = if (baseOre || primitive) {
@@ -138,7 +140,6 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             }
         }
 
-        val weight = (weightMultiple * rate).toInt()
         val definition = OreVeinDefinition(
             minY1,
             maxY1,

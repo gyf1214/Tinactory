@@ -50,7 +50,7 @@ public final class OreVeinDataProvider implements DataProvider {
 
     private record VeinEntry(ResourceLocation loc, int weight) {}
 
-    private final List<Vein> veins = new ArrayList<>();
+    private final Map<ResourceLocation, Vein> veins = new LinkedHashMap<>();
     private final Map<String, List<VeinEntry>> groups = new LinkedHashMap<>();
 
     public OreVeinDataProvider(IDataGen dataGen,
@@ -71,7 +71,10 @@ public final class OreVeinDataProvider implements DataProvider {
 
     public ResourceLocation addVein(String veinId, TagKey<Biome> biomeTag, OreVeinDefinition definition) {
         var veinLoc = ResourceLocation.fromNamespaceAndPath(modId, PREFIX + veinId);
-        veins.add(new Vein(veinLoc, biomeTag, definition));
+        if (veins.containsKey(veinLoc)) {
+            throw new IllegalArgumentException("Duplicate vein " + veinLoc);
+        }
+        veins.put(veinLoc, new Vein(veinLoc, biomeTag, definition));
         return veinLoc;
     }
 
@@ -88,7 +91,7 @@ public final class OreVeinDataProvider implements DataProvider {
             validateDefinitions();
 
             var futures = Stream.concat(
-                veins.stream().map(entry -> writeStructure(output, registries, entry)),
+                veins.values().stream().map(entry -> writeStructure(output, registries, entry)),
                 groups.entrySet().stream().map(entry ->
                     writeGroup(output, registries, entry.getKey(), entry.getValue()))
             ).toArray(CompletableFuture[]::new);
