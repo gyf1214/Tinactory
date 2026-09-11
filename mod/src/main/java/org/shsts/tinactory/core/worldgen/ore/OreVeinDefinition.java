@@ -41,4 +41,8 @@ public record OreVeinDefinition(
             throw new IllegalArgumentException("ores must not be empty");
         }
     }
+
+    public OreVeinDefinition scaleArea(double areaScale) {
+        return new OreVeinDefinition(minY, maxY, shape.scaleArea(areaScale), density, hostBlock, ores);
+    }
 }

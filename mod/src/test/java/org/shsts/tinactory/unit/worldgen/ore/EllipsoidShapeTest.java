@@ -55,6 +55,23 @@ class EllipsoidShapeTest {
     }
 
     @Test
+    void scaleDefinitionShouldScaleAreaOnly() {
+        var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 2d, 5d);
+
+        var scaled = shape.scaleDefinition(definition, 4d);
+
+        assertEquals(new EllipsoidShape.Definition(400d, 800d, 0.6d, 2d, 5d), scaled);
+    }
+
+    @Test
+    void scaleDefinitionShouldRejectInvalidFactors() {
+        var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 2d, 5d);
+
+        assertThrows(IllegalArgumentException.class, () -> shape.scaleDefinition(definition, 0d));
+        assertThrows(IllegalArgumentException.class, () -> shape.scaleDefinition(definition, Double.NaN));
+    }
+
+    @Test
     void samplingShouldBeDeterministicAndStayWithinConfiguredRanges() {
         var definition = new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 4d);
         var first = shape.sample(definition, 123L);

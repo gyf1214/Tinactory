@@ -18,12 +18,13 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructure;
 import org.shsts.tinactory.core.util.CodecHelper;
-import org.shsts.tinactory.core.worldgen.ore.MultiscaleStructurePlacement;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
+import org.shsts.tinactory.core.worldgen.placement.OffsetSpreadPlacement;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,6 +45,9 @@ public final class OreVeinDataProvider implements DataProvider {
     private final PackOutput.PathProvider structurePathProvider;
     private final PackOutput.PathProvider structureSetPathProvider;
     private final CompletableFuture<HolderLookup.Provider> lookupProvider;
+    private final int levels;
+    private final int distanceScale;
+    private final int areaScale;
 
     private record Vein(ResourceLocation loc, TagKey<Biome> biomeTag, OreVeinDefinition definition) {}
 
@@ -54,9 +57,22 @@ public final class OreVeinDataProvider implements DataProvider {
     private final Map<String, List<VeinEntry>> groups = new LinkedHashMap<>();
 
     public OreVeinDataProvider(IDataGen dataGen,
-        IDataHandler<OreVeinDataProvider> handler, GatherDataEvent event) {
+        IDataHandler<OreVeinDataProvider> handler, GatherDataEvent event,
+        int levels, int distanceScale, int areaScale) {
+        if (levels <= 0) {
+            throw new IllegalArgumentException("levels must be positive");
+        }
+        if (distanceScale < 1) {
+            throw new IllegalArgumentException("distanceScale must be at least 1");
+        }
+        if (areaScale < 1) {
+            throw new IllegalArgumentException("areaScale must be at least 1");
+        }
         this.modId = dataGen.modid();
         this.handler = handler;
+        this.levels = levels;
+        this.distanceScale = distanceScale;
+        this.areaScale = areaScale;
         var packOutput = event.getGenerator().getPackOutput();
         this.structurePathProvider = packOutput.createPathProvider(
             PackOutput.Target.DATA_PACK, "worldgen/structure");
@@ -90,13 +106,17 @@ public final class OreVeinDataProvider implements DataProvider {
             handler.register(this);
             validateDefinitions();
 
-            var futures = Stream.concat(
-                veins.values().stream().map(entry -> writeStructure(output, registries, entry)),
-                groups.entrySet().stream().map(entry ->
-                    writeGroup(output, registries, entry.getKey(), entry.getValue()))
-            ).toArray(CompletableFuture[]::new);
+            var futures = new ArrayList<CompletableFuture<?>>();
+            for (var level = 0; level < levels; level++) {
+                for (var vein : veins.values()) {
+                    futures.add(writeStructure(output, registries, vein, level));
+                }
+                for (var entry : groups.entrySet()) {
+                    futures.add(writeGroup(output, registries, entry.getKey(), entry.getValue(), level));
+                }
+            }
 
-            return CompletableFuture.allOf(futures);
+            return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
         });
     }
 
@@ -106,21 +126,21 @@ public final class OreVeinDataProvider implements DataProvider {
     }
 
     private CompletableFuture<?> writeStructure(CachedOutput output, HolderLookup.Provider registries,
-        Vein vein) {
+        Vein vein, int level) {
         var biomeLookup = registries.lookupOrThrow(Registries.BIOME);
         var settings = new Structure.StructureSettings(
             biomeLookup.getOrThrow(vein.biomeTag),
             Map.of(),
             GenerationStep.Decoration.UNDERGROUND_ORES,
             TerrainAdjustment.NONE);
-        var structure = new OreVeinStructure(settings, vein.definition);
+        var structure = new OreVeinStructure(settings, vein.definition.scaleArea(Math.pow(areaScale, level)));
         var json = CodecHelper.encodeJson(registries, Structure.DIRECT_CODEC, structure);
-        return DataProvider.saveStable(output, json, structurePathProvider.json(vein.loc));
+        return DataProvider.saveStable(output, json, structurePathProvider.json(levelLocation(vein.loc, level)));
     }
 
     private CompletableFuture<?> writeGroup(CachedOutput output, HolderLookup.Provider registries,
-        String id, List<VeinEntry> veins) {
-        var loc = ResourceLocation.fromNamespaceAndPath(modId, PREFIX + id);
+        String id, List<VeinEntry> veins, int level) {
+        var loc = ResourceLocation.fromNamespaceAndPath(modId, PREFIX + id + "/" + level);
 
         var ops = registries.createSerializationContext(JsonOps.INSTANCE);
         var owner = ops.lookupProvider.lookup(Registries.STRUCTURE)
@@ -128,18 +148,20 @@ public final class OreVeinDataProvider implements DataProvider {
             .owner();
         var entries = new ArrayList<StructureSet.StructureSelectionEntry>();
         for (var entry : veins) {
-            var key = ResourceKey.create(Registries.STRUCTURE, entry.loc);
+            var key = ResourceKey.create(Registries.STRUCTURE, levelLocation(entry.loc, level));
             var holder = Holder.Reference.createStandAlone(owner, key);
             entries.add(new StructureSet.StructureSelectionEntry(holder, entry.weight));
         }
 
-        var placement = new MultiscaleStructurePlacement(
+        var distanceFactor = scaleFactor(distanceScale, level);
+        var placement = new OffsetSpreadPlacement(
             Vec3i.ZERO,
             StructurePlacement.FrequencyReductionMethod.DEFAULT,
             0.75F,
-            salt(id),
+            salt(id + "/" + level),
             Optional.empty(),
-            1, 1, 4, 1, 2, 3);
+            Math.multiplyExact(4, distanceFactor), 1, RandomSpreadType.LINEAR,
+            distanceFactor, distanceFactor);
         var structureSet = new StructureSet(entries, placement);
 
         var json = StructureSet.DIRECT_CODEC.encodeStart(ops, structureSet).getOrThrow();
@@ -157,5 +179,17 @@ public final class OreVeinDataProvider implements DataProvider {
 
     private int salt(String id) {
         return id.hashCode() & Integer.MAX_VALUE;
+    }
+
+    private ResourceLocation levelLocation(ResourceLocation loc, int level) {
+        return loc.withPath(path -> path + "/" + level);
+    }
+
+    private int scaleFactor(int scale, int level) {
+        var factor = 1;
+        for (var index = 0; index < level; index++) {
+            factor = Math.multiplyExact(factor, scale);
+        }
+        return factor;
     }
 }

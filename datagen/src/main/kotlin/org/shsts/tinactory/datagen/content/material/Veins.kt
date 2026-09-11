@@ -8,7 +8,9 @@ import org.shsts.tinactory.datagen.provider.OreVeinDataProvider
 import org.shsts.tinactory.integration.material.OreVariant
 
 object Veins {
-    val VEIN_DATA = DATA_GEN.createHandler(::OreVeinDataProvider)
+    val VEIN_DATA = DATA_GEN.createHandler { dataGen, handler, event ->
+        OreVeinDataProvider(dataGen, handler, event, 3, 2, 2)
+    }
 
     fun init() {
         stone()

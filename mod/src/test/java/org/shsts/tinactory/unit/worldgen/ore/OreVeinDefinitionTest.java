@@ -11,6 +11,7 @@ import org.shsts.tinactory.unit.fixture.TestOreHelper;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
@@ -29,6 +30,21 @@ class OreVeinDefinitionTest {
         assertEquals(0.75d, definition.density());
         assertEquals(HOST, definition.hostBlock());
         assertEquals(List.of(new OreEntry(IRON_ORE, 3.5d)), definition.ores());
+    }
+
+    @Test
+    void scaleAreaShouldRetainNonShapeConfiguration() {
+        var definition = definition();
+
+        var scaled = definition.scaleArea(2d);
+
+        assertEquals(-32, scaled.minY());
+        assertEquals(64, scaled.maxY());
+        assertEquals(new OreShapeDefinition<>(ELLIPSOID,
+            new EllipsoidShape.Definition(200d, 400d, 0.6d, 1d, 3d)), scaled.shape());
+        assertEquals(0.75d, scaled.density());
+        assertEquals(HOST, scaled.hostBlock());
+        assertSame(definition.ores(), scaled.ores());
     }
 
     @Test

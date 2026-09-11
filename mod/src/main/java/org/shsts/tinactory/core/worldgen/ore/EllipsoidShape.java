@@ -49,6 +49,19 @@ public final class EllipsoidShape implements IOreShape<EllipsoidShape.Definition
     }
 
     @Override
+    public Definition scaleDefinition(Definition definition, double areaScale) {
+        if (!Double.isFinite(areaScale) || areaScale <= 0d) {
+            throw new IllegalArgumentException("area scale must be finite and positive");
+        }
+        return new Definition(
+            definition.minArea() * areaScale,
+            definition.maxArea() * areaScale,
+            definition.maxEccentric(),
+            definition.minRadiusY(),
+            definition.maxRadiusY());
+    }
+
+    @Override
     public Instance sample(Definition definition, long veinSeed) {
         var area = sampleRange(veinSeed, definition.minArea(), definition.maxArea(), AREA_SALT);
         var eccentric = sampleRange(veinSeed, 0d, definition.maxEccentric(), ECCENTRIC_SALT);

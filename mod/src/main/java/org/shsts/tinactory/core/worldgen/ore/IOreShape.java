@@ -15,6 +15,8 @@ public interface IOreShape<D, I> {
 
     MapCodec<I> instanceCodec();
 
+    D scaleDefinition(D definition, double areaScale);
+
     I sample(D definition, long veinSeed);
 
     BoundingBox bounds(BlockPos center, I instance);

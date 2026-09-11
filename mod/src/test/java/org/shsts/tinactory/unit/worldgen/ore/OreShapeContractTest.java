@@ -38,6 +38,11 @@ class OreShapeContractTest {
         }
 
         @Override
+        public String scaleDefinition(String definition, double areaScale) {
+            return definition;
+        }
+
+        @Override
         public Integer sample(String definition, long veinSeed) {
             return definition.length() + (int) veinSeed;
         }

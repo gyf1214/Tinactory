@@ -194,6 +194,11 @@ class OreVeinUtilTest {
         }
 
         @Override
+        public Integer scaleDefinition(Integer definition, double areaScale) {
+            return definition;
+        }
+
+        @Override
         public Integer sample(Integer definition, long veinSeed) {
             return definition;
         }
@@ -227,6 +232,11 @@ class OreVeinUtilTest {
         @Override
         public MapCodec<Integer> instanceCodec() {
             return Codec.INT.fieldOf("value");
+        }
+
+        @Override
+        public Integer scaleDefinition(Integer definition, double areaScale) {
+            return definition;
         }
 
         @Override
