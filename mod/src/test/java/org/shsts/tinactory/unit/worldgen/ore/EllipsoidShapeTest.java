@@ -1,9 +1,12 @@
 package org.shsts.tinactory.unit.worldgen.ore;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -116,6 +119,94 @@ class EllipsoidShapeTest {
         assertEquals(12, alongZ.maxX());
         assertEquals(22, alongZ.maxY());
         assertEquals(34, alongZ.maxZ());
+    }
+
+    @Test
+    void intersectingBoundsShouldRejectGenerationBoxOutsideYRange() {
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(4, 2, 2, 0), new BoundingBox(-2, 3, -2, 2, 4, 2));
+
+        assertTrue(bounds.isEmpty());
+    }
+
+    @Test
+    void intersectingBoundsShouldRejectGenerationBoxOutsideHorizontalEllipse() {
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(4, 2, 2, 0), new BoundingBox(5, -1, -1, 6, 1, 1));
+
+        assertTrue(bounds.isEmpty());
+    }
+
+    @Test
+    void intersectingBoundsShouldIncludeTangentIntersection() {
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(4, 2, 2, 0), new BoundingBox(4, 0, -1, 5, 1, 1));
+
+        assertEquals(new BoundingBox(4, 0, 0, 4, 0, 0), bounds.orElseThrow());
+    }
+
+    @Test
+    void intersectingBoundsShouldFindBothRootsOnRectangleEdge() {
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(4, 2, 2, 0), new BoundingBox(-5, 0, 1, 5, 0, 3));
+
+        assertEquals(new BoundingBox(-3, 0, 1, 3, 0, 2), bounds.orElseThrow());
+    }
+
+    @Test
+    void intersectingBoundsShouldUseTheRotatedEllipse() {
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(4, 2, 2, Math.PI / 4d), new BoundingBox(2, 0, -2, 3, 0, 2));
+
+        assertEquals(new BoundingBox(2, 0, 0, 3, 0, 2), bounds.orElseThrow());
+    }
+
+    @Test
+    void intersectingBoundsShouldRejectContinuousIntersectionWithoutIntegerInterval() {
+        var angle = Math.atan2(2d, 1d);
+        var bounds = shape.intersectingBounds(new BlockPos(0, 0, 0),
+            new EllipsoidShape.Instance(2, 1, 0.1, angle), new BoundingBox(0, 0, 1, 1, 0, 2));
+
+        assertTrue(bounds.isEmpty());
+    }
+
+    @Test
+    void intersectingBoundsShouldContainEveryPositiveFillLatticePoint() {
+        var random = new Random(0L);
+
+        for (var sample = 0; sample < 100; sample++) {
+            var center = new BlockPos(random.nextInt(7) - 3, random.nextInt(7) - 3, random.nextInt(7) - 3);
+            var radiusLong = 0.5d + random.nextDouble() * 4.5d;
+            var radiusShort = 0.25d + random.nextDouble() * (radiusLong - 0.25d);
+            var instance = new EllipsoidShape.Instance(radiusLong, 0.25d + random.nextDouble() * 3.75d,
+                radiusShort, random.nextDouble() * 2d * Math.PI);
+            var minX = center.getX() + random.nextInt(9) - 6;
+            var minY = center.getY() + random.nextInt(9) - 6;
+            var minZ = center.getZ() + random.nextInt(9) - 6;
+            var generationBox = new BoundingBox(minX, minY, minZ,
+                minX + random.nextInt(5), minY + random.nextInt(5), minZ + random.nextInt(5));
+            var bounds = shape.intersectingBounds(center, instance, generationBox);
+            var foundPositiveFill = false;
+
+            for (var x = generationBox.minX(); x <= generationBox.maxX(); x++) {
+                for (var y = generationBox.minY(); y <= generationBox.maxY(); y++) {
+                    for (var z = generationBox.minZ(); z <= generationBox.maxZ(); z++) {
+                        var position = new BlockPos(x, y, z);
+                        if (shape.fillFactor(0L, center, position, instance) > 0d) {
+                            foundPositiveFill = true;
+                            var candidate = bounds.orElseThrow();
+                            assertTrue(x >= candidate.minX() && x <= candidate.maxX());
+                            assertTrue(y >= candidate.minY() && y <= candidate.maxY());
+                            assertTrue(z >= candidate.minZ() && z <= candidate.maxZ());
+                        }
+                    }
+                }
+            }
+
+            if (!foundPositiveFill) {
+                assertTrue(bounds.isEmpty());
+            }
+        }
     }
 
     @Test

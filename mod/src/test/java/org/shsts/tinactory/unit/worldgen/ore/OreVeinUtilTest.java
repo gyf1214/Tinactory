@@ -179,6 +179,11 @@ class OreVeinUtilTest {
         }
 
         @Override
+        public Optional<BoundingBox> intersectingBounds(BlockPos center, Integer instance, BoundingBox generationBox) {
+            return Optional.of(new BoundingBox(center));
+        }
+
+        @Override
         public double fillFactor(long veinSeed, BlockPos center, BlockPos position, Integer instance) {
             return 2d;
         }

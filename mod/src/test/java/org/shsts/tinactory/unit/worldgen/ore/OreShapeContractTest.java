@@ -9,6 +9,8 @@ import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OreShapeContractTest {
@@ -43,6 +45,11 @@ class OreShapeContractTest {
         @Override
         public BoundingBox bounds(BlockPos center, Integer instance) {
             return new BoundingBox(center);
+        }
+
+        @Override
+        public Optional<BoundingBox> intersectingBounds(BlockPos center, Integer instance, BoundingBox generationBox) {
+            return Optional.of(new BoundingBox(center));
         }
 
         @Override
