@@ -1,4 +1,4 @@
-package org.shsts.tinactory.unit.worldgen.placement;
+package org.shsts.tinactory.unit.worldgen.ore;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
@@ -6,7 +6,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.worldgen.placement.MultiscaleStructurePlacement;
+import org.shsts.tinactory.core.worldgen.ore.MultiscaleStructurePlacement;
 
 import java.util.Optional;
 
@@ -73,11 +73,7 @@ class MultiscaleStructurePlacementTest {
             frequency,
             12001,
             Optional.empty(),
-            1,
-            1,
-            4,
-            1,
-            2);
+            1, 1, 4, 1, 2, 3);
     }
 
     private static JsonObject placementJson(int spacing, int separation, int scale) {

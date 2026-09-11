@@ -15,7 +15,7 @@ import org.shsts.tinactory.content.worldgen.ore.OreVeinPiece;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructure;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructureType;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
-import org.shsts.tinactory.core.worldgen.placement.MultiscaleStructurePlacement;
+import org.shsts.tinactory.core.worldgen.ore.MultiscaleStructurePlacement;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
 
