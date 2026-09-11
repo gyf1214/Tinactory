@@ -13,7 +13,6 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import org.shsts.tinactory.content.worldgen.PlayerStartFeature;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinPiece;
 import org.shsts.tinactory.content.worldgen.ore.OreVeinStructure;
-import org.shsts.tinactory.content.worldgen.ore.OreVeinStructureType;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.MultiscaleStructurePlacement;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -47,7 +46,7 @@ public final class AllWorldGens {
         PLAYER_START_FEATURE = REGISTRATE.registryEntry(FEATURES, "player_start", PlayerStartFeature::new);
         ELLIPSOID_SHAPE = REGISTRATE.registryEntry(ORE_SHAPES.getHandler(), "ellipsoid", EllipsoidShape::new);
         ORE_VEIN_STRUCTURE_TYPE = REGISTRATE.registryEntry(
-            STRUCTURE_TYPES, "ore_vein", OreVeinStructureType::new);
+            STRUCTURE_TYPES, "ore_vein", () -> () -> OreVeinStructure.CODEC);
         ORE_VEIN_PIECE_TYPE = REGISTRATE.registryEntry(
             STRUCTURE_PIECES, "ore_vein", () -> OreVeinPiece::new);
         MULTISCALE_PLACEMENT_TYPE = REGISTRATE.registryEntry(

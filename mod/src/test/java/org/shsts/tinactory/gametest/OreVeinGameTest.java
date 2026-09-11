@@ -40,7 +40,7 @@ public final class OreVeinGameTest {
     public static void testOreVeinTypesAreRegistered(GameTestHelper helper) {
         var structureType = BuiltInRegistries.STRUCTURE_TYPE.get(modLoc("ore_vein"));
         var pieceType = BuiltInRegistries.STRUCTURE_PIECE.get(modLoc("ore_vein"));
-        if (!(structureType instanceof StructureType<?> type) || type.codec() == null) {
+        if (!(structureType instanceof StructureType<?> type)) {
             helper.fail("Ore vein structure type is not registered");
             return;
         }
@@ -57,19 +57,18 @@ public final class OreVeinGameTest {
 
     @GameTest
     public static void testOreVeinStructureCodecRoundTripsDefinitions(GameTestHelper helper) {
-        var definition = new OreVeinDefinition(
-            modLoc("test/ore"), 1, -32, 48,
+        var definition = new OreVeinDefinition(-32, 48,
             new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
                 new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
         var structure = new OreVeinStructure(
             new Structure.StructureSettings(HolderSet.direct(helper.getLevel().registryAccess()
                 .registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS))),
-            List.of(definition));
+            definition);
         var codec = AllWorldGens.ORE_VEIN_STRUCTURE_TYPE.get().codec();
         var encoded = CodecHelper.encodeTag(helper.getLevel().registryAccess(), codec.codec(), structure);
         var decoded = CodecHelper.parseTag(helper.getLevel().registryAccess(), codec.codec(), encoded);
-        if (!structure.definitions().equals(decoded.definitions())) {
+        if (!structure.definition().equals(decoded.definition())) {
             helper.fail("Ore vein structure definitions did not round-trip");
             return;
         }
@@ -120,10 +119,9 @@ public final class OreVeinGameTest {
         var bounds = piece.getBoundingBox();
         var left = findFilledPosition(instance, bounds, true);
         var right = findFilledPosition(instance, bounds, false);
-        var nonHost = center;
         helper.getLevel().setBlock(left, Blocks.STONE.defaultBlockState(), 3);
         helper.getLevel().setBlock(right, Blocks.STONE.defaultBlockState(), 3);
-        helper.getLevel().setBlock(nonHost, Blocks.DEEPSLATE.defaultBlockState(), 3);
+        helper.getLevel().setBlock(center, Blocks.DEEPSLATE.defaultBlockState(), 3);
 
         var leftBox = new BoundingBox(
             bounds.minX(), bounds.minY(), bounds.minZ(), center.getX(), bounds.maxY(), bounds.maxZ());
@@ -138,7 +136,7 @@ public final class OreVeinGameTest {
             helper.fail("Ore vein placed a block outside the writable box");
             return;
         }
-        if (!Blocks.DEEPSLATE.equals(helper.getLevel().getBlockState(nonHost).getBlock())) {
+        if (!Blocks.DEEPSLATE.equals(helper.getLevel().getBlockState(center).getBlock())) {
             helper.fail("Ore vein replaced a non-host block");
             return;
         }
@@ -156,8 +154,7 @@ public final class OreVeinGameTest {
     }
 
     private static OreVeinInstance sampledInstance() {
-        var definition = new OreVeinDefinition(
-            modLoc("test/ore"), 1, -32, 48,
+        var definition = new OreVeinDefinition(-32, 48,
             new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
                 new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1), new OreEntry(Blocks.GOLD_ORE, 2)));
@@ -166,7 +163,7 @@ public final class OreVeinGameTest {
 
     private static OreVeinInstance placementInstance(BlockPos center) {
         return new OreVeinInstance(
-            OreVeinUtil.ALGORITHM_VERSION, modLoc("test/placement"), 67890L, center,
+            OreVeinUtil.ALGORITHM_VERSION, 67890L, center,
             new OreShapeInstance<>(AllWorldGens.ELLIPSOID_SHAPE.get(), new EllipsoidShape.Instance(3, 1, 3, 0)),
             1d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
     }

@@ -27,46 +27,58 @@ import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
 import org.shsts.tinycorelib.datagen.api.IDataGen;
 import org.shsts.tinycorelib.datagen.api.IDataHandler;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class OreVeinDataProvider implements DataProvider {
+    private static final String PREFIX = "ore_vein/";
+
     private final String modId;
     private final IDataHandler<OreVeinDataProvider> handler;
     private final PackOutput.PathProvider structurePathProvider;
     private final PackOutput.PathProvider structureSetPathProvider;
     private final CompletableFuture<HolderLookup.Provider> lookupProvider;
-    private final Map<String, VeinGroup> groups = new LinkedHashMap<>();
+
+    private record Vein(ResourceLocation loc, TagKey<Biome> biomeTag, OreVeinDefinition definition) {}
+
+    private record VeinEntry(ResourceLocation loc, int weight) {}
+
+    private final List<Vein> veins = new ArrayList<>();
+    private final Map<String, List<VeinEntry>> groups = new LinkedHashMap<>();
 
     public OreVeinDataProvider(IDataGen dataGen,
         IDataHandler<OreVeinDataProvider> handler, GatherDataEvent event) {
         this.modId = dataGen.modid();
         this.handler = handler;
         var packOutput = event.getGenerator().getPackOutput();
-        this.structurePathProvider = packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "worldgen/structure");
+        this.structurePathProvider = packOutput.createPathProvider(
+            PackOutput.Target.DATA_PACK, "worldgen/structure");
         this.structureSetPathProvider = packOutput.createPathProvider(
             PackOutput.Target.DATA_PACK, "worldgen/structure_set");
         this.lookupProvider = event.getLookupProvider();
     }
 
-    public void addVein(String id, TagKey<Biome> biomeTag, OreVeinDefinition definition) {
-        if (id.isBlank()) {
-            throw new IllegalArgumentException("Ore vein group ID must not be blank");
-        }
-        var group = groups.computeIfAbsent(id, ignored -> new VeinGroup(biomeTag, new LinkedHashMap<>()));
-        if (!group.biomeTag().equals(biomeTag)) {
-            throw new IllegalArgumentException("Ore vein group " + id +
-                " is registered with multiple biome tags: " + group.biomeTag() + " and " + biomeTag);
-        }
-        if (group.definitions().putIfAbsent(definition.id(), definition) != null) {
-            throw new IllegalArgumentException("Duplicate ore vein definition " + definition.id() +
-                " in group " + id);
-        }
+    public void addGroup(String id, ResourceLocation vein, int weight) {
+        groups.computeIfAbsent(id, $ -> new ArrayList<>()).add(new VeinEntry(vein, weight));
+    }
+
+    public ResourceLocation addVein(String veinId, TagKey<Biome> biomeTag, OreVeinDefinition definition) {
+        var veinLoc = ResourceLocation.fromNamespaceAndPath(modId, PREFIX + veinId);
+        veins.add(new Vein(veinLoc, biomeTag, definition));
+        return veinLoc;
+    }
+
+    public void addVein(String groupId, int weight, String veinId,
+        TagKey<Biome> biomeTag, OreVeinDefinition definition) {
+        var loc = addVein(veinId, biomeTag, definition);
+        addGroup(groupId, loc, weight);
     }
 
     @Override
@@ -74,9 +86,13 @@ public final class OreVeinDataProvider implements DataProvider {
         return lookupProvider.thenCompose(registries -> {
             handler.register(this);
             validateDefinitions();
-            var futures = groups.entrySet().stream()
-                .map(entry -> writeGroup(output, registries, entry.getKey(), entry.getValue()))
-                .toArray(CompletableFuture[]::new);
+
+            var futures = Stream.concat(
+                veins.stream().map(entry -> writeStructure(output, registries, entry)),
+                groups.entrySet().stream().map(entry ->
+                    writeGroup(output, registries, entry.getKey(), entry.getValue()))
+            ).toArray(CompletableFuture[]::new);
+
             return CompletableFuture.allOf(futures);
         });
     }
@@ -86,30 +102,34 @@ public final class OreVeinDataProvider implements DataProvider {
         return "Ore Veins: " + modId;
     }
 
-    private CompletableFuture<?> writeGroup(CachedOutput output, HolderLookup.Provider registries,
-        String id, VeinGroup group) {
-        var structureId = structureId(id);
-        if (group.definitions().isEmpty()) {
-            throw new IllegalStateException("No ore vein definitions configured for group " + id);
-        }
+    private CompletableFuture<?> writeStructure(CachedOutput output, HolderLookup.Provider registries,
+        Vein vein) {
         var biomeLookup = registries.lookupOrThrow(Registries.BIOME);
         var settings = new Structure.StructureSettings(
-            biomeLookup.getOrThrow(group.biomeTag()),
+            biomeLookup.getOrThrow(vein.biomeTag),
             Map.of(),
             GenerationStep.Decoration.UNDERGROUND_ORES,
             TerrainAdjustment.NONE);
-        var structure = new OreVeinStructure(settings, List.copyOf(group.definitions().values()));
-        var structureJson = CodecHelper.encodeJson(registries, Structure.DIRECT_CODEC, structure);
-        var structureFuture = DataProvider.saveStable(
-            output, structureJson, structurePathProvider.json(structureId));
+        var structure = new OreVeinStructure(settings, vein.definition);
+        var json = CodecHelper.encodeJson(registries, Structure.DIRECT_CODEC, structure);
+        return DataProvider.saveStable(output, json, structurePathProvider.json(vein.loc));
+    }
 
-        var serializationOps = registries.createSerializationContext(JsonOps.INSTANCE);
-        var structureOwner = serializationOps.lookupProvider.lookup(Registries.STRUCTURE)
+    private CompletableFuture<?> writeGroup(CachedOutput output, HolderLookup.Provider registries,
+        String id, List<VeinEntry> veins) {
+        var loc = ResourceLocation.fromNamespaceAndPath(modId, PREFIX + id);
+
+        var ops = registries.createSerializationContext(JsonOps.INSTANCE);
+        var owner = ops.lookupProvider.lookup(Registries.STRUCTURE)
             .orElseThrow(() -> new IllegalStateException("Structure registry is missing from datagen lookup"))
             .owner();
-        var structureKey = ResourceKey.create(Registries.STRUCTURE, structureId);
-        var structureHolder = Holder.Reference.createStandAlone(
-            structureOwner, structureKey);
+        var entries = new ArrayList<StructureSet.StructureSelectionEntry>();
+        for (var entry : veins) {
+            var key = ResourceKey.create(Registries.STRUCTURE, entry.loc);
+            var holder = Holder.Reference.createStandAlone(owner, key);
+            entries.add(new StructureSet.StructureSelectionEntry(holder, entry.weight));
+        }
+
         var placement = new MultiscaleStructurePlacement(
             Vec3i.ZERO,
             StructurePlacement.FrequencyReductionMethod.DEFAULT,
@@ -117,36 +137,22 @@ public final class OreVeinDataProvider implements DataProvider {
             salt(id),
             Optional.empty(),
             1, 1, 4, 1, 2, 3);
-        var structureSet = new StructureSet(structureHolder, placement);
-        var structureSetJson = StructureSet.DIRECT_CODEC.encodeStart(serializationOps, structureSet).getOrThrow();
-        var structureSetFuture = DataProvider.saveStable(
-            output, structureSetJson, structureSetPathProvider.json(structureId));
-        return CompletableFuture.allOf(structureFuture, structureSetFuture);
+        var structureSet = new StructureSet(entries, placement);
+
+        var json = StructureSet.DIRECT_CODEC.encodeStart(ops, structureSet).getOrThrow();
+
+        return DataProvider.saveStable(output, json, structureSetPathProvider.json(loc));
     }
 
     private void validateDefinitions() {
-        if (groups.isEmpty()) {
-            throw new IllegalStateException("No ore vein groups configured");
-        }
         groups.forEach((id, group) -> {
-            if (group.definitions().isEmpty()) {
+            if (group.isEmpty()) {
                 throw new IllegalStateException("No ore vein definitions configured for group " + id);
             }
-            structureId(id);
         });
-    }
-
-    private ResourceLocation structureId(String id) {
-        try {
-            return ResourceLocation.fromNamespaceAndPath(modId, "ore_vein/" + id);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("Invalid ore vein group ID: " + id, exception);
-        }
     }
 
     private int salt(String id) {
         return id.hashCode() & Integer.MAX_VALUE;
     }
-
-    private record VeinGroup(TagKey<Biome> biomeTag, Map<ResourceLocation, OreVeinDefinition> definitions) {}
 }

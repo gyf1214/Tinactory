@@ -18,36 +18,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.GOLD_ORE;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.HOST;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.IRON_ORE;
 
 class OreVeinUtilTest {
-    @Test
-    void selectShouldRejectAnEmptyDefinitionList() {
-        assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.select(List.of(), 1L));
-    }
-
-    @Test
-    void selectShouldReachFirstMiddleAndLastWeightedDefinitions() {
-        var definitions = List.of(
-            definition("first", 0.5d), definition("middle", 1.25d), definition("last", 2.75d));
-        var selected = new HashSet<String>();
-        for (var seed = 0L; seed < 10_000L; seed++) {
-            selected.add(OreVeinUtil.select(definitions, seed).id().getPath());
-        }
-
-        assertEquals(Set.of("definition/first", "definition/middle", "definition/last"), selected);
-    }
-
     @Test
     void hashToUnitShouldPreserveSeedAndPositionFixtures() {
         assertEquals(0.2758902365283412d, OreVeinUtil.hashToUnit(123L, 456L));
@@ -57,9 +38,8 @@ class OreVeinUtilTest {
 
     @Test
     void sampleShouldBeDeterministicAndSampleEachRadiusWithinItsRange() {
-        var definition = new OreVeinDefinition(
-            modLoc("definition"), 1, -32, 32, shapeDefinition(100d, 200d, 0.6d, 1d, 4d), 0.75d,
-            HOST, ores());
+        var definition = new OreVeinDefinition(-32, 32,
+            shapeDefinition(), 0.75d, HOST, ores());
         var center = new BlockPos(10, 20, 30);
         var first = OreVeinUtil.sample(definition, 123L, center);
         var second = OreVeinUtil.sample(definition, 123L, center);
@@ -80,7 +60,6 @@ class OreVeinUtilTest {
         }
         assertTrue(sawNonMinimumRadius);
         assertEquals(OreVeinUtil.ALGORITHM_VERSION, first.algorithmVersion());
-        assertEquals(definition.id(), first.definitionId());
         assertEquals(definition.hostBlock(), first.hostBlock());
         assertEquals(definition.ores(), first.ores());
     }
@@ -88,7 +67,7 @@ class OreVeinUtilTest {
     @Test
     void oreAtShouldBeStableRegardlessOfCoordinateIterationOrder() {
         var instance = new OreVeinInstance(
-            OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 123L, new BlockPos(0, 0, 0),
+            OreVeinUtil.ALGORITHM_VERSION, 123L, new BlockPos(0, 0, 0),
             shapeInstance(4, 4, 4), 0.6d, HOST,
             List.of(new OreEntry(IRON_ORE, 0.25d), new OreEntry(GOLD_ORE, 0.75d)));
         var forward = new HashMap<BlockPos, Optional<?>>();
@@ -121,7 +100,7 @@ class OreVeinUtilTest {
     @Test
     void oreAtShouldApplyEllipsoidBoundsAndDensityFade() {
         var instance = new OreVeinInstance(
-            OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 321L, new BlockPos(10, 20, 30),
+            OreVeinUtil.ALGORITHM_VERSION, 321L, new BlockPos(10, 20, 30),
             shapeInstance(3, 2, 3), 1d, HOST, List.of(new OreEntry(IRON_ORE, 1)));
         var bounds = OreVeinUtil.bounds(instance);
 
@@ -154,22 +133,15 @@ class OreVeinUtilTest {
     void oreAtShouldRejectAnInvalidShapeFillFactor() {
         var shape = new InvalidFactorShape();
         var instance = new OreVeinInstance(
-            OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 1L, new BlockPos(0, 0, 0),
+            OreVeinUtil.ALGORITHM_VERSION, 1L, new BlockPos(0, 0, 0),
             new OreShapeInstance<>(shape, 1), 1d, HOST, ores());
 
         assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
     }
 
-    private static OreVeinDefinition definition(String path, double selectionWeight) {
-        return new OreVeinDefinition(
-            modLoc("definition/" + path), selectionWeight, 0, 1, shapeDefinition(1d, 1d, 0d, 1d, 1d), 1d,
-            HOST, ores());
-    }
-
-    private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition(
-        double minArea, double maxArea, double maxEccentric, double minY, double maxY) {
+    private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {
         return new OreShapeDefinition<>(ELLIPSOID,
-            new EllipsoidShape.Definition(minArea, maxArea, maxEccentric, minY, maxY));
+            new EllipsoidShape.Definition(100.0, 200.0, 0.6, 1.0, 4.0));
     }
 
     private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(

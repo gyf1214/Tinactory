@@ -6,7 +6,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -16,7 +15,6 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public record OreVeinInstance(
     int algorithmVersion,
-    ResourceLocation definitionId,
     long veinSeed,
     BlockPos center,
     OreShapeInstance<?> shape,
@@ -26,7 +24,6 @@ public record OreVeinInstance(
 ) {
     public static final Codec<OreVeinInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.INT.fieldOf("algorithm_version").forGetter(OreVeinInstance::algorithmVersion),
-        ResourceLocation.CODEC.fieldOf("definition_id").forGetter(OreVeinInstance::definitionId),
         Codec.LONG.fieldOf("vein_seed").forGetter(OreVeinInstance::veinSeed),
         BlockPos.CODEC.fieldOf("center").forGetter(OreVeinInstance::center),
         OreVeinUtil.INSTANCE_CODEC.fieldOf("shape").forGetter(OreVeinInstance::shape),

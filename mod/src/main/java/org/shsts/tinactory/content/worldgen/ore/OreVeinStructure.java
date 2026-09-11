@@ -1,5 +1,7 @@
 package org.shsts.tinactory.content.worldgen.ore;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -10,27 +12,30 @@ import org.shsts.tinactory.AllWorldGens;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
 
-import java.util.List;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class OreVeinStructure extends Structure {
-    private final List<OreVeinDefinition> definitions;
+    public static final MapCodec<OreVeinStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        Structure.settingsCodec(instance),
+        OreVeinDefinition.CODEC.forGetter(OreVeinStructure::definition)
+    ).apply(instance, OreVeinStructure::new));
 
-    public OreVeinStructure(StructureSettings settings, List<OreVeinDefinition> definitions) {
+    private final OreVeinDefinition definition;
+
+    public OreVeinStructure(StructureSettings settings, OreVeinDefinition definition) {
         super(settings);
-        this.definitions = List.copyOf(definitions);
+        this.definition = definition;
     }
 
-    public List<OreVeinDefinition> definitions() {
-        return definitions;
+    public OreVeinDefinition definition() {
+        return definition;
     }
 
     @Override
     public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
         WorldgenRandom random = context.random();
-        var definition = OreVeinUtil.select(definitions, random.nextLong());
         var x = context.chunkPos().getMinBlockX() + random.nextInt(16);
         var z = context.chunkPos().getMinBlockZ() + random.nextInt(16);
         var minY = Math.max(definition.minY(), context.heightAccessor().getMinBuildHeight());

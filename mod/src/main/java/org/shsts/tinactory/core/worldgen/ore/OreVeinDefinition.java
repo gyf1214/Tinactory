@@ -6,7 +6,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.core.util.CodecHelper;
 
@@ -15,8 +14,6 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record OreVeinDefinition(
-    ResourceLocation id,
-    double selectionWeight,
     int minY,
     int maxY,
     OreShapeDefinition<?> shape,
@@ -25,8 +22,6 @@ public record OreVeinDefinition(
     List<OreEntry> ores
 ) {
     public static final MapCodec<OreVeinDefinition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(OreVeinDefinition::id),
-        Codec.DOUBLE.fieldOf("selection_weight").forGetter(OreVeinDefinition::selectionWeight),
         Codec.INT.fieldOf("min_y").forGetter(OreVeinDefinition::minY),
         Codec.INT.fieldOf("max_y").forGetter(OreVeinDefinition::maxY),
         OreVeinUtil.DEFINITION_CODEC.fieldOf("shape").forGetter(OreVeinDefinition::shape),
@@ -36,9 +31,6 @@ public record OreVeinDefinition(
     ).apply(instance, OreVeinDefinition::new));
 
     public OreVeinDefinition {
-        if (!Double.isFinite(selectionWeight) || selectionWeight <= 0d) {
-            throw new IllegalArgumentException("selectionWeight must be positive");
-        }
         if (minY > maxY) {
             throw new IllegalArgumentException("minY must not exceed maxY");
         }

@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.HOST;
@@ -23,8 +22,6 @@ class OreVeinDefinitionTest {
     void definitionShouldRetainConfiguration() {
         var definition = definition();
 
-        assertEquals(modLoc("ore/iron"), definition.id());
-        assertEquals(7.25d, definition.selectionWeight());
         assertEquals(-32, definition.minY());
         assertEquals(64, definition.maxY());
         assertEquals(new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
@@ -36,24 +33,20 @@ class OreVeinDefinitionTest {
 
     @Test
     void definitionShouldRejectInvalidRangesWeightsDensityAndComposition() {
-        assertThrows(IllegalArgumentException.class, () -> definition(0d, -32, 64, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> definition(-0.1d, -32, 64, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> definition(Double.NaN, -32, 64, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> definition(Double.POSITIVE_INFINITY, -32, 64, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> definition(1d, 64, -32, 0.75d));
-        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1d, 0, 1,
-            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(0, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
-        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1d, 0, 1,
-            new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(2, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 0d));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, -0.1d));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, 1.1d));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.NaN));
-        assertThrows(IllegalArgumentException.class, () -> definition(1, -32, 64, Double.POSITIVE_INFINITY));
-        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(
-            modLoc("ore"), 1, 0, 1, shapeDefinition(), 0.75d, HOST, List.of()));
+        assertThrows(IllegalArgumentException.class, () -> definition(64, -32, 0.75d));
+        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(0, 1,
+            new OreShapeDefinition<>(ELLIPSOID,
+                new EllipsoidShape.Definition(0, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
+        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(0, 1,
+            new OreShapeDefinition<>(ELLIPSOID,
+                new EllipsoidShape.Definition(2, 1, 0.6d, 1, 1)), 0.75d, HOST, ores()));
+        assertThrows(IllegalArgumentException.class, () -> definition(-32, 64, 0d));
+        assertThrows(IllegalArgumentException.class, () -> definition(-32, 64, -0.1d));
+        assertThrows(IllegalArgumentException.class, () -> definition(-32, 64, 1.1d));
+        assertThrows(IllegalArgumentException.class, () -> definition(-32, 64, Double.NaN));
+        assertThrows(IllegalArgumentException.class, () -> definition(-32, 64, Double.POSITIVE_INFINITY));
+        assertThrows(IllegalArgumentException.class, () -> new OreVeinDefinition(0, 1,
+            shapeDefinition(), 0.75d, HOST, List.of()));
     }
 
     @Test
@@ -68,15 +61,13 @@ class OreVeinDefinitionTest {
     }
 
     private static OreVeinDefinition definition() {
-        return new OreVeinDefinition(
-            modLoc("ore/iron"), 7.25d, -32, 64, shapeDefinition(100d, 200d, 0.6d, 1d, 3d), 0.75d,
-            HOST, ores());
+        return new OreVeinDefinition(-32, 64,
+            shapeDefinition(100d, 200d, 0.6d, 1d, 3d),
+            0.75d, HOST, ores());
     }
 
-    private static OreVeinDefinition definition(double selectionWeight, int minY, int maxY, double density) {
-        return new OreVeinDefinition(
-            modLoc("ore"), selectionWeight, minY, maxY, shapeDefinition(), density,
-            HOST, ores());
+    private static OreVeinDefinition definition(int minY, int maxY, double density) {
+        return new OreVeinDefinition(minY, maxY, shapeDefinition(), density, HOST, ores());
     }
 
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {

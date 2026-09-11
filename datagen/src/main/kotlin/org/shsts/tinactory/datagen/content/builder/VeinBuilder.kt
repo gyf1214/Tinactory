@@ -5,11 +5,9 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.biome.Biome
 import org.shsts.tinactory.AllMaterials.getMaterial
 import org.shsts.tinactory.AllWorldGens
 import org.shsts.tinactory.core.electric.Voltage
-import org.shsts.tinactory.core.util.LocHelper.modLoc
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape
 import org.shsts.tinactory.core.worldgen.ore.OreEntry
 import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition
@@ -33,6 +31,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
     private var block: OreAnalyzerRecipeBuilder.() -> Unit = {}
     private val ores = mutableListOf<MaterialSet>()
     private val oreEntries = mutableListOf<OreEntry>()
+    private var weightMultiple = 10
 
     companion object {
         const val VEIN_TECH_RANK = RANK_PER_VOLTAGE / 2
@@ -139,15 +138,16 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
             }
         }
 
+        val weight = (weightMultiple * rate).toInt()
         val definition = OreVeinDefinition(
-            modLoc(id1),
-            rate,
             minY1,
             maxY1,
             ORE_SHAPE,
             0.5,
             variant1.baseBlock,
             oreEntries.toList())
-        VEIN_DATA.addCallback { provider -> provider.addVein(variant1.serializedName, biomeTag1, definition) }
+        VEIN_DATA.addCallback { provider ->
+            provider.addVein(variant1.serializedName, weight, id1, biomeTag1, definition)
+        }
     }
 }

@@ -24,7 +24,6 @@ public final class OreVeinUtil {
         CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
             .dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
 
-    private static final long SELECTION_SALT = 0x4F1BBCDCBFA54001L;
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;
     private static final long ORE_SALT = 0xA5A3564E27F2C9B1L;
     private static final long X_HASH = 0x632BE59BD9B4E019L;
@@ -33,18 +32,9 @@ public final class OreVeinUtil {
 
     private OreVeinUtil() {}
 
-    public static OreVeinDefinition select(List<OreVeinDefinition> definitions, long selectionSeed) {
-        if (definitions.isEmpty()) {
-            throw new IllegalArgumentException("definitions must not be empty");
-        }
-        var veinChoice = hashToUnit(selectionSeed, SELECTION_SALT);
-        return weightedChoice(veinChoice, definitions, OreVeinDefinition::selectionWeight);
-    }
-
     public static OreVeinInstance sample(OreVeinDefinition definition, long veinSeed, BlockPos center) {
         return new OreVeinInstance(
             ALGORITHM_VERSION,
-            definition.id(),
             veinSeed,
             center,
             sampleShape(definition.shape(), veinSeed),
