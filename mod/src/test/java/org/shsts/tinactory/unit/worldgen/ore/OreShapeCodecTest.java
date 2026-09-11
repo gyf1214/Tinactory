@@ -35,7 +35,7 @@ class OreShapeCodecTest {
 
     @Test
     void instanceCodecShouldRoundTripThroughJsonAndNbt() {
-        var value = new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(4, 2, 6));
+        var value = new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(6, 2, 4, 1.25d));
         var registryAccess = createRegistry(TestOreHelper.SHAPES);
         var codec = OreVeinUtil.INSTANCE_CODEC.codec();
         var json = CodecHelper.encodeJson(registryAccess, codec, value);
@@ -44,12 +44,31 @@ class OreShapeCodecTest {
         assertEquals(value, CodecHelper.parseJson(registryAccess, codec, json));
         assertEquals(value, CodecHelper.parseTag(registryAccess, codec, tag));
         assertEquals(modLoc("ellipsoid").toString(), json.getAsJsonObject().get("type").getAsString());
+        assertEquals(6d, json.getAsJsonObject().get("radius_long").getAsDouble());
+        assertEquals(4d, json.getAsJsonObject().get("radius_short").getAsDouble());
+        assertEquals(1.25d, json.getAsJsonObject().get("angle").getAsDouble());
+        assertFalse(json.getAsJsonObject().has("radius_x"));
+        assertFalse(json.getAsJsonObject().has("radius_z"));
     }
 
     @Test
     void codecShouldRejectUnknownShapeIds() {
         var json = new JsonObject();
         json.addProperty("type", modLoc("missing").toString());
+        json.addProperty("radius_long", 4);
+        json.addProperty("radius_y", 2);
+        json.addProperty("radius_short", 2);
+        json.addProperty("angle", 0);
+        var registryAccess = createRegistry(TestOreHelper.SHAPES);
+
+        assertThrows(RuntimeException.class,
+            () -> CodecHelper.parseJson(registryAccess, OreVeinUtil.INSTANCE_CODEC.codec(), json));
+    }
+
+    @Test
+    void codecShouldRejectLegacyEllipsoidInstanceFields() {
+        var json = new JsonObject();
+        json.addProperty("type", modLoc("ellipsoid").toString());
         json.addProperty("radius_x", 4);
         json.addProperty("radius_y", 2);
         json.addProperty("radius_z", 6);

@@ -29,16 +29,18 @@ class OreVeinInstanceTest {
         assertEquals(modLoc("ore/iron"), instance.definitionId());
         assertEquals(12345L, instance.veinSeed());
         assertEquals(new BlockPos(10, 20, 30), instance.center());
-        assertEquals(new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(4, 2, 6)), instance.shape());
+        assertEquals(new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(6, 2, 4, 0.75d)), instance.shape());
         assertEquals(0.75d, instance.density());
         assertEquals(HOST, instance.hostBlock());
         assertEquals(List.of(new OreEntry(IRON_ORE, 3.5d)), instance.ores());
     }
 
     @Test
-    void instanceShouldRejectThePriorAlgorithmVersion() {
+    void instanceShouldRejectPriorAlgorithmVersions() {
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             1, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
+        assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
+            2, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
     }
 
     @Test
@@ -47,10 +49,10 @@ class OreVeinInstanceTest {
             0, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
-            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(0, 1, 1)), 0.75d, HOST, ores()));
+            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(0, 1, 1, 0)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0),
-            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(1, -1, 1)), 0.75d, HOST, ores()));
+            new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(1, -1, 1, 0)), 0.75d, HOST, ores()));
         assertThrows(IllegalArgumentException.class, () -> new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("ore"), 1L, new BlockPos(0, 0, 0), shapeInstance(), 0d, HOST,
             ores()));
@@ -75,7 +77,8 @@ class OreVeinInstanceTest {
 
     private static OreVeinInstance instance() {
         return new OreVeinInstance(
-            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore/iron"), 12345L, new BlockPos(10, 20, 30), shapeInstance(4, 2, 6),
+            OreVeinUtil.ALGORITHM_VERSION, modLoc("ore/iron"), 12345L, new BlockPos(10, 20, 30),
+            shapeInstance(6, 2, 4, 0.75d),
             0.75d,
             HOST, ores());
     }
@@ -84,8 +87,14 @@ class OreVeinInstanceTest {
         return shapeInstance(1, 1, 1);
     }
 
-    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(int radiusX, int radiusY, int radiusZ) {
-        return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusX, radiusY, radiusZ));
+    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(
+        int radiusLong, int radiusY, int radiusShort) {
+        return shapeInstance(radiusLong, radiusY, radiusShort, 0d);
+    }
+
+    private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(
+        int radiusLong, int radiusY, int radiusShort, double angle) {
+        return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusLong, radiusY, radiusShort, angle));
     }
 
     private static List<OreEntry> ores() {

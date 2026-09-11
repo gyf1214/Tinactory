@@ -167,7 +167,7 @@ public final class OreVeinGameTest {
     private static OreVeinInstance placementInstance(BlockPos center) {
         return new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("test/placement"), 67890L, center,
-            new OreShapeInstance<>(AllWorldGens.ELLIPSOID_SHAPE.get(), new EllipsoidShape.Instance(3, 1, 3)),
+            new OreShapeInstance<>(AllWorldGens.ELLIPSOID_SHAPE.get(), new EllipsoidShape.Instance(3, 1, 3, 0)),
             1d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
     }
 

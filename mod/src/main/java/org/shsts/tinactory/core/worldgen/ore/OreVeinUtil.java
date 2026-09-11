@@ -16,7 +16,7 @@ import java.util.function.ToDoubleFunction;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class OreVeinUtil {
-    public static final int ALGORITHM_VERSION = 2;
+    public static final int ALGORITHM_VERSION = 3;
     public static final MapCodec<OreShapeDefinition<?>> DEFINITION_CODEC =
         CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
             .dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);

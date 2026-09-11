@@ -69,12 +69,13 @@ class OreVeinUtilTest {
         for (var seed = 0L; seed < 100L; seed++) {
             var instance = OreVeinUtil.sample(definition, seed, center);
             var ellipsoid = ellipsoidInstance(instance);
-            var area = ellipsoid.radiusX() * ellipsoid.radiusZ();
-            var eccentricity = (ellipsoid.radiusX() - ellipsoid.radiusZ()) /
-                (ellipsoid.radiusX() + ellipsoid.radiusZ());
+            var area = ellipsoid.radiusLong() * ellipsoid.radiusShort();
+            var eccentricity = (ellipsoid.radiusLong() - ellipsoid.radiusShort()) /
+                (ellipsoid.radiusLong() + ellipsoid.radiusShort());
             assertTrue(area >= 100d && area < 200d);
-            assertTrue(eccentricity >= -0.6d && eccentricity < 0.6d);
+            assertTrue(eccentricity >= 0d && eccentricity < 0.6d);
             assertTrue(ellipsoid.radiusY() >= 1d && ellipsoid.radiusY() < 4d);
+            assertTrue(ellipsoid.angle() >= 0d && ellipsoid.angle() < 2d * Math.PI);
             sawNonMinimumRadius |= area > 100d || ellipsoid.radiusY() > 1d;
         }
         assertTrue(sawNonMinimumRadius);
@@ -121,15 +122,15 @@ class OreVeinUtilTest {
     void oreAtShouldApplyEllipsoidBoundsAndDensityFade() {
         var instance = new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, modLoc("definition"), 321L, new BlockPos(10, 20, 30),
-            shapeInstance(3, 2, 4), 1d, HOST, List.of(new OreEntry(IRON_ORE, 1)));
+            shapeInstance(3, 2, 3), 1d, HOST, List.of(new OreEntry(IRON_ORE, 1)));
         var bounds = OreVeinUtil.bounds(instance);
 
         assertEquals(7, bounds.minX());
         assertEquals(18, bounds.minY());
-        assertEquals(26, bounds.minZ());
+        assertEquals(27, bounds.minZ());
         assertEquals(13, bounds.maxX());
         assertEquals(22, bounds.maxY());
-        assertEquals(34, bounds.maxZ());
+        assertEquals(33, bounds.maxZ());
         assertTrue(OreVeinUtil.oreAt(instance, instance.center()).isPresent());
         assertTrue(OreVeinUtil.oreAt(instance, new BlockPos(13, 20, 30)).isEmpty());
         assertTrue(OreVeinUtil.oreAt(instance, new BlockPos(14, 20, 30)).isEmpty());
@@ -172,8 +173,8 @@ class OreVeinUtilTest {
     }
 
     private static OreShapeInstance<EllipsoidShape.Instance> shapeInstance(
-        double radiusX, double radiusY, double radiusZ) {
-        return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusX, radiusY, radiusZ));
+        double radiusLong, double radiusY, double radiusShort) {
+        return new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(radiusLong, radiusY, radiusShort, 0));
     }
 
     private static EllipsoidShape.Instance ellipsoidInstance(OreVeinInstance instance) {
