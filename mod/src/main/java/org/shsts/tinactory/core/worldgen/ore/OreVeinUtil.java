@@ -61,6 +61,10 @@ public final class OreVeinUtil {
         return bounds(instance.shape(), instance.center());
     }
 
+    public static Optional<BoundingBox> intersectingBounds(OreVeinInstance instance, BoundingBox generationBox) {
+        return intersectingBounds(instance.shape(), instance.center(), generationBox);
+    }
+
     private static <D> OreShapeInstance<?> sampleShape(OreShapeDefinition<D> definition, long veinSeed) {
         return sampleShape(definition, definition.shape(), veinSeed);
     }
@@ -77,6 +81,11 @@ public final class OreVeinUtil {
 
     private static <I> BoundingBox bounds(OreShapeInstance<I> instance, BlockPos center) {
         return instance.shape().bounds(center, instance.instance());
+    }
+
+    private static <I> Optional<BoundingBox> intersectingBounds(OreShapeInstance<I> instance, BlockPos center,
+        BoundingBox generationBox) {
+        return instance.shape().intersectingBounds(center, instance.instance(), generationBox);
     }
 
     private static <T> T weightedChoice(double unit, List<T> entries, ToDoubleFunction<T> weightFunc) {

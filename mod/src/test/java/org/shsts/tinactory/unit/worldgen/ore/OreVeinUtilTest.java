@@ -139,6 +139,26 @@ class OreVeinUtilTest {
         assertThrows(IllegalArgumentException.class, () -> OreVeinUtil.oreAt(instance, new BlockPos(0, 0, 0)));
     }
 
+    @Test
+    void intersectingBoundsShouldDelegateThePersistedShapeAndArguments() {
+        var shape = new DelegatingShape();
+        var center = new BlockPos(10, 20, 30);
+        var generationBox = new BoundingBox(1, 2, 3, 4, 5, 6);
+        var instance = new OreVeinInstance(
+            OreVeinUtil.ALGORITHM_VERSION, 1L, center,
+            new OreShapeInstance<>(shape, 42), 1d, HOST, ores());
+
+        var candidate = OreVeinUtil.intersectingBounds(instance, generationBox);
+
+        assertEquals(center, shape.receivedCenter);
+        assertEquals(42, shape.receivedInstance);
+        assertEquals(generationBox, shape.receivedGenerationBox);
+        assertEquals(Optional.of(new BoundingBox(7, 8, 9, 10, 11, 12)), candidate);
+
+        shape.returnEmpty = true;
+        assertEquals(Optional.empty(), OreVeinUtil.intersectingBounds(instance, generationBox));
+    }
+
     private static OreShapeDefinition<EllipsoidShape.Definition> shapeDefinition() {
         return new OreShapeDefinition<>(ELLIPSOID,
             new EllipsoidShape.Definition(100.0, 200.0, 0.6, 1.0, 4.0));
@@ -155,6 +175,47 @@ class OreVeinUtilTest {
 
     private static List<OreEntry> ores() {
         return List.of(new OreEntry(IRON_ORE, 1d));
+    }
+
+    private static final class DelegatingShape implements IOreShape<Integer, Integer> {
+        private BlockPos receivedCenter;
+        private Integer receivedInstance;
+        private BoundingBox receivedGenerationBox;
+        private boolean returnEmpty;
+
+        @Override
+        public MapCodec<Integer> definitionCodec() {
+            return Codec.INT.fieldOf("value");
+        }
+
+        @Override
+        public MapCodec<Integer> instanceCodec() {
+            return Codec.INT.fieldOf("value");
+        }
+
+        @Override
+        public Integer sample(Integer definition, long veinSeed) {
+            return definition;
+        }
+
+        @Override
+        public BoundingBox bounds(BlockPos center, Integer instance) {
+            return new BoundingBox(center);
+        }
+
+        @Override
+        public Optional<BoundingBox> intersectingBounds(BlockPos center, Integer instance,
+            BoundingBox generationBox) {
+            receivedCenter = center;
+            receivedInstance = instance;
+            receivedGenerationBox = generationBox;
+            return returnEmpty ? Optional.empty() : Optional.of(new BoundingBox(7, 8, 9, 10, 11, 12));
+        }
+
+        @Override
+        public double fillFactor(long veinSeed, BlockPos center, BlockPos position, Integer instance) {
+            return instance;
+        }
     }
 
     private static final class InvalidFactorShape implements IOreShape<Integer, Integer> {

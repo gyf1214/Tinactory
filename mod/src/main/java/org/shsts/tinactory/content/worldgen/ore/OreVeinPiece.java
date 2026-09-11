@@ -52,12 +52,17 @@ public final class OreVeinPiece extends StructurePiece {
         if (!boundingBox.intersects(box)) {
             return;
         }
-        var minX = Math.max(boundingBox.minX(), box.minX());
-        var minY = Math.max(boundingBox.minY(), box.minY());
-        var minZ = Math.max(boundingBox.minZ(), box.minZ());
-        var maxX = Math.min(boundingBox.maxX(), box.maxX());
-        var maxY = Math.min(boundingBox.maxY(), box.maxY());
-        var maxZ = Math.min(boundingBox.maxZ(), box.maxZ());
+        var candidateBox = OreVeinUtil.intersectingBounds(instance, box);
+        if (candidateBox.isEmpty()) {
+            return;
+        }
+        var scanBox = candidateBox.orElseThrow();
+        var minX = scanBox.minX();
+        var minY = scanBox.minY();
+        var minZ = scanBox.minZ();
+        var maxX = scanBox.maxX();
+        var maxY = scanBox.maxY();
+        var maxZ = scanBox.maxZ();
         for (var x = minX; x <= maxX; x++) {
             for (var y = minY; y <= maxY; y++) {
                 for (var z = minZ; z <= maxZ; z++) {
