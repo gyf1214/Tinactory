@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.BlockItem;
@@ -44,7 +43,6 @@ import static org.shsts.tinactory.core.util.LocHelper.gregtech;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.core.util.LocHelper.name;
-import static org.shsts.tinactory.core.util.LocHelper.prepend;
 import static org.shsts.tinactory.core.util.LocHelper.suffix;
 import static org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN;
 import static org.shsts.tinactory.datagen.TinactoryDatagen.FUSION_MODELS;
@@ -75,6 +73,7 @@ public final class Models {
     public static final String CUBE_COLUMN_EMISSIVE_MODEL = "block/cube_column_emissive";
     public static final String CUBE_CTM_MODEL = "block/cube_ctm";
     public static final String CUBE_CTM_EMISSIVE_MODEL = "block/cube_ctm_emissive";
+    public static final String ORE_MODEL = "block/ore";
 
     public static int xRotation(Direction dir) {
         return switch (dir) {
@@ -156,13 +155,15 @@ public final class Models {
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> oreBlock(
         OreVariant variant) {
         return ctx -> {
-            var models = ctx.provider().models();
-            var loc = BuiltInRegistries.BLOCK.getKey(variant.baseBlock);
-            var baseModel = models.getExistingFile(prepend(loc, "block"));
-            var overlay = models.getExistingFile(modLoc("block/material/ore_overlay"));
-            ctx.provider().getMultipartBuilder(ctx.object())
-                .part().modelFile(baseModel).addModel().end()
-                .part().modelFile(overlay).addModel().end();
+            var baseTex = mcLoc("block/" + variant.getSerializedName());
+            var existingFileHelper = ctx.provider().models().existingFileHelper;
+            var model = ctx.provider().models()
+                .withExistingParent(ctx.id(), modLoc(ORE_MODEL))
+                .texture("base", baseTex);
+            applyCompanion(model, "overlay",
+                IconSet.DULL.blockOverlay(existingFileHelper, "ore"),
+                existingFileHelper);
+            ctx.provider().simpleBlock(ctx.object(), model);
         };
     }
 
@@ -421,12 +422,29 @@ public final class Models {
             .blockModel(CableModel::genBlockModels)
             .itemModel(CableModel::genItemModels)
             .blockModel(MachineModel::genBlockModels)
-            .blockModel(ctx -> {
-                var model = IconSet.DULL.blockOverlay(ctx.provider(), "material/ore", "ore")
-                    .renderType(CUTOUT_RENDER_TYPE);
-                applyCompanion(model, "all", gregtech("block/material_sets/dull/ore"),
-                    ctx.provider().existingFileHelper);
-            })
+            .blockModel(ctx -> ctx.provider()
+                .withExistingParent(ORE_MODEL, mcLoc("block/block"))
+                .renderType(CUTOUT_RENDER_TYPE)
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                    .texture("#base").cullface(dir)
+                    .end())
+                .end()
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                    .texture("#overlay").cullface(dir).tintindex(0)
+                    .end())
+                .end()
+                .element()
+                .from(0, 0, 0).to(16, 16, 16)
+                .allFaces((dir, face) -> face
+                    .texture("#overlay_emissive").cullface(dir).tintindex(0)
+                    .end())
+                .end()
+                .texture("overlay_emissive", BLOCK_VOID_TEX)
+                .texture("particle", "#base"))
             .blockModel(ctx -> ctx.provider()
                 .withExistingParent(CUBE_COLUMN_EMISSIVE_MODEL, mcLoc("block/block"))
                 .texture("particle", "#side")

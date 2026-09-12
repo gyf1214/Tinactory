@@ -6,8 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelBuilder;
-import net.neoforged.neoforge.client.model.generators.ModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext;
 
@@ -16,8 +14,6 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.util.LocHelper.extend;
 import static org.shsts.tinactory.core.util.LocHelper.gregtech;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.datagen.content.Models.CUBE_TINT_MODEL;
 import static org.shsts.tinactory.datagen.content.Models.TEXTURE_TYPE;
 
 @ParametersAreNonnullByDefault
@@ -85,12 +81,9 @@ public record IconSet(String subfolder, @Nullable IconSet parent) {
         };
     }
 
-    public <T extends ModelBuilder<T>> T blockOverlay(ModelProvider<T> prov,
-        String id, String sub) {
-        var tex = getTex(BLOCK_LOC, prov.existingFileHelper, sub).orElseThrow(() ->
+    public ResourceLocation blockOverlay(ExistingFileHelper existingFileHelper, String sub) {
+        return getTex(BLOCK_LOC, existingFileHelper, sub).orElseThrow(() ->
             new IllegalArgumentException("No block overlay %s for icon set %s"
                 .formatted(sub, subfolder)));
-        return prov.withExistingParent(id + "_overlay", modLoc(CUBE_TINT_MODEL))
-            .texture("all", tex);
     }
 }

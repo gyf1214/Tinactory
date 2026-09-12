@@ -542,7 +542,7 @@
     "item[.]tinactory[.]logistics[.](.*_storage_cell)[.](.*)": "$2 ME$1",
     "item[.]tinactory[.]logistics[.]pattern_cell[.](.*)": "$1 ME图样单元",
     "block[.]tinactory[.]material[.]ore[.](.*)": "$1矿石",
-    "block[.]tinactory[.]material[.]ore_(.*)[.](.*)": "$2$1矿石",
+    "block[.]tinactory[.]material[.]ore_(.*)[.](.*)": "$1$2矿石",
     "block[.]tinactory[.]network[.](.*)[.](.*)": "$1$2",
     "block[.]tinactory[.]machine[.](.*)[.](.*)": "$1$2",
     "block[.]tinactory[.]primitive[.](.*)": "原始$1",

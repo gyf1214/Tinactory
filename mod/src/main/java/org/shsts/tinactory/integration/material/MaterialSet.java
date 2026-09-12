@@ -263,12 +263,12 @@ public class MaterialSet {
         public Builder<P> ore(OreVariant variant, String sub) {
             if (!ores.containsKey(variant)) {
                 var ore = REGISTRATE.block(newId(sub), OreBlock.factory(variant))
+                    .creativeTab(CreativeModeTabs.NATURAL_BLOCKS)
                     .properties(p -> p
                         .strength(variant.destroyTime, variant.explodeResistance)
                         .mapColor(variant.mapColor)
                         .sound(variant.soundType))
                     .tint(color)
-                    .noBlockItem()
                     .register();
                 ores.put(variant, new OreEntry(ore, false));
             }
