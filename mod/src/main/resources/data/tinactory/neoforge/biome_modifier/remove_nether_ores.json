@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:remove_features",
+  "biomes": "#minecraft:is_nether",
+  "features": "#tinactory:replace_nether_ores",
+  "steps": [
+    "underground_decoration"
+  ]
+}
