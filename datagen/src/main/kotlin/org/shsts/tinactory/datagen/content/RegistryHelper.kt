@@ -31,6 +31,8 @@ object RegistryHelper {
 
     fun itemKey(item: ItemLike) = BuiltInRegistries.ITEM.getResourceKey(item.asItem()).orElseThrow()
 
+    fun blockKey(block: Block) = BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow()
+
     fun recipeLoc(prefix: String, loc: ResourceLocation): ResourceLocation {
         val id = if (loc.namespace == TinactoryKeys.ID) {
             "${prefix}/${loc.path}"

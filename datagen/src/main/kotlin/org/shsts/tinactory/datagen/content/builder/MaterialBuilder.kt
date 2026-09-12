@@ -31,6 +31,7 @@ import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.ITEM_VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.blockKey
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemKey
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -157,15 +158,23 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
     }
 
     private fun buildOre(variant: OreVariant) {
-        val tierTag = variant.mineTag
-        blockData(material.oreEntry(variant) as IEntry<out Block>) {
-            blockState { oreBlock(it, variant) }
-            tag(BlockTags.MINEABLE_WITH_PICKAXE)
-            tag(tierTag)
-            if (material.hasItem("raw")) {
-                drop(material.item("raw"))
-            } else {
-                drop(material.item("raw_fluid"))
+        val entry = material.oreEntry(variant)
+        val oreTag = AllTags.extend(AllTags.ORE_BLOCK, variant.serializedName)
+        if (!material.isExistingOre(variant)) {
+            blockData(entry as IEntry<out Block>) {
+                blockState { oreBlock(it, variant) }
+                tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                tag(variant.mineTag)
+                tag(oreTag)
+                if (material.hasItem("raw")) {
+                    drop(material.item("raw"))
+                } else {
+                    drop(material.item("raw_fluid"))
+                }
+            }
+        } else {
+            dataGen {
+                tag(blockKey(entry.get()), oreTag)
             }
         }
     }
@@ -1013,9 +1022,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             buildItem(sub)
         }
         for (variant in material.ores()) {
-            if (!material.isExistingOre(variant)) {
-                buildOre(variant)
-            }
+            buildOre(variant)
         }
         dustWithTiny()
         toolRecipes()

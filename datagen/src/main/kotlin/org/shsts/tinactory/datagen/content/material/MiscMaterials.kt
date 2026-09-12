@@ -4,9 +4,11 @@ import net.minecraft.tags.BlockTags
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.Items
 import org.shsts.tinactory.AllMaterials.getMaterial
+import org.shsts.tinactory.AllTags
 import org.shsts.tinactory.AllTags.FLUID_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ITEM_STORAGE_CELL
 import org.shsts.tinactory.AllTags.ORE_BASE_DUST
+import org.shsts.tinactory.AllTags.ORE_BLOCK
 import org.shsts.tinactory.AllTags.PATTERN_STORAGE_CELL
 import org.shsts.tinactory.AllTags.STORAGE_CELL
 import org.shsts.tinactory.AllTags.TOOL
@@ -597,6 +599,7 @@ object MiscMaterials {
 
             for (base in OreVariant.entries) {
                 tag(getMaterial(base.material).tag("dust"), ORE_BASE_DUST)
+                tag(AllTags.extend(ORE_BLOCK, base.serializedName), ORE_BLOCK)
             }
 
             tag(ITEM_STORAGE_CELL, STORAGE_CELL)
