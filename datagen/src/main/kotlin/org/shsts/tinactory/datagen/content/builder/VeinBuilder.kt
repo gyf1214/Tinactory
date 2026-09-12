@@ -38,7 +38,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
 
         private val ORE_SHAPE = OreShapeDefinition(
             AllWorldGens.ELLIPSOID_SHAPE.get(),
-            EllipsoidShape.Definition(100.0, 200.0, 0.6, 2.0, 5.0))
+            EllipsoidShape.Definition(100.0, 200.0, 0.6, 6.0, 12.0))
 
         private val BIOME_TAGS = mapOf(
             Level.OVERWORLD to TagKey.create(

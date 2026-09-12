@@ -157,10 +157,10 @@ public final class OreVeinDataProvider implements DataProvider {
         var placement = new OffsetSpreadPlacement(
             Vec3i.ZERO,
             StructurePlacement.FrequencyReductionMethod.DEFAULT,
-            0.75F,
+            0.25f,
             salt(id + "/" + level),
             Optional.empty(),
-            Math.multiplyExact(4, distanceFactor), 1, RandomSpreadType.LINEAR,
+            7 * distanceFactor, 1, RandomSpreadType.LINEAR,
             distanceFactor, distanceFactor);
         var structureSet = new StructureSet(entries, placement);
 
@@ -188,7 +188,7 @@ public final class OreVeinDataProvider implements DataProvider {
     private int scaleFactor(int scale, int level) {
         var factor = 1;
         for (var index = 0; index < level; index++) {
-            factor = Math.multiplyExact(factor, scale);
+            factor *= scale;
         }
         return factor;
     }
