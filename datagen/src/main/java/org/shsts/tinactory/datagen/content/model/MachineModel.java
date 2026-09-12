@@ -392,9 +392,9 @@ public class MachineModel {
             .allFaces((d, f) -> {
                 f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay");
                 if (d == Direction.NORTH) {
-                    f.tintindex(0);
-                } else if (d == Direction.SOUTH) {
                     f.tintindex(1);
+                } else if (d == Direction.SOUTH) {
+                    f.tintindex(2);
                 }
             })
             .end()
@@ -402,9 +402,9 @@ public class MachineModel {
             .allFaces((d, f) -> {
                 f.cullface(d).texture("#" + DIR_TEX_KEYS.get(d) + "_overlay_emissive");
                 if (d == Direction.NORTH) {
-                    f.tintindex(0);
-                } else if (d == Direction.SOUTH) {
                     f.tintindex(1);
+                } else if (d == Direction.SOUTH) {
+                    f.tintindex(2);
                 }
             })
             .end();
@@ -424,7 +424,7 @@ public class MachineModel {
             .face(FRONT_FACING)
             .cullface(FRONT_FACING)
             .texture("#io_overlay")
-            .tintindex(2)
+            .tintindex(3)
             .end().end();
     }
 

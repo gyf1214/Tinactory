@@ -289,7 +289,7 @@ public class MachineMeta extends MetaConsumer {
                 .transform(MachineSet::baseMachine)
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
-                .tint(i -> i == 2 ? v.color : 0xFFFFFFFF)
+                .tint(i -> i == 3 ? v.color : 0xFFFFFFFF)
                 .end();
         }
 
@@ -365,7 +365,7 @@ public class MachineMeta extends MetaConsumer {
                 .end()
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
-                .tint(i -> i == 0 ? v.color : 0xFFFFFFFF)
+                .tint(i -> i == 1 ? v.color : 0xFFFFFFFF)
                 .end()
                 .buildObject();
         }

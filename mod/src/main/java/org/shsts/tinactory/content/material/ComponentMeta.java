@@ -165,8 +165,8 @@ public class ComponentMeta extends MetaConsumer {
                 .properties(MACHINE_PROPERTY)
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 .tint(i -> switch (i) {
-                    case 0 -> v.color;
-                    case 1 -> v1.color;
+                    case 1 -> v.color;
+                    case 2 -> v1.color;
                     default -> 0xFFFFFFFF;
                 }).register();
             components.put(v, block);

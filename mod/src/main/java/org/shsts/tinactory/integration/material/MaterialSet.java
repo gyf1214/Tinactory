@@ -268,7 +268,7 @@ public class MaterialSet {
                         .strength(variant.destroyTime, variant.explodeResistance)
                         .mapColor(variant.mapColor)
                         .sound(variant.soundType))
-                    .tint(color)
+                    .tint(0xFFFFFFFF, color)
                     .register();
                 ores.put(variant, new OreEntry(ore, false));
             }

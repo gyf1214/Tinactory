@@ -434,13 +434,13 @@ public final class Models {
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)
                 .allFaces((dir, face) -> face
-                    .texture("#overlay").cullface(dir).tintindex(0)
+                    .texture("#overlay").cullface(dir).tintindex(1)
                     .end())
                 .end()
                 .element()
                 .from(0, 0, 0).to(16, 16, 16)
                 .allFaces((dir, face) -> face
-                    .texture("#overlay_emissive").cullface(dir).tintindex(0)
+                    .texture("#overlay_emissive").cullface(dir).tintindex(1)
                     .end())
                 .end()
                 .texture("overlay_emissive", BLOCK_VOID_TEX)

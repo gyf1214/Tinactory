@@ -51,7 +51,7 @@ public class MultiblockInterfaceBlock extends SidedMachineBlock {
     }
 
     public static int tint(Voltage v, BlockState state, int index) {
-        var target = state.getValue(JOINED) ? 2 : 0;
+        var target = state.getValue(JOINED) ? 3 : 1;
         return index == target ? v.color : 0xFFFFFFFF;
     }
 }
