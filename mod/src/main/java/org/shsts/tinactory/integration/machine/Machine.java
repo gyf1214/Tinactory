@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import org.shsts.tinactory.AllDataComponents;
 import org.shsts.tinactory.AllEvents;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -179,6 +180,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         var item = arg.stack();
         if (item.has(DataComponents.CUSTOM_NAME)) {
             setName(arg.world(), item.getHoverName());
+        }
+        if (item.has(AllDataComponents.UUID.get())) {
+            uuid = item.get(AllDataComponents.UUID.get());
         }
         if (arg.placer() instanceof Player player) {
             setPlayerTeam(arg.world(), player);

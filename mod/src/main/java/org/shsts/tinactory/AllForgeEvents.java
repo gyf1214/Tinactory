@@ -126,8 +126,11 @@ public final class AllForgeEvents {
         if (blockEntity == null) {
             return;
         }
-        var customName = MACHINE.tryGet(blockEntity)
-            .flatMap(machine -> machine.config().getTag("name"))
+        var machine = MACHINE.tryGet(blockEntity).orElse(null);
+        if (machine == null) {
+            return;
+        }
+        var customName = machine.config().getTag("name")
             .map(tag -> CodecHelper.parseTag(event.getLevel().registryAccess(),
                 ComponentSerialization.CODEC, tag))
             .orElse(null);
@@ -139,6 +142,7 @@ public final class AllForgeEvents {
             var stack = drop.getItem();
             if (stack.is(blockItem)) {
                 stack.set(DataComponents.CUSTOM_NAME, customName);
+                stack.set(AllDataComponents.UUID.get(), machine.uuid());
                 return;
             }
         }

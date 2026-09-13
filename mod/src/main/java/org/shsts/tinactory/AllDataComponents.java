@@ -3,6 +3,7 @@ package org.shsts.tinactory;
 import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -15,6 +16,8 @@ import org.shsts.tinactory.integration.autocraft.PatternHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
+
+import java.util.UUID;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -39,6 +42,8 @@ public final class AllDataComponents {
     public static final IEntry<DataComponentType<Long>> BATTERY = component("battery", Codec.LONG);
     public static final IEntry<DataComponentType<Long>> REACTIONS = component("reaction", Codec.LONG);
     public static final IEntry<DataComponentType<Boolean>> HIDE_BAR = component("hide_bar", Codec.BOOL);
+    public static final IEntry<DataComponentType<UUID>> UUID =
+        component("uuid", UUIDUtil.CODEC, UUIDUtil.STREAM_CODEC);
 
     private static <T> IEntry<DataComponentType<T>> component(
         String name, Codec<T> codec,
