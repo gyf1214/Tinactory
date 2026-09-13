@@ -1,9 +1,17 @@
 package org.shsts.tinactory.datagen.content.material
 
+import net.minecraft.resources.ResourceKey
+import net.minecraft.world.level.Level
+import org.shsts.tinactory.datagen.TinactoryDatagen.DATA_GEN
 import org.shsts.tinactory.datagen.content.builder.VeinBuilder
+import org.shsts.tinactory.datagen.provider.OreVeinDataProvider
 import org.shsts.tinactory.integration.material.OreVariant
 
 object Veins {
+    val VEIN_DATA = DATA_GEN.createHandler { dataGen, handler, event ->
+        OreVeinDataProvider(dataGen, handler, event, 3, 2, 7)
+    }
+
     fun init() {
         stone()
         deepslate()
@@ -12,27 +20,27 @@ object Veins {
     }
 
     private fun stone() {
-        vein("chalcopyrite", 0.4) {
+        vein("chalcopyrite", 0.4, Level.OVERWORLD, 8, 80) {
             primitive = true
             ore("chalcopyrite", 0.8)
             ore("pyrite", 0.6)
         }
-        vein("limonite", 0.6) {
+        vein("limonite", 0.6, Level.OVERWORLD, 8, 80) {
             baseOre = true
             ore("limonite", 0.8)
             ore("banded_iron", 0.4)
             ore("garnierite", 0.2)
         }
-        vein("coal", 0.3) {
+        vein("coal", 0.3, Level.OVERWORLD, 8, 80) {
             ore("coal", 1.0)
             ore("coal", 0.4)
         }
-        vein("cassiterite", 0.2) {
+        vein("cassiterite", 0.2, Level.OVERWORLD, 8, 80) {
             ore("tin", 1.0)
             ore("cassiterite", 0.3)
             ore("tin", 0.1)
         }
-        vein("redstone", 0.1) {
+        vein("redstone", 0.1, Level.OVERWORLD, 8, 80) {
             ore("redstone", 1.0)
             ore("ruby", 0.3)
             ore("cinnabar", 0.1)
@@ -40,73 +48,73 @@ object Veins {
     }
 
     private fun deepslate() {
-        vein("magnetite", 0.4) {
+        vein("magnetite", 0.4, Level.OVERWORLD, -64, 8) {
             baseOre = true
             ore("magnetite", 1.0)
             ore("gold", 0.2)
             ore("magnetite", 0.2)
         }
-        vein("sulfide", 0.4) {
+        vein("sulfide", 0.4, Level.OVERWORLD, -64, 8) {
             ore("galena", 0.5)
             ore("sphalerite", 0.6)
             ore("silver", 0.3)
         }
-        vein("graphite", 0.2) {
+        vein("graphite", 0.2, Level.OVERWORLD, -64, 8) {
             ore("graphite", 1.0)
             ore("graphite", 0.3)
             ore("diamond", 0.1)
         }
-        vein("bauxite", 0.5) {
+        vein("bauxite", 0.5, Level.OVERWORLD, -64, 8) {
             ore("bauxite", 0.8)
             ore("ilmenite", 0.6)
         }
-        vein("oil", 0.3) {
+        vein("oil", 0.3, Level.OVERWORLD, -64, 8) {
             ore("natural_gas", 0.3)
             ore("light_oil", 0.4)
             ore("heavy_oil", 0.7)
         }
-        vein("gem", 0.1) {
+        vein("gem", 0.1, Level.OVERWORLD, -64, 8) {
             ore("emerald", 0.4)
             ore("sapphire", 0.7)
         }
     }
 
     private fun netherrack() {
-        vein("gold", 0.2) {
+        vein("gold", 0.2, Level.NETHER, 5, 117) {
             variant(OreVariant.NETHERRACK)
             baseOre = true
             ore("gold", 0.5)
             ore("topaz", 0.3)
             ore("blue_topaz", 0.3)
         }
-        vein("quartz", 0.4) {
+        vein("quartz", 0.4, Level.NETHER, 5, 117) {
             ore("nether_quartz", 0.5)
             ore("certus_quartz", 0.5)
             ore("lapis", 0.1)
         }
-        vein("lava", 0.6) {
+        vein("lava", 0.6, Level.NETHER, 5, 117) {
             ore("lava", 1.0)
             ore("lava", 0.2)
         }
-        vein("tungsten", 0.3) {
+        vein("tungsten", 0.3, Level.NETHER, 5, 117) {
             ore("tungstate", 0.7)
             ore("molybdate", 0.4)
         }
-        vein("pitchblende", 0.2) {
+        vein("pitchblende", 0.2, Level.NETHER, 5, 117) {
             ore("pitchblende", 0.8)
             ore("thorium", 0.3)
         }
     }
 
     private fun endStone() {
-        vein("ender", 0.2) {
+        vein("ender", 0.2, Level.END, 55, 70) {
             variant(OreVariant.END_STONE)
             baseOre = true
             ore("platinum_metallic", 1.0)
             ore("platinum_metallic", 0.3)
             ore("ender_pearl", 0.1)
         }
-        vein("naquadah", 0.1) {
+        vein("naquadah", 0.1, Level.END, 55, 70) {
             variant(OreVariant.END_STONE)
             baseOre = false
             ore("naquadah", 1.0)
@@ -117,8 +125,11 @@ object Veins {
 
     private var rank = 0
 
-    private fun vein(id: String, rate: Double, block: VeinBuilder.() -> Unit) {
+    private fun vein(id: String, rate: Double, dimension: ResourceKey<Level>, minY: Int, maxY: Int,
+        block: VeinBuilder.() -> Unit) {
         VeinBuilder(id, rank++, rate).apply {
+            dimension(dimension)
+            yRange(minY, maxY)
             block()
             build()
         }

@@ -31,6 +31,7 @@ import org.shsts.tinactory.datagen.content.Models
 import org.shsts.tinactory.datagen.content.Models.ITEM_VOID_TEX
 import org.shsts.tinactory.datagen.content.Models.basicItem
 import org.shsts.tinactory.datagen.content.Models.oreBlock
+import org.shsts.tinactory.datagen.content.RegistryHelper.blockKey
 import org.shsts.tinactory.datagen.content.RegistryHelper.itemKey
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.DataFactories.blockData
@@ -62,6 +63,7 @@ import org.shsts.tinactory.datagen.content.builder.RecipeFactories.vanilla
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.wiremill
 import org.shsts.tinactory.datagen.content.model.IconSet
 import org.shsts.tinactory.integration.material.MaterialSet
+import org.shsts.tinactory.integration.material.OreVariant
 import org.shsts.tinycorelib.api.registrate.entry.IEntry
 import org.shsts.tinycorelib.datagen.api.context.IEntryDataContext
 import kotlin.math.round
@@ -155,17 +157,24 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         }
     }
 
-    private fun buildOre() {
-        val variant = material.oreVariant()
-        val tierTag = variant.mineTag
-        blockData(material.blockEntry("ore") as IEntry<out Block>) {
-            blockState { oreBlock(it, variant) }
-            tag(BlockTags.MINEABLE_WITH_PICKAXE)
-            tag(tierTag)
-            if (material.hasItem("raw")) {
-                drop(material.item("raw"))
-            } else {
-                drop(material.item("raw_fluid"))
+    private fun buildOre(variant: OreVariant) {
+        val entry = material.oreEntry(variant)
+        val oreTag = AllTags.extend(AllTags.ORE_BLOCK, variant.serializedName)
+        if (!material.isExistingOre(variant)) {
+            blockData(entry as IEntry<out Block>) {
+                blockState { oreBlock(it, variant) }
+                tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                tag(variant.mineTag)
+                tag(oreTag)
+                if (material.hasItem("raw")) {
+                    drop(material.item("raw"))
+                } else {
+                    drop(material.item("raw_fluid"))
+                }
+            }
+        } else {
+            dataGen {
+                tag(blockKey(entry.get()), oreTag)
             }
         }
     }
@@ -771,7 +780,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         var primitive = false
         var siftAndHammer = false
         var siftPrimary = false
-        private val variant = material.oreVariant()
+        private val variant = material.oreMain()
         private val byProducts = mutableListOf<MaterialSet>()
 
         fun byProducts(vararg value: Any) {
@@ -814,7 +823,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                     output(material, to)
                     if (from == "crushed") {
                         input("water")
-                        output(material.oreVariant().material, "dust")
+                        output(variant.material, "dust")
                         output(byProduct(0), "dust", rate = 0.3)
                         workTicks(200)
                     } else {
@@ -866,7 +875,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
             thermalCentrifuge {
                 input(material, "crushed") {
                     output(material, "crushed_centrifuged")
-                    output(material.oreVariant().material, "dust")
+                    output(variant.material, "dust")
                     output(byProduct(2), "dust", rate = 0.3)
                     workTicks(400)
                 }
@@ -926,7 +935,7 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
                 input(material, "raw") {
                     input("water", amount = 2 * amount)
                     output(material, "dust", 2 * amount)
-                    output(material.oreVariant().material, "dust", 2 * amount)
+                    output(variant.material, "dust", 2 * amount)
                     for (i in 0..2) {
                         output(byProduct(i), "dust", 2 * amount, rate = 0.3)
                     }
@@ -1012,8 +1021,8 @@ class MaterialBuilder(private val material: MaterialSet, private val icon: IconS
         for (sub in material.itemSubs()) {
             buildItem(sub)
         }
-        if (material.hasBlock("ore")) {
-            buildOre()
+        for (variant in material.ores()) {
+            buildOre(variant)
         }
         dustWithTiny()
         toolRecipes()

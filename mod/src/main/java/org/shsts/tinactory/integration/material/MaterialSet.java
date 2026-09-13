@@ -56,22 +56,22 @@ public class MaterialSet {
         }
     }
 
-    private record BlockEntry(ResourceLocation loc, Supplier<? extends Block> block) {}
+    private record OreEntry(Supplier<? extends Block> block, boolean isExisting) {}
 
     private record FluidEntry(ResourceLocation loc, Supplier<? extends Fluid> fluid, int baseAmount) {}
 
     private final Map<String, ItemEntry> items;
-    private final Map<String, BlockEntry> blocks;
+    private final Map<OreVariant, OreEntry> ores;
     private final Map<String, FluidEntry> fluids;
     @Nullable
-    private final OreVariant oreVariant;
+    private final OreVariant oreMain;
 
     private MaterialSet(Builder<?> builder) {
         this.name = builder.name;
         this.color = builder.color;
         this.items = builder.items;
-        this.blocks = builder.blocks;
-        this.oreVariant = builder.oreVariant;
+        this.ores = builder.ores;
+        this.oreMain = builder.oreMain;
         this.fluids = builder.fluids;
     }
 
@@ -116,25 +116,25 @@ public class MaterialSet {
         return fluids.keySet();
     }
 
-    private BlockEntry safeBlock(String sub) {
-        assert blocks.containsKey(sub) : "%s does not have block %s".formatted(this, sub);
-        return blocks.get(sub);
+    public Set<OreVariant> ores() {
+        return ores.keySet();
     }
 
-    public ResourceLocation blockLoc(String sub) {
-        return safeBlock(sub).loc;
+    private OreEntry safeOre(OreVariant variant) {
+        assert ores.containsKey(variant) : "%s does not have block %s".formatted(this, variant);
+        return ores.get(variant);
     }
 
-    public Supplier<? extends Block> blockEntry(String sub) {
-        return safeBlock(sub).block;
+    public boolean isExistingOre(OreVariant variant) {
+        return ores.containsKey(variant) && ores.get(variant).isExisting;
     }
 
-    public Block block(String sub) {
-        return safeBlock(sub).block.get();
+    public Supplier<? extends Block> oreEntry(OreVariant variant) {
+        return safeOre(variant).block;
     }
 
-    public boolean hasBlock(String sub) {
-        return blocks.containsKey(sub);
+    public boolean hasOre(OreVariant variant) {
+        return ores.containsKey(variant);
     }
 
     public boolean hasFluid(String sub) {
@@ -156,19 +156,19 @@ public class MaterialSet {
         return Math.round(amount * fluids.get(sub).baseAmount);
     }
 
-    public OreVariant oreVariant() {
-        assert oreVariant != null;
-        return oreVariant;
+    public OreVariant oreMain() {
+        assert oreMain != null;
+        return oreMain;
     }
 
     public static class Builder<P> extends SimpleBuilder<MaterialSet, P, Builder<P>> {
         private final String name;
         private final Map<String, ItemEntry> items = new HashMap<>();
-        private final Map<String, BlockEntry> blocks = new HashMap<>();
+        private final Map<OreVariant, OreEntry> ores = new HashMap<>();
         private final Map<String, FluidEntry> fluids = new HashMap<>();
         private int color = 0xFFFFFFFF;
         @Nullable
-        private OreVariant oreVariant = null;
+        private OreVariant oreMain = null;
 
         private Builder(P parent, String name) {
             super(parent);
@@ -260,19 +260,35 @@ public class MaterialSet {
             return this;
         }
 
-        public Builder<P> oreOnly(OreVariant variant) {
-            oreVariant = variant;
-            if (!blocks.containsKey("ore")) {
-                var ore = REGISTRATE.block(newId("ore"), OreBlock.factory(variant))
+        public Builder<P> ore(OreVariant variant, String sub) {
+            if (!ores.containsKey(variant)) {
+                var ore = REGISTRATE.block(newId(sub), OreBlock.factory(variant))
+                    .creativeTab(CreativeModeTabs.NATURAL_BLOCKS)
                     .properties(p -> p
                         .strength(variant.destroyTime, variant.explodeResistance)
                         .mapColor(variant.mapColor)
                         .sound(variant.soundType))
-                    .tint(color)
-                    .noBlockItem()
+                    .tint(0xFFFFFFFF, color)
                     .register();
-                blocks.put("ore", new BlockEntry(ore.loc(), ore));
+                ores.put(variant, new OreEntry(ore, false));
             }
+            return this;
+        }
+
+        public Builder<P> ore(OreVariant variant) {
+            oreMain = variant;
+            return ore(variant, "ore");
+        }
+
+        public Builder<P> oreExisting(OreVariant variant, Supplier<? extends Block> block) {
+            if (!ores.containsKey(variant)) {
+                ores.put(variant, new OreEntry(block, true));
+            }
+            return this;
+        }
+
+        public Builder<P> oreMain(OreVariant variant) {
+            oreMain = variant;
             return this;
         }
 

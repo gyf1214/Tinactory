@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.material;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,6 +20,7 @@ import org.shsts.tinycorelib.api.meta.MetaLoadingException;
 
 import java.util.Locale;
 
+import static org.shsts.tinactory.AllRegistries.BLOCKS;
 import static org.shsts.tinactory.AllRegistries.FLUIDS;
 import static org.shsts.tinactory.AllRegistries.ITEMS;
 import static org.shsts.tinactory.AllRegistries.SOUND_EVENTS;
@@ -131,6 +133,29 @@ public class MaterialMeta extends MetaConsumer {
         toolBuilder.build();
     }
 
+    private void buildOre(MaterialSet.Builder<?> builder, JsonElement je, boolean first) {
+        OreVariant variant;
+        if (je.isJsonObject()) {
+            var jo1 = je.getAsJsonObject();
+            variant = OreVariant.fromName(GsonHelper.getAsString(jo1, "variant"));
+            if (jo1.has("existing")) {
+                var block = BLOCKS.getEntry(ResourceLocation.parse(GsonHelper.getAsString(jo1, "existing")));
+                if (first) {
+                    builder.oreMain(variant);
+                }
+                builder.oreExisting(variant, block);
+                return;
+            }
+        } else {
+            variant = OreVariant.fromName(GsonHelper.convertToString(je, "ore"));
+        }
+        if (first) {
+            builder.ore(variant);
+        } else {
+            builder.ore(variant, "ore_" + variant.getSerializedName());
+        }
+    }
+
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
         if (jo.has("alias")) {
@@ -145,8 +170,16 @@ public class MaterialMeta extends MetaConsumer {
         buildItems(builder, jo);
         buildFluids(builder, jo);
         if (jo.has("ore")) {
-            var variant = OreVariant.fromName(GsonHelper.getAsString(jo, "ore"));
-            builder.oreOnly(variant);
+            var je = jo.get("ore");
+            if (je.isJsonArray()) {
+                var first = true;
+                for (var je1 : je.getAsJsonArray()) {
+                    buildOre(builder, je1, first);
+                    first = false;
+                }
+            } else {
+                buildOre(builder, je, true);
+            }
         }
         buildAliases(builder, jo);
         if (jo.has("tools")) {

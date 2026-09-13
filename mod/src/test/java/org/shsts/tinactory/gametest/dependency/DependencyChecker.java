@@ -649,7 +649,18 @@ public final class DependencyChecker {
     private Map<IDependencyNode, String> exemptTargets() {
         var ret = new HashMap<IDependencyNode, String>();
         addMaterialExemptions(ret, TEST_MATERIAL, "test-only material set");
+        addOreBlockExemptions(ret);
         return ret;
+    }
+
+    private void addOreBlockExemptions(Map<IDependencyNode, String> exemptions) {
+        for (var material : AllMaterials.SET.values()) {
+            for (var variant : material.ores()) {
+                var block = material.oreEntry(variant).get();
+                stackNode(new ItemStack(block.asItem()))
+                    .ifPresent(node -> exemptions.put(node, "ore block item"));
+            }
+        }
     }
 
     private void addMaterialExemptions(Map<IDependencyNode, String> exemptions, String materialName, String reason) {

@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.common.Tags;
 import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.Locale;
@@ -19,13 +18,13 @@ import java.util.Locale;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public enum OreVariant implements StringRepresentable {
-    STONE(0, Blocks.STONE, Items.COBBLESTONE, BlockTags.NEEDS_IRON_TOOL, Voltage.ULV,
+    STONE(0, Blocks.STONE, Items.COBBLESTONE, BlockTags.NEEDS_STONE_TOOL, Voltage.ULV,
         3f, 6f, MapColor.STONE, SoundType.STONE, "stone"),
     DEEPSLATE(1, Blocks.DEEPSLATE, Items.COBBLED_DEEPSLATE, BlockTags.NEEDS_IRON_TOOL, Voltage.LV,
         4.5f, 6f, MapColor.DEEPSLATE, SoundType.DEEPSLATE, "stone"),
-    NETHERRACK(2, Blocks.NETHERRACK, Items.NETHERRACK, BlockTags.NEEDS_DIAMOND_TOOL, Voltage.HV,
+    NETHERRACK(2, Blocks.NETHERRACK, Items.NETHERRACK, BlockTags.NEEDS_IRON_TOOL, Voltage.HV,
         6f, 7.5f, MapColor.NETHER, SoundType.NETHERRACK, "netherrack"),
-    END_STONE(3, Blocks.END_STONE, Items.END_STONE, Tags.Blocks.NEEDS_NETHERITE_TOOL, Voltage.EV,
+    END_STONE(3, Blocks.END_STONE, Items.END_STONE, BlockTags.NEEDS_DIAMOND_TOOL, Voltage.EV,
         7.5f, 9f, MapColor.SAND, SoundType.STONE, "end_stone");
 
     public final int rank;

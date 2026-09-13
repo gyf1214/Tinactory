@@ -1,6 +1,9 @@
 {
   "color": "0xFFFFE650",
-  "ore": "deepslate",
+  "ore": [
+    "deepslate",
+    "netherrack"
+  ],
   "items": [
     "bolt",
     "crushed",
