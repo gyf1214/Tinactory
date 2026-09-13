@@ -74,7 +74,7 @@ object RecoveryRegistry {
             val totalOutputAmount = outputs.sumOf { it.second }
             arcFurnace {
                 recipe(prepend(loc, "recovery")) {
-                    voltage(recipe.output.voltage ?: Voltage.HV)
+                    voltage(Voltage.HV)
                     workTicks(totalOutputAmount * config.workTicksPerIngot)
                     input(recipe.output.item)
                     input("oxygen", amount = totalOutputAmount * config.oxygenPerIngot)

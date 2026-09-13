@@ -449,7 +449,7 @@ object Multiblocks {
                 misc("clear_glass")
                 input("oxygen", amount = 0.6)
                 voltage(Voltage.HV)
-                workTicks(768)
+                workTicks(384)
             }
         }
 

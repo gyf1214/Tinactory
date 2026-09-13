@@ -86,7 +86,7 @@ abstract class AssemblyRecipeBuilder<R : AssemblyRecipe, B : AssemblyRecipeBuild
 
     override fun recordItemOutput(item: ItemLike, amount: Int) {
         if (recordRecovery) {
-            recoveryOutputs += RecoveryOutput(item, amount, voltage)
+            recoveryOutputs += RecoveryOutput(item, amount)
         }
     }
 

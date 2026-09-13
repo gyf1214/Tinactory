@@ -2,13 +2,11 @@ package org.shsts.tinactory.datagen.content.recovery
 
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.ItemLike
-import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.integration.material.MaterialSet
 
 data class RecoveryOutput(
     val item: ItemLike,
-    val amount: Int,
-    val voltage: Voltage?)
+    val amount: Int)
 
 sealed interface RecoveryInput {
     val amount: Double

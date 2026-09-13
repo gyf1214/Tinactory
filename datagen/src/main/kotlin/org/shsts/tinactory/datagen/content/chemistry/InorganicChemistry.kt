@@ -507,12 +507,12 @@ object InorganicChemistry {
             output("wrought_iron") {
                 input("iron")
                 input("oxygen", amount = 0.05)
-                workTicks(64)
+                workTicks(32)
             }
             output("annealed_copper") {
                 input("copper")
                 input("oxygen", amount = 0.075)
-                workTicks(96)
+                workTicks(48)
             }
         }
 
