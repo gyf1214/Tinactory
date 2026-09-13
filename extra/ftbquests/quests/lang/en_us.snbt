@@ -1930,9 +1930,9 @@
 	quest.61B9D2ACAF1C5D38.quest_subtitle: "Make Titanium usable structure"
 	quest.61B9D2ACAF1C5D38.title: "Light, Tough Titanium"
 	quest.61C306A510164241.quest_desc: [
-		"The ME Storage Interface bridges ordinary machine logistics and digital storage, so later materials do not stay scattered across chests and tanks."
+		"The ME Storage Interface gives one network view and access point for the item and fluid contents exposed by connected Electric Chests, Electric Tanks, and ME Drives."
 		""
-		"Prepare the interface first. Once quartz, Fluix, and storage components are ready, this chapter can move from transport networks to unified storage."
+		"This is an access interface, not storage capacity: the connected Electric Chests, Electric Tanks, and ME Drives still provide the actual storage."
 	]
 	quest.61C306A510164241.quest_subtitle: "Make an ME Storage Interface"
 	quest.61C306A510164241.title: "Connect ME Storage"

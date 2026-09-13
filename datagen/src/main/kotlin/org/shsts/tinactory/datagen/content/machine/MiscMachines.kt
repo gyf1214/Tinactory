@@ -258,6 +258,13 @@ object MiscMachines {
                 input("iron", "plate", 4)
                 tech(Technologies.INTEGRATED_CIRCUIT)
             }
+            logistics("me_storage_interface") {
+                circuit(4)
+                component("conveyor_module", 2)
+                component("electric_pump", 2)
+                input("steel", "plate", 4)
+                tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
+            }
         }
         assembler {
             componentVoltage = Voltage.HV
@@ -268,13 +275,6 @@ object MiscMachines {
                 workTicks(MACHINE_TICKS)
             }
 
-            logistics("me_storage_interface") {
-                circuit(4)
-                component("conveyor_module", 2)
-                component("electric_pump", 2)
-                input("stainless_steel", "plate", 4)
-                tech(Technologies.PUMP_AND_PISTON, Technologies.CONVEYOR_MODULE)
-            }
             logistics("me_drive") {
                 circuit(4)
                 input(Items.CHEST)

@@ -99,7 +99,7 @@ object Machines {
             }
             block("logistics/me_storage_interface") {
                 machineModel {
-                    casing(Voltage.HV)
+                    casing(Voltage.LV)
                     overlay("cover/overlay_storage")
                     ioTex(ME_BUS)
                 }
