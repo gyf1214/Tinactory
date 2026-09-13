@@ -184,7 +184,7 @@ object MiscComponents {
                 circuit(1, voltage = Voltage.ULV)
                 voltage(Voltage.ULV)
                 workTicks(COMPONENT_TICKS)
-                tech(Technologies.SOLDERING)
+                tech(Technologies.SIFTING)
             }
         }
 
