@@ -32,6 +32,7 @@ public final class AllTags {
 
     public static final TagKey<Item> EXTRUDER_INPUT = modItem("extruder_input");
     public static final TagKey<Item> ORE_BASE_DUST = modItem("ore_base_dust");
+    public static final TagKey<Item> RESEARCH_EQUIPMENT = modItem("research_equipment");
 
     public static final TagKey<Block> MINEABLE_WITH_WRENCH = modBlock("mineable/wrench");
     public static final TagKey<Block> MINEABLE_WITH_WIRE_CUTTER = modBlock("mineable/wire_cutter");

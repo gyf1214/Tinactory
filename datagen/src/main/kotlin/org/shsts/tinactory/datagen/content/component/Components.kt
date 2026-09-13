@@ -84,7 +84,10 @@ object Components {
             }
 
             for (entry in componentEntry<Item>("research_equipment").values) {
-                item(entry) { model(basicItem("${RESEARCH_TEX}base", "${RESEARCH_TEX}overlay")) }
+                item(entry) {
+                    model(basicItem("${RESEARCH_TEX}base", "${RESEARCH_TEX}overlay"))
+                    tag(AllTags.RESEARCH_EQUIPMENT)
+                }
             }
 
             component("grinder/good") { model(basicItem("$GRINDER_TEX.diamond")) }
