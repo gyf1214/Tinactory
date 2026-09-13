@@ -18,10 +18,10 @@ import java.util.function.ToDoubleFunction;
 public final class OreVeinUtil {
     public static final int ALGORITHM_VERSION = 3;
     public static final MapCodec<OreShapeDefinition<?>> DEFINITION_CODEC =
-        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
+        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.key())
             .dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);
     public static final MapCodec<OreShapeInstance<?>> INSTANCE_CODEC =
-        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES_KEY)
+        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.key())
             .dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
 
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;

@@ -2,10 +2,8 @@ package org.shsts.tinactory;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
@@ -33,15 +31,11 @@ import org.shsts.tinycorelib.api.registrate.entry.IRegistry;
 import org.shsts.tinycorelib.api.registrate.handler.IEntryHandler;
 
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinycorelib.api.CoreLibKeys.EVENT_REGISTRY_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class AllRegistries {
-    public static final ResourceKey<Registry<IOreShape<?, ?>>> ORE_SHAPES_KEY =
-        ResourceKey.createRegistryKey(modLoc("ore_shape"));
-
     public static final IRegistry<IScheduling> SCHEDULINGS;
     public static final IRegistry<IComponentType<?>> COMPONENT_TYPES;
     public static final IRegistry<ISubnetLabel> SUBNET_LABELS;
@@ -69,8 +63,8 @@ public final class AllRegistries {
         METRICS_CALLBACKS = REGISTRATE.registry(TinactoryKeys.METRICS_CALLBACKS, IMetricsCallback.class)
             .onBake(MetricsManager::onBake)
             .register();
-        ORE_SHAPES = REGISTRATE.<IOreShape<?, ?>>genericRegistry(
-            ORE_SHAPES_KEY.location().getPath(), IOreShape.class).register();
+        ORE_SHAPES = REGISTRATE.<IOreShape<?, ?>>genericRegistry("ore_shape", IOreShape.class)
+            .register();
 
         EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY);
         BLOCKS = REGISTRATE.getHandler(Registries.BLOCK, BuiltInRegistries.BLOCK);
