@@ -185,7 +185,8 @@ public class TechPanel extends Panel {
             }
 
             var progress = team.getTechProgress(selectedTech) * rect().width() / selectedTech.getMaxProgress();
-            RenderUtil.fill(graphics, rect().resize((int) progress, rect().height()), PROGRESS_COLOR);
+            var progress1 = Math.clamp(progress, 0, rect().width());
+            RenderUtil.fill(graphics, rect().resize(progress1, rect().height()), PROGRESS_COLOR);
         }
 
         @Override
