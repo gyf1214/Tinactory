@@ -5,7 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.shsts.tinactory.content.gui.ElectricStorageMenu;
+import org.shsts.tinactory.content.gui.StorageMenu;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 
@@ -24,8 +24,8 @@ import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class ElectricStorageScreen extends StorageScreen<ElectricStorageMenu> {
-    public ElectricStorageScreen(ElectricStorageMenu menu, Component title) {
+public final class ElectricStorageScreen extends StorageScreen<StorageMenu> {
+    public ElectricStorageScreen(StorageMenu menu, Component title) {
         super(menu, title);
 
         var config = menu.machineConfig();

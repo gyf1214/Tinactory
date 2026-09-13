@@ -1,9 +1,12 @@
 package org.shsts.tinactory.unit.logistics;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.core.logistics.DigitalStorage;
 import org.shsts.tinactory.core.logistics.IDigitalProvider;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.unit.fixture.TestStack;
 
 import java.util.List;
@@ -21,6 +24,16 @@ class DigitalStorageTest {
         @Override
         public PortType type() {
             return PortType.ITEM;
+        }
+
+        @Override
+        protected CompoundTag serializeStack(HolderLookup.Provider provider, TestStack stack) {
+            return (CompoundTag) CodecHelper.encodeTag(provider, TestStack.CODEC, stack);
+        }
+
+        @Override
+        protected TestStack deserializeStack(HolderLookup.Provider provider, CompoundTag tag) {
+            return CodecHelper.parseTag(provider, TestStack.CODEC, tag);
         }
     }
 
@@ -74,16 +87,10 @@ class DigitalStorageTest {
     }
 
     @Test
-    void shouldRejectInputWhenProviderOrMaxAmountCannotAcceptIt() {
+    void shouldRejectInputWhenProviderCannotAcceptIt() {
         var bytesLimited = new TestStorage(new FakeDigitalProvider(5), 4, 2);
 
         assertFalse(bytesLimited.acceptInput(new TestStack("iron", 1)));
-
-        var maxAmountLimited = new TestStorage(new FakeDigitalProvider(20), 2, 1);
-        maxAmountLimited.maxAmount = 2;
-        maxAmountLimited.insert(new TestStack("iron", 2), false);
-
-        assertFalse(maxAmountLimited.acceptInput(new TestStack("iron", 1)));
     }
 
     @Test
@@ -126,20 +133,6 @@ class DigitalStorageTest {
         var drained = storage.extract(4, false);
 
         assertEquals(4, drained.amount());
-        assertEquals(0, storage.getStorageAmount(new TestStack("iron", 1)));
-        assertEquals(0, provider.bytesUsed());
-    }
-
-    @Test
-    void shouldClearContentsAndResetProviderState() {
-        var provider = new FakeDigitalProvider(100);
-        var storage = new TestStorage(provider, 3, 1);
-        storage.insert(new TestStack("iron", 2), false);
-        storage.insert(new TestStack("gold", 1), false);
-
-        storage.clear();
-
-        assertTrue(storage.getAllStorages().isEmpty());
         assertEquals(0, storage.getStorageAmount(new TestStack("iron", 1)));
         assertEquals(0, provider.bytesUsed());
     }

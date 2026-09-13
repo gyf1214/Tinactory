@@ -3,14 +3,13 @@ package org.shsts.tinactory;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
-import org.shsts.tinactory.content.gui.ElectricStorageMenu;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.MESignalControllerMenu;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
-import org.shsts.tinactory.content.gui.MEStorageInterfaceMenu;
 import org.shsts.tinactory.content.gui.MachineMenu;
+import org.shsts.tinactory.content.gui.StorageMenus;
 import org.shsts.tinactory.content.gui.TechMenu;
 import org.shsts.tinactory.content.gui.WorkbenchMenu;
 import org.shsts.tinactory.content.gui.client.BatteryBoxScreen;
@@ -154,11 +153,11 @@ public final class AllMenus {
             .screen(() -> () -> WorkbenchScreen::new)
             .register();
 
-        ELECTRIC_CHEST = processing("machine/electric_chest", ElectricStorageMenu::chest)
+        ELECTRIC_CHEST = processing("machine/electric_chest", StorageMenus::electricChest)
             .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
-        ELECTRIC_TANK = processing("machine/electric_tank", ElectricStorageMenu::tank)
+        ELECTRIC_TANK = processing("machine/electric_tank", StorageMenus::electricTank)
             .screen(() -> () -> ElectricStorageScreen::new)
             .register();
 
@@ -175,7 +174,7 @@ public final class AllMenus {
             .screen(() -> () -> MEDriveScreen::new)
             .register();
 
-        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", MEStorageInterfaceMenu::factory)
+        ME_STORAGE_INTERFACE = processing("logistics/me_storage_interface", StorageMenus::meStorageInterface)
             .screen(() -> () -> StorageScreen::new)
             .register();
 

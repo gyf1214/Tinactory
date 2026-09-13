@@ -16,6 +16,7 @@ import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
@@ -38,7 +39,7 @@ import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class StorageMenu extends InventoryMenu {
+public class StorageMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
@@ -51,7 +52,7 @@ public abstract class StorageMenu extends InventoryMenu {
     private final int fluidStackLimit;
     private final Runnable updateListener;
 
-    protected StorageMenu(Properties properties, IPort<ItemStack> itemPort, int itemStackLimit,
+    public StorageMenu(Properties properties, IPort<ItemStack> itemPort, int itemStackLimit,
         IPort<FluidStack> fluidPort, int fluidStackLimit) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
@@ -359,5 +360,9 @@ public abstract class StorageMenu extends InventoryMenu {
             remaining -= entryAmount;
             isFilter = false;
         } while (remaining > 0);
+    }
+
+    public IMachineConfig machineConfig() {
+        return machine.config();
     }
 }

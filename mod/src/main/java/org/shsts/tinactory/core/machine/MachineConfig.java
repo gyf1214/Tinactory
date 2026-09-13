@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
@@ -44,6 +45,12 @@ public class MachineConfig implements IMachineConfig {
     @Override
     public Optional<Tag> getTag(String key) {
         return Optional.ofNullable(tag.get(key));
+    }
+
+    @Override
+    public Optional<ListTag> getList(String key) {
+        return tag.contains(key, Tag.TAG_LIST) ? Optional.ofNullable((ListTag) tag.get(key)) :
+            Optional.empty();
     }
 
     @Override

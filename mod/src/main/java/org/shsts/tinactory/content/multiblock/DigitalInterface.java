@@ -95,20 +95,16 @@ public class DigitalInterface extends MultiblockInterface implements ILayoutProv
             internalItem.resetFilters();
             internalFluid.resetFilters();
             if (type.direction == PortDirection.INPUT) {
-                internalItem.maxAmount = Integer.MAX_VALUE;
                 menuItem.allowInput = true;
                 externalItem.allowInput = true;
                 externalItem.allowOutput = false;
-                internalFluid.maxAmount = Integer.MAX_VALUE;
                 menuFluid.allowInput = true;
                 externalFluid.allowInput = true;
                 externalFluid.allowOutput = false;
             } else {
-                internalItem.maxAmount = Integer.MAX_VALUE;
                 menuItem.allowInput = false;
                 externalItem.allowInput = false;
                 externalItem.allowOutput = true;
-                internalFluid.maxAmount = Integer.MAX_VALUE;
                 menuFluid.allowInput = false;
                 externalFluid.allowInput = false;
                 externalFluid.allowOutput = true;

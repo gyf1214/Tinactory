@@ -4,7 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -86,24 +85,25 @@ public final class StoragePorts {
         }
 
         @Override
+        protected CompoundTag serializeStack(HolderLookup.Provider provider, ItemStack stack) {
+            return StackHelper.serializeItemStack(provider, stack);
+        }
+
+        @Override
+        protected ItemStack deserializeStack(HolderLookup.Provider provider, CompoundTag tag) {
+            return StackHelper.deserializeItemStack(provider, tag);
+        }
+
+        @Override
         public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
-            var listTag = new ListTag();
-            for (var stack : getAllStorages()) {
-                listTag.add(StackHelper.serializeItemStack(provider, stack));
-            }
-            tag.put("Items", listTag);
+            tag.put("Items", serializeToList(provider));
             return tag;
         }
 
         @Override
         public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-            clear();
-            var listTag = tag.getList("Items", Tag.TAG_COMPOUND);
-            for (var itemTag : listTag) {
-                var stack = StackHelper.deserializeItemStack(provider, (CompoundTag) itemTag);
-                insert(stack, false);
-            }
+            deserializeFromList(provider, tag.getList("Items", Tag.TAG_COMPOUND));
         }
     }
 
@@ -114,24 +114,25 @@ public final class StoragePorts {
         }
 
         @Override
+        protected CompoundTag serializeStack(HolderLookup.Provider provider, FluidStack stack) {
+            return (CompoundTag) stack.save(provider);
+        }
+
+        @Override
+        protected FluidStack deserializeStack(HolderLookup.Provider provider, CompoundTag tag) {
+            return FluidStack.parseOptional(provider, tag);
+        }
+
+        @Override
         public CompoundTag serializeNBT(HolderLookup.Provider provider) {
             var tag = new CompoundTag();
-            var listTag = new ListTag();
-            for (var stack : getAllStorages()) {
-                listTag.add(stack.save(provider));
-            }
-            tag.put("Fluids", listTag);
+            tag.put("Fluids", serializeToList(provider));
             return tag;
         }
 
         @Override
         public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-            clear();
-            var listTag = tag.getList("Fluids", Tag.TAG_COMPOUND);
-            for (var fluidTag : listTag) {
-                var stack = FluidStack.parseOptional(provider, (CompoundTag) fluidTag);
-                insert(stack, false);
-            }
+            deserializeFromList(provider, tag.getList("Fluids", Tag.TAG_COMPOUND));
         }
     }
 

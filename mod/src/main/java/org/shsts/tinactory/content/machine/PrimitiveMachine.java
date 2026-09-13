@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -100,6 +101,11 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
 
         @Override
         public Optional<Tag> getTag(String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ListTag> getList(String key) {
             return Optional.empty();
         }
 

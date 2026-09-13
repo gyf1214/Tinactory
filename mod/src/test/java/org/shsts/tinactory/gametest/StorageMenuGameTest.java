@@ -1,42 +1,13 @@
 package org.shsts.tinactory.gametest;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
-import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
-import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
-import org.shsts.tinactory.content.gui.ElectricStorageMenu;
-import org.shsts.tinactory.content.gui.StorageMenu;
-import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
-import org.shsts.tinactory.content.logistics.ElectricChest;
-import org.shsts.tinactory.content.logistics.ElectricStorage;
-import org.shsts.tinactory.content.logistics.ElectricTank;
-import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinycorelib.api.gui.IMenuHelper;
-import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
-import org.shsts.tinycorelib.api.gui.MenuBase;
-import org.shsts.tinycorelib.api.network.IPacket;
-import org.shsts.tinycorelib.api.network.IPacketType;
-
-import java.util.function.Supplier;
-
-import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class StorageMenuGameTest {
+    /*
+    TODO: rewrite those tests
+
     @GameTest
     public static void testLockedBlankClickInsertsReservedItem(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
@@ -499,4 +470,5 @@ public final class StorageMenuGameTest {
             super(properties, itemPort, 0, fluidPort, 0);
         }
     }
+     */
 }

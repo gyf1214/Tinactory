@@ -3,6 +3,7 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -41,6 +42,8 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
     }
 
     Optional<Tag> getTag(String key);
+
+    Optional<ListTag> getList(String key);
 
     Optional<CompoundTag> getCompound(String key);
 }

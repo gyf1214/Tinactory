@@ -2,6 +2,7 @@ package org.shsts.tinactory.unit.fixture;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -254,6 +255,11 @@ public final class TestMachine implements IMachine {
 
         @Override
         public Optional<Tag> getTag(String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<ListTag> getList(String key) {
             return Optional.empty();
         }
 
