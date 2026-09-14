@@ -171,11 +171,14 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
             return;
         }
         var limit = insertLimit(key, 0);
-        if (adapter.amount(stack) > limit) {
+        var amount = adapter.amount(stack);
+        if (amount > limit) {
             LOGGER.warn("Entry {} overflow", key);
             contents.put(key, adapter.stackOf(key, limit));
+            doInsert(key, limit, 0);
         } else {
             contents.put(key, stack);
+            doInsert(key, amount, 0);
         }
     }
 

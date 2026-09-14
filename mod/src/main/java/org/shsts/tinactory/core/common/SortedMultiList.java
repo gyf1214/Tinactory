@@ -5,6 +5,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 @ParametersAreNonnullByDefault
@@ -12,6 +14,7 @@ import java.util.Random;
 public class SortedMultiList<T> {
     private final Random random = new Random();
 
+    private final Map<T, Integer> uniqueKey = new HashMap<>();
     private final Comparator<? super T> comparator;
     @Nullable
     private Node root;
@@ -23,19 +26,21 @@ public class SortedMultiList<T> {
     public record IndexedValue<T>(T value, int index, int count) {}
 
     private class Node {
-        T key;
+        public final T key;
+        public final int unique;
+        public final int priority = random.nextInt();
 
-        int count;
-        int size;
-        int priority = random.nextInt();
+        public int count;
+        public int size;
 
         @Nullable
-        Node left = null;
+        public Node left = null;
         @Nullable
-        Node right = null;
+        public Node right = null;
 
-        Node(T key, int count) {
+        public Node(T key, int count, int unique) {
             this.key = key;
+            this.unique = unique;
             this.count = count;
             this.size = count;
         }
@@ -50,11 +55,15 @@ public class SortedMultiList<T> {
     }
 
     public void insert(T key, int count) {
-        root = insert(root, key, count);
+        var unique = uniqueKey.computeIfAbsent(key, $ -> uniqueKey.size());
+        root = insert(root, key, count, unique);
     }
 
     public void remove(T key, int count) {
-        root = remove(root, key, count);
+        if (!uniqueKey.containsKey(key)) {
+            return;
+        }
+        root = remove(root, key, count, uniqueKey.get(key));
     }
 
     @Nullable
@@ -121,21 +130,29 @@ public class SortedMultiList<T> {
         }
     }
 
-    private Node insert(@Nullable Node node, T key, int count) {
+    private int compare(Node node, T key, int unique) {
+        if (node.unique == unique) {
+            return 0;
+        }
+        var cmp1 = comparator.compare(key, node.key);
+        return cmp1 != 0 ? cmp1 : (unique < node.unique ? -1 : 1);
+    }
+
+    private Node insert(@Nullable Node node, T key, int count, int unique) {
         if (node == null) {
-            return new Node(key, count);
+            return new Node(key, count, unique);
         }
 
-        int cmp = comparator.compare(key, node.key);
+        int cmp = compare(node, key, unique);
         if (cmp == 0) {
-            node.count++;
+            node.count += count;
         } else if (cmp < 0) {
-            node.left = insert(node.left, key, count);
+            node.left = insert(node.left, key, count, unique);
             if (node.left.priority > node.priority) {
                 node = rotateRight(node, node.left);
             }
         } else {
-            node.right = insert(node.right, key, count);
+            node.right = insert(node.right, key, count, unique);
             if (node.right.priority > node.priority) {
                 node = rotateLeft(node, node.right);
             }
@@ -146,21 +163,22 @@ public class SortedMultiList<T> {
     }
 
     @Nullable
-    private Node remove(@Nullable Node node, T key, int count) {
+    private Node remove(@Nullable Node node, T key, int count, int unique) {
         if (node == null) {
             return null;
         }
 
-        int cmp = comparator.compare(key, node.key);
+        int cmp = compare(node, key, unique);
 
         if (cmp < 0) {
-            node.left = remove(node.left, key, count);
+            node.left = remove(node.left, key, count, unique);
         } else if (cmp > 0) {
-            node.right = remove(node.right, key, count);
+            node.right = remove(node.right, key, count, unique);
         } else {
             if (node.count > count) {
                 node.count -= count;
             } else {
+                uniqueKey.remove(key);
                 return merge(node.left, node.right);
             }
         }
@@ -171,5 +189,6 @@ public class SortedMultiList<T> {
 
     public void clear() {
         root = null;
+        uniqueKey.clear();
     }
 }

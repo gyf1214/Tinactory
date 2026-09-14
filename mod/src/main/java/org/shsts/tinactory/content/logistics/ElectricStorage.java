@@ -102,8 +102,8 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         @Override
         protected int insertLimit(IStackKey key, int existingAmount) {
             // empty slot amounts + existing slot remaining amount
-            return Math.max(0, storageSlots - slotMap.size()) * stackLimit +
-                stackLimit - existingAmount % stackLimit;
+            return Math.max(0, storageSlots - slotMap.size()) * stackLimit -
+                Math.ceilMod(existingAmount, stackLimit);
         }
 
         private int slotsUsed(int amount) {
@@ -188,14 +188,14 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     }
 
     private boolean stackValid(T stack) {
-        return filters.stream().anyMatch($ -> $.test(stack));
+        return filters.isEmpty() || filters.stream().anyMatch($ -> $.test(stack));
     }
 
     protected abstract Predicate<T> deserializeFilter(Tag tag);
 
     private void updateFilters() {
         filters.clear();
-        var list = machineConfig.getList(FILTER_KEY);
+        var list = machineConfig().getList(FILTER_KEY);
         if (list.isPresent()) {
             for (var tag : list.get()) {
                 filters.add(deserializeFilter(tag));
@@ -206,7 +206,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     private long getAmountInVirtualSlot(@Nullable SortedMultiList.IndexedValue<IStackKey> value) {
         if (value == null) {
             return 0;
-        } else if (value.count() == value.index()) {
+        } else if (value.index() == value.count() - 1) {
             var key = value.value();
             return storage.getStorageAmount(key) % stackLimit;
         } else {
@@ -360,7 +360,9 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
             if (entryTag.getBoolean("isFilter")) {
                 legacyFilters.add(key);
             }
-            storage.deserializeEntry(adapter.stackOf(key, amount));
+            if (amount > 0) {
+                storage.deserializeEntry(adapter.stackOf(key, amount));
+            }
         }
     }
 
