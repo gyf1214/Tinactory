@@ -237,8 +237,6 @@
     "tinactory.tooltip.openPortPanel": "Show ports",
     "tinactory.tooltip.batteryMode": "Battery Mode",
     "tinactory.tooltip.dischargeMode": "Discharge Mode",
-    "tinactory.tooltip.chestLock": "Empty slot locked",
-    "tinactory.tooltip.chestUnlock": "Empty slot unlocked",
     "tinactory.tooltip.autoVoid": "Automatically void excess items",
     "tinactory.tooltip.noAutoVoid": "Do not void items",
     "tinactory.tooltip.chestStorage.0": "Storage priority: Lowest",

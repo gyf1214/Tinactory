@@ -53,8 +53,6 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int STORAGE_VERSION = 2;
 
-    public static final String UNLOCK_KEY = "unlockChest";
-    public static final boolean UNLOCK_DEFAULT = true;
     public static final String PRIORITY_KEY = "priority";
     public static final int PRIORITY_DEFAULT = 2;
     public static final String VOID_KEY = "void";
@@ -181,10 +179,6 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
 
     public int amountSignal() {
         return amountSignal;
-    }
-
-    public boolean isUnlocked() {
-        return machineConfig().getBoolean(UNLOCK_KEY, UNLOCK_DEFAULT);
     }
 
     private boolean stackValid(T stack) {

@@ -672,8 +672,6 @@
     "tinactory.tooltip.openPortPanel": "显示端口",
     "tinactory.tooltip.batteryMode": "储电模式",
     "tinactory.tooltip.dischargeMode": "放电模式",
-    "tinactory.tooltip.chestLock": "空槽锁定",
-    "tinactory.tooltip.chestUnlock": "空槽解锁",
     "tinactory.tooltip.autoVoid": "自动销毁多余物品",
     "tinactory.tooltip.noAutoVoid": "不自动销毁物品",
     "tinactory.tooltip.chestStorage.0": "存储优先级：最低",
