@@ -296,6 +296,10 @@ public class StorageMenu extends InventoryMenu {
     private void addEntries(Collection<StorageEntry> entries, IStackKey key, long amount) {
         var remaining = amount;
         var limit = key.type() == PortType.ITEM ? itemStackLimit : fluidStackLimit;
+        if (limit == 0) {
+            entries.add(new StorageEntry(key, remaining));
+            return;
+        }
         do {
             var entryAmount = Math.min(remaining, limit);
             entries.add(new StorageEntry(key, entryAmount));
