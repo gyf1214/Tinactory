@@ -67,6 +67,13 @@ public final class StackHelper {
                 .forGetter(ItemStack::getComponentsPatch)
         ).apply(instance, ItemStack::new));
 
+    public static final Codec<FluidStack> SINGLE_FLUID_CODEC = RecordCodecBuilder.create(
+        instance -> instance.group(
+            FluidStack.FLUID_NON_EMPTY_CODEC.fieldOf("id").forGetter(FluidStack::getFluidHolder),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
+                .forGetter(FluidStack::getComponentsPatch)
+        ).apply(instance, (holder, components) -> new FluidStack(holder, 1, components)));
+
     public static final StreamCodec<RegistryFriendlyByteBuf, IStackKey> KEY_STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(KEY_CODEC);
 

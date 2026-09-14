@@ -14,7 +14,6 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
-import org.shsts.tinactory.compat.ftbfilter.ItemFilterIntegration;
 import org.shsts.tinactory.core.logistics.PortTransmitter;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
@@ -124,8 +123,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         var from1 = getPort(machine, logistic, from.get());
         var to1 = getPort(machine, logistic, to.get());
         return from1.isPresent() && to1.isPresent() && from1.get().type() == to1.get().type() &&
-            (entry.filterType() == LogisticWorkerConfig.FilterType.NONE ||
-                entry.filterType().portType == from1.get().type());
+            (entry.filterType() == FilterEntry.Type.NONE || entry.filterType().portType == from1.get().type());
     }
 
     private void validateConfigs() {
@@ -172,30 +170,20 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         }
     }
 
-    private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, LogisticWorkerConfig config) {
-        switch (config.filterType()) {
-            case TAG -> ITEM_TRANSMITTER.transmit(from, to, stack -> stack.is(config.tagFilter()),
-                itemBandwidth);
-            case ITEM -> {
-                var item = config.itemFilter();
-                if (ItemFilterIntegration.isFilter(item)) {
-                    var registry = Objects.requireNonNull(blockEntity.getLevel()).registryAccess();
-                    ITEM_TRANSMITTER.transmit(from, to,
-                        stack -> ItemFilterIntegration.matches(item, stack, registry),
-                        itemBandwidth);
-                } else {
-                    ITEM_TRANSMITTER.transmitIdentity(from, to, item, itemBandwidth);
-                }
-            }
-            default -> ITEM_TRANSMITTER.transmit(from, to, StackHelper.TRUE_FILTER, itemBandwidth);
+    private void transmitItem(IPort<ItemStack> from, IPort<ItemStack> to, FilterEntry filter) {
+        if (filter.isIdentity(PortType.ITEM)) {
+            ITEM_TRANSMITTER.transmitIdentity(from, to, filter.asItem(), itemBandwidth);
+        } else {
+            var registry = Objects.requireNonNull(blockEntity.getLevel()).registryAccess();
+            ITEM_TRANSMITTER.transmit(from, to, stack -> filter.testItem(stack, registry), itemBandwidth);
         }
     }
 
-    private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FluidStack filter) {
-        if (filter.isEmpty()) {
-            FLUID_TRANSMITTER.transmit(from, to, StackHelper.TRUE_FLUID_FILTER, fluidBandwidth);
+    private void transmitFluid(IPort<FluidStack> from, IPort<FluidStack> to, FilterEntry filter) {
+        if (filter.isIdentity(PortType.FLUID)) {
+            FLUID_TRANSMITTER.transmitIdentity(from, to, filter.asFluid(), fluidBandwidth);
         } else {
-            FLUID_TRANSMITTER.transmitIdentity(from, to, filter, fluidBandwidth);
+            FLUID_TRANSMITTER.transmit(from, to, filter::testFluid, fluidBandwidth);
         }
     }
 
@@ -235,9 +223,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
             var from = entry1.from().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
             var to = entry1.to().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
-                transmitItem(from.asItem(), to.asItem(), entry1);
+                transmitItem(from.asItem(), to.asItem(), entry1.filter());
             } else {
-                transmitFluid(from.asFluid(), to.asFluid(), entry1.fluidFilter());
+                transmitFluid(from.asFluid(), to.asFluid(), entry1.filter());
             }
             tick = 0;
         } else {

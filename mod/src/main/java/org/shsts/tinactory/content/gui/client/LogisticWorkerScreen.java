@@ -2,24 +2,19 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
+import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
@@ -28,14 +23,11 @@ import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.I18n;
-import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
-import org.shsts.tinactory.integration.logistics.StackHelper;
-import org.shsts.tinactory.integration.util.ClientUtil;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -92,13 +84,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         private static final Rect FILTER_RECT = new Rect(BUTTON_SIZE * 3 + 4, 2, 16, 16);
         private static final Rect BACKGROUND_TEX_RECT = new Rect(0, 1, 108, 18);
 
-        @Nullable
-        private TagKey<Item> tagFilter = null;
-        @Nullable
-        private List<ItemStack> tagFilterItems = null;
-        @Nullable
-        private List<TagKey<Item>> tagSelectList = null;
-        private int nextSelectTag = 0;
+        private final FilterEntry.ClickHelper clickHelper = new FilterEntry.ClickHelper();
 
         public ConfigPanel() {
             super(LogisticWorkerScreen.this, CONFIG_WIDTH, BUTTON_SIZE, 0);
@@ -147,7 +133,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
             var from = config.from().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
             var to = config.to().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
-            var filterType = config.filterType();
 
             var isFrom = selectedConfig == index && selectedFrom;
             var isTo = selectedConfig == index && !selectedFrom;
@@ -169,23 +154,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             RenderUtil.renderItem(graphics, from, fromRect.x() + 2, fromRect.y() + 2);
             RenderUtil.renderItem(graphics, to, toRect.x() + 2, toRect.y() + 2);
 
-            switch (filterType) {
-                case ITEM -> RenderUtil.renderItem(graphics, config.itemFilter(), filterRect.x(), filterRect.y());
-                case FLUID -> RenderUtil.renderFluid(graphics, config.fluidFilter(), filterRect);
-                case TAG -> {
-                    if (tagFilterItems == null || config.tagFilter() != tagFilter) {
-                        tagFilter = config.tagFilter();
-                        tagFilterItems = provider.lookup(Registries.ITEM)
-                            .flatMap(items -> items.get(tagFilter))
-                            .stream().flatMap(HolderSet.ListBacked::stream)
-                            .map($ -> new ItemStack($.value()))
-                            .toList();
-                    }
-                    ClientUtil.selectItemFromItems(tagFilterItems).ifPresent(stack ->
-                        RenderUtil.renderItem(graphics, stack, filterRect.x(), filterRect.y()));
-                }
-            }
-
+            RenderUtil.renderDescriptor(graphics, config.filter().display(), filterRect);
             if (FILTER_RECT.in(mouseX, mouseY)) {
                 RenderUtil.renderSlotHover(graphics, filterRect);
             }
@@ -232,44 +201,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 }
                 needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
-                var carried = menu.getCarried();
-                if (carried.isEmpty()) {
-                    var tagSet = false;
-                    if (button == 1) {
-                        var filterType = config.filterType();
-                        if (filterType == LogisticWorkerConfig.FilterType.ITEM) {
-                            var tagList = config.itemFilter().getItemHolder().tags()
-                                .sorted(Comparator.comparing(TagKey::location, LocHelper.LOC_DISPLAY_ORDER))
-                                .toList();
-                            if (!tagList.isEmpty()) {
-                                tagSelectList = tagList;
-                                config.setFilter(tagSelectList.getFirst());
-                                nextSelectTag = tagList.size() == 1 ? 0 : 1;
-                                tagSet = true;
-                            }
-                        } else if (filterType == LogisticWorkerConfig.FilterType.TAG && tagSelectList != null) {
-                            config.setFilter(tagSelectList.get(nextSelectTag));
-                            nextSelectTag = (nextSelectTag + 1) % tagSelectList.size();
-                            tagSet = true;
-                        }
-                    }
-                    if (!tagSet) {
-                        config.clearFilter();
-                        tagSelectList = null;
-                    }
-                } else {
-                    var fluid = button == 0 ?
-                        StackHelper.copyWithAmount(StackHelper.getFluidFromItem(carried), 1) :
-                        FluidStack.EMPTY;
-                    if (fluid.isEmpty()) {
-                        config.setFilter(StackHelper.copyWithCount(carried, 1));
-                    } else {
-                        config.setFilter(fluid);
-                    }
-                    tagSelectList = null;
-                }
-
-                tagFilterItems = null;
+                var filter = config.filter();
+                var filter1 = filter.click(index, clickHelper, button, menu.getCarried());
+                config.setFilter(filter1);
                 needUpdate = true;
             }
 
@@ -290,12 +224,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             } else if (TO_RECT.in(mouseX, mouseY)) {
                 port = config.to().flatMap(k -> Optional.ofNullable(ports.get(k)));
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
-                return switch (config.filterType()) {
-                    case NONE -> Optional.empty();
-                    case ITEM -> Optional.of(ClientUtil.itemTooltip(config.itemFilter()));
-                    case TAG -> Optional.of(ClientUtil.tagTooltip(config.tagFilter()));
-                    case FLUID -> Optional.of(ClientUtil.fluidTooltip(config.fluidFilter(), false));
-                };
+                return config.filter().tooltip();
             }
 
             return port.map(p -> List.of(p.machineName(), p.portName()));

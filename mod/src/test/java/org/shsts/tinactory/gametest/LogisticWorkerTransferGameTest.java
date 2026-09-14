@@ -22,6 +22,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -139,9 +140,9 @@ public final class LogisticWorkerTransferGameTest {
         config.setFrom(source.uuid(), 0);
         config.setTo(destination.uuid(), 0);
         if (fluidFilter == null) {
-            config.clearFilter();
+            config.setFilter(FilterEntry.EMPTY);
         } else {
-            config.setFilter(fluidFilter);
+            config.setFilter(FilterEntry.fromFluid(fluidFilter));
         }
         worker.setConfig(SetMachineConfigPacket.builder()
             .set(PREFIX + 0, config.serializeNBT(helper.getLevel().registryAccess())).get());

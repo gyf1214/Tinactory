@@ -4,16 +4,10 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.shsts.tinactory.api.logistics.PortType;
+import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,10 +22,7 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
     private LogisticComponent.PortKey from = null;
     @Nullable
     private LogisticComponent.PortKey to = null;
-    @Nullable
-    private TagKey<Item> tagFilter = null;
-    private ItemStack itemFilter = ItemStack.EMPTY;
-    private FluidStack fluidFilter = FluidStack.EMPTY;
+    private FilterEntry filter = FilterEntry.EMPTY;
 
     public boolean isValid() {
         return valid;
@@ -45,42 +36,12 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         return Optional.ofNullable(to);
     }
 
-    public enum FilterType {
-        NONE(PortType.NONE),
-        ITEM(PortType.ITEM),
-        TAG(PortType.ITEM),
-        FLUID(PortType.FLUID);
-
-        public final PortType portType;
-
-        FilterType(PortType portType) {
-            this.portType = portType;
-        }
+    public FilterEntry.Type filterType() {
+        return filter.type();
     }
 
-    public FilterType filterType() {
-        if (tagFilter != null) {
-            return FilterType.TAG;
-        } else if (!itemFilter.isEmpty()) {
-            return FilterType.ITEM;
-        } else if (!fluidFilter.isEmpty()) {
-            return FilterType.FLUID;
-        } else {
-            return FilterType.NONE;
-        }
-    }
-
-    public ItemStack itemFilter() {
-        return itemFilter;
-    }
-
-    public TagKey<Item> tagFilter() {
-        assert tagFilter != null;
-        return tagFilter;
-    }
-
-    public FluidStack fluidFilter() {
-        return fluidFilter;
+    public FilterEntry filter() {
+        return filter;
     }
 
     public void setValid(boolean val) {
@@ -103,28 +64,8 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         to = null;
     }
 
-    public void setFilter(ItemStack val) {
-        tagFilter = null;
-        itemFilter = val;
-        fluidFilter = FluidStack.EMPTY;
-    }
-
-    public void setFilter(TagKey<Item> val) {
-        tagFilter = val;
-        itemFilter = ItemStack.EMPTY;
-        fluidFilter = FluidStack.EMPTY;
-    }
-
-    public void setFilter(FluidStack val) {
-        tagFilter = null;
-        fluidFilter = val;
-        itemFilter = ItemStack.EMPTY;
-    }
-
-    public void clearFilter() {
-        tagFilter = null;
-        itemFilter = ItemStack.EMPTY;
-        fluidFilter = FluidStack.EMPTY;
+    public void setFilter(FilterEntry val) {
+        filter = val;
     }
 
     @Override
@@ -139,13 +80,8 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
             tag.putUUID("toMachine", to.machineId());
             tag.putInt("toPortIndex", to.portIndex());
         }
-        if (tagFilter != null) {
-            tag.putString("tagFilter", tagFilter.location().toString());
-        } else if (!itemFilter.isEmpty()) {
-            tag.put("itemFilter", itemFilter.save(provider));
-        } else if (!fluidFilter.isEmpty()) {
-            tag.put("fluidFilter", fluidFilter.save(provider));
-        }
+        var filterTag = CodecHelper.encodeTag(provider, FilterEntry.CODEC, filter);
+        tag.merge((CompoundTag) filterTag);
         return tag;
     }
 
@@ -162,21 +98,11 @@ public class LogisticWorkerConfig implements INBTSerializable<CompoundTag> {
         } else {
             to = null;
         }
-        tagFilter = null;
-        itemFilter = ItemStack.EMPTY;
-        fluidFilter = FluidStack.EMPTY;
-        if (tag.contains("tagFilter", Tag.TAG_STRING)) {
-            tagFilter = TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.getString("tagFilter")));
-        } else if (tag.contains("itemFilter", Tag.TAG_COMPOUND)) {
-            itemFilter = ItemStack.parseOptional(provider, tag.getCompound("itemFilter"));
-        } else if (tag.contains("fluidFilter", Tag.TAG_COMPOUND)) {
-            fluidFilter = FluidStack.parseOptional(provider, tag.getCompound("fluidFilter"));
-        }
+        filter = CodecHelper.parseTag(provider, FilterEntry.CODEC, tag);
     }
 
     public static LogisticWorkerConfig fromTag(HolderLookup.Provider provider, CompoundTag tag) {
         var ret = new LogisticWorkerConfig();
-        ret.valid = true;
         ret.deserializeNBT(provider, tag);
         return ret;
     }

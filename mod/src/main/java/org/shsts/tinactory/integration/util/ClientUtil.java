@@ -117,6 +117,10 @@ public final class ClientUtil {
         return selectItemFromItems(Arrays.asList(ingredient.getItems()));
     }
 
+    public static Optional<ItemStack> selectItemFromTag(TagKey<Item> tag) {
+        return selectItemFromItems(Ingredient.of(tag));
+    }
+
     public static String getNumberString(long count) {
         if (count < 1000) {
             return NUMBER_FORMAT.format(count);

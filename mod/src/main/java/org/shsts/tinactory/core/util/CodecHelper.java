@@ -73,7 +73,7 @@ public final class CodecHelper {
     }
 
     public static <E> Codec<E> registryValueCodec(ResourceKey<? extends Registry<E>> registryKey) {
-        var holderCodec = RegistryFixedCodec.<E>create(registryKey);
+        var holderCodec = RegistryFixedCodec.create(registryKey);
         return Codec.of(
             new Encoder<>() {
                 @Override
@@ -109,7 +109,7 @@ public final class CodecHelper {
         return lookup.listElements()
             .filter(holder -> holder.value() == value)
             .findFirst()
-            .map(holder -> DataResult.<Holder<E>>success(holder))
+            .map(DataResult::<Holder<E>>success)
             .orElseGet(() -> DataResult.error(() -> "Unregistered value in " + registryKey + ": " + value));
     }
 
