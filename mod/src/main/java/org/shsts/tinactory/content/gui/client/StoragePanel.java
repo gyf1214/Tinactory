@@ -93,12 +93,8 @@ public class StoragePanel extends ButtonPanel {
         var rect1 = rect.offset(1, 1).enlarge(-2, -2);
         if (index < entries.size()) {
             var entry = entries.get(index);
-            if (entry.isFilter() && entry.amount() == 0) {
-                RenderUtil.renderGhostDescriptor(graphics, entry.key().display(), rect1);
-            } else {
-                var display = entry.key().display(entry.amount());
-                RenderUtil.renderDescriptorWithDecoration(graphics, display, rect1);
-            }
+            var display = entry.key().display(entry.amount());
+            RenderUtil.renderDescriptorWithDecoration(graphics, display, rect1);
         }
         if (isHovering) {
             RenderUtil.renderSlotHover(graphics, rect1);
@@ -129,8 +125,7 @@ public class StoragePanel extends ButtonPanel {
     protected Optional<List<Component>> buttonTooltip(int index, double mouseX, double mouseY) {
         if (index < entries.size()) {
             var entry = entries.get(index);
-            return entry.isFilter() && entry.amount() == 0 ? entry.key().tooltip() :
-                entry.key().tooltip(entry.amount());
+            return entry.key().tooltip(entry.amount());
         } else {
             return Optional.empty();
         }

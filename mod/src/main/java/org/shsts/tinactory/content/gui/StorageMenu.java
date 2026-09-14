@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -143,10 +142,9 @@ public class StorageMenu extends InventoryMenu {
         return new FluidClickResult();
     }
 
-    private boolean clickItemSlot(ItemStack carried, @Nullable IStackKey key, IPort<ItemStack> port, long amount,
-        int button) {
+    private void clickItemSlot(ItemStack carried, @Nullable IStackKey key,
+        IPort<ItemStack> port, long amount, int button) {
         if (!carried.isEmpty()) {
-            var count = carried.getCount();
             if (button == 1) {
                 var carried1 = StackHelper.copyWithCount(carried, 1);
                 carried.shrink(1);
@@ -160,7 +158,6 @@ public class StorageMenu extends InventoryMenu {
             } else {
                 setCarried(port.insert(carried, false));
             }
-            return getCarried().getCount() < count;
         } else if (key != null) {
             var item = StackHelper.ITEM_ADAPTER.stackOf(key);
             var count = (int) Math.min(port.getStorageAmount(item), Math.min(amount, item.getMaxStackSize()));
@@ -168,58 +165,25 @@ public class StorageMenu extends InventoryMenu {
             var item1 = StackHelper.copyWithCount(item, count1);
             var extracted = port.extract(item1, false);
             setCarried(extracted);
-            return !extracted.isEmpty();
         }
-        return false;
     }
 
     private void onSlotClick(StorageEventPacket packet) {
         var button = packet.button();
-        if (getCarried().isEmpty() && button == 0 && packet.isItem() && packet.shiftPressed()) {
+        var carried = getCarried();
+
+        if (carried.isEmpty() && packet.isItem() && packet.shiftPressed()) {
             quickMoveStack(packet.key());
             return;
         }
 
-        var carried = getCarried();
-        var carriedKey = filterKey(carried);
-        if (!packet.isEmpty() && filters().contains(packet.key()) && storageAmount(packet.key()) == 0) {
-            if (carriedKey == null && (carried.isEmpty() || itemStackLimit > 0 || isUnlocked() || button == 1)) {
-                resetFilter(packet.key());
-                return;
-            } else if (button == 1 && !carriedKey.equals(packet.key())) {
-                replaceFilter(packet.key(), carriedKey);
-                return;
-            }
-        } else if (packet.isEmpty() && !isUnlocked() && carriedKey != null && !filters().contains(carriedKey)) {
-            setFilter(carriedKey);
+        var handler = StackHelper.getFluidHandlerFromItem(StackHelper.copyWithCount(carried, 1));
+        var fluidClick = handler.isPresent() && (packet.isFluid() ||
+            !handler.get().drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty());
+        if (fluidClick && !packet.shiftPressed() && clickFluidEntry(packet, button)) {
             return;
         }
-
-        var carried1 = getCarried();
-        var fluidBearing = hasDrainableFluid(carried1);
-        var fluidClick = fluidBearing || packet.isFluid() && hasFluidHandler(carried1);
-        if (fluidClick && packet.shiftPressed()) {
-            clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
-        } else if (fluidClick || button == 1) {
-            if (!clickFluidEntry(packet, button)) {
-                clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
-            }
-        } else if (!clickItemSlot(getCarried(), packet.isItem() ? packet.key() : null, itemPort, packet.amount(),
-            button)) {
-            clickFluidEntry(packet, button);
-        }
-    }
-
-    private boolean hasDrainableFluid(ItemStack carried) {
-        var stack = StackHelper.copyWithCount(carried, 1);
-        return StackHelper.getFluidHandlerFromItem(stack)
-            .map(handler -> !handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty())
-            .orElse(false);
-    }
-
-    private boolean hasFluidHandler(ItemStack carried) {
-        var stack = StackHelper.copyWithCount(carried, 1);
-        return StackHelper.getFluidHandlerFromItem(stack).isPresent();
+        clickItemSlot(carried, packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
     }
 
     private boolean clickFluidEntry(StorageEventPacket packet, int button) {
@@ -247,14 +211,6 @@ public class StorageMenu extends InventoryMenu {
             return fluid.isEmpty() ? null : StackHelper.FLUID_ADAPTER.keyOf(fluid);
         }
         return null;
-    }
-
-    private long storageAmount(IStackKey key) {
-        return switch (key.type()) {
-            case ITEM -> itemPort.getStorageAmount(StackHelper.ITEM_ADAPTER.stackOf(key));
-            case FLUID -> fluidPort.getStorageAmount(StackHelper.FLUID_ADAPTER.stackOf(key));
-            case NONE -> 0;
-        };
     }
 
     private void quickMoveStack(IStackKey key) {
@@ -316,10 +272,6 @@ public class StorageMenu extends InventoryMenu {
         return List.of();
     }
 
-    protected boolean isUnlocked() {
-        return true;
-    }
-
     protected boolean setFilter(IStackKey key) {
         return false;
     }
@@ -333,32 +285,21 @@ public class StorageMenu extends InventoryMenu {
     }
 
     private StorageSyncPacket storageEntries() {
-        var amounts = new HashMap<IStackKey, Long>();
-        itemPort.getAllStorages().forEach(stack -> amounts.put(StackHelper.ITEM_ADAPTER.keyOf(stack),
-            (long) stack.getCount()));
-        fluidPort.getAllStorages().forEach(stack -> amounts.put(StackHelper.FLUID_ADAPTER.keyOf(stack),
-            (long) stack.getAmount()));
         var entries = new ArrayList<StorageEntry>();
-        for (var key : filters()) {
-            addEntries(entries, key, amounts.getOrDefault(key, 0L), true);
-            amounts.remove(key);
-        }
-        amounts.forEach((key, amount) -> addEntries(entries, key, amount, false));
+        itemPort.getAllStorages().forEach(stack -> addEntries(entries,
+            StackHelper.ITEM_ADAPTER.keyOf(stack), stack.getCount()));
+        fluidPort.getAllStorages().forEach(stack -> addEntries(entries,
+            StackHelper.FLUID_ADAPTER.keyOf(stack), stack.getAmount()));
         return new StorageSyncPacket(entries);
     }
 
-    private void addEntries(Collection<StorageEntry> entries, IStackKey key, long amount, boolean isFilter) {
+    private void addEntries(Collection<StorageEntry> entries, IStackKey key, long amount) {
         var remaining = amount;
         var limit = key.type() == PortType.ITEM ? itemStackLimit : fluidStackLimit;
-        if (limit == 0) {
-            entries.add(new StorageEntry(key, remaining, isFilter));
-            return;
-        }
         do {
             var entryAmount = Math.min(remaining, limit);
-            entries.add(new StorageEntry(key, entryAmount, isFilter));
+            entries.add(new StorageEntry(key, entryAmount));
             remaining -= entryAmount;
-            isFilter = false;
         } while (remaining > 0);
     }
 

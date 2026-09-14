@@ -6,4 +6,4 @@ import org.shsts.tinactory.api.logistics.IStackKey;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public record StorageEntry(IStackKey key, long amount, boolean isFilter) {}
+public record StorageEntry(IStackKey key, long amount) {}
