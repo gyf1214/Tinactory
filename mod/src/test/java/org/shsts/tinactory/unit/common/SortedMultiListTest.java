@@ -39,4 +39,18 @@ class SortedMultiListTest {
         assertEquals("gold", values.get(0).value());
         assertEquals("iron", values.get(1).value());
     }
+
+    @Test
+    void shouldKeepComparatorEquivalentKeysDistinctAfterRemovingAndReinserting() {
+        var values = new SortedMultiList<String>(Comparator.comparingInt(String::length));
+
+        values.insert("a", 1);
+        values.insert("b", 1);
+        values.remove("a", 1);
+        values.insert("c", 1);
+
+        assertEquals(2, values.size());
+        assertEquals("b", values.get(0).value());
+        assertEquals("c", values.get(1).value());
+    }
 }

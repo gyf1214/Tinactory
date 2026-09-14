@@ -124,6 +124,41 @@ class DigitalStorageTest {
     }
 
     @Test
+    void shouldRestoreMultipleEntriesAndContinueTrackingProviderUsage() {
+        var sourceProvider = new FakeDigitalProvider(30);
+        var source = new TestStorage(sourceProvider, 4, 2);
+        source.insert(new TestStack("iron", 3), false);
+        source.insert(new TestStack("gold", 2), false);
+
+        var restoredProvider = new FakeDigitalProvider(30);
+        var restored = new TestStorage(restoredProvider, 4, 2);
+        restored.deserializeFromList(TEST_REGISTRY, source.serializeToList(TEST_REGISTRY));
+
+        assertEquals(3, restored.getStorageAmount(new TestStack("iron", 1)));
+        assertEquals(2, restored.getStorageAmount(new TestStack("gold", 1)));
+        assertEquals(18, restoredProvider.bytesUsed());
+
+        assertEquals(0, restored.insert(new TestStack("iron", 1), false).amount());
+        assertEquals(20, restoredProvider.bytesUsed());
+
+        var extracted = restored.extract(new TestStack("gold", 2), false);
+        assertEquals(2, extracted.amount());
+        assertEquals(12, restoredProvider.bytesUsed());
+        assertEquals(0, restored.getStorageAmount(new TestStack("gold", 1)));
+    }
+
+    @Test
+    void shouldIgnoreEmptyDeserializedEntries() {
+        var provider = new FakeDigitalProvider(20);
+        var storage = new TestStorage(provider, 4, 2);
+
+        storage.deserializeEntry(new TestStack("iron", 0));
+
+        assertTrue(storage.getAllStorages().isEmpty());
+        assertEquals(0, provider.bytesUsed());
+    }
+
+    @Test
     void extractAnyShouldDrainFirstEntryWithinLimit() {
         var provider = new FakeDigitalProvider(100);
         var storage = new TestStorage(provider, 3, 1);

@@ -173,6 +173,37 @@ public final class PersistenceGameTest {
     }
 
     @GameTest
+    public static void testElectricChestExposesFullVirtualStackAmounts(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var provider = helper.getLevel().registryAccess();
+        var chest = getContainer(helper.getBlockEntity(pos), ElectricChest.ID, ElectricChest.class);
+        chest.deserializeNBT(provider, storageTag(
+            StackHelper.serializeItemStack(provider, new ItemStack(Items.DIAMOND, 128))));
+
+        var handler = ITEM_HANDLER.get(helper.getBlockEntity(pos));
+        require(helper, handler.getStackInSlot(0).getCount() == 64 && handler.getStackInSlot(1).getCount() == 64,
+            "Electric Chest did not expose full final virtual stack amounts", pos);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testElectricTankExposesFullVirtualTankAmounts(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var provider = helper.getLevel().registryAccess();
+        var tank = getContainer(helper.getBlockEntity(pos), ElectricTank.ID, ElectricTank.class);
+        tank.deserializeNBT(provider, storageTag(
+            fluidStorageTag(provider, new FluidStack(Fluids.LAVA, 32000))));
+
+        var handler = FLUID_HANDLER.get(helper.getBlockEntity(pos));
+        require(helper, handler.getFluidInTank(0).getAmount() == 16000 &&
+                handler.getFluidInTank(1).getAmount() == 16000,
+            "Electric Tank did not expose full final virtual tank amounts", pos);
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testElectricChestClampsMapEntryToVirtualCapacity(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_chest"));
@@ -220,6 +251,12 @@ public final class PersistenceGameTest {
         require(helper, !first.isEmpty() && !second.isEmpty() &&
                 first.has(DataComponents.CUSTOM_NAME) != second.has(DataComponents.CUSTOM_NAME),
             "Electric Chest merged distinct component-bearing item identities", pos);
+
+        var secondExtracted = handler.extractItem(1, 1, false);
+        var firstExtracted = handler.extractItem(0, 1, false);
+        require(helper, !firstExtracted.isEmpty() && !secondExtracted.isEmpty() &&
+                firstExtracted.has(DataComponents.CUSTOM_NAME) != secondExtracted.has(DataComponents.CUSTOM_NAME),
+            "Electric Chest could not extract both distinct component-bearing item identities", pos);
         helper.succeed();
     }
 
