@@ -202,7 +202,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 needUpdate = true;
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
                 var filter = config.filter();
-                var filter1 = filter.click(index, clickHelper, button, menu.getCarried());
+                var filter1 = filter.click(index, clickHelper, button, menu.getCarried(),
+                    true, true, true);
                 config.setFilter(filter1);
                 needUpdate = true;
             }
