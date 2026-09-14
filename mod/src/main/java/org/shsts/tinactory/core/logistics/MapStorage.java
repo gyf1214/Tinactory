@@ -91,7 +91,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
                 doExtract(key, existingAmount, existingAmount);
                 invokeUpdate();
             }
-            return existing;
+            return adapter.copy(existing);
         } else {
             if (!simulate) {
                 var updated = adapter.withAmount(existing, existingAmount - amount);
@@ -117,7 +117,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
                 doExtract(key, existingAmount, existingAmount);
                 invokeUpdate();
             }
-            return existing;
+            return adapter.copy(existing);
         } else {
             if (!simulate) {
                 var updated = adapter.withAmount(existing, existingAmount - limit);
