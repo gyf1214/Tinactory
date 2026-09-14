@@ -14,6 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class DigitalStorageTest {
     private static class TestStorage extends DigitalStorage<TestStack> {
@@ -106,6 +107,20 @@ class DigitalStorageTest {
         assertEquals(2, extracted.amount());
         assertEquals(3, storage.getStorageAmount(new TestStack("iron", 1)));
         assertEquals(5, provider.bytesUsed());
+    }
+
+    @Test
+    void shouldRestoreContentsAndProviderUsageFromSerializedEntries() {
+        var sourceProvider = new FakeDigitalProvider(20);
+        var source = new TestStorage(sourceProvider, 4, 2);
+        source.insert(new TestStack("iron", 5), false);
+
+        var restoredProvider = new FakeDigitalProvider(20);
+        var restored = new TestStorage(restoredProvider, 4, 2);
+        restored.deserializeFromList(TEST_REGISTRY, source.serializeToList(TEST_REGISTRY));
+
+        assertEquals(5, restored.getStorageAmount(new TestStack("iron", 1)));
+        assertEquals(14, restoredProvider.bytesUsed());
     }
 
     @Test
