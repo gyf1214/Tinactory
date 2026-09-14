@@ -18,6 +18,7 @@ public class SortedMultiList<T> {
     private final Comparator<? super T> comparator;
     @Nullable
     private Node root;
+    private int uniqueKeys = 0;
 
     public SortedMultiList(Comparator<? super T> comparator) {
         this.comparator = comparator;
@@ -55,7 +56,7 @@ public class SortedMultiList<T> {
     }
 
     public void insert(T key, int count) {
-        var unique = uniqueKey.computeIfAbsent(key, $ -> uniqueKey.size());
+        var unique = uniqueKey.computeIfAbsent(key, $ -> uniqueKeys++);
         root = insert(root, key, count, unique);
     }
 

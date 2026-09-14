@@ -208,7 +208,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
             return 0;
         } else if (value.index() == value.count() - 1) {
             var key = value.value();
-            return storage.getStorageAmount(key) % stackLimit;
+            return stackLimit + Math.ceilMod(storage.getStorageAmount(key), stackLimit);
         } else {
             return stackLimit;
         }

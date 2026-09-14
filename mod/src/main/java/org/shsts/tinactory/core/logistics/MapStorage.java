@@ -161,6 +161,9 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
     }
 
     public void deserializeEntry(T stack) {
+        if (adapter.isEmpty(stack)) {
+            return;
+        }
         var key = adapter.keyOf(stack);
         if (contents.containsKey(key)) {
             LOGGER.warn("Ignoring duplicate entry {}", key);
