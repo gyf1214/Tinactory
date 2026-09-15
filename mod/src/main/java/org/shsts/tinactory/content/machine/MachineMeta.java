@@ -20,6 +20,7 @@ import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.content.electric.BatteryBox;
 import org.shsts.tinactory.content.logistics.ElectricChest;
+import org.shsts.tinactory.content.logistics.ElectricStorage;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.content.logistics.FlexibleStackContainer;
 import org.shsts.tinactory.content.logistics.LogisticWorker;
@@ -378,21 +379,29 @@ public class MachineMeta extends MetaConsumer {
             }
         }
 
+        private ElectricStorage.Properties parseElectricStorage(Voltage v, JsonObject jo) {
+            return new ElectricStorage.Properties(
+                GsonHelper.getAsInt(jo, "storageSlots"),
+                GsonHelper.getAsInt(jo, "stackLimit"),
+                GsonHelper.getAsInt(jo, "filterSlots"),
+                getPower(v, jo));
+        }
+
         private IEntry<MachineBlock> electricChest(Voltage v, JsonObject jo) {
-            var storageSlots = GsonHelper.getAsInt(jo, "storageSlots");
-            var stackLimit = GsonHelper.getAsInt(jo, "stackLimit");
-            var power = getPower(v, jo);
+            var properties = parseElectricStorage(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricChest", NUMBER_FORMAT.format(stackLimit),
-                            NUMBER_FORMAT.format(storageSlots));
-                        addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                        addTooltip(tooltip, "electricChest",
+                            NUMBER_FORMAT.format(properties.stackLimit()),
+                            NUMBER_FORMAT.format(properties.storageSlots()));
+                        addTooltip(tooltip, "machinePower",
+                            NUMBER_FORMAT.format(properties.power()));
                     }))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_CHEST)
                 .blockEntity()
                 .capability(MACHINE, ELECTRIC_MACHINE, ITEM_HANDLER)
-                .transform(ElectricChest.factory(storageSlots, stackLimit, power))
+                .transform(ElectricChest.factory(properties))
                 .end()
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
@@ -401,21 +410,21 @@ public class MachineMeta extends MetaConsumer {
         }
 
         private IEntry<MachineBlock> electricTank(Voltage v, JsonObject jo) {
-            var storageSlots = GsonHelper.getAsInt(jo, "storageSlots");
-            var stackLimit = GsonHelper.getAsInt(jo, "stackLimit");
-            var power = getPower(v, jo);
+            var properties = parseElectricStorage(v, jo);
             return BlockEntityBuilder.builder(machineId(v),
                     MachineBlocks.simple(tooltip -> {
-                        addTooltip(tooltip, "electricTank", NUMBER_FORMAT.format(stackLimit),
-                            NUMBER_FORMAT.format(storageSlots));
-                        addTooltip(tooltip, "machinePower", NUMBER_FORMAT.format(power));
+                        addTooltip(tooltip, "electricTank",
+                            NUMBER_FORMAT.format(properties.stackLimit()),
+                            NUMBER_FORMAT.format(properties.storageSlots()));
+                        addTooltip(tooltip, "machinePower",
+                            NUMBER_FORMAT.format(properties.power()));
                     }))
                 .transform(MachineSet::baseMachine)
                 .menu(AllMenus.ELECTRIC_TANK)
                 .blockEntity()
                 .capability(MACHINE, ELECTRIC_MACHINE, FLUID_HANDLER,
                     MENU_FLUID_HANDLER)
-                .transform(ElectricTank.factory(storageSlots, stackLimit, power))
+                .transform(ElectricTank.factory(properties))
                 .end()
                 .block()
                 .creativeTab(CreativeModeTabs.FUNCTIONAL_BLOCKS)

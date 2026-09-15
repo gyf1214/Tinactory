@@ -29,11 +29,13 @@ public final class StorageMenus {
 
     public static StorageMenu electricChest(MenuBase.Properties properties) {
         var storage = getContainer(properties, ElectricChest.ID, ElectricChest.class);
-        return new StorageMenu(properties, storage.port(), storage.stackLimit(), IPort.empty(), 0);
+        return new StorageMenu(properties, storage.port(), storage.stackLimit(), IPort.empty(), 0,
+            storage.storageSlots(), storage.filterSlots());
     }
 
     public static StorageMenu electricTank(MenuBase.Properties properties) {
         var storage = getContainer(properties, ElectricTank.ID, ElectricTank.class);
-        return new StorageMenu(properties, IPort.empty(), 0, storage.port(), storage.stackLimit());
+        return new StorageMenu(properties, IPort.empty(), 0, storage.port(), storage.stackLimit(),
+            storage.storageSlots(), storage.filterSlots());
     }
 }

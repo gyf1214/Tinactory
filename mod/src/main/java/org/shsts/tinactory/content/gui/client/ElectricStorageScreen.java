@@ -21,16 +21,18 @@ import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public final class ElectricStorageScreen extends StorageScreen<StorageMenu> {
+public final class ElectricStorageScreen extends StorageScreen {
     public ElectricStorageScreen(StorageMenu menu, Component title) {
         super(menu, title);
 
         var config = menu.machineConfig();
         var offset = new Rect(-SLOT_SIZE, PANEL_HEIGHT - SLOT_SIZE, SLOT_SIZE, SLOT_SIZE);
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY, VOID_DEFAULT,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(
+            menu, config, VOID_KEY, VOID_DEFAULT,
             VOID_BUTTON, 18, 0, "noAutoVoid", "autoVoid"));
         offset = offset.offset(-SLOT_SIZE - SPACING, 0);
-        rootPanel.addChild(anchor, offset, new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
+        rootPanel.addChild(anchor, offset, new StoragePriorityButton(
+            menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
     }
 }

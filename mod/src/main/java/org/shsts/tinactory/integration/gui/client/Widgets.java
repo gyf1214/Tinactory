@@ -9,13 +9,17 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
+import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
+import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
+import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
@@ -53,5 +57,21 @@ public final class Widgets {
         ret.setHint(I18n.tr("gui.recipebook.search_hint")
             .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
         return ret;
+    }
+
+    public static void gregtechButton(MenuBase menu, Panel parent, Panel panel,
+        RectD anchor, int x, int y, Component tooltip, Runnable extraCallback) {
+        var button = new SimpleButton(menu, SWITCH_BUTTON, tooltip) {
+            @Override
+            public void onMouseClicked(double mouseX, double mouseY, int button) {
+                super.onMouseClicked(mouseX, mouseY, button);
+                panel.setActive(!panel.isActive());
+                extraCallback.run();
+            }
+        };
+        var overlay = new StaticWidget(menu, GREGTECH_LOGO);
+        var offset = new Rect(x, y, SLOT_SIZE, SLOT_SIZE);
+        parent.addChild(anchor, offset, button);
+        parent.addChild(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
     }
 }

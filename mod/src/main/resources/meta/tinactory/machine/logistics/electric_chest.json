@@ -5,17 +5,20 @@
     "ulv": {
       "power": 1,
       "storageSlots": 54,
-      "stackLimit": 64
+      "stackLimit": 64,
+      "filterSlots": 6
     },
     "mv": {
       "power": 2,
       "storageSlots": 81,
-      "stackLimit": 128
+      "stackLimit": 128,
+      "filterSlots": 12
     },
     "ev": {
       "power": 4,
       "storageSlots": 108,
-      "stackLimit": 256
+      "stackLimit": 256,
+      "filterSlots": 18
     }
   }
 }

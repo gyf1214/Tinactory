@@ -45,5 +45,9 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
 
     Optional<ListTag> getList(String key);
 
+    default ListTag getCopiedList(String key) {
+        return getList(key).map(ListTag::copy).orElseGet(ListTag::new);
+    }
+
     Optional<CompoundTag> getCompound(String key);
 }

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.integration.gui.client;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.sounds.SoundEvents;
@@ -35,7 +36,7 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
         private final int pageChange;
 
         private PageButton(Texture texture, Texture hoverTexture, int pageChange) {
-            super(GridViewPanel.this.menu, texture, hoverTexture, null, 0, 0);
+            super(GridViewPanel.this.menu, texture, hoverTexture, null);
             this.pageChange = pageChange;
         }
 
@@ -53,28 +54,36 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
 
     protected final GridViewGroup<T> gridViewGroup;
     protected int page = 0;
+    @Nullable
     private final PageButton leftPageButton;
+    @Nullable
     private final PageButton rightPageButton;
 
-    private GridViewPanel(MenuScreen<?> screen, GridViewGroup<T> gridViewGroup) {
+    private GridViewPanel(MenuScreen<?> screen, GridViewGroup<T> gridViewGroup, boolean showPageButton) {
         super(screen, gridViewGroup);
         this.gridViewGroup = gridViewGroup;
-        this.leftPageButton = new PageButton(PAGE_BACKWARD, PAGE_BACKWARD_HOVERED, -1);
-        this.rightPageButton = new PageButton(PAGE_FORWARD, PAGE_FORWARD_HOVERED, 1);
-
         gridViewGroup.setSlotFactory(this::createSlot);
 
-        addChild(PAGE_ANCHOR, PAGE_OFFSET_LEFT, leftPageButton);
-        addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
+        if (showPageButton) {
+            this.leftPageButton = new PageButton(PAGE_BACKWARD, PAGE_BACKWARD_HOVERED, -1);
+            this.rightPageButton = new PageButton(PAGE_FORWARD, PAGE_FORWARD_HOVERED, 1);
+            addChild(PAGE_ANCHOR, PAGE_OFFSET_LEFT, leftPageButton);
+            addChild(PAGE_ANCHOR, PAGE_OFFSET_RIGHT, rightPageButton);
+        } else {
+            this.leftPageButton = null;
+            this.rightPageButton = null;
+        }
     }
 
     protected GridViewPanel(MenuScreen<?> screen, int itemWidth, int itemHeight,
-        int verticalSpacing, Rect offset) {
-        this(screen, new GridViewGroup<>(itemWidth, itemHeight, verticalSpacing, offset));
+        int verticalSpacing, Rect offset, boolean showPageButton) {
+        this(screen, new GridViewGroup<>(itemWidth, itemHeight, verticalSpacing, offset), showPageButton);
     }
 
-    protected GridViewPanel(MenuScreen<?> screen, int itemWidth, int itemHeight, int verticalSpacing) {
-        this(screen, itemWidth, itemHeight, verticalSpacing, PAGE_PANEL_OFFSET);
+    protected GridViewPanel(MenuScreen<?> screen, int itemWidth, int itemHeight, int verticalSpacing,
+        boolean showPageButton) {
+        this(screen, itemWidth, itemHeight, verticalSpacing,
+            showPageButton ? PAGE_PANEL_OFFSET : Rect.ZERO, showPageButton);
     }
 
     protected abstract T createSlot(int index);
@@ -86,8 +95,12 @@ public abstract class GridViewPanel<T extends IViewNode> extends Panel {
         var slotCount = gridViewGroup.getSlotCount();
         var maxPage = Math.max(1, (itemCount + slotCount - 1) / slotCount);
         page = Math.clamp(val, 0, maxPage - 1);
-        leftPageButton.setActive(page != 0);
-        rightPageButton.setActive(page != maxPage - 1);
+        if (leftPageButton != null) {
+            leftPageButton.setActive(page != 0);
+        }
+        if (rightPageButton != null) {
+            rightPageButton.setActive(page != maxPage - 1);
+        }
         for (var i = 0; i < gridViewGroup.getSlotCount(); i++) {
             var button = gridViewGroup.getSlot(i);
             var itemIndex = page * slotCount + i;

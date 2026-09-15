@@ -157,7 +157,7 @@ public class MEPatternIngredientPanel extends GridViewPanel<MEPatternIngredientP
 
     private MEPatternIngredientPanel(MenuScreen<?> screen, List<MEPatternIngredientDraft> drafts,
         String label) {
-        super(screen, 0, SLOT_SIZE, SPACING, ROWS_OFFSET);
+        super(screen, 0, SLOT_SIZE, SPACING, ROWS_OFFSET, true);
         this.drafts = drafts;
 
         var keyLabel = new Label(menu, tr(label));

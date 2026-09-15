@@ -18,18 +18,23 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
+import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
+import org.shsts.tinactory.content.logistics.ElectricStorage;
+import org.shsts.tinactory.content.logistics.FilterEntry;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.logistics.StorageEntry;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllMenus.FILTER_SLOT;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
@@ -49,16 +54,20 @@ public class StorageMenu extends InventoryMenu {
     private final IPort<FluidStack> fluidPort;
     private final int itemStackLimit;
     private final int fluidStackLimit;
+    private final int storageSlots;
+    private final int filterSlots;
     private final Runnable updateListener;
 
     public StorageMenu(Properties properties, IPort<ItemStack> itemPort, int itemStackLimit,
-        IPort<FluidStack> fluidPort, int fluidStackLimit) {
+        IPort<FluidStack> fluidPort, int fluidStackLimit, int storageSlots, int filterSlots) {
         super(properties, PANEL_HEIGHT);
         this.machine = MACHINE.get(blockEntity());
         this.itemPort = itemPort;
         this.itemStackLimit = itemStackLimit;
         this.fluidPort = fluidPort;
         this.fluidStackLimit = fluidStackLimit;
+        this.storageSlots = storageSlots;
+        this.filterSlots = filterSlots;
 
         var scheduler = new ActiveScheduler<>(STORAGE_SYNC, this::storageEntries);
         this.updateListener = scheduler::invokeUpdate;
@@ -74,7 +83,38 @@ public class StorageMenu extends InventoryMenu {
         }
 
         onEventPacket(STORAGE_SLOT, this::onSlotClick);
+        onEventPacket(FILTER_SLOT, this::onFilterClick);
         onEventPacket(SET_MACHINE_CONFIG, machine::setConfig);
+    }
+
+    public StorageMenu(Properties properties, IPort<ItemStack> itemPort, int itemStackLimit,
+        IPort<FluidStack> fluidPort, int fluidStackLimit) {
+        this(properties, itemPort, itemStackLimit, fluidPort, fluidStackLimit,
+            Integer.MAX_VALUE, 0);
+    }
+
+    public int storageSlots() {
+        return storageSlots;
+    }
+
+    public int filterSlots() {
+        return filterSlots;
+    }
+
+    public boolean allowItemFilter() {
+        return filterSlots > 0 && itemPort.type() != PortType.NONE;
+    }
+
+    public boolean allowFluidFilter() {
+        return filterSlots > 0 && fluidPort.type() != PortType.NONE;
+    }
+
+    public boolean allowTagFilter() {
+        return allowItemFilter();
+    }
+
+    public IMachineConfig machineConfig() {
+        return machine.config();
     }
 
     @Override
@@ -198,21 +238,6 @@ public class StorageMenu extends InventoryMenu {
         }
     }
 
-    @Nullable
-    private IStackKey filterKey(ItemStack carried) {
-        if (carried.isEmpty()) {
-            return null;
-        }
-        if (itemStackLimit > 0) {
-            return StackHelper.ITEM_ADAPTER.keyOf(carried);
-        }
-        if (fluidStackLimit > 0) {
-            var fluid = StackHelper.getFluidFromItem(carried);
-            return fluid.isEmpty() ? null : StackHelper.FLUID_ADAPTER.keyOf(fluid);
-        }
-        return null;
-    }
-
     private void quickMoveStack(IStackKey key) {
         var inv = new PlayerMainInvWrapper(inventory);
         var target = itemPort;
@@ -268,20 +293,46 @@ public class StorageMenu extends InventoryMenu {
         return false;
     }
 
-    protected Collection<IStackKey> filters() {
-        return List.of();
+    public FilterEntry getFilter(int index) {
+        if (index < 0 || index >= filterSlots) {
+            return FilterEntry.EMPTY;
+        }
+        var list = machineConfig().getList(ElectricStorage.FILTER_KEY);
+        if (list.isEmpty()) {
+            return FilterEntry.EMPTY;
+        }
+        var list1 = list.get();
+        if (index >= list1.size()) {
+            return FilterEntry.EMPTY;
+        }
+        return CodecHelper.parseTag(machine.registryAccess(), FilterEntry.CODEC,
+            list1.getCompound(index));
     }
 
-    protected boolean setFilter(IStackKey key) {
-        return false;
-    }
+    private void onFilterClick(FilterEventPacket packet) {
+        var list = machineConfig().getCopiedList(ElectricStorage.FILTER_KEY);
+        var remove = packet.remove();
+        var append = packet.append();
+        var changed = false;
 
-    protected boolean resetFilter(IStackKey key) {
-        return false;
-    }
+        if (remove.isPresent()) {
+            var i = remove.getAsInt();
+            if (i >= 0 && i < list.size()) {
+                list.remove(i);
+                changed = true;
+            }
+        }
 
-    protected boolean replaceFilter(IStackKey oldKey, IStackKey newKey) {
-        return false;
+        if (append.type() != FilterEntry.Type.NONE && list.size() < filterSlots) {
+            list.add(CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append));
+            changed = true;
+        }
+
+        if (changed) {
+            machine.setConfig(SetMachineConfigPacket.builder()
+                .set(ElectricStorage.FILTER_KEY, list)
+                .get());
+        }
     }
 
     private StorageSyncPacket storageEntries() {
@@ -305,9 +356,5 @@ public class StorageMenu extends InventoryMenu {
             entries.add(new StorageEntry(key, entryAmount));
             remaining -= entryAmount;
         } while (remaining > 0);
-    }
-
-    public IMachineConfig machineConfig() {
-        return machine.config();
     }
 }

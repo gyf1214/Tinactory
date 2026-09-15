@@ -4,13 +4,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -75,7 +73,7 @@ public class ElectricTank extends ElectricStorage<FluidStack> implements INBTSer
     private final IFluidTanksHandler fluidHandler = new IFluidTanksHandler() {
         @Override
         public int getTanks() {
-            return storageSlots;
+            return storageSlots();
         }
 
         @Override
@@ -115,24 +113,17 @@ public class ElectricTank extends ElectricStorage<FluidStack> implements INBTSer
         }
     };
 
-    public ElectricTank(BlockEntity blockEntity, int storageSlots, int stackLimit, double power) {
-        super(blockEntity, PortType.FLUID, StackHelper.FLUID_ADAPTER, storageSlots, stackLimit, power);
+    public ElectricTank(BlockEntity blockEntity, Properties properties) {
+        super(blockEntity, PortType.FLUID, StackHelper.FLUID_ADAPTER, properties);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        int storageSlots, int stackLimit, double power) {
-        return $ -> $.container(ID, be -> new ElectricTank(be, storageSlots, stackLimit, power));
-    }
-
-    @Override
-    protected Predicate<FluidStack> deserializeFilter(Tag tag) {
-        // TODO
-        return StackHelper.TRUE_FLUID_FILTER;
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.container(ID, be -> new ElectricTank(be, properties));
     }
 
     @Override
-    protected void appendLegacyFilter(IStackKey key) {
-        // TODO
+    protected Predicate<FluidStack> asPredicate(HolderLookup.Provider provider, FilterEntry entry) {
+        return entry::testFluid;
     }
 
     @Override

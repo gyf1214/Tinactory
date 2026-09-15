@@ -58,12 +58,17 @@ public abstract class ButtonPanel extends GridViewPanel<ButtonPanel.ItemButton> 
     }
 
     protected ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing,
-        Rect offset) {
-        super(screen, buttonWidth, buttonHeight, verticalSpacing, offset);
+        Rect offset, boolean showPageButton) {
+        super(screen, buttonWidth, buttonHeight, verticalSpacing, offset, showPageButton);
+    }
+
+    public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing,
+        boolean showPageButton) {
+        super(screen, buttonWidth, buttonHeight, verticalSpacing, showPageButton);
     }
 
     public ButtonPanel(MenuScreen<?> screen, int buttonWidth, int buttonHeight, int verticalSpacing) {
-        super(screen, buttonWidth, buttonHeight, verticalSpacing);
+        this(screen, buttonWidth, buttonHeight, verticalSpacing, true);
     }
 
     @Override

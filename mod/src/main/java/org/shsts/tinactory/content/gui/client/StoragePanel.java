@@ -71,8 +71,11 @@ public class StoragePanel extends ButtonPanel {
         }
     }
 
-    public StoragePanel(MenuScreen<?> screen) {
+    private final int maxSlots;
+
+    public StoragePanel(MenuScreen<?> screen, int maxSlots) {
         super(screen, SLOT_SIZE, SLOT_SIZE, 0);
+        this.maxSlots = maxSlots;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class StoragePanel extends ButtonPanel {
     @Override
     protected int getItemCount() {
         var slotCount = gridViewGroup.getSlotCount();
-        return Math.max(1, (entries.size() + slotCount) / slotCount) * slotCount;
+        return Math.min(maxSlots, Math.max(1, (entries.size() + slotCount) / slotCount) * slotCount);
     }
 
     @Override

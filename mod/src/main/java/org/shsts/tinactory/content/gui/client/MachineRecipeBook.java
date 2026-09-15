@@ -263,7 +263,7 @@ public class MachineRecipeBook extends Panel {
     public static void addButton(MenuBase menu, Panel parent, MachineRecipeBook recipeBook,
         RectD anchor, int x, int y, Runnable extraCallback) {
         var button = new SimpleButton(menu, RECIPE_BOOK_BUTTON, RECIPE_BOOK_BUTTON_HOVERED,
-            I18n.tr("tinactory.tooltip.openRecipeBook"), 0, 0) {
+            I18n.tr("tinactory.tooltip.openRecipeBook")) {
             @Override
             public void onMouseClicked(double mouseX, double mouseY, int button) {
                 super.onMouseClicked(mouseX, mouseY, button);

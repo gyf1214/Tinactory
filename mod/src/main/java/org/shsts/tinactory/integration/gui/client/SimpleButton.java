@@ -19,12 +19,6 @@ public abstract class SimpleButton extends Button {
     protected final int normalX, normalY;
     protected final int hoverX, hoverY;
 
-    public SimpleButton(MenuBase menu, Texture texture,
-        @Nullable Component tooltip, int normalX, int normalY,
-        int hoverX, int hoverY) {
-        this(menu, texture, texture, tooltip, normalX, normalY, hoverX, hoverY);
-    }
-
     public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
         @Nullable Component tooltip, int normalX, int normalY,
         int hoverX, int hoverY) {
@@ -38,13 +32,18 @@ public abstract class SimpleButton extends Button {
     }
 
     public SimpleButton(MenuBase menu, Texture texture,
-        @Nullable Component tooltip, int hoverX, int hoverY) {
-        this(menu, texture, tooltip, 0, 0, hoverX, hoverY);
+        @Nullable Component tooltip, int normalX, int normalY,
+        int hoverX, int hoverY) {
+        this(menu, texture, texture, tooltip, normalX, normalY, hoverX, hoverY);
     }
 
     public SimpleButton(MenuBase menu, Texture texture, Texture hoverTexture,
-        @Nullable Component tooltip, int hoverX, int hoverY) {
-        this(menu, texture, hoverTexture, tooltip, 0, 0, hoverX, hoverY);
+        @Nullable Component tooltip) {
+        this(menu, texture, hoverTexture, tooltip, 0, 0, 0, 0);
+    }
+
+    public SimpleButton(MenuBase menu, Texture texture, @Nullable Component tooltip) {
+        this(menu, texture, tooltip, 0, 0, 0, 0);
     }
 
     @Override

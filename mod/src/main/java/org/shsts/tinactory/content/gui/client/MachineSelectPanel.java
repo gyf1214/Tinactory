@@ -67,7 +67,7 @@ public class MachineSelectPanel<T> extends ButtonPanel {
     private UUID selected = null;
 
     public MachineSelectPanel(MenuScreen<?> screen) {
-        super(screen, BUTTON_SIZE, BUTTON_SIZE, 1, BUTTON_OFFSET);
+        super(screen, BUTTON_SIZE, BUTTON_SIZE, 1, BUTTON_OFFSET, true);
         var bg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_BG, PANEL_BORDER);
         var icon = Widgets.searchIcon(menu);
         this.searchBox = Widgets.searchBox(this::refreshDisplayMachines);

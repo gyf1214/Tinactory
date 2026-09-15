@@ -30,6 +30,7 @@ import org.shsts.tinactory.content.gui.client.StorageScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
 import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
+import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
@@ -87,6 +88,7 @@ public final class AllMenus {
     public static final IPacketType<MECraftEventPacket> ME_CRAFT_ACTION;
     public static final IPacketType<MEPatternEventPacket> ME_PATTERN_ACTION;
     public static final IPacketType<WorkbenchTransferEventPacket> WORKBENCH_TRANSFER;
+    public static final IPacketType<FilterEventPacket> FILTER_SLOT;
 
     public static final IMenuType WORKBENCH;
     public static final IMenuType TECH_MENU;
@@ -138,6 +140,7 @@ public final class AllMenus {
         ME_PATTERN_ACTION = REGISTRATE.menuEventPacket("event/me_pattern_action", MEPatternEventPacket::new);
         WORKBENCH_TRANSFER = REGISTRATE.menuEventPacket("event/workbench_transfer",
             WorkbenchTransferEventPacket::new);
+        FILTER_SLOT = REGISTRATE.menuEventPacket("event/filter_slot", FilterEventPacket::new);
 
         OPEN_TECH = REGISTRATE.packet("open_tech", () -> OpenTechPacket.INSTANCE)
             .direction(PacketDirection.SERVERBOUND)

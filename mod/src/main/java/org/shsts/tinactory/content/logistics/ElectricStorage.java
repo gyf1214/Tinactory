@@ -64,8 +64,9 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     private final IElectricMachine electric;
     private final PortType type;
     private final IStackAdapter<T> adapter;
-    protected final int storageSlots;
-    protected final int stackLimit;
+    private final int storageSlots;
+    private final int stackLimit;
+    private final int filterSlots;
     private final Storage storage;
     private final SortedMultiList<IStackKey> slotMap = new SortedMultiList<>(StackHelper.KEY_DISPLAY_ORDER);
     private final List<IStackKey> legacyFilters = new ArrayList<>();
@@ -138,21 +139,20 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         }
     }
 
+    public record Properties(int storageSlots, int stackLimit, int filterSlots, double power) {}
+
     protected ElectricStorage(BlockEntity blockEntity, PortType type, IStackAdapter<T> adapter,
-        int storageSlots, int stackLimit, IElectricMachine electric) {
+        Properties properties) {
         this.blockEntity = blockEntity;
         this.type = type;
         this.adapter = adapter;
-        this.storageSlots = storageSlots;
-        this.stackLimit = stackLimit;
+        this.storageSlots = properties.storageSlots;
+        this.stackLimit = properties.stackLimit;
+        this.filterSlots = properties.filterSlots;
         this.storage = new Storage();
-        this.electric = electric;
-    }
 
-    protected ElectricStorage(BlockEntity blockEntity, PortType type, IStackAdapter<T> adapter,
-        int storageSlots, int stackLimit, double power) {
-        this(blockEntity, type, adapter, storageSlots, stackLimit,
-            new SimpleElectricConsumer(getBlockVoltage(blockEntity).value, power));
+        var voltage = getBlockVoltage(blockEntity);
+        this.electric = new SimpleElectricConsumer(voltage.value, properties.power);
     }
 
     protected IMachine machine() {
@@ -173,8 +173,16 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         return storage;
     }
 
+    public int storageSlots() {
+        return storageSlots;
+    }
+
     public int stackLimit() {
         return stackLimit;
+    }
+
+    public int filterSlots() {
+        return filterSlots;
     }
 
     public int amountSignal() {
@@ -185,14 +193,16 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         return filters.isEmpty() || filters.stream().anyMatch($ -> $.test(stack));
     }
 
-    protected abstract Predicate<T> deserializeFilter(Tag tag);
+    protected abstract Predicate<T> asPredicate(HolderLookup.Provider provider, FilterEntry entry);
 
     private void updateFilters() {
         filters.clear();
         var list = machineConfig().getList(FILTER_KEY);
+        var provider = machine().registryAccess();
         if (list.isPresent()) {
             for (var tag : list.get()) {
-                filters.add(deserializeFilter(tag));
+                var entry = CodecHelper.parseTag(provider, FilterEntry.CODEC, tag);
+                filters.add(asPredicate(provider, entry));
             }
         }
     }
@@ -312,13 +322,21 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         updateSignal();
     }
 
-    protected abstract void appendLegacyFilter(IStackKey key);
-
     private void onLoad(Level world) {
-        for (var key : legacyFilters) {
-            appendLegacyFilter(key);
+        if (!legacyFilters.isEmpty()) {
+            var list = machineConfig().getCopiedList(FILTER_KEY);
+            for (var key : legacyFilters) {
+                if (list.size() < filterSlots) {
+                    var filter = new FilterEntry(key, null);
+                    list.add(CodecHelper.encodeTag(world.registryAccess(),
+                        FilterEntry.CODEC, filter));
+                }
+                if (list.size() >= filterSlots) {
+                    break;
+                }
+            }
+            legacyFilters.clear();
         }
-        legacyFilters.clear();
     }
 
     @Override

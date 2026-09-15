@@ -4,12 +4,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
@@ -30,7 +28,7 @@ public class ElectricChest extends ElectricStorage<ItemStack> implements INBTSer
     private final IItemHandler itemHandler = new IItemHandler() {
         @Override
         public int getSlots() {
-            return storageSlots;
+            return storageSlots();
         }
 
         @Override
@@ -59,24 +57,17 @@ public class ElectricChest extends ElectricStorage<ItemStack> implements INBTSer
         }
     };
 
-    public ElectricChest(BlockEntity blockEntity, int storageSlots, int stackLimit, double power) {
-        super(blockEntity, PortType.ITEM, StackHelper.ITEM_ADAPTER, storageSlots, stackLimit, power);
+    public ElectricChest(BlockEntity blockEntity, Properties properties) {
+        super(blockEntity, PortType.ITEM, StackHelper.ITEM_ADAPTER, properties);
     }
 
-    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(
-        int storageSlots, int stackLimit, double power) {
-        return $ -> $.container(ID, be -> new ElectricChest(be, storageSlots, stackLimit, power));
-    }
-
-    @Override
-    protected Predicate<ItemStack> deserializeFilter(Tag tag) {
-        // TODO
-        return StackHelper.TRUE_FILTER;
+    public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(Properties properties) {
+        return $ -> $.container(ID, be -> new ElectricChest(be, properties));
     }
 
     @Override
-    protected void appendLegacyFilter(IStackKey key) {
-        // TODO
+    protected Predicate<ItemStack> asPredicate(HolderLookup.Provider provider, FilterEntry entry) {
+        return stack -> entry.testItem(stack, provider);
     }
 
     @Override

@@ -8,7 +8,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.ProcessingMenu;
+import org.shsts.tinactory.integration.gui.client.Widgets;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_ANCHOR;
@@ -41,11 +43,12 @@ public class MachineScreen extends ProcessingScreen {
         portPanel.setActive(false);
 
         var anchor = RectD.corners(1d, 0d, 1d, 0d);
-        PortPanel.addButton(menu, rootPanel, portPanel, anchor, -SLOT_SIZE, buttonY, () -> {
-            if (portPanel.isActive() && recipeBook != null) {
-                recipeBook.setBookActive(false);
-            }
-        });
+        Widgets.gregtechButton(menu, rootPanel, portPanel, anchor, -SLOT_SIZE, buttonY,
+            I18n.tr("tinactory.tooltip.openPortPanel"), () -> {
+                if (portPanel.isActive() && recipeBook != null) {
+                    recipeBook.setBookActive(false);
+                }
+            });
 
         var machine = MACHINE.get(menu.blockEntity());
         var config = machine.config();

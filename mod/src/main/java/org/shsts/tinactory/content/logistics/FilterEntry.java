@@ -7,7 +7,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +41,9 @@ public record FilterEntry(@Nullable IStackKey key, @Nullable TagKey<Item> tag) {
             ItemStack.SINGLE_ITEM_CODEC.optionalFieldOf("itemFilter").forGetter(FilterEntry::item),
             StackHelper.SINGLE_FLUID_CODEC.optionalFieldOf("fluidFilter").forGetter(FilterEntry::fluid)
         ).apply(instance, FilterEntry::fromStacks));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, FilterEntry> STREAM_CODEC =
+        ByteBufCodecs.fromCodecWithRegistries(CODEC);
 
     public FilterEntry {
         assert key == null || tag == null;

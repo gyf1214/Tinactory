@@ -12,12 +12,9 @@ import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.sync.SlotEventPacket;
-import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.gui.client.Label;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
-import org.shsts.tinactory.integration.gui.client.SimpleButton;
-import org.shsts.tinactory.integration.gui.client.StaticWidget;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
 import org.shsts.tinactory.integration.util.ClientUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
@@ -32,9 +29,7 @@ import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.PORT_TEXT_COLOR;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
-import static org.shsts.tinactory.core.gui.Texture.GREGTECH_LOGO;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
-import static org.shsts.tinactory.core.gui.Texture.SWITCH_BUTTON;
 import static org.shsts.tinactory.integration.gui.ProcessingMenu.portLabel;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
@@ -125,22 +120,5 @@ public class PortPanel extends Panel {
             var y = slot.y() + 1 + by;
             RenderUtil.fill(graphics, new Rect(x, y, 16, 16), OVERLAY_COLOR);
         }
-    }
-
-    public static void addButton(MenuBase menu, Panel parent, PortPanel panel,
-        RectD anchor, int x, int y, Runnable extraCallback) {
-        var button = new SimpleButton(menu, SWITCH_BUTTON,
-            I18n.tr("tinactory.tooltip.openPortPanel"), 0, 0, 0, 0) {
-            @Override
-            public void onMouseClicked(double mouseX, double mouseY, int button) {
-                super.onMouseClicked(mouseX, mouseY, button);
-                panel.setActive(!panel.isActive());
-                extraCallback.run();
-            }
-        };
-        var overlay = new StaticWidget(menu, GREGTECH_LOGO);
-        var offset = new Rect(x, y, SLOT_SIZE, SLOT_SIZE);
-        parent.addChild(anchor, offset, button);
-        parent.addChild(anchor, offset.offset(1, 1).enlarge(-1, -1), overlay);
     }
 }

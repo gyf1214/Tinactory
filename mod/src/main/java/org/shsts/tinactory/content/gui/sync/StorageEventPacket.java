@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.integration.logistics.StackHelper;
@@ -14,23 +13,11 @@ import org.shsts.tinycorelib.api.network.IPacket;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class StorageEventPacket implements IPacket {
-    public static final int QUICK_MOVE_BUTTON = -1;
-
     @Nullable
     private IStackKey key;
     private long amount;
     private int button;
     private boolean shiftPressed;
-
-    public StorageEventPacket(ItemStack item, int button) {
-        this.key = StackHelper.ITEM_ADAPTER.keyOf(item);
-        this.button = button;
-    }
-
-    public StorageEventPacket(FluidStack fluid, int button) {
-        this.key = StackHelper.FLUID_ADAPTER.keyOf(fluid);
-        this.button = button;
-    }
 
     public StorageEventPacket(IStackKey key, int button, boolean shiftPressed) {
         this(key, Long.MAX_VALUE, button, shiftPressed);
