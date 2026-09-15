@@ -27,6 +27,7 @@ import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Arrays;
@@ -37,6 +38,7 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -185,11 +187,15 @@ public final class PersistenceGameTest {
         var key = StackHelper.ITEM_ADAPTER.keyOf(diamond);
 
         chest.deserializeNBT(provider, legacyStorageTag(provider, key, diamond.getCount(), true));
+        CapabilityProvider.invoke(helper.getBlockEntity(pos), SERVER_LOAD::get, helper.getLevel());
 
         var handler = ITEM_HANDLER.get(helper.getBlockEntity(pos));
         require(helper, handler.getStackInSlot(0).is(Items.DIAMOND) &&
                 handler.getStackInSlot(0).getCount() == diamond.getCount(),
             "Version-1 marked entry did not keep its existing stack", pos);
+        var filters = MACHINE.get(helper.getBlockEntity(pos)).config().getList(ElectricStorage.FILTER_KEY);
+        require(helper, filters.isPresent() && filters.get().size() == 1,
+            "Version-1 marked entry did not migrate to machine filter config", pos);
         var persisted = chest.serializeNBT(provider);
         require(helper, persisted.getInt("version") == 2 && persisted.getList("entries", 10).size() == 1,
             "Version-1 marked entry did not convert to version-2 content", pos);
