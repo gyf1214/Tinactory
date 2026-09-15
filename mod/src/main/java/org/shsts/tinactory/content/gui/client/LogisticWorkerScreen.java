@@ -204,8 +204,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 var filter = config.filter();
                 var filter1 = filter.click(index, clickHelper, button, menu.getCarried(),
                     true, true, true);
-                config.setFilter(filter1);
-                needUpdate = true;
+                if (filter1.isPresent()) {
+                    config.setFilter(filter1.get());
+                    needUpdate = true;
+                }
             }
 
             if (needUpdate) {

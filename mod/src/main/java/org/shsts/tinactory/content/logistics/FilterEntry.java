@@ -162,33 +162,32 @@ public record FilterEntry(@Nullable IStackKey key, @Nullable TagKey<Item> tag) {
         return key != null ? key.tooltip() : Optional.empty();
     }
 
-    public FilterEntry click(int index, ClickHelper helper, int button, ItemStack carried,
-        boolean allowItem, boolean allowFluid, boolean allowTag) {
+    public Optional<FilterEntry> click(int index, ClickHelper helper, int button,
+        ItemStack carried, boolean allowItem, boolean allowFluid, boolean allowTag) {
         if (carried.isEmpty()) {
-            var ret = EMPTY;
-            if (allowTag && button == 1) {
+            if (button != 1) {
+                helper.reset();
+                return Optional.of(EMPTY);
+            } else if (allowTag) {
                 if (key != null && key.type() == PortType.ITEM) {
                     if (helper.init(index, StackHelper.ITEM_ADAPTER.stackOf(key))) {
-                        ret = helper.next();
+                        return Optional.of(helper.next());
                     }
                 } else if (tag != null && helper.canClick(index)) {
-                    ret = helper.next();
+                    return Optional.of(helper.next());
                 }
             }
-            if (ret.type() == Type.NONE) {
-                helper.reset();
-            }
-            return ret;
+            return Optional.empty();
         } else {
             helper.reset();
             var fluid = (allowFluid && button == 0) ? StackHelper.getFluidFromItem(carried) :
                 FluidStack.EMPTY;
             if (!fluid.isEmpty()) {
-                return fromFluid(fluid);
+                return Optional.of(fromFluid(fluid));
             } else if (allowItem) {
-                return fromItem(carried);
+                return Optional.of(fromItem(carried));
             } else {
-                return EMPTY;
+                return Optional.empty();
             }
         }
     }

@@ -74,8 +74,11 @@ public class FilterPanel extends Panel {
                 storageMenu.allowFluidFilter(),
                 storageMenu.allowTagFilter());
 
-            var event = new FilterEventPacket(oldFilter.type() != FilterEntry.Type.NONE, index, newFilter);
-            menu.triggerEvent(FILTER_SLOT, () -> event);
+            if (newFilter.isPresent()) {
+                var event = new FilterEventPacket(oldFilter.type() != FilterEntry.Type.NONE,
+                    index, newFilter.get());
+                menu.triggerEvent(FILTER_SLOT, () -> event);
+            }
         }
 
         @Override
