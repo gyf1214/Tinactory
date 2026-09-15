@@ -21,10 +21,12 @@ import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.gui.StorageMenu;
+import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricTank;
+import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.gui.IMenuHelper;
 import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
@@ -43,6 +45,79 @@ import static org.shsts.tinactory.integration.common.CapabilityProvider.getConta
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class StorageMenuGameTest {
+    @GameTest
+    public static void testReplacingFilterPreservesFilterSlot(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = chestMenu(helper, pos, player);
+        var diamond = FilterEntry.fromItem(new ItemStack(Items.DIAMOND));
+        var emerald = FilterEntry.fromItem(new ItemStack(Items.EMERALD));
+        var gold = FilterEntry.fromItem(new ItemStack(Items.GOLD_INGOT));
+
+        menu.handleEventPacket(AllMenus.FILTER_SLOT, new FilterEventPacket(false, 0, diamond));
+        menu.handleEventPacket(AllMenus.FILTER_SLOT, new FilterEventPacket(false, 1, emerald));
+        menu.handleEventPacket(AllMenus.FILTER_SLOT, new FilterEventPacket(true, 0, gold));
+
+        var first = menu.getFilter(0);
+        if (first.type() != FilterEntry.Type.ITEM || !first.asItem().is(Items.GOLD_INGOT)) {
+            helper.fail("Replacing the first filter did not preserve its slot", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testChestFilterEventRestrictsItems(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var chest = getContainer(helper.getBlockEntity(pos), ElectricChest.ID, ElectricChest.class);
+        var menu = chestMenu(helper, pos, helper.makeMockPlayer(GameType.SURVIVAL));
+        var diamond = new ItemStack(Items.DIAMOND);
+        var emerald = new ItemStack(Items.EMERALD);
+
+        menu.handleEventPacket(AllMenus.FILTER_SLOT,
+            new FilterEventPacket(false, 0, FilterEntry.fromItem(diamond)));
+
+        var accepted = chest.port().insert(diamond.copy(), false);
+        var rejected = chest.port().insert(emerald.copy(), false);
+        if (!accepted.isEmpty() || rejected.isEmpty() || chest.port().getStorageAmount(diamond) != 1 ||
+            chest.port().getStorageAmount(emerald) != 0) {
+            helper.fail("Chest filter event did not restrict item insertion", pos);
+            return;
+        }
+
+        menu.handleEventPacket(AllMenus.FILTER_SLOT, new FilterEventPacket(true, 0, FilterEntry.EMPTY));
+        if (!chest.port().insert(emerald.copy(), false).isEmpty()) {
+            helper.fail("Removing the chest filter did not restore unrestricted insertion", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testTankFilterEventRestrictsFluids(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var tank = getContainer(helper.getBlockEntity(pos), ElectricTank.ID, ElectricTank.class);
+        var menu = tankMenu(helper, pos, helper.makeMockPlayer(GameType.SURVIVAL));
+        var water = new FluidStack(Fluids.WATER, 1000);
+        var lava = new FluidStack(Fluids.LAVA, 1000);
+
+        menu.handleEventPacket(AllMenus.FILTER_SLOT,
+            new FilterEventPacket(false, 0, FilterEntry.fromFluid(water)));
+
+        var accepted = tank.port().insert(water.copy(), false);
+        var rejected = tank.port().insert(lava.copy(), false);
+        if (!accepted.isEmpty() || rejected.getAmount() != lava.getAmount() ||
+            tank.port().getStorageAmount(water) != water.getAmount() ||
+            tank.port().getStorageAmount(lava) != 0) {
+            helper.fail("Tank filter event did not restrict fluid insertion", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
     @GameTest
     public static void testAggregateStorageSyncHandlesZeroStackLimit(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
@@ -579,7 +654,8 @@ public final class StorageMenuGameTest {
         var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
         var properties = new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
             player.getInventory(), blockEntity);
-        return new StorageMenu(properties, chest.port(), chest.stackLimit(), empty(), 0);
+        return new StorageMenu(properties, chest.port(), chest.stackLimit(), empty(), 0,
+            chest.storageSlots(), chest.filterSlots());
     }
 
     private static StorageMenu tankMenu(GameTestHelper helper, BlockPos pos, Player player) {
@@ -587,14 +663,16 @@ public final class StorageMenuGameTest {
         var tank = getContainer(blockEntity, ElectricTank.ID, ElectricTank.class);
         var properties = new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_TANK.get(), 0,
             player.getInventory(), blockEntity);
-        return new StorageMenu(properties, empty(), 0, tank.port(), tank.stackLimit());
+        return new StorageMenu(properties, empty(), 0, tank.port(), tank.stackLimit(),
+            tank.storageSlots(), tank.filterSlots());
     }
 
     private static StorageMenu dualStorageMenu(GameTestHelper helper, BlockPos pos, Player player,
         ElectricChest chest, ElectricTank tank) {
         var properties = new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
             player.getInventory(), helper.getBlockEntity(pos));
-        return new StorageMenu(properties, chest.port(), chest.stackLimit(), tank.port(), tank.stackLimit());
+        return new StorageMenu(properties, chest.port(), chest.stackLimit(), tank.port(), tank.stackLimit(),
+            chest.storageSlots(), chest.filterSlots());
     }
 
     private static final IMenuHelper MENU_HELPER = new IMenuHelper() {

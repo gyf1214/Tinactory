@@ -19,11 +19,14 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricStorage;
 import org.shsts.tinactory.content.logistics.ElectricTank;
+import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.Arrays;
@@ -173,6 +176,51 @@ public final class PersistenceGameTest {
     }
 
     @GameTest
+    public static void testElectricChestVersion1FilterEntryKeepsExistingStack(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var provider = helper.getLevel().registryAccess();
+        var chest = getContainer(helper.getBlockEntity(pos), ElectricChest.ID, ElectricChest.class);
+        var diamond = new ItemStack(Items.DIAMOND, 3);
+        var key = StackHelper.ITEM_ADAPTER.keyOf(diamond);
+
+        chest.deserializeNBT(provider, legacyStorageTag(provider, key, diamond.getCount(), true));
+
+        var handler = ITEM_HANDLER.get(helper.getBlockEntity(pos));
+        require(helper, handler.getStackInSlot(0).is(Items.DIAMOND) &&
+                handler.getStackInSlot(0).getCount() == diamond.getCount(),
+            "Version-1 marked entry did not keep its existing stack", pos);
+        var persisted = chest.serializeNBT(provider);
+        require(helper, persisted.getInt("version") == 2 && persisted.getList("entries", 10).size() == 1,
+            "Version-1 marked entry did not convert to version-2 content", pos);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testElectricChestVersion2ConfigFilterRestrictsInput(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var provider = helper.getLevel().registryAccess();
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var filters = new ListTag();
+        filters.add(CodecHelper.encodeTag(provider, FilterEntry.CODEC,
+            FilterEntry.fromItem(new ItemStack(Items.DIAMOND))));
+
+        MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder()
+            .set(ElectricStorage.FILTER_KEY, filters).get());
+
+        var accepted = chest.port().insert(new ItemStack(Items.DIAMOND), false);
+        var rejected = chest.port().insert(new ItemStack(Items.EMERALD), false);
+        require(helper, accepted.isEmpty() && !rejected.isEmpty(),
+            "Version-2 machine-config filter did not restrict input", pos);
+        var persisted = chest.serializeNBT(provider);
+        require(helper, persisted.getInt("version") == 2 && !persisted.contains(ElectricStorage.FILTER_KEY),
+            "Version-2 storage NBT serialized machine filters as content", pos);
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testElectricChestExposesFullVirtualStackAmounts(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_chest"));
@@ -278,6 +326,20 @@ public final class PersistenceGameTest {
         var list = new ListTag();
         list.addAll(Arrays.asList(entries));
         tag.put("entries", list);
+        return tag;
+    }
+
+    private static CompoundTag legacyStorageTag(HolderLookup.Provider provider, IStackKey key, long amount,
+        boolean isFilter) {
+        var tag = new CompoundTag();
+        tag.putInt("version", 1);
+        var entries = new ListTag();
+        var entry = new CompoundTag();
+        entry.put("key", CodecHelper.encodeTag(provider, StackHelper.KEY_CODEC, key));
+        entry.putLong("amount", amount);
+        entry.putBoolean("isFilter", isFilter);
+        entries.add(entry);
+        tag.put("entries", entries);
         return tag;
     }
 
