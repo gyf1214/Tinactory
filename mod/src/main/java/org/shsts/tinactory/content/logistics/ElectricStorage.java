@@ -20,6 +20,7 @@ import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.core.common.SortedMultiList;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.logistics.MapStorage;
 import org.shsts.tinactory.core.machine.SimpleElectricConsumer;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -335,6 +336,9 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
                     break;
                 }
             }
+            machine().setConfig(SetMachineConfigPacket.builder()
+                .set(FILTER_KEY, list)
+                .get());
             legacyFilters.clear();
         }
     }

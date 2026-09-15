@@ -311,28 +311,26 @@ public class StorageMenu extends InventoryMenu {
 
     private void onFilterClick(FilterEventPacket packet) {
         var list = machineConfig().getCopiedList(ElectricStorage.FILTER_KEY);
-        var remove = packet.remove();
+        var remove = packet.remove().orElse(-1);
         var append = packet.append();
-        var changed = false;
+        var hasRemove = remove >= 0 && remove < list.size();
+        var hasAppend = append.type() != FilterEntry.Type.NONE;
 
-        if (remove.isPresent()) {
-            var i = remove.getAsInt();
-            if (i >= 0 && i < list.size()) {
-                list.remove(i);
-                changed = true;
-            }
+        if (hasRemove && hasAppend) {
+            var tag = CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append);
+            list.set(remove, tag);
+        } else if (hasRemove) {
+            list.remove(remove);
+        } else if (hasAppend && list.size() < filterSlots) {
+            var tag = CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append);
+            list.add(tag);
+        } else {
+            return;
         }
 
-        if (append.type() != FilterEntry.Type.NONE && list.size() < filterSlots) {
-            list.add(CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append));
-            changed = true;
-        }
-
-        if (changed) {
-            machine.setConfig(SetMachineConfigPacket.builder()
-                .set(ElectricStorage.FILTER_KEY, list)
-                .get());
-        }
+        machine.setConfig(SetMachineConfigPacket.builder()
+            .set(ElectricStorage.FILTER_KEY, list)
+            .get());
     }
 
     private StorageSyncPacket storageEntries() {
