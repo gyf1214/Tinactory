@@ -23,14 +23,17 @@ import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.content.logistics.FilterEntry;
+import org.shsts.tinactory.content.logistics.SignalConfig;
 import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
+import org.shsts.tinactory.integration.machine.Machine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
@@ -39,6 +42,8 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_CONFIG;
+import static org.shsts.tinactory.AllNetworks.STORAGE_DETECTOR;
 import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
 import static org.shsts.tinactory.AllNetworks.STORAGE_PRIORITY;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
@@ -326,6 +331,63 @@ public final class PersistenceGameTest {
             .get());
 
         helper.succeed();
+    }
+
+    @GameTest
+    public static void testMachineConfigLegacyPersistenceMigration(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var provider = helper.getLevel().registryAccess();
+        var signal = new SignalConfig(
+            UUID.fromString("00000000-0000-0000-0000-000000000041"), "stop");
+        var signalConfig = new CompoundTag();
+        signalConfig.put("signal", CodecHelper.encodeTag(provider, SignalConfig.CODEC, signal));
+        var machine = loadMachineConfig(helper, pos, signalConfig);
+        var loadedSignal = machine.config().get(SIGNAL_CONFIG).orElse(null);
+        require(helper, signal.equals(loadedSignal),
+            "Legacy signal config did not migrate to its typed value", pos);
+        var signalPersisted = machine.serializeNBT(provider).getCompound("config");
+        require(helper, signalPersisted.contains(SIGNAL_CONFIG.loc().toString()) &&
+                !signalPersisted.contains("signal"),
+            "Migrated signal config did not use its namespaced persistence key", pos);
+
+        var item = new ItemStack(Items.DIAMOND);
+        var itemConfig = new CompoundTag();
+        itemConfig.put("targetItem", StackHelper.serializeItemStack(provider, item));
+        itemConfig.putLong("targetAmount", 7L);
+        machine = loadMachineConfig(helper, pos, itemConfig);
+        var loadedItemDetector = machine.config().get(STORAGE_DETECTOR).orElse(null);
+        require(helper, loadedItemDetector != null && loadedItemDetector.amount() == 7L &&
+                StackHelper.ITEM_ADAPTER.keyOf(item).equals(loadedItemDetector.key()),
+            "Legacy item detector config did not migrate to its typed value", pos);
+        var itemPersisted = machine.serializeNBT(provider).getCompound("config");
+        require(helper, itemPersisted.contains(STORAGE_DETECTOR.loc().toString()) &&
+                !itemPersisted.contains("targetItem") && !itemPersisted.contains("targetAmount"),
+            "Migrated item detector config retained legacy keys", pos);
+
+        var fluid = new FluidStack(Fluids.LAVA, 1);
+        var fluidConfig = new CompoundTag();
+        fluidConfig.put("targetFluid", fluid.save(provider, new CompoundTag()));
+        fluidConfig.putLong("targetAmount", 13L);
+        machine = loadMachineConfig(helper, pos, fluidConfig);
+        var loadedFluidDetector = machine.config().get(STORAGE_DETECTOR).orElse(null);
+        require(helper, loadedFluidDetector != null && loadedFluidDetector.amount() == 13L &&
+                StackHelper.FLUID_ADAPTER.keyOf(fluid).equals(loadedFluidDetector.key()),
+            "Legacy fluid detector config did not migrate to its typed value", pos);
+        var fluidPersisted = machine.serializeNBT(provider).getCompound("config");
+        require(helper, fluidPersisted.contains(STORAGE_DETECTOR.loc().toString()) &&
+                !fluidPersisted.contains("targetFluid") && !fluidPersisted.contains("targetAmount"),
+            "Migrated fluid detector config retained legacy keys", pos);
+        helper.succeed();
+    }
+
+    private static Machine loadMachineConfig(GameTestHelper helper, BlockPos pos, CompoundTag config) {
+        var blockEntity = helper.getBlockEntity(pos);
+        var machine = getContainer(blockEntity, "network/machine", Machine.class);
+        var payload = machine.serializeNBT(helper.getLevel().registryAccess());
+        payload.put("config", config);
+        machine.deserializeOnUpdate(helper.getLevel().registryAccess(), payload);
+        return machine;
     }
 
     private static CompoundTag storageTag(CompoundTag... entries) {

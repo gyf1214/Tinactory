@@ -28,10 +28,14 @@ import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
@@ -39,6 +43,7 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_WORKER_CONFIGS;
+import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class LogisticWorkerTransferGameTest {
@@ -117,6 +122,65 @@ public final class LogisticWorkerTransferGameTest {
         });
     }
 
+    @GameTest(timeoutTicks = 70)
+    public static void testLegacyWorkerMigrationCompactsGapsAndTransfers(GameTestHelper helper) {
+        var route = placeRoute(helper, "logistics/electric_chest", "logistics/electric_chest");
+        var source = ITEM_HANDLER.get(helper.getBlockEntity(route.source()));
+        require(helper, source.insertItem(0, stack(Items.IRON_INGOT, 8), false).isEmpty(),
+            "Could not fill the item source with iron", route.source());
+        var sourceMachine = MACHINE.get(helper.getBlockEntity(route.source()));
+        var destinationMachine = MACHINE.get(helper.getBlockEntity(route.destination()));
+        var migrated = new LogisticWorkerConfig(true,
+            new LogisticComponent.PortKey(sourceMachine.uuid(), 0),
+            new LogisticComponent.PortKey(destinationMachine.uuid(), 0), FilterEntry.EMPTY);
+        var machine = loadLegacyWorkerConfigs(helper, route, Map.of(5, migrated, 2, LogisticWorkerConfig.EMPTY));
+        var configs = machine.config().get(LOGISTIC_WORKER_CONFIGS).orElse(null);
+        require(helper, configs != null && configs.equals(List.of(LogisticWorkerConfig.EMPTY, migrated)),
+            "Legacy worker configs did not sort and compact numeric indexes", route.worker());
+        var persisted = machine.serializeNBT(helper.getLevel().registryAccess()).getCompound("config");
+        require(helper, persisted.contains(LOGISTIC_WORKER_CONFIGS.loc().toString()) &&
+                !persisted.contains("workerConfig_2") && !persisted.contains("workerConfig_5"),
+            "Migrated worker configs did not use the namespaced persistence key", route.worker());
+        useWithMockPlayer(helper, route.source());
+
+        helper.runAfterDelay(45, () -> {
+            var destination = ITEM_HANDLER.get(helper.getBlockEntity(route.destination()));
+            require(helper, itemAmount(destination, Items.IRON_INGOT) == 8,
+                "Worker did not transfer using the migrated worker list", route.destination());
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 70)
+    public static void testLegacyWorkerMigrationRespectsConfiguredSlotLimit(GameTestHelper helper) {
+        var route = placeRoute(helper, "logistics/electric_chest", "logistics/electric_chest");
+        var source = ITEM_HANDLER.get(helper.getBlockEntity(route.source()));
+        require(helper, source.insertItem(0, stack(Items.IRON_INGOT, 8), false).isEmpty(),
+            "Could not fill the item source with iron", route.source());
+        var sourceMachine = MACHINE.get(helper.getBlockEntity(route.source()));
+        var destinationMachine = MACHINE.get(helper.getBlockEntity(route.destination()));
+        var beyondLimit = new LogisticWorkerConfig(true,
+            new LogisticComponent.PortKey(sourceMachine.uuid(), 0),
+            new LogisticComponent.PortKey(destinationMachine.uuid(), 0), FilterEntry.EMPTY);
+        var legacy = new HashMap<Integer, LogisticWorkerConfig>();
+        for (var index = 0; index < 16; index++) {
+            legacy.put(index, LogisticWorkerConfig.EMPTY);
+        }
+        legacy.put(16, beyondLimit);
+        var machine = loadLegacyWorkerConfigs(helper, route, legacy);
+        var configs = machine.config().get(LOGISTIC_WORKER_CONFIGS).orElse(null);
+        require(helper, configs != null && configs.size() == 17,
+            "Legacy worker migration did not retain the indexed entries for consumption", route.worker());
+        useWithMockPlayer(helper, route.source());
+
+        helper.runAfterDelay(45, () -> {
+            var destination = ITEM_HANDLER.get(helper.getBlockEntity(route.destination()));
+            require(helper, itemAmount(destination, Items.IRON_INGOT) == 0,
+                "Worker consumed a migrated entry beyond its configured slot count", route.destination());
+            helper.succeed();
+        });
+    }
+
     private static Route placeRoute(GameTestHelper helper, String sourceName, String destinationName) {
         helper.setBlock(SOURCE, machineState(sourceName, Direction.EAST));
         helper.setBlock(CENTRAL_CABLE, cableState());
@@ -144,6 +208,19 @@ public final class LogisticWorkerTransferGameTest {
         worker.setConfig(SetMachineConfigPacket.builder()
             .set(LOGISTIC_WORKER_CONFIGS, List.of(config))
             .get());
+    }
+
+    private static Machine loadLegacyWorkerConfigs(GameTestHelper helper, Route route,
+        Map<Integer, LogisticWorkerConfig> configs) {
+        var blockEntity = helper.getBlockEntity(route.worker());
+        var machine = getContainer(blockEntity, "network/machine", Machine.class);
+        var provider = helper.getLevel().registryAccess();
+        var payload = machine.serializeNBT(provider);
+        var config = payload.getCompound("config");
+        configs.forEach((index, value) -> config.put("workerConfig_" + index,
+            CodecHelper.encodeTag(provider, LogisticWorkerConfig.CODEC, value)));
+        machine.deserializeOnUpdate(provider, payload);
+        return machine;
     }
 
     private static int itemAmount(IItemHandler handler, Item item) {
