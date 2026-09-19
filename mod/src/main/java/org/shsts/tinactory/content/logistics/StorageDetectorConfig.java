@@ -41,7 +41,8 @@ public record StorageDetectorConfig(@Nullable IStackKey key, long amount) {
                     if (!item.isEmpty()) {
                         key = StackHelper.ITEM_ADAPTER.keyOf(item);
                     }
-                } else if (unknownTags.get("targetFluid") instanceof CompoundTag fluidTag) {
+                }
+                if (key == null && unknownTags.get("targetFluid") instanceof CompoundTag fluidTag) {
                     var fluid = FluidStack.parseOptional(provider, fluidTag);
                     if (!fluid.isEmpty()) {
                         key = StackHelper.FLUID_ADAPTER.keyOf(fluid);
