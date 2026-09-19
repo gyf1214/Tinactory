@@ -10,6 +10,7 @@ import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestMachine.AUTO_VOID;
 import static org.shsts.tinactory.unit.fixture.TestMachine.MACHINE_CONFIGS;
 import static org.shsts.tinactory.unit.fixture.TestMachine.MACHINE_LIMIT;
@@ -68,5 +69,24 @@ class MachineConfigTest {
         assertEquals(Optional.of(true), config.get(AUTO_VOID));
         assertEquals(Optional.of(42), config.get(MACHINE_LIMIT));
         assertEquals(Optional.of("machine"), config.get(MACHINE_NAME));
+    }
+
+    @Test
+    void shouldFixLegacyKeyWhilePreserveUnknownKey() {
+        var serialized = new CompoundTag();
+        serialized.putBoolean("void", true);
+        serialized.putInt("tinactory:limit", 42);
+        serialized.putString("tinactory:name", "machine");
+        serialized.putDouble("unknown", 0.5);
+
+        var config = new MachineConfig();
+        config.deserializeNBT(REGISTRY, serialized);
+        var serialized1 = config.serializeNBT(REGISTRY);
+
+        assertEquals(4, serialized1.size());
+        assertTrue(serialized1.getBoolean("tinactory:auto_void"));
+        assertEquals(42, serialized1.getInt("tinactory:limit"));
+        assertEquals("machine", serialized1.getString("tinactory:name"));
+        assertEquals(0.5, serialized1.getDouble("unknown"));
     }
 }

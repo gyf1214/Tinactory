@@ -145,9 +145,13 @@ public class MachineConfig implements IMachineConfig {
                 return holder;
             }
         }
-        return lookup.listElements()
-            .filter($ -> $.value().legacyKey().filter(key::equals).isPresent())
-            .findAny();
+        return Optional.empty();
+    }
+
+    private <T> void fixLegacyConfig(HolderLookup.Provider provider, ResourceLocation loc,
+        IMachineConfigType<T> type) {
+        type.fixLegacyConfig(provider, unknownTags)
+            .ifPresent(val -> configs.put(type, new Entry<>(loc, type, val)));
     }
 
     @Override
@@ -167,5 +171,9 @@ public class MachineConfig implements IMachineConfig {
                 unknownTags.put(key, val);
             }
         }
+        lookup.listElements()
+            .filter(holder -> !configs.containsKey(holder.value()))
+            .forEach(holder -> fixLegacyConfig(provider, holder.unwrapKey().orElseThrow().location(),
+                holder.value()));
     }
 }

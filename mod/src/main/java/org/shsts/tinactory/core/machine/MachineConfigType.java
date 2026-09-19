@@ -4,11 +4,15 @@ import com.mojang.serialization.Codec;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.shsts.tinactory.api.machine.IMachineConfigType;
+import org.shsts.tinactory.core.util.CodecHelper;
 
+import java.util.Map;
 import java.util.Optional;
 
 @ParametersAreNonnullByDefault
@@ -36,7 +40,15 @@ public class MachineConfigType<T> implements IMachineConfigType<T> {
     }
 
     @Override
-    public Optional<String> legacyKey() {
-        return Optional.ofNullable(legacyKey);
+    public Optional<T> fixLegacyConfig(HolderLookup.Provider provider, Map<String, Tag> unknownTags) {
+        if (legacyKey == null) {
+            return Optional.empty();
+        }
+        if (unknownTags.containsKey(legacyKey)) {
+            var val = CodecHelper.parseTag(provider, codec, unknownTags.get(legacyKey));
+            unknownTags.remove(legacyKey);
+            return Optional.of(val);
+        }
+        return Optional.empty();
     }
 }
