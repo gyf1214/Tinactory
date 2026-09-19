@@ -255,7 +255,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             if (selectedConfig == -1) {
                 return;
             }
-            getPort(index).ifPresent(port -> updateConfig(index, config ->
+            getPort(index).ifPresent(port -> updateConfig(selectedConfig, config ->
                 new UpdateConfigAction(false, selectedFrom ?
                     config.setFrom(port.machineId(), port.portIndex()) :
                     config.setTo(port.machineId(), port.portIndex()))));
