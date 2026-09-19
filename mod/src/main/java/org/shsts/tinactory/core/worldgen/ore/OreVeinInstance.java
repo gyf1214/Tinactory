@@ -5,9 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
-import org.shsts.tinactory.core.util.CodecHelper;
 
 import java.util.List;
 
@@ -28,7 +26,7 @@ public record OreVeinInstance(
         BlockPos.CODEC.fieldOf("center").forGetter(OreVeinInstance::center),
         OreVeinUtil.INSTANCE_CODEC.fieldOf("shape").forGetter(OreVeinInstance::shape),
         Codec.DOUBLE.fieldOf("density").forGetter(OreVeinInstance::density),
-        CodecHelper.registryValueCodec(Registries.BLOCK).fieldOf("host_block").forGetter(OreVeinInstance::hostBlock),
+        OreEntry.BLOCK_CODEC.fieldOf("host_block").forGetter(OreVeinInstance::hostBlock),
         OreEntry.CODEC.listOf().fieldOf("ores").forGetter(OreVeinInstance::ores)
     ).apply(instance, OreVeinInstance::new));
 

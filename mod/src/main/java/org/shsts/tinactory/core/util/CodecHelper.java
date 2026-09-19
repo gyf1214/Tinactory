@@ -4,11 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.Encoder;
 import com.mojang.serialization.JsonOps;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,13 +24,12 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.codec.StreamEncoder;
-import net.minecraft.resources.RegistryFixedCodec;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.io.Reader;
 import java.util.Collection;
@@ -73,45 +69,8 @@ public final class CodecHelper {
         return encoder.encodeStart(ops, sth).getOrThrow();
     }
 
-    public static <E> Codec<E> registryValueCodec(ResourceKey<? extends Registry<E>> registryKey) {
-        var holderCodec = RegistryFixedCodec.create(registryKey);
-        return Codec.of(
-            new Encoder<>() {
-                @Override
-                public <T> DataResult<T> encode(E value, DynamicOps<T> ops, T prefix) {
-                    return findRegistryHolder(ops, registryKey, value)
-                        .flatMap(holder -> holderCodec.encode(holder, ops, prefix));
-                }
-            },
-            new Decoder<>() {
-                @Override
-                public <T> DataResult<Pair<E, T>> decode(DynamicOps<T> ops, T input) {
-                    return holderCodec.decode(ops, input).map(pair -> pair.mapFirst(Holder::value));
-                }
-            },
-            "RegistryValue[" + registryKey + "]"
-        );
-    }
-
-    private static <E> DataResult<Holder<E>> findRegistryHolder(
-        DynamicOps<?> ops, ResourceKey<? extends Registry<E>> registryKey, E value) {
-        if (!(ops instanceof RegistryOps<?> registryOps)) {
-            return DataResult.error(() -> "Registry value codec requires RegistryOps");
-        }
-        var registryInfo = registryOps.lookupProvider.lookup(registryKey);
-        if (registryInfo.isEmpty()) {
-            return DataResult.error(() -> "Unknown registry: " + registryKey);
-        }
-        if (!(registryInfo.get().owner() instanceof HolderLookup.RegistryLookup<?> rawLookup)) {
-            return DataResult.error(() -> "Registry lookup cannot enumerate values: " + registryKey);
-        }
-        @SuppressWarnings("unchecked")
-        var lookup = (HolderLookup.RegistryLookup<E>) rawLookup;
-        return lookup.listElements()
-            .filter(holder -> holder.value() == value)
-            .findFirst()
-            .map(DataResult::<Holder<E>>success)
-            .orElseGet(() -> DataResult.error(() -> "Unregistered value in " + registryKey + ": " + value));
+    public static <T> Codec<IEntry<T>> entryCodec(ResourceKey<? extends Registry<T>> registryKey) {
+        return new EntryCodec<>(registryKey);
     }
 
     public static <T> StreamCodec<RegistryFriendlyByteBuf, T> registryStreamCodec(

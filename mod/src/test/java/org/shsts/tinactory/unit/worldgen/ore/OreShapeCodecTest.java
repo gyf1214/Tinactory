@@ -11,7 +11,6 @@ import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
@@ -76,15 +75,5 @@ class OreShapeCodecTest {
 
         assertThrows(RuntimeException.class,
             () -> CodecHelper.parseJson(registryAccess, OreVeinUtil.INSTANCE_CODEC.codec(), json));
-    }
-
-    @Test
-    void codecShouldRejectAnUnregisteredShapeOnEncode() {
-        var value = new OreShapeDefinition<>(new EllipsoidShape(), new EllipsoidShape.Definition(1d, 1d, 0d, 1d, 1d));
-        var registryAccess = createRegistry(TestOreHelper.SHAPES);
-
-        assertThrows(RuntimeException.class,
-            () -> CodecHelper.encodeJson(registryAccess, OreVeinUtil.DEFINITION_CODEC.codec(), value));
-        assertNotSame(ELLIPSOID, value.shape());
     }
 }

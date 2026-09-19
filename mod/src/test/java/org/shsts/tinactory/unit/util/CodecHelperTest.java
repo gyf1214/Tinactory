@@ -1,17 +1,13 @@
 package org.shsts.tinactory.unit.util;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestCodecHelper;
-import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -19,7 +15,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
 
 class CodecHelperTest {
@@ -37,42 +32,6 @@ class CodecHelperTest {
 
         assertEquals(17, CodecHelper.parseJson(TEST_REGISTRY, Codec.INT, encodedJson));
         assertEquals(23, CodecHelper.parseTag(TEST_REGISTRY, Codec.INT, encodedTag));
-    }
-
-    @Test
-    void registryValueCodecRoundTripsRegisteredValuesThroughContext() {
-        var registryAccess = TestCodecHelper.createRegistry(TestOreHelper.BLOCKS);
-        var codec = CodecHelper.registryValueCodec(TestOreHelper.BLOCKS.key());
-
-        var encodedJson = CodecHelper.encodeJson(registryAccess, codec, TestOreHelper.HOST);
-        var encodedTag = CodecHelper.encodeTag(registryAccess, codec, TestOreHelper.HOST);
-
-        assertEquals("tinactory:host", encodedJson.getAsString());
-        assertEquals("tinactory:host", encodedTag.getAsString());
-        assertEquals(TestOreHelper.HOST,
-            CodecHelper.parseJson(registryAccess, codec, encodedJson));
-        assertEquals(TestOreHelper.HOST,
-            CodecHelper.parseTag(registryAccess, codec, encodedTag));
-    }
-
-    @Test
-    void registryValueCodecRejectsUnknownIdsAndUnregisteredValues() {
-        var registryAccess = TestCodecHelper.createRegistry(TestOreHelper.BLOCKS);
-        var codec = CodecHelper.registryValueCodec(TestOreHelper.BLOCKS.key());
-
-        assertThrows(RuntimeException.class, () -> CodecHelper.parseJson(registryAccess, codec,
-            new JsonPrimitive("tinactory:missing")));
-        assertThrows(RuntimeException.class, () -> CodecHelper.encodeJson(registryAccess, codec, Blocks.DIRT));
-    }
-
-    @Test
-    void registryValueCodecRequiresRegistryOps() {
-        var codec = CodecHelper.registryValueCodec(TestOreHelper.BLOCKS.key());
-
-        assertThrows(RuntimeException.class, () -> codec.encodeStart(JsonOps.INSTANCE, TestOreHelper.HOST)
-            .getOrThrow());
-        assertThrows(RuntimeException.class, () -> codec.parse(JsonOps.INSTANCE,
-            new JsonPrimitive("tinactory:host")).getOrThrow());
     }
 
     @Test

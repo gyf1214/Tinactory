@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 public final class TestCodecHelper {
     private TestCodecHelper() {}
 
@@ -45,5 +47,14 @@ public final class TestCodecHelper {
 
     public static <U> IEntry<U> createEntry(ResourceLocation loc, U obj) {
         return CORE.createEntry(loc, obj);
+    }
+
+    public static <U> IEntry<U> register(Registry<? super U> registry, ResourceLocation loc, U obj) {
+        Registry.register(registry, loc, obj);
+        return createEntry(loc, obj);
+    }
+
+    public static <U> IEntry<U> register(Registry<? super U> registry, String id, U obj) {
+        return register(registry, modLoc(id), obj);
     }
 }

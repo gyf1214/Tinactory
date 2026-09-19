@@ -58,7 +58,7 @@ public final class OreVeinGameTest {
     @GameTest
     public static void testOreVeinStructureCodecRoundTripsDefinitions(GameTestHelper helper) {
         var definition = new OreVeinDefinition(-32, 48,
-            new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
+            new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE,
                 new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
         var structure = new OreVeinStructure(
@@ -155,7 +155,7 @@ public final class OreVeinGameTest {
 
     private static OreVeinInstance sampledInstance() {
         var definition = new OreVeinDefinition(-32, 48,
-            new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE.get(),
+            new OreShapeDefinition<>(AllWorldGens.ELLIPSOID_SHAPE,
                 new EllipsoidShape.Definition(100d, 200d, 0.6d, 1d, 3d)),
             0.75d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1), new OreEntry(Blocks.GOLD_ORE, 2)));
         return OreVeinUtil.sample(definition, 12345L, new BlockPos(10, 20, 30));
@@ -164,7 +164,7 @@ public final class OreVeinGameTest {
     private static OreVeinInstance placementInstance(BlockPos center) {
         return new OreVeinInstance(
             OreVeinUtil.ALGORITHM_VERSION, 67890L, center,
-            new OreShapeInstance<>(AllWorldGens.ELLIPSOID_SHAPE.get(), new EllipsoidShape.Instance(3, 1, 3, 0)),
+            new OreShapeInstance<>(AllWorldGens.ELLIPSOID_SHAPE, new EllipsoidShape.Instance(3, 1, 3, 0)),
             1d, Blocks.STONE, List.of(new OreEntry(Blocks.IRON_ORE, 1)));
     }
 

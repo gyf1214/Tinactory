@@ -37,7 +37,7 @@ class VeinBuilder(private val id: String, private val rank: Int, private val rat
         const val VEIN_TECH_RANK = RANK_PER_VOLTAGE / 2
 
         private val ORE_SHAPE = OreShapeDefinition(
-            AllWorldGens.ELLIPSOID_SHAPE.get(),
+            AllWorldGens.ELLIPSOID_SHAPE,
             EllipsoidShape.Definition(100.0, 200.0, 0.6, 6.0, 12.0))
 
         private val BIOME_TAGS = mapOf(

@@ -1,28 +1,30 @@
 package org.shsts.tinactory.core.worldgen.ore;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
+import static org.shsts.tinactory.AllRegistries.ORE_SHAPES;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public final class OreVeinUtil {
     public static final int ALGORITHM_VERSION = 3;
+    private static final Codec<IEntry<IOreShape<?, ?>>> SHAPE_CODEC = CodecHelper.entryCodec(ORE_SHAPES.key());
     public static final MapCodec<OreShapeDefinition<?>> DEFINITION_CODEC =
-        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.key())
-            .dispatchMap(OreShapeDefinition::shape, OreVeinUtil::definitionCodecFor);
+        SHAPE_CODEC.dispatchMap(OreShapeDefinition::entry, OreVeinUtil::definitionCodecFor);
     public static final MapCodec<OreShapeInstance<?>> INSTANCE_CODEC =
-        CodecHelper.registryValueCodec(AllRegistries.ORE_SHAPES.key())
-            .dispatchMap(OreShapeInstance::shape, OreVeinUtil::instanceCodecFor);
+        SHAPE_CODEC.dispatchMap(OreShapeInstance::entry, OreVeinUtil::instanceCodecFor);
 
     private static final long FILL_SALT = 0xD6E8FEB86659FD93L;
     private static final long ORE_SALT = 0xA5A3564E27F2C9B1L;
@@ -71,7 +73,7 @@ public final class OreVeinUtil {
 
     private static <D, I> OreShapeInstance<I> sampleShape(OreShapeDefinition<D> definition,
         IOreShape<D, I> shape, long veinSeed) {
-        return new OreShapeInstance<>(shape, shape.sample(definition.definition(), veinSeed));
+        return new OreShapeInstance<>(definition.loc(), shape, shape.sample(definition.definition(), veinSeed));
     }
 
     private static <I> double fillFactor(OreShapeInstance<I> instance, long veinSeed, BlockPos center,
@@ -124,18 +126,20 @@ public final class OreVeinUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static MapCodec<? extends OreShapeDefinition<?>> definitionCodecFor(IOreShape<?, ?> shape) {
-        var typedShape = (IOreShape<Object, Object>) shape;
+    private static MapCodec<? extends OreShapeDefinition<?>> definitionCodecFor(IEntry<IOreShape<?, ?>> shape) {
+        var loc = shape.loc();
+        var typedShape = (IOreShape<Object, Object>) shape.get();
         return typedShape.definitionCodec().xmap(
-            definition -> new OreShapeDefinition<>(typedShape, definition),
+            definition -> new OreShapeDefinition<>(loc, typedShape, definition),
             OreShapeDefinition::definition);
     }
 
     @SuppressWarnings("unchecked")
-    private static MapCodec<? extends OreShapeInstance<?>> instanceCodecFor(IOreShape<?, ?> shape) {
-        var typedShape = (IOreShape<Object, Object>) shape;
+    private static MapCodec<? extends OreShapeInstance<?>> instanceCodecFor(IEntry<IOreShape<?, ?>> shape) {
+        var loc = shape.loc();
+        var typedShape = (IOreShape<Object, Object>) shape.get();
         return typedShape.instanceCodec().xmap(
-            instance -> new OreShapeInstance<>(typedShape, instance),
+            instance -> new OreShapeInstance<>(loc, typedShape, instance),
             OreShapeInstance::instance);
     }
 }

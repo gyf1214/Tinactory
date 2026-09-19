@@ -3,7 +3,6 @@ package org.shsts.tinactory.unit.fixture;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -46,8 +45,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import static org.shsts.tinactory.core.util.LocHelper.modLoc;
 
 public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
@@ -459,13 +456,10 @@ public final class TestMachine implements IMachine {
         machineConfig("list", Codec.INT.listOf());
 
     private static <T> IEntry<IMachineConfigType<T>> machineConfig(ILoc loc, Codec<T> codec, String legacyKey) {
-        var val = Registry.register(MACHINE_CONFIGS, loc.loc(), new MachineConfigType<>(codec, legacyKey));
-        return TestCodecHelper.createEntry(loc.loc(), val);
+        return TestCodecHelper.register(MACHINE_CONFIGS, loc.loc(), new MachineConfigType<>(codec, legacyKey));
     }
 
     private static <T> IEntry<IMachineConfigType<T>> machineConfig(String id, Codec<T> codec) {
-        var loc = modLoc(id);
-        var val = Registry.register(MACHINE_CONFIGS, loc, new MachineConfigType<>(codec, null));
-        return TestCodecHelper.createEntry(loc, val);
+        return TestCodecHelper.register(MACHINE_CONFIGS, id, new MachineConfigType<>(codec, null));
     }
 }
