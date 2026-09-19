@@ -210,7 +210,7 @@ class ProcessingRecipeTest {
         var consumed = new ArrayList<ProcessingInfo>();
         var inserted = new ArrayList<IProcessingResult>();
 
-        assertTrue(recipe.matchesForTest(machine, 1, RandomSource.create()));
+        assertTrue(recipe.matches(machine, 1));
 
         recipe.consumeInputs(container, 1, consumed::add);
         recipe.insertOutputs(container, 1, RandomSource.create(), inserted::add);
@@ -246,8 +246,8 @@ class ProcessingRecipeTest {
         var blockingMachine = new TestMachine(container);
         var autoVoidMachine = new TestMachine(container).autoVoid(true);
 
-        assertFalse(recipe.matchesForTest(blockingMachine, 1, RandomSource.create()));
-        assertTrue(recipe.matchesForTest(autoVoidMachine, 1, RandomSource.create()));
+        assertFalse(recipe.matches(blockingMachine, 1));
+        assertTrue(recipe.matches(autoVoidMachine, 1));
     }
 
     @Test

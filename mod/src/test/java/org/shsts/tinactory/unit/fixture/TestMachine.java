@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -51,6 +52,7 @@ public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
     private final IMachineConfig config = new MachineConfig();
     private final RandomSource random = RandomSource.create(31L);
+    private RegistryAccess registryAccess = TestCodecHelper.createRegistry(MACHINE_CONFIGS);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
     private Optional<TestTeamProfile> owner = Optional.empty();
@@ -91,8 +93,8 @@ public final class TestMachine implements IMachine {
         return this;
     }
 
-    public Optional<String> targetRecipe() {
-        return config.getString("targetRecipe");
+    public Optional<ResourceLocation> targetRecipe() {
+        return config.get(TARGET_RECIPE);
     }
 
     public TestTeamProfile team() {
@@ -103,6 +105,11 @@ public final class TestMachine implements IMachine {
 
     public TestMachine multiblock(boolean value) {
         multiblock = value;
+        return this;
+    }
+
+    public TestMachine registryAccess(RegistryAccess value) {
+        registryAccess = value;
         return this;
     }
 
@@ -154,6 +161,11 @@ public final class TestMachine implements IMachine {
     @Override
     public BlockEntity blockEntity() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RegistryAccess registryAccess() {
+        return registryAccess;
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import org.shsts.tinactory.AllNetworks;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IContainer;
@@ -151,7 +152,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     private Optional<ResourceLocation> targetRecipe() {
-        return machine().flatMap($ -> $.config().getLoc("targetRecipe"));
+        return machine().flatMap($ -> $.config().get($.registryAccess(), AllNetworks.TARGET_RECIPE.loc()));
     }
 
     @Override

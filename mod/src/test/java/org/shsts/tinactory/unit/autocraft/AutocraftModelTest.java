@@ -50,7 +50,7 @@ class AutocraftModelTest {
 
         assertEquals(List.of(ore), pattern.inputs());
         assertEquals(List.of(plate, slag), pattern.outputs());
-        assertEquals(new TestMachineConstraint("tooling"), pattern.constraints().get(0));
+        assertEquals(new TestMachineConstraint("tooling"), pattern.constraints().getFirst());
     }
 
     @Test
@@ -174,11 +174,11 @@ class AutocraftModelTest {
 
         assertTrue(constraint.matches(machine, Voltage.LV));
         var restore = constraint.configureLease(machine).orElseThrow();
-        assertEquals(recipeId.toString(), machine.targetRecipe().orElseThrow());
+        assertEquals(recipeId, machine.targetRecipe().orElseThrow());
 
         restore.run();
 
-        assertEquals(previous.toString(), machine.targetRecipe().orElseThrow());
+        assertEquals(previous, machine.targetRecipe().orElseThrow());
     }
 
     @Test
@@ -189,7 +189,7 @@ class AutocraftModelTest {
         var firstRestore = new TargetRecipeConstraint(firstRecipe).configureLease(machine).orElseThrow();
         var secondRestore = new TargetRecipeConstraint(secondRecipe).configureLease(machine).orElseThrow();
 
-        assertEquals(secondRecipe.toString(), machine.targetRecipe().orElseThrow());
+        assertEquals(secondRecipe, machine.targetRecipe().orElseThrow());
 
         secondRestore.run();
         firstRestore.run();

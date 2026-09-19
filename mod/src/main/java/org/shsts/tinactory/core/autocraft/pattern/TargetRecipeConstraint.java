@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.AllNetworks;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.core.autocraft.api.IMachineConstraint;
@@ -41,10 +42,19 @@ public record TargetRecipeConstraint(ResourceLocation recipeId) implements IMach
 
     @Override
     public Optional<Runnable> configureLease(IMachine machine) {
-        var previous = machine.config().getString("targetRecipe");
-        machine.setConfig(SetMachineConfigPacket.builder().set("targetRecipe", recipeId).get());
+        var targetRecipe = AllNetworks.TARGET_RECIPE.loc();
+        var provider = machine.registryAccess();
+        var previous = machine.config().<ResourceLocation>get(provider, targetRecipe);
+        machine.setConfig(SetMachineConfigPacket.builder()
+            .set(provider, targetRecipe, recipeId)
+            .get());
+
         return Optional.of(() -> previous.ifPresentOrElse(
-            value -> machine.setConfig(SetMachineConfigPacket.builder().set("targetRecipe", value).get()),
-            () -> machine.setConfig(SetMachineConfigPacket.builder().reset("targetRecipe").get())));
+            value -> machine.setConfig(SetMachineConfigPacket.builder()
+                .set(provider, targetRecipe, value)
+                .get()),
+            () -> machine.setConfig(SetMachineConfigPacket.builder()
+                .reset(provider, targetRecipe)
+                .get())));
     }
 }

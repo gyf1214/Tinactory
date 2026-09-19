@@ -8,6 +8,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import org.shsts.tinactory.AllNetworks;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
-import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -129,7 +129,9 @@ public class ProcessingRecipe implements IRecipe<IMachine> {
 
     public boolean matches(IMachine machine, int parallel) {
         var container = machine.container();
-        var autoVoid = machine.config().getBoolean(VOID_KEY, VOID_DEFAULT);
+        var autoVoid = machine.config()
+            .<Boolean>get(machine.registryAccess(), AllNetworks.AUTO_VOID.loc())
+            .orElse(VOID_DEFAULT);
         return canCraft(machine) && container
             .filter($ -> matchInputs(machine, $, parallel) &&
                 (autoVoid || matchOutputs(machine, $, parallel, machine.random())))

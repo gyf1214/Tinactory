@@ -27,13 +27,4 @@ public class TestRecipe extends ProcessingRecipe {
         RandomSource random) {
         return matchOutputs(machine, container, parallel, random);
     }
-
-    public boolean matchesForTest(TestMachine machine, int parallel, RandomSource random) {
-        return canCraft(machine) && machine.container()
-            .filter(container -> matchInputs(machine, container, parallel) ||
-                machine.config().getBoolean("void", false))
-            .filter(container -> machine.config().getBoolean("void", false) ||
-                matchOutputs(machine, container, parallel, random))
-            .isPresent();
-    }
 }
