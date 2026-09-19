@@ -23,6 +23,7 @@ import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.logistics.FilterEntry;
+import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -30,13 +31,14 @@ import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_WORKER_CONFIGS;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class LogisticWorkerTransferGameTest {
@@ -135,17 +137,13 @@ public final class LogisticWorkerTransferGameTest {
         var source = MACHINE.get(helper.getBlockEntity(route.source()));
         var worker = MACHINE.get(helper.getBlockEntity(route.worker()));
         var destination = MACHINE.get(helper.getBlockEntity(route.destination()));
-        var config = new LogisticWorkerConfig();
-        config.setValid(true);
-        config.setFrom(source.uuid(), 0);
-        config.setTo(destination.uuid(), 0);
-        if (fluidFilter == null) {
-            config.setFilter(FilterEntry.EMPTY);
-        } else {
-            config.setFilter(FilterEntry.fromFluid(fluidFilter));
-        }
+        var config = new LogisticWorkerConfig(true,
+            new LogisticComponent.PortKey(source.uuid(), 0),
+            new LogisticComponent.PortKey(destination.uuid(), 0),
+            fluidFilter == null ? FilterEntry.EMPTY : FilterEntry.fromFluid(fluidFilter));
         worker.setConfig(SetMachineConfigPacket.builder()
-            .set(PREFIX + 0, config.serializeNBT(helper.getLevel().registryAccess())).get());
+            .set(LOGISTIC_WORKER_CONFIGS, List.of(config))
+            .get());
     }
 
     private static int itemAmount(IItemHandler handler, Item item) {

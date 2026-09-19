@@ -2,11 +2,10 @@ package org.shsts.tinactory.content.gui.client;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -29,17 +28,19 @@ import org.shsts.tinactory.integration.gui.client.MenuScreen;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_WORKER_CONFIGS;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.CONFIG_WIDTH;
 import static org.shsts.tinactory.content.gui.LogisticWorkerMenu.SLOT_SYNC;
-import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
@@ -62,7 +63,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     private static final int TOP_MARGIN = FONT_HEIGHT + SPACING;
     private static final int WIDTH = CONFIG_WIDTH + PANEL_WIDTH + PORT_WIDTH + 2 * MARGIN_X;
 
-    private final HolderLookup.Provider provider;
     private final int workerSlots;
     private final IMachineConfig machineConfig;
     private final LogisticWorker worker;
@@ -92,33 +92,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected int getItemCount() {
-            var highestSlot = -1;
-            for (var slot = 0; slot < workerSlots; slot++) {
-                if (machineConfig.contains(PREFIX + slot, Tag.TAG_COMPOUND)) {
-                    highestSlot = slot;
-                }
-            }
-            return Math.min(highestSlot + 2, workerSlots);
-        }
-
-        private void deleteConfig(int index) {
-            var itemCount = getItemCount();
-            if (index == itemCount - 1 && !machineConfig.contains(PREFIX + index, Tag.TAG_COMPOUND)) {
-                return;
-            }
-
-            if (selectedConfig == index) {
-                selectedConfig = -1;
-            }
-            var packet = SetMachineConfigPacket.builder();
-            for (var slot = index + 1; slot < itemCount; slot++) {
-                var source = PREFIX + slot;
-                var destination = PREFIX + (slot - 1);
-                machineConfig.getCompound(source).ifPresentOrElse(
-                    tag -> packet.set(destination, tag), () -> packet.reset(destination));
-            }
-            packet.reset(PREFIX + (itemCount - 1));
-            menu.triggerEvent(SET_MACHINE_CONFIG, packet);
+            var count = (int) machineConfig.get(LOGISTIC_WORKER_CONFIGS)
+                .map(List::size).orElse(0);
+            return Math.min(count + 1, workerSlots);
         }
 
         private Optional<ItemStack> getIcon(LogisticComponent.PortKey key) {
@@ -131,12 +107,12 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             float partialTick, Rect rect, int index, boolean isHovering) {
             var config = getConfig(index);
 
-            var from = config.from().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
-            var to = config.to().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
+            var from = config.optionalFrom().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
+            var to = config.optionalTo().flatMap(this::getIcon).orElse(ItemStack.EMPTY);
 
             var isFrom = selectedConfig == index && selectedFrom;
             var isTo = selectedConfig == index && !selectedFrom;
-            var isValid = config.isValid();
+            var isValid = config.valid();
             var fromRect = rect.offsetLike(FROM_RECT);
             var validRect = rect.offsetLike(VALID_RECT);
             var toRect = rect.offsetLike(TO_RECT);
@@ -171,50 +147,42 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            var config = getConfig(index);
-            var needUpdate = false;
-
-            if (FROM_RECT.in(mouseX, mouseY)) {
-                if (button == 0) {
-                    selectedConfig = index;
-                    selectedFrom = true;
-                    config.from().ifPresent(p -> machinePanel.select(p.machineId()));
-                } else {
-                    config.resetFrom();
-                    needUpdate = true;
+            updateConfig(index, config -> {
+                if (FROM_RECT.in(mouseX, mouseY)) {
+                    if (button == 0) {
+                        selectedConfig = index;
+                        selectedFrom = true;
+                        config.optionalFrom().ifPresent(p -> machinePanel.select(p.machineId()));
+                    } else {
+                        return new UpdateConfigAction(false, config.resetFrom());
+                    }
+                } else if (TO_RECT.in(mouseX, mouseY)) {
+                    if (button == 0) {
+                        selectedConfig = index;
+                        selectedFrom = false;
+                        config.optionalTo().ifPresent(p -> machinePanel.select(p.machineId()));
+                    } else {
+                        return new UpdateConfigAction(false, config.resetTo());
+                    }
+                } else if (VALID_RECT.in(mouseX, mouseY)) {
+                    if (button == 0) {
+                        return new UpdateConfigAction(false, config.setValid(!config.valid()));
+                    } else {
+                        if (selectedConfig == index) {
+                            selectedConfig = -1;
+                        }
+                        return new UpdateConfigAction(true, null);
+                    }
+                } else if (FILTER_RECT.in(mouseX, mouseY)) {
+                    var filter = config.filter();
+                    var filter1 = filter.click(index, clickHelper, button, menu.getCarried(),
+                        true, true, true);
+                    if (filter1.isPresent()) {
+                        return new UpdateConfigAction(false, config.setFilter(filter1.get()));
+                    }
                 }
-            } else if (TO_RECT.in(mouseX, mouseY)) {
-                if (button == 0) {
-                    selectedConfig = index;
-                    selectedFrom = false;
-                    config.to().ifPresent(p -> machinePanel.select(p.machineId()));
-                } else {
-                    config.resetTo();
-                    needUpdate = true;
-                }
-            } else if (VALID_RECT.in(mouseX, mouseY)) {
-                if (button == 0) {
-                    config.setValid(!config.isValid());
-                } else {
-                    deleteConfig(index);
-                    return;
-                }
-                needUpdate = true;
-            } else if (FILTER_RECT.in(mouseX, mouseY)) {
-                var filter = config.filter();
-                var filter1 = filter.click(index, clickHelper, button, menu.getCarried(),
-                    true, true, true);
-                if (filter1.isPresent()) {
-                    config.setFilter(filter1.get());
-                    needUpdate = true;
-                }
-            }
-
-            if (needUpdate) {
-                var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + index, config.serializeNBT(provider));
-                menu.triggerEvent(SET_MACHINE_CONFIG, packet);
-            }
+                return new UpdateConfigAction(false, null);
+            });
         }
 
         @Override
@@ -223,9 +191,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
 
             var port = Optional.<LogisticWorkerSyncPacket.PortInfo>empty();
             if (FROM_RECT.in(mouseX, mouseY)) {
-                port = config.from().flatMap(k -> Optional.ofNullable(ports.get(k)));
+                port = config.optionalFrom().flatMap(k -> Optional.ofNullable(ports.get(k)));
             } else if (TO_RECT.in(mouseX, mouseY)) {
-                port = config.to().flatMap(k -> Optional.ofNullable(ports.get(k)));
+                port = config.optionalTo().flatMap(k -> Optional.ofNullable(ports.get(k)));
             } else if (FILTER_RECT.in(mouseX, mouseY)) {
                 return config.filter().tooltip();
             }
@@ -251,7 +219,7 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
                 return false;
             }
             var config = getConfig(selectedConfig);
-            var port1 = selectedFrom ? config.from() : config.to();
+            var port1 = selectedFrom ? config.optionalFrom() : config.optionalTo();
             return port1.filter(portKey -> port.machineId().equals(portKey.machineId()) &&
                 port.portIndex() == portKey.portIndex()).isPresent();
         }
@@ -287,17 +255,10 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             if (selectedConfig == -1) {
                 return;
             }
-            getPort(index).ifPresent(port -> {
-                var config = getConfig(selectedConfig);
-                if (selectedFrom) {
-                    config.setFrom(port.machineId(), port.portIndex());
-                } else {
-                    config.setTo(port.machineId(), port.portIndex());
-                }
-                var packet = SetMachineConfigPacket.builder()
-                    .set(PREFIX + selectedConfig, config.serializeNBT(provider));
-                menu.triggerEvent(SET_MACHINE_CONFIG, packet);
-            });
+            getPort(index).ifPresent(port -> updateConfig(index, config ->
+                new UpdateConfigAction(false, selectedFrom ?
+                    config.setFrom(port.machineId(), port.portIndex()) :
+                    config.setTo(port.machineId(), port.portIndex()))));
         }
 
         @Override
@@ -320,7 +281,6 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         this.contentHeight = menu.endY();
 
         var blockEntity = menu.blockEntity();
-        this.provider = menu.world().registryAccess();
         this.machineConfig = menu.machine.config();
         this.worker = LogisticWorker.get(blockEntity);
         this.workerSlots = worker.workerSlots;
@@ -361,6 +321,37 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
         super.removed();
     }
 
+    private record UpdateConfigAction(boolean delete, @Nullable LogisticWorkerConfig newConfig) {}
+
+    private void updateConfig(int index, Function<LogisticWorkerConfig, UpdateConfigAction> actionFunc) {
+        var configList = machineConfig.get(LOGISTIC_WORKER_CONFIGS)
+            .map(ArrayList::new)
+            .orElseGet(ArrayList::new);
+        var hasIndex = index >= 0 && index < configList.size();
+        var oldConfig = hasIndex ? configList.get(index) : LogisticWorkerConfig.EMPTY;
+        var action = actionFunc.apply(oldConfig);
+
+        var updated = false;
+        if (hasIndex && action.delete) {
+            configList.remove(index);
+            updated = true;
+        } else if (action.newConfig != null) {
+            if (hasIndex) {
+                configList.set(index, action.newConfig);
+                updated = true;
+            } else if (configList.size() < workerSlots) {
+                configList.add(index, action.newConfig);
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            var packet = SetMachineConfigPacket.builder()
+                .set(LOGISTIC_WORKER_CONFIGS, configList);
+            menu.triggerEvent(SET_MACHINE_CONFIG, packet);
+        }
+    }
+
     private void refreshConfig() {
         configPanel.refresh();
         if (selectedConfig >= configPanel.getItemCount()) {
@@ -392,8 +383,9 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
     }
 
     private LogisticWorkerConfig getConfig(int slot) {
-        return machineConfig.getCompound(PREFIX + slot)
-            .map($ -> LogisticWorkerConfig.fromTag(provider, $))
-            .orElseGet(LogisticWorkerConfig::new);
+        return machineConfig.get(LOGISTIC_WORKER_CONFIGS)
+            .filter(list -> slot >= 0 && slot < list.size())
+            .map(list -> list.get(slot))
+            .orElse(LogisticWorkerConfig.EMPTY);
     }
 }

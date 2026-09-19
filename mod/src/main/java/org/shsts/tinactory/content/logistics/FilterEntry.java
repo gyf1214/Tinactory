@@ -1,6 +1,7 @@
 package org.shsts.tinactory.content.logistics;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -35,12 +36,14 @@ import java.util.Optional;
 public record FilterEntry(@Nullable IStackKey key, @Nullable TagKey<Item> tag) {
     public static final FilterEntry EMPTY = new FilterEntry(null, null);
 
-    public static final Codec<FilterEntry> CODEC = RecordCodecBuilder.create(
+    public static final MapCodec<FilterEntry> MAP_CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             TagKey.codec(Registries.ITEM).optionalFieldOf("tagFilter").forGetter($ -> Optional.ofNullable($.tag)),
             ItemStack.SINGLE_ITEM_CODEC.optionalFieldOf("itemFilter").forGetter(FilterEntry::item),
             StackHelper.SINGLE_FLUID_CODEC.optionalFieldOf("fluidFilter").forGetter(FilterEntry::fluid)
         ).apply(instance, FilterEntry::fromStacks));
+
+    public static final Codec<FilterEntry> CODEC = MAP_CODEC.codec();
 
     public static final StreamCodec<RegistryFriendlyByteBuf, FilterEntry> STREAM_CODEC =
         ByteBufCodecs.fromCodecWithRegistries(CODEC);

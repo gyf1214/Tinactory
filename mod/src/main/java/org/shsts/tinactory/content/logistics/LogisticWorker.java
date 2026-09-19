@@ -38,8 +38,8 @@ import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.LOGISTIC_WORKER_CONFIGS;
 import static org.shsts.tinactory.AllNetworks.PRE_SIGNAL_SCHEDULING;
-import static org.shsts.tinactory.content.logistics.LogisticWorkerConfig.PREFIX;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -98,10 +98,9 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
     }
 
     private Optional<LogisticWorkerConfig> getConfig(int index) {
-        var machine = MACHINE.get(blockEntity);
-        var provider = machine.registryAccess();
-        return machine.config().getCompound(PREFIX + index)
-            .map($ -> LogisticWorkerConfig.fromTag(provider, $));
+        return MACHINE.get(blockEntity).config().get(LOGISTIC_WORKER_CONFIGS)
+            .filter(list -> index >= 0 && index < list.size())
+            .map(list -> list.get(index));
     }
 
     private static Optional<IPort<?>> getPort(IMachine machine, LogisticComponent logistic,
@@ -112,11 +111,11 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
     private static boolean validateConfig(IMachine machine, LogisticComponent logistic,
         LogisticWorkerConfig entry) {
-        if (!entry.isValid()) {
+        if (!entry.valid()) {
             return true;
         }
-        var from = entry.from();
-        var to = entry.to();
+        var from = entry.optionalFrom();
+        var to = entry.optionalTo();
         if (from.isEmpty() || to.isEmpty() || from.get().equals(to.get())) {
             return false;
         }
@@ -147,7 +146,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
 
         for (var i = 0; i < workerSlots; i++) {
             var valid = getConfig(i)
-                .filter(LogisticWorkerConfig::isValid)
+                .filter(LogisticWorkerConfig::valid)
                 .filter(entry -> validateConfig(machine, logistic, entry))
                 .isPresent();
 
@@ -207,7 +206,7 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         currentSlot = nextValidSlot[currentSlot];
 
         var entry = getConfig(currentSlot);
-        if (entry.isEmpty() || !entry.get().isValid()) {
+        if (entry.isEmpty() || !entry.get().valid()) {
             // this should not happen, we should revalidate
             LOGGER.warn("{}: unexpected invalid entry slot {}", this, currentSlot);
             needRevalidate = true;
@@ -220,8 +219,8 @@ public class LogisticWorker extends CapabilityProvider implements IEventSubscrib
         var machine = MACHINE.get(blockEntity);
         if (validateConfig(machine, logistic, entry1)) {
             LOGGER.trace("{}: transmit entry slot {}", blockEntity, currentSlot);
-            var from = entry1.from().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
-            var to = entry1.to().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
+            var from = entry1.optionalFrom().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
+            var to = entry1.optionalTo().flatMap(k -> getPort(machine, logistic, k)).orElseThrow();
             if (from.type() == PortType.ITEM) {
                 transmitItem(from.asItem(), to.asItem(), entry1.filter());
             } else {

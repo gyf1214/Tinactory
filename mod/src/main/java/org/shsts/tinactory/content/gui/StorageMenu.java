@@ -303,7 +303,9 @@ public class StorageMenu extends InventoryMenu {
     }
 
     private void onFilterClick(FilterEventPacket packet) {
-        var list = machineConfig().get(STORAGE_FILTERS).map(ArrayList::new).orElseGet(ArrayList::new);
+        var list = machineConfig().get(STORAGE_FILTERS)
+            .map(ArrayList::new)
+            .orElseGet(ArrayList::new);
         var remove = packet.remove().orElse(-1);
         var append = packet.append();
         var hasRemove = remove >= 0 && remove < list.size();

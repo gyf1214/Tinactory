@@ -13,6 +13,7 @@ import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
+import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
 import org.shsts.tinactory.content.logistics.SignalComponent;
 import org.shsts.tinactory.content.logistics.SignalConfig;
 import org.shsts.tinactory.content.logistics.StorageDetectorConfig;
@@ -60,6 +61,7 @@ public final class AllNetworks {
     public static final IEntry<IMachineConfigType<Boolean>> BATTERY_DISCHARGE;
     public static final IEntry<IMachineConfigType<StorageDetectorConfig>> STORAGE_DETECTOR;
     public static final IEntry<IMachineConfigType<SignalConfig>> SIGNAL_CONFIG;
+    public static final IEntry<IMachineConfigType<List<LogisticWorkerConfig>>> LOGISTIC_WORKER_CONFIGS;
 
     static {
         PRE_WORK_SCHEDULING = scheduling("machine/pre_work").register();
@@ -97,6 +99,8 @@ public final class AllNetworks {
         STORAGE_DETECTOR = REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(), "storage_detector",
             StorageDetectorConfig::configType);
         SIGNAL_CONFIG = legacyConfig("signal", SignalConfig.CODEC);
+        LOGISTIC_WORKER_CONFIGS = REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(),
+            "logistic_worker", LogisticWorkerConfig::configType);
     }
 
     public static void init() {}
