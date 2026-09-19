@@ -1,13 +1,19 @@
 package org.shsts.tinactory;
 
+import com.mojang.serialization.Codec;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.ResourceLocation;
+import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.SignalComponent;
+import org.shsts.tinactory.core.machine.MachineConfigType;
 import org.shsts.tinactory.integration.builder.SchedulingBuilder;
 import org.shsts.tinactory.integration.network.ComponentType;
 import org.shsts.tinactory.integration.network.NetworkComponent;
@@ -16,6 +22,7 @@ import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import static org.shsts.tinactory.AllRegistries.COMPONENT_TYPES;
+import static org.shsts.tinactory.AllRegistries.MACHINE_CONFIGS;
 import static org.shsts.tinactory.AllRegistries.SUBNET_LABELS;
 import static org.shsts.tinactory.Tinactory.REGISTRATE;
 
@@ -35,8 +42,13 @@ public final class AllNetworks {
     public static final IEntry<ComponentType<LogisticComponent>> LOGISTIC_COMPONENT;
     public static final IEntry<ComponentType<AutocraftComponent>> AUTOCRAFT_COMPONENT;
     public static final IEntry<ComponentType<SignalComponent>> SIGNAL_COMPONENT;
+
     public static final IEntry<ISubnetLabel> ELECTRIC_SUBNET;
     public static final IEntry<ISubnetLabel> LOGISTICS_SUBNET;
+
+    public static final IEntry<IMachineConfigType<Component>> MACHINE_NAME;
+    public static final IEntry<IMachineConfigType<Boolean>> AUTO_VOID;
+    public static final IEntry<IMachineConfigType<ResourceLocation>> TARGET_RECIPE;
 
     static {
         PRE_WORK_SCHEDULING = scheduling("machine/pre_work").register();
@@ -60,8 +72,13 @@ public final class AllNetworks {
         LOGISTIC_COMPONENT = componentType("logistics", LogisticComponent.class, LogisticComponent::new);
         AUTOCRAFT_COMPONENT = componentType("autocraft", AutocraftComponent.class, AutocraftComponent::new);
         SIGNAL_COMPONENT = componentType("signal", SignalComponent.class, SignalComponent::new);
+
         ELECTRIC_SUBNET = subnetLabel("electric");
         LOGISTICS_SUBNET = subnetLabel("logistics");
+
+        MACHINE_NAME = legacyConfig("name", ComponentSerialization.CODEC);
+        AUTO_VOID = legacyConfig("auto_void", Codec.BOOL, "void");
+        TARGET_RECIPE = legacyConfig("target_recipe", ResourceLocation.CODEC, "targetRecipe");
     }
 
     public static void init() {}
@@ -78,5 +95,14 @@ public final class AllNetworks {
 
     private static IEntry<ISubnetLabel> subnetLabel(String id) {
         return REGISTRATE.registryEntry(SUBNET_LABELS.getHandler(), id, SubnetLabel::new);
+    }
+
+    private static <T> IEntry<IMachineConfigType<T>> legacyConfig(String id, Codec<T> codec) {
+        return legacyConfig(id, codec, id);
+    }
+
+    private static <T> IEntry<IMachineConfigType<T>> legacyConfig(String id, Codec<T> codec, String legacyKey) {
+        return REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(), id,
+            () -> new MachineConfigType<>(codec, legacyKey));
     }
 }

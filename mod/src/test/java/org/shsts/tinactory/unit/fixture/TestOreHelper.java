@@ -4,9 +4,9 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.IOreShape;
 
@@ -20,7 +20,7 @@ public final class TestOreHelper {
     public static final Block GOLD_ORE = Registry.register(BLOCKS, modLoc("ore/gold"), Blocks.GOLD_ORE);
 
     public static final MappedRegistry<IOreShape<?, ?>> SHAPES = new MappedRegistry<>(
-        ResourceKey.createRegistryKey(modLoc("ore_shape")), Lifecycle.stable());
+        AllRegistries.ORE_SHAPES.key(), Lifecycle.stable());
     public static final EllipsoidShape ELLIPSOID = Registry.register(SHAPES, modLoc("ellipsoid"),
         new EllipsoidShape());
 

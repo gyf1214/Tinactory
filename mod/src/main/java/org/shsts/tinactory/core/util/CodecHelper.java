@@ -21,7 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -30,6 +29,7 @@ import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.StringRepresentable;
 import org.shsts.tinactory.api.logistics.PortDirection;
@@ -113,12 +113,13 @@ public final class CodecHelper {
             .orElseGet(() -> DataResult.error(() -> "Unregistered value in " + registryKey + ": " + value));
     }
 
-    public static CompoundTag readRequiredNbt(FriendlyByteBuf buf, String name) {
-        var tag = buf.readNbt();
-        if (tag == null) {
-            throw new IllegalArgumentException("Missing " + name + " payload");
-        }
-        return tag;
+    public static <T> Optional<Holder<T>> lookupHolder(HolderLookup.Provider provider, ResourceKey<T> key) {
+        return provider.lookup(key.registryKey()).flatMap($ -> $.get(key));
+    }
+
+    public static <T> Optional<Holder<T>> lookupHolder(HolderLookup.Provider provider,
+        ResourceKey<? extends Registry<T>> registryKey, ResourceLocation loc) {
+        return lookupHolder(provider, ResourceKey.create(registryKey, loc));
     }
 
     public static CompoundTag encodeBlockPos(BlockPos pos) {

@@ -40,6 +40,7 @@ import static org.shsts.tinactory.AllEvents.CLIENT_TICK;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.MACHINE_NAME;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -295,7 +296,7 @@ public class MultiblockInterface extends Machine {
 
     @Override
     public Component title() {
-        if (config.contains("name", Tag.TAG_STRING) || multiblock == null) {
+        if (config.contains(MACHINE_NAME.get()) || multiblock == null) {
             return super.title();
         }
         return I18n.name(multiblock.blockEntity.getBlockState().getBlock());

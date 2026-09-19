@@ -1,85 +1,72 @@
 package org.shsts.tinactory.unit.machine;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestMachine.AUTO_VOID;
+import static org.shsts.tinactory.unit.fixture.TestMachine.MACHINE_CONFIGS;
+import static org.shsts.tinactory.unit.fixture.TestMachine.MACHINE_LIMIT;
+import static org.shsts.tinactory.unit.fixture.TestMachine.MACHINE_NAME;
 
 class MachineConfigTest {
+    private static final RegistryAccess REGISTRY = TestCodecHelper.createRegistry(MACHINE_CONFIGS);
+
     @Test
     void shouldApplySetAndResetPacketValues() {
         var config = new MachineConfig();
         config.apply(SetMachineConfigPacket.builder()
-            .set("enabled", true)
-            .set("limit", 42)
-            .set("name", "machine")
+            .set(AUTO_VOID, true)
+            .set(MACHINE_LIMIT, 42)
+            .set(MACHINE_NAME, "machine")
             .get());
 
         config.apply(SetMachineConfigPacket.builder()
-            .set("limit", 7)
-            .reset("name")
+            .set(MACHINE_LIMIT, 7)
+            .reset(MACHINE_NAME)
             .get());
 
-        assertEquals(Optional.of(true), config.getBoolean("enabled"));
-        assertEquals(Optional.of(7), config.getInt("limit"));
-        assertEquals(Optional.empty(), config.getString("name"));
+        assertEquals(Optional.of(true), config.get(AUTO_VOID));
+        assertEquals(Optional.of(7), config.get(MACHINE_LIMIT));
+        assertEquals(Optional.empty(), config.get(MACHINE_NAME));
     }
 
     @Test
-    void shouldDefensivelyCopyAppliedAndSerializedTags() {
+    void shouldRoundTripSerialization() {
         var config = new MachineConfig();
-        var child = new CompoundTag();
-        child.putString("value", "original");
         config.apply(SetMachineConfigPacket.builder()
-            .set("child", child)
+            .set(AUTO_VOID, true)
+            .set(MACHINE_LIMIT, 42)
+            .set(MACHINE_NAME, "machine")
             .get());
 
-        child.putString("value", "mutated");
-        var serialized = config.serializeNBT(TEST_REGISTRY);
-        serialized.getCompound("child").putString("value", "serialized-mutation");
+        var serialized = config.serializeNBT(REGISTRY);
+        var config1 = new MachineConfig();
+        config1.deserializeNBT(REGISTRY, serialized);
 
-        assertEquals("original", config.getCompound("child").orElseThrow().getString("value"));
+        assertEquals(Optional.of(true), config1.get(AUTO_VOID));
+        assertEquals(Optional.of(42), config1.get(MACHINE_LIMIT));
+        assertEquals(Optional.of("machine"), config1.get(MACHINE_NAME));
     }
 
     @Test
-    void shouldDefensivelyCopyDeserializedTag() {
+    void shouldDeserializeLegacyKeyAsWellAsNormalKey() {
+        var serialized = new CompoundTag();
+        serialized.putBoolean("void", true);
+        serialized.putInt("tinactory:limit", 42);
+        serialized.putString("tinactory:name", "machine");
+
         var config = new MachineConfig();
-        var source = new CompoundTag();
-        source.putString("name", "before");
+        config.deserializeNBT(REGISTRY, serialized);
 
-        config.deserializeNBT(TEST_REGISTRY, source);
-        source.putString("name", "after");
-
-        assertEquals(Optional.of("before"), config.getString("name"));
-    }
-
-    @Test
-    void shouldReadTypedOptionalValues() {
-        var config = new MachineConfig();
-        var child = new CompoundTag();
-        child.putInt("nested", 3);
-        config.apply(SetMachineConfigPacket.builder()
-            .set("enabled", true)
-            .set("limit", 42)
-            .set("capacity", 3000000000L)
-            .set("name", "machine")
-            .set("child", child)
-            .get());
-
-        assertTrue(config.contains("enabled", Tag.TAG_BYTE));
-        assertEquals(Optional.of(true), config.getBoolean("enabled"));
-        assertEquals(Optional.of(42), config.getInt("limit"));
-        assertEquals(Optional.of(3000000000L), config.getLong("capacity"));
-        assertEquals(Optional.of("machine"), config.getString("name"));
-        assertEquals(3, config.getCompound("child").orElseThrow().getInt("nested"));
-        assertFalse(config.getBoolean("missing").isPresent());
+        assertEquals(Optional.of(true), config.get(AUTO_VOID));
+        assertEquals(Optional.of(42), config.get(MACHINE_LIMIT));
+        assertEquals(Optional.of("machine"), config.get(MACHINE_NAME));
     }
 }

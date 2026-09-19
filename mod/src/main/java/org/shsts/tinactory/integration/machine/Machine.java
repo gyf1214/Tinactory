@@ -65,6 +65,7 @@ import static org.shsts.tinactory.AllEvents.SERVER_TICK;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.MACHINE_NAME;
 import static org.shsts.tinactory.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.WORK_SCHEDULING;
@@ -271,8 +272,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
-        return config.getTag("name")
-            .map($ -> CodecHelper.parseTag(registryAccess(), ComponentSerialization.CODEC, $))
+        return config.get(MACHINE_NAME.get())
             .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 

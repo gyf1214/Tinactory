@@ -98,7 +98,7 @@ public class FusionRuntime extends ProcessingRuntime {
         if (!charging) {
             return super.powerCons();
         }
-        return Math.min(chargeRate(), Math.max(0d, startupCapacity() - startupEnergy));
+        return Math.clamp(startupCapacity() - startupEnergy, 0d, chargeRate());
     }
 
     @Override

@@ -1,10 +1,9 @@
 package org.shsts.tinactory.unit.fixture;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -12,12 +11,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.AllNetworks;
+import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.gui.IRenderDescriptor;
 import org.shsts.tinactory.api.logistics.IContainer;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.api.machine.IProcessor;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
@@ -28,7 +30,12 @@ import org.shsts.tinactory.api.tech.IServerTeamProfile;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.api.tech.ITechnology;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
+import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.core.machine.MachineConfig;
+import org.shsts.tinactory.core.machine.MachineConfigType;
 import org.shsts.tinactory.core.util.I18n;
+import org.shsts.tinycorelib.api.core.ILoc;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,9 +45,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.shsts.tinactory.core.util.LocHelper.modLoc;
+
 public final class TestMachine implements IMachine {
     private final UUID id = UUID.fromString("00000000-0000-0000-0000-000000000031");
-    private final TestMachineConfig config = new TestMachineConfig();
+    private final IMachineConfig config = new MachineConfig();
     private final RandomSource random = RandomSource.create(31L);
     private Optional<IContainer> container;
     private Optional<IElectricMachine> electric = Optional.empty();
@@ -58,8 +67,12 @@ public final class TestMachine implements IMachine {
         return this;
     }
 
+    private <T> void setConfig(IEntry<IMachineConfigType<T>> type, T val) {
+        config.apply(SetMachineConfigPacket.builder().set(type, val).get());
+    }
+
     public TestMachine autoVoid(boolean value) {
-        config.booleanValue("void", value);
+        setConfig(AUTO_VOID, value);
         return this;
     }
 
@@ -69,7 +82,7 @@ public final class TestMachine implements IMachine {
     }
 
     public TestMachine targetRecipe(ResourceLocation loc) {
-        config.stringValue("targetRecipe", loc.toString());
+        setConfig(TARGET_RECIPE, loc);
         return this;
     }
 
@@ -194,83 +207,7 @@ public final class TestMachine implements IMachine {
     }
 
     @Override
-    public void buildSchedulings(ISchedulingRegister builder) {
-    }
-
-    private static final class TestMachineConfig implements IMachineConfig {
-        private final Map<String, Boolean> booleans = new HashMap<>();
-        private final Map<String, String> strings = new HashMap<>();
-
-        private void booleanValue(String key, boolean value) {
-            booleans.put(key, value);
-        }
-
-        private void stringValue(String key, String value) {
-            strings.put(key, value);
-        }
-
-        @Override
-        public void apply(ISetMachineConfigPacket packet) {
-            for (var key : packet.getResets()) {
-                booleans.remove(key);
-                strings.remove(key);
-            }
-            packet.getSets().getAllKeys().forEach(key -> {
-                var tag = packet.getSets().get(key);
-                if (tag instanceof StringTag stringTag) {
-                    strings.put(key, stringTag.getAsString());
-                }
-            });
-        }
-
-        @Override
-        public boolean contains(String key, int tagType) {
-            return booleans.containsKey(key) || strings.containsKey(key);
-        }
-
-        @Override
-        public Optional<Boolean> getBoolean(String key) {
-            return Optional.ofNullable(booleans.get(key));
-        }
-
-        @Override
-        public Optional<Integer> getInt(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Long> getLong(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<String> getString(String key) {
-            return Optional.ofNullable(strings.get(key));
-        }
-
-        @Override
-        public Optional<CompoundTag> getCompound(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Tag> getTag(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<ListTag> getList(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-            return new CompoundTag();
-        }
-
-        @Override
-        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
-    }
+    public void buildSchedulings(ISchedulingRegister builder) {}
 
     private record TestProcessor(Set<ResourceLocation> recipeTypes) implements IMachineProcessor {
         @Override
@@ -493,5 +430,26 @@ public final class TestMachine implements IMachine {
         public IRenderDescriptor getDisplay() {
             return EmptyRenderDescriptor.INSTANCE;
         }
+    }
+
+    public static final MappedRegistry<IMachineConfigType<?>> MACHINE_CONFIGS = new MappedRegistry<>(
+        AllRegistries.MACHINE_CONFIGS.key(), Lifecycle.stable());
+
+    public static final IEntry<IMachineConfigType<Boolean>> AUTO_VOID =
+        machineConfig(AllNetworks.AUTO_VOID, Codec.BOOL, "void");
+    public static final IEntry<IMachineConfigType<ResourceLocation>> TARGET_RECIPE =
+        machineConfig(AllNetworks.TARGET_RECIPE, ResourceLocation.CODEC, "targetRecipe");
+    public static final IEntry<IMachineConfigType<Integer>> MACHINE_LIMIT = machineConfig("limit", Codec.INT);
+    public static final IEntry<IMachineConfigType<String>> MACHINE_NAME = machineConfig("name", Codec.STRING);
+
+    private static <T> IEntry<IMachineConfigType<T>> machineConfig(ILoc loc, Codec<T> codec, String legacyKey) {
+        var val = Registry.register(MACHINE_CONFIGS, loc.loc(), new MachineConfigType<>(codec, legacyKey));
+        return TestCodecHelper.createEntry(loc.loc(), val);
+    }
+
+    private static <T> IEntry<IMachineConfigType<T>> machineConfig(String id, Codec<T> codec) {
+        var loc = modLoc(id);
+        var val = Registry.register(MACHINE_CONFIGS, loc, new MachineConfigType<>(codec, null));
+        return TestCodecHelper.createEntry(loc, val);
     }
 }

@@ -14,6 +14,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.metrics.IMetricsCallback;
 import org.shsts.tinactory.api.network.IComponentType;
 import org.shsts.tinactory.api.network.IScheduling;
@@ -41,6 +42,7 @@ public final class AllRegistries {
     public static final IRegistry<ISubnetLabel> SUBNET_LABELS;
     public static final IRegistry<IMetricsCallback> METRICS_CALLBACKS;
     public static final IRegistry<IOreShape<?, ?>> ORE_SHAPES;
+    public static final IRegistry<IMachineConfigType<?>> MACHINE_CONFIGS;
 
     public static final IEntryHandler<IEvent<?>> EVENTS;
     public static final IEntryHandler<Block> BLOCKS;
@@ -64,6 +66,8 @@ public final class AllRegistries {
             .onBake(MetricsManager::onBake)
             .register();
         ORE_SHAPES = REGISTRATE.<IOreShape<?, ?>>genericRegistry("ore_shape", IOreShape.class)
+            .register();
+        MACHINE_CONFIGS = REGISTRATE.<IMachineConfigType<?>>genericRegistry("machine_config", IMachineConfigType.class)
             .register();
 
         EVENTS = REGISTRATE.getHandler(EVENT_REGISTRY_KEY);

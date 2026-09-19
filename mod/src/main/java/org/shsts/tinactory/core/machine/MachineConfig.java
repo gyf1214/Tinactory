@@ -2,83 +2,170 @@ package org.shsts.tinactory.core.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
+import org.shsts.tinactory.core.util.CodecHelper;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import static org.shsts.tinactory.AllRegistries.MACHINE_CONFIGS;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineConfig implements IMachineConfig {
-    private CompoundTag tag = new CompoundTag();
+    public record Entry<T>(ResourceLocation loc, IMachineConfigType<T> type, T value)
+        implements IMachineConfig.Entry<T> {
+        @Override
+        public T get() {
+            return value;
+        }
+    }
+
+    private final Map<IMachineConfigType<?>, IMachineConfig.Entry<?>> configs = new IdentityHashMap<>();
+    private final Map<String, Tag> unknownTags = new HashMap<>();
+
+    public static <T> Entry<T> fromTag(HolderLookup.Provider provider,
+        ResourceLocation loc, IMachineConfigType<T> type, Tag tag) {
+        var val = CodecHelper.parseTag(provider, type.codec(), tag);
+        return new Entry<>(loc, type, val);
+    }
+
+    public static <T> Tag encodeVal(HolderLookup.Provider provider, IMachineConfig.Entry<T> entry) {
+        return CodecHelper.encodeTag(provider, entry.type().codec(), entry.get());
+    }
+
+    public static <T> Entry<T> fromStream(RegistryFriendlyByteBuf buf, ResourceLocation loc,
+        IMachineConfigType<T> type) {
+        var val = type.streamCodec().decode(buf);
+        return new Entry<>(loc, type, val);
+    }
+
+    public static <T> void encodeVal(RegistryFriendlyByteBuf buf, IMachineConfig.Entry<T> entry) {
+        entry.type().streamCodec().encode(buf, entry.get());
+    }
+
+    @Override
+    public boolean contains(IMachineConfigType<?> type) {
+        return configs.containsKey(type);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> get(IMachineConfigType<T> type) {
+        return Optional.ofNullable(configs.get(type)).map($ -> (T) $.get());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> get(HolderLookup.Provider provider, ResourceLocation loc) {
+        return CodecHelper.lookupHolder(provider, MACHINE_CONFIGS.key(), loc)
+            .flatMap($ -> get((IMachineConfigType<T>) $.value()));
+    }
 
     @Override
     public boolean contains(String key, int tagType) {
-        return tag.contains(key, tagType);
+        return false;
     }
 
     @Override
     public Optional<Boolean> getBoolean(String key) {
-        return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public Optional<Integer> getInt(String key) {
-        return tag.contains(key, Tag.TAG_INT) ? Optional.of(tag.getInt(key)) : Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public Optional<Long> getLong(String key) {
-        return tag.contains(key, Tag.TAG_LONG) ? Optional.of(tag.getLong(key)) : Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public Optional<String> getString(String key) {
-        return tag.contains(key, Tag.TAG_STRING) ? Optional.of(tag.getString(key)) :
-            Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public Optional<Tag> getTag(String key) {
-        return Optional.ofNullable(tag.get(key));
+        return Optional.empty();
     }
 
     @Override
     public Optional<ListTag> getList(String key) {
-        return tag.contains(key, Tag.TAG_LIST) ? Optional.ofNullable((ListTag) tag.get(key)) :
-            Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public Optional<CompoundTag> getCompound(String key) {
-        return tag.contains(key, Tag.TAG_COMPOUND) ? Optional.of(tag.getCompound(key)) :
-            Optional.empty();
+        return Optional.empty();
     }
 
     @Override
     public void apply(ISetMachineConfigPacket packet) {
-        var sets = packet.getSets();
-        for (var k : sets.getAllKeys()) {
-            var v = sets.get(k);
-            assert v != null;
-            tag.put(k, v.copy());
+        for (var set : packet.getSets()) {
+            configs.put(set.type(), set);
         }
-        for (var key : packet.getResets()) {
-            tag.remove(key);
+        for (var reset : packet.getResets()) {
+            configs.remove(reset);
         }
     }
 
     @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        return tag.copy();
+        var tag = new CompoundTag();
+        for (var entry : configs.values()) {
+            tag.put(entry.loc().toString(), encodeVal(provider, entry));
+        }
+        for (var entry : unknownTags.entrySet()) {
+            tag.put(entry.getKey(), entry.getValue());
+        }
+        return tag;
+    }
+
+    private static Optional<? extends Holder<IMachineConfigType<?>>> lookupType(
+        HolderLookup.RegistryLookup<IMachineConfigType<?>> lookup, String key) {
+        if (key.contains(":")) {
+            var holder = lookup.get(ResourceKey.create(MACHINE_CONFIGS.key(), ResourceLocation.parse(key)));
+            if (holder.isPresent()) {
+                return holder;
+            }
+        }
+        return lookup.listElements()
+            .filter($ -> $.value().legacyKey().filter(key::equals).isPresent())
+            .findAny();
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-        this.tag = tag.copy();
+        configs.clear();
+        unknownTags.clear();
+        var lookup = provider.lookupOrThrow(MACHINE_CONFIGS.key());
+        for (var key : tag.getAllKeys()) {
+            var val = Objects.requireNonNull(tag.get(key));
+            var typeHolder = lookupType(lookup, key);
+            if (typeHolder.isPresent()) {
+                var holder = typeHolder.get();
+                var loc = holder.unwrapKey().orElseThrow().location();
+                var type = holder.value();
+                configs.put(holder.value(), fromTag(provider, loc, type, val));
+            } else {
+                unknownTags.put(key, val);
+            }
+        }
     }
 }

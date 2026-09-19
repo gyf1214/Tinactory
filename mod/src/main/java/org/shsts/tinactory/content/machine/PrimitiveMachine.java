@@ -2,10 +2,6 @@ package org.shsts.tinactory.content.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +17,7 @@ import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.machine.EmptyMachineConfig;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
@@ -68,59 +65,6 @@ public class PrimitiveMachine extends CapabilityProvider implements IMachine, IE
             // prevent updateShape on neighbor
             world.setBlock(blockEntity.getBlockPos(), state.setValue(WORKING, working), 19);
         }
-    }
-
-    private static class EmptyMachineConfig implements IMachineConfig {
-        @Override
-        public void apply(ISetMachineConfigPacket packet) {}
-
-        @Override
-        public boolean contains(String key, int tagType) {
-            return false;
-        }
-
-        @Override
-        public Optional<Boolean> getBoolean(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Integer> getInt(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Long> getLong(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<String> getString(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Tag> getTag(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<ListTag> getList(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<CompoundTag> getCompound(String key) {
-            return Optional.empty();
-        }
-
-        @Override
-        public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-            return new CompoundTag();
-        }
-
-        @Override
-        public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {}
     }
 
     private final EmptyMachineConfig machineConfig = new EmptyMachineConfig();

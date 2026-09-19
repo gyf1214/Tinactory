@@ -2,10 +2,11 @@ package org.shsts.tinactory.api.machine;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -13,11 +14,27 @@ import java.util.function.Supplier;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface ISetMachineConfigPacket extends IPacket {
-    CompoundTag getSets();
+    List<? extends IMachineConfig.Entry<?>> getSets();
 
-    List<String> getResets();
+    List<IMachineConfigType<?>> getResets();
 
     interface Builder extends Supplier<ISetMachineConfigPacket> {
+        Builder reset(IMachineConfigType<?> type);
+
+        default Builder reset(IEntry<? extends IMachineConfigType<?>> type) {
+            return reset(type.get());
+        }
+
+        Builder reset(HolderLookup.Provider provider, ResourceLocation loc);
+
+        <T> Builder set(ResourceLocation loc, IMachineConfigType<T> type, T val);
+
+        default <T> Builder set(IEntry<IMachineConfigType<T>> type, T val) {
+            return set(type.loc(), type.get(), val);
+        }
+
+        <T> Builder set(HolderLookup.Provider provider, ResourceLocation loc, T val);
+
         Builder reset(String key);
 
         Builder set(String key, boolean val);

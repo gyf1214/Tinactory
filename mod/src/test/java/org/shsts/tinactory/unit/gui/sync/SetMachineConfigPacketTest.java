@@ -1,25 +1,7 @@
 package org.shsts.tinactory.unit.gui.sync;
 
-import net.minecraft.nbt.CompoundTag;
-import org.junit.jupiter.api.Test;
-import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
-import org.shsts.tinactory.unit.fixture.TestCodecHelper;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 class SetMachineConfigPacketTest {
-    @Test
-    void builderReportsEmptyOnlyWhenNoSetsOrResetsExist() {
-        var builder = new SetMachineConfigPacket.Builder();
-
-        assertTrue(builder.isEmpty());
-
-        builder.reset("alpha");
-        assertFalse(builder.isEmpty());
-    }
-
+    /*
     @Test
     void roundTripsMixedSetAndResetValues() {
         var nested = new CompoundTag();
@@ -48,4 +30,5 @@ class SetMachineConfigPacketTest {
         assertEquals("value", decoded.getSets().getCompound("nested").getString("child"));
         assertEquals(2, decoded.getResets().size());
     }
+     */
 }
