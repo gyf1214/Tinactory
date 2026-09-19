@@ -29,10 +29,6 @@ public interface IMachineConfig extends INBTSerializable<CompoundTag> {
 
     void apply(ISetMachineConfigPacket packet);
 
-    boolean contains(String key, int tagType);
-
-    Optional<CompoundTag> getCompound(String key);
-
     interface Entry<T> extends IEntry<T> {
         IMachineConfigType<T> type();
     }

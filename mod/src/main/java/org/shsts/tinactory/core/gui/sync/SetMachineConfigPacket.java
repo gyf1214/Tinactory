@@ -4,7 +4,6 @@ import io.netty.handler.codec.DecoderException;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -121,16 +120,6 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
         public <T> ISetMachineConfigPacket.Builder set(HolderLookup.Provider provider,
             ResourceLocation loc, T val) {
             return set(loc, lookupType(provider, loc), val);
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder reset(String key) {
-            return this;
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder set(String key, Tag tag) {
-            return this;
         }
 
         @Override

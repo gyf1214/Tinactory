@@ -33,16 +33,6 @@ public class EmptyMachineConfig implements IMachineConfig {
     public void apply(ISetMachineConfigPacket packet) {}
 
     @Override
-    public boolean contains(String key, int tagType) {
-        return false;
-    }
-
-    @Override
-    public Optional<CompoundTag> getCompound(String key) {
-        return Optional.empty();
-    }
-
-    @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         return new CompoundTag();
     }

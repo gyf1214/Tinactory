@@ -3,7 +3,6 @@ package org.shsts.tinactory.api.machine;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinycorelib.api.network.IPacket;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
@@ -30,9 +29,5 @@ public interface ISetMachineConfigPacket extends IPacket {
         <T> Builder set(IEntry<IMachineConfigType<T>> type, T val);
 
         <T> Builder set(HolderLookup.Provider provider, ResourceLocation loc, T val);
-
-        Builder reset(String key);
-
-        Builder set(String key, Tag tag);
     }
 }

@@ -75,16 +75,6 @@ public class MachineConfig implements IMachineConfig {
     }
 
     @Override
-    public boolean contains(String key, int tagType) {
-        return false;
-    }
-
-    @Override
-    public Optional<CompoundTag> getCompound(String key) {
-        return Optional.empty();
-    }
-
-    @Override
     public void apply(ISetMachineConfigPacket packet) {
         for (var set : packet.getSets()) {
             configs.put(set.type(), set);
