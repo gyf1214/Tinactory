@@ -11,7 +11,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class EllipsoidShapeTest {
     private final EllipsoidShape shape = new EllipsoidShape();
@@ -43,15 +43,15 @@ class EllipsoidShapeTest {
         var definitionCodec = shape.definitionCodec().codec();
         var instanceCodec = shape.instanceCodec().codec();
 
-        var definitionJson = CodecHelper.encodeJson(TEST_REGISTRY, definitionCodec, definition);
-        var definitionTag = CodecHelper.encodeTag(TEST_REGISTRY, definitionCodec, definition);
-        var instanceJson = CodecHelper.encodeJson(TEST_REGISTRY, instanceCodec, instance);
-        var instanceTag = CodecHelper.encodeTag(TEST_REGISTRY, instanceCodec, instance);
+        var definitionJson = CodecHelper.encodeJson(EMPTY_REGISTRY, definitionCodec, definition);
+        var definitionTag = CodecHelper.encodeTag(EMPTY_REGISTRY, definitionCodec, definition);
+        var instanceJson = CodecHelper.encodeJson(EMPTY_REGISTRY, instanceCodec, instance);
+        var instanceTag = CodecHelper.encodeTag(EMPTY_REGISTRY, instanceCodec, instance);
 
-        assertEquals(definition, CodecHelper.parseJson(TEST_REGISTRY, definitionCodec, definitionJson));
-        assertEquals(definition, CodecHelper.parseTag(TEST_REGISTRY, definitionCodec, definitionTag));
-        assertEquals(instance, CodecHelper.parseJson(TEST_REGISTRY, instanceCodec, instanceJson));
-        assertEquals(instance, CodecHelper.parseTag(TEST_REGISTRY, instanceCodec, instanceTag));
+        assertEquals(definition, CodecHelper.parseJson(EMPTY_REGISTRY, definitionCodec, definitionJson));
+        assertEquals(definition, CodecHelper.parseTag(EMPTY_REGISTRY, definitionCodec, definitionTag));
+        assertEquals(instance, CodecHelper.parseJson(EMPTY_REGISTRY, instanceCodec, instanceJson));
+        assertEquals(instance, CodecHelper.parseTag(EMPTY_REGISTRY, instanceCodec, instanceTag));
     }
 
     @Test
@@ -245,5 +245,4 @@ class EllipsoidShapeTest {
         assertEquals(0.75d, shape.fillFactor(123L, center, new BlockPos(10, 20, 32), instance));
         assertEquals(0d, shape.fillFactor(123L, center, new BlockPos(11, 20, 30), instance));
     }
-
 }

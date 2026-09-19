@@ -12,7 +12,7 @@ import org.shsts.tinactory.unit.fixture.TestTechnologyHelper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class TinactorySavedDataTest {
     @Test
@@ -39,7 +39,7 @@ class TinactorySavedDataTest {
         var profile = data.getTeamProfile("alpha");
         profile.setTechProgress(known, 6L);
         profile.setTargetTech(known);
-        var saved = data.save(new CompoundTag(), TEST_REGISTRY);
+        var saved = data.save(new CompoundTag(), EMPTY_REGISTRY);
 
         var teams = saved.getList("teams", Tag.TAG_COMPOUND);
         var teamTag = teams.getCompound(0);
@@ -50,7 +50,7 @@ class TinactorySavedDataTest {
         tech.add(unknownTechTag);
         teamTag.putString("target", "tinactory:missing");
 
-        var loaded = TinactorySavedData.fromTag(saved, TEST_REGISTRY, manager);
+        var loaded = TinactorySavedData.fromTag(saved, EMPTY_REGISTRY, manager);
         var loadedProfile = loaded.getTeamProfile("alpha");
 
         assertEquals(6L, loadedProfile.getTechProgress(known));

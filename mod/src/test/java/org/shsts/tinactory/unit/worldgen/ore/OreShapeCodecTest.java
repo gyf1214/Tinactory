@@ -1,27 +1,29 @@
 package org.shsts.tinactory.unit.worldgen.ore;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import org.junit.jupiter.api.Test;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.worldgen.ore.EllipsoidShape;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeDefinition;
 import org.shsts.tinactory.core.worldgen.ore.OreShapeInstance;
 import org.shsts.tinactory.core.worldgen.ore.OreVeinUtil;
+import org.shsts.tinactory.unit.fixture.TestCodecHelper;
 import org.shsts.tinactory.unit.fixture.TestOreHelper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createRegistry;
 import static org.shsts.tinactory.unit.fixture.TestOreHelper.ELLIPSOID;
 
 class OreShapeCodecTest {
+    private static final RegistryAccess REGISTRY = TestCodecHelper.createRegistry(TestOreHelper.SHAPES);
+
     @Test
     void definitionCodecShouldDispatchToAFlatTypedPayload() {
         var value = new OreShapeDefinition<>(ELLIPSOID, new EllipsoidShape.Definition(100d, 200d, 0.6d, 2d, 5d));
-        var registryAccess = createRegistry(TestOreHelper.SHAPES);
-        var json = CodecHelper.encodeJson(registryAccess, OreVeinUtil.DEFINITION_CODEC.codec(), value)
+        var json = CodecHelper.encodeJson(REGISTRY, OreVeinUtil.DEFINITION_CODEC.codec(), value)
             .getAsJsonObject();
 
         assertEquals(modLoc("ellipsoid").toString(), json.get("type").getAsString());
@@ -35,13 +37,12 @@ class OreShapeCodecTest {
     @Test
     void instanceCodecShouldRoundTripThroughJsonAndNbt() {
         var value = new OreShapeInstance<>(ELLIPSOID, new EllipsoidShape.Instance(6, 2, 4, 1.25d));
-        var registryAccess = createRegistry(TestOreHelper.SHAPES);
         var codec = OreVeinUtil.INSTANCE_CODEC.codec();
-        var json = CodecHelper.encodeJson(registryAccess, codec, value);
-        var tag = CodecHelper.encodeTag(registryAccess, codec, value);
+        var json = CodecHelper.encodeJson(REGISTRY, codec, value);
+        var tag = CodecHelper.encodeTag(REGISTRY, codec, value);
 
-        assertEquals(value, CodecHelper.parseJson(registryAccess, codec, json));
-        assertEquals(value, CodecHelper.parseTag(registryAccess, codec, tag));
+        assertEquals(value, CodecHelper.parseJson(REGISTRY, codec, json));
+        assertEquals(value, CodecHelper.parseTag(REGISTRY, codec, tag));
         assertEquals(modLoc("ellipsoid").toString(), json.getAsJsonObject().get("type").getAsString());
         assertEquals(6d, json.getAsJsonObject().get("radius_long").getAsDouble());
         assertEquals(4d, json.getAsJsonObject().get("radius_short").getAsDouble());
@@ -58,10 +59,9 @@ class OreShapeCodecTest {
         json.addProperty("radius_y", 2);
         json.addProperty("radius_short", 2);
         json.addProperty("angle", 0);
-        var registryAccess = createRegistry(TestOreHelper.SHAPES);
 
         assertThrows(RuntimeException.class,
-            () -> CodecHelper.parseJson(registryAccess, OreVeinUtil.INSTANCE_CODEC.codec(), json));
+            () -> CodecHelper.parseJson(REGISTRY, OreVeinUtil.INSTANCE_CODEC.codec(), json));
     }
 
     @Test
@@ -71,9 +71,8 @@ class OreShapeCodecTest {
         json.addProperty("radius_x", 4);
         json.addProperty("radius_y", 2);
         json.addProperty("radius_z", 6);
-        var registryAccess = createRegistry(TestOreHelper.SHAPES);
 
         assertThrows(RuntimeException.class,
-            () -> CodecHelper.parseJson(registryAccess, OreVeinUtil.INSTANCE_CODEC.codec(), json));
+            () -> CodecHelper.parseJson(REGISTRY, OreVeinUtil.INSTANCE_CODEC.codec(), json));
     }
 }

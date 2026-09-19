@@ -21,7 +21,7 @@ public final class TestCodecHelper {
 
     public static final ITinyCoreLib CORE = ITinyCoreLib.get();
 
-    public static final RegistryAccess TEST_REGISTRY = new RegistryAccess() {
+    public static final RegistryAccess EMPTY_REGISTRY = new RegistryAccess() {
         @Override
         public <E> Optional<Registry<E>> registry(ResourceKey<? extends Registry<? extends E>> registryKey) {
             throw new UnsupportedOperationException();
@@ -42,7 +42,7 @@ public final class TestCodecHelper {
     }
 
     public static RegistryFriendlyByteBuf buf() {
-        return buf(TEST_REGISTRY);
+        return buf(EMPTY_REGISTRY);
     }
 
     public static <U> IEntry<U> createEntry(ResourceLocation loc, U obj) {

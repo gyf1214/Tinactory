@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class TechInitPacketTest {
     @Test
@@ -43,7 +43,7 @@ class TechInitPacketTest {
         assertEquals(new ItemIdRenderDescriptor(modLoc("display_item")),
             decodedTechs.get(1).technology().getDisplay());
 
-        var jo = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decodedTechs.get(1).technology())
+        var jo = CodecHelper.encodeJson(EMPTY_REGISTRY, Technology.CODEC, decodedTechs.get(1).technology())
             .getAsJsonObject();
         assertEquals("tinactory:display_item", jo.get("display_item").getAsString());
         assertEquals("tinactory:textures/gui/technology/target", jo.get("display_texture").getAsString());

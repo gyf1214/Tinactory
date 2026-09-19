@@ -15,7 +15,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.INGREDIENT_CODEC;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.INPUT_CODEC;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.OUTPUT_CODEC;
@@ -31,8 +31,8 @@ class ProcessingObjectCodecTest {
             List.of(output(1, "ingot", 3)),
             40, 120, 16);
 
-        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), recipe);
-        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
+        var jo = CodecHelper.encodeJson(EMPTY_REGISTRY, codec.encoder(), recipe);
+        var roundTrip = CodecHelper.parseJson(EMPTY_REGISTRY, codec.decoder(), jo);
 
         assertEquals(recipe.inputs, roundTrip.inputs);
         assertEquals(recipe.outputs, roundTrip.outputs);
@@ -48,8 +48,8 @@ class ProcessingObjectCodecTest {
             List.of(input(0, "scan", 1)),
             50, 32, 4, modLoc("research_target"), 7);
 
-        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), recipe);
-        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
+        var jo = CodecHelper.encodeJson(EMPTY_REGISTRY, codec.encoder(), recipe);
+        var roundTrip = CodecHelper.parseJson(EMPTY_REGISTRY, codec.decoder(), jo);
 
         assertEquals(recipe.inputs, roundTrip.inputs);
         assertEquals(recipe.target, roundTrip.target);
@@ -68,8 +68,8 @@ class ProcessingObjectCodecTest {
             true, Optional.of(display), Optional.empty(),
             List.of(input(1, "dust", 2)));
 
-        var jo = CodecHelper.encodeJson(TEST_REGISTRY, codec.encoder(), recipe);
-        var roundTrip = CodecHelper.parseJson(TEST_REGISTRY, codec.decoder(), jo);
+        var jo = CodecHelper.encodeJson(EMPTY_REGISTRY, codec.encoder(), recipe);
+        var roundTrip = CodecHelper.parseJson(EMPTY_REGISTRY, codec.decoder(), jo);
 
         assertTrue(roundTrip.matchesType(new TestRecipeType<>("test_marker_base", TestRecipe.class)));
         assertTrue(roundTrip.matchesType(baseTypeId));

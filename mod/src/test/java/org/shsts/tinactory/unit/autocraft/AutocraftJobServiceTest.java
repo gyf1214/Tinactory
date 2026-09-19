@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class AutocraftJobServiceTest {
     @Test
@@ -149,10 +149,10 @@ class AutocraftJobServiceTest {
         var target = new CraftAmount(TestStackKey.item("minecraft:iron_ingot", ""), 1);
 
         service.submitPrepared(List.of(target), testPlan());
-        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(EMPTY_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restoredExecutor = new TestExecutor(JobState.IDLE);
         service = new AutocraftJobService(restoredExecutor);
-        service.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
+        service.restoreRunningSnapshot(EMPTY_REGISTRY, persisted, PATTERN_CODECS);
 
         assertTrue(restoredExecutor.restoreCalled);
         assertTrue(service.isBusy());

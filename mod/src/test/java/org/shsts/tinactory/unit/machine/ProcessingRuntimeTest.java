@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class ProcessingRuntimeTest {
     private static final ResourceLocation PROCESSING_TYPE = modLoc("test_processing");
@@ -122,7 +122,7 @@ class ProcessingRuntimeTest {
         var original = runtime(machine, originalProcessor);
         original.onPreWork();
         original.onWorkTick(1d);
-        var saved = original.serializeNBT(TEST_REGISTRY);
+        var saved = original.serializeNBT(EMPTY_REGISTRY);
 
         var restoredProcessor = new TestRecipeProcessor()
             .recipe(RECIPE_ID)
@@ -130,7 +130,7 @@ class ProcessingRuntimeTest {
             .progressPerTick(4)
             .maxProgress(12);
         var restored = runtime(machine, restoredProcessor);
-        restored.deserializeNBT(TEST_REGISTRY, saved);
+        restored.deserializeNBT(EMPTY_REGISTRY, saved);
         restored.onPreWork();
 
         assertTrue(restoredProcessor.continued());
@@ -282,11 +282,11 @@ class ProcessingRuntimeTest {
     void shouldTreatEmptySerializationTagAsIdleState() {
         var runtime = runtime(new TestMachine(new TestContainer()), new TestRecipeProcessor().recipe(RECIPE_ID));
 
-        runtime.deserializeNBT(TEST_REGISTRY, new CompoundTag());
+        runtime.deserializeNBT(EMPTY_REGISTRY, new CompoundTag());
 
         assertEquals(0L, runtime.progressTicks());
         assertTrue(runtime.getAllInfo().isEmpty());
-        assertTrue(runtime.serializeNBT(TEST_REGISTRY).isEmpty());
+        assertTrue(runtime.serializeNBT(EMPTY_REGISTRY).isEmpty());
     }
 
     @Test
@@ -299,7 +299,7 @@ class ProcessingRuntimeTest {
         processorInfo.add(new CompoundTag());
         tag.put("processorInfo", processorInfo);
 
-        assertThrows(RuntimeException.class, () -> runtime.deserializeNBT(TEST_REGISTRY, tag));
+        assertThrows(RuntimeException.class, () -> runtime.deserializeNBT(EMPTY_REGISTRY, tag));
     }
 
     private static final class RuntimeBuilder {

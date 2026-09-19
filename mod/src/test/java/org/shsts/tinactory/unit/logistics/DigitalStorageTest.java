@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class DigitalStorageTest {
     private static class TestStorage extends DigitalStorage<TestStack> {
@@ -117,7 +117,7 @@ class DigitalStorageTest {
 
         var restoredProvider = new FakeDigitalProvider(20);
         var restored = new TestStorage(restoredProvider, 4, 2);
-        restored.deserializeFromList(TEST_REGISTRY, source.serializeToList(TEST_REGISTRY));
+        restored.deserializeFromList(EMPTY_REGISTRY, source.serializeToList(EMPTY_REGISTRY));
 
         assertEquals(5, restored.getStorageAmount(new TestStack("iron", 1)));
         assertEquals(14, restoredProvider.bytesUsed());
@@ -132,7 +132,7 @@ class DigitalStorageTest {
 
         var restoredProvider = new FakeDigitalProvider(30);
         var restored = new TestStorage(restoredProvider, 4, 2);
-        restored.deserializeFromList(TEST_REGISTRY, source.serializeToList(TEST_REGISTRY));
+        restored.deserializeFromList(EMPTY_REGISTRY, source.serializeToList(EMPTY_REGISTRY));
 
         assertEquals(3, restored.getStorageAmount(new TestStack("iron", 1)));
         assertEquals(2, restored.getStorageAmount(new TestStack("gold", 1)));

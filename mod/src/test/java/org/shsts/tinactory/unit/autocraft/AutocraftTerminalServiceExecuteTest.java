@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.unit.fixture.TestAutocraftHelper.PATTERN_CODECS;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class AutocraftTerminalServiceExecuteTest {
     @Test
@@ -244,9 +244,9 @@ class AutocraftTerminalServiceExecuteTest {
             PlanSummary.empty(),
             256L));
 
-        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(EMPTY_REGISTRY, PATTERN_CODECS).orElseThrow();
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(EMPTY_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(256L, persisted.getLong("memoryUsage"));
         assertEquals(256L, restored.getJob().orElseThrow().memoryUsage());
@@ -261,11 +261,11 @@ class AutocraftTerminalServiceExecuteTest {
             target,
             PlanSummary.empty(),
             256L));
-        var persisted = service.serializeRunningSnapshot(TEST_REGISTRY, PATTERN_CODECS).orElseThrow();
+        var persisted = service.serializeRunningSnapshot(EMPTY_REGISTRY, PATTERN_CODECS).orElseThrow();
         persisted.remove("memoryUsage");
 
         var restored = new AutocraftJobService(new TestExecutor(), 64L, 64L, 1, 1024L);
-        restored.restoreRunningSnapshot(TEST_REGISTRY, persisted, PATTERN_CODECS);
+        restored.restoreRunningSnapshot(EMPTY_REGISTRY, persisted, PATTERN_CODECS);
 
         assertEquals(0L, restored.getJob().orElseThrow().memoryUsage());
     }

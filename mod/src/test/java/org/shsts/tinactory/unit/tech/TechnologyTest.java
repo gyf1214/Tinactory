@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 
 class TechnologyTest {
     @Test
@@ -58,8 +58,8 @@ class TechnologyTest {
         jo.addProperty("display_texture", displayTexture.toString());
         jo.addProperty("rank", 9);
 
-        var decoded = CodecHelper.parseJson(TEST_REGISTRY, Technology.CODEC, jo);
-        var encoded = CodecHelper.encodeJson(TEST_REGISTRY, Technology.CODEC, decoded).getAsJsonObject();
+        var decoded = CodecHelper.parseJson(EMPTY_REGISTRY, Technology.CODEC, jo);
+        var encoded = CodecHelper.encodeJson(EMPTY_REGISTRY, Technology.CODEC, decoded).getAsJsonObject();
 
         assertEquals(new ItemIdRenderDescriptor(displayItem), decoded.getDisplay());
         assertEquals(displayItem.toString(), encoded.get("display_item").getAsString());
@@ -74,7 +74,7 @@ class TechnologyTest {
         jo.addProperty("rank", 9);
 
         assertThrows(IllegalStateException.class,
-            () -> CodecHelper.parseJson(TEST_REGISTRY, Technology.CODEC, jo));
+            () -> CodecHelper.parseJson(EMPTY_REGISTRY, Technology.CODEC, jo));
     }
 
     @Test

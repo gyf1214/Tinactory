@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.shsts.tinactory.api.logistics.PortDirection.INPUT;
 import static org.shsts.tinactory.api.logistics.PortDirection.OUTPUT;
 import static org.shsts.tinactory.core.util.LocHelper.modLoc;
-import static org.shsts.tinactory.unit.fixture.TestCodecHelper.TEST_REGISTRY;
+import static org.shsts.tinactory.unit.fixture.TestCodecHelper.EMPTY_REGISTRY;
 import static org.shsts.tinactory.unit.fixture.TestCodecHelper.createEntry;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.input;
 import static org.shsts.tinactory.unit.fixture.TestProcessingHelper.output;
@@ -95,12 +95,12 @@ class ProcessingMachineTest {
 
         var recipe = processor.newRecipe(machine, target.loc()).orElseThrow();
         processor.onWorkBegin(recipe, machine, 1, $ -> {});
-        var saved = processor.serializeNBT(TEST_REGISTRY);
+        var saved = processor.serializeNBT(EMPTY_REGISTRY);
 
         var restored = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
-        restored.deserializeNBT(TEST_REGISTRY, saved);
+        restored.deserializeNBT(EMPTY_REGISTRY, saved);
         restored.onWorkContinue(recipe, machine);
-        var restoredTag = restored.serializeNBT(TEST_REGISTRY);
+        var restoredTag = restored.serializeNBT(EMPTY_REGISTRY);
 
         assertEquals(target.loc().toString(), saved.getString("filterRecipe"));
         assertEquals(target.loc().toString(), restoredTag.getString("filterRecipe"));
@@ -215,13 +215,13 @@ class ProcessingMachineTest {
         var original = new TestProcessingMachine(new TestRecipeManager().add(RECIPE_TYPE, target));
         var recipe = original.newRecipe(machine, target.loc()).orElseThrow();
         original.onWorkBegin(recipe, machine, 1, $ -> {});
-        var saved = original.serializeNBT(TEST_REGISTRY);
+        var saved = original.serializeNBT(EMPTY_REGISTRY);
 
         var restored = new TestProcessingMachine(new TestRecipeManager());
-        restored.deserializeNBT(TEST_REGISTRY, saved);
+        restored.deserializeNBT(EMPTY_REGISTRY, saved);
         restored.onWorkContinue(recipe, machine);
 
-        assertFalse(restored.serializeNBT(TEST_REGISTRY).contains("filterRecipe"));
+        assertFalse(restored.serializeNBT(EMPTY_REGISTRY).contains("filterRecipe"));
     }
 
     private static IEntry<TestRecipe> recipe(String path, long voltage) {
