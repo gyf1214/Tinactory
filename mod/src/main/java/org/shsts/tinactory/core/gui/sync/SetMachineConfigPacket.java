@@ -6,7 +6,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -49,7 +48,7 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
         };
 
     private static final StreamCodec<RegistryFriendlyByteBuf, IMachineConfigType<?>> TYPE_STREAM_CODEC =
-        ByteBufCodecs.registry(MACHINE_CONFIGS.key());
+        CodecHelper.registryStreamCodec(MACHINE_CONFIGS.key());
 
     private List<IMachineConfig.Entry<?>> sets;
     private List<IMachineConfigType<?>> resets;

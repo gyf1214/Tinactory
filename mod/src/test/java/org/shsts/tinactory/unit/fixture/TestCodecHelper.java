@@ -35,8 +35,12 @@ public final class TestCodecHelper {
         return new RegistryAccess.ImmutableRegistryAccess(List.of(registries));
     }
 
+    public static RegistryFriendlyByteBuf buf(RegistryAccess registry) {
+        return new RegistryFriendlyByteBuf(Unpooled.buffer(), registry, ConnectionType.NEOFORGE);
+    }
+
     public static RegistryFriendlyByteBuf buf() {
-        return new RegistryFriendlyByteBuf(Unpooled.buffer(), TEST_REGISTRY, ConnectionType.NEOFORGE);
+        return buf(TEST_REGISTRY);
     }
 
     public static <U> IEntry<U> createEntry(ResourceLocation loc, U obj) {

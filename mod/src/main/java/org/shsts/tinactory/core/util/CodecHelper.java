@@ -24,6 +24,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.codec.StreamEncoder;
 import net.minecraft.resources.RegistryFixedCodec;
@@ -111,6 +112,11 @@ public final class CodecHelper {
             .findFirst()
             .map(DataResult::<Holder<E>>success)
             .orElseGet(() -> DataResult.error(() -> "Unregistered value in " + registryKey + ": " + value));
+    }
+
+    public static <T> StreamCodec<RegistryFriendlyByteBuf, T> registryStreamCodec(
+        ResourceKey<? extends Registry<T>> registryKey) {
+        return new RegistryStreamCodec<>(registryKey);
     }
 
     public static <T> Optional<Holder<T>> lookupHolder(HolderLookup.Provider provider, ResourceKey<T> key) {
