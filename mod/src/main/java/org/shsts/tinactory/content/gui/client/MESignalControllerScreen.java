@@ -29,8 +29,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_CONFIG;
 import static org.shsts.tinactory.content.gui.MESignalControllerMenu.SIGNAL_SYNC;
-import static org.shsts.tinactory.content.logistics.MESignalController.SIGNAL_CONFIG_KEY;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.PANEL_WIDTH;
@@ -114,7 +114,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
             getInfo(index).ifPresent(info -> {
                 var config = new SignalConfig(info.machineId(), info.key());
                 var packet = SetMachineConfigPacket.builder()
-                    .set(SIGNAL_CONFIG_KEY, config.toTag());
+                    .set(SIGNAL_CONFIG, config);
                 menu.triggerEvent(SET_MACHINE_CONFIG, packet);
             });
         }
@@ -164,7 +164,7 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
                     signalPanel.refresh();
 
                     var packet = SetMachineConfigPacket.builder()
-                        .reset(SIGNAL_CONFIG_KEY);
+                        .reset(SIGNAL_CONFIG);
                     menu.triggerEvent(SET_MACHINE_CONFIG, packet);
                 }
             }
@@ -203,7 +203,6 @@ public class MESignalControllerScreen extends MenuScreen<MESignalControllerMenu>
     }
 
     private Optional<SignalConfig> getConfig() {
-        return machineConfig.getCompound(SIGNAL_CONFIG_KEY)
-            .map(SignalConfig::fromTag);
+        return machineConfig.get(SIGNAL_CONFIG);
     }
 }

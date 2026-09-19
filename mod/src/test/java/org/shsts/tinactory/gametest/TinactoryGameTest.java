@@ -42,12 +42,12 @@ import java.util.Objects;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
+import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.Tinactory.CORE;
-import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class TinactoryGameTest {
@@ -371,7 +371,7 @@ public final class TinactoryGameTest {
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         var batteryMachine = MACHINE.get(batteryBoxEntity);
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
-            .set(DISCHARGE_KEY, true)
+            .set(BATTERY_DISCHARGE, true)
             .get());
         MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithMockPlayer(helper, consumerPos);

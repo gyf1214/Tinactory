@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.TARGET_RECIPE;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
@@ -115,10 +116,10 @@ public class MachineRecipeBook extends Panel {
             ghostRecipe.clear();
             if (recipe == null) {
                 menu.triggerEvent(SET_MACHINE_CONFIG,
-                    SetMachineConfigPacket.builder().reset("targetRecipe"));
+                    SetMachineConfigPacket.builder().reset(TARGET_RECIPE));
             } else {
                 menu.triggerEvent(SET_MACHINE_CONFIG,
-                    SetMachineConfigPacket.builder().set("targetRecipe", loc));
+                    SetMachineConfigPacket.builder().set(TARGET_RECIPE, loc));
                 recipe.select(layout, ghostRecipe::addIngredient);
             }
         }
@@ -205,7 +206,7 @@ public class MachineRecipeBook extends Panel {
 
     @Nullable
     private ResourceLocation getCurrentRecipeLoc() {
-        return machineConfig.getLoc("targetRecipe").orElse(null);
+        return machineConfig.get(TARGET_RECIPE).orElse(null);
     }
 
     public void remove() {

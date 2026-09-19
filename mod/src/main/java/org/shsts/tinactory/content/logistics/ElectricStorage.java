@@ -45,6 +45,8 @@ import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
+import static org.shsts.tinactory.AllNetworks.STORAGE_PRIORITY;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
@@ -54,11 +56,8 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int STORAGE_VERSION = 2;
 
-    public static final String PRIORITY_KEY = "priority";
     public static final int PRIORITY_DEFAULT = 2;
-    public static final String VOID_KEY = "void";
     public static final boolean VOID_DEFAULT = false;
-    public static final String FILTER_KEY = "filter";
     public static final String AMOUNT_SIGNAL = "amount";
 
     protected final BlockEntity blockEntity;
@@ -198,11 +197,10 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
 
     private void updateFilters() {
         filters.clear();
-        var list = machineConfig().getList(FILTER_KEY);
+        var list = machineConfig().get(STORAGE_FILTERS);
         var provider = machine().registryAccess();
         if (list.isPresent()) {
-            for (var tag : list.get()) {
-                var entry = CodecHelper.parseTag(provider, FilterEntry.CODEC, tag);
+            for (var entry : list.get()) {
                 filters.add(asPredicate(provider, entry));
             }
         }
@@ -308,7 +306,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
         logistics.unregisterPort(machine(), 0);
         logistics.registerStoragePort(machine(), 0, storage,
-            machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT));
+            machineConfig().get(STORAGE_PRIORITY).orElse(PRIORITY_DEFAULT));
     }
 
     private void onMachineConfig() {
@@ -325,19 +323,19 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
 
     private void onLoad(Level world) {
         if (!legacyFilters.isEmpty()) {
-            var list = machineConfig().getCopiedList(FILTER_KEY);
+            var list = machineConfig().get(STORAGE_FILTERS)
+                .map(ArrayList::new)
+                .orElseGet(ArrayList::new);
             for (var key : legacyFilters) {
                 if (list.size() < filterSlots) {
-                    var filter = new FilterEntry(key, null);
-                    list.add(CodecHelper.encodeTag(world.registryAccess(),
-                        FilterEntry.CODEC, filter));
+                    list.add(new FilterEntry(key, null));
                 }
                 if (list.size() >= filterSlots) {
                     break;
                 }
             }
             machine().setConfig(SetMachineConfigPacket.builder()
-                .set(FILTER_KEY, list)
+                .set(STORAGE_FILTERS, list)
                 .get());
             legacyFilters.clear();
         }

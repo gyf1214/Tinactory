@@ -41,13 +41,13 @@ import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.CONTAINER_CHANGE;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.MACHINE_NAME;
+import static org.shsts.tinactory.AllNetworks.MACHINE_PARALLEL;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MultiblockInterface extends Machine {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String PARALLEL_KEY = "parallel";
 
     public final Voltage voltage;
 
@@ -286,7 +286,7 @@ public class MultiblockInterface extends Machine {
     @Override
     public int parallel() {
         var maxParallel = maxParallel();
-        return Math.min(maxParallel, config.getInt(PARALLEL_KEY, maxParallel));
+        return Math.min(maxParallel, config.get(MACHINE_PARALLEL).orElse(maxParallel));
     }
 
     @Override
@@ -296,7 +296,7 @@ public class MultiblockInterface extends Machine {
 
     @Override
     public Component title() {
-        if (config.contains(MACHINE_NAME.get()) || multiblock == null) {
+        if (config.contains(MACHINE_NAME) || multiblock == null) {
             return super.title();
         }
         return I18n.name(multiblock.blockEntity.getBlockState().getBlock());

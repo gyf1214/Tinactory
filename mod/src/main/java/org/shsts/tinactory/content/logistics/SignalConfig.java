@@ -1,22 +1,18 @@
 package org.shsts.tinactory.content.logistics;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.UUIDUtil;
 
 import java.util.UUID;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public record SignalConfig(UUID machine, String key) {
-    public CompoundTag toTag() {
-        var tag = new CompoundTag();
-        tag.putUUID("machine", machine);
-        tag.putString("key", key);
-        return tag;
-    }
-
-    public static SignalConfig fromTag(CompoundTag tag) {
-        return new SignalConfig(tag.getUUID("machine"), tag.getString("key"));
-    }
+    public static final Codec<SignalConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        UUIDUtil.CODEC.fieldOf("machine").forGetter(SignalConfig::machine),
+        Codec.STRING.fieldOf("key").forGetter(SignalConfig::key)
+    ).apply(instance, SignalConfig::new));
 }

@@ -14,6 +14,7 @@ import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.machine.ISetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
 import org.shsts.tinactory.core.util.CodecHelper;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,11 +106,15 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
             return reset(lookupType(provider, loc));
         }
 
-        @Override
-        public <T> ISetMachineConfigPacket.Builder set(ResourceLocation loc, IMachineConfigType<T> type,
+        private <T> ISetMachineConfigPacket.Builder set(ResourceLocation loc, IMachineConfigType<T> type,
             T val) {
             sets.add(new MachineConfig.Entry<>(loc, type, val));
             return this;
+        }
+
+        @Override
+        public <T> ISetMachineConfigPacket.Builder set(IEntry<IMachineConfigType<T>> type, T val) {
+            return set(type.loc(), type.get(), val);
         }
 
         @Override
@@ -120,26 +125,6 @@ public class SetMachineConfigPacket implements ISetMachineConfigPacket {
 
         @Override
         public ISetMachineConfigPacket.Builder reset(String key) {
-            return this;
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder set(String key, boolean val) {
-            return this;
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder set(String key, int val) {
-            return this;
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder set(String key, long val) {
-            return this;
-        }
-
-        @Override
-        public ISetMachineConfigPacket.Builder set(String key, String value) {
             return this;
         }
 

@@ -2,15 +2,13 @@ package org.shsts.tinactory.content.logistics;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.content.network.SignalMachineBlock;
 import org.shsts.tinactory.core.logistics.ISignalMachine;
 import org.shsts.tinactory.core.util.MathUtil;
+import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinycorelib.api.blockentity.ICapabilityBuilder;
 import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.core.Transformer;
@@ -18,18 +16,13 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 
 import static org.shsts.tinactory.AllCapabilities.SIGNAL_MACHINE;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.STORAGE_DETECTOR;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEStorageDetector extends MEStorageAccess implements ISignalMachine {
-    public static final String TARGET_ITEM_KEY = "targetItem";
-    public static final String TARGET_FLUID_KEY = "targetFluid";
-    public static final String TARGET_AMOUNT_KEY = "targetAmount";
     private static final String ID = "logistics/me_storage_detector";
 
-    private ItemStack targetItem = ItemStack.EMPTY;
-    private FluidStack targetFluid = FluidStack.EMPTY;
-    private long targetAmount = 0L;
     private int signal = 0;
 
     public MEStorageDetector(BlockEntity blockEntity, double power) {
@@ -41,32 +34,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
         return $ -> $.container(ID, be -> new MEStorageDetector(be, power));
     }
 
-    public static ItemStack targetItem(HolderLookup.Provider provider, IMachineConfig config) {
-        return config.getCompound(TARGET_ITEM_KEY)
-            .map($ -> ItemStack.parseOptional(provider, $))
-            .orElse(ItemStack.EMPTY);
-    }
-
-    public static FluidStack targetFluid(HolderLookup.Provider provider, IMachineConfig config) {
-        return config.getCompound(TARGET_FLUID_KEY)
-            .map($ -> FluidStack.parseOptional(provider, $))
-            .orElse(FluidStack.EMPTY);
-    }
-
-    private void validateConfig() {
-        var world = blockEntity.getLevel();
-        if (world == null || world.isClientSide) {
-            return;
-        }
-        var config = machine().config();
-        targetItem = targetItem(world.registryAccess(), config);
-        targetFluid = targetFluid(world.registryAccess(), config);
-        targetAmount = config.getLong(TARGET_AMOUNT_KEY, 0L);
-
-        updateSignal();
-    }
-
-    private int toSignal(long amount) {
+    private int toSignal(long amount, long targetAmount) {
         if (targetAmount <= 0) {
             return amount > 0 ? 15 : 0;
         }
@@ -74,20 +42,34 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     }
 
     private int recalculateSignal() {
-        if (!targetItem.isEmpty()) {
-            return toSignal(combinedItem.getStorageAmount(targetItem));
-        } else if (!targetFluid.isEmpty()) {
-            return toSignal(combinedFluid.getStorageAmount(targetFluid));
+        var config = machine().config().get(STORAGE_DETECTOR);
+        if (config.isEmpty()) {
+            return 0;
+        }
+        var key = config.get().key();
+        var targetAmount = config.get().amount();
+        if (key == null) {
+            return 0;
+        }
+        if (key.type() == PortType.ITEM) {
+            var amount = combinedItem.getStorageAmount(StackHelper.ITEM_ADAPTER.stackOf(key));
+            return toSignal(amount, targetAmount);
+        } else if (key.type() == PortType.FLUID) {
+            var amount = combinedFluid.getStorageAmount(StackHelper.FLUID_ADAPTER.stackOf(key));
+            return toSignal(amount, targetAmount);
         } else {
             return 0;
         }
     }
 
     private void updateSignal() {
+        var world = machine().world();
+        if (world.isClientSide) {
+            return;
+        }
         var oldSignal = signal;
         signal = recalculateSignal();
-        var world = machine().world();
-        if (!world.isClientSide && signal != oldSignal) {
+        if (signal != oldSignal) {
             SignalMachineBlock.updateSignal(world, blockEntity);
         }
     }
@@ -95,7 +77,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     @Override
     protected void onConnect(INetwork network) {
         super.onConnect(network);
-        validateConfig();
+        updateSignal();
     }
 
     @Override
@@ -106,7 +88,7 @@ public class MEStorageDetector extends MEStorageAccess implements ISignalMachine
     @Override
     public void subscribeEvents(IEventManager eventManager) {
         super.subscribeEvents(eventManager);
-        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::validateConfig);
+        eventManager.subscribe(SET_MACHINE_CONFIG.get(), this::updateSignal);
     }
 
     @Override

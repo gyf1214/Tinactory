@@ -26,6 +26,7 @@ import static org.shsts.tinactory.AllEvents.BUILD_SCHEDULING;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.SIGNAL_CONFIG;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_READ_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_WRITE_SCHEDULING;
 import static org.shsts.tinactory.integration.network.MachineBlock.FACING;
@@ -34,7 +35,6 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MESignalController extends CapabilityProvider implements IEventSubscriber, ISignalMachine {
-    public static final String SIGNAL_CONFIG_KEY = "signal";
     private static final String ID = "logistics/me_signal_controller";
 
     private final BlockEntity blockEntity;
@@ -65,8 +65,7 @@ public class MESignalController extends CapabilityProvider implements IEventSubs
     private void validateConfig(IMachine machine, SignalComponent component) {
         needRevalidate = false;
         var config1 = machine.config()
-            .getCompound(SIGNAL_CONFIG_KEY)
-            .map(SignalConfig::fromTag);
+            .get(SIGNAL_CONFIG);
 
         if (config1.isEmpty()) {
             config = null;

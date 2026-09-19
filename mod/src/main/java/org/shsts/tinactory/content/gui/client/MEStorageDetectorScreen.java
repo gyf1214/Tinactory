@@ -4,15 +4,16 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
+import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.content.gui.MEStorageDetectorMenu;
-import org.shsts.tinactory.content.logistics.MEStorageDetector;
+import org.shsts.tinactory.content.logistics.StorageDetectorConfig;
+import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.core.gui.RectD;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
@@ -23,10 +24,10 @@ import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
+import java.util.Optional;
+
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
-import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_AMOUNT_KEY;
-import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_FLUID_KEY;
-import static org.shsts.tinactory.content.logistics.MEStorageDetector.TARGET_ITEM_KEY;
+import static org.shsts.tinactory.AllNetworks.STORAGE_DETECTOR;
 import static org.shsts.tinactory.core.gui.Menu.EDIT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
@@ -41,7 +42,6 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
     private static final int SLOT_Y_OFFSET = SLOT_SIZE / 2;
     private static final int EDIT_Y_OFFSET = SLOT_Y_OFFSET + (SLOT_SIZE - EDIT_HEIGHT) / 2;
 
-    private final HolderLookup.Provider provider;
     private final IMachineConfig config;
 
     private class MarkerSlot extends MenuWidget {
@@ -53,16 +53,13 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             RenderUtil.blit(graphics, SLOT_BACKGROUND, rect());
 
-            var registries = MEStorageDetectorScreen.this.menu.world().registryAccess();
-            var targetItem = MEStorageDetector.targetItem(registries, config);
-            var targetFluid = MEStorageDetector.targetFluid(registries, config);
-
             var rect1 = rect().offset(1, 1).enlarge(-2, -2);
-            if (!targetItem.isEmpty()) {
-                RenderUtil.renderItem(graphics, targetItem, rect1.x(), rect1.y());
-            } else if (!targetFluid.isEmpty()) {
-                RenderUtil.renderFluid(graphics, targetFluid, rect1);
-            }
+
+            var display = config.get(STORAGE_DETECTOR)
+                .flatMap(config -> Optional.ofNullable(config.key()))
+                .map(IStackKey::display)
+                .orElse(EmptyRenderDescriptor.INSTANCE);
+            RenderUtil.renderDescriptor(graphics, display, rect1);
 
             if (isHovered(mouseX, mouseY)) {
                 RenderUtil.renderSlotHover(graphics, rect1);
@@ -84,24 +81,20 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
             ClientUtil.playSound(SoundEvents.UI_BUTTON_CLICK);
 
             var carried = menu.getCarried();
+            var amount = getConfigAmount();
             var packet = SetMachineConfigPacket.builder();
 
             if (carried.isEmpty()) {
-                packet.reset(TARGET_ITEM_KEY)
-                    .reset(TARGET_FLUID_KEY);
-            } else {
-                var fluid = button == 0 ?
-                    StackHelper.copyWithAmount(StackHelper.getFluidFromItem(carried), 1) :
-                    FluidStack.EMPTY;
-                if (fluid.isEmpty()) {
-                    packet
-                        .set(TARGET_ITEM_KEY, StackHelper.copyWithCount(carried, 1).save(provider))
-                        .reset(TARGET_FLUID_KEY);
+                if (amount == 0L) {
+                    packet.reset(STORAGE_DETECTOR);
                 } else {
-                    packet
-                        .set(TARGET_FLUID_KEY, fluid.save(provider))
-                        .reset(TARGET_ITEM_KEY);
+                    packet.set(STORAGE_DETECTOR, new StorageDetectorConfig(null, amount));
                 }
+            } else {
+                var fluid = button == 0 ? StackHelper.getFluidFromItem(carried) : FluidStack.EMPTY;
+                var key = !fluid.isEmpty() ? StackHelper.FLUID_ADAPTER.keyOf(fluid) :
+                    StackHelper.ITEM_ADAPTER.keyOf(carried);
+                packet.set(STORAGE_DETECTOR, new StorageDetectorConfig(key, amount));
             }
 
             menu.triggerEvent(SET_MACHINE_CONFIG, packet);
@@ -112,7 +105,6 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
 
     public MEStorageDetectorScreen(MEStorageDetectorMenu menu, Component title) {
         super(menu, title);
-        this.provider = menu.world().registryAccess();
         this.config = menu.machine.config();
 
         var slot = new MarkerSlot();
@@ -129,9 +121,12 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
         this.contentHeight = menu.endY();
     }
 
+    private long getConfigAmount() {
+        return Math.max(0, config.get(STORAGE_DETECTOR).map(StorageDetectorConfig::amount).orElse(0L));
+    }
+
     private void resetEditText() {
-        var amount = config.getLong(TARGET_AMOUNT_KEY, 0L);
-        targetAmountEdit.setValue(Long.toString(amount));
+        targetAmountEdit.setValue(Long.toString(getConfigAmount()));
     }
 
     private void onEditChange(String str) {
@@ -140,10 +135,13 @@ public class MEStorageDetectorScreen extends MenuScreen<MEStorageDetectorMenu> {
             val = Long.parseLong(str);
         } catch (NumberFormatException ignored) {
         }
-        var oldVal = config.getLong(TARGET_AMOUNT_KEY, 0L);
+
+        var oldConfig = config.get(STORAGE_DETECTOR);
+        var oldVal = Math.max(0, oldConfig.map(StorageDetectorConfig::amount).orElse(0L));
         if (val >= 0L && val != oldVal) {
+            var key = oldConfig.map(StorageDetectorConfig::key).orElse(null);
             menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder()
-                .set(TARGET_AMOUNT_KEY, val));
+                .set(STORAGE_DETECTOR, new StorageDetectorConfig(key, val)));
         }
     }
 

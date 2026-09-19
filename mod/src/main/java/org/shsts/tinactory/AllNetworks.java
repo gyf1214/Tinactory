@@ -11,8 +11,11 @@ import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.content.autocraft.AutocraftComponent;
 import org.shsts.tinactory.content.electric.ElectricComponent;
+import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.SignalComponent;
+import org.shsts.tinactory.content.logistics.SignalConfig;
+import org.shsts.tinactory.content.logistics.StorageDetectorConfig;
 import org.shsts.tinactory.core.machine.MachineConfigType;
 import org.shsts.tinactory.integration.builder.SchedulingBuilder;
 import org.shsts.tinactory.integration.network.ComponentType;
@@ -20,6 +23,8 @@ import org.shsts.tinactory.integration.network.NetworkComponent;
 import org.shsts.tinactory.integration.network.SubnetLabel;
 import org.shsts.tinycorelib.api.registrate.IRegistrate;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
+
+import java.util.List;
 
 import static org.shsts.tinactory.AllRegistries.COMPONENT_TYPES;
 import static org.shsts.tinactory.AllRegistries.MACHINE_CONFIGS;
@@ -49,6 +54,12 @@ public final class AllNetworks {
     public static final IEntry<IMachineConfigType<Component>> MACHINE_NAME;
     public static final IEntry<IMachineConfigType<Boolean>> AUTO_VOID;
     public static final IEntry<IMachineConfigType<ResourceLocation>> TARGET_RECIPE;
+    public static final IEntry<IMachineConfigType<Integer>> MACHINE_PARALLEL;
+    public static final IEntry<IMachineConfigType<Integer>> STORAGE_PRIORITY;
+    public static final IEntry<IMachineConfigType<List<FilterEntry>>> STORAGE_FILTERS;
+    public static final IEntry<IMachineConfigType<Boolean>> BATTERY_DISCHARGE;
+    public static final IEntry<IMachineConfigType<StorageDetectorConfig>> STORAGE_DETECTOR;
+    public static final IEntry<IMachineConfigType<SignalConfig>> SIGNAL_CONFIG;
 
     static {
         PRE_WORK_SCHEDULING = scheduling("machine/pre_work").register();
@@ -79,6 +90,13 @@ public final class AllNetworks {
         MACHINE_NAME = legacyConfig("name", ComponentSerialization.CODEC);
         AUTO_VOID = legacyConfig("auto_void", Codec.BOOL, "void");
         TARGET_RECIPE = legacyConfig("target_recipe", ResourceLocation.CODEC, "targetRecipe");
+        MACHINE_PARALLEL = legacyConfig("parallel", Codec.INT);
+        STORAGE_PRIORITY = legacyConfig("storage_priority", Codec.INT, "priority");
+        STORAGE_FILTERS = legacyConfig("storage_filters", FilterEntry.CODEC.listOf(), "filter");
+        BATTERY_DISCHARGE = legacyConfig("battery_discharge", Codec.BOOL, "discharge");
+        STORAGE_DETECTOR = REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(), "storage_detector",
+            StorageDetectorConfig::configType);
+        SIGNAL_CONFIG = legacyConfig("signal", SignalConfig.CODEC);
     }
 
     public static void init() {}
@@ -97,12 +115,12 @@ public final class AllNetworks {
         return REGISTRATE.registryEntry(SUBNET_LABELS.getHandler(), id, SubnetLabel::new);
     }
 
-    private static <T> IEntry<IMachineConfigType<T>> legacyConfig(String id, Codec<T> codec) {
-        return legacyConfig(id, codec, id);
-    }
-
     private static <T> IEntry<IMachineConfigType<T>> legacyConfig(String id, Codec<T> codec, String legacyKey) {
         return REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(), id,
             () -> new MachineConfigType<>(codec, legacyKey));
+    }
+
+    private static <T> IEntry<IMachineConfigType<T>> legacyConfig(String id, Codec<T> codec) {
+        return legacyConfig(id, codec, id);
     }
 }

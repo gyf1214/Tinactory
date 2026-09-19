@@ -9,7 +9,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +31,6 @@ import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.tech.ITeamProfile;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.machine.MachineConfig;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.common.UpdatableCapabilityProvider;
@@ -144,9 +142,8 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
     }
 
-    private void setName(Level world, Component name) {
-        var tag = CodecHelper.encodeTag(world.registryAccess(), ComponentSerialization.CODEC, name);
-        setConfig(SetMachineConfigPacket.builder().set("name", tag).get());
+    private void setName(Component name) {
+        setConfig(SetMachineConfigPacket.builder().set(MACHINE_NAME, name).get());
     }
 
     /**
@@ -180,7 +177,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
         }
         var item = arg.stack();
         if (item.has(DataComponents.CUSTOM_NAME)) {
-            setName(arg.world(), item.getHoverName());
+            setName(item.getHoverName());
         }
         if (item.has(AllDataComponents.UUID.get())) {
             uuid = item.get(AllDataComponents.UUID.get());
@@ -209,7 +206,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
         var item = arg.stack();
         if (item.is(Items.NAME_TAG) && item.has(DataComponents.CUSTOM_NAME)) {
-            setName(player.level(), item.getHoverName());
+            setName(item.getHoverName());
             item.shrink(1);
             result.set(ItemInteractionResult.sidedSuccess(player.level().isClientSide));
         }
@@ -272,7 +269,7 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     @Override
     public Component title() {
-        return config.get(MACHINE_NAME.get())
+        return config.get(MACHINE_NAME)
             .orElseGet(() -> I18n.name(blockEntity.getBlockState().getBlock()));
     }
 

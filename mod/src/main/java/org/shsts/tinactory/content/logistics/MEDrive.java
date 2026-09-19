@@ -50,14 +50,14 @@ import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.AUTOCRAFT_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
+import static org.shsts.tinactory.AllNetworks.STORAGE_PRIORITY;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_DEFAULT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     ILayoutProvider, IBytesProvider, INBTSerializable<CompoundTag> {
-    public static final String PRIORITY_KEY = ElectricStorage.PRIORITY_KEY;
-    public static final int PRIORITY_DEFAULT = ElectricStorage.PRIORITY_DEFAULT;
     public static final String AMOUNT_SIGNAL = ElectricStorage.AMOUNT_SIGNAL;
 
     public record ByteStats(long bytesUsed, long bytesCapacity) {}
@@ -166,7 +166,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
 
     private void registerPort(INetwork network) {
         var logistics = network.getComponent(LOGISTIC_COMPONENT.get());
-        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        var priority = (int) machineConfig().get(STORAGE_PRIORITY).orElse(PRIORITY_DEFAULT);
         logistics.unregisterPort(machine(), 0);
         logistics.unregisterPort(machine(), 1);
         logistics.registerStoragePort(machine(), 0, combinedItems, priority);
@@ -215,7 +215,7 @@ public class MEDrive extends CapabilityProvider implements IEventSubscriber,
     private void registerPatternCells(INetwork network) {
         var patternRepository = network.getComponent(AUTOCRAFT_COMPONENT.get()).patternRepository();
         patternRepository.removeCellPorts(machine().uuid());
-        var priority = machineConfig().getInt(PRIORITY_KEY, PRIORITY_DEFAULT);
+        var priority = (int) machineConfig().get(STORAGE_PRIORITY).orElse(PRIORITY_DEFAULT);
         for (var i = 0; i < storages.getSlots(); i++) {
             var stack = storages.getStackInSlot(i);
             if (stack.isEmpty()) {

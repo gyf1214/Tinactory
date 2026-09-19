@@ -21,7 +21,6 @@ import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IStackKey;
 import org.shsts.tinactory.content.logistics.ElectricChest;
-import org.shsts.tinactory.content.logistics.ElectricStorage;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.machine.IBoiler;
@@ -30,6 +29,7 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
@@ -39,6 +39,8 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
+import static org.shsts.tinactory.AllNetworks.STORAGE_PRIORITY;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -187,13 +189,13 @@ public final class PersistenceGameTest {
         var key = StackHelper.ITEM_ADAPTER.keyOf(diamond);
 
         chest.deserializeNBT(provider, legacyStorageTag(provider, key, diamond.getCount(), true));
-        CapabilityProvider.invoke(helper.getBlockEntity(pos), SERVER_LOAD::get, helper.getLevel());
+        CapabilityProvider.invoke(helper.getBlockEntity(pos), SERVER_LOAD, helper.getLevel());
 
         var handler = ITEM_HANDLER.get(helper.getBlockEntity(pos));
         require(helper, handler.getStackInSlot(0).is(Items.DIAMOND) &&
                 handler.getStackInSlot(0).getCount() == diamond.getCount(),
             "Version-1 marked entry did not keep its existing stack", pos);
-        var filters = MACHINE.get(helper.getBlockEntity(pos)).config().getList(ElectricStorage.FILTER_KEY);
+        var filters = MACHINE.get(helper.getBlockEntity(pos)).config().get(STORAGE_FILTERS);
         require(helper, filters.isPresent() && filters.get().size() == 1,
             "Version-1 marked entry did not migrate to machine filter config", pos);
         var persisted = chest.serializeNBT(provider);
@@ -209,19 +211,18 @@ public final class PersistenceGameTest {
         var blockEntity = helper.getBlockEntity(pos);
         var provider = helper.getLevel().registryAccess();
         var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
-        var filters = new ListTag();
-        filters.add(CodecHelper.encodeTag(provider, FilterEntry.CODEC,
-            FilterEntry.fromItem(new ItemStack(Items.DIAMOND))));
+        var filters = new ArrayList<FilterEntry>();
+        filters.add(FilterEntry.fromItem(new ItemStack(Items.DIAMOND)));
 
         MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder()
-            .set(ElectricStorage.FILTER_KEY, filters).get());
+            .set(STORAGE_FILTERS, filters).get());
 
         var accepted = chest.port().insert(new ItemStack(Items.DIAMOND), false);
         var rejected = chest.port().insert(new ItemStack(Items.EMERALD), false);
         require(helper, accepted.isEmpty() && !rejected.isEmpty(),
             "Version-2 machine-config filter did not restrict input", pos);
         var persisted = chest.serializeNBT(provider);
-        require(helper, persisted.getInt("version") == 2 && !persisted.contains(ElectricStorage.FILTER_KEY),
+        require(helper, persisted.getInt("version") == 2 && !persisted.contains(STORAGE_FILTERS.loc().toString()),
             "Version-2 storage NBT serialized machine filters as content", pos);
         helper.succeed();
     }
@@ -321,7 +322,8 @@ public final class PersistenceGameTest {
         var machine = MACHINE.get(helper.getBlockEntity(pos));
 
         machine.setConfig(SetMachineConfigPacket.builder()
-            .set(ElectricStorage.PRIORITY_KEY, 3).get());
+            .set(STORAGE_PRIORITY, 3)
+            .get());
 
         helper.succeed();
     }

@@ -13,10 +13,10 @@ import org.shsts.tinactory.integration.gui.ProcessingMenu;
 import org.shsts.tinactory.integration.gui.client.Widgets;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_OFFSET;
 import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_DEFAULT;
-import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
@@ -53,7 +53,7 @@ public class MachineScreen extends ProcessingScreen {
         var machine = MACHINE.get(menu.blockEntity());
         var config = machine.config();
         var offset = new Rect(-SLOT_SIZE * 2 - SPACING, buttonY, SLOT_SIZE, SLOT_SIZE);
-        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, VOID_KEY,
+        rootPanel.addChild(anchor, offset, new MachineConfigButton(menu, config, AUTO_VOID,
             VOID_DEFAULT, VOID_BUTTON, 18, 0, "noAutoVoid", "autoVoid"));
 
         if (recipeBook != null) {

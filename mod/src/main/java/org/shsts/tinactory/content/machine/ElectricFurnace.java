@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
 import static org.shsts.tinactory.AllRecipes.MARKER;
 import static org.shsts.tinactory.Tinactory.CORE;
 import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.PROGRESS_PER_TICK;
 import static org.shsts.tinactory.core.machine.ProcessingMachine.machineVoltage;
 import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
-import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_KEY;
 import static org.shsts.tinactory.core.util.LocHelper.mcLoc;
 
 @ParametersAreNonnullByDefault
@@ -95,7 +95,7 @@ public class ElectricFurnace implements IRecipeProcessor<RecipeHolder<SmeltingRe
     }
 
     private boolean matchesOutput(SmeltingRecipe recipe, IMachine machine, IPort<ItemStack> port) {
-        if (machine.config().getBoolean(VOID_KEY, VOID_DEFAULT)) {
+        if (machine.config().get(AUTO_VOID).orElse(VOID_DEFAULT)) {
             return true;
         }
         var result = getResult(recipe);

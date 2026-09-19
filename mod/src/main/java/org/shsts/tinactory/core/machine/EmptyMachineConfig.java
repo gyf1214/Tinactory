@@ -4,8 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.shsts.tinactory.api.machine.IMachineConfig;
 import org.shsts.tinactory.api.machine.IMachineConfigType;
@@ -37,36 +35,6 @@ public class EmptyMachineConfig implements IMachineConfig {
     @Override
     public boolean contains(String key, int tagType) {
         return false;
-    }
-
-    @Override
-    public Optional<Boolean> getBoolean(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Integer> getInt(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Long> getLong(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> getString(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Tag> getTag(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<ListTag> getList(String key) {
-        return Optional.empty();
     }
 
     @Override

@@ -21,11 +21,9 @@ import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
 import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageEventPacket;
 import org.shsts.tinactory.content.gui.sync.StorageSyncPacket;
-import org.shsts.tinactory.content.logistics.ElectricStorage;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.logistics.StorageEntry;
-import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.gui.InventoryMenu;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.slf4j.Logger;
@@ -38,6 +36,7 @@ import static org.shsts.tinactory.AllMenus.FILTER_SLOT;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
+import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
@@ -297,39 +296,31 @@ public class StorageMenu extends InventoryMenu {
         if (index < 0 || index >= filterSlots) {
             return FilterEntry.EMPTY;
         }
-        var list = machineConfig().getList(ElectricStorage.FILTER_KEY);
-        if (list.isEmpty()) {
-            return FilterEntry.EMPTY;
-        }
-        var list1 = list.get();
-        if (index >= list1.size()) {
-            return FilterEntry.EMPTY;
-        }
-        return CodecHelper.parseTag(machine.registryAccess(), FilterEntry.CODEC,
-            list1.getCompound(index));
+        return machineConfig().get(STORAGE_FILTERS)
+            .filter(list -> index < list.size())
+            .map(list -> list.get(index))
+            .orElse(FilterEntry.EMPTY);
     }
 
     private void onFilterClick(FilterEventPacket packet) {
-        var list = machineConfig().getCopiedList(ElectricStorage.FILTER_KEY);
+        var list = machineConfig().get(STORAGE_FILTERS).map(ArrayList::new).orElseGet(ArrayList::new);
         var remove = packet.remove().orElse(-1);
         var append = packet.append();
         var hasRemove = remove >= 0 && remove < list.size();
         var hasAppend = append.type() != FilterEntry.Type.NONE;
 
         if (hasRemove && hasAppend) {
-            var tag = CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append);
-            list.set(remove, tag);
+            list.set(remove, append);
         } else if (hasRemove) {
             list.remove(remove);
         } else if (hasAppend && list.size() < filterSlots) {
-            var tag = CodecHelper.encodeTag(machine.registryAccess(), FilterEntry.CODEC, append);
-            list.add(tag);
+            list.add(append);
         } else {
             return;
         }
 
         machine.setConfig(SetMachineConfigPacket.builder()
-            .set(ElectricStorage.FILTER_KEY, list)
+            .set(STORAGE_FILTERS, list)
             .get());
     }
 

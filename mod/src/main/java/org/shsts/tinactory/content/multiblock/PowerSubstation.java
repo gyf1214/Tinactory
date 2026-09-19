@@ -21,9 +21,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
+import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
-import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -59,7 +59,7 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
         if (multiblockInterface == null) {
             return false;
         }
-        return multiblockInterface.config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+        return multiblockInterface.config().get(BATTERY_DISCHARGE).orElse(DISCHARGE_DEFAULT);
     }
 
     @Override

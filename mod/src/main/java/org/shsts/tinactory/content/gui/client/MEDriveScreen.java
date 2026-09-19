@@ -11,8 +11,6 @@ import org.shsts.tinactory.integration.gui.LayoutMenu;
 import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.content.logistics.MEDrive.PRIORITY_DEFAULT;
-import static org.shsts.tinactory.content.logistics.MEDrive.PRIORITY_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
@@ -25,7 +23,8 @@ public class MEDriveScreen extends LayoutScreen<LayoutMenu> {
 
         var config = MACHINE.get(menu.blockEntity()).config();
         var buttonY = menu.layout().rect.endY() + SPACING;
-        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d), new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE),
-            new StoragePriorityButton(menu, config, PRIORITY_KEY, PRIORITY_DEFAULT));
+        rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d),
+            new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE),
+            new StoragePriorityButton(menu, config));
     }
 }

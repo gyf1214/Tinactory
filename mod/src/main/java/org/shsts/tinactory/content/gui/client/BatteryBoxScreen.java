@@ -7,8 +7,8 @@ import org.shsts.tinactory.integration.gui.LayoutMenu;
 import org.shsts.tinactory.integration.gui.client.LayoutScreen;
 
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
 import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
-import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_KEY;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.CHARGE_DISCHARGE_BUTTON;
@@ -21,7 +21,7 @@ public class BatteryBoxScreen extends LayoutScreen<LayoutMenu> {
 
         var config = MACHINE.get(menu.blockEntity()).config();
         var buttonY = menu.layout().rect.endY() + SPACING;
-        var button = new MachineConfigButton(menu, config, DISCHARGE_KEY, DISCHARGE_DEFAULT,
+        var button = new MachineConfigButton(menu, config, BATTERY_DISCHARGE, DISCHARGE_DEFAULT,
             CHARGE_DISCHARGE_BUTTON, 0, 18, "batteryMode", "dischargeMode");
         rootPanel.addChild(RectD.corners(1d, 0d, 1d, 0d),
             new Rect(-SLOT_SIZE, buttonY, SLOT_SIZE, SLOT_SIZE), button);

@@ -27,27 +27,11 @@ public interface ISetMachineConfigPacket extends IPacket {
 
         Builder reset(HolderLookup.Provider provider, ResourceLocation loc);
 
-        <T> Builder set(ResourceLocation loc, IMachineConfigType<T> type, T val);
-
-        default <T> Builder set(IEntry<IMachineConfigType<T>> type, T val) {
-            return set(type.loc(), type.get(), val);
-        }
+        <T> Builder set(IEntry<IMachineConfigType<T>> type, T val);
 
         <T> Builder set(HolderLookup.Provider provider, ResourceLocation loc, T val);
 
         Builder reset(String key);
-
-        Builder set(String key, boolean val);
-
-        Builder set(String key, int val);
-
-        Builder set(String key, long val);
-
-        Builder set(String key, String value);
-
-        default Builder set(String key, ResourceLocation val) {
-            return set(key, val.toString());
-        }
 
         Builder set(String key, Tag tag);
     }

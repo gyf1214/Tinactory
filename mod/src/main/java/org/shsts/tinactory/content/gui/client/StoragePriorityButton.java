@@ -7,16 +7,20 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.shsts.tinactory.api.machine.IMachineConfig;
+import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.integration.gui.client.Button;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.STORAGE_PRIORITY;
+import static org.shsts.tinactory.content.logistics.ElectricStorage.PRIORITY_DEFAULT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.util.I18n.tr;
 
@@ -28,19 +32,23 @@ public class StoragePriorityButton extends Button {
     private static final String PRIORITY_TOOLTIP = "tinactory.tooltip.chestStorage.";
 
     private final IMachineConfig config;
-    private final String key;
+    private final IEntry<IMachineConfigType<Integer>> type;
     private final int defaultVal;
 
     public StoragePriorityButton(MenuBase menu, IMachineConfig config,
-        String key, int defaultVal) {
+        IEntry<IMachineConfigType<Integer>> type, int defaultVal) {
         super(menu);
         this.config = config;
-        this.key = key;
+        this.type = type;
         this.defaultVal = defaultVal;
     }
 
+    public StoragePriorityButton(MenuBase menu, IMachineConfig config) {
+        this(menu, config, STORAGE_PRIORITY, PRIORITY_DEFAULT);
+    }
+
     private int getValue() {
-        return Math.clamp(config.getInt(key, defaultVal), -1, 4);
+        return Math.clamp(config.get(type).orElse(defaultVal), -1, 4);
     }
 
     @Override
@@ -66,7 +74,7 @@ public class StoragePriorityButton extends Button {
             var val1 = getValue() - 1;
             val2 = val1 < -1 ? 4 : val1;
         }
-        menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().set(key, val2));
+        menu.triggerEvent(SET_MACHINE_CONFIG, SetMachineConfigPacket.builder().set(type, val2));
     }
 
     @Override

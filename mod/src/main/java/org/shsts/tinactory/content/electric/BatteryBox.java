@@ -30,6 +30,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
+import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -37,7 +38,6 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     IBatteryBox, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
-    public static final String DISCHARGE_KEY = "discharge";
     public static final boolean DISCHARGE_DEFAULT = false;
     private static final String ID = "battery_box";
 
@@ -75,7 +75,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     private boolean isDischarge() {
-        return machine().config().getBoolean(DISCHARGE_KEY, DISCHARGE_DEFAULT);
+        return machine().config().get(BATTERY_DISCHARGE).orElse(DISCHARGE_DEFAULT);
     }
 
     @Override
