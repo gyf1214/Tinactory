@@ -6,6 +6,7 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -452,7 +453,10 @@ public final class TestMachine implements IMachine {
     public static final IEntry<IMachineConfigType<ResourceLocation>> TARGET_RECIPE =
         machineConfig(AllNetworks.TARGET_RECIPE, ResourceLocation.CODEC, "targetRecipe");
     public static final IEntry<IMachineConfigType<Integer>> MACHINE_LIMIT = machineConfig("limit", Codec.INT);
-    public static final IEntry<IMachineConfigType<String>> MACHINE_NAME = machineConfig("name", Codec.STRING);
+    public static final IEntry<IMachineConfigType<Component>> MACHINE_NAME =
+        machineConfig("name", ComponentSerialization.CODEC);
+    public static final IEntry<IMachineConfigType<List<Integer>>> MACHINE_LIST =
+        machineConfig("list", Codec.INT.listOf());
 
     private static <T> IEntry<IMachineConfigType<T>> machineConfig(ILoc loc, Codec<T> codec, String legacyKey) {
         var val = Registry.register(MACHINE_CONFIGS, loc.loc(), new MachineConfigType<>(codec, legacyKey));

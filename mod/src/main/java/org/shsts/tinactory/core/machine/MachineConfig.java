@@ -110,7 +110,11 @@ public class MachineConfig implements IMachineConfig {
     private <T> void fixLegacyConfig(HolderLookup.Provider provider, ResourceLocation loc,
         IMachineConfigType<T> type) {
         type.fixLegacyConfig(provider, unknownTags)
-            .ifPresent(val -> configs.put(type, new Entry<>(loc, type, val)));
+            .ifPresent(val -> {
+                if (!configs.containsKey(type)) {
+                    configs.put(type, new Entry<>(loc, type, val));
+                }
+            });
     }
 
     @Override
@@ -131,8 +135,6 @@ public class MachineConfig implements IMachineConfig {
             }
         }
         lookup.listElements()
-            .filter(holder -> !configs.containsKey(holder.value()))
-            .forEach(holder -> fixLegacyConfig(provider, holder.unwrapKey().orElseThrow().location(),
-                holder.value()));
+            .forEach(holder -> fixLegacyConfig(provider, holder.unwrapKey().orElseThrow().location(), holder.value()));
     }
 }
