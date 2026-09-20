@@ -19,7 +19,6 @@ import org.shsts.tinycorelib.api.registrate.builder.IBlockEntityTypeBuilder;
 import java.util.function.Predicate;
 
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
-import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -73,7 +72,7 @@ public class ElectricTank extends ElectricStorage<FluidStack> implements INBTSer
     private final IFluidTanksHandler fluidHandler = new IFluidTanksHandler() {
         @Override
         public int getTanks() {
-            return storageSlots();
+            return virtualSlots();
         }
 
         @Override
@@ -130,7 +129,6 @@ public class ElectricTank extends ElectricStorage<FluidStack> implements INBTSer
     public void attachCapability(ICapabilityBuilder builder) {
         super.attachCapability(builder);
         builder.attach(FLUID_HANDLER, fluidHandler);
-        builder.attach(MENU_FLUID_HANDLER, fluidHandler);
     }
 
     @Override

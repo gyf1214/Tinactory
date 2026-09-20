@@ -28,7 +28,7 @@ public class ElectricChest extends ElectricStorage<ItemStack> implements INBTSer
     private final IItemHandler itemHandler = new IItemHandler() {
         @Override
         public int getSlots() {
-            return storageSlots();
+            return virtualSlots();
         }
 
         @Override

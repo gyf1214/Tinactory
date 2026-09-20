@@ -217,6 +217,10 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         }
     }
 
+    protected int virtualSlots() {
+        return autoVoid() ? storageSlots + 1 : storageSlots;
+    }
+
     private long getAmountInVirtualSlot(@Nullable SortedMultiList.IndexedValue<IStackKey> value) {
         if (value == null) {
             return 0;
@@ -244,7 +248,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     }
 
     protected boolean validForVirtualSlot(int slot, T stack) {
-        if (slot < 0 || slot >= storageSlots || adapter.isEmpty(stack)) {
+        if (slot < 0 || slot >= virtualSlots() || adapter.isEmpty(stack)) {
             return false;
         }
         var value = slotMap.get(slot);
@@ -259,11 +263,16 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         if (!validForVirtualSlot(value, stack)) {
             return stack;
         }
+
+        if (autoVoid() && slot == storageSlots) {
+            return slotMap.size() >= storageSlots ? adapter.empty() : stack;
+        }
+
         var existing = getAmountInVirtualSlot(value);
         var amount = adapter.amount(stack);
         var insert = (int) Math.min(amount, stackLimit - existing);
         if (insert <= 0) {
-            return autoVoid() ? adapter.empty() : stack;
+            return stack;
         }
 
         var remaining = storage.insert(adapter.withAmount(stack, insert), simulate);
