@@ -16,6 +16,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
@@ -39,9 +40,11 @@ import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
+import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
+import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_CONFIG;
 import static org.shsts.tinactory.AllNetworks.STORAGE_DETECTOR;
 import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
@@ -260,6 +263,44 @@ public final class PersistenceGameTest {
         require(helper, handler.getFluidInTank(0).getAmount() == 16000 &&
                 handler.getFluidInTank(1).getAmount() == 16000,
             "Electric Tank did not expose full final virtual tank amounts", pos);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testElectricChestAutoVoidsFullVirtualSlot(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder().set(AUTO_VOID, true).get());
+
+        var handler = ITEM_HANDLER.get(blockEntity);
+        var diamond = new ItemStack(Items.DIAMOND, 64);
+        require(helper, handler.insertItem(0, diamond.copy(), false).isEmpty(),
+            "Could not fill the electric chest virtual slot", pos);
+        require(helper, handler.insertItem(0, diamond.copy(), true).isEmpty(),
+            "Auto-void simulation rejected a full virtual slot", pos);
+        require(helper, handler.insertItem(0, diamond.copy(), false).isEmpty() &&
+                handler.getStackInSlot(0).getCount() == 64,
+            "Auto-void did not void full virtual-slot item input", pos);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testElectricTankAutoVoidsFullVirtualTank(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_tank"));
+        var blockEntity = helper.getBlockEntity(pos);
+        MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder().set(AUTO_VOID, true).get());
+
+        var tank = MENU_FLUID_HANDLER.get(blockEntity).getTank(0);
+        var lava = new FluidStack(Fluids.LAVA, 16000);
+        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000,
+            "Could not fill the electric tank virtual slot", pos);
+        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.SIMULATE) == 16000,
+            "Auto-void simulation rejected a full virtual tank", pos);
+        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000 &&
+                tank.getFluidAmount() == 16000,
+            "Auto-void did not void full virtual-tank fluid input", pos);
         helper.succeed();
     }
 

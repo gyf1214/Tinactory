@@ -201,7 +201,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
     }
 
     private boolean autoVoid() {
-        return machineConfig.get(AUTO_VOID).orElse(VOID_DEFAULT);
+        return machineConfig().get(AUTO_VOID).orElse(VOID_DEFAULT);
     }
 
     protected abstract Predicate<T> asPredicate(HolderLookup.Provider provider, FilterEntry entry);
@@ -263,7 +263,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         var amount = adapter.amount(stack);
         var insert = (int) Math.min(amount, stackLimit - existing);
         if (insert <= 0) {
-            return stack;
+            return autoVoid() ? adapter.empty() : stack;
         }
 
         var remaining = storage.insert(adapter.withAmount(stack, insert), simulate);
