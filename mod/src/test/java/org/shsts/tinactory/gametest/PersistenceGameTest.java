@@ -29,6 +29,7 @@ import org.shsts.tinactory.content.machine.IBoiler;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
+import org.shsts.tinactory.integration.logistics.IFluidTanksHandler;
 import org.shsts.tinactory.integration.logistics.StackHelper;
 import org.shsts.tinactory.integration.machine.Machine;
 
@@ -40,7 +41,6 @@ import static org.shsts.tinactory.AllCapabilities.BYTES_PROVIDER_ITEM;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
-import static org.shsts.tinactory.AllCapabilities.MENU_FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
@@ -267,7 +267,7 @@ public final class PersistenceGameTest {
     }
 
     @GameTest
-    public static void testElectricChestAutoVoidsFullVirtualSlot(GameTestHelper helper) {
+    public static void testElectricChestAutoVoidsThroughVoidSlot(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_chest"));
         var blockEntity = helper.getBlockEntity(pos);
@@ -275,32 +275,44 @@ public final class PersistenceGameTest {
 
         var handler = ITEM_HANDLER.get(blockEntity);
         var diamond = new ItemStack(Items.DIAMOND, 64);
-        require(helper, handler.insertItem(0, diamond.copy(), false).isEmpty(),
-            "Could not fill the electric chest virtual slot", pos);
-        require(helper, handler.insertItem(0, diamond.copy(), true).isEmpty(),
-            "Auto-void simulation rejected a full virtual slot", pos);
-        require(helper, handler.insertItem(0, diamond.copy(), false).isEmpty() &&
+        var voidSlot = handler.getSlots() - 1;
+        for (var slot = 0; slot < voidSlot; slot++) {
+            require(helper, handler.insertItem(slot, diamond.copy(), false).isEmpty(),
+                "Could not fill the electric chest virtual slot " + slot, pos);
+        }
+        require(helper, handler.getStackInSlot(voidSlot).isEmpty(),
+            "Electric Chest void slot was not empty", pos);
+        require(helper, handler.insertItem(0, diamond.copy(), true).getCount() == diamond.getCount() &&
+                handler.insertItem(0, diamond.copy(), false).getCount() == diamond.getCount(),
+            "Auto-void incorrectly accepted input through a full normal slot", pos);
+        require(helper, handler.insertItem(voidSlot, diamond.copy(), true).isEmpty(),
+            "Auto-void simulation rejected the void slot input", pos);
+        require(helper, handler.insertItem(voidSlot, diamond.copy(), false).isEmpty() &&
                 handler.getStackInSlot(0).getCount() == 64,
-            "Auto-void did not void full virtual-slot item input", pos);
+            "Auto-void did not void through the final void slot", pos);
         helper.succeed();
     }
 
     @GameTest
-    public static void testElectricTankAutoVoidsFullVirtualTank(GameTestHelper helper) {
+    public static void testElectricTankAutoVoidsThroughVoidTank(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, block("logistics/ulv/electric_tank"));
         var blockEntity = helper.getBlockEntity(pos);
         MACHINE.get(blockEntity).setConfig(SetMachineConfigPacket.builder().set(AUTO_VOID, true).get());
 
-        var tank = MENU_FLUID_HANDLER.get(blockEntity).getTank(0);
+        var handler = (IFluidTanksHandler) FLUID_HANDLER.get(blockEntity);
+        var voidTank = handler.getTank(handler.getTanks() - 1);
         var lava = new FluidStack(Fluids.LAVA, 16000);
-        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000,
-            "Could not fill the electric tank virtual slot", pos);
-        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.SIMULATE) == 16000,
-            "Auto-void simulation rejected a full virtual tank", pos);
-        require(helper, tank.fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000 &&
-                tank.getFluidAmount() == 16000,
-            "Auto-void did not void full virtual-tank fluid input", pos);
+        for (var index = 0; index < handler.getTanks() - 1; index++) {
+            require(helper, handler.getTank(index).fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000,
+                "Could not fill the electric tank virtual tank " + index, pos);
+        }
+        require(helper, voidTank.getFluid().isEmpty(), "Electric Tank void tank was not empty", pos);
+        require(helper, voidTank.fill(lava.copy(), IFluidHandler.FluidAction.SIMULATE) == 16000,
+            "Auto-void simulation rejected the void tank input", pos);
+        require(helper, voidTank.fill(lava.copy(), IFluidHandler.FluidAction.EXECUTE) == 16000 &&
+                voidTank.getFluid().isEmpty(),
+            "Auto-void did not void through the final void tank", pos);
         helper.succeed();
     }
 
