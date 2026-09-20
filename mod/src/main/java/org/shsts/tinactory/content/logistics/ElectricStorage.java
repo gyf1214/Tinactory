@@ -43,6 +43,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllEvents.CONNECT;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllEvents.SET_MACHINE_CONFIG;
+import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
 import static org.shsts.tinactory.AllNetworks.LOGISTIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
@@ -95,7 +96,7 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
 
         @Override
         public boolean acceptInput(T stack) {
-            return stackValid(stack) && super.acceptInput(stack);
+            return stackValid(stack) && (autoVoid() || super.acceptInput(stack));
         }
 
         @Override
@@ -110,13 +111,19 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
         }
 
         @Override
-        protected void doInsert(IStackKey key, int amount, int existingAmount) {
+        protected T doInsert(T stack, boolean simulate) {
+            var remaining = super.doInsert(stack, simulate);
+            return autoVoid() ? adapter.empty() : remaining;
+        }
+
+        @Override
+        protected void postInsert(IStackKey key, int amount, int existingAmount) {
             var newSlots = Math.max(0, slotsUsed(existingAmount + amount) - slotsUsed(existingAmount));
             slotMap.insert(key, newSlots);
         }
 
         @Override
-        protected void doExtract(IStackKey key, int amount, int existingAmount) {
+        protected void postExtract(IStackKey key, int amount, int existingAmount) {
             var freeSlots = Math.max(0, slotsUsed(existingAmount) - slotsUsed(existingAmount - amount));
             slotMap.remove(key, freeSlots);
         }
@@ -191,6 +198,10 @@ public abstract class ElectricStorage<T> extends CapabilityProvider implements I
 
     private boolean stackValid(T stack) {
         return filters.isEmpty() || filters.stream().anyMatch($ -> $.test(stack));
+    }
+
+    private boolean autoVoid() {
+        return machineConfig.get(AUTO_VOID).orElse(VOID_DEFAULT);
     }
 
     protected abstract Predicate<T> asPredicate(HolderLookup.Provider provider, FilterEntry entry);

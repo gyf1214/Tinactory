@@ -118,10 +118,10 @@ class MapStorageTest {
         }
 
         @Override
-        protected void doInsert(IStackKey key, int amount, int existingAmount) {}
+        protected void postInsert(IStackKey key, int amount, int existingAmount) {}
 
         @Override
-        protected void doExtract(IStackKey key, int amount, int existingAmount) {}
+        protected void postExtract(IStackKey key, int amount, int existingAmount) {}
 
         @Override
         protected CompoundTag serializeStack(HolderLookup.Provider provider, MutableStack stack) {

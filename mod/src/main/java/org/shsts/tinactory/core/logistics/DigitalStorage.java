@@ -39,14 +39,14 @@ public abstract class DigitalStorage<T> extends MapStorage<T> implements IPortFi
     }
 
     @Override
-    protected void doInsert(IStackKey key, int amount, int existingAmount) {
+    protected void postInsert(IStackKey key, int amount, int existingAmount) {
         var bytes = existingAmount > 0 ? (long) amount * bytesPerUnit :
             (long) bytesPerType + (long) amount * bytesPerUnit;
         provider.consume(key, bytes);
     }
 
     @Override
-    protected void doExtract(IStackKey key, int amount, int existingAmount) {
+    protected void postExtract(IStackKey key, int amount, int existingAmount) {
         var bytes = amount >= existingAmount ? (long) bytesPerType + (long) existingAmount * bytesPerUnit :
             (long) amount * bytesPerUnit;
         provider.restore(key, bytes);

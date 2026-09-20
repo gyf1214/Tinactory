@@ -32,9 +32,9 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
 
     protected abstract int insertLimit(IStackKey key, int existingAmount);
 
-    protected abstract void doInsert(IStackKey key, int amount, int existingAmount);
+    protected abstract void postInsert(IStackKey key, int amount, int existingAmount);
 
-    protected abstract void doExtract(IStackKey key, int amount, int existingAmount);
+    protected abstract void postExtract(IStackKey key, int amount, int existingAmount);
 
     private int existingAmount(IStackKey key) {
         return contents.containsKey(key) ? adapter.amount(contents.get(key)) : 0;
@@ -52,10 +52,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
         return true;
     }
 
-    public T insert(T stack, boolean simulate) {
-        if (adapter.isEmpty(stack) || !acceptInput(stack)) {
-            return stack;
-        }
+    protected T doInsert(T stack, boolean simulate) {
         var key = adapter.keyOf(stack);
         var existing = existingAmount(key);
         var amount = adapter.amount(stack);
@@ -68,10 +65,17 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
         if (!simulate) {
             var updated = adapter.withAmount(stack, existing + inserted);
             contents.put(key, updated);
-            doInsert(key, inserted, existing);
+            postInsert(key, inserted, existing);
             invokeUpdate();
         }
         return remaining;
+    }
+
+    public T insert(T stack, boolean simulate) {
+        if (adapter.isEmpty(stack) || !acceptInput(stack)) {
+            return stack;
+        }
+        return doInsert(stack, simulate);
     }
 
     public T extract(T stack, boolean simulate) {
@@ -88,7 +92,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
         if (amount >= existingAmount) {
             if (!simulate) {
                 contents.remove(key);
-                doExtract(key, existingAmount, existingAmount);
+                postExtract(key, existingAmount, existingAmount);
                 invokeUpdate();
             }
             return adapter.copy(existing);
@@ -96,7 +100,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
             if (!simulate) {
                 var updated = adapter.withAmount(existing, existingAmount - amount);
                 contents.put(key, updated);
-                doExtract(key, amount, existingAmount);
+                postExtract(key, amount, existingAmount);
                 invokeUpdate();
             }
             return adapter.copy(stack);
@@ -114,7 +118,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
         if (limit >= existingAmount) {
             if (!simulate) {
                 contents.remove(key);
-                doExtract(key, existingAmount, existingAmount);
+                postExtract(key, existingAmount, existingAmount);
                 invokeUpdate();
             }
             return adapter.copy(existing);
@@ -122,7 +126,7 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
             if (!simulate) {
                 var updated = adapter.withAmount(existing, existingAmount - limit);
                 contents.put(key, updated);
-                doExtract(key, limit, existingAmount);
+                postExtract(key, limit, existingAmount);
                 invokeUpdate();
             }
             return adapter.withAmount(existing, limit);
@@ -178,10 +182,10 @@ public abstract class MapStorage<T> extends PortNotifier implements IPort<T> {
         if (amount > limit) {
             LOGGER.warn("Entry {} overflow", key);
             contents.put(key, adapter.stackOf(key, limit));
-            doInsert(key, limit, 0);
+            postInsert(key, limit, 0);
         } else {
             contents.put(key, stack);
-            doInsert(key, amount, 0);
+            postInsert(key, amount, 0);
         }
     }
 

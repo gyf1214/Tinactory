@@ -16,10 +16,10 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_ANCHOR;
 import static org.shsts.tinactory.content.gui.client.MachineRecipeBook.PANEL_OFFSET;
-import static org.shsts.tinactory.content.logistics.ElectricStorage.VOID_DEFAULT;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.VOID_BUTTON;
+import static org.shsts.tinactory.core.machine.ProcessingRuntime.VOID_DEFAULT;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
