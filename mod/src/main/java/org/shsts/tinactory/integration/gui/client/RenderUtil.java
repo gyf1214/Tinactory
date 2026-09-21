@@ -27,6 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.ItemDecoratorHandler;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -177,14 +178,18 @@ public final class RenderUtil {
     /**
      * Copied from {@link GuiGraphics#renderItemDecorations}
      */
-    private static void renderVanillaItemDecorations(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
+    @SuppressWarnings("UnstableApiUsage")
+    private static void renderVanillaItemDecorations(GuiGraphics graphics, ItemStack stack, int x, int y) {
+        var poseStack = graphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 200f);
         if (stack.isBarVisible()) {
             int l = stack.getBarWidth();
             int i = stack.getBarColor();
             int j = x + 2;
             int k = y + 13;
-            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
-            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+            graphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+            graphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
         }
 
         var minecraft = Minecraft.getInstance();
@@ -195,8 +200,11 @@ public final class RenderUtil {
         if (f > 0.0F) {
             int i1 = y + Mth.floor(16.0F * (1.0F - f));
             int j1 = i1 + Mth.ceil(16.0F * f);
-            guiGraphics.fill(RenderType.guiOverlay(), x, i1, x + 16, j1, Integer.MAX_VALUE);
+            graphics.fill(RenderType.guiOverlay(), x, i1, x + 16, j1, Integer.MAX_VALUE);
         }
+        poseStack.popPose();
+
+        ItemDecoratorHandler.of(stack).render(graphics, ClientUtil.getFont(), stack, x, y);
     }
 
     public static void renderItemWithDecoration(GuiGraphics graphics, ItemStack stack, Rect rect) {
@@ -212,6 +220,11 @@ public final class RenderUtil {
         graphics.renderItem(stack, rect.x(), rect.y());
         graphics.fill(RenderType.guiGhostRecipeOverlay(),
             rect.x(), rect.y(), rect.endX(), rect.endY(), 0xAA8B8B8B);
+    }
+
+    public static void renderFakeItemWithDecoration(GuiGraphics graphics, ItemStack stack, Rect rect) {
+        graphics.renderFakeItem(stack, rect.x(), rect.y());
+        graphics.renderItemDecorations(ClientUtil.getFont(), stack, rect.x(), rect.y());
     }
 
     public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect, int color) {

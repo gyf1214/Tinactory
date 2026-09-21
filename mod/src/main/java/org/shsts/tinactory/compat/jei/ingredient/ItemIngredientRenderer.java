@@ -22,7 +22,7 @@ import java.util.List;
 public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
     public void render(GuiGraphics graphics, ItemStack ingredient) {
-        RenderUtil.renderItemWithDecoration(graphics, ingredient, new Rect(0, 0, 16, 16));
+        RenderUtil.renderFakeItemWithDecoration(graphics, ingredient, new Rect(0, 0, 16, 16));
     }
 
     @Override
