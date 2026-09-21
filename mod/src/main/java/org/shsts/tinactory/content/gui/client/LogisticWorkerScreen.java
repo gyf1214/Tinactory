@@ -127,8 +127,8 @@ public class LogisticWorkerScreen extends MenuScreen<LogisticWorkerMenu> {
             RenderUtil.blit(graphics, RECIPE_BUTTON, toRect, isTo ? BUTTON_SIZE : 0, 0);
             RenderUtil.blit(graphics,
                 ALLOW_ARROW_BUTTON, validRect, 0, isValid ? ALLOW_ARROW_BUTTON.height() / 2 : 0);
-            RenderUtil.renderItem(graphics, from, fromRect.x() + 2, fromRect.y() + 2);
-            RenderUtil.renderItem(graphics, to, toRect.x() + 2, toRect.y() + 2);
+            RenderUtil.renderItem(graphics, from, fromRect.offset(2, 2).resize(16, 16));
+            RenderUtil.renderItem(graphics, to, toRect.offset(2, 2).resize(16, 16));
 
             RenderUtil.renderDescriptor(graphics, config.filter().display(), filterRect);
             if (FILTER_RECT.in(mouseX, mouseY)) {

@@ -18,8 +18,7 @@ import java.util.List;
 public class FluidIngredientRenderer implements IIngredientRenderer<FluidStack> {
     @Override
     public void render(GuiGraphics graphics, FluidStack ingredient) {
-        var rect = new Rect(0, 0, 16, 16);
-        RenderUtil.renderFluidWithDecoration(graphics, ingredient, rect);
+        RenderUtil.renderFluidWithDecoration(graphics, ingredient, new Rect(0, 0, 16, 16));
     }
 
     @Override

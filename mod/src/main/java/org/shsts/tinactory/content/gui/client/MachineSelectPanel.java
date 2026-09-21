@@ -133,7 +133,7 @@ public class MachineSelectPanel<T> extends ButtonPanel {
         var machine = displayMachineList.get(index);
         RenderUtil.blit(graphics, RECIPE_BUTTON, rect,
             machine.id.equals(selected) ? 21 : 0, 0);
-        RenderUtil.renderItem(graphics, machine.icon, rect.x() + 2, rect.y() + 2);
+        RenderUtil.renderItem(graphics, machine.icon, rect.offset(2, 2).resize(16, 16));
     }
 
     @Override

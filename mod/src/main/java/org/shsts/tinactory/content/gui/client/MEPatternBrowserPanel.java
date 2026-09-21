@@ -52,10 +52,10 @@ public class MEPatternBrowserPanel extends Panel {
                 return;
             }
 
-            var rect1 = rect.offset(1, 1).resize(SLOT_SIZE - 2, SLOT_SIZE - 2);
+            var rect1 = rect.offset(1, 1).resize(16, 16);
             var pattern = patterns.get(index);
             if (pattern.outputs().isEmpty()) {
-                RenderUtil.renderItem(graphics, new ItemStack(Items.BARRIER), rect1.x(), rect1.y());
+                RenderUtil.renderItem(graphics, new ItemStack(Items.BARRIER), rect1);
                 return;
             }
             var display = pattern.outputs().getFirst().key().display();

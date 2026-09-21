@@ -19,6 +19,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +38,8 @@ import org.shsts.tinactory.core.gui.Texture;
 import org.shsts.tinactory.core.gui.TextureRenderDescriptor;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
+import java.util.Optional;
+
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -44,6 +47,7 @@ public final class RenderUtil {
     public static final int TEXT_COLOR = 0xFF404040;
     public static final int HIGHLIGHT_COLOR = 0x80FFFFFF;
     public static final int WHITE = 0xFFFFFFFF;
+    private static final int MAX_STACK_TEXT_WIDTH = 14;
 
     public static void blit(GuiGraphics graphics, Texture tex, Rect dstRect) {
         blit(graphics, tex, dstRect, new Rect(0, 0, dstRect.width(), dstRect.height()));
@@ -101,40 +105,6 @@ public final class RenderUtil {
         RenderUtil.fill(graphics, rect, HIGHLIGHT_COLOR);
     }
 
-    public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect, int color) {
-        if (!stack.isEmpty()) {
-            var fluid = stack.getFluid();
-            var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
-            var extension = IClientFluidTypeExtensions.of(fluid);
-            var sprite = atlas.apply(extension.getStillTexture(stack));
-            var renderColor = mixColor(extension.getTintColor(stack), color);
-            blitAtlas(graphics, sprite, renderColor, rect);
-        }
-    }
-
-    public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect) {
-        renderFluid(graphics, stack, rect, WHITE);
-    }
-
-    public static void renderFluid(GuiGraphics graphics, FluidStack stack, int x, int y) {
-        renderFluid(graphics, stack, new Rect(x, y, 16, 16), WHITE);
-    }
-
-    public static void renderFluidWithDecoration(GuiGraphics graphics, FluidStack stack, Rect rect) {
-        if (!stack.isEmpty()) {
-            renderFluid(graphics, stack, rect);
-            var s = ClientUtil.getFluidAmountString(stack.getAmount());
-            var font = ClientUtil.getFont();
-            var x = rect.endX() + 1 - font.width(s);
-            var y = rect.endY() + 2 - font.lineHeight;
-            graphics.drawString(font, s, x, y, WHITE, true);
-        }
-    }
-
-    public static void renderGhostFluid(GuiGraphics graphics, FluidStack stack, Rect rect) {
-        renderFluid(graphics, stack, rect, 0x55FFFFFF);
-    }
-
     /**
      * Non-GUI block rendering helper for block-entity renderers. Keeps the explicit PoseStack boundary.
      */
@@ -187,24 +157,88 @@ public final class RenderUtil {
             packedLight, packedOverlay, ModelData.EMPTY, null);
     }
 
-    public static void renderItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        graphics.renderItem(stack, x, y);
+    private static void renderStackText(GuiGraphics graphics, String text, Rect rect) {
+        var font = ClientUtil.getFont();
+        var width = font.width(text);
+        var scale = width > (1 + MAX_STACK_TEXT_WIDTH) ? MAX_STACK_TEXT_WIDTH / (float) (width - 1) : 1f;
+
+        var poseStack = graphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(rect.endX(), rect.endY(), 200f);
+        poseStack.scale(scale, scale, 1f);
+        graphics.drawString(font, text, 1 - width, 2 - font.lineHeight, WHITE, true);
+        poseStack.popPose();
     }
 
-    public static void renderItemWithDecoration(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        var text = ClientUtil.getItemCountString(stack.getCount());
-        graphics.renderItem(stack, x, y);
-        graphics.renderItemDecorations(ClientUtil.getFont(), stack, x, y, text);
+    public static void renderItem(GuiGraphics graphics, ItemStack stack, Rect rect) {
+        graphics.renderItem(stack, rect.x(), rect.y());
     }
 
-    public static void renderFakeItemWithDecoration(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        graphics.renderFakeItem(stack, x, y);
-        graphics.renderItemDecorations(ClientUtil.getFont(), stack, x, y);
+    /**
+     * Copied from {@link GuiGraphics#renderItemDecorations}
+     */
+    private static void renderVanillaItemDecorations(GuiGraphics guiGraphics, ItemStack stack, int x, int y) {
+        if (stack.isBarVisible()) {
+            int l = stack.getBarWidth();
+            int i = stack.getBarColor();
+            int j = x + 2;
+            int k = y + 13;
+            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + 13, k + 2, -16777216);
+            guiGraphics.fill(RenderType.guiOverlay(), j, k, j + l, k + 1, i | 0xFF000000);
+        }
+
+        var minecraft = Minecraft.getInstance();
+        var partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(true);
+        var f = (float) Optional.ofNullable(minecraft.player)
+            .map(player -> player.getCooldowns().getCooldownPercent(stack.getItem(), partialTick))
+            .orElse(0f);
+        if (f > 0.0F) {
+            int i1 = y + Mth.floor(16.0F * (1.0F - f));
+            int j1 = i1 + Mth.ceil(16.0F * f);
+            guiGraphics.fill(RenderType.guiOverlay(), x, i1, x + 16, j1, Integer.MAX_VALUE);
+        }
     }
 
-    public static void renderGhostItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        graphics.renderItem(stack, x, y);
-        graphics.fill(RenderType.guiGhostRecipeOverlay(), x, y, x + 16, y + 16, 0xAA8B8B8B);
+    public static void renderItemWithDecoration(GuiGraphics graphics, ItemStack stack, Rect rect) {
+        renderItem(graphics, stack, rect);
+        if (stack.getCount() > 1) {
+            var text = ClientUtil.getItemCountString(stack.getCount());
+            renderStackText(graphics, text, rect);
+        }
+        renderVanillaItemDecorations(graphics, stack, rect.x(), rect.y());
+    }
+
+    public static void renderGhostItem(GuiGraphics graphics, ItemStack stack, Rect rect) {
+        graphics.renderItem(stack, rect.x(), rect.y());
+        graphics.fill(RenderType.guiGhostRecipeOverlay(),
+            rect.x(), rect.y(), rect.endX(), rect.endY(), 0xAA8B8B8B);
+    }
+
+    public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect, int color) {
+        if (!stack.isEmpty()) {
+            var fluid = stack.getFluid();
+            var atlas = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS);
+            var extension = IClientFluidTypeExtensions.of(fluid);
+            var sprite = atlas.apply(extension.getStillTexture(stack));
+            var renderColor = mixColor(extension.getTintColor(stack), color);
+            blitAtlas(graphics, sprite, renderColor, rect);
+        }
+    }
+
+    public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect) {
+        renderFluid(graphics, stack, rect, WHITE);
+    }
+
+    public static void renderFluidWithDecoration(GuiGraphics graphics, FluidStack stack, Rect rect) {
+        renderFluid(graphics, stack, rect);
+        if (!stack.isEmpty()) {
+            var text = ClientUtil.getFluidAmountString(stack.getAmount());
+            renderStackText(graphics, text, rect);
+        }
+    }
+
+    public static void renderGhostFluid(GuiGraphics graphics, FluidStack stack, Rect rect) {
+        renderFluid(graphics, stack, rect, 0x55FFFFFF);
     }
 
     public static void renderDescriptor(GuiGraphics graphics, IRenderDescriptor descriptor, Rect rect) {
@@ -212,9 +246,9 @@ public final class RenderUtil {
             case EmptyRenderDescriptor ignored -> {}
             case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
             case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
-                .ifPresent(item -> renderItem(graphics, new ItemStack(item), rect.x(), rect.y()));
-            case ItemRenderDescriptor(ItemStack stack) -> renderItem(graphics, stack, rect.x(), rect.y());
-            case FluidRenderDescriptor(FluidStack stack) -> renderFluid(graphics, stack, rect.x(), rect.y());
+                .ifPresent(item -> renderItem(graphics, new ItemStack(item), rect));
+            case ItemRenderDescriptor(ItemStack stack) -> renderItem(graphics, stack, rect);
+            case FluidRenderDescriptor(FluidStack stack) -> renderFluid(graphics, stack, rect);
             default -> throw new IllegalArgumentException(
                 "Unsupported render descriptor: " + descriptor.getClass().getName());
         }
@@ -225,9 +259,9 @@ public final class RenderUtil {
             case EmptyRenderDescriptor ignored -> {}
             case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
             case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
-                .ifPresent(item -> renderItemWithDecoration(graphics, new ItemStack(item), rect.x(), rect.y()));
+                .ifPresent(item -> renderItemWithDecoration(graphics, new ItemStack(item), rect));
             case ItemRenderDescriptor(ItemStack stack) -> renderItemWithDecoration(
-                graphics, stack, rect.x(), rect.y());
+                graphics, stack, rect);
             case FluidRenderDescriptor(FluidStack stack) -> renderFluidWithDecoration(graphics, stack, rect);
             default -> throw new IllegalArgumentException(
                 "Unsupported render descriptor: " + descriptor.getClass().getName());
@@ -239,8 +273,8 @@ public final class RenderUtil {
             case EmptyRenderDescriptor ignored -> {}
             case TextureRenderDescriptor(Texture texture) -> blit(graphics, texture, rect);
             case ItemIdRenderDescriptor(ResourceLocation id) -> ClientUtil.getRegistryObject(Registries.ITEM, id)
-                .ifPresent(item -> renderGhostItem(graphics, new ItemStack(item), rect.x(), rect.y()));
-            case ItemRenderDescriptor(ItemStack stack) -> renderGhostItem(graphics, stack, rect.x(), rect.y());
+                .ifPresent(item -> renderGhostItem(graphics, new ItemStack(item), rect));
+            case ItemRenderDescriptor(ItemStack stack) -> renderGhostItem(graphics, stack, rect);
             case FluidRenderDescriptor(FluidStack stack) -> renderGhostFluid(graphics, stack, rect);
             default -> throw new IllegalArgumentException(
                 "Unsupported render descriptor: " + descriptor.getClass().getName());

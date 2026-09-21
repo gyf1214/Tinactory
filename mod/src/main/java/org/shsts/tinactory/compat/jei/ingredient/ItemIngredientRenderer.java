@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import org.shsts.tinactory.core.gui.Rect;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
 import org.shsts.tinactory.integration.util.ClientUtil;
 
@@ -21,7 +22,7 @@ import java.util.List;
 public class ItemIngredientRenderer implements IIngredientRenderer<ItemStack> {
     @Override
     public void render(GuiGraphics graphics, ItemStack ingredient) {
-        RenderUtil.renderFakeItemWithDecoration(graphics, ingredient, 0, 0);
+        RenderUtil.renderItemWithDecoration(graphics, ingredient, new Rect(0, 0, 16, 16));
     }
 
     @Override

@@ -51,7 +51,8 @@ public class Tab extends Panel {
             var ty = index == currentTab ? BUTTON_HEIGHT : 0;
             RenderUtil.blit(graphics, BUTTON_TEX, rect, tx, ty);
             if (!icon.isEmpty()) {
-                RenderUtil.renderItem(graphics, icon, rect.x() + ICON_X_OFFSET, rect.y() + ICON_Y_OFFSET);
+                RenderUtil.renderItem(graphics, icon,
+                    rect.offset(ICON_X_OFFSET, ICON_Y_OFFSET).resize(16, 16));
             }
         }
 

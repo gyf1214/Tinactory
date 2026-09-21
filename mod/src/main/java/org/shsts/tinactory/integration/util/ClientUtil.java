@@ -7,7 +7,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -30,7 +29,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @MethodsReturnNonnullByDefault
@@ -38,16 +36,13 @@ import java.util.Optional;
 public final class ClientUtil {
     public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
     public static final NumberFormat DOUBLE_FORMAT = new DecimalFormat("0.00");
+    public static final NumberFormat AMOUNT_FORMAT = new DecimalFormat("0.0");
     public static final NumberFormat PERCENTAGE_FORMAT = new DecimalFormat("0%");
 
     public static RecipeManager getRecipeManager() {
         var connection = Minecraft.getInstance().getConnection();
         assert connection != null;
         return connection.getRecipeManager();
-    }
-
-    public static ItemRenderer getItemRenderer() {
-        return Minecraft.getInstance().getItemRenderer();
     }
 
     public static Font getFont() {
@@ -78,10 +73,6 @@ public final class ClientUtil {
         var world = Minecraft.getInstance().level;
         assert world != null;
         return world.registryAccess();
-    }
-
-    public static <T> ResourceLocation getRegistryKey(ResourceKey<? extends Registry<T>> registryKey, T value) {
-        return Objects.requireNonNull(registryAccess().registryOrThrow(registryKey).getKey(value));
     }
 
     public static <T> Optional<T> getRegistryObject(ResourceKey<? extends Registry<T>> registryKey,
@@ -125,15 +116,15 @@ public final class ClientUtil {
         if (count < 1000) {
             return NUMBER_FORMAT.format(count);
         } else if (count < 10000) {
-            return DOUBLE_FORMAT.format((double) count / 1e3d) + "k";
+            return AMOUNT_FORMAT.format((double) count / 1e3d) + "k";
         } else if (count < 1000000) {
             return NUMBER_FORMAT.format(count / 1000) + "k";
         } else if (count < 10000000) {
-            return DOUBLE_FORMAT.format((double) count / 1e6d) + "M";
+            return AMOUNT_FORMAT.format((double) count / 1e6d) + "M";
         } else if (count < 1000000000) {
             return NUMBER_FORMAT.format(count / 1000000) + "M";
         } else if (count < 10000000000L) {
-            return DOUBLE_FORMAT.format((double) count / 1e9d) + "G";
+            return AMOUNT_FORMAT.format((double) count / 1e9d) + "G";
         } else {
             return NUMBER_FORMAT.format(count / 1000000000) + "G";
         }
@@ -146,8 +137,10 @@ public final class ClientUtil {
     public static String getFluidAmountString(int amount) {
         if (amount < 1000) {
             return NUMBER_FORMAT.format(amount);
+        } else if (amount < 10000) {
+            return AMOUNT_FORMAT.format((double) amount / 1e3d) + "B";
         } else if (amount < 1000000) {
-            return getNumberString(amount / 1000) + "B";
+            return NUMBER_FORMAT.format(amount / 1000) + "B";
         } else {
             return getNumberString(amount / 1000);
         }
