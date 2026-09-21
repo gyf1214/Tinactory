@@ -724,6 +724,7 @@
     "tinactory.tooltip.electric.bufferGen": "放电功率: %s EU/t",
     "tinactory.tooltip.invalidMultiblock": "结构不完整",
     "tinactory.tooltip.multiblock": "多方块结构：%s",
+    "tinactory.tooltip.openFilterPanel": "显示过滤列表",
     "tinactory.gui.techMenu.title": "科研",
     "tinactory.gui.techMenu.welcome": "加入 FTB Teams 队伍后即可开始游玩 Tinactory！",
     "tinactory.gui.techMenu.currentTechLabel": "当前研究",
