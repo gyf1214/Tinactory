@@ -224,7 +224,11 @@ public final class RenderUtil {
 
     public static void renderFakeItemWithDecoration(GuiGraphics graphics, ItemStack stack, Rect rect) {
         graphics.renderFakeItem(stack, rect.x(), rect.y());
-        graphics.renderItemDecorations(ClientUtil.getFont(), stack, rect.x(), rect.y());
+        if (stack.getCount() > 1) {
+            var text = ClientUtil.getItemCountString(stack.getCount());
+            renderStackText(graphics, text, rect);
+        }
+        renderVanillaItemDecorations(graphics, stack, rect.x(), rect.y());
     }
 
     public static void renderFluid(GuiGraphics graphics, FluidStack stack, Rect rect, int color) {
