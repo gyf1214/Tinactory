@@ -115,6 +115,9 @@ public class MECraftRequestPanel extends Panel {
     public void updateRequestables(MECraftRequestSyncPacket packet) {
         requestables.clear();
         requestables.addAll(packet.requestables());
+        if (selected != null && !requestables.contains(selected)) {
+            selected = null;
+        }
         refreshDisplays(searchBox.getValue());
     }
 
