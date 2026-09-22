@@ -495,6 +495,51 @@ public final class StorageMenuGameTest {
     }
 
     @GameTest
+    public static void testFilledFluidContainerDoesNotFallBackToItem(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var properties = new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
+            player.getInventory(), blockEntity);
+        var menu = new StorageMenu(properties, chest.port(), chest.stackLimit(), new RejectingFluidPort(), 1000,
+            chest.storageSlots(), chest.filterSlots());
+        menu.setCarried(new ItemStack(Items.WATER_BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(0));
+
+        if (chest.port().getStorageAmount(new ItemStack(Items.WATER_BUCKET)) != 0 ||
+            !menu.getCarried().is(Items.WATER_BUCKET)) {
+            helper.fail("Filled fluid container fell back to item insertion after fluid rejection", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testEmptyFluidContainerStillInsertsAsItem(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var blockEntity = helper.getBlockEntity(pos);
+        var chest = getContainer(blockEntity, ElectricChest.ID, ElectricChest.class);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var properties = new MenuBase.Properties(MENU_HELPER, AllMenus.ELECTRIC_CHEST.get(), 0,
+            player.getInventory(), blockEntity);
+        var menu = new StorageMenu(properties, chest.port(), chest.stackLimit(), new RejectingFluidPort(), 1000,
+            chest.storageSlots(), chest.filterSlots());
+        menu.setCarried(new ItemStack(Items.BUCKET));
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(0));
+
+        if (chest.port().getStorageAmount(new ItemStack(Items.BUCKET)) != 1 || !menu.getCarried().isEmpty()) {
+            helper.fail("Empty fluid container did not insert as an item", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testLeftClickEmptyFluidContainerDrainsFluidEntry(GameTestHelper helper) {
         var chestPos = new BlockPos(1, 1, 1);
         var tankPos = new BlockPos(2, 1, 1);
@@ -606,6 +651,48 @@ public final class StorageMenuGameTest {
             return;
         }
         helper.succeed();
+    }
+
+    private static final class RejectingFluidPort implements IPort<FluidStack> {
+        @Override
+        public PortType type() {
+            return PortType.FLUID;
+        }
+
+        @Override
+        public boolean acceptInput(FluidStack stack) {
+            return false;
+        }
+
+        @Override
+        public FluidStack insert(FluidStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Override
+        public FluidStack extract(FluidStack stack, boolean simulate) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public FluidStack extract(int limit, boolean simulate) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public long getStorageAmount(FluidStack stack) {
+            return 0;
+        }
+
+        @Override
+        public List<FluidStack> getAllStorages() {
+            return List.of();
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return false;
+        }
     }
 
     /*

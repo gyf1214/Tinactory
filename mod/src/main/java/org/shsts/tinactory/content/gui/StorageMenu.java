@@ -218,10 +218,14 @@ public class StorageMenu extends InventoryMenu {
         }
 
         var handler = StackHelper.getFluidHandlerFromItem(StackHelper.copyWithCount(carried, 1));
-        var fluidClick = handler.isPresent() && (packet.isFluid() ||
-            !handler.get().drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty());
-        if (fluidClick && !packet.shiftPressed() && clickFluidEntry(packet, button)) {
-            return;
+        var hasDrainableFluid = handler.isPresent() &&
+            !handler.get().drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE).isEmpty();
+        var fluidClick = handler.isPresent() && (packet.isFluid() || hasDrainableFluid);
+        if (fluidClick && !packet.shiftPressed()) {
+            if (clickFluidEntry(packet, button) || packet.isFluid() ||
+                hasDrainableFluid && fluidPort.type() != PortType.NONE) {
+                return;
+            }
         }
         clickItemSlot(carried, packet.isItem() ? packet.key() : null, itemPort, packet.amount(), button);
     }
