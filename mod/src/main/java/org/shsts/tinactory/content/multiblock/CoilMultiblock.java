@@ -5,6 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -57,12 +58,10 @@ public class CoilMultiblock extends Multiblock {
     public CompoundTag serializeOnUpdate(HolderLookup.Provider provider) {
         var tag = super.serializeOnUpdate(provider);
         if (coilBlock != null) {
-            provider.lookup(Registries.BLOCK)
-                .flatMap(registry -> registry.listElements()
-                    .filter($ -> $.value() == coilBlock)
-                    .map($ -> $.key().location())
-                    .findFirst())
-                .ifPresent(loc -> tag.putString("coilBlock", loc.toString()));
+            var loc = BuiltInRegistries.BLOCK.getKey(coilBlock);
+            if (loc != null) {
+                tag.putString("coilBlock", loc.toString());
+            }
         }
         return tag;
     }
