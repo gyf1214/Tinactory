@@ -38,7 +38,7 @@ import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TE
 @MethodsReturnNonnullByDefault
 public class PortPanel extends Panel {
     private static final Rect LABEL_RECT =
-        new Rect(PANEL_BORDER + SPACING, BUTTON_TOP_MARGIN + PANEL_BORDER,
+        new Rect(PANEL_BORDER + SPACING, PANEL_BORDER + BUTTON_TOP_MARGIN,
             -(PANEL_BORDER + SPACING) * 2 - SLOT_SIZE, SLOT_SIZE);
 
     private static final int OVERLAY_COLOR = 0x80FFAA00;

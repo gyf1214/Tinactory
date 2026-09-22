@@ -72,6 +72,8 @@ public record Texture(ResourceLocation loc, int width, int height) {
         modLoc("gui/input_output_overlay"), 18, 36);
     public static final Texture CHARGE_DISCHARGE_BUTTON = new Texture(
         modLoc("gui/charge_discharge_button"), 18, 36);
+    public static final Texture SEARCH_ICON = new Texture(
+        modLoc("gui/search_icon"), 12, 12);
 
     public Texture(ResourceLocation loc, int width, int height) {
         this.loc = loc.getPath().endsWith(".png") ? loc :

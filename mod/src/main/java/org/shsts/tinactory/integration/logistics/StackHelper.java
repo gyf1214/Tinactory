@@ -31,13 +31,16 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.shsts.tinactory.api.logistics.IPort;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.core.util.LocHelper;
 import org.shsts.tinycorelib.api.core.ILoc;
 import org.slf4j.Logger;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static net.minecraft.world.item.ItemStack.isSameItemSameComponents;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
@@ -288,5 +291,10 @@ public final class StackHelper {
             case "fluid" -> FluidPortAdapter.KEY_CODEC;
             default -> throw new IllegalArgumentException("Unknown ingredient key codec: " + name);
         };
+    }
+
+    public static boolean matchText(String query, IStackKey key) {
+        return Stream.concat(Stream.of(key.name()), key.tooltip().orElse(List.of()).stream())
+            .anyMatch(text -> I18n.matchText(query, text));
     }
 }

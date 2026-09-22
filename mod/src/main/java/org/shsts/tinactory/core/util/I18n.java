@@ -40,6 +40,14 @@ public final class I18n {
     }
 
     public static String flattenComponent(Component text) {
-        return ChatFormatting.stripFormatting(text.getString()).trim().toLowerCase(Locale.ROOT);
+        return ChatFormatting.stripFormatting(text.getString()).trim();
+    }
+
+    public static boolean matchText(String query, String text) {
+        return text.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT));
+    }
+
+    public static boolean matchText(String query, Component text) {
+        return matchText(query, flattenComponent(text));
     }
 }

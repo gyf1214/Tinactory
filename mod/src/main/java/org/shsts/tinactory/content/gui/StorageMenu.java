@@ -37,6 +37,7 @@ import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllMenus.STORAGE_SLOT;
 import static org.shsts.tinactory.AllMenus.STORAGE_SYNC;
 import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
+import static org.shsts.tinactory.core.gui.Menu.SEARCH_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 
@@ -46,7 +47,7 @@ public class StorageMenu extends InventoryMenu {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static final String SLOT_SYNC = "slots";
-    public static final int PANEL_HEIGHT = 7 * SLOT_SIZE + SPACING;
+    public static final int PANEL_HEIGHT = SEARCH_SIZE + 7 * SLOT_SIZE + SPACING * 2;
 
     private final IMachine machine;
     private final IPort<ItemStack> itemPort;

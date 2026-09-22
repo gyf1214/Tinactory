@@ -25,6 +25,8 @@ public final class Menu {
     public static final int MARGIN_X = (WIDTH - CONTENT_WIDTH) / 2;
     public static final int MARGIN_VERTICAL = 3 + SPACING;
     public static final int MARGIN_TOP = MARGIN_VERTICAL + FONT_HEIGHT + SPACING;
+    public static final int SEARCH_SIZE = 12;
+    public static final int SEARCH_TOP_MARGIN = SEARCH_SIZE + 2 * SPACING;
 
     private Menu() {}
 }

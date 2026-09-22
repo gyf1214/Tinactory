@@ -108,7 +108,7 @@ public class MECraftCpuStatusPanel extends Panel {
     public void onSelectCpu(@Nullable Consumer<MECraftCpuSyncPacket.CpuInfo> val) {
         onSelectCpu = val;
         cpuPanel.clearSelect();
-        cpuPanel.setSearchQuery("");
+        cpuPanel.clearSearch();
         cancelButton.setLabel(val == null ? cancelJobLabel : cancelLabel);
     }
 

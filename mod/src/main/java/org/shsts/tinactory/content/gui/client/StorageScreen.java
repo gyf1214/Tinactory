@@ -15,6 +15,7 @@ import org.shsts.tinactory.integration.gui.client.Widgets;
 
 import static org.shsts.tinactory.content.gui.StorageMenu.PANEL_HEIGHT;
 import static org.shsts.tinactory.content.gui.StorageMenu.SLOT_SYNC;
+import static org.shsts.tinactory.core.gui.Menu.SEARCH_TOP_MARGIN;
 import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
 
 @OnlyIn(Dist.CLIENT)
@@ -35,7 +36,8 @@ public class StorageScreen extends MenuScreen<StorageMenu> {
         var filterSlots = menu.filterSlots();
         if (filterSlots > 0) {
             this.filterPanel = new FilterPanel(this, filterSlots);
-            rootPanel.addChild(FilterPanel.panelOffset(filterSlots), filterPanel);
+            var offset = FilterPanel.panelOffset(filterSlots).offset(0, SEARCH_TOP_MARGIN);
+            rootPanel.addChild(offset, filterPanel);
             filterPanel.setActive(false);
 
             Widgets.gregtechButton(menu, rootPanel, filterPanel, RectD.ZERO, 0, PANEL_HEIGHT - SLOT_SIZE,

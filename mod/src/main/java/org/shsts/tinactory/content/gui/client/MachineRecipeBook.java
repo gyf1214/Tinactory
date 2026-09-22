@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,9 +23,9 @@ import org.shsts.tinactory.integration.gui.client.ButtonPanel;
 import org.shsts.tinactory.integration.gui.client.IViewAdapter;
 import org.shsts.tinactory.integration.gui.client.Panel;
 import org.shsts.tinactory.integration.gui.client.RenderUtil;
+import org.shsts.tinactory.integration.gui.client.SearchBox;
 import org.shsts.tinactory.integration.gui.client.SimpleButton;
 import org.shsts.tinactory.integration.gui.client.StretchImage;
-import org.shsts.tinactory.integration.gui.client.Widgets;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.gui.MenuBase;
 
@@ -40,25 +39,25 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllMenus.SET_MACHINE_CONFIG;
 import static org.shsts.tinactory.AllNetworks.TARGET_RECIPE;
 import static org.shsts.tinactory.core.gui.Menu.BUTTON_SIZE;
-import static org.shsts.tinactory.core.gui.Menu.FONT_HEIGHT;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_TOP;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_VERTICAL;
 import static org.shsts.tinactory.core.gui.Menu.MARGIN_X;
+import static org.shsts.tinactory.core.gui.Menu.SEARCH_SIZE;
 import static org.shsts.tinactory.core.gui.Menu.SPACING;
 import static org.shsts.tinactory.core.gui.Texture.DISABLE_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BG;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BOOK_BUTTON_HOVERED;
 import static org.shsts.tinactory.core.gui.Texture.RECIPE_BUTTON;
+import static org.shsts.tinactory.integration.gui.client.SearchBox.SEARCH_ANCHOR;
 import static org.shsts.tinactory.integration.gui.client.Widgets.BUTTON_PANEL_TEX;
 
 @OnlyIn(Dist.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineRecipeBook extends Panel {
-    public static final int SEARCH_SIZE = 12;
+    public static final int BUTTON_TOP_MARGIN = SEARCH_SIZE + 2 * SPACING;
     private static final int BUTTON_PER_LINE = 4;
-    public static final int BUTTON_TOP_MARGIN = SEARCH_SIZE + SPACING * 2;
     public static final int PANEL_BORDER = 8;
     private static final int PANEL_WIDTH = BUTTON_SIZE * BUTTON_PER_LINE + PANEL_BORDER * 2;
     public static final RectD PANEL_ANCHOR = RectD.corners(0d, 0d, 0d, 1d);
@@ -66,12 +65,8 @@ public class MachineRecipeBook extends Panel {
         -MARGIN_TOP, -MARGIN_X, MARGIN_VERTICAL);
     private static final Rect BUTTON_PANEL_OFFSET = Rect.corners(PANEL_BORDER,
         PANEL_BORDER + BUTTON_TOP_MARGIN, -PANEL_BORDER, -PANEL_BORDER);
-    private static final int SEARCH_POS = PANEL_BORDER + SPACING;
-    public static final int SEARCH_BOX_MARGIN = (SEARCH_SIZE - FONT_HEIGHT + 1) / 2;
-    private static final int SEARCH_BOX_Y = SEARCH_POS + SEARCH_BOX_MARGIN;
-    public static final RectD SEARCH_BOX_ANCHOR = RectD.corners(0d, 0d, 1d, 0d);
-    private static final Rect SEARCH_BOX_OFFSET = Rect.corners(SEARCH_POS + SEARCH_SIZE + SPACING,
-        SEARCH_BOX_Y, -PANEL_BORDER - 4, SEARCH_BOX_Y + FONT_HEIGHT);
+    private static final Rect SEARCH_OFFSET = Rect.corners(PANEL_BORDER,
+        PANEL_BORDER + SPACING, -PANEL_BORDER, PANEL_BORDER + SPACING);
 
     private class RecipeButtonPanel extends ButtonPanel {
         private boolean pendingPage = true;
@@ -173,7 +168,7 @@ public class MachineRecipeBook extends Panel {
     private final Layout layout;
     private final Panel bookPanel;
     private final RecipeButtonPanel buttonPanel;
-    private final EditBox searchBox;
+    private final SearchBox searchBox;
     private final GhostRecipe ghostRecipe;
     private final List<IRecipeBookItem> recipes = new ArrayList<>();
     private final List<IRecipeBookItem> displayRecipes = new ArrayList<>();
@@ -186,15 +181,13 @@ public class MachineRecipeBook extends Panel {
         this.bookPanel = new Panel(screen);
         this.layout = screen.menu().layout();
         this.ghostRecipe = new GhostRecipe(menu);
-        this.searchBox = Widgets.searchBox(this::refreshDisplayRecipes);
+        this.searchBox = SearchBox.dark(screen, this::refreshDisplayRecipes);
         buttonPanel = new RecipeButtonPanel();
         var panelBg = new StretchImage(menu, RECIPE_BOOK_BG, BUTTON_PANEL_TEX, PANEL_BORDER);
-        var searchIcon = Widgets.searchIcon(menu);
 
         bookPanel.addChild(RectD.FULL, Rect.ZERO, panelBg);
         bookPanel.addGroup(BUTTON_PANEL_OFFSET, buttonPanel);
-        bookPanel.addVanillaWidget(SEARCH_BOX_ANCHOR, SEARCH_BOX_OFFSET, 0, searchBox);
-        bookPanel.addChild(new Rect(SEARCH_POS, SEARCH_POS, SEARCH_SIZE, SEARCH_SIZE), searchIcon);
+        bookPanel.addChild(SEARCH_ANCHOR, SEARCH_OFFSET, searchBox);
         bookPanel.setActive(false);
 
         addChild(PANEL_ANCHOR, PANEL_OFFSET, bookPanel);

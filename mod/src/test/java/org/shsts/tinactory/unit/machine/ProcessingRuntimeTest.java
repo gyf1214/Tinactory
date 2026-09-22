@@ -19,6 +19,7 @@ import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
+import org.shsts.tinactory.core.util.I18n;
 import org.shsts.tinactory.unit.fixture.TestContainer;
 import org.shsts.tinactory.unit.fixture.TestIngredient;
 import org.shsts.tinactory.unit.fixture.TestMachine;
@@ -30,7 +31,6 @@ import org.shsts.tinycorelib.api.core.DistLazy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -566,8 +566,7 @@ class ProcessingRuntimeTest {
 
         @Override
         public boolean matchSearch(String query) {
-            var query1 = query.toLowerCase(Locale.ROOT);
-            return loc.toString().toLowerCase(Locale.ROOT).contains(query1);
+            return I18n.matchText(query, loc.toString());
         }
     }
 }
