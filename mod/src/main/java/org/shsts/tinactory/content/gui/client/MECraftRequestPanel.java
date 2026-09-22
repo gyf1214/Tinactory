@@ -1,5 +1,6 @@
 package org.shsts.tinactory.content.gui.client;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +21,7 @@ import org.shsts.tinactory.integration.logistics.StackHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.shsts.tinactory.AllMenus.ME_CRAFT_ACTION;
@@ -41,7 +43,8 @@ public class MECraftRequestPanel extends Panel {
     private final List<IStackKey> displays = new ArrayList<>();
     private final SearchBox searchBox;
     private final EditBox quantityEdit;
-    private int selected = -1;
+    @Nullable
+    private IStackKey selected = null;
 
     private class RequestablesPanel extends ButtonPanel {
         public RequestablesPanel() {
@@ -58,15 +61,15 @@ public class MECraftRequestPanel extends Panel {
         @Override
         protected void renderButton(GuiGraphics graphics, int mouseX, int mouseY,
             float partialTick, Rect rect, int index, boolean isHovering) {
-            if (index == selected) {
+            if (index < 0 || index >= displays.size()) {
+                return;
+            }
+            var requestable = displays.get(index);
+            if (Objects.equals(selected, requestable)) {
                 RenderUtil.blit(graphics, RECIPE_BUTTON, rect, 22, 1);
             } else {
                 RenderUtil.blit(graphics, SLOT_BACKGROUND, rect);
             }
-            if (index >= displays.size()) {
-                return;
-            }
-            var requestable = displays.get(index);
             var display = requestable.display();
             var rect1 = rect.offset(1, 1).enlarge(-2, -2);
             RenderUtil.renderDescriptor(graphics, display, rect1);
@@ -74,8 +77,8 @@ public class MECraftRequestPanel extends Panel {
 
         @Override
         protected void onSelect(int index, double mouseX, double mouseY, int button) {
-            if (index < displays.size()) {
-                selected = index;
+            if (index >= 0 && index < displays.size()) {
+                selected = displays.get(index);
             }
         }
 
@@ -116,7 +119,7 @@ public class MECraftRequestPanel extends Panel {
     }
 
     private void requestPreview() {
-        if (selected < 0 || selected >= displays.size()) {
+        if (selected == null) {
             return;
         }
         var quantity = 0;
@@ -127,7 +130,7 @@ public class MECraftRequestPanel extends Panel {
         if (quantity < 0) {
             return;
         }
-        var packet = MECraftEventPacket.preview(displays.get(selected), quantity);
+        var packet = MECraftEventPacket.preview(selected, quantity);
         screen.menu().triggerEvent(ME_CRAFT_ACTION, () -> packet);
     }
 }

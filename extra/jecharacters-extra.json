@@ -1,7 +1,7 @@
 {
   "contains": {
     "additional": [
-      "org.shsts.tinactory.core.utl.I18n:matchText(Ljava/lang/String;Ljava/lang/String;)Z"
+      "org.shsts.tinactory.core.util.I18n:matchText(Ljava/lang/String;Ljava/lang/String;)Z"
     ]
   }
 }

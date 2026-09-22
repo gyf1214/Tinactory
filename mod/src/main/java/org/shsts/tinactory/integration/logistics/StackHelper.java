@@ -293,6 +293,7 @@ public final class StackHelper {
         };
     }
 
+    // TODO: consider cache tooltip()
     public static boolean matchText(String query, IStackKey key) {
         return Stream.concat(Stream.of(key.name()), key.tooltip().orElse(List.of()).stream())
             .anyMatch(text -> I18n.matchText(query, text));
