@@ -123,7 +123,8 @@ tasks.named<JavaExec>("runGameTestServer") {
         "-javaagent:${gameTestAgent.absolutePath}" +
             "=destfile=${gameTestExecutionData.absolutePath},append=false," +
             "includes=org.shsts.tinactory.*," +
-            "excludes=org.shsts.tinactory.gametest.*:org.shsts.tinactory.unit.*",
+            "excludes=org.shsts.tinactory.*.gui.client.*:" +
+                "org.shsts.tinactory.gametest.*:org.shsts.tinactory.unit.*",
     )
 }
 
@@ -134,6 +135,7 @@ tasks.register<JacocoReport>("jacocoGameTestReport") {
     classDirectories.setFrom(
         sourceSets.main.get().output.asFileTree.matching {
             include("org/shsts/tinactory/**")
+            exclude("org/shsts/tinactory/**/gui/client/**")
         }
     )
     reports {
