@@ -1,4 +1,7 @@
+import org.gradle.api.tasks.JavaExec
 import org.gradle.jvm.tasks.Jar
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
     id("tinactory-common")
@@ -105,6 +108,38 @@ sourceSets.main {
 tasks.test {
     configure<JacocoTaskExtension> {
         includes = listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*")
+    }
+}
+
+val jacocoVersion = extensions.getByType<JacocoPluginExtension>().toolVersion
+val gameTestAgent = configurations.detachedConfiguration(
+    dependencies.create("org.jacoco:org.jacoco.agent:$jacocoVersion:runtime")
+).singleFile
+val gameTestExecutionData = layout.buildDirectory.file("jacoco/gameTest.exec").get().asFile
+gameTestExecutionData.parentFile.mkdirs()
+
+tasks.named<JavaExec>("runGameTestServer") {
+    jvmArgs(
+        "-javaagent:${gameTestAgent.absolutePath}" +
+            "=destfile=${gameTestExecutionData.absolutePath},append=false," +
+            "includes=org.shsts.tinactory.*," +
+            "excludes=org.shsts.tinactory.gametest.*:org.shsts.tinactory.unit.*",
+    )
+}
+
+tasks.register<JacocoReport>("jacocoGameTestReport") {
+    dependsOn("runGameTestServer")
+    executionData(gameTestExecutionData)
+    sourceDirectories.from(sourceSets.main.get().allSource.srcDirs)
+    classDirectories.setFrom(
+        sourceSets.main.get().output.asFileTree.matching {
+            include("org/shsts/tinactory/**")
+        }
+    )
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = true
     }
 }
 
