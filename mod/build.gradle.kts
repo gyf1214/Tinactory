@@ -135,6 +135,8 @@ tasks.register<JacocoReport>("jacocoGameTestReport") {
     classDirectories.setFrom(
         sourceSets.main.get().output.asFileTree.matching {
             include("org/shsts/tinactory/**")
+            exclude("org/shsts/tinactory/api/**")
+            exclude("org/shsts/tinactory/core/**")
             exclude("org/shsts/tinactory/**/gui/client/**")
         }
     )
