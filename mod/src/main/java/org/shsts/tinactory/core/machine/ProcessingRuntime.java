@@ -31,8 +31,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import static org.shsts.tinactory.core.util.CodecHelper.encodeList;
 import static org.shsts.tinactory.core.util.CodecHelper.encodeTag;
@@ -46,13 +44,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
 
     private final List<IRecipeProcessor<?>> processors;
     private final boolean autoRecipe;
-    private final Supplier<Optional<IMachine>> machineSupplier;
-    @Nullable
-    private BooleanSupplier sideSupplier;
-    @Nullable
-    private Boolean isClientSide = null;
-    private final Runnable onUpdate;
-    private final BiConsumer<PortDirection, IProcessingObject> onReportObject;
+    protected final IProcessingAdapter adapter;
     private final Codec<ProcessingInfo> processingInfoCodec;
     private final List<ProcessingInfo> infoList = new ArrayList<>();
     private final ListMultimap<Integer, IProcessingObject> infoMap = ArrayListMultimap.create();
@@ -119,44 +111,28 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     public record Properties(Collection<? extends IRecipeProcessor<?>> processors,
-        boolean autoRecipe, Supplier<Optional<IMachine>> machineSupplier, BooleanSupplier sideSupplier,
-        Runnable onUpdate, BiConsumer<PortDirection, IProcessingObject> onReportObject,
+        boolean autoRecipe, IProcessingAdapter adapter,
         Codec<ProcessingInfo> processingInfoCodec) {}
 
     public ProcessingRuntime(Properties properties) {
         this.processors = List.copyOf(properties.processors);
         this.autoRecipe = properties.autoRecipe;
-        this.machineSupplier = properties.machineSupplier;
-        this.sideSupplier = properties.sideSupplier;
-        this.onUpdate = properties.onUpdate;
-        this.onReportObject = properties.onReportObject;
+        this.adapter = properties.adapter;
         this.processingInfoCodec = properties.processingInfoCodec;
     }
 
-    private boolean isClientSide() {
-        if (isClientSide == null) {
-            assert sideSupplier != null;
-            isClientSide = sideSupplier.getAsBoolean();
-            sideSupplier = null;
-        }
-        return isClientSide;
-    }
-
-    protected Optional<IMachine> machine() {
-        return machineSupplier.get();
-    }
-
     private Optional<IContainer> container() {
-        return machine().flatMap(IMachine::container);
+        return adapter.machine().flatMap(IMachine::container);
     }
 
     private Optional<ResourceLocation> targetRecipe() {
-        return machine().flatMap($ -> $.config().get($.registryAccess(), AllNetworks.TARGET_RECIPE.loc()));
+        return adapter.machine()
+            .flatMap($ -> $.config().get($.registryAccess(), AllNetworks.TARGET_RECIPE.loc()));
     }
 
     @Override
     public DistLazy<List<IRecipeBookItem>> recipeBookItems() {
-        var machine = machine();
+        var machine = adapter.machine();
         if (machine.isEmpty()) {
             return () -> Collections::emptyList;
         }
@@ -187,10 +163,10 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
     }
 
     private void setTargetRecipe(ResourceLocation loc) {
-        var machine = machine().orElseThrow();
+        var machine = adapter.machine().orElseThrow();
         clearFilters(PortDirection.INPUT);
         for (var processor : processors) {
-            if (processor.allowTargetRecipe(isClientSide(), loc, machine)) {
+            if (processor.allowTargetRecipe(adapter.isClientSide(), loc, machine)) {
                 processor.setTargetRecipe(loc, machine);
                 return;
             }
@@ -207,10 +183,6 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
 
     protected boolean hasCurrentRecipe() {
         return currentRecipe != null;
-    }
-
-    protected void setChanged() {
-        onUpdate.run();
     }
 
     protected <T> boolean gateRecipe(IRecipeProcessor<T> processor, IMachine machine, T recipe) {
@@ -276,7 +248,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
             currentRecipeLoc = null;
         }
         if (currentRecipe != null) {
-            machine().ifPresent(currentRecipe::onWorkContinue);
+            adapter.machine().ifPresent(currentRecipe::onWorkContinue);
             needUpdate = false;
         }
         updateTargetRecipe();
@@ -311,7 +283,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         if (stopped) {
             return;
         }
-        var machine = machine();
+        var machine = adapter.machine();
         if (machine.isEmpty()) {
             return;
         }
@@ -325,11 +297,11 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         if (currentRecipe != null) {
             beforeWorkBegin();
             currentRecipe.onWorkBegin(machine.get(), machine.get().parallel(),
-                infoList, onReportObject);
+                infoList, adapter::reportObject);
             buildInfoMap();
         }
         needUpdate = false;
-        setChanged();
+        adapter.onUpdate();
     }
 
     @Override
@@ -337,7 +309,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         if (currentRecipe == null) {
             return;
         }
-        var machine = machine();
+        var machine = adapter.machine();
         if (machine.isEmpty()) {
             return;
         }
@@ -345,10 +317,11 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
         workSpeed = currentRecipe.processor.workSpeed(partial);
         if (workProgress >= currentRecipe.maxProgress()) {
             workProgress = currentRecipe.maxProgress();
-            currentRecipe.onWorkDone(machine.get(), machine.get().random(), onReportObject);
+            currentRecipe.onWorkDone(machine.get(), machine.get().random(),
+                adapter::reportObject);
             afterWorkDone();
         }
-        setChanged();
+        adapter.onUpdate();
     }
 
     @Override
@@ -390,7 +363,7 @@ public class ProcessingRuntime implements IMachineProcessor, IRecipeBookProcesso
 
     @Override
     public boolean allowTargetRecipe(ResourceLocation loc) {
-        var machine = machine();
+        var machine = adapter.machine();
         if (machine.isEmpty()) {
             return false;
         }

@@ -1,5 +1,6 @@
 package org.shsts.tinactory.unit.machine;
 
+import javax.annotation.Nullable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -16,6 +17,7 @@ import org.shsts.tinactory.api.recipe.IProcessingResult;
 import org.shsts.tinactory.core.gui.EmptyRenderDescriptor;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.client.IRecipeBookItem;
+import org.shsts.tinactory.core.machine.IProcessingAdapter;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.core.recipe.ProcessingInfo;
@@ -32,11 +34,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -87,11 +86,11 @@ class ProcessingRuntimeTest {
 
     @Test
     void shouldReportOnlyActualConsumedAndProducedObjectsThroughCallback() {
-        var reportedObjects = new ArrayList<Report>();
         var container = new TestContainer()
             .port(0, PortDirection.INPUT, new TestPort("ore", 64, 0))
             .port(1, PortDirection.OUTPUT, new TestPort("dust", 64, 0));
         var machine = new TestMachine(container);
+        var adapter = new TestProcessingAdapter(machine);
         var ingredient = new TestIngredient("ore", 2);
         var outputPreview = new TestResult("dust", 1);
         var result = new TestResult("dust", 1);
@@ -99,8 +98,8 @@ class ProcessingRuntimeTest {
             .recipe(RECIPE_ID)
             .inputInfo(new ProcessingInfo(0, ingredient), new ProcessingInfo(1, outputPreview))
             .doneResult(result);
-        var runtime = runtimeBuilder(machine, processor)
-            .onReportObject((direction, object) -> reportedObjects.add(new Report(direction, object)))
+        var runtime = runtimeBuilder(processor)
+            .adapter(adapter)
             .build();
 
         runtime.onPreWork();
@@ -108,7 +107,7 @@ class ProcessingRuntimeTest {
 
         assertEquals(List.of(
             new Report(PortDirection.INPUT, ingredient),
-            new Report(PortDirection.OUTPUT, result)), reportedObjects);
+            new Report(PortDirection.OUTPUT, result)), adapter.reports);
     }
 
     @Test
@@ -140,28 +139,28 @@ class ProcessingRuntimeTest {
 
     @Test
     void shouldApplyTargetRecipeThroughMachineConfigAndSignalUpdates() {
-        var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer()).targetRecipe(RECIPE_ID);
+        var adapter = new TestProcessingAdapter(machine);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
-        var runtime = runtimeBuilder(machine, processor)
+        var runtime = runtimeBuilder(processor)
             .autoRecipe(false)
-            .onUpdate(updates::incrementAndGet)
+            .adapter(adapter)
             .build();
 
         runtime.onPreWork();
 
         assertEquals(Optional.of(RECIPE_ID), processor.targetRecipe());
-        assertEquals(1, updates.get());
+        assertEquals(1, adapter.updates);
     }
 
     @Test
     void shouldNotStartRecipeWhenAutoRecipeIsDisabledWithoutTarget() {
-        var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer());
+        var adapter = new TestProcessingAdapter(machine);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
-        var runtime = runtimeBuilder(machine, processor)
+        var runtime = runtimeBuilder(processor)
             .autoRecipe(false)
-            .onUpdate(updates::incrementAndGet)
+            .adapter(adapter)
             .build();
 
         runtime.onPreWork();
@@ -169,16 +168,16 @@ class ProcessingRuntimeTest {
         assertEquals(0, processor.beginParallel());
         assertEquals(0L, runtime.progressTicks());
         assertFalse(runtime.isWorking(1d));
-        assertEquals(1, updates.get());
+        assertEquals(1, adapter.updates);
     }
 
     @Test
     void shouldShortCircuitPreWorkWhenStopped() {
-        var updates = new AtomicInteger();
         var machine = new TestMachine(new TestContainer());
+        var adapter = new TestProcessingAdapter(machine);
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID);
-        var runtime = runtimeBuilder(machine, processor)
-            .onUpdate(updates::incrementAndGet)
+        var runtime = runtimeBuilder(processor)
+            .adapter(adapter)
             .build();
 
         runtime.setStopped(true);
@@ -186,34 +185,31 @@ class ProcessingRuntimeTest {
         runtime.onPreWork();
 
         assertEquals(0L, runtime.progressTicks());
-        assertEquals(0, updates.get());
+        assertEquals(0, adapter.updates);
     }
 
     @Test
     void shouldIgnorePreWorkAndTicksWhenMachineIsMissing() {
-        var machineRef = new AtomicReference<Optional<IMachine>>(Optional.of(new TestMachine(new TestContainer())));
-        var updates = new AtomicInteger();
+        var adapter = new TestProcessingAdapter(new TestMachine(new TestContainer()));
         var processor = new TestRecipeProcessor().recipe(RECIPE_ID).maxProgress(10).progressPerTick(3);
         var runtime = runtimeBuilder(processor)
-            .machineSupplier(machineRef::get)
+            .adapter(adapter)
             .autoRecipe(true)
-            .onUpdate(updates::incrementAndGet)
             .build();
 
         runtime.onPreWork();
-        machineRef.set(Optional.empty());
+        adapter.machine = null;
         runtime.onWorkTick(1d);
 
         assertEquals(0L, runtime.progressTicks());
-        assertEquals(1, updates.get());
+        assertEquals(1, adapter.updates);
 
         var emptyRuntime = runtimeBuilder(new TestRecipeProcessor().recipe(RECIPE_ID))
-            .machineSupplier(Optional::empty)
+            .adapter(adapter)
             .autoRecipe(true)
-            .onUpdate(updates::incrementAndGet)
             .build();
         emptyRuntime.onPreWork();
-        assertEquals(1, updates.get());
+        assertEquals(1, adapter.updates);
     }
 
     @Test
@@ -304,18 +300,11 @@ class ProcessingRuntimeTest {
 
     private static final class RuntimeBuilder {
         private final List<IRecipeProcessor<?>> processors;
-        private Supplier<Optional<IMachine>> machineSupplier;
         private boolean autoRecipe = true;
-        private Runnable onUpdate = () -> {};
-        private BiConsumer<PortDirection, IProcessingObject> onReportObject = (dir, obj) -> {};
+        private IProcessingAdapter adapter = new TestProcessingAdapter();
 
         private RuntimeBuilder(List<IRecipeProcessor<?>> processors) {
             this.processors = processors;
-        }
-
-        public RuntimeBuilder machineSupplier(Supplier<Optional<IMachine>> val) {
-            machineSupplier = val;
-            return this;
         }
 
         public RuntimeBuilder autoRecipe(boolean val) {
@@ -323,20 +312,14 @@ class ProcessingRuntimeTest {
             return this;
         }
 
-        public RuntimeBuilder onUpdate(Runnable val) {
-            onUpdate = val;
-            return this;
-        }
-
-        public RuntimeBuilder onReportObject(BiConsumer<PortDirection, IProcessingObject> val) {
-            onReportObject = val;
+        public RuntimeBuilder adapter(IProcessingAdapter val) {
+            adapter = val;
             return this;
         }
 
         public ProcessingRuntime build() {
             var properties = new ProcessingRuntime.Properties(
-                processors, autoRecipe, machineSupplier,
-                () -> false, onUpdate, onReportObject,
+                processors, autoRecipe, adapter,
                 TestProcessingHelper.INFO_CODEC);
             return new ProcessingRuntime(properties);
         }
@@ -346,12 +329,44 @@ class ProcessingRuntimeTest {
         return new RuntimeBuilder(Arrays.asList(processors));
     }
 
-    private static RuntimeBuilder runtimeBuilder(TestMachine machine, TestRecipeProcessor... processors) {
-        return runtimeBuilder(processors).machineSupplier(() -> Optional.of(machine));
+    private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
+        var adapter = new TestProcessingAdapter(machine);
+        return runtimeBuilder(processors).adapter(adapter).build();
     }
 
-    private static ProcessingRuntime runtime(TestMachine machine, TestRecipeProcessor... processors) {
-        return runtimeBuilder(machine, processors).build();
+    private record Report(PortDirection direction, IProcessingObject object) {}
+
+    private static final class TestProcessingAdapter implements IProcessingAdapter {
+        private int updates = 0;
+        private final List<Report> reports = new ArrayList<>();
+        @Nullable
+        private IMachine machine = null;
+
+        public TestProcessingAdapter() {}
+
+        public TestProcessingAdapter(@Nullable IMachine machine) {
+            this.machine = machine;
+        }
+
+        @Override
+        public Optional<IMachine> machine() {
+            return Optional.ofNullable(machine);
+        }
+
+        @Override
+        public boolean isClientSide() {
+            return false;
+        }
+
+        @Override
+        public void onUpdate() {
+            updates++;
+        }
+
+        @Override
+        public void reportObject(PortDirection direction, IProcessingObject object) {
+            reports.add(new Report(direction, object));
+        }
     }
 
     private static final class TestRecipeProcessor implements IRecipeProcessor<ResourceLocation> {
@@ -538,9 +553,6 @@ class ProcessingRuntimeTest {
 
         @Override
         public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
-    }
-
-    private record Report(PortDirection direction, IProcessingObject object) {
     }
 
     private record TestRecipeBookItem(ResourceLocation loc) implements IRecipeBookItem {

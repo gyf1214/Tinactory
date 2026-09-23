@@ -30,7 +30,7 @@ public class MultiblockProcessor extends MachineProcessor {
     }
 
     @Override
-    protected Optional<IMachine> machine() {
+    public Optional<IMachine> machine() {
         return Multiblock.get(blockEntity).getInterface().map($ -> $);
     }
 }

@@ -15,6 +15,7 @@ import org.shsts.tinactory.api.network.INetwork;
 import org.shsts.tinactory.api.network.ISchedulingRegister;
 import org.shsts.tinactory.api.recipe.IProcessingObject;
 import org.shsts.tinactory.api.tech.ITeamProfile;
+import org.shsts.tinactory.core.machine.IProcessingAdapter;
 import org.shsts.tinactory.core.machine.IRecipeProcessor;
 import org.shsts.tinactory.core.machine.ProcessingRuntime;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
@@ -26,7 +27,6 @@ import org.shsts.tinycorelib.api.blockentity.IEventManager;
 import org.shsts.tinycorelib.api.blockentity.IEventSubscriber;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -47,7 +47,7 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class MachineProcessor extends CapabilityProvider implements
-    IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag> {
+    IElectricMachine, IEventSubscriber, INBTSerializable<CompoundTag>, IProcessingAdapter {
     protected final BlockEntity blockEntity;
     protected final ProcessingRuntime runtime;
     private final Consumer<ITeamProfile> onTechChange = this::onTechChange;
@@ -60,10 +60,7 @@ public class MachineProcessor extends CapabilityProvider implements
         var properties = new ProcessingRuntime.Properties(
             processorFactories.stream().map(factory -> factory.apply(blockEntity)).toList(),
             autoRecipe,
-            this::machine,
-            () -> Objects.requireNonNull(blockEntity.getLevel()).isClientSide,
-            blockEntity::setChanged,
-            this::reportProcessingObject,
+            this,
             ProcessingHelper.INFO_CODEC);
         this.runtime = runtimeFactory.apply(properties);
     }
@@ -74,11 +71,25 @@ public class MachineProcessor extends CapabilityProvider implements
         this(blockEntity, ProcessingRuntime::new, processorFactories, autoRecipe);
     }
 
-    protected Optional<IMachine> machine() {
+    @Override
+    public Optional<IMachine> machine() {
         return MACHINE.tryGet(blockEntity);
     }
 
-    private void reportProcessingObject(PortDirection direction, IProcessingObject object) {
+    @Override
+    public boolean isClientSide() {
+        var world = blockEntity.getLevel();
+        assert world != null;
+        return world.isClientSide;
+    }
+
+    @Override
+    public void onUpdate() {
+        blockEntity.setChanged();
+    }
+
+    @Override
+    public void reportObject(PortDirection direction, IProcessingObject object) {
         var action = switch (direction) {
             case INPUT -> "consumed";
             case OUTPUT -> "produced";

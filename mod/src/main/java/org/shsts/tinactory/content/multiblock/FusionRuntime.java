@@ -40,7 +40,7 @@ public class FusionRuntime extends ProcessingRuntime {
     }
 
     private Optional<Voltage> voltage() {
-        return machine().map($ -> ((MultiblockInterface) $).voltage);
+        return adapter.machine().map($ -> ((MultiblockInterface) $).voltage);
     }
 
     public double startupCapacity() {
@@ -79,7 +79,7 @@ public class FusionRuntime extends ProcessingRuntime {
             super.onWorkTick(partial);
         }
         if (startupEnergy != energyBefore) {
-            setChanged();
+            adapter.onUpdate();
         }
     }
 
