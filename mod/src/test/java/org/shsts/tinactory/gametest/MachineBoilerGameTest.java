@@ -123,7 +123,7 @@ public final class MachineBoilerGameTest {
     }
 
     @GameTest(timeoutTicks = 1_300)
-    public static void testBoilerBlockedOutputDoesNotConsumeInput(GameTestHelper helper) {
+    public static void testBoilerAlwaysVoidsOutput(GameTestHelper helper) {
         var machine = placeBoiler(helper);
         var container = machine.container().orElseThrow();
         var fuel = container.getPort(0, ContainerAccess.INTERNAL).asItem();
@@ -135,20 +135,13 @@ public final class MachineBoilerGameTest {
 
         helper.runAfterDelay(800, () -> {
             var water = input.getStorageAmount(new FluidStack(Fluids.WATER, 1));
-            if (water != 1) {
-                helper.fail("Blocked boiler output consumed input: water=" + water + ", output=" +
-                    output.getAllStorages(), BOILER_POS);
+            var steam = output.getStorageAmount(new FluidStack(STEAM, 1));
+            if (water != 0 || output.getStorageAmount(new FluidStack(Fluids.LAVA, 1)) != 16_000 || steam != 0) {
+                helper.fail("Boiler did not auto-void output: water=" + water + ", steam=" + steam +
+                    ", output=" + output.getAllStorages(), BOILER_POS);
                 return;
             }
-            output.extract(16_000, false);
-            helper.runAfterDelay(300, () -> {
-                if (input.getStorageAmount(new FluidStack(Fluids.WATER, 1)) != 0 ||
-                    output.getStorageAmount(new FluidStack(STEAM, 1)) != 1) {
-                    helper.fail("Boiler did not resume after blocked output opened", BOILER_POS);
-                    return;
-                }
-                helper.succeed();
-            });
+            helper.succeed();
         });
     }
 
