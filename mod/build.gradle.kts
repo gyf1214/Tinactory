@@ -1,7 +1,4 @@
-import org.gradle.api.tasks.JavaExec
 import org.gradle.jvm.tasks.Jar
-import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
     id("tinactory-common")
@@ -122,9 +119,7 @@ tasks.named<JavaExec>("runGameTestServer") {
     jvmArgs(
         "-javaagent:${gameTestAgent.absolutePath}" +
             "=destfile=${gameTestExecutionData.absolutePath},append=false," +
-            "includes=org.shsts.tinactory.*," +
-            "excludes=org.shsts.tinactory.*.gui.client.*:" +
-                "org.shsts.tinactory.gametest.*:org.shsts.tinactory.unit.*",
+            "includes=org.shsts.tinactory.*"
     )
 }
 
@@ -137,7 +132,9 @@ tasks.register<JacocoReport>("jacocoGameTestReport") {
             include("org/shsts/tinactory/**")
             exclude("org/shsts/tinactory/api/**")
             exclude("org/shsts/tinactory/core/**")
-            exclude("org/shsts/tinactory/**/gui/client/**")
+            exclude("org/shsts/tinactory/**/client/**")
+            exclude("org/shsts/tinactory/compat/jei/**")
+            exclude("org/shsts/tinactory/compat/waila/**")
         }
     )
     reports {
