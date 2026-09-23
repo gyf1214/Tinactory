@@ -22,6 +22,7 @@ import org.shsts.tinactory.AllMaterials;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
@@ -48,6 +49,14 @@ public final class MachineProcessingGameTest {
         TinactoryKeys.ID, "gametest/ore_analyzer/autocraft");
     private static final ResourceLocation POWER_PAUSE_RECIPE = ResourceLocation.fromNamespaceAndPath(
         TinactoryKeys.ID, "gametest/ore_analyzer/power_pause");
+    private static final ResourceLocation SMELTING_IRON_RECIPE = ResourceLocation.fromNamespaceAndPath(
+        TinactoryKeys.ID, "smelting/minecraft/iron_ingot");
+    private static final ResourceLocation INVALID_RECIPE = ResourceLocation.fromNamespaceAndPath(
+        TinactoryKeys.ID, "gametest/ore_analyzer/missing");
+    private static final Item CHALCOPYRITE = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(
+        TinactoryKeys.ID, "material/raw/chalcopyrite"));
+    private static final Item PYRITE = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(
+        TinactoryKeys.ID, "material/raw/pyrite"));
 
     @GameTest(timeoutTicks = 80)
     public static void testZeroPowerConsumesInputBeforeProgress(GameTestHelper helper) {
@@ -161,6 +170,127 @@ public final class MachineProcessingGameTest {
                     input + ", output=" + output + ", progress=" + progress + ", workFactor=" +
                     workFactor(machine) + ", electricType=" + electric.getMachineType() + ", power=" +
                     electric.getPowerCons(), MACHINE_POS);
+                return;
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 320)
+    public static void testElectricFurnaceTargetRecipeConfiguresInputFilter(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "electric_furnace", true);
+        var input = machine.container().orElseThrow().getPort(0, ContainerAccess.INTERNAL).asItem();
+        var ironDust = AllMaterials.getMaterial("iron").item("dust");
+        machine.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, SMELTING_IRON_RECIPE).get());
+
+        var cobblestoneRemaining = input.insert(new ItemStack(Items.COBBLESTONE), true);
+        var ironDustRemaining = input.insert(new ItemStack(ironDust), true);
+        if (!cobblestoneRemaining.is(Items.COBBLESTONE) || cobblestoneRemaining.getCount() != 1 ||
+            !ironDustRemaining.isEmpty()) {
+            helper.fail("Electric furnace target did not configure its input filter: allowTarget=" +
+                ((IMachineProcessor) machine.processor().orElseThrow()).allowTargetRecipe(SMELTING_IRON_RECIPE) +
+                ", cobblestone=" +
+                cobblestoneRemaining + ", ironDust=" + ironDustRemaining, MACHINE_POS);
+            return;
+        }
+        insertInput(machine, 0, new ItemStack(ironDust));
+        helper.runAfterDelay(240, () -> {
+            if (amount(machine, 0, ironDust) != 0 || amount(machine, 1, Items.IRON_INGOT) != 1) {
+                helper.fail("Targeted electric furnace did not complete smelting", MACHINE_POS);
+                return;
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest
+    public static void testElectricFurnaceInvalidAndMissingTargetsResetInputFilter(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "electric_furnace", false);
+        var input = machine.container().orElseThrow().getPort(0, ContainerAccess.INTERNAL).asItem();
+        machine.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, SMELTING_IRON_RECIPE).get());
+        machine.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, INVALID_RECIPE).get());
+
+        var cobblestone = new ItemStack(Items.COBBLESTONE);
+        if (!input.insert(cobblestone.copy(), true).isEmpty()) {
+            helper.fail("Invalid electric furnace target kept the old input filter", MACHINE_POS);
+            return;
+        }
+        machine.setConfig(SetMachineConfigPacket.builder().reset(TARGET_RECIPE).get());
+        if (machine.config().contains(TARGET_RECIPE) || !input.insert(cobblestone.copy(), true).isEmpty()) {
+            helper.fail("Missing electric furnace target did not clear its input filter", MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(timeoutTicks = 320)
+    public static void testElectricFurnaceBlockedOutputRetriesAfterSpaceOpens(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "electric_furnace", true);
+        var output = machine.container().orElseThrow().getPort(1, ContainerAccess.INTERNAL).asItem();
+        var remaining = new ItemStack(Items.COBBLESTONE, 64);
+        for (var i = 0; i < 16 && !remaining.isEmpty(); i++) {
+            remaining = output.insert(remaining, false);
+        }
+        if (!remaining.isEmpty()) {
+            helper.fail("Could not seed the electric furnace output blocker", MACHINE_POS);
+            return;
+        }
+        var ironDust = AllMaterials.getMaterial("iron").item("dust");
+        insertInput(machine, 0, new ItemStack(ironDust));
+
+        helper.runAfterDelay(30, () -> {
+            if (amount(machine, 0, ironDust) != 1 || machine.processor().orElseThrow().getProgress() != 0d) {
+                helper.fail("Blocked electric furnace output admitted a recipe", MACHINE_POS);
+                return;
+            }
+            output.extract(16 * 64, false);
+            helper.runAfterDelay(240, () -> {
+                if (amount(machine, 0, ironDust) != 0 || amount(machine, 1, Items.IRON_INGOT) != 1) {
+                    helper.fail("Electric furnace did not retry after its output opened", MACHINE_POS);
+                    return;
+                }
+                helper.succeed();
+            });
+        });
+    }
+
+    @GameTest(timeoutTicks = 120)
+    public static void testOreAnalyzerUntargetedRunResetsInputFilter(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "ore_analyzer", true);
+        machine.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, AUTOCRAFT_RECIPE).get());
+        machine.setConfig(SetMachineConfigPacket.builder().reset(TARGET_RECIPE).get());
+        var input = machine.container().orElseThrow().getPort(0, ContainerAccess.INTERNAL).asItem();
+        var cobblestone = new ItemStack(Items.COBBLESTONE);
+        if (!input.insert(cobblestone.copy(), true).isEmpty()) {
+            helper.fail("Untargeted Ore Analyzer retained the targeted input filter", MACHINE_POS);
+            return;
+        }
+        insertInput(machine, 0, cobblestone);
+
+        helper.runAfterDelay(80, () -> {
+            if (amount(machine, 0, Items.COBBLESTONE) != 0 ||
+                (amount(machine, 1, CHALCOPYRITE) + amount(machine, 1, PYRITE)) != 1) {
+                helper.fail("Untargeted Ore Analyzer did not produce a valid cobblestone result", MACHINE_POS);
+                return;
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 120)
+    public static void testMachineClearsWorkingStateWhenNetworkDisconnects(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "ore_analyzer", true);
+        seedRecipe(machine, POWER_PAUSE_RECIPE, Items.ENDER_PEARL);
+
+        helper.runAfterDelay(20, () -> {
+            if (!helper.getBlockState(MACHINE_POS).getValue(MachineBlock.WORKING)) {
+                helper.fail("Machine did not enter the working state before disconnect", MACHINE_POS);
+                return;
+            }
+            helper.destroyBlock(CABLE_POS);
+            machine.onDisconnectFromNetwork();
+            if (helper.getBlockState(MACHINE_POS).getValue(MachineBlock.WORKING)) {
+                helper.fail("Machine did not clear its working state after network disconnect", MACHINE_POS);
                 return;
             }
             helper.succeed();
