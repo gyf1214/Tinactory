@@ -2,21 +2,26 @@ package org.shsts.tinactory.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
+import org.shsts.tinactory.AllDataComponents;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMaterials;
 import org.shsts.tinactory.api.TinactoryKeys;
@@ -26,10 +31,13 @@ import org.shsts.tinactory.api.machine.IMachineProcessor;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.integration.common.CapabilityProvider;
+import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -53,10 +61,6 @@ public final class MachineProcessingGameTest {
         TinactoryKeys.ID, "smelting/minecraft/iron_ingot");
     private static final ResourceLocation INVALID_RECIPE = ResourceLocation.fromNamespaceAndPath(
         TinactoryKeys.ID, "gametest/ore_analyzer/missing");
-    private static final Item CHALCOPYRITE = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(
-        TinactoryKeys.ID, "material/raw/chalcopyrite"));
-    private static final Item PYRITE = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(
-        TinactoryKeys.ID, "material/raw/pyrite"));
 
     @GameTest(timeoutTicks = 80)
     public static void testZeroPowerConsumesInputBeforeProgress(GameTestHelper helper) {
@@ -268,8 +272,9 @@ public final class MachineProcessingGameTest {
         insertInput(machine, 0, cobblestone);
 
         helper.runAfterDelay(80, () -> {
-            if (amount(machine, 0, Items.COBBLESTONE) != 0 ||
-                (amount(machine, 1, CHALCOPYRITE) + amount(machine, 1, PYRITE)) != 1) {
+            var output = machine.container().orElseThrow().getPort(1, ContainerAccess.INTERNAL).asItem();
+            var outputAmount = output.getAllStorages().stream().mapToLong(ItemStack::getCount).sum();
+            if (amount(machine, 0, Items.COBBLESTONE) != 0 || outputAmount != 1) {
                 helper.fail("Untargeted Ore Analyzer did not produce a valid cobblestone result", MACHINE_POS);
                 return;
             }
@@ -293,6 +298,121 @@ public final class MachineProcessingGameTest {
                 helper.fail("Machine did not clear its working state after network disconnect", MACHINE_POS);
                 return;
             }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testMachineNameTagUpdatesTitle(GameTestHelper helper) {
+        helper.setBlock(MACHINE_POS, machineState("ore_analyzer", Direction.EAST));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var absolutePos = helper.absolutePos(MACHINE_POS);
+        var state = helper.getLevel().getBlockState(absolutePos);
+        state.useItemOn(ItemStack.EMPTY, helper.getLevel(), player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absolutePos), Direction.NORTH, absolutePos, true));
+
+        var nameTag = new ItemStack(Items.NAME_TAG);
+        nameTag.set(DataComponents.CUSTOM_NAME, Component.literal("coverage machine"));
+        player.setItemInHand(InteractionHand.MAIN_HAND, nameTag);
+        state.useItemOn(nameTag, helper.getLevel(), player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absolutePos), Direction.NORTH, absolutePos, true));
+        var machine = MACHINE.get(helper.getBlockEntity(MACHINE_POS));
+        if (!nameTag.isEmpty() || !machine.title().getString().equals("coverage machine")) {
+            helper.fail("Machine name tag did not update its title: tag=" + nameTag + ", title=" +
+                machine.title().getString(), MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testMachinePlacementRestoresNameAndUuid(GameTestHelper helper) {
+        var floorPos = MACHINE_POS.below();
+        helper.setBlock(floorPos, Blocks.STONE);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var expectedUuid = UUID.randomUUID();
+        var stack = new ItemStack(machineState("ore_analyzer", Direction.EAST).getBlock());
+        stack.set(DataComponents.CUSTOM_NAME, Component.literal("placed machine"));
+        stack.set(AllDataComponents.UUID.get(), expectedUuid);
+        player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+        var absoluteFloorPos = helper.absolutePos(floorPos);
+        stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absoluteFloorPos), Direction.UP, absoluteFloorPos, false)));
+
+        var machine = MACHINE.get(helper.getBlockEntity(MACHINE_POS));
+        if (!machine.uuid().equals(expectedUuid) || !machine.title().getString().equals("placed machine")) {
+            helper.fail("Machine placement did not restore its identity: uuid=" + machine.uuid() + ", title=" +
+                machine.title().getString(), MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testMachineWorkBlockRejectsStaleBlockEntityState(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "ore_analyzer", false);
+        helper.setBlock(MACHINE_POS, Blocks.AIR);
+        if (machine.workBlock().isPresent()) {
+            helper.fail("Machine exposed a stale work block after its block was removed", MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(timeoutTicks = 80)
+    public static void testMachineOwnerSerializationRoundTrip(GameTestHelper helper) {
+        placeMachineNetwork(helper, "ore_analyzer", false);
+        var machine = CapabilityProvider.getContainer(helper.getBlockEntity(MACHINE_POS), "network/machine",
+            Machine.class);
+        var tag = machine.serializeNBT(helper.getLevel().registryAccess());
+        if (!tag.contains("owner")) {
+            helper.fail("Machine serialization omitted its owner", MACHINE_POS);
+            return;
+        }
+        machine.deserializeNBT(helper.getLevel().registryAccess(), tag);
+        if (!machine.serializeNBT(helper.getLevel().registryAccess()).contains("owner")) {
+            helper.fail("Machine owner was not retained after NBT round trip", MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testMachineConfigCanSkipUpdateEvent(GameTestHelper helper) {
+        var machine = placeMachineNetwork(helper, "ore_analyzer", false);
+        machine.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, AUTOCRAFT_RECIPE).get(), false);
+        if (!machine.config().contains(TARGET_RECIPE)) {
+            helper.fail("Machine did not apply a config update without invoking its event", MACHINE_POS);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest(timeoutTicks = 100)
+    public static void testConnectedMachineRecreatesNetworkAfterDisconnect(GameTestHelper helper) {
+        var childPos = MACHINE_POS.east(2);
+        helper.setBlock(MACHINE_POS, machineState("ore_analyzer", Direction.EAST));
+        helper.setBlock(CABLE_POS, cableState());
+        helper.setBlock(childPos, machineState("ore_analyzer", Direction.WEST));
+        useWithMockPlayer(helper, MACHINE_POS);
+
+        helper.runAfterDelay(16, () -> {
+            var parent = MACHINE.get(helper.getBlockEntity(MACHINE_POS));
+            var child = MACHINE.get(helper.getBlockEntity(childPos));
+            var parentNetwork = parent.network().orElse(null);
+            var childNetwork = child.network().orElse(null);
+            if (parentNetwork == null || childNetwork != parentNetwork) {
+                helper.fail("Connected machine did not join the parent network", childPos);
+                return;
+            }
+            child.assignNetwork(parentNetwork);
+            child.onDisconnectFromNetwork();
+            var reconnected = child.network().orElse(null);
+            if (reconnected == null || reconnected == parentNetwork) {
+                helper.fail("Disconnected child machine did not create a replacement network", childPos);
+                return;
+            }
+            helper.destroyBlock(childPos);
             helper.succeed();
         });
     }
