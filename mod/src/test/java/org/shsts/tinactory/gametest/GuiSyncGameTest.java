@@ -13,7 +13,6 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
-import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
@@ -86,23 +85,6 @@ public final class GuiSyncGameTest {
             registryAccess);
         if (removedFilter.remove().orElse(-1) != 1) {
             helper.fail("Filter event packet did not preserve its removal index");
-            return;
-        }
-
-        var chestPacket = roundTrip(new ChestItemSyncPacket(diamond, null), ChestItemSyncPacket::new,
-            registryAccess);
-        var equalChestPacket = new ChestItemSyncPacket(diamond.copy(), null);
-        var chestEqual = chestPacket.equals(equalChestPacket);
-        var chestFilterEmpty = chestPacket.getFilter().isEmpty();
-        if (!chestEqual || !chestFilterEmpty) {
-            helper.fail("Chest item sync equality or nullable filter state changed during its round trip");
-            return;
-        }
-        var namedFilter = new ItemStack(Items.EMERALD);
-        var filteredPacket = roundTrip(new ChestItemSyncPacket(diamond, namedFilter), ChestItemSyncPacket::new,
-            registryAccess);
-        if (filteredPacket.getFilter().isEmpty() || !filteredPacket.getFilter().orElseThrow().is(Items.EMERALD)) {
-            helper.fail("Chest item sync packet did not preserve its filter");
             return;
         }
 
@@ -237,20 +219,6 @@ public final class GuiSyncGameTest {
         active.invokeUpdate();
         if (!active.shouldSend()) {
             helper.fail("Active scheduler did not reactivate after an update");
-            return;
-        }
-        helper.succeed();
-    }
-
-    @GameTest
-    public static void testChestPacketHashMatchesEquality(GameTestHelper helper) {
-        var diamond = new ItemStack(Items.DIAMOND);
-        var left = roundTrip(new ChestItemSyncPacket(diamond, null), ChestItemSyncPacket::new,
-            helper.getLevel().registryAccess());
-        var right = new ChestItemSyncPacket(diamond.copy(), null);
-
-        if (left.equals(right) && left.hashCode() != right.hashCode()) {
-            helper.fail("Equal chest item packets produced different hashes");
             return;
         }
         helper.succeed();

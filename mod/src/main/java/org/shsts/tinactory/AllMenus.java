@@ -29,7 +29,6 @@ import org.shsts.tinactory.content.gui.client.ResearchBenchScreen;
 import org.shsts.tinactory.content.gui.client.StorageScreen;
 import org.shsts.tinactory.content.gui.client.TechScreen;
 import org.shsts.tinactory.content.gui.client.WorkbenchScreen;
-import org.shsts.tinactory.content.gui.sync.ChestItemSyncPacket;
 import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
 import org.shsts.tinactory.content.gui.sync.LogisticWorkerSyncPacket;
 import org.shsts.tinactory.content.gui.sync.MECraftCpuSyncPacket;
@@ -67,7 +66,6 @@ public final class AllMenus {
     public static final IPacketType<SyncPackets.LongPacket> LONG_SYNC;
     public static final IPacketType<SyncPackets.UnitPacket> UNIT_SYNC;
     public static final IPacketType<FluidSyncPacket> FLUID_STACK_SYNC;
-    public static final IPacketType<ChestItemSyncPacket> CHEST_ITEM_SYNC;
     public static final IPacketType<LogisticWorkerSyncPacket> LOGISTIC_WORKER_SYNC;
     public static final IPacketType<StorageSyncPacket> STORAGE_SYNC;
     public static final IPacketType<MESignalControllerSyncPacket> ME_SIGNAL_CONTROLLER_SYNC;
@@ -119,7 +117,6 @@ public final class AllMenus {
         LONG_SYNC = REGISTRATE.menuSyncPacket("sync/long", SyncPackets.LongPacket::new);
         UNIT_SYNC = REGISTRATE.menuSyncPacket("sync/unit", () -> SyncPackets.UnitPacket.INSTANCE);
         FLUID_STACK_SYNC = REGISTRATE.menuSyncPacket("sync/fluid", FluidSyncPacket::new);
-        CHEST_ITEM_SYNC = REGISTRATE.menuSyncPacket("sync/chest_item", ChestItemSyncPacket::new);
         LOGISTIC_WORKER_SYNC = REGISTRATE.menuSyncPacket("sync/logistic_worker", LogisticWorkerSyncPacket::new);
         STORAGE_SYNC = REGISTRATE.menuSyncPacket("sync/storage", StorageSyncPacket::new);
         ME_SIGNAL_CONTROLLER_SYNC = REGISTRATE.menuSyncPacket("sync/me_signal_controller",
