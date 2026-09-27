@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,12 +19,18 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.IItemPort;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.content.autocraft.MECraftTerminal;
+import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
+import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
+import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
+import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
+import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
 import org.shsts.tinactory.content.tool.BatteryItem;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
@@ -37,9 +44,15 @@ import org.shsts.tinactory.integration.common.CapabilityProvider;
 import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
+import org.shsts.tinycorelib.api.gui.IMenuHelper;
+import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
+import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinycorelib.api.network.IPacketType;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -52,6 +65,41 @@ import static org.shsts.tinactory.integration.logistics.StackHelper.ITEM_ADAPTER
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class AutocraftGameTest {
+    private static final IMenuHelper MENU_HELPER = new IMenuHelper() {
+        @Override
+        public <P extends IPacket> ISyncSlotScheduler<P> simpleScheduler(IPacketType<P> type,
+            Supplier<P> factory) {
+            return new ISyncSlotScheduler<>() {
+                @Override
+                public IPacketType<P> packetType() {
+                    return type;
+                }
+
+                @Override
+                public boolean shouldSend() {
+                    return true;
+                }
+
+                @Override
+                public P createPacket() {
+                    return factory.get();
+                }
+            };
+        }
+
+        @Override
+        public <P extends IPacket> void sendSyncPacket(ServerPlayer player, int containerId,
+            int syncSlotId, IPacketType<P> type, P packet) {}
+
+        @Override
+        public <P extends IPacket> void sendEventPacket(int containerId, IPacketType<P> type, P packet) {}
+
+        @Override
+        public void requireMenuSyncPacket(IPacketType<?> type) {}
+
+        @Override
+        public void requireMenuEventPacket(IPacketType<?> type) {}
+    };
     private static final Voltage VOLTAGE = Voltage.HV;
     private static final BlockPos CABLE = new BlockPos(2, 2, 2);
     private static final BlockPos DRIVE = CABLE.west();
@@ -66,6 +114,59 @@ public final class AutocraftGameTest {
     private static final Item INPUT_ITEM = Items.AMETHYST_SHARD;
     private static final Item OUTPUT_ITEM = Items.DIAMOND;
     private static final UUID PATTERN_ID = UUID.fromString("b5ca4f4e-7b33-4b48-9dcf-b1f9e17d7ea4");
+
+    @GameTest(timeoutTicks = 60)
+    public static void testTerminalMenusDispatchActionsAndBuildSyncState(GameTestHelper helper) {
+        placeNetwork(helper, true, true);
+        helper.runAfterDelay(12, () -> {
+            var player = helper.makeMockPlayer(GameType.SURVIVAL);
+            var craftMenu = new MECraftTerminalMenu(new MenuBase.Properties(MENU_HELPER,
+                AllMenus.ME_CRAFT_TERMINAL.get(), 0, player.getInventory(), helper.getBlockEntity(CRAFT_TERMINAL)));
+            var patternMenu = new MEPatternTerminalMenu(new MenuBase.Properties(MENU_HELPER,
+                AllMenus.ME_PATTERN_TERMINAL.get(), 0, player.getInventory(), helper.getBlockEntity(PATTERN_TERMINAL)));
+            craftMenu.broadcastChanges();
+            patternMenu.broadcastChanges();
+            if (craftMenu.stillValid(player) || patternMenu.stillValid(player)) {
+                helper.fail("Autocraft terminal menus allowed access without machine ownership", CRAFT_TERMINAL);
+                return;
+            }
+
+            craftMenu.handleEventPacket(AllMenus.ME_CRAFT_ACTION,
+                MECraftEventPacket.preview(ITEM_ADAPTER.keyOf(new ItemStack(OUTPUT_ITEM)), 1));
+            craftMenu.broadcastChanges();
+            craftMenu.handleEventPacket(AllMenus.ME_CRAFT_ACTION,
+                MECraftEventPacket.execute(UUID.randomUUID()));
+            craftMenu.handleEventPacket(AllMenus.ME_CRAFT_ACTION,
+                MECraftEventPacket.cancel(UUID.randomUUID()));
+
+            var repository = getContainer(helper.getBlockEntity(PATTERN_TERMINAL), MEPatternTerminal.ID,
+                MEPatternTerminal.class).patternRepository();
+            var initial = repository.listPatterns().size();
+            patternMenu.handleEventPacket(AllMenus.ME_PATTERN_ACTION,
+                new MEPatternEventPacket());
+            if (repository.listPatterns().size() != initial) {
+                helper.fail("Pattern terminal accepted a pattern without outputs", PATTERN_TERMINAL);
+                return;
+            }
+            patternMenu.handleEventPacket(AllMenus.ME_PATTERN_ACTION, MEPatternEventPacket.create(pattern()));
+            var created = repository.listPatterns().stream()
+                .filter($ -> !$.patternUuid().equals(PATTERN_ID)).findFirst().orElse(null);
+            if (created == null) {
+                helper.fail("Pattern terminal did not create a valid pattern", PATTERN_TERMINAL);
+                return;
+            }
+            patternMenu.handleEventPacket(AllMenus.ME_PATTERN_ACTION,
+                MEPatternEventPacket.update(created.patternUuid(), pattern()));
+            patternMenu.handleEventPacket(AllMenus.ME_PATTERN_ACTION,
+                MEPatternEventPacket.delete(created.patternUuid()));
+            patternMenu.broadcastChanges();
+            if (repository.containsPatternUuid(created.patternUuid())) {
+                helper.fail("Pattern terminal did not delete the selected pattern", PATTERN_TERMINAL);
+                return;
+            }
+            helper.succeed();
+        });
+    }
 
     @GameTest(timeoutTicks = 60)
     public static void testAutocraftPlanningUsesLiveNetwork(GameTestHelper helper) {
@@ -222,12 +323,7 @@ public final class AutocraftGameTest {
         if (withInput && !inputPort.insert(input, false).isEmpty()) {
             helper.fail("Could not seed the ME storage cell with autocraft input", DRIVE);
         }
-        var pattern = new CraftPattern(
-            PATTERN_ID,
-            List.of(new CraftAmount(ITEM_ADAPTER.keyOf(input), 1)),
-            List.of(new CraftAmount(ITEM_ADAPTER.keyOf(new ItemStack(OUTPUT_ITEM)), 1)),
-            List.of(new TargetRecipeConstraint(
-                ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "gametest/ore_analyzer/autocraft"))));
+        var pattern = pattern();
         if (!PATTERN_CELL_ITEM.tryGet(patternCell).orElseThrow().insert(pattern)) {
             helper.fail("Could not store the autocraft test pattern", DRIVE);
         }
@@ -238,6 +334,15 @@ public final class AutocraftGameTest {
         }
 
         useWithMockPlayer(helper, DRIVE);
+    }
+
+    private static CraftPattern pattern() {
+        return new CraftPattern(
+            PATTERN_ID,
+            List.of(new CraftAmount(ITEM_ADAPTER.keyOf(new ItemStack(INPUT_ITEM)), 1)),
+            List.of(new CraftAmount(ITEM_ADAPTER.keyOf(new ItemStack(OUTPUT_ITEM)), 1)),
+            List.of(new TargetRecipeConstraint(
+                ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, "gametest/ore_analyzer/autocraft"))));
     }
 
     private static Item item(String name) {

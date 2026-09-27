@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +22,9 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
@@ -32,11 +35,17 @@ import org.shsts.tinactory.core.util.CodecHelper;
 import org.shsts.tinactory.integration.machine.Machine;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
+import org.shsts.tinycorelib.api.gui.IMenuHelper;
+import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
+import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinycorelib.api.network.IPacketType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.ITEM_HANDLER;
@@ -47,12 +56,63 @@ import static org.shsts.tinactory.integration.common.CapabilityProvider.getConta
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class LogisticWorkerTransferGameTest {
+    private static final IMenuHelper MENU_HELPER = new IMenuHelper() {
+        @Override
+        public <P extends IPacket> ISyncSlotScheduler<P> simpleScheduler(IPacketType<P> type,
+            Supplier<P> factory) {
+            return new ISyncSlotScheduler<>() {
+                @Override
+                public IPacketType<P> packetType() {
+                    return type;
+                }
+
+                @Override
+                public boolean shouldSend() {
+                    return true;
+                }
+
+                @Override
+                public P createPacket() {
+                    return factory.get();
+                }
+            };
+        }
+
+        @Override
+        public <P extends IPacket> void sendSyncPacket(ServerPlayer player, int containerId,
+            int syncSlotId, IPacketType<P> type, P packet) {}
+
+        @Override
+        public <P extends IPacket> void sendEventPacket(int containerId, IPacketType<P> type, P packet) {}
+
+        @Override
+        public void requireMenuSyncPacket(IPacketType<?> type) {}
+
+        @Override
+        public void requireMenuEventPacket(IPacketType<?> type) {}
+    };
     private static final Voltage VOLTAGE = Voltage.MV;
     private static final BlockPos SOURCE = new BlockPos(1, 2, 1);
     private static final BlockPos CENTRAL_CABLE = new BlockPos(2, 2, 1);
     private static final BlockPos DESTINATION = new BlockPos(3, 2, 1);
     private static final BlockPos BATTERY = new BlockPos(2, 1, 1);
     private static final BlockPos WORKER = new BlockPos(2, 3, 1);
+
+    @GameTest
+    public static void testLogisticWorkerMenuSyncAndLifecycle(GameTestHelper helper) {
+        var route = placeRoute(helper, "logistics/electric_chest", "logistics/electric_chest");
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = new LogisticWorkerMenu(new MenuBase.Properties(MENU_HELPER, AllMenus.LOGISTIC_WORKER.get(), 0,
+            player.getInventory(), helper.getBlockEntity(route.worker())));
+        menu.broadcastChanges();
+        menu.removed(player);
+
+        if (menu.stillValid(player)) {
+            helper.fail("Logistic worker menu allowed access without machine ownership", route.worker());
+            return;
+        }
+        helper.succeed();
+    }
 
     @GameTest(timeoutTicks = 70)
     public static void testItemTransferUsesCombinedWorkerBandwidth(GameTestHelper helper) {

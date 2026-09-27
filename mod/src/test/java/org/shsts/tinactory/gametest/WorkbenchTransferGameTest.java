@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -119,6 +120,50 @@ public final class WorkbenchTransferGameTest {
     }
 
     @GameTest
+    public static void testMaxTransferPlansAllAvailableShapelessCrafts(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.playerSlots().getFirst().set(new ItemStack(Items.OAK_LOG, 3));
+
+        var recipe = craftingRecipe(menu, OAK_PLANKS_RECIPE);
+        var result = menu.planTransfer(recipe, true);
+        menu.transfer(recipe, true);
+
+        if (result.code() != WorkbenchTransferResult.Code.SUCCESS ||
+            menu.materialSlots().get(4).getItem().getCount() != 3 || menu.playerSlots().getFirst().hasItem()) {
+            helper.fail("Max transfer did not place all available shapeless ingredients");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testTransferReportsFullInventoryWhenOldGridCannotBeStowed(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        for (var slot : menu.playerSlots()) {
+            slot.set(new ItemStack(Items.COBBLESTONE, 64));
+        }
+        menu.materialSlots().getFirst().set(new ItemStack(Items.DIAMOND));
+        menu.materialSlots().get(1).set(new ItemStack(Items.OAK_PLANKS, 2));
+
+        var result = menu.planTransfer(craftingRecipe(menu, VANILLA_STICK_RECIPE), false);
+        menu.transfer(craftingRecipe(menu, VANILLA_STICK_RECIPE), false);
+
+        if (result.code() != WorkbenchTransferResult.Code.INVENTORY_FULL ||
+            !menu.materialSlots().getFirst().getItem().is(Items.DIAMOND) ||
+            menu.materialSlots().get(1).getItem().getCount() != 2) {
+            helper.fail("Transfer did not preserve slots when the displaced grid could not be stowed");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void testCraftingShapelessRecipeConsumesOneIngredient(GameTestHelper helper) {
         var pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
@@ -135,6 +180,30 @@ public final class WorkbenchTransferGameTest {
         workbench.onTake(player, result.copy());
         if (menu.materialSlots().getFirst().getItem().getCount() != 1) {
             helper.fail("Workbench consumed more than one shapeless ingredient");
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testPickingUpWorkbenchResultConsumesIngredients(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, AllBlockEntities.WORKBENCH.get());
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var menu = menu(helper, pos, player);
+        menu.materialSlots().get(4).set(new ItemStack(Items.OAK_PLANKS));
+        menu.materialSlots().get(7).set(new ItemStack(Items.OAK_PLANKS));
+        var resultIndex = menu.slots.size() - 1;
+
+        if (!menu.getSlot(resultIndex).getItem().is(Items.STICK)) {
+            helper.fail("Workbench result slot did not expose the stick recipe output");
+            return;
+        }
+        menu.clicked(resultIndex, 0, ClickType.PICKUP, player);
+
+        if (!menu.getCarried().is(Items.STICK) || menu.getCarried().getCount() != 2 ||
+            menu.materialSlots().get(4).hasItem() || menu.materialSlots().get(7).hasItem()) {
+            helper.fail("Picking up the workbench result did not return output and consume ingredients");
             return;
         }
         helper.succeed();
