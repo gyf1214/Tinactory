@@ -1,28 +1,38 @@
 package org.shsts.tinactory.gametest;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllCapabilities;
+import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllMultiblocks;
 import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
+import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
+import org.shsts.tinactory.content.gui.DigitalInterfaceMenu;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
@@ -33,6 +43,7 @@ import org.shsts.tinactory.content.multiblock.PowerSubstation;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
+import org.shsts.tinactory.integration.gui.sync.FluidSyncPacket;
 import org.shsts.tinactory.integration.multiblock.BlockIngredient;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
@@ -41,12 +52,20 @@ import org.shsts.tinactory.integration.multiblock.WorldMultiblockCheckCtx;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
+import org.shsts.tinycorelib.api.gui.IMenuHelper;
+import org.shsts.tinycorelib.api.gui.ISyncSlotScheduler;
+import org.shsts.tinycorelib.api.gui.MenuBase;
+import org.shsts.tinycorelib.api.network.IPacket;
+import org.shsts.tinycorelib.api.network.IPacketType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.TARGET_RECIPE;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class MultiblockGameTest {
@@ -104,6 +123,87 @@ public final class MultiblockGameTest {
     @GameTest(template = "empty_64x16x64", timeoutTicks = 400)
     public static void testRegisteredStructureSmokeBatchB(GameTestHelper helper) {
         testRegisteredStructureSmokeBatch(helper, STRUCTURE_SMOKE_B);
+    }
+
+    @GameTest(template = "empty_64x16x64", timeoutTicks = 180)
+    public static void testDigitalInterfaceMenuUsesRegisteredProcessorLayout(GameTestHelper helper) {
+        var controller = new BlockPos(32, 2, 32);
+        var placed = placeDigitalInterfaceStructure(helper, "large_chemical_reactor", controller);
+        if (placed == null) {
+            return;
+        }
+
+        helper.runAfterDelay(20, () -> {
+            var multiblock = Multiblock.get(helper.getBlockEntity(placed.controller()));
+            var digital = (DigitalInterface) AllCapabilities.MACHINE.get(helper.getBlockEntity(placed.interfacePos()));
+            if (multiblock.getInterface().orElse(null) != digital || digital.processor().isEmpty() ||
+                !digital.isContainerReady()) {
+                helper.fail("Registered digital interface did not bind to its processor and container",
+                    placed.interfacePos());
+                return;
+            }
+
+            useWithMockPlayer(helper, placed.interfacePos());
+            var layout = digital.getLayout();
+            var expectedItemSlots = layoutSlotCount(layout, PortType.ITEM);
+            var expectedFluidSlots = layoutSlotCount(layout, PortType.FLUID);
+            if (expectedItemSlots == 0 || expectedFluidSlots == 0) {
+                helper.fail("Selected registered structure did not expose both item and fluid layout slots",
+                    placed.interfacePos());
+                return;
+            }
+
+            var emptyPlayer = serverPlayer(helper);
+            var emptyPackets = new CapturingMenuHelper();
+            var emptyMenu = digitalMenu(helper, placed.interfacePos(), emptyPlayer, emptyPackets);
+            emptyMenu.broadcastChanges();
+            var emptyItemSlots = menuItemSlots(emptyMenu, emptyPlayer);
+            var emptyFluidPackets = emptyPackets.packets(FluidSyncPacket.class);
+            if (emptyItemSlots.size() != expectedItemSlots || emptyFluidPackets.size() != expectedFluidSlots ||
+                emptyItemSlots.stream().anyMatch(slot -> slot.mayPlace(new ItemStack(Items.DIAMOND)) ||
+                    slot.mayPickup(emptyPlayer) || !slot.getItem().isEmpty()) ||
+                emptyFluidPackets.stream().anyMatch(packet -> !packet.getFluidStack().isEmpty())) {
+                helper.fail("Empty digital interface menu did not match its registered layout", placed.interfacePos());
+                return;
+            }
+
+            var itemInput = digital.getPort(0, ContainerAccess.EXTERNAL).asItem();
+            var fluidInput = digital.getPort(1, ContainerAccess.EXTERNAL).asFluid();
+            var remainingItem = itemInput.insert(new ItemStack(Items.IRON_INGOT), false);
+            var remainingFluid = fluidInput.insert(new FluidStack(Fluids.WATER, 1000), false);
+            if (!remainingItem.isEmpty() || !remainingFluid.isEmpty()) {
+                helper.fail("Digital interface did not accept the smoke recipe inputs", placed.interfacePos());
+                return;
+            }
+
+            var recipe = ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID,
+                "gametest/multiblock/digital_interface_menu_smoke");
+            digital.setConfig(SetMachineConfigPacket.builder().set(TARGET_RECIPE, recipe).get());
+            helper.runAfterDelay(40, () -> {
+                var filledPlayer = serverPlayer(helper);
+                var filledPackets = new CapturingMenuHelper();
+                var filledMenu = digitalMenu(helper, placed.interfacePos(), filledPlayer, filledPackets);
+                filledMenu.broadcastChanges();
+                var visibleItems = menuItemSlots(filledMenu, filledPlayer).stream()
+                    .map(slot -> slot.getItem())
+                    .toList();
+                var visibleFluids = filledPackets.packets(FluidSyncPacket.class).stream()
+                    .map(packet -> packet.getFluidStack())
+                    .toList();
+                if (visibleItems.size() != expectedItemSlots || visibleFluids.size() != expectedFluidSlots ||
+                    visibleItems.stream().noneMatch(stack -> stack.is(Items.IRON_INGOT)) ||
+                    visibleItems.stream().noneMatch(stack -> stack.is(Items.DIAMOND)) ||
+                    visibleFluids.stream().noneMatch(fluid -> fluid.getFluid() == Fluids.WATER &&
+                        fluid.getAmount() == 1000) ||
+                    visibleFluids.stream().noneMatch(fluid -> fluid.getFluid() == Fluids.LAVA &&
+                        fluid.getAmount() == 250)) {
+                    helper.fail("Digital interface menu did not sync the active item's and fluid's processing info",
+                        placed.interfacePos());
+                    return;
+                }
+                helper.succeed();
+            });
+        });
     }
 
     @GameTest(template = "empty_5x5x5", timeoutTicks = 120)
@@ -489,6 +589,36 @@ public final class MultiblockGameTest {
         return new PlacedMultiblock(id, controller, interfacePos, display);
     }
 
+    private static PlacedMultiblock placeDigitalInterfaceStructure(GameTestHelper helper, String id,
+        BlockPos controller) {
+        var display = placeDisplayedStructure(helper, id, controller, FACING);
+        var multiblock = Multiblock.get(helper.getBlockEntity(controller));
+        BlockPos interfacePos = null;
+        for (var y = 0; y < display.height() && interfacePos == null; y++) {
+            for (var z = 0; z < display.depth() && interfacePos == null; z++) {
+                for (var x = 0; x < display.width(); x++) {
+                    if (display.controllerPosition().equals(new BlockPos(x, y, z)) ||
+                        display.getIngredient(x, y, z).isEmpty()) {
+                        continue;
+                    }
+                    var pos = structurePos(display, controller, x, y, z);
+                    var original = helper.getBlockState(pos);
+                    placeDigitalInterface(helper, pos);
+                    if (multiblock.checkStructure().isPresent()) {
+                        interfacePos = pos;
+                        break;
+                    }
+                    helper.setBlock(pos, original);
+                }
+            }
+        }
+        if (interfacePos == null) {
+            helper.fail("no compatible digital interface position found for " + id, controller);
+            return null;
+        }
+        return new PlacedMultiblock(id, controller, interfacePos, display);
+    }
+
     private static IMultiblockDisplay placeDisplayedStructure(GameTestHelper helper, String id, BlockPos controller,
         Direction controllerFacing) {
         var set = Objects.requireNonNull(AllMultiblocks.MULTIBLOCK_SETS.get(id), id);
@@ -518,6 +648,46 @@ public final class MultiblockGameTest {
             interfaceState = interfaceState.setValue(MachineBlock.IO_FACING, FACING.getOpposite());
         }
         helper.setBlock(interfacePos, interfaceState);
+    }
+
+    private static void placeDigitalInterface(GameTestHelper helper, BlockPos interfacePos) {
+        var interfaceState = AllBlockEntities.getMachine("multiblock/digital_interface").block(Voltage.EV)
+            .defaultBlockState();
+        if (interfaceState.hasProperty(MachineBlock.IO_FACING)) {
+            interfaceState = interfaceState.setValue(MachineBlock.IO_FACING, FACING.getOpposite());
+        }
+        helper.setBlock(interfacePos, interfaceState);
+    }
+
+    private static int layoutSlotCount(Layout layout, PortType type) {
+        return (int) layout.slots.stream().filter(slot -> slot.type().portType == type).count();
+    }
+
+    private static List<Slot> menuItemSlots(DigitalInterfaceMenu menu, Player player) {
+        return menu.slots.stream()
+            .filter(slot -> !slot.mayPlace(new ItemStack(Items.DIAMOND)) && !slot.mayPickup(player))
+            .toList();
+    }
+
+    private static DigitalInterfaceMenu digitalMenu(GameTestHelper helper, BlockPos interfacePos,
+        ServerPlayer player, IMenuHelper menuHelper) {
+        return new DigitalInterfaceMenu(new MenuBase.Properties(menuHelper, AllMenus.DIGITAL_INTERFACE.get(), 0,
+            player.getInventory(), helper.getBlockEntity(interfacePos)));
+    }
+
+    private static ServerPlayer serverPlayer(GameTestHelper helper) {
+        var player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+            new GameProfile(UUID.randomUUID(), "digital-interface-menu-test"), ClientInformation.createDefault());
+        player.setGameMode(GameType.SURVIVAL);
+        return player;
+    }
+
+    private static void useWithMockPlayer(GameTestHelper helper, BlockPos pos) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var absolutePos = helper.absolutePos(pos);
+        var state = helper.getLevel().getBlockState(absolutePos);
+        state.useItemOn(ItemStack.EMPTY, helper.getLevel(), player, InteractionHand.MAIN_HAND,
+            new BlockHitResult(Vec3.atCenterOf(absolutePos), Direction.NORTH, absolutePos, true));
     }
 
     private static BlockPos findInterface(GameTestHelper helper, BlockPos controller, IMultiblockDisplay display) {
@@ -557,4 +727,51 @@ public final class MultiblockGameTest {
 
     private record PlacedMultiblock(String id, BlockPos controller, BlockPos interfacePos,
         IMultiblockDisplay display) {}
+
+    private static final class CapturingMenuHelper implements IMenuHelper {
+        private final List<IPacket> sentPackets = new ArrayList<>();
+
+        @Override
+        public <P extends IPacket> ISyncSlotScheduler<P> simpleScheduler(IPacketType<P> type,
+            Supplier<P> factory) {
+            return new ISyncSlotScheduler<>() {
+                private boolean shouldSend = true;
+
+                @Override
+                public IPacketType<P> packetType() {
+                    return type;
+                }
+
+                @Override
+                public boolean shouldSend() {
+                    return shouldSend;
+                }
+
+                @Override
+                public P createPacket() {
+                    shouldSend = false;
+                    return factory.get();
+                }
+            };
+        }
+
+        @Override
+        public <P extends IPacket> void sendSyncPacket(ServerPlayer player, int containerId, int syncSlotId,
+            IPacketType<P> type, P packet) {
+            sentPackets.add(packet);
+        }
+
+        @Override
+        public <P extends IPacket> void sendEventPacket(int containerId, IPacketType<P> type, P packet) {}
+
+        @Override
+        public void requireMenuSyncPacket(IPacketType<?> type) {}
+
+        @Override
+        public void requireMenuEventPacket(IPacketType<?> type) {}
+
+        public <P extends IPacket> List<P> packets(Class<P> type) {
+            return sentPackets.stream().filter(type::isInstance).map(type::cast).toList();
+        }
+    }
 }

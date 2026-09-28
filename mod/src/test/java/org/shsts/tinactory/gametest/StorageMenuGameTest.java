@@ -9,6 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
@@ -19,6 +21,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IPort;
+import org.shsts.tinactory.api.logistics.IPortNotifier;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.gui.StorageMenu;
 import org.shsts.tinactory.content.gui.sync.FilterEventPacket;
@@ -143,8 +146,169 @@ public final class StorageMenuGameTest {
         helper.succeed();
     }
 
-    private static final class FixedItemPort implements IPort<ItemStack> {
+    @GameTest
+    public static void testItemStorageSyncSplitsAtPositiveStackLimit(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = serverPlayer(helper);
+        var menuHelper = new CapturingMenuHelper();
+        var diamonds = new ItemStack(Items.DIAMOND, 70);
+        var menu = storageMenu(helper, pos, player, menuHelper, new FixedItemPort(diamonds), 32, empty(), 0);
+
+        menu.broadcastChanges();
+
+        var packet = menuHelper.packet(StorageSyncPacket.class);
+        var expectedAmounts = List.of(32L, 32L, 6L);
+        if (packet.isEmpty() || packet.get().entries().size() != expectedAmounts.size() ||
+            packet.get().entries().stream().anyMatch(entry ->
+                !entry.key().equals(StackHelper.ITEM_ADAPTER.keyOf(diamonds))) ||
+            packet.get().entries().stream().mapToLong(entry -> entry.amount()).sum() != diamonds.getCount()) {
+            helper.fail("Positive item stack limit did not preserve the split storage amount", pos);
+            return;
+        }
+        for (var i = 0; i < expectedAmounts.size(); i++) {
+            if (packet.get().entries().get(i).amount() != expectedAmounts.get(i)) {
+                helper.fail("Positive item stack limit emitted an unexpected item chunk", pos);
+                return;
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testFluidStorageSyncSplitsAtPositiveStackLimit(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = serverPlayer(helper);
+        var menuHelper = new CapturingMenuHelper();
+        var water = new FluidStack(Fluids.WATER, 2500);
+        var menu = storageMenu(helper, pos, player, menuHelper, empty(), 0, new FixedFluidPort(water), 1000);
+
+        menu.broadcastChanges();
+
+        var packet = menuHelper.packet(StorageSyncPacket.class);
+        var expectedAmounts = List.of(1000L, 1000L, 500L);
+        if (packet.isEmpty() || packet.get().entries().size() != expectedAmounts.size() ||
+            packet.get().entries().stream().anyMatch(entry ->
+                !entry.key().equals(StackHelper.FLUID_ADAPTER.keyOf(water))) ||
+            packet.get().entries().stream().mapToLong(entry -> entry.amount()).sum() != water.getAmount()) {
+            helper.fail("Positive fluid stack limit did not preserve the split storage amount", pos);
+            return;
+        }
+        for (var i = 0; i < expectedAmounts.size(); i++) {
+            if (packet.get().entries().get(i).amount() != expectedAmounts.get(i)) {
+                helper.fail("Positive fluid stack limit emitted an unexpected fluid chunk", pos);
+                return;
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testInventoryQuickMoveInsertsEntireStack(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var stack = new ItemStack(Items.DIAMOND, 10);
+        var port = new MutableItemPort(Items.DIAMOND, 64, 0);
+        player.getInventory().setItem(0, stack.copy());
+        var menu = storageMenu(helper, pos, player, MENU_HELPER, port, 64, empty(), 0);
+
+        menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
+
+        if (!player.getInventory().getItem(0).isEmpty() || port.getStorageAmount(stack) != stack.getCount()) {
+            helper.fail("Inventory quick-move did not insert the entire stack exactly once", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testInventoryQuickMovePreservesPartialRemainder(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var stack = new ItemStack(Items.DIAMOND, 10);
+        var port = new MutableItemPort(Items.DIAMOND, 4, 0);
+        player.getInventory().setItem(0, stack.copy());
+        var menu = storageMenu(helper, pos, player, MENU_HELPER, port, 64, empty(), 0);
+
+        menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
+
+        if (player.getInventory().getItem(0).getCount() != 6 || port.getStorageAmount(stack) != 4 ||
+            player.getInventory().getItem(0).getCount() + port.getStorageAmount(stack) != stack.getCount()) {
+            helper.fail("Partial inventory quick-move lost or duplicated items", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testInventoryQuickMoveLeavesStackWhenPortIsFull(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var stack = new ItemStack(Items.DIAMOND, 10);
+        var port = new MutableItemPort(Items.DIAMOND, 0, 0);
+        player.getInventory().setItem(0, stack.copy());
+        var menu = storageMenu(helper, pos, player, MENU_HELPER, port, 64, empty(), 0);
+
+        menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
+
+        if (player.getInventory().getItem(0).getCount() != stack.getCount() || port.getStorageAmount(stack) != 0) {
+            helper.fail("Full storage port consumed or duplicated the quick-moved stack", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testStorageQuickMoveLeavesEntryWhenPlayerInventoryIsFull(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var diamonds = new ItemStack(Items.DIAMOND, 10);
+        var port = new MutableItemPort(Items.DIAMOND, 64, diamonds.getCount());
+        for (var i = 0; i < player.getInventory().getContainerSize(); i++) {
+            player.getInventory().setItem(i, new ItemStack(Items.COBBLESTONE, 64));
+        }
+        var menu = storageMenu(helper, pos, player, MENU_HELPER, port, 64, empty(), 0);
+        var key = StackHelper.ITEM_ADAPTER.keyOf(diamonds);
+
+        menu.handleEventPacket(AllMenus.STORAGE_SLOT, new StorageEventPacket(key, diamonds.getCount(), true));
+
+        if (port.getStorageAmount(diamonds) != diamonds.getCount() ||
+            player.getInventory().countItem(Items.DIAMOND) != 0) {
+            helper.fail("Storage quick-move changed its entry without player inventory room", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testStorageMenuRemovalUnregistersPortListener(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var port = new FixedItemPort(new ItemStack(Items.DIAMOND));
+        var menu = storageMenu(helper, pos, player, MENU_HELPER, port, 64, empty(), 0);
+        if (port.listenerCount() != 1) {
+            helper.fail("Storage menu did not register its port update listener", pos);
+            return;
+        }
+
+        menu.removed(player);
+
+        if (port.listenerCount() != 0) {
+            helper.fail("Removed storage menu kept its port update listener", pos);
+            return;
+        }
+        helper.succeed();
+    }
+
+    private static final class FixedItemPort implements IPort<ItemStack>, IPortNotifier {
         private final ItemStack stack;
+        private final List<Runnable> listeners = new ArrayList<>();
 
         private FixedItemPort(ItemStack stack) {
             this.stack = stack;
@@ -189,10 +353,145 @@ public final class StorageMenuGameTest {
         public boolean acceptOutput() {
             return true;
         }
+
+        @Override
+        public void onUpdate(Runnable listener) {
+            listeners.add(listener);
+        }
+
+        @Override
+        public void unregisterListener(Runnable listener) {
+            listeners.remove(listener);
+        }
+
+        public int listenerCount() {
+            return listeners.size();
+        }
+    }
+
+    private static final class FixedFluidPort implements IPort<FluidStack> {
+        private final FluidStack fluid;
+
+        private FixedFluidPort(FluidStack fluid) {
+            this.fluid = fluid;
+        }
+
+        @Override
+        public PortType type() {
+            return PortType.FLUID;
+        }
+
+        @Override
+        public boolean acceptInput(FluidStack stack) {
+            return false;
+        }
+
+        @Override
+        public FluidStack insert(FluidStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Override
+        public FluidStack extract(FluidStack stack, boolean simulate) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public FluidStack extract(int limit, boolean simulate) {
+            return FluidStack.EMPTY;
+        }
+
+        @Override
+        public long getStorageAmount(FluidStack stack) {
+            return FluidStack.isSameFluidSameComponents(fluid, stack) ? fluid.getAmount() : 0;
+        }
+
+        @Override
+        public List<FluidStack> getAllStorages() {
+            return List.of(fluid);
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return true;
+        }
+    }
+
+    private static final class MutableItemPort implements IPort<ItemStack> {
+        private final ItemStack template;
+        private final int capacity;
+        private int storedAmount;
+
+        private MutableItemPort(Item item, int capacity, int initialAmount) {
+            this.template = new ItemStack(item);
+            this.capacity = capacity;
+            this.storedAmount = initialAmount;
+        }
+
+        @Override
+        public PortType type() {
+            return PortType.ITEM;
+        }
+
+        @Override
+        public boolean acceptInput(ItemStack stack) {
+            return ItemStack.isSameItemSameComponents(template, stack);
+        }
+
+        @Override
+        public ItemStack insert(ItemStack stack, boolean simulate) {
+            if (!acceptInput(stack)) {
+                return stack;
+            }
+            var inserted = Math.min(stack.getCount(), capacity - storedAmount);
+            if (!simulate && inserted > 0) {
+                storedAmount += inserted;
+            }
+            return StackHelper.copyWithCount(stack, stack.getCount() - inserted);
+        }
+
+        @Override
+        public ItemStack extract(ItemStack stack, boolean simulate) {
+            if (!ItemStack.isSameItemSameComponents(template, stack)) {
+                return ItemStack.EMPTY;
+            }
+            var extracted = Math.min(stack.getCount(), storedAmount);
+            if (!simulate && extracted > 0) {
+                storedAmount -= extracted;
+            }
+            return StackHelper.copyWithCount(template, extracted);
+        }
+
+        @Override
+        public ItemStack extract(int limit, boolean simulate) {
+            return extract(StackHelper.copyWithCount(template, limit), simulate);
+        }
+
+        @Override
+        public long getStorageAmount(ItemStack stack) {
+            return ItemStack.isSameItemSameComponents(template, stack) ? storedAmount : 0;
+        }
+
+        @Override
+        public List<ItemStack> getAllStorages() {
+            return storedAmount == 0 ? List.of() : List.of(StackHelper.copyWithCount(template, storedAmount));
+        }
+
+        @Override
+        public boolean acceptOutput() {
+            return true;
+        }
     }
 
     private static Block block(String id) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(TinactoryKeys.ID, id));
+    }
+
+    private static ServerPlayer serverPlayer(GameTestHelper helper) {
+        var player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+            new GameProfile(UUID.randomUUID(), "storage-menu-test"), ClientInformation.createDefault());
+        player.setGameMode(GameType.SURVIVAL);
+        return player;
     }
 
     private static final class CapturingMenuHelper implements IMenuHelper {
@@ -743,6 +1042,13 @@ public final class StorageMenuGameTest {
             player.getInventory(), blockEntity);
         return new StorageMenu(properties, chest.port(), chest.stackLimit(), empty(), 0,
             chest.storageSlots(), chest.filterSlots());
+    }
+
+    private static StorageMenu storageMenu(GameTestHelper helper, BlockPos pos, Player player, IMenuHelper menuHelper,
+        IPort<ItemStack> itemPort, int itemStackLimit, IPort<FluidStack> fluidPort, int fluidStackLimit) {
+        var properties = new MenuBase.Properties(menuHelper, AllMenus.ELECTRIC_CHEST.get(), 0,
+            player.getInventory(), helper.getBlockEntity(pos));
+        return new StorageMenu(properties, itemPort, itemStackLimit, fluidPort, fluidStackLimit);
     }
 
     private static StorageMenu tankMenu(GameTestHelper helper, BlockPos pos, Player player) {
