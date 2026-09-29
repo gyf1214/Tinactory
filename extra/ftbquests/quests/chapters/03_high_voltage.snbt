@@ -462,11 +462,8 @@
 					id: "minecraft:crying_obsidian"
 				}
 				id: "58A667C11AA55AF9"
-				tags: [
-					"tinactory_technology"
-					"tinactory_technology_tinactory_rocket_t1"
-				]
-				type: "custom"
+				technology: "tinactory:rocket_t1"
+				type: "tinactory:technology"
 			}]
 			x: 8.0d
 			y: 8.0d

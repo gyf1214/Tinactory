@@ -577,11 +577,8 @@
 					id: "minecraft:end_portal_frame"
 				}
 				id: "433A0522B2F3010E"
-				tags: [
-					"tinactory_technology"
-					"tinactory_technology_tinactory_rocket_t2"
-				]
-				type: "custom"
+				technology: "tinactory:rocket_t2"
+				type: "tinactory:technology"
 			}]
 			x: 4.0d
 			y: 16.0d

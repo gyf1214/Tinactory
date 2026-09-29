@@ -370,11 +370,8 @@
 					id: "tinactory:multiblock/rocket_launch_site"
 				}
 				id: "070000000000011F"
-				tags: [
-					"tinactory_technology"
-					"tinactory_technology_tinactory_interstellar_travel"
-				]
-				type: "custom"
+				technology: "tinactory:interstellar_travel"
+				type: "tinactory:technology"
 			}]
 			x: 2.0d
 			y: 14.0d
