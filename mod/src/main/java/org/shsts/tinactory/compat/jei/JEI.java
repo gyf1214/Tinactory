@@ -6,6 +6,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.registration.IAdvancedRegistration;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IModIngredientRegistration;
@@ -14,6 +15,7 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import org.shsts.tinactory.AllTags;
+import org.shsts.tinactory.compat.ftbquests.TechTaskJeiLookup;
 import org.shsts.tinactory.compat.jei.category.AssemblyCategory;
 import org.shsts.tinactory.compat.jei.category.BlastFurnaceCategory;
 import org.shsts.tinactory.compat.jei.category.ChemicalReactorCategory;
@@ -211,5 +214,17 @@ public class JEI implements IModPlugin {
                     new TechIngredientPlugin(index, category.recipeType()));
             }
         }
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime) {
+        TechTaskJeiLookup.install(technologyId -> runtime.getRecipesGui().show(
+            runtime.getJeiHelpers().getFocusFactory().createFocus(RecipeIngredientRole.OUTPUT,
+                TechIngredient.TYPE, new TechIngredient(technologyId))));
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        TechTaskJeiLookup.clear();
     }
 }

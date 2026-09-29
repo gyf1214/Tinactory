@@ -8,12 +8,13 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.ftbfilter.ItemFilterIntegration;
-import org.shsts.tinactory.compat.ftbquests.TechQuestIntegration;
+import org.shsts.tinactory.compat.ftbquests.TechTaskRegistration;
 import org.shsts.tinactory.content.logistics.MEStorageCellAliases;
 import org.shsts.tinactory.integration.tech.TechManagers;
 import org.shsts.tinycorelib.api.ITinyCoreLib;
@@ -35,7 +36,16 @@ public class Tinactory {
         modContainer.registerConfig(ModConfig.Type.SERVER, TinactoryConfig.CONFIG_SPEC);
         this.modEventBus = modEventBus;
         modEventBus.addListener(this::onConstructEvent);
+        modEventBus.addListener(this::onCommonSetup);
         modEventBus.addListener(MEStorageCellAliases::registerAliases);
+    }
+
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            if (ModList.get().isLoaded("ftbquests")) {
+                TechTaskRegistration.register();
+            }
+        });
     }
 
     private void onConstructEvent(FMLConstructModEvent event) {
@@ -66,9 +76,6 @@ public class Tinactory {
             AllMultiblocks.init();
 
             TechManagers.init();
-            if (ModList.get().isLoaded("ftbquests")) {
-                new TechQuestIntegration().register();
-            }
             ItemFilterIntegration.init();
             AllWorldGens.init();
 
