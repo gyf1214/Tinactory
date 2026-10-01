@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.List;
@@ -29,8 +30,8 @@ public class PoweredItem extends Item implements IPoweredItem {
     }
 
     @Override
-    public Voltage voltage() {
-        return voltage;
+    public long voltage() {
+        return voltage.value;
     }
 
     @Override

@@ -10,7 +10,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.tool.IPoweredItem;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
@@ -64,7 +64,7 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     private boolean allowItem(ItemStack stack) {
         return stack.getItem() instanceof IPoweredItem poweredItem &&
-            poweredItem.voltage() == voltage;
+            poweredItem.voltage() == voltage.value;
     }
 
     private IMachine machine() {

@@ -6,7 +6,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.content.tool.IPoweredItem;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault

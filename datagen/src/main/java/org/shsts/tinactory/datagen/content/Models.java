@@ -141,7 +141,7 @@ public final class Models {
 
     public static <U extends PoweredItem> void batteryItem(
         IEntryDataContext<U, ItemModelProvider> ctx) {
-        var voltage = ctx.object().voltage();
+        var voltage = Voltage.fromValue(ctx.object().voltage());
         var base = gregtech("item/metaitems/battery.re." + voltage.id + ".lithium");
         var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", extend(base, "1"));
@@ -158,8 +158,9 @@ public final class Models {
         IEntryDataContext<U, ItemModelProvider> ctx) {
         var tool = ctx.object();
         var family = tool instanceof PoweredDrillItem ? "drill" : "chainsaw";
+        var voltage = Voltage.fromValue(tool.voltage());
         ctx.provider().withExistingParent(ctx.id(), "item/generated")
-            .texture("layer0", gregtech("item/tools/power_unit_" + tool.voltage().id))
+            .texture("layer0", gregtech("item/tools/power_unit_" + voltage.id))
             .texture("layer1", gregtech("item/tools/" + family));
     }
 

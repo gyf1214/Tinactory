@@ -69,7 +69,7 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
     @Override
     public void onWorkTick(double partial) {
         var currentMode = mode();
-        var factor = getInterface()
+        var factor = (double) getInterface()
             .flatMap(IMachine::network)
             .map($ -> {
                 var electric = $.getComponent(ELECTRIC_COMPONENT.get());

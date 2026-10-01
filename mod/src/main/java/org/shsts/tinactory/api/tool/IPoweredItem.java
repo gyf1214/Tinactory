@@ -1,14 +1,13 @@
-package org.shsts.tinactory.content.tool;
+package org.shsts.tinactory.api.tool;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
-import org.shsts.tinactory.core.electric.Voltage;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public interface IPoweredItem {
-    Voltage voltage();
+    long voltage();
 
     long capacity();
 
