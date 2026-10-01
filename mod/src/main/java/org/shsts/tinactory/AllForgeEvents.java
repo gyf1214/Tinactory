@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.compat.ftbquests.FtbTeamsTeamProvider;
+import org.shsts.tinactory.content.tool.PoweredToolItem;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.SinglePlayerTeamProvider;
@@ -117,6 +118,15 @@ public final class AllForgeEvents {
             return;
         }
         WorldMultiblockManagers.get(world).invalidate(event.getPos());
+    }
+
+    @SubscribeEvent
+    public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
+        var stack = event.getEntity().getMainHandItem();
+        if (stack.getItem() instanceof PoweredToolItem poweredTool &&
+            poweredTool.getPower(stack) < poweredTool.normalUseCost()) {
+            event.setNewSpeed(0.0F);
+        }
     }
 
     @SubscribeEvent

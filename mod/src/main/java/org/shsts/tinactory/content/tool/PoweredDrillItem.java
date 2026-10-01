@@ -5,7 +5,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Tool;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
 
 import java.util.List;
 
@@ -21,6 +24,11 @@ public class PoweredDrillItem extends PoweredToolItem {
 
     public int areaMiningRadius() {
         return areaMiningRadius;
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
+        return ItemAbilities.DEFAULT_PICKAXE_ACTIONS.contains(itemAbility);
     }
 
     private static Tool tool(PoweredToolConfig config) {
