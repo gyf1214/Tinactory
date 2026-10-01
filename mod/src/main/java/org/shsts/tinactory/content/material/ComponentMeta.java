@@ -14,7 +14,7 @@ import org.shsts.tinactory.content.logistics.MENetworkBridge;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.network.BridgeBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
@@ -118,16 +118,16 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildBatteries(String name, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "items");
-        var components = new HashMap<Voltage, IEntry<BatteryItem>>();
+        var components = new HashMap<Voltage, IEntry<PoweredItem>>();
         for (var entry : jo1.entrySet()) {
             var v = Voltage.fromName(entry.getKey());
             var capacity = GsonHelper.convertToInt(entry.getValue(), "items");
             var id = "network/" + v.id + "/" + name;
-            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity))
+            var item = REGISTRATE.item(id, prop -> new PoweredItem(prop, v, capacity))
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
-                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, BatteryItem::fullItem)
-                .itemProperty(BatteryItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
-                    BatteryItem.normalizedPower(stack))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .itemProperty(PoweredItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
+                    PoweredItem.normalizedPower(stack))
                 .register();
             components.put(v, item);
         }

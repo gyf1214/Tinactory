@@ -41,8 +41,8 @@ import org.shsts.tinactory.compat.jei.gui.SlotScreenHandler;
 import org.shsts.tinactory.compat.jei.gui.TechMenuHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchHandler;
 import org.shsts.tinactory.compat.jei.gui.WorkbenchTransferHandler;
-import org.shsts.tinactory.compat.jei.ingredient.BatterySubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.IngredientRenderers;
+import org.shsts.tinactory.compat.jei.ingredient.PoweredItemSubtypeInterpreter;
 import org.shsts.tinactory.compat.jei.ingredient.RecipeMarker;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredient;
 import org.shsts.tinactory.compat.jei.ingredient.TechIngredientIndex;
@@ -54,7 +54,7 @@ import org.shsts.tinactory.content.recipe.BlastFurnaceRecipe;
 import org.shsts.tinactory.content.recipe.ChemicalReactorRecipe;
 import org.shsts.tinactory.content.recipe.CleanRecipe;
 import org.shsts.tinactory.content.recipe.DistillationRecipe;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.IPoweredItem;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.recipe.AssemblyRecipe;
 import org.shsts.tinactory.core.recipe.ProcessingRecipe;
@@ -93,8 +93,8 @@ public class JEI implements IModPlugin {
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
         for (var item : BuiltInRegistries.ITEM) {
-            if (item instanceof BatteryItem) {
-                registration.registerSubtypeInterpreter(item, BatterySubtypeInterpreter.INSTANCE);
+            if (item instanceof IPoweredItem) {
+                registration.registerSubtypeInterpreter(item, PoweredItemSubtypeInterpreter.INSTANCE);
             }
         }
     }

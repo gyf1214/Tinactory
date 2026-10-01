@@ -27,7 +27,7 @@ import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
@@ -367,7 +367,7 @@ public final class TinactoryGameTest {
         helper.setBlock(batteryBoxPos, batteryBoxState);
         var battery = batteryItem(voltage);
         var batteryStack = new ItemStack(battery);
-        battery.setPower(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity());
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         var batteryMachine = MACHINE.get(batteryBoxEntity);
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
@@ -392,7 +392,7 @@ public final class TinactoryGameTest {
             if (electric.getWorkFactor() <= 0d) {
                 helper.fail("Battery box did not power the electric consumer", consumerPos);
             }
-            if (battery.getPower(batteryStack) >= battery.capacity) {
+            if (battery.getPower(batteryStack) >= battery.capacity()) {
                 helper.fail("Battery box did not consume stored battery power", batteryBoxPos);
             }
             helper.succeed();
@@ -446,7 +446,7 @@ public final class TinactoryGameTest {
 
         var battery = batteryItem(Voltage.HV);
         var batteryStack = new ItemStack(battery);
-        battery.setPower(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity());
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithMockPlayer(helper, batteryBoxPos);
@@ -482,7 +482,7 @@ public final class TinactoryGameTest {
                 helper.fail("HV battery box buffer did not discharge through transformer: " + factorReport,
                     batteryBoxPos);
             }
-            if (batteryPower >= battery.capacity) {
+            if (batteryPower >= battery.capacity()) {
                 helper.fail("HV battery was not drained through transformer: " + factorReport, batteryBoxPos);
             }
             helper.succeed();
@@ -532,8 +532,8 @@ public final class TinactoryGameTest {
             .setValue(CableBlock.WEST, west);
     }
 
-    private static BatteryItem batteryItem(Voltage voltage) {
-        return (BatteryItem) AllItems.getComponent("battery").get(voltage).get();
+    private static PoweredItem batteryItem(Voltage voltage) {
+        return (PoweredItem) AllItems.getComponent("battery").get(voltage).get();
     }
 
     private static void useWithMockPlayer(GameTestHelper helper, BlockPos pos) {

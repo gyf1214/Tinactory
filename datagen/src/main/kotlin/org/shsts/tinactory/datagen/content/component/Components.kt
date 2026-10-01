@@ -19,7 +19,7 @@ import org.shsts.tinactory.content.electric.Circuits.allCircuitComponents
 import org.shsts.tinactory.content.electric.Circuits.allCircuits
 import org.shsts.tinactory.content.electric.Circuits.board
 import org.shsts.tinactory.content.electric.Circuits.circuitBoard
-import org.shsts.tinactory.content.tool.BatteryItem
+import org.shsts.tinactory.content.tool.PoweredItem
 import org.shsts.tinactory.core.electric.Voltage
 import org.shsts.tinactory.core.util.LocHelper.ae2
 import org.shsts.tinactory.core.util.LocHelper.ic2
@@ -71,7 +71,7 @@ object Components {
                 item(entry) { model(Models::componentItem) }
             }
 
-            for ((v, entry) in componentEntry<BatteryItem>("battery")) {
+            for ((v, entry) in componentEntry<PoweredItem>("battery")) {
                 item(entry) {
                     model(Models::batteryItem)
                     tag(AllTags.battery(v))

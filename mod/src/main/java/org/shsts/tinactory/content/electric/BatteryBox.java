@@ -7,10 +7,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import org.shsts.tinactory.AllTags;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.IPoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
@@ -63,8 +64,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     private boolean allowItem(ItemStack stack) {
-        return stack.getItem() instanceof BatteryItem batteryItem &&
-            batteryItem.voltage == voltage;
+        return stack.is(AllTags.BATTERY) && stack.getItem() instanceof IPoweredItem poweredItem &&
+            poweredItem.voltage() == voltage;
     }
 
     private IMachine machine() {
@@ -97,11 +98,12 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         }
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (stack.isEmpty() || !stack.is(AllTags.BATTERY) ||
+                !(stack.getItem() instanceof IPoweredItem battery)) {
                 continue;
             }
             var cap = Math.min(voltage.value, sign > 0 ?
-                battery.capacity - battery.getPower(stack) :
+                battery.capacity() - battery.getPower(stack) :
                 battery.getPower(stack));
             battery.charge(stack, (long) Math.floor(cap * factor));
         }
@@ -113,7 +115,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0L;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (stack.isEmpty() || !stack.is(AllTags.BATTERY) ||
+                !(stack.getItem() instanceof IPoweredItem battery)) {
                 continue;
             }
             ret += battery.getPower(stack);
@@ -126,10 +129,11 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0L;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (stack.isEmpty() || !stack.is(AllTags.BATTERY) ||
+                !(stack.getItem() instanceof IPoweredItem battery)) {
                 continue;
             }
-            ret += battery.capacity;
+            ret += battery.capacity();
         }
         return ret;
     }
@@ -149,7 +153,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0d;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
+            if (!stack.isEmpty() && stack.is(AllTags.BATTERY) &&
+                stack.getItem() instanceof IPoweredItem battery) {
                 ret += Math.min(voltage.value, battery.getPower(stack));
             }
         }
@@ -164,8 +169,9 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0d;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
-                ret += Math.min(voltage.value, battery.capacity - battery.getPower(stack));
+            if (!stack.isEmpty() && stack.is(AllTags.BATTERY) &&
+                stack.getItem() instanceof IPoweredItem battery) {
+                ret += Math.min(voltage.value, battery.capacity() - battery.getPower(stack));
             }
         }
         return ret;

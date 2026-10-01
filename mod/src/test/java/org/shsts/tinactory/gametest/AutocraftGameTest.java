@@ -31,7 +31,7 @@ import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -305,10 +305,10 @@ public final class AutocraftGameTest {
         }
         helper.setBlock(CABLE, cableState());
 
-        var battery = (BatteryItem) AllItems.getComponent("battery").get(VOLTAGE).get();
+        var battery = (PoweredItem) AllItems.getComponent("battery").get(VOLTAGE).get();
         for (var batteryPos : List.of(BATTERY, BATTERY_2)) {
             var batteryStack = new ItemStack(battery);
-            battery.setPower(batteryStack, battery.capacity);
+            battery.setPower(batteryStack, battery.capacity());
             var batteryEntity = helper.getBlockEntity(batteryPos);
             var batteryMachine = CapabilityProvider.getContainer(batteryEntity, "network/machine", Machine.class);
             batteryMachine.config().apply(SetMachineConfigPacket.builder()

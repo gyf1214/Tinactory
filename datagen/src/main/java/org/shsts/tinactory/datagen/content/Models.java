@@ -21,7 +21,7 @@ import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.joml.Vector3f;
 import org.shsts.tinactory.content.multiblock.TurbineBlock;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
@@ -137,9 +137,9 @@ public final class Models {
             .texture("layer0", gregtech(tex));
     }
 
-    public static <U extends BatteryItem> void batteryItem(
+    public static <U extends PoweredItem> void batteryItem(
         IEntryDataContext<U, ItemModelProvider> ctx) {
-        var voltage = ctx.object().voltage;
+        var voltage = ctx.object().voltage();
         var base = gregtech("item/metaitems/battery.re." + voltage.id + ".lithium");
         var model = ctx.provider().withExistingParent(ctx.id(), "item/generated")
             .texture("layer0", extend(base, "1"));
@@ -148,7 +148,7 @@ public final class Models {
                 .texture("layer0", extend(base, Integer.toString(i)));
             model.override()
                 .model(override)
-                .predicate(modLoc(BatteryItem.ITEM_PROPERTY), (float) (i - 1) / 8f);
+                .predicate(modLoc(PoweredItem.ITEM_PROPERTY), (float) (i - 1) / 8f);
         }
     }
 
