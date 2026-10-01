@@ -21,6 +21,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.IStackKey;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.logistics.ElectricChest;
 import org.shsts.tinactory.content.logistics.ElectricTank;
 import org.shsts.tinactory.content.logistics.FilterEntry;
@@ -45,6 +46,7 @@ import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.SERVER_LOAD;
 import static org.shsts.tinactory.AllNetworks.AUTO_VOID;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_CONFIG;
 import static org.shsts.tinactory.AllNetworks.STORAGE_DETECTOR;
 import static org.shsts.tinactory.AllNetworks.STORAGE_FILTERS;
@@ -431,6 +433,52 @@ public final class PersistenceGameTest {
         require(helper, fluidPersisted.contains(STORAGE_DETECTOR.loc().toString()) &&
                 !fluidPersisted.contains("targetFluid") && !fluidPersisted.contains("targetAmount"),
             "Migrated fluid detector config retained legacy keys", pos);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void testBatteryBoxModeMigratesLegacyValues(GameTestHelper helper) {
+        var pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, block("logistics/ulv/electric_chest"));
+        var provider = helper.getLevel().registryAccess();
+
+        var bufferConfig = new CompoundTag();
+        bufferConfig.putBoolean(BATTERY_MODE.loc().toString(), false);
+        var machine = loadMachineConfig(helper, pos, bufferConfig);
+        require(helper, machine.config().get(BATTERY_MODE).orElse(null) == BatteryBoxMode.BUFFER,
+            "Legacy namespaced false did not migrate to Buffer", pos);
+        require(helper, machine.serializeNBT(provider).getCompound("config").getString(BATTERY_MODE.loc().toString())
+                .equals("buffer"),
+            "Buffer mode did not serialize as a string under battery_discharge", pos);
+
+        var chargeConfig = new CompoundTag();
+        chargeConfig.putString(BATTERY_MODE.loc().toString(), "charge");
+        machine = loadMachineConfig(helper, pos, chargeConfig);
+        require(helper, machine.config().get(BATTERY_MODE).orElse(null) == BatteryBoxMode.CHARGE,
+            "Charge mode string did not load", pos);
+        require(helper, machine.serializeNBT(provider).getCompound("config").getString(BATTERY_MODE.loc().toString())
+                .equals("charge"),
+            "Charge mode did not serialize as a string", pos);
+
+        var dischargeConfig = new CompoundTag();
+        dischargeConfig.putBoolean(BATTERY_MODE.loc().toString(), true);
+        machine = loadMachineConfig(helper, pos, dischargeConfig);
+        require(helper, machine.config().get(BATTERY_MODE).orElse(null) == BatteryBoxMode.DISCHARGE,
+            "Legacy namespaced true did not migrate to Discharge", pos);
+
+        var legacyAliasConfig = new CompoundTag();
+        legacyAliasConfig.putBoolean("discharge", true);
+        machine = loadMachineConfig(helper, pos, legacyAliasConfig);
+        require(helper, machine.config().get(BATTERY_MODE).orElse(null) == BatteryBoxMode.DISCHARGE,
+            "Legacy discharge alias did not migrate to Discharge", pos);
+        require(helper, machine.serializeNBT(provider).getCompound("config").getString(BATTERY_MODE.loc().toString())
+                .equals("discharge"),
+            "Migrated Discharge mode did not use the existing namespaced key", pos);
+
+        legacyAliasConfig.putBoolean("discharge", false);
+        machine = loadMachineConfig(helper, pos, legacyAliasConfig);
+        require(helper, machine.config().get(BATTERY_MODE).orElse(null) == BatteryBoxMode.BUFFER,
+            "Legacy discharge alias false did not migrate to Buffer", pos);
         helper.succeed();
     }
 

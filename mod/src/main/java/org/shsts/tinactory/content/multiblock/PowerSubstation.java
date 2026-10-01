@@ -12,6 +12,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.multiblock.IMultiblockCheckCtx;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.electric.IBatteryBox;
 import org.shsts.tinactory.core.util.MathUtil;
 import org.shsts.tinactory.integration.multiblock.Multiblock;
@@ -21,9 +22,9 @@ import org.shsts.tinycorelib.api.registrate.entry.IMenuType;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
-import static org.shsts.tinactory.content.electric.BatteryBox.DISCHARGE_DEFAULT;
+import static org.shsts.tinactory.content.electric.BatteryBox.MODE_DEFAULT;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -55,11 +56,11 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
         return AllMenus.BATTERY_BOX;
     }
 
-    private boolean isDischarge() {
+    private BatteryBoxMode mode() {
         if (multiblockInterface == null) {
-            return false;
+            return MODE_DEFAULT;
         }
-        return multiblockInterface.config().get(BATTERY_DISCHARGE).orElse(DISCHARGE_DEFAULT);
+        return multiblockInterface.config().get(BATTERY_MODE).orElse(MODE_DEFAULT);
     }
 
     @Override
@@ -67,15 +68,18 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
 
     @Override
     public void onWorkTick(double partial) {
-        double factor;
-        if (isDischarge()) {
-            factor = -1;
-        } else {
-            factor = getInterface()
-                .flatMap(IMachine::network)
-                .map($ -> $.getComponent(ELECTRIC_COMPONENT.get()).getBufferFactor())
-                .orElse(0d);
-        }
+        var currentMode = mode();
+        var factor = getInterface()
+            .flatMap(IMachine::network)
+            .map($ -> {
+                var electric = $.getComponent(ELECTRIC_COMPONENT.get());
+                return switch (currentMode) {
+                    case BUFFER -> electric.getBufferFactor();
+                    case CHARGE -> electric.getWorkFactor();
+                    case DISCHARGE -> -1d;
+                };
+            })
+            .orElse(0d);
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
             return;
@@ -103,17 +107,24 @@ public class PowerSubstation extends Multiblock implements IBatteryBox,
 
     @Override
     public ElectricMachineType getMachineType() {
-        return isDischarge() ? ElectricMachineType.GENERATOR : ElectricMachineType.BUFFER;
+        return switch (mode()) {
+            case BUFFER -> ElectricMachineType.BUFFER;
+            case CHARGE -> ElectricMachineType.CONSUMER;
+            case DISCHARGE -> ElectricMachineType.GENERATOR;
+        };
     }
 
     @Override
     public double getPowerGen() {
+        if (mode() == BatteryBoxMode.CHARGE) {
+            return 0d;
+        }
         return Math.min(powerLevel(), output);
     }
 
     @Override
     public double getPowerCons() {
-        return isDischarge() ? 0 : Math.min(capacity - powerLevel(), output);
+        return mode() == BatteryBoxMode.DISCHARGE ? 0 : Math.min(capacity - powerLevel(), output);
     }
 
     @Override

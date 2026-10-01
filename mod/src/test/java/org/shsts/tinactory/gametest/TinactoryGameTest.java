@@ -25,6 +25,7 @@ import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.machine.IMachine;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.multiblock.DigitalInterface;
 import org.shsts.tinactory.content.recipe.OreAnalyzerRecipe;
 import org.shsts.tinactory.content.tool.PoweredItem;
@@ -42,7 +43,7 @@ import java.util.Objects;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
 import static org.shsts.tinactory.AllNetworks.LOGISTICS_SUBNET;
@@ -371,7 +372,7 @@ public final class TinactoryGameTest {
         var batteryBoxEntity = helper.getBlockEntity(batteryBoxPos);
         var batteryMachine = MACHINE.get(batteryBoxEntity);
         batteryMachine.config().apply(SetMachineConfigPacket.builder()
-            .set(BATTERY_DISCHARGE, true)
+            .set(BATTERY_MODE, BatteryBoxMode.DISCHARGE)
             .get());
         MENU_ITEM_HANDLER.get(batteryBoxEntity).insertItem(0, batteryStack, false);
         useWithMockPlayer(helper, consumerPos);
