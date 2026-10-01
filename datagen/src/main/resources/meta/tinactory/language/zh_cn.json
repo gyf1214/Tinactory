@@ -984,6 +984,8 @@
     "config.jade.plugin_tinactory.electric": "用电",
     "config.jade.plugin_tinactory.multiblock": "多方块",
     "config.jade.plugin_tinactory.me_craft_cpu": "ME合成CPU",
-    "config.jade.plugin_tinactory.fusion": "聚变"
+    "config.jade.plugin_tinactory.fusion": "聚变",
+    "ftbquests.task.tinactory.technology": "Tinactory科技",
+    "ftbquests.task.tinactory.technology.technology": "科技"
   }
 }

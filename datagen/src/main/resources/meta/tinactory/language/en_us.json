@@ -476,6 +476,8 @@
     "config.jade.plugin_tinactory.electric": "Electric",
     "config.jade.plugin_tinactory.multiblock": "Multiblock",
     "config.jade.plugin_tinactory.me_craft_cpu": "ME Craft CPU",
-    "config.jade.plugin_tinactory.fusion": "Fusion"
+    "config.jade.plugin_tinactory.fusion": "Fusion",
+    "ftbquests.task.tinactory.technology": "Tinactory Technology",
+    "ftbquests.task.tinactory.technology.technology": "Technology"
   }
 }

@@ -88,7 +88,7 @@ public final class TechTask extends Task {
         }
         var max = resolveMaxProgress();
         TechManagers.server().teamByPlayer(player).ifPresent(profile -> {
-            var progress = Math.max(0L, Math.min(profile.getTechProgress(technologyId), max));
+            var progress = Math.clamp(profile.getTechProgress(technologyId), 0L, max);
             if (teamData.getProgress(this) != progress) {
                 teamData.setProgress(this, progress);
             }
@@ -97,7 +97,7 @@ public final class TechTask extends Task {
 
     @Override
     public void onButtonClicked(Button button, boolean clicked) {
-        if (clicked && technologyId != null) {
+        if (technologyId != null) {
             TechTaskJeiLookup.open(technologyId);
         }
     }
