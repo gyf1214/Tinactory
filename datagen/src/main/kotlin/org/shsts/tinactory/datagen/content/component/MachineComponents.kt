@@ -1,8 +1,11 @@
 package org.shsts.tinactory.datagen.content.component
 
+import net.minecraft.world.item.Items
+import net.minecraft.world.level.ItemLike
 import org.shsts.tinactory.AllItems.getComponent
 import org.shsts.tinactory.AllTags.TOOL_WIRE_CUTTER
 import org.shsts.tinactory.core.electric.Voltage
+import org.shsts.tinactory.datagen.content.RegistryHelper.getItem
 import org.shsts.tinactory.datagen.content.Technologies
 import org.shsts.tinactory.datagen.content.builder.AssemblyRecipeFactory
 import org.shsts.tinactory.datagen.content.builder.RecipeFactories.assembler
@@ -17,6 +20,7 @@ object MachineComponents {
         cables()
         components()
         batteries()
+        poweredTools()
         superconductors()
     }
 
@@ -224,6 +228,51 @@ object MachineComponents {
             battery(Voltage.LV, "cadmium", soldering = false)
             battery(Voltage.MV, "sodium_hydroxide")
             battery(Voltage.HV, "lithium")
+        }
+    }
+
+    private fun poweredTools() {
+        poweredToolTier(Voltage.LV, "cobalt_brass", "cadmium", Items.DIAMOND, "buzzsaw/basic")
+        poweredToolTier(Voltage.MV, "aluminium", "sodium_hydroxide", getItem("component/grinder/good"),
+            "buzzsaw/good")
+        poweredToolTier(Voltage.HV, "vanadium_steel", "lithium", getItem("component/grinder/advanced"),
+            "buzzsaw/advanced")
+    }
+
+    private fun poweredToolTier(v: Voltage, material: String, batteryDust: String,
+        drillHead: ItemLike, chainsawHead: String) {
+        val rank = v.rank - 1
+        val batteryCoreCount = rank * rank
+        val cableCount = rank * 2
+        assembler {
+            componentVoltage = v
+            defaults {
+                voltage(v)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.BATTERY, Technologies.MOTOR)
+            }
+            component("drill", voltage = v) {
+                input(material, "plate", 4)
+                input(material, "gear", 2)
+                component("cable", cableCount)
+                component("electric_motor")
+                circuit(1)
+                input("battery_alloy", "plate", batteryCoreCount)
+                input(batteryDust, "dust", batteryCoreCount)
+                input("soldering_alloy", amount = cableCount)
+                input(drillHead)
+            }
+            component("chainsaw", voltage = v) {
+                input(material, "plate", 4)
+                input(material, "gear", 2)
+                component("cable", cableCount)
+                component("electric_motor")
+                circuit(1)
+                input("battery_alloy", "plate", batteryCoreCount)
+                input(batteryDust, "dust", batteryCoreCount)
+                input("soldering_alloy", amount = cableCount)
+                input(getItem("component/$chainsawHead"))
+            }
         }
     }
 

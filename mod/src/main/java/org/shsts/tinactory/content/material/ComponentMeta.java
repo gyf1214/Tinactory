@@ -151,6 +151,7 @@ public class ComponentMeta extends MetaConsumer {
             var id = "tool/" + v.id + "/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredDrillItem(prop, config, areaMiningRadius))
+                .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
                 .register();
@@ -172,6 +173,7 @@ public class ComponentMeta extends MetaConsumer {
             var id = "tool/" + v.id + "/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredChainsawItem(prop, config, maxSearchBlocks))
+                .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
                 .register();

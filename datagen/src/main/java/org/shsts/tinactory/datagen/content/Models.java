@@ -21,7 +21,9 @@ import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.joml.Vector3f;
 import org.shsts.tinactory.content.multiblock.TurbineBlock;
+import org.shsts.tinactory.content.tool.PoweredDrillItem;
 import org.shsts.tinactory.content.tool.PoweredItem;
+import org.shsts.tinactory.content.tool.PoweredToolItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.datagen.content.model.CableModel;
 import org.shsts.tinactory.datagen.content.model.IconSet;
@@ -150,6 +152,15 @@ public final class Models {
                 .model(override)
                 .predicate(modLoc(PoweredItem.ITEM_PROPERTY), (float) (i - 1) / 8f);
         }
+    }
+
+    public static <U extends PoweredToolItem> void poweredToolItem(
+        IEntryDataContext<U, ItemModelProvider> ctx) {
+        var tool = ctx.object();
+        var family = tool instanceof PoweredDrillItem ? "drill" : "chainsaw";
+        ctx.provider().withExistingParent(ctx.id(), "item/generated")
+            .texture("layer0", gregtech("item/tools/power_unit_" + tool.voltage().id))
+            .texture("layer1", gregtech("item/tools/" + family));
     }
 
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> oreBlock(
