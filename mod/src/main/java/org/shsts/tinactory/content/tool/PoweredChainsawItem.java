@@ -2,21 +2,29 @@ package org.shsts.tinactory.content.tool;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -36,6 +44,44 @@ public class PoweredChainsawItem extends PoweredToolItem {
     @Override
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
         return ItemAbilities.DEFAULT_AXE_ACTIONS.contains(itemAbility);
+    }
+
+    @Override
+    protected boolean hasSpecialAbilityContext(BlockState state, BlockPos pos, Player player) {
+        return maxSearchBlocks > 0 && state.is(BlockTags.LOGS);
+    }
+
+    @Override
+    protected void performSpecialAbility(ItemStack stack, Level level, BlockState state, BlockPos pos,
+        ServerPlayer player) {
+        var frontier = new ArrayDeque<BlockPos>();
+        var visited = new HashSet<BlockPos>();
+        var logs = new ArrayList<BlockPos>();
+        frontier.add(pos);
+        visited.add(pos);
+        var matchedBlocks = 1;
+        while (!frontier.isEmpty() && matchedBlocks < maxSearchBlocks) {
+            var current = frontier.removeFirst();
+            for (var direction : Direction.values()) {
+                if (matchedBlocks >= maxSearchBlocks) {
+                    break;
+                }
+                var candidate = current.relative(direction);
+                if (!visited.add(candidate) || !level.hasChunkAt(candidate)) {
+                    continue;
+                }
+                var candidateState = level.getBlockState(candidate);
+                if (candidateState.is(BlockTags.LOGS)) {
+                    matchedBlocks++;
+                    frontier.addLast(candidate);
+                    logs.add(candidate);
+                } else if (candidateState.is(BlockTags.LEAVES)) {
+                    matchedBlocks++;
+                    frontier.addLast(candidate);
+                }
+            }
+        }
+        destroyExtraBlocks(player, logs);
     }
 
     @Override

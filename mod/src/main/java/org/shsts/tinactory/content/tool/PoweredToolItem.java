@@ -74,8 +74,8 @@ public class PoweredToolItem extends PoweredItem {
                 if (player.hasData(AllDataComponents.POWERED_TOOL_BREAK_GUARD.get())) {
                     return true;
                 }
-                var cost = actionCost(stack, state, pos, player);
-                var useSpecialAbility = cost == specialAbilityCost && specialAbilityCost > 0;
+                var useSpecialAbility = shouldUseSpecialAbility(stack, state, pos, player);
+                var cost = useSpecialAbility ? specialAbilityCost : normalUseCost;
                 try {
                     charge(stack, -cost);
                     if (useSpecialAbility) {
@@ -116,10 +116,11 @@ public class PoweredToolItem extends PoweredItem {
     }
 
     private long actionCost(ItemStack stack, BlockState state, BlockPos pos, Player player) {
-        if (specialAbilityCost > 0 && player.isShiftKeyDown() && hasSpecialAbilityContext(state, pos, player) &&
-            getPower(stack) >= specialAbilityCost) {
-            return specialAbilityCost;
-        }
-        return normalUseCost;
+        return shouldUseSpecialAbility(stack, state, pos, player) ? specialAbilityCost : normalUseCost;
+    }
+
+    private boolean shouldUseSpecialAbility(ItemStack stack, BlockState state, BlockPos pos, Player player) {
+        return specialAbilityCost > 0 && player.isShiftKeyDown() && hasSpecialAbilityContext(state, pos, player) &&
+            getPower(stack) >= specialAbilityCost;
     }
 }
