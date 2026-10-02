@@ -50,6 +50,7 @@ object Technologies {
     val ROBOT_ARM: ResourceLocation
 
     // LV
+    val POWERED_TOOLS: ResourceLocation
     val KANTHAL: ResourceLocation
     val SIFTING: ResourceLocation
     val AUTOFARM: ResourceLocation
@@ -194,6 +195,15 @@ object Technologies {
                 displayItem(Circuits.getCircuit("good_integrated").entry())
                 depends(SENSOR_AND_EMITTER, MATERIAL_CUTTING)
             }
+
+            val previousBase = base
+            base = null
+            POWERED_TOOLS = tech("powered_tools") {
+                maxProgress(15)
+                displayItem(getComponent("drill").getValue(Voltage.LV))
+                depends(BATTERY, MATERIAL_CUTTING)
+            }
+            base = previousBase
 
             COLD_WORKING = tech("cold_working") {
                 maxProgress(40)

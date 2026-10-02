@@ -242,7 +242,7 @@ object MachineComponents {
             defaults {
                 voltage(Voltage.HV)
                 workTicks(COMPONENT_TICKS)
-                tech(Technologies.BATTERY, Technologies.MOTOR)
+                tech(Technologies.POWERED_TOOLS)
             }
             component("nano_saber", voltage = Voltage.HV) {
                 input("tungsten_steel", "stick", 2)
@@ -265,7 +265,7 @@ object MachineComponents {
             defaults {
                 voltage(v)
                 workTicks(COMPONENT_TICKS)
-                tech(Technologies.BATTERY, Technologies.MOTOR)
+                tech(Technologies.POWERED_TOOLS)
             }
             component("drill", voltage = v) {
                 input(material, "plate", 4)

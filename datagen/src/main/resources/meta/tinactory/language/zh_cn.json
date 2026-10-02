@@ -922,6 +922,8 @@
     "tinactory.technology.multi_smelter.details": "多功能熔炉可同时处理多种矿石，其高效性可在大规模冶金作业中节省时间、能源和空间。",
     "tinactory.technology.advanced_polymer": "高级聚合物",
     "tinactory.technology.advanced_polymer.details": "高强度合成材料，专为极致耐用性和柔韧性而设计，是先进建筑、防护装备和高性能机械的必备材料。",
+    "tinactory.technology.powered_tools": "动力工具",
+    "tinactory.technology.powered_tools.details": "电池供能设备将储存的能量转化为便携动力，可用于钻孔、切割和近身作战，让动力机械不再局限于工厂设备。",
     "tinactory.technology.autocrafting": "自动合成",
     "tinactory.technology.autocrafting.details": "解锁ME样板存储、样板编辑、合成请求和合成CPU，让网络能够执行已存储的配方。",
     "tinactory.technology.carbon_fiber": "碳纤维",

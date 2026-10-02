@@ -434,6 +434,8 @@
     "tinactory.technology.multi_smelter.details": "An industrial furnace capable of processing multiple ores simultaneously. Its efficiency saves time, energy, and space in large-scale metallurgical operations.",
     "tinactory.technology.large_turbine.details": "A heavy-duty power unit that channels high-pressure steam through multi-stage blades to generate rotational energy. Engineered for stability and throughput, it delivers strong, continuous mechanical power for industrial energy grids.",
     "tinactory.technology.advanced_polymer.details": "High-strength synthetic materials designed for extreme durability and flexibility. They’re essential for advanced construction, protective gear, and high-performance machinery.",
+    "tinactory.technology.powered_tools": "Powered Tools",
+    "tinactory.technology.powered_tools.details": "Battery-powered equipment turns stored energy into portable force for drilling, cutting, and close combat, bringing powered machinery beyond the factory floor.",
     "tinactory.technology.autocrafting": "Autocrafting",
     "tinactory.technology.autocrafting.details": "Adds ME pattern storage, pattern editing, craft requests, and Craft CPUs so stored recipes can be executed by the network.",
     "tinactory.technology.carbon_fiber.details": "An ultra-light yet incredibly strong composite made from tightly bound carbon strands. It’s ideal for aerospace structures, advanced vehicles, and high-efficiency machinery where strength-to-weight ratio is critical.",
