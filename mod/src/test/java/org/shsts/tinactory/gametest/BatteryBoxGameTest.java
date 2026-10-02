@@ -59,7 +59,7 @@ public final class BatteryBoxGameTest {
         helper.succeed();
     }
 
-    @GameTest(timeoutTicks = 100)
+    @GameTest
     public static void testChargeModeConsumesPowerAndChargesSlotsInParallel(GameTestHelper helper) {
         var sourcePos = new BlockPos(1, 1, 1);
         var cablePos = sourcePos.east();

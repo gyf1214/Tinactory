@@ -60,8 +60,6 @@ public record Texture(ResourceLocation loc, int width, int height) {
         modLoc("gui/recipe_book_button"), 42, 21);
     public static final Texture CRAFTING_ARROW = new Texture(
         modLoc("gui/arrow_crafting"), 22, 15);
-    public static final Texture LOCK_BUTTON = new Texture(
-        gregtech("gui/widget/button_public_private"), 18, 36);
     public static final Texture ALLOW_ARROW_BUTTON = new Texture(
         gregtech("gui/widget/button_allow_import_export"), 20, 40);
     public static final Texture VOID_BUTTON = new Texture(

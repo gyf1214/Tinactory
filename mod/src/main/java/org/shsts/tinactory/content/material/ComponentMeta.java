@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.SoundType;
 import org.shsts.tinactory.content.logistics.MENetworkBridge;
@@ -24,7 +23,6 @@ import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
 import org.shsts.tinactory.integration.common.CellItem;
-import org.shsts.tinactory.integration.material.MaterialSet;
 import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinycorelib.api.registrate.entry.IEntry;
 import org.slf4j.Logger;
@@ -146,8 +144,8 @@ public class ComponentMeta extends MetaConsumer {
         for (var entry : parseVoltageConfig(jo, "items")) {
             var v = entry.voltage();
             var jo1 = entry.jo();
-            var areaMiningRadius = getNonNegativeInt(jo1, "areaMiningRadius");
-            var config = poweredToolConfig(entry, areaMiningRadius);
+            var areaMiningRadius = GsonHelper.getAsInt(jo1, "areaMiningRadius");
+            var config = poweredToolConfig(entry);
             var id = "tool/" + v.id + "/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredDrillItem(prop, config, areaMiningRadius))
@@ -165,11 +163,8 @@ public class ComponentMeta extends MetaConsumer {
         for (var entry : parseVoltageConfig(jo, "items")) {
             var v = entry.voltage();
             var jo1 = entry.jo();
-            var maxSearchBlocks = getNonNegativeInt(jo1, "maxSearchBlocks");
-            if (maxSearchBlocks == 1) {
-                throw new JsonSyntaxException("maxSearchBlocks must be zero or at least two");
-            }
-            var config = poweredToolConfig(entry, maxSearchBlocks);
+            var maxSearchBlocks = GsonHelper.getAsInt(jo1, "maxSearchBlocks");
+            var config = poweredToolConfig(entry);
             var id = "tool/" + v.id + "/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredChainsawItem(prop, config, maxSearchBlocks))
@@ -182,59 +177,15 @@ public class ComponentMeta extends MetaConsumer {
         COMPONENTS.put(name, components);
     }
 
-    private PoweredToolConfig poweredToolConfig(VoltageWithConfig entry, int abilityLimit) {
+    private PoweredToolConfig poweredToolConfig(VoltageWithConfig entry) {
         var jo = entry.jo();
-        var capacity = getIntegralLong(jo, "capacity");
-        var normalUseCost = getIntegralLong(jo, "normalUseCost");
-        var specialAbilityCost = abilityLimit == 0 ? 0 : getIntegralLong(jo, "specialAbilityCost");
-        if (capacity <= 0) {
-            throw new JsonSyntaxException("capacity must be positive");
-        }
-        if (normalUseCost <= 0 || normalUseCost > capacity) {
-            throw new JsonSyntaxException("normalUseCost must be positive and no greater than capacity");
-        }
-        if (abilityLimit > 0 && (specialAbilityCost <= 0 || specialAbilityCost > capacity)) {
-            throw new JsonSyntaxException("specialAbilityCost must be positive and no greater than capacity");
-        }
-
-        var miningSpeed = GsonHelper.getAsDouble(jo, "miningSpeed");
-        if (!Double.isFinite(miningSpeed) || miningSpeed <= 0 || miningSpeed > Float.MAX_VALUE) {
-            throw new JsonSyntaxException("miningSpeed must be a positive finite number");
-        }
-        var tierName = GsonHelper.getAsString(jo, "harvestTier").toUpperCase(Locale.ROOT);
-        Tier harvestTier;
-        try {
-            harvestTier = Tiers.valueOf(tierName);
-        } catch (IllegalArgumentException e) {
-            throw new JsonSyntaxException("Unknown harvestTier " + tierName, e);
-        }
-        var materialName = GsonHelper.getAsString(jo, "material");
-        MaterialSet material = getMaterial(materialName);
-        if (material == null) {
-            throw new JsonSyntaxException("Unknown material " + materialName);
-        }
-        return new PoweredToolConfig(entry.voltage(), capacity, normalUseCost, specialAbilityCost,
-            (float) miningSpeed, harvestTier, material);
-    }
-
-    private static int getNonNegativeInt(JsonObject jo, String field) {
-        var value = getIntegralLong(jo, field);
-        if (value < 0 || value > Integer.MAX_VALUE) {
-            throw new JsonSyntaxException(field + " must be a nonnegative integer");
-        }
-        return (int) value;
-    }
-
-    private static long getIntegralLong(JsonObject jo, String field) {
-        var value = jo.get(field);
-        if (value == null || !value.isJsonPrimitive() || !value.getAsJsonPrimitive().isNumber()) {
-            throw new JsonSyntaxException("Expected integer field " + field);
-        }
-        try {
-            return value.getAsBigDecimal().longValueExact();
-        } catch (ArithmeticException | NumberFormatException e) {
-            throw new JsonSyntaxException(field + " must be an integer in long range", e);
-        }
+        return new PoweredToolConfig(entry.voltage(),
+            GsonHelper.getAsLong(jo, "capacity"),
+            GsonHelper.getAsLong(jo, "normalUseCost"),
+            GsonHelper.getAsLong(jo, "specialAbilityCost", 0),
+            GsonHelper.getAsFloat(jo, "miningSpeed"),
+            Tiers.valueOf(GsonHelper.getAsString(jo, "harvestTier").toUpperCase(Locale.ROOT)),
+            getMaterial(GsonHelper.getAsString(jo, "material")));
     }
 
     private void buildCables(String name, JsonObject jo) {
