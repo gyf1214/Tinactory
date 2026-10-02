@@ -164,6 +164,11 @@ public final class Models {
             .texture("layer1", gregtech("item/tools/" + family));
     }
 
+    public static <U extends Item> void nanoSaberItem(IEntryDataContext<U, ItemModelProvider> ctx) {
+        ctx.provider().withExistingParent(ctx.id(), "item/generated")
+            .texture("layer0", gregtech("item/metaitems/nano_saber/active"));
+    }
+
     public static <U extends Block> Consumer<IEntryDataContext<U, BlockStateProvider>> oreBlock(
         OreVariant variant) {
         return ctx -> {

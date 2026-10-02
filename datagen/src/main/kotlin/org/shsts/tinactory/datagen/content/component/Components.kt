@@ -85,6 +85,10 @@ object Components {
                 item(entry) { model(Models::poweredToolItem) }
             }
 
+            for (entry in componentEntry<Item>("nano_saber").values) {
+                item(entry) { model(Models::nanoSaberItem) }
+            }
+
             for ((v, entry) in componentEntry<Item>("machine_hull")) {
                 item(entry) { model(machineItem(v, IO_TEX)) }
             }

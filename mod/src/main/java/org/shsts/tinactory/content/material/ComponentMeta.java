@@ -19,6 +19,8 @@ import org.shsts.tinactory.content.tool.PoweredChainsawItem;
 import org.shsts.tinactory.content.tool.PoweredDrillItem;
 import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.content.tool.PoweredToolConfig;
+import org.shsts.tinactory.content.tool.PoweredWeaponConfig;
+import org.shsts.tinactory.content.tool.PoweredWeaponItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
@@ -177,6 +179,26 @@ public class ComponentMeta extends MetaConsumer {
         COMPONENTS.put(name, components);
     }
 
+    private void buildPoweredWeapons(String name, JsonObject jo) {
+        var components = new HashMap<Voltage, IEntry<PoweredWeaponItem>>();
+        for (var entry : parseVoltageConfig(jo, "items")) {
+            var v = entry.voltage();
+            var jo1 = entry.jo();
+            var config = new PoweredWeaponConfig(v,
+                GsonHelper.getAsLong(jo1, "capacity"),
+                GsonHelper.getAsLong(jo1, "hitCost"),
+                GsonHelper.getAsDouble(jo1, "attackDamage"),
+                GsonHelper.getAsDouble(jo1, "attackSpeed"));
+            var id = "tool/" + v.id + "/" + name;
+            var item = REGISTRATE.item(id, prop -> new PoweredWeaponItem(prop, config))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .register();
+            components.put(v, item);
+        }
+        COMPONENTS.put(name, components);
+    }
+
     private PoweredToolConfig poweredToolConfig(VoltageWithConfig entry) {
         var jo = entry.jo();
         return new PoweredToolConfig(entry.voltage(),
@@ -293,6 +315,7 @@ public class ComponentMeta extends MetaConsumer {
             case "battery" -> buildBatteries(name, jo);
             case "powered_drill" -> buildPoweredDrills(name, jo);
             case "powered_chainsaw" -> buildPoweredChainsaws(name, jo);
+            case "powered_weapon" -> buildPoweredWeapons(name, jo);
             case "cable" -> buildCables(name, jo);
             case "subnet" -> buildSubnets(name, jo);
             case "network_bridge" -> buildNetworkBridge(name, jo);

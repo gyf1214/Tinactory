@@ -237,6 +237,22 @@ object MachineComponents {
             "buzzsaw/good")
         poweredToolTier(Voltage.HV, "vanadium_steel", "lithium", getItem("component/grinder/advanced"),
             "buzzsaw/advanced")
+        assembler {
+            componentVoltage = Voltage.HV
+            defaults {
+                voltage(Voltage.HV)
+                workTicks(COMPONENT_TICKS)
+                tech(Technologies.BATTERY, Technologies.MOTOR)
+            }
+            component("nano_saber", voltage = Voltage.HV) {
+                input("tungsten_steel", "stick", 2)
+                input(getItem("component/energy_crystal"), 3)
+                input(getItem("component/advanced_alloy"), 2)
+                input(getItem("component/carbon_plate"), 2)
+                circuit(1, Voltage.EV)
+                component("emitter", 2, Voltage.HV)
+            }
+        }
     }
 
     private fun poweredToolTier(v: Voltage, material: String, batteryDust: String,
