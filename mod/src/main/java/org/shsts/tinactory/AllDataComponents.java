@@ -48,9 +48,11 @@ public final class AllDataComponents {
         component("me_pattern_cell_content", PATTERN_CELL_CODEC);
     public static final IEntry<DataComponentType<Long>> BATTERY = component("battery", Codec.LONG);
     public static final IEntry<DataComponentType<Long>> REACTIONS = component("reaction", Codec.LONG);
-    public static final IEntry<DataComponentType<Boolean>> HIDE_BAR = component("hide_bar", Codec.BOOL);
+    public static final IEntry<DataComponentType<Unit>> HIDE_BAR = component("hide_bar", Unit.CODEC);
     public static final IEntry<DataComponentType<UUID>> UUID =
         component("uuid", UUIDUtil.CODEC, UUIDUtil.STREAM_CODEC);
+    public static final IEntry<DataComponentType<Unit>> POWERED_ACTIVATED =
+        component("powered_activated", Unit.CODEC);
     public static final IEntry<AttachmentType<Direction>> DRILL_HIT_FACE =
         attachment("drill_hit_face", () -> AttachmentType.builder(() -> Direction.UP).build());
     public static final IEntry<AttachmentType<Unit>> POWERED_TOOL_BREAK_GUARD =

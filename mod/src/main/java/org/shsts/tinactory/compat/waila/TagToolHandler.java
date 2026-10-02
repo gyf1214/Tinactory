@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +34,7 @@ public class TagToolHandler implements ToolHandler {
 
     private ItemStack getItem() {
         var ret = new ItemStack(item.get());
-        ret.set(HIDE_BAR, true);
+        ret.set(HIDE_BAR, Unit.INSTANCE);
         return ret;
     }
 

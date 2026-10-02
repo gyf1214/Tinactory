@@ -3,22 +3,30 @@ package org.shsts.tinactory.content.tool;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.shsts.tinactory.AllDataComponents;
 import org.shsts.tinactory.integration.material.MaterialSet;
 
 import java.util.List;
 
+import static org.shsts.tinactory.AllDataComponents.POWERED_ACTIVATED;
+import static org.shsts.tinactory.AllDataComponents.POWERED_TOOL_BREAK_GUARD;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class PoweredToolItem extends PoweredItem {
+public abstract class PoweredToolItem extends PoweredItem {
     private final long normalUseCost;
     private final long specialAbilityCost;
     private final float miningSpeed;
@@ -55,23 +63,23 @@ public class PoweredToolItem extends PoweredItem {
     }
 
     @Override
-    public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
+    public boolean canAttackBlock(BlockState state, Level world, BlockPos pos, Player player) {
         var stack = player.getMainHandItem();
         if (stack.getItem() != this) {
             return false;
         }
-        if (player.hasData(AllDataComponents.POWERED_TOOL_BREAK_GUARD.get())) {
+        if (player.hasData(POWERED_TOOL_BREAK_GUARD)) {
             return true;
         }
         return getPower(stack) >= actionCost(stack, state, pos, player);
     }
 
     @Override
-    public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos,
+    public boolean mineBlock(ItemStack stack, Level world, BlockState state, BlockPos pos,
         LivingEntity entity) {
-        if (!level.isClientSide) {
+        if (!world.isClientSide) {
             if (entity instanceof ServerPlayer player) {
-                if (player.hasData(AllDataComponents.POWERED_TOOL_BREAK_GUARD.get())) {
+                if (player.hasData(POWERED_TOOL_BREAK_GUARD)) {
                     return true;
                 }
                 var useSpecialAbility = shouldUseSpecialAbility(stack, state, pos, player);
@@ -79,7 +87,7 @@ public class PoweredToolItem extends PoweredItem {
                 try {
                     charge(stack, -cost);
                     if (useSpecialAbility) {
-                        performSpecialAbility(stack, level, state, pos, player);
+                        performSpecialAbility(stack, world, state, pos, player);
                     }
                 } finally {
                     breakAttemptFinished(player);
@@ -91,12 +99,10 @@ public class PoweredToolItem extends PoweredItem {
         return true;
     }
 
-    protected boolean hasSpecialAbilityContext(BlockState state, BlockPos pos, Player player) {
-        return false;
-    }
+    protected abstract boolean hasSpecialAbilityContext(BlockState state, BlockPos pos, Player player);
 
-    protected void performSpecialAbility(ItemStack stack, Level level, BlockState state, BlockPos pos,
-        ServerPlayer player) {}
+    protected abstract void performSpecialAbility(ItemStack stack, Level world, BlockState state,
+        BlockPos pos, ServerPlayer player);
 
     protected void breakAttemptFinished(ServerPlayer player) {}
 
@@ -104,7 +110,7 @@ public class PoweredToolItem extends PoweredItem {
         if (positions.isEmpty()) {
             return;
         }
-        var guard = AllDataComponents.POWERED_TOOL_BREAK_GUARD.get();
+        var guard = POWERED_TOOL_BREAK_GUARD.get();
         player.setData(guard, Unit.INSTANCE);
         try {
             for (var pos : positions) {
@@ -119,8 +125,41 @@ public class PoweredToolItem extends PoweredItem {
         return shouldUseSpecialAbility(stack, state, pos, player) ? specialAbilityCost : normalUseCost;
     }
 
+    protected boolean specialAbilityActivated(ItemStack stack) {
+        return specialAbilityCost > 0 && stack.has(POWERED_ACTIVATED);
+    }
+
     private boolean shouldUseSpecialAbility(ItemStack stack, BlockState state, BlockPos pos, Player player) {
-        return specialAbilityCost > 0 && player.isShiftKeyDown() && hasSpecialAbilityContext(state, pos, player) &&
+        return specialAbilityActivated(stack) && hasSpecialAbilityContext(state, pos, player) &&
             getPower(stack) >= specialAbilityCost;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand usedHand) {
+        var stack = player.getItemInHand(usedHand);
+        if (specialAbilityCost <= 0) {
+            return InteractionResultHolder.pass(stack);
+        }
+        if (!world.isClientSide) {
+            if (stack.has(POWERED_ACTIVATED)) {
+                stack.remove(POWERED_ACTIVATED);
+            } else {
+                stack.set(POWERED_ACTIVATED, Unit.INSTANCE);
+            }
+        }
+        return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
+        TooltipFlag flag) {
+        if (specialAbilityActivated(stack)) {
+            var usages = Math.floorDiv(getPower(stack), specialAbilityCost);
+            addTooltip(tooltip, "powered_activated", NUMBER_FORMAT.format(usages));
+        } else if (normalUseCost > 0) {
+            var usages = Math.floorDiv(getPower(stack), normalUseCost);
+            addTooltip(tooltip, "powered", NUMBER_FORMAT.format(usages));
+        }
+        super.appendHoverText(stack, context, tooltip, flag);
     }
 }

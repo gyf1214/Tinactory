@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -15,10 +16,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
-import org.shsts.tinactory.AllDataComponents;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.shsts.tinactory.AllDataComponents.DRILL_HIT_FACE;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -41,14 +43,13 @@ public class PoweredDrillItem extends PoweredToolItem {
 
     @Override
     protected boolean hasSpecialAbilityContext(BlockState state, BlockPos pos, Player player) {
-        return areaMiningRadius > 0 &&
-            player.getExistingDataOrNull(AllDataComponents.DRILL_HIT_FACE.get()) != null;
+        return areaMiningRadius > 0 && player.hasData(DRILL_HIT_FACE);
     }
 
     @Override
-    protected void performSpecialAbility(ItemStack stack, Level level, BlockState state, BlockPos pos,
+    protected void performSpecialAbility(ItemStack stack, Level world, BlockState state, BlockPos pos,
         ServerPlayer player) {
-        var face = player.getExistingDataOrNull(AllDataComponents.DRILL_HIT_FACE.get());
+        var face = player.getExistingDataOrNull(DRILL_HIT_FACE.get());
         if (face == null) {
             return;
         }
@@ -67,10 +68,11 @@ public class PoweredDrillItem extends PoweredToolItem {
                     continue;
                 }
                 var target = pos.relative(planeA, x).relative(planeB, y);
-                if (!level.hasChunkAt(target)) {
+                if (!world.hasChunk(SectionPos.blockToSectionCoord(target.getX()),
+                    SectionPos.blockToSectionCoord(target.getZ()))) {
                     continue;
                 }
-                var targetState = level.getBlockState(target);
+                var targetState = world.getBlockState(target);
                 if (targetState.is(BlockTags.MINEABLE_WITH_PICKAXE) ||
                     targetState.is(BlockTags.MINEABLE_WITH_SHOVEL)) {
                     candidates.add(target);
@@ -82,7 +84,7 @@ public class PoweredDrillItem extends PoweredToolItem {
 
     @Override
     protected void breakAttemptFinished(ServerPlayer player) {
-        player.removeData(AllDataComponents.DRILL_HIT_FACE.get());
+        player.removeData(DRILL_HIT_FACE.get());
     }
 
     private static Tool tool(PoweredToolConfig config) {

@@ -4,6 +4,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -52,7 +53,7 @@ public class PoweredChainsawItem extends PoweredToolItem {
     }
 
     @Override
-    protected void performSpecialAbility(ItemStack stack, Level level, BlockState state, BlockPos pos,
+    protected void performSpecialAbility(ItemStack stack, Level world, BlockState state, BlockPos pos,
         ServerPlayer player) {
         var frontier = new ArrayDeque<BlockPos>();
         var visited = new HashSet<BlockPos>();
@@ -67,10 +68,11 @@ public class PoweredChainsawItem extends PoweredToolItem {
                     break;
                 }
                 var candidate = current.relative(direction);
-                if (!visited.add(candidate) || !level.hasChunkAt(candidate)) {
+                if (!visited.add(candidate) || !world.hasChunk(SectionPos.blockToSectionCoord(candidate.getX()),
+                    SectionPos.blockToSectionCoord(candidate.getZ()))) {
                     continue;
                 }
-                var candidateState = level.getBlockState(candidate);
+                var candidateState = world.getBlockState(candidate);
                 if (candidateState.is(BlockTags.LOGS)) {
                     matchedBlocks++;
                     frontier.addLast(candidate);
