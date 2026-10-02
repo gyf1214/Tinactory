@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -35,6 +36,8 @@ import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.shsts.tinactory.AllDataComponents.POWERED_ACTIVATED;
 
 @GameTestHolder(TinactoryKeys.ID)
 public final class PoweredToolGameTest {
@@ -169,7 +172,7 @@ public final class PoweredToolGameTest {
 
         if (!player.gameMode.destroyBlock(helper.absolutePos(pos)) || !helper.getBlockState(pos).isAir() ||
             tool.getPower(player.getMainHandItem()) != 0) {
-            helper.fail("Sneaking drill activation without extra targets did not charge once", pos);
+            helper.fail("Activated drill without extra targets did not charge once", pos);
             return;
         }
         helper.succeed();
@@ -334,7 +337,7 @@ public final class PoweredToolGameTest {
 
         if (!player.gameMode.destroyBlock(helper.absolutePos(pos)) || !helper.getBlockState(pos).isAir() ||
             tool.getPower(player.getMainHandItem()) != 0) {
-            helper.fail("Sneaking chainsaw activation without connected extra logs did not charge once", pos);
+            helper.fail("Activated chainsaw without connected extra logs did not charge once", pos);
             return;
         }
         helper.succeed();
@@ -508,14 +511,16 @@ public final class PoweredToolGameTest {
     }
 
     private static ServerPlayer player(GameTestHelper helper, PoweredToolItem tool, long charge,
-        boolean sneaking, BlockPos pos) {
+        boolean specialAbilityActivated, BlockPos pos) {
         var player = FakePlayerFactory.getMinecraft(helper.getLevel());
         player.setGameMode(GameType.SURVIVAL);
         var absolutePos = helper.absolutePos(pos);
         player.setPos(absolutePos.getX() + 0.5, absolutePos.getY() + 0.5, absolutePos.getZ() + 0.5);
-        player.setShiftKeyDown(sneaking);
         var stack = new ItemStack(tool);
         tool.setPower(stack, charge);
+        if (specialAbilityActivated) {
+            stack.set(POWERED_ACTIVATED, Unit.INSTANCE);
+        }
         player.setItemInHand(InteractionHand.MAIN_HAND, stack);
         return player;
     }
