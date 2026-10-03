@@ -38,3 +38,9 @@ type = "required"
 versionRange = "[1.3.6,)"
 ordering = "NONE"
 side = "CLIENT"
+
+[[dependencies.tinactory]]
+modId = "ftbfiltersystem"
+type = "optional"
+ordering = "AFTER"
+side = "BOTH"
