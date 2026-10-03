@@ -25,14 +25,11 @@ class LayoutTest {
         var imageTexture = new Texture(modLoc("gui/layout_image"), 20, 10);
         var progressTexture = new Texture(modLoc("gui/layout_progress"), 8, 80);
         var layout = Layout.builder()
-            .port(SlotType.ITEM_INPUT)
-            .slot(10, 20)
-            .slot(28, 20)
-            .port(SlotType.ITEM_INPUT)
-            .slot(10, 50)
-            .port(SlotType.ITEM_OUTPUT)
-            .slot(90, 20)
-            .slot(108, 20)
+            .slot(0, SlotType.ITEM_INPUT, 10, 20)
+            .slot(0, SlotType.ITEM_INPUT, 28, 20)
+            .slot(1, SlotType.ITEM_INPUT, 10, 50)
+            .slot(2, SlotType.ITEM_OUTPUT, 90, 20)
+            .slot(2, SlotType.ITEM_OUTPUT, 108, 20)
             .image(new Rect(120, 4, 20, 10), imageTexture)
             .progressBar(new Rect(140, 50, 8, 40), progressTexture, ProgressDirection.HORIZONTAL)
             .buildLayout();

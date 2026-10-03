@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.shsts.tinactory.core.gui.Menu.SLOT_SIZE;
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, LayoutSetBuilder<P>> {
@@ -23,8 +21,6 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
 
     private final List<Layout.WidgetInfo> images = new ArrayList<>();
     private final List<SlotAndVoltages> slots = new ArrayList<>();
-    private SlotType curSlotType = SlotType.NONE;
-    private int curPort = -1;
     private int curSlot = 0;
     @Nullable
     private Layout.ProgressBarInfo progressBar = null;
@@ -39,56 +35,14 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
         return this;
     }
 
-    public LayoutSetBuilder<P> port(SlotType type) {
-        curPort++;
-        curSlotType = type;
-        return this;
-    }
-
     public LayoutSetBuilder<P> slot(int port, SlotType type, int x, int y, Collection<Voltage> voltages) {
         var slot = new Layout.SlotInfo(curSlot++, x, y, port, type);
         slots.add(new SlotAndVoltages(slot, voltages));
         return this;
     }
 
-    public LayoutSetBuilder<P> slot(int x, int y, Collection<Voltage> voltages) {
-        assert curPort >= 0;
-        var slot = new Layout.SlotInfo(curSlot++, x, y, curPort, curSlotType);
-        slots.add(new SlotAndVoltages(slot, voltages));
-        return this;
-    }
-
-    public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage) {
-        return slot(x, y, Voltage.between(fromVoltage, Voltage.MAX));
-    }
-
-    public LayoutSetBuilder<P> slot(int x, int y, Voltage fromVoltage, Voltage toVoltage) {
-        return slot(x, y, Voltage.between(fromVoltage, toVoltage));
-    }
-
-    public LayoutSetBuilder<P> slot(int x, int y) {
-        return slot(x, y, Arrays.asList(Voltage.values()));
-    }
-
-    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Collection<Voltage> voltages) {
-        for (var i = 0; i < rows; i++) {
-            for (var j = 0; j < columns; j++) {
-                slot(x + j * SLOT_SIZE, y + i * SLOT_SIZE, voltages);
-            }
-        }
-        return this;
-    }
-
-    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns) {
-        return slots(x, y, rows, columns, Arrays.asList(Voltage.values()));
-    }
-
-    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from) {
-        return slots(x, y, rows, columns, Voltage.between(from, Voltage.MAX));
-    }
-
-    public LayoutSetBuilder<P> slots(int x, int y, int rows, int columns, Voltage from, Voltage to) {
-        return slots(x, y, rows, columns, Voltage.between(from, to));
+    public LayoutSetBuilder<P> slot(int port, SlotType type, int x, int y) {
+        return slot(port, type, x, y, Arrays.asList(Voltage.values()));
     }
 
     public LayoutSetBuilder<P> image(Rect rect, Texture tex) {
