@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.shsts.tinactory.AllDataComponents.DRILL_HIT_FACE;
+import static org.shsts.tinactory.integration.util.ClientUtil.NUMBER_FORMAT;
+import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -85,6 +88,13 @@ public class PoweredDrillItem extends PoweredToolItem {
     @Override
     protected void breakAttemptFinished(ServerPlayer player) {
         player.removeData(DRILL_HIT_FACE.get());
+    }
+
+    @Override
+    protected void appendSpecialAbilityText(ItemStack stack, List<Component> tooltip) {
+        super.appendSpecialAbilityText(stack, tooltip);
+        var area = NUMBER_FORMAT.format(2L * areaMiningRadius + 1L);
+        addTooltip(tooltip, "powered_drill", area, area);
     }
 
     private static Tool tool(Config config) {

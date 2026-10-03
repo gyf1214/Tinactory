@@ -154,12 +154,16 @@ public abstract class PoweredToolItem extends PoweredItem {
         return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
     }
 
+    protected void appendSpecialAbilityText(ItemStack stack, List<Component> tooltip) {
+        var usages = Math.floorDiv(getPower(stack), specialAbilityCost);
+        addTooltip(tooltip, "powered_activated", NUMBER_FORMAT.format(usages));
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip,
         TooltipFlag flag) {
         if (specialAbilityActivated(stack)) {
-            var usages = Math.floorDiv(getPower(stack), specialAbilityCost);
-            addTooltip(tooltip, "powered_activated", NUMBER_FORMAT.format(usages));
+            appendSpecialAbilityText(stack, tooltip);
         } else if (normalUseCost > 0) {
             var usages = Math.floorDiv(getPower(stack), normalUseCost);
             addTooltip(tooltip, "powered", NUMBER_FORMAT.format(usages));

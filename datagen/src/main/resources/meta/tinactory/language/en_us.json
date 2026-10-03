@@ -294,6 +294,7 @@
     "tinactory.tooltip.openFilterPanel": "Show filters",
     "tinactory.tooltip.powered": "%s Uses",
     "tinactory.tooltip.powered_activated": "%s Uses (Special Ability)",
+    "tinactory.tooltip.powered_drill": "Mining Range: %s × %s",
     "tinactory.gui.techMenu.title": "Technologies",
     "tinactory.gui.techMenu.welcome": "Join an FTB Teams party to start playing Tinactory!",
     "tinactory.gui.techMenu.currentTechLabel": "Current Research",
