@@ -270,13 +270,14 @@ public final class MachineProcessingGameTest {
             helper.fail("Untargeted Ore Analyzer retained the targeted input filter", MACHINE_POS);
             return;
         }
-        insertInput(machine, 0, cobblestone);
+        insertInput(machine, 0, new ItemStack(Items.AMETHYST_SHARD));
 
         helper.runAfterDelay(80, () -> {
-            var output = machine.container().orElseThrow().getPort(1, ContainerAccess.INTERNAL).asItem();
-            var outputAmount = output.getAllStorages().stream().mapToLong(ItemStack::getCount).sum();
-            if (amount(machine, 0, Items.COBBLESTONE) != 0 || outputAmount != 1) {
-                helper.fail("Untargeted Ore Analyzer did not produce a valid cobblestone result", MACHINE_POS);
+            var inputAmount = amount(machine, 0, Items.AMETHYST_SHARD);
+            var outputAmount = amount(machine, 1, Items.DIAMOND);
+            if (inputAmount != 0 || outputAmount != 1) {
+                helper.fail("Untargeted Ore Analyzer did not produce the guaranteed amethyst result: input=" +
+                    inputAmount + ", output=" + outputAmount, MACHINE_POS);
                 return;
             }
             helper.succeed();
