@@ -24,6 +24,8 @@ import org.shsts.tinactory.core.electric.Voltage;
 @GameTestHolder(TinactoryKeys.ID)
 public final class PoweredWeaponGameTest {
     private static final long HIT_COST = 4096L;
+    private static final double ATTACK_DAMAGE = 50.0d;
+    private static final float TARGET_MAX_HEALTH = 100.0f;
 
     @GameTest(template = "empty_8x8x8", timeoutTicks = 80)
     public static void testLivingHitDealsConfiguredDamageAndConsumesOneHit(GameTestHelper helper) {
@@ -39,12 +41,13 @@ public final class PoweredWeaponGameTest {
             player.setOnGround(true);
             target.setHealth(target.getMaxHealth());
             player.attack(target);
-            if (Math.abs(player.getAttributeValue(Attributes.ATTACK_DAMAGE) - 24.0d) > 0.001d ||
+            if (Math.abs(player.getAttributeValue(Attributes.ATTACK_DAMAGE) - ATTACK_DAMAGE) > 0.001d ||
                 Math.abs(player.getAttributeValue(Attributes.ATTACK_SPEED) - 1.6d) > 0.001d) {
-                helper.fail("Nano Saber did not apply 24 damage and 1.6 attack speed");
+                helper.fail("Nano Saber did not apply 50 damage and 1.6 attack speed");
                 return;
             }
-            if (Math.abs(target.getHealth() - 16.0f) > 0.001f || power(saber, stack) != 0L) {
+            if (Math.abs(target.getHealth() - (TARGET_MAX_HEALTH - (float) ATTACK_DAMAGE)) > 0.001f ||
+                power(saber, stack) != 0L) {
                 helper.fail("Accepted hit result was health=" + target.getHealth() + ", damage=" +
                     (target.getMaxHealth() - target.getHealth()) + ", charge=" + power(saber, stack) +
                     ", cooldown=" + player.getAttackStrengthScale(0.5f));
@@ -176,8 +179,10 @@ public final class PoweredWeaponGameTest {
                     cooled.setHealth(cooled.getMaxHealth());
                     player.attack(cooled);
                     var cooledDamage = cooled.getMaxHealth() - cooled.getHealth();
-                    if (firstDamage < 23.9f || earlyDamage <= 0f || earlyDamage >= 23.9f ||
-                        cooledDamage < 23.9f || power(saber, player.getMainHandItem()) != 0L) {
+                    if (Math.abs(firstDamage - ATTACK_DAMAGE) > 0.001d || earlyDamage <= 0f ||
+                        earlyDamage >= ATTACK_DAMAGE - 0.1d ||
+                        Math.abs(cooledDamage - ATTACK_DAMAGE) > 0.001d ||
+                        power(saber, player.getMainHandItem()) != 0L) {
                         helper.fail("Nano Saber damage did not recover over the 13-tick 1.6-speed cooldown");
                         return;
                     }
@@ -215,8 +220,8 @@ public final class PoweredWeaponGameTest {
         }
         target.setNoAi(true);
         target.setSilent(true);
-        target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(40.0d);
-        target.setHealth(40.0f);
+        target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(TARGET_MAX_HEALTH);
+        target.setHealth(TARGET_MAX_HEALTH);
         place(helper, target, pos);
         return target;
     }
