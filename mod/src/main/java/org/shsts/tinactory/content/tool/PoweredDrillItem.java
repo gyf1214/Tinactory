@@ -27,7 +27,7 @@ import static org.shsts.tinactory.AllDataComponents.DRILL_HIT_FACE;
 public class PoweredDrillItem extends PoweredToolItem {
     private final int areaMiningRadius;
 
-    public PoweredDrillItem(Item.Properties properties, PoweredToolConfig config, int areaMiningRadius) {
+    public PoweredDrillItem(Item.Properties properties, Config config, int areaMiningRadius) {
         super(properties.component(DataComponents.TOOL, tool(config)), config);
         this.areaMiningRadius = areaMiningRadius;
     }
@@ -87,7 +87,7 @@ public class PoweredDrillItem extends PoweredToolItem {
         player.removeData(DRILL_HIT_FACE.get());
     }
 
-    private static Tool tool(PoweredToolConfig config) {
+    private static Tool tool(Config config) {
         return new Tool(List.of(
             Tool.Rule.deniesDrops(config.harvestTier().getIncorrectBlocksForDrops()),
             Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_PICKAXE, config.miningSpeed()),

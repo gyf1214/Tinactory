@@ -1,11 +1,8 @@
 {
   "type": "powered_weapon",
-  "items": {
-    "hv": {
-      "capacity": 3686400,
-      "hitCost": 4096,
-      "attackDamage": 24.0,
-      "attackSpeed": 1.6
-    }
-  }
+  "capacity": 3686400,
+  "hitCost": 4096,
+  "attackDamage": 50.0,
+  "attackSpeed": 1.6,
+  "items": "hv"
 }

@@ -15,6 +15,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.material.MaterialSet;
 
 import java.util.List;
@@ -33,7 +34,10 @@ public abstract class PoweredToolItem extends PoweredItem {
     private final Tier harvestTier;
     private final MaterialSet material;
 
-    public PoweredToolItem(Properties properties, PoweredToolConfig config) {
+    public record Config(Voltage voltage, long capacity, long normalUseCost,
+        long specialAbilityCost, float miningSpeed, Tier harvestTier, MaterialSet material) {}
+
+    public PoweredToolItem(Properties properties, Config config) {
         super(properties, config.voltage(), config.capacity());
         this.normalUseCost = config.normalUseCost();
         this.specialAbilityCost = config.specialAbilityCost();

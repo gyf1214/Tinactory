@@ -18,8 +18,7 @@ import org.shsts.tinactory.content.network.SubnetBlock;
 import org.shsts.tinactory.content.tool.PoweredChainsawItem;
 import org.shsts.tinactory.content.tool.PoweredDrillItem;
 import org.shsts.tinactory.content.tool.PoweredItem;
-import org.shsts.tinactory.content.tool.PoweredToolConfig;
-import org.shsts.tinactory.content.tool.PoweredWeaponConfig;
+import org.shsts.tinactory.content.tool.PoweredToolItem;
 import org.shsts.tinactory.content.tool.PoweredWeaponItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
@@ -143,12 +142,13 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildPoweredDrills(String name, JsonObject jo) {
         var components = new HashMap<Voltage, IEntry<PoweredDrillItem>>();
-        for (var entry : parseVoltageConfig(jo, "items")) {
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
             var v = entry.voltage();
             var jo1 = entry.jo();
             var areaMiningRadius = GsonHelper.getAsInt(jo1, "areaMiningRadius");
             var config = poweredToolConfig(entry);
-            var id = "tool/" + v.id + "/" + name;
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredDrillItem(prop, config, areaMiningRadius))
                 .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
@@ -162,12 +162,13 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildPoweredChainsaws(String name, JsonObject jo) {
         var components = new HashMap<Voltage, IEntry<PoweredChainsawItem>>();
-        for (var entry : parseVoltageConfig(jo, "items")) {
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
             var v = entry.voltage();
             var jo1 = entry.jo();
             var maxSearchBlocks = GsonHelper.getAsInt(jo1, "maxSearchBlocks");
             var config = poweredToolConfig(entry);
-            var id = "tool/" + v.id + "/" + name;
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
             var item = REGISTRATE.item(id, prop ->
                     new PoweredChainsawItem(prop, config, maxSearchBlocks))
                 .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
@@ -181,15 +182,16 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildPoweredWeapons(String name, JsonObject jo) {
         var components = new HashMap<Voltage, IEntry<PoweredWeaponItem>>();
-        for (var entry : parseVoltageConfig(jo, "items")) {
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
             var v = entry.voltage();
             var jo1 = entry.jo();
-            var config = new PoweredWeaponConfig(v,
+            var config = new PoweredWeaponItem.Config(v,
                 GsonHelper.getAsLong(jo1, "capacity"),
                 GsonHelper.getAsLong(jo1, "hitCost"),
                 GsonHelper.getAsDouble(jo1, "attackDamage"),
                 GsonHelper.getAsDouble(jo1, "attackSpeed"));
-            var id = "tool/" + v.id + "/" + name;
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
             var item = REGISTRATE.item(id, prop -> new PoweredWeaponItem(prop, config))
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
@@ -199,9 +201,9 @@ public class ComponentMeta extends MetaConsumer {
         COMPONENTS.put(name, components);
     }
 
-    private PoweredToolConfig poweredToolConfig(VoltageWithConfig entry) {
+    private PoweredToolItem.Config poweredToolConfig(VoltageWithConfig entry) {
         var jo = entry.jo();
-        return new PoweredToolConfig(entry.voltage(),
+        return new PoweredToolItem.Config(entry.voltage(),
             GsonHelper.getAsLong(jo, "capacity"),
             GsonHelper.getAsLong(jo, "normalUseCost"),
             GsonHelper.getAsLong(jo, "specialAbilityCost", 0),

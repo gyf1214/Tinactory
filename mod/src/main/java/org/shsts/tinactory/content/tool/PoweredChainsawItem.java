@@ -33,7 +33,7 @@ import java.util.List;
 public class PoweredChainsawItem extends PoweredToolItem {
     private final int maxSearchBlocks;
 
-    public PoweredChainsawItem(Item.Properties properties, PoweredToolConfig config, int maxSearchBlocks) {
+    public PoweredChainsawItem(Item.Properties properties, Config config, int maxSearchBlocks) {
         super(properties.component(DataComponents.TOOL, tool(config)), config);
         this.maxSearchBlocks = maxSearchBlocks;
     }
@@ -124,7 +124,7 @@ public class PoweredChainsawItem extends PoweredToolItem {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    private static Tool tool(PoweredToolConfig config) {
+    private static Tool tool(Config config) {
         return new Tool(List.of(
             Tool.Rule.deniesDrops(config.harvestTier().getIncorrectBlocksForDrops()),
             Tool.Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, config.miningSpeed())), 1.0F, 0);

@@ -85,6 +85,7 @@
     "item[.]tinactory[.]material[.]ingot_hot[.](.*)": "Hot $1 Ingot",
     "item[.]tinactory[.]material[.](.*)[.](.*)": "$2 $1",
     "item[.]tinactory[.]tool[.](.*)[.](.*)": "$2 $1",
+    "item[.]tinactory[.]tool[.](.*)": "$1",
     "item[.]tinactory[.](circuit_)?board[.](.*)": "$2 Circuit Board",
     "item[.]tinactory[.]circuit_component[.](.*).advanced_smd": "Advanced SMD $1",
     "item[.]tinactory[.]circuit_component[.](.*).smd": "SMD $1",

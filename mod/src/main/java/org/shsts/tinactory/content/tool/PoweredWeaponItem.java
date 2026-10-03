@@ -15,6 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.List;
 
@@ -26,7 +27,10 @@ import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 public final class PoweredWeaponItem extends PoweredItem {
     private final long hitCost;
 
-    public PoweredWeaponItem(Properties properties, PoweredWeaponConfig config) {
+    public record Config(Voltage voltage, long capacity, long hitCost,
+        double attackDamage, double attackSpeed) {}
+
+    public PoweredWeaponItem(Properties properties, Config config) {
         super(properties.attributes(attributes(config)), config.voltage(), config.capacity());
         this.hitCost = config.hitCost();
     }
@@ -57,7 +61,7 @@ public final class PoweredWeaponItem extends PoweredItem {
         super.appendHoverText(stack, context, tooltip, flag);
     }
 
-    private static ItemAttributeModifiers attributes(PoweredWeaponConfig config) {
+    private static ItemAttributeModifiers attributes(Config config) {
         return ItemAttributeModifiers.builder()
             .add(Attributes.ATTACK_DAMAGE,
                 new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, config.attackDamage() - 1.0d,
