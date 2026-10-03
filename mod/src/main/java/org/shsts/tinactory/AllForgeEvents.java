@@ -9,11 +9,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
@@ -21,6 +23,8 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.shsts.tinactory.api.tech.ITeamProvider;
 import org.shsts.tinactory.compat.ftbquests.FtbTeamsTeamProvider;
+import org.shsts.tinactory.content.tool.PoweredDrillItem;
+import org.shsts.tinactory.content.tool.PoweredToolItem;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
 import org.shsts.tinactory.integration.network.WorldNetworkManagers;
 import org.shsts.tinactory.integration.tech.SinglePlayerTeamProvider;
@@ -117,6 +121,41 @@ public final class AllForgeEvents {
             return;
         }
         WorldMultiblockManagers.get(world).invalidate(event.getPos());
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    public static void onLeftClickBlock(LeftClickBlock event) {
+        if (!(event.getEntity() instanceof ServerPlayer player) || player.level().isClientSide) {
+            return;
+        }
+        var faceAttachment = AllDataComponents.DRILL_HIT_FACE.get();
+        switch (event.getAction()) {
+            case START -> {
+                player.removeData(faceAttachment);
+                if (!event.isCanceled() && player.getMainHandItem().getItem() instanceof PoweredDrillItem &&
+                    event.getFace() != null) {
+                    player.setData(faceAttachment, event.getFace());
+                }
+            }
+            case ABORT -> player.removeData(faceAttachment);
+            default -> {}
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (event.isCanceled() && event.getPlayer() instanceof ServerPlayer player) {
+            player.removeData(AllDataComponents.DRILL_HIT_FACE.get());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
+        var stack = event.getEntity().getMainHandItem();
+        if (stack.getItem() instanceof PoweredToolItem poweredTool &&
+            poweredTool.getPower(stack) < poweredTool.normalUseCost()) {
+            event.setNewSpeed(0.0F);
+        }
     }
 
     @SubscribeEvent

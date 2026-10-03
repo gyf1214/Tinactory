@@ -10,7 +10,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.electric.IElectricMachine;
 import org.shsts.tinactory.api.machine.IMachine;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.ILayoutProvider;
 import org.shsts.tinactory.core.gui.Layout;
@@ -30,7 +30,7 @@ import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PROCESSOR;
 import static org.shsts.tinactory.AllEvents.REMOVED_IN_WORLD;
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVoltage;
 
@@ -38,7 +38,7 @@ import static org.shsts.tinactory.integration.network.MachineBlock.getBlockVolta
 @MethodsReturnNonnullByDefault
 public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     IBatteryBox, IElectricMachine, ILayoutProvider, INBTSerializable<CompoundTag> {
-    public static final boolean DISCHARGE_DEFAULT = false;
+    public static final BatteryBoxMode MODE_DEFAULT = BatteryBoxMode.BUFFER;
     private static final String ID = "battery_box";
 
     private final BlockEntity blockEntity;
@@ -63,8 +63,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
     }
 
     private boolean allowItem(ItemStack stack) {
-        return stack.getItem() instanceof BatteryItem batteryItem &&
-            batteryItem.voltage == voltage;
+        return stack.getItem() instanceof IPoweredItem poweredItem &&
+            poweredItem.voltage() == voltage.value;
     }
 
     private IMachine machine() {
@@ -74,8 +74,8 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         return machine;
     }
 
-    private boolean isDischarge() {
-        return machine().config().get(BATTERY_DISCHARGE).orElse(DISCHARGE_DEFAULT);
+    private BatteryBoxMode mode() {
+        return machine().config().get(BATTERY_MODE).orElse(MODE_DEFAULT);
     }
 
     @Override
@@ -83,25 +83,25 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public void onWorkTick(double partial) {
-        double factor;
-        if (isDischarge()) {
-            factor = -1;
-        } else {
-            factor = machine().network().orElseThrow()
-                .getComponent(ELECTRIC_COMPONENT.get())
-                .getBufferFactor();
-        }
+        var currentMode = mode();
+        var electric = machine().network().orElseThrow().getComponent(ELECTRIC_COMPONENT.get());
+        var factor = switch (currentMode) {
+            case BUFFER -> electric.getBufferFactor();
+            case CHARGE -> electric.getWorkFactor();
+            case DISCHARGE -> -1d;
+        };
         var sign = MathUtil.compare(factor);
         if (sign == 0) {
             return;
         }
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (!allowItem(stack)) {
                 continue;
             }
+            var battery = (IPoweredItem) stack.getItem();
             var cap = Math.min(voltage.value, sign > 0 ?
-                battery.capacity - battery.getPower(stack) :
+                battery.capacity() - battery.getPower(stack) :
                 battery.getPower(stack));
             battery.charge(stack, (long) Math.floor(cap * factor));
         }
@@ -113,9 +113,10 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0L;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (!allowItem(stack)) {
                 continue;
             }
+            var battery = (IPoweredItem) stack.getItem();
             ret += battery.getPower(stack);
         }
         return ret;
@@ -126,10 +127,11 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
         var ret = 0L;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (stack.isEmpty() || !(stack.getItem() instanceof BatteryItem battery)) {
+            if (!allowItem(stack)) {
                 continue;
             }
-            ret += battery.capacity;
+            var battery = (IPoweredItem) stack.getItem();
+            ret += battery.capacity();
         }
         return ret;
     }
@@ -141,15 +143,23 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public ElectricMachineType getMachineType() {
-        return isDischarge() ? ElectricMachineType.GENERATOR : ElectricMachineType.BUFFER;
+        return switch (mode()) {
+            case BUFFER -> ElectricMachineType.BUFFER;
+            case CHARGE -> ElectricMachineType.CONSUMER;
+            case DISCHARGE -> ElectricMachineType.GENERATOR;
+        };
     }
 
     @Override
     public double getPowerGen() {
+        if (mode() == BatteryBoxMode.CHARGE) {
+            return 0d;
+        }
         var ret = 0d;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
+            if (allowItem(stack)) {
+                var battery = (IPoweredItem) stack.getItem();
                 ret += Math.min(voltage.value, battery.getPower(stack));
             }
         }
@@ -158,14 +168,15 @@ public class BatteryBox extends CapabilityProvider implements IEventSubscriber,
 
     @Override
     public double getPowerCons() {
-        if (isDischarge()) {
+        if (mode() == BatteryBoxMode.DISCHARGE) {
             return 0;
         }
         var ret = 0d;
         for (var i = 0; i < items.getSlots(); i++) {
             var stack = items.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof BatteryItem battery) {
-                ret += Math.min(voltage.value, battery.capacity - battery.getPower(stack));
+            if (allowItem(stack)) {
+                var battery = (IPoweredItem) stack.getItem();
+                ret += Math.min(voltage.value, battery.capacity() - battery.getPower(stack));
             }
         }
         return ret;

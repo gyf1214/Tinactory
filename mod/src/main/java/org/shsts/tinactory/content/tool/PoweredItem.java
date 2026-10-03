@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 
 import java.util.List;
@@ -16,18 +17,29 @@ import static org.shsts.tinactory.integration.util.ClientUtil.addTooltip;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class BatteryItem extends Item {
+public class PoweredItem extends Item implements IPoweredItem {
     public static final String ITEM_PROPERTY = "battery_level";
 
-    public final Voltage voltage;
-    public final long capacity;
+    private final Voltage voltage;
+    private final long capacity;
 
-    public BatteryItem(Properties properties, Voltage voltage, long capacity) {
+    public PoweredItem(Properties properties, Voltage voltage, long capacity) {
         super(properties.stacksTo(1));
         this.voltage = voltage;
         this.capacity = capacity;
     }
 
+    @Override
+    public long voltage() {
+        return voltage.value;
+    }
+
+    @Override
+    public long capacity() {
+        return capacity;
+    }
+
+    @Override
     public long getPower(ItemStack stack) {
         return Math.clamp(stack.getOrDefault(BATTERY, 0L), 0L, capacity);
     }
@@ -37,7 +49,8 @@ public class BatteryItem extends Item {
     }
 
     public static float normalizedPower(ItemStack stack) {
-        return ((BatteryItem) stack.getItem()).getNormalizedPower(stack);
+        var poweredItem = (IPoweredItem) stack.getItem();
+        return (float) poweredItem.getPower(stack) / (float) poweredItem.capacity();
     }
 
     public ItemStack fullItem() {
@@ -46,14 +59,14 @@ public class BatteryItem extends Item {
         return ret;
     }
 
+    @Override
     public void setPower(ItemStack stack, long value) {
-        var val1 = Math.clamp(value, 0, capacity);
-        stack.set(BATTERY, val1);
+        stack.set(BATTERY, Math.clamp(value, 0L, capacity));
     }
 
+    @Override
     public void charge(ItemStack stack, long delta) {
-        var value = Math.clamp(getPower(stack) + delta, 0L, capacity);
-        setPower(stack, value);
+        setPower(stack, Math.clamp(getPower(stack) + delta, 0L, capacity));
     }
 
     @Override

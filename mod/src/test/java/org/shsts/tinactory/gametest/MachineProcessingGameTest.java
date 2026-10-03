@@ -28,7 +28,8 @@ import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.machine.IMachine;
 import org.shsts.tinactory.api.machine.IMachineProcessor;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.integration.common.CapabilityProvider;
@@ -42,7 +43,7 @@ import java.util.UUID;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.TARGET_RECIPE;
 
@@ -458,13 +459,13 @@ public final class MachineProcessingGameTest {
     }
 
     private static void restoreBatteryPower(GameTestHelper helper) {
-        var battery = (BatteryItem) AllItems.getComponent("battery").get(VOLTAGE).get();
+        var battery = (PoweredItem) AllItems.getComponent("battery").get(VOLTAGE).get();
         for (var pos : batteryPositions()) {
             var stack = new ItemStack(battery);
-            battery.setPower(stack, battery.capacity);
+            battery.setPower(stack, battery.capacity());
             var batteryMachine = MACHINE.get(helper.getBlockEntity(pos));
             batteryMachine.config().apply(SetMachineConfigPacket.builder()
-                .set(BATTERY_DISCHARGE, true).get());
+                .set(BATTERY_MODE, BatteryBoxMode.DISCHARGE).get());
             MENU_ITEM_HANDLER.get(helper.getBlockEntity(pos)).insertItem(0, stack, false);
         }
     }

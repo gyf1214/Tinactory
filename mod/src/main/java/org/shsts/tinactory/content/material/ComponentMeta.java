@@ -9,12 +9,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.SoundType;
 import org.shsts.tinactory.content.logistics.MENetworkBridge;
 import org.shsts.tinactory.content.machine.MachineSet;
 import org.shsts.tinactory.content.network.BridgeBlock;
 import org.shsts.tinactory.content.network.SubnetBlock;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredChainsawItem;
+import org.shsts.tinactory.content.tool.PoweredDrillItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
+import org.shsts.tinactory.content.tool.PoweredToolItem;
+import org.shsts.tinactory.content.tool.PoweredWeaponItem;
 import org.shsts.tinactory.core.common.MetaConsumer;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.integration.builder.BlockEntityBuilder;
@@ -27,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.FLUID_HANDLER_ITEM;
@@ -118,20 +124,92 @@ public class ComponentMeta extends MetaConsumer {
 
     private void buildBatteries(String name, JsonObject jo) {
         var jo1 = GsonHelper.getAsJsonObject(jo, "items");
-        var components = new HashMap<Voltage, IEntry<BatteryItem>>();
+        var components = new HashMap<Voltage, IEntry<PoweredItem>>();
         for (var entry : jo1.entrySet()) {
             var v = Voltage.fromName(entry.getKey());
             var capacity = GsonHelper.convertToInt(entry.getValue(), "items");
             var id = "network/" + v.id + "/" + name;
-            var item = REGISTRATE.item(id, prop -> new BatteryItem(prop, v, capacity))
+            var item = REGISTRATE.item(id, prop -> new PoweredItem(prop, v, capacity))
                 .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
-                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, BatteryItem::fullItem)
-                .itemProperty(BatteryItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
-                    BatteryItem.normalizedPower(stack))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .itemProperty(PoweredItem.ITEM_PROPERTY, () -> () -> (stack, $1, $2, $3) ->
+                    PoweredItem.normalizedPower(stack))
                 .register();
             components.put(v, item);
         }
         COMPONENTS.put(name, components);
+    }
+
+    private void buildPoweredDrills(String name, JsonObject jo) {
+        var components = new HashMap<Voltage, IEntry<PoweredDrillItem>>();
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
+            var v = entry.voltage();
+            var jo1 = entry.jo();
+            var areaMiningRadius = GsonHelper.getAsInt(jo1, "areaMiningRadius");
+            var config = poweredToolConfig(entry);
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
+            var item = REGISTRATE.item(id, prop ->
+                    new PoweredDrillItem(prop, config, areaMiningRadius))
+                .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .register();
+            components.put(v, item);
+        }
+        COMPONENTS.put(name, components);
+    }
+
+    private void buildPoweredChainsaws(String name, JsonObject jo) {
+        var components = new HashMap<Voltage, IEntry<PoweredChainsawItem>>();
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
+            var v = entry.voltage();
+            var jo1 = entry.jo();
+            var maxSearchBlocks = GsonHelper.getAsInt(jo1, "maxSearchBlocks");
+            var config = poweredToolConfig(entry);
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
+            var item = REGISTRATE.item(id, prop ->
+                    new PoweredChainsawItem(prop, config, maxSearchBlocks))
+                .tint(() -> () -> (stack, layer) -> layer == 1 ? config.material().color : 0xFFFFFFFF)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .register();
+            components.put(v, item);
+        }
+        COMPONENTS.put(name, components);
+    }
+
+    private void buildPoweredWeapons(String name, JsonObject jo) {
+        var components = new HashMap<Voltage, IEntry<PoweredWeaponItem>>();
+        var entries = parseVoltageConfig(jo, "items");
+        for (var entry : entries) {
+            var v = entry.voltage();
+            var jo1 = entry.jo();
+            var config = new PoweredWeaponItem.Config(v,
+                GsonHelper.getAsLong(jo1, "capacity"),
+                GsonHelper.getAsLong(jo1, "hitCost"),
+                GsonHelper.getAsDouble(jo1, "attackDamage"),
+                GsonHelper.getAsDouble(jo1, "attackSpeed"));
+            var id = entries.size() > 1 ? "tool/" + name + "/" + v.id : "tool/" + name;
+            var item = REGISTRATE.item(id, prop -> new PoweredWeaponItem(prop, config))
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .creativeTab(CreativeModeTabs.TOOLS_AND_UTILITIES, PoweredItem::fullItem)
+                .register();
+            components.put(v, item);
+        }
+        COMPONENTS.put(name, components);
+    }
+
+    private PoweredToolItem.Config poweredToolConfig(VoltageWithConfig entry) {
+        var jo = entry.jo();
+        return new PoweredToolItem.Config(entry.voltage(),
+            GsonHelper.getAsLong(jo, "capacity"),
+            GsonHelper.getAsLong(jo, "normalUseCost"),
+            GsonHelper.getAsLong(jo, "specialAbilityCost", 0),
+            GsonHelper.getAsFloat(jo, "miningSpeed"),
+            Tiers.valueOf(GsonHelper.getAsString(jo, "harvestTier").toUpperCase(Locale.ROOT)),
+            getMaterial(GsonHelper.getAsString(jo, "material")));
     }
 
     private void buildCables(String name, JsonObject jo) {
@@ -237,6 +315,9 @@ public class ComponentMeta extends MetaConsumer {
         switch (type) {
             case "default" -> buildComponents(name, jo);
             case "battery" -> buildBatteries(name, jo);
+            case "powered_drill" -> buildPoweredDrills(name, jo);
+            case "powered_chainsaw" -> buildPoweredChainsaws(name, jo);
+            case "powered_weapon" -> buildPoweredWeapons(name, jo);
             case "cable" -> buildCables(name, jo);
             case "subnet" -> buildSubnets(name, jo);
             case "network_bridge" -> buildNetworkBridge(name, jo);

@@ -1,0 +1,32 @@
+{
+  "type": "powered_chainsaw",
+  "items": {
+    "lv": {
+      "capacity": 384000,
+      "normalUseCost": 256,
+      "specialAbilityCost": 0,
+      "miningSpeed": 8.0,
+      "harvestTier": "iron",
+      "material": "cobalt_brass",
+      "maxSearchBlocks": 0
+    },
+    "mv": {
+      "capacity": 1536000,
+      "normalUseCost": 512,
+      "specialAbilityCost": 6144,
+      "miningSpeed": 12.0,
+      "harvestTier": "diamond",
+      "material": "aluminium",
+      "maxSearchBlocks": 64
+    },
+    "hv": {
+      "capacity": 6144000,
+      "normalUseCost": 1024,
+      "specialAbilityCost": 16384,
+      "miningSpeed": 16.0,
+      "harvestTier": "netherite",
+      "material": "vanadium_steel",
+      "maxSearchBlocks": 128
+    }
+  }
+}

@@ -28,7 +28,7 @@ import org.shsts.tinactory.content.gui.LogisticWorkerMenu;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
 import org.shsts.tinactory.content.logistics.LogisticWorkerConfig;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
 import org.shsts.tinactory.core.util.CodecHelper;
@@ -250,7 +250,7 @@ public final class LogisticWorkerTransferGameTest {
 
         var battery = batteryItem();
         var batteryStack = new ItemStack(battery);
-        battery.setPower(batteryStack, battery.capacity);
+        battery.setPower(batteryStack, battery.capacity());
         require(helper, MENU_ITEM_HANDLER.get(helper.getBlockEntity(BATTERY))
                 .insertItem(0, batteryStack, false).isEmpty(),
             "Could not charge the logistics test battery", BATTERY);
@@ -330,8 +330,8 @@ public final class LogisticWorkerTransferGameTest {
         return (Block) AllItems.getComponent(name).get(VOLTAGE).get();
     }
 
-    private static BatteryItem batteryItem() {
-        return (BatteryItem) AllItems.getComponent("battery").get(VOLTAGE).get();
+    private static PoweredItem batteryItem() {
+        return (PoweredItem) AllItems.getComponent("battery").get(VOLTAGE).get();
     }
 
     private static void useWithMockPlayer(GameTestHelper helper, BlockPos pos) {

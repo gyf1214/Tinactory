@@ -10,6 +10,7 @@ import org.shsts.tinactory.api.machine.IMachineConfigType;
 import org.shsts.tinactory.api.network.IScheduling;
 import org.shsts.tinactory.api.network.ISubnetLabel;
 import org.shsts.tinactory.content.autocraft.AutocraftComponent;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.electric.ElectricComponent;
 import org.shsts.tinactory.content.logistics.FilterEntry;
 import org.shsts.tinactory.content.logistics.LogisticComponent;
@@ -58,7 +59,7 @@ public final class AllNetworks {
     public static final IEntry<IMachineConfigType<Integer>> MACHINE_PARALLEL;
     public static final IEntry<IMachineConfigType<Integer>> STORAGE_PRIORITY;
     public static final IEntry<IMachineConfigType<List<FilterEntry>>> STORAGE_FILTERS;
-    public static final IEntry<IMachineConfigType<Boolean>> BATTERY_DISCHARGE;
+    public static final IEntry<IMachineConfigType<BatteryBoxMode>> BATTERY_MODE;
     public static final IEntry<IMachineConfigType<StorageDetectorConfig>> STORAGE_DETECTOR;
     public static final IEntry<IMachineConfigType<SignalConfig>> SIGNAL_CONFIG;
     public static final IEntry<IMachineConfigType<List<LogisticWorkerConfig>>> LOGISTIC_WORKER_CONFIGS;
@@ -95,7 +96,7 @@ public final class AllNetworks {
         MACHINE_PARALLEL = legacyConfig("parallel", Codec.INT);
         STORAGE_PRIORITY = legacyConfig("storage_priority", Codec.INT, "priority");
         STORAGE_FILTERS = legacyConfig("storage_filters", FilterEntry.CODEC.listOf(), "filter");
-        BATTERY_DISCHARGE = legacyConfig("battery_discharge", Codec.BOOL, "discharge");
+        BATTERY_MODE = legacyConfig("battery_discharge", BatteryBoxMode.CODEC, "discharge");
         STORAGE_DETECTOR = REGISTRATE.registryEntry(MACHINE_CONFIGS.getHandler(), "storage_detector",
             StorageDetectorConfig::configType);
         SIGNAL_CONFIG = legacyConfig("signal", SignalConfig.CODEC);

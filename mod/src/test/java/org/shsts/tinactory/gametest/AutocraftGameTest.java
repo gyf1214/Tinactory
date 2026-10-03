@@ -27,11 +27,12 @@ import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.content.autocraft.MECraftCpu;
 import org.shsts.tinactory.content.autocraft.MECraftTerminal;
 import org.shsts.tinactory.content.autocraft.MEPatternTerminal;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.gui.MECraftTerminalMenu;
 import org.shsts.tinactory.content.gui.MEPatternTerminalMenu;
 import org.shsts.tinactory.content.gui.sync.MECraftEventPacket;
 import org.shsts.tinactory.content.gui.sync.MEPatternEventPacket;
-import org.shsts.tinactory.content.tool.BatteryItem;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.autocraft.pattern.CraftAmount;
 import org.shsts.tinactory.core.autocraft.pattern.CraftPattern;
 import org.shsts.tinactory.core.autocraft.pattern.TargetRecipeConstraint;
@@ -58,7 +59,7 @@ import static org.shsts.tinactory.AllCapabilities.ITEM_PORT_ITEM;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
 import static org.shsts.tinactory.AllCapabilities.MENU_ITEM_HANDLER;
 import static org.shsts.tinactory.AllCapabilities.PATTERN_CELL_ITEM;
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.integration.common.CapabilityProvider.getContainer;
 import static org.shsts.tinactory.integration.logistics.StackHelper.ITEM_ADAPTER;
@@ -305,14 +306,14 @@ public final class AutocraftGameTest {
         }
         helper.setBlock(CABLE, cableState());
 
-        var battery = (BatteryItem) AllItems.getComponent("battery").get(VOLTAGE).get();
+        var battery = (PoweredItem) AllItems.getComponent("battery").get(VOLTAGE).get();
         for (var batteryPos : List.of(BATTERY, BATTERY_2)) {
             var batteryStack = new ItemStack(battery);
-            battery.setPower(batteryStack, battery.capacity);
+            battery.setPower(batteryStack, battery.capacity());
             var batteryEntity = helper.getBlockEntity(batteryPos);
             var batteryMachine = CapabilityProvider.getContainer(batteryEntity, "network/machine", Machine.class);
             batteryMachine.config().apply(SetMachineConfigPacket.builder()
-                .set(BATTERY_DISCHARGE, true).get());
+                .set(BATTERY_MODE, BatteryBoxMode.DISCHARGE).get());
             MENU_ITEM_HANDLER.get(batteryEntity).insertItem(0, batteryStack, false);
         }
 

@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -24,14 +25,17 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllCapabilities;
+import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.AllMultiblocks;
 import org.shsts.tinactory.AllRegistries;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.api.electric.ElectricMachineType;
 import org.shsts.tinactory.api.logistics.ContainerAccess;
 import org.shsts.tinactory.api.logistics.PortType;
 import org.shsts.tinactory.api.logistics.SlotType;
 import org.shsts.tinactory.api.multiblock.IMultiblockDisplay;
+import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.gui.DigitalInterfaceMenu;
 import org.shsts.tinactory.content.multiblock.Cleanroom;
 import org.shsts.tinactory.content.multiblock.CoilMultiblock;
@@ -40,6 +44,7 @@ import org.shsts.tinactory.content.multiblock.DistillationTower;
 import org.shsts.tinactory.content.multiblock.Lithography;
 import org.shsts.tinactory.content.multiblock.NuclearReactor;
 import org.shsts.tinactory.content.multiblock.PowerSubstation;
+import org.shsts.tinactory.content.tool.PoweredItem;
 import org.shsts.tinactory.core.electric.Voltage;
 import org.shsts.tinactory.core.gui.Layout;
 import org.shsts.tinactory.core.gui.sync.SetMachineConfigPacket;
@@ -50,6 +55,7 @@ import org.shsts.tinactory.integration.multiblock.MultiblockInterface;
 import org.shsts.tinactory.integration.multiblock.MultiblockInterfaceBlock;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockCheckCtx;
 import org.shsts.tinactory.integration.multiblock.WorldMultiblockManagers;
+import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 import org.shsts.tinactory.integration.network.PrimitiveBlock;
 import org.shsts.tinycorelib.api.gui.IMenuHelper;
@@ -64,7 +70,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static org.shsts.tinactory.AllNetworks.BATTERY_DISCHARGE;
+import static org.shsts.tinactory.AllNetworks.BATTERY_MODE;
+import static org.shsts.tinactory.AllNetworks.ELECTRIC_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.TARGET_RECIPE;
 
 @GameTestHolder(TinactoryKeys.ID)
@@ -306,7 +313,7 @@ public final class MultiblockGameTest {
             inter.icon();
             inter.canPlayerInteract(helper.makeMockPlayer(GameType.SURVIVAL));
             multiblock.setWorkBlock(helper.getLevel(), helper.getBlockState(placed.controller()));
-            inter.setConfig(SetMachineConfigPacket.builder().set(BATTERY_DISCHARGE, true).get(), false);
+            inter.setConfig(SetMachineConfigPacket.builder().set(BATTERY_MODE, BatteryBoxMode.DISCHARGE).get(), false);
             inter.setMultiblock(multiblock);
             var update = multiblock.serializeOnUpdate(helper.getLevel().registryAccess());
             var interfaceUpdate = inter.serializeOnUpdate(helper.getLevel().registryAccess());
@@ -492,8 +499,13 @@ public final class MultiblockGameTest {
                 helper.fail("power substation did not restore stored power", placed.controller());
                 return;
             }
-            inter.config().apply(SetMachineConfigPacket.builder().set(BATTERY_DISCHARGE, true).get());
-            if (substation.getPowerCons() != 0d || substation.getMachineType().name().equals("BUFFER")) {
+            inter.config().apply(SetMachineConfigPacket.builder().set(BATTERY_MODE, BatteryBoxMode.CHARGE).get());
+            if (substation.getMachineType() != ElectricMachineType.CONSUMER || substation.getPowerCons() <= 0d) {
+                helper.fail("power substation charge mode was not applied", placed.controller());
+                return;
+            }
+            inter.config().apply(SetMachineConfigPacket.builder().set(BATTERY_MODE, BatteryBoxMode.DISCHARGE).get());
+            if (substation.getPowerCons() != 0d || substation.getMachineType() != ElectricMachineType.GENERATOR) {
                 helper.fail("power substation discharge mode was not applied", placed.controller());
                 return;
             }
@@ -503,6 +515,61 @@ public final class MultiblockGameTest {
             }
             substation.onInvalidateStructure();
             helper.succeed();
+        });
+    }
+
+    @GameTest(template = "empty_32x16x32", timeoutTicks = 220)
+    public static void testPowerSubstationChargeModeUsesLiveNetworkPower(GameTestHelper helper) {
+        var base = new BlockPos(1, 1, 1);
+        var display = placeDisplayedStructure(helper, "power_substation",
+            AllMultiblocks.MULTIBLOCK_SETS.get("power_substation").display().controllerPosition()
+                .offset(base.getX(), base.getY(), base.getZ()), FACING);
+        var controller = base.offset(display.controllerPosition().getX(), display.controllerPosition().getY(),
+            display.controllerPosition().getZ());
+        var interfacePos = structurePos(display, controller, 4, 0, 2);
+        var interfaceState = AllBlockEntities.getMachine("multiblock/interface").block(Voltage.HV)
+            .defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.EAST);
+        helper.setBlock(interfacePos, interfaceState);
+
+        var cablePos = interfacePos.east();
+        var cableBlock = (Block) AllItems.getComponent("cable").get(Voltage.HV).get();
+        var cableState = cableBlock.defaultBlockState()
+            .setValue(CableBlock.WEST, true)
+            .setValue(CableBlock.EAST, true);
+        helper.setBlock(cablePos, cableState);
+
+        var sourcePos = cablePos.east();
+        var sourceState = AllBlockEntities.getMachine("battery_box").block(Voltage.HV).defaultBlockState()
+            .setValue(MachineBlock.IO_FACING, Direction.WEST);
+        helper.setBlock(sourcePos, sourceState);
+
+        var battery = (PoweredItem) AllItems.getComponent("battery").get(Voltage.HV).get();
+        var stack = new ItemStack(battery);
+        battery.setPower(stack, battery.capacity());
+        AllCapabilities.MENU_ITEM_HANDLER.get(helper.getBlockEntity(sourcePos)).insertItem(0, stack, false);
+        AllCapabilities.MACHINE.get(helper.getBlockEntity(sourcePos)).config().apply(
+            SetMachineConfigPacket.builder().set(BATTERY_MODE, BatteryBoxMode.DISCHARGE).get());
+
+        helper.runAfterDelay(30, () -> {
+            AllCapabilities.MACHINE.get(helper.getBlockEntity(interfacePos)).config().apply(
+                SetMachineConfigPacket.builder().set(BATTERY_MODE, BatteryBoxMode.CHARGE).get());
+            useWithMockPlayer(helper, sourcePos);
+            helper.runAfterDelay(80, () -> {
+                var network = AllCapabilities.MACHINE.get(helper.getBlockEntity(interfacePos)).network().orElseThrow();
+                var workFactor = network.getComponent(ELECTRIC_COMPONENT.get()).getWorkFactor();
+                var substation = (PowerSubstation) Multiblock.get(helper.getBlockEntity(controller));
+                var storedPower = substation.serializeNBT(helper.getLevel().registryAccess()).getLong("power");
+                if (workFactor <= 0d || workFactor >= 1d) {
+                    helper.fail("Power Substation Charge mode did not draw from the live network", interfacePos);
+                    return;
+                }
+                if (storedPower <= 0L) {
+                    helper.fail("Power Substation did not store energy in Charge mode", controller);
+                    return;
+                }
+                helper.succeed();
+            });
         });
     }
 

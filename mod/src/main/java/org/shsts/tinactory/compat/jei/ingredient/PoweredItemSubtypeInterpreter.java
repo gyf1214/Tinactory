@@ -6,11 +6,11 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.shsts.tinactory.AllDataComponents;
+import org.shsts.tinactory.api.tool.IPoweredItem;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public enum BatterySubtypeInterpreter implements ISubtypeInterpreter<ItemStack> {
+public enum PoweredItemSubtypeInterpreter implements ISubtypeInterpreter<ItemStack> {
     INSTANCE;
 
     @Override
@@ -18,7 +18,7 @@ public enum BatterySubtypeInterpreter implements ISubtypeInterpreter<ItemStack> 
         if (context == UidContext.Recipe) {
             return null;
         }
-        return stack.get(AllDataComponents.BATTERY);
+        return ((IPoweredItem) stack.getItem()).getPower(stack);
     }
 
     @Override

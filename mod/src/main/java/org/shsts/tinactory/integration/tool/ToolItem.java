@@ -51,7 +51,7 @@ public class ToolItem extends Item {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return !stack.getOrDefault(HIDE_BAR, false);
+        return !stack.has(HIDE_BAR);
     }
 
     @Override

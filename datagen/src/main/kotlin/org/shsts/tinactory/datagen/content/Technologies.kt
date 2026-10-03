@@ -53,6 +53,7 @@ object Technologies {
     val KANTHAL: ResourceLocation
     val SIFTING: ResourceLocation
     val AUTOFARM: ResourceLocation
+    val POWERED_TOOLS: ResourceLocation
     val INTEGRATED_CIRCUIT: ResourceLocation
     val COLD_WORKING: ResourceLocation
     val ELECTROLYZING: ResourceLocation
@@ -188,6 +189,15 @@ object Technologies {
                 maxProgress(15)
                 displayItem(Items.WHEAT)
             }
+
+            val previousBase = base
+            base = null
+            POWERED_TOOLS = tech("powered_tools") {
+                maxProgress(15)
+                displayItem(getComponent("drill").getValue(Voltage.LV))
+                depends(BATTERY, MATERIAL_CUTTING)
+            }
+            base = previousBase
 
             INTEGRATED_CIRCUIT = tech("integrated_circuit") {
                 maxProgress(20)

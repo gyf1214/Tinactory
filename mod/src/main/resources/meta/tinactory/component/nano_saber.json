@@ -1,0 +1,8 @@
+{
+  "type": "powered_weapon",
+  "capacity": 3686400,
+  "hitCost": 4096,
+  "attackDamage": 50.0,
+  "attackSpeed": 1.6,
+  "items": "hv"
+}
