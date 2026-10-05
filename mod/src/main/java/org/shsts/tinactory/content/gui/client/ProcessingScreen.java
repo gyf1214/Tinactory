@@ -24,12 +24,17 @@ public class ProcessingScreen extends LayoutScreen<ProcessingMenu> {
         super(menu, title);
 
         for (var slot : layout.slots) {
+            var rectBg = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
             if (slot.type().portType == PortType.FLUID) {
                 var syncSlot = FLUID_SYNC + slot.index();
-                var rectBg = new Rect(slot.x(), slot.y(), Menu.SLOT_SIZE, Menu.SLOT_SIZE);
                 var rect = rectBg.offset(1, 1).enlarge(-2, -2);
                 layoutBg.addChild(rectBg, new StaticWidget(menu, FLUID_SLOT_BG));
+                if (slot.overlay() != null) {
+                    layoutBg.addChild(rectBg, new StaticWidget(menu, slot.overlay()));
+                }
                 layoutPanel.addChild(rect, new FluidSlot(menu, slot.index(), syncSlot));
+            } else if (slot.overlay() != null) {
+                layoutBg.addChild(rectBg, new StaticWidget(menu, slot.overlay()));
             }
         }
 

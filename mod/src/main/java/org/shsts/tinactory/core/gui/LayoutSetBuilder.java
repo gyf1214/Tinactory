@@ -30,13 +30,13 @@ public class LayoutSetBuilder<P> extends SimpleBuilder<Map<Voltage, Layout>, P, 
     }
 
     public LayoutSetBuilder<P> dummySlot(int x, int y) {
-        var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE);
+        var slot = new Layout.SlotInfo(0, x, y, 0, SlotType.NONE, null);
         slots.add(new SlotAndVoltages(slot, Arrays.asList(Voltage.values())));
         return this;
     }
 
     public LayoutSetBuilder<P> slot(int port, SlotType type, int x, int y, Collection<Voltage> voltages) {
-        var slot = new Layout.SlotInfo(curSlot++, x, y, port, type);
+        var slot = new Layout.SlotInfo(curSlot++, x, y, port, type, null);
         slots.add(new SlotAndVoltages(slot, voltages));
         return this;
     }

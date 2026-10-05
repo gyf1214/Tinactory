@@ -71,11 +71,15 @@ public abstract class RecipeCategory<R extends IRecipe<?>> {
         builder.add(helper.createBlankDrawable(WIDTH, layout.rect.height()));
         for (var slot : layout.slots) {
             var type = slot.type().portType;
+            var x = xOffset + slot.x();
+            var y = slot.y();
             if (type == PortType.FLUID) {
-                builder.add(DrawableHelper.createStatic(helper, Texture.FLUID_SLOT_BG),
-                    xOffset + slot.x(), slot.y());
+                builder.add(DrawableHelper.createStatic(helper, Texture.FLUID_SLOT_BG), x, y);
             } else {
-                builder.add(helper.getSlotDrawable(), xOffset + slot.x(), slot.y());
+                builder.add(helper.getSlotDrawable(), x, y);
+            }
+            if (slot.overlay() != null) {
+                builder.add(DrawableHelper.createStatic(helper, slot.overlay()), x, y);
             }
         }
         for (var image : layout.images) {

@@ -41,13 +41,13 @@ class LayoutTest {
             new Layout.PortInfo(1, SlotType.ITEM_INPUT),
             new Layout.PortInfo(2, SlotType.ITEM_OUTPUT)), layout.ports);
         assertEquals(List.of(
-            new Layout.SlotInfo(0, 10, 20, 0, SlotType.ITEM_INPUT),
-            new Layout.SlotInfo(1, 28, 20, 0, SlotType.ITEM_INPUT)), layout.portSlots.get(0));
+            new Layout.SlotInfo(0, 10, 20, 0, SlotType.ITEM_INPUT, null),
+            new Layout.SlotInfo(1, 28, 20, 0, SlotType.ITEM_INPUT, null)), layout.portSlots.get(0));
         assertEquals(List.of(
-            new Layout.SlotInfo(2, 10, 50, 1, SlotType.ITEM_INPUT)), layout.portSlots.get(1));
+            new Layout.SlotInfo(2, 10, 50, 1, SlotType.ITEM_INPUT, null)), layout.portSlots.get(1));
         assertEquals(List.of(
-            new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT),
-            new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT)), layout.portSlots.get(2));
+            new Layout.SlotInfo(3, 90, 20, 2, SlotType.ITEM_OUTPUT, null),
+            new Layout.SlotInfo(4, 108, 20, 2, SlotType.ITEM_OUTPUT, null)), layout.portSlots.get(2));
         assertEquals(
             new Layout.ProgressBarInfo(new Rect(140, 50, 8, 40), progressTexture, ProgressDirection.HORIZONTAL),
             layout.progressBar);
@@ -77,19 +77,19 @@ class LayoutTest {
 
     private static Layout.SlotWith<TestIngredient> inputSlot(int index, int x, int y, int port,
         String key, int amount) {
-        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_INPUT),
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_INPUT, null),
             new TestIngredient(key, amount));
     }
 
     private static Layout.SlotWith<TestResult> outputSlot(int index, int x, int y, int port,
         String key, int amount) {
-        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT),
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT, null),
             new TestResult(key, amount));
     }
 
     private static Layout.SlotWith<TestIngredient> markerOutput(int index, int x, int y, int port,
         String key, int amount) {
-        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT),
+        return new Layout.SlotWith<>(new Layout.SlotInfo(index, x, y, port, SlotType.ITEM_OUTPUT, null),
             new TestIngredient(key, amount));
     }
 }

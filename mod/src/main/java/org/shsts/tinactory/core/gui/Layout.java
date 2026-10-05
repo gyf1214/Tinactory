@@ -23,13 +23,13 @@ import java.util.function.ToIntFunction;
 public class Layout {
     public record WidgetInfo(Rect rect, Texture texture) {}
 
-    public record SlotInfo(int index, int x, int y, int port, SlotType type) {
+    public record SlotInfo(int index, int x, int y, int port, SlotType type, @Nullable Texture overlay) {
         public SlotInfo setIndex(int index) {
-            return new SlotInfo(index, x, y, port, type);
+            return new SlotInfo(index, x, y, port, type, overlay);
         }
 
         public SlotInfo setType(SlotType type) {
-            return new SlotInfo(index, x, y, port, type);
+            return new SlotInfo(index, x, y, port, type, overlay);
         }
     }
 
