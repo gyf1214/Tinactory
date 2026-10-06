@@ -9,6 +9,17 @@ base {
     archivesName = "tinactory"
 }
 
+repositories {
+    maven {
+        name = "Create"
+        url = uri("https://maven.createmod.net")
+    }
+    maven {
+        name = "Registrate"
+        url = uri("https://maven.ithundxr.dev/snapshots")
+    }
+}
+
 neoForge {
     mods {
         create("tinactory") {
@@ -63,9 +74,31 @@ neoForge {
 
 dependencies {
     val tinycorelibVersion = "${property("minecraft_version")}-${property("tinycorelib_version")}"
+    val useCreateInRuns = providers.gradleProperty("tinactory.createInRuns")
+        .map { it.toBoolean() }
+        .getOrElse(true)
 
     compileOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}:api")
     runtimeOnly("org.shsts.tinycorelib:core:${tinycorelibVersion}")
+
+    compileOnly("com.simibubi.create:create-${property("minecraft_version")}:${property("create_version")}:slim") {
+        isTransitive = false
+    }
+    compileOnly("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
+    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${property("minecraft_version")}:${property("flywheel_version")}")
+    compileOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
+    if (useCreateInRuns) {
+        listOf(
+            "clientAdditionalRuntimeClasspath",
+            "serverAdditionalRuntimeClasspath",
+            "gameTestServerAdditionalRuntimeClasspath",
+        ).forEach { runConfiguration ->
+            add(runConfiguration, "curse.maven:create-328085:7963363")
+            add(runConfiguration, "net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
+            add(runConfiguration, "dev.engine-room.flywheel:flywheel-neoforge-${property("minecraft_version")}:${property("flywheel_version")}")
+            add(runConfiguration, "com.tterrag.registrate:Registrate:${property("registrate_version")}")
+        }
+    }
 
     implementation("mezz.jei:jei-${property("minecraft_version")}-neoforge:${property("jei_version")}")
     implementation("curse.maven:jade-324717:${property("jade_id")}")

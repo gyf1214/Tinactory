@@ -44,3 +44,10 @@ modId = "ftbfiltersystem"
 type = "optional"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.tinactory]]
+modId = "create"
+type = "optional"
+versionRange = "[6.0.10,6.1.0)"
+ordering = "NONE"
+side = "BOTH"
