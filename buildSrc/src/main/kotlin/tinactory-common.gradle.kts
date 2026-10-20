@@ -28,6 +28,14 @@ repositories {
         url = uri("https://maven.architectury.dev")
     }
     maven {
+        name = "Create"
+        url = uri("https://maven.createmod.net")
+    }
+    maven {
+        name = "Registrate"
+        url = uri("https://maven.ithundxr.dev/snapshots")
+    }
+    maven {
         url = uri("https://cursemaven.com")
         content {
             includeGroup("curse.maven")

@@ -1,0 +1,26 @@
+{
+  "type": "kinetic_generator",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "voltages": {
+    "ulv": {
+      "stress": 1024,
+      "rpm": 16,
+      "power": 8
+    },
+    "mv": {
+      "stress": 7168,
+      "rpm": 32,
+      "power": 128
+    },
+    "ev": {
+      "stress": 50176,
+      "rpm": 64,
+      "power": 2048
+    }
+  }
+}

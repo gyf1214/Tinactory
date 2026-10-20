@@ -13,6 +13,7 @@ import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import org.shsts.tinactory.api.TinactoryKeys;
+import org.shsts.tinactory.compat.create.CreateIntegration;
 import org.shsts.tinactory.compat.ftbfilter.ItemFilterIntegration;
 import org.shsts.tinactory.compat.ftbquests.TechTaskRegistration;
 import org.shsts.tinactory.content.logistics.MEStorageCellAliases;
@@ -79,6 +80,9 @@ public class Tinactory {
             ItemFilterIntegration.init();
             AllWorldGens.init();
 
+            if (ModList.get().isLoaded("create")) {
+                CreateIntegration.init();
+            }
             REGISTRATE.register(modEventBus);
             modEventBus.addListener(AllCapabilities::registerCapabilities);
             NeoForge.EVENT_BUS.register(AllForgeEvents.class);

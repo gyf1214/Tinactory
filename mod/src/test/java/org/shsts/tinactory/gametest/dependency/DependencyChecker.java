@@ -650,7 +650,19 @@ public final class DependencyChecker {
         var ret = new HashMap<IDependencyNode, String>();
         addMaterialExemptions(ret, TEST_MATERIAL, "test-only material set");
         addOreBlockExemptions(ret);
+        addOptionalConverterExemptions(ret);
         return ret;
+    }
+
+    private void addOptionalConverterExemptions(Map<IDependencyNode, String> exemptions) {
+        for (var entry : AllBlockEntities.MACHINE_SETS.entrySet()) {
+            if (entry.getKey().startsWith("create/")) {
+                for (var block : entry.getValue().entries()) {
+                    stackNode(new ItemStack(block.get()))
+                        .ifPresent(node -> exemptions.put(node, "optional Create converter"));
+                }
+            }
+        }
     }
 
     private void addOreBlockExemptions(Map<IDependencyNode, String> exemptions) {

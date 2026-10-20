@@ -7,6 +7,7 @@ import org.shsts.tinactory.datagen.content.component.CircuitComponents
 import org.shsts.tinactory.datagen.content.component.Components
 import org.shsts.tinactory.datagen.content.component.MachineComponents
 import org.shsts.tinactory.datagen.content.component.MiscComponents
+import org.shsts.tinactory.datagen.content.create.CreateMachines
 import org.shsts.tinactory.datagen.content.machine.Machines
 import org.shsts.tinactory.datagen.content.machine.MiscMachines
 import org.shsts.tinactory.datagen.content.machine.Multiblocks
@@ -42,6 +43,7 @@ object AllDataKt {
         ProcessingMachines.init()
         Multiblocks.init()
         MiscMachines.init()
+        CreateMachines.init()
 
         MaterialRecoveryRecipes.init()
 

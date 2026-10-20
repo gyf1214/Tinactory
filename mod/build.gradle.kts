@@ -9,6 +9,12 @@ base {
     archivesName = "tinactory"
 }
 
+configurations {
+    maybeCreate("api")
+    val localRuntimeOnly = create("localRuntimeOnly")
+    getByName("runtimeClasspath").extendsFrom(localRuntimeOnly)
+}
+
 repositories {
     maven {
         name = "Create"
@@ -87,17 +93,17 @@ dependencies {
     compileOnly("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${property("minecraft_version")}:${property("flywheel_version")}")
     compileOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
+    testCompileOnly("com.simibubi.create:create-${property("minecraft_version")}:${property("create_version")}:slim") {
+        isTransitive = false
+    }
+    testCompileOnly("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
+    testCompileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${property("minecraft_version")}:${property("flywheel_version")}")
+    testCompileOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
     if (useCreateInRuns) {
-        listOf(
-            "clientAdditionalRuntimeClasspath",
-            "serverAdditionalRuntimeClasspath",
-            "gameTestServerAdditionalRuntimeClasspath",
-        ).forEach { runConfiguration ->
-            add(runConfiguration, "curse.maven:create-328085:7963363")
-            add(runConfiguration, "net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
-            add(runConfiguration, "dev.engine-room.flywheel:flywheel-neoforge-${property("minecraft_version")}:${property("flywheel_version")}")
-            add(runConfiguration, "com.tterrag.registrate:Registrate:${property("registrate_version")}")
-        }
+        add("localRuntimeOnly", "curse.maven:create-328085:7963363")
+        add("localRuntimeOnly", "net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
+        add("localRuntimeOnly", "dev.engine-room.flywheel:flywheel-neoforge-${property("minecraft_version")}:${property("flywheel_version")}")
+        add("localRuntimeOnly", "com.tterrag.registrate:Registrate:${property("registrate_version")}")
     }
 
     implementation("mezz.jei:jei-${property("minecraft_version")}-neoforge:${property("jei_version")}")
@@ -136,6 +142,7 @@ sourceSets.main {
 }
 
 tasks.test {
+    include("org/shsts/tinactory/unit/**")
     configure<JacocoTaskExtension> {
         includes = listOf("org.shsts.tinactory.api.*", "org.shsts.tinactory.core.*")
     }
@@ -190,10 +197,6 @@ tasks.jacocoTestReport {
             include("org/shsts/tinactory/core/**")
         }
     )
-}
-
-configurations {
-    maybeCreate("api")
 }
 
 val apiJar = tasks.register<Jar>("apiJar") {
