@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.shsts.tinactory.AllMenus;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.content.gui.sync.ActiveScheduler;
@@ -226,7 +227,7 @@ public final class GuiSyncGameTest {
 
     private static <P extends IPacket> P roundTrip(P packet, Supplier<P> factory,
         RegistryAccess registryAccess) {
-        var buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess);
+        var buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess, ConnectionType.OTHER);
         packet.serializeToBuf(buf);
         var result = factory.get();
         result.deserializeFromBuf(buf);

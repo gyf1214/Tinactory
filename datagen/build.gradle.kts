@@ -55,9 +55,6 @@ dependencies {
     implementation("curse.maven:fusion-connected-textures-854949:${property("fusion_id")}")
 
     runtimeOnly("curse.maven:create-328085:7963363")
-    runtimeOnly("net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
-    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${property("minecraft_version")}:${property("flywheel_version")}")
-    runtimeOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
 }
 
 checkSource {

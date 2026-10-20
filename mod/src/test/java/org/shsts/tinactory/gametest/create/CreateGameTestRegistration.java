@@ -6,7 +6,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import org.shsts.tinactory.api.TinactoryKeys;
 
-@EventBusSubscriber(modid = TinactoryKeys.ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = TinactoryKeys.ID)
 public final class CreateGameTestRegistration {
     private CreateGameTestRegistration() {}
 

@@ -101,9 +101,6 @@ dependencies {
     testCompileOnly("com.tterrag.registrate:Registrate:${property("registrate_version")}")
     if (useCreateInRuns) {
         add("localRuntimeOnly", "curse.maven:create-328085:7963363")
-        add("localRuntimeOnly", "net.createmod.ponder:ponder-neoforge:${property("ponder_version")}+mc${property("minecraft_version")}")
-        add("localRuntimeOnly", "dev.engine-room.flywheel:flywheel-neoforge-${property("minecraft_version")}:${property("flywheel_version")}")
-        add("localRuntimeOnly", "com.tterrag.registrate:Registrate:${property("registrate_version")}")
     }
 
     implementation("mezz.jei:jei-${property("minecraft_version")}-neoforge:${property("jei_version")}")
