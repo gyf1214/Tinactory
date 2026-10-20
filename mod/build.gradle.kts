@@ -68,6 +68,7 @@ neoForge {
                     .orElse("false").get(),
             )
             systemProperty("tinycorelib.gameTest.defaultTemplate", "empty_8x5x5")
+            systemProperty("neoforge.enabledGameTestNamespaces", "tinactory")
         }
     }
 
