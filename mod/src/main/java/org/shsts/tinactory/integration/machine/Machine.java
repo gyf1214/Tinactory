@@ -67,7 +67,6 @@ import static org.shsts.tinactory.AllNetworks.MACHINE_NAME;
 import static org.shsts.tinactory.AllNetworks.PRE_WORK_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.SIGNAL_COMPONENT;
 import static org.shsts.tinactory.AllNetworks.WORK_SCHEDULING;
-import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 import static org.shsts.tinactory.integration.network.MachineBlock.WORKING;
 
 @MethodsReturnNonnullByDefault
@@ -363,10 +362,9 @@ public class Machine extends UpdatableCapabilityProvider implements IMachine,
 
     private void onWork(Level world, INetwork network) {
         assert this.network == network;
-        var workFactor = network
+        var workSpeed = network
             .getComponent(ELECTRIC_COMPONENT.get())
-            .getWorkFactor();
-        var workSpeed = MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
+            .getCurvedWorkFactor();
         var workSpeed1 = MathUtil.compare(workSpeed) > 0 ? workSpeed : 0d;
         processor().ifPresent(processor -> {
             processor.onWorkTick(workSpeed1);

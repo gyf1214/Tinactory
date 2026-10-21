@@ -60,7 +60,7 @@ public final class CreateElectricMotorBlockEntity extends GeneratingKineticBlock
     public double workFactor() {
         return MACHINE.tryGet(this)
             .flatMap(IMachine::network)
-            .map(network -> network.getComponent(ELECTRIC_COMPONENT.get()).getWorkFactor())
+            .map(network -> network.getComponent(ELECTRIC_COMPONENT.get()).getCurvedWorkFactor())
             .orElse(0d);
     }
 

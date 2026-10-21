@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.shsts.tinactory.AllItems;
+import org.shsts.tinactory.TinactoryConfig;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.create.CreateElectricMotorBlockEntity;
 import org.shsts.tinactory.compat.create.CreateKineticGeneratorBlockEntity;
@@ -100,7 +101,8 @@ public final class CreateIntegrationGameTest {
                 return;
             }
             var workFactor = network.getComponent(ELECTRIC_COMPONENT.get()).getWorkFactor();
-            var expectedCapacity = 3_200f * 32f * (float) workFactor;
+            var curvedWorkFactor = Math.pow(workFactor, TinactoryConfig.CONFIG.workFactorExponent.get());
+            var expectedCapacity = 3_200f * 32f * (float) curvedWorkFactor;
             if (Math.abs(first.getSpeed()) != 32f || Math.abs(second.getSpeed()) != 32f ||
                 Math.abs(first.getOrCreateNetwork().getActualCapacityOf(first) - expectedCapacity) > 1f ||
                 Math.abs(second.getOrCreateNetwork().getActualCapacityOf(second) - expectedCapacity) > 1f) {
@@ -266,7 +268,8 @@ public final class CreateIntegrationGameTest {
             var oldId = sourceMachine.uuid();
             var workFactor = sourceMachine.network().orElseThrow()
                 .getComponent(ELECTRIC_COMPONENT.get()).getWorkFactor();
-            var expectedCapacity = 102_400f * (float) workFactor;
+            var curvedWorkFactor = Math.pow(workFactor, TinactoryConfig.CONFIG.workFactorExponent.get());
+            var expectedCapacity = 102_400f * (float) curvedWorkFactor;
             var provider = helper.getLevel().registryAccess();
             var saved = motor.saveWithoutMetadata(provider);
             var restoredPos = new BlockPos(8, 2, 2);

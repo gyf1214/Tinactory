@@ -25,6 +25,7 @@ import java.util.function.Function;
 
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SCHEDULING;
 import static org.shsts.tinactory.AllNetworks.ELECTRIC_SUBNET;
+import static org.shsts.tinactory.TinactoryConfig.CONFIG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -215,6 +216,10 @@ public class ElectricComponent extends NetworkComponent {
 
     public double getWorkFactor() {
         return workFactor;
+    }
+
+    public double getCurvedWorkFactor() {
+        return MathUtil.safePow(workFactor, CONFIG.workFactorExponent.get());
     }
 
     public double getBufferFactor() {
