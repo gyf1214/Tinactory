@@ -46,7 +46,7 @@ public final class CreateElectricMotorBlockEntity extends GeneratingKineticBlock
     public static <P> Transformer<IBlockEntityTypeBuilder<P>> factory(float stress, int rpm, double power) {
         return builder -> builder
             .factory((type, pos, state, container) ->
-                new CreateElectricMotorBlockEntity(type, pos, state, container, stress, rpm),
+                    new CreateElectricMotorBlockEntity(type, pos, state, container, stress, rpm),
                 CreateElectricMotorBlockEntity::container)
             .container(MACHINE_CONTAINER_ID, blockEntity ->
                 new MotorMachine((CreateElectricMotorBlockEntity) blockEntity, power))
@@ -124,7 +124,7 @@ public final class CreateElectricMotorBlockEntity extends GeneratingKineticBlock
 
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return container.createUpdatePacket(registries -> super.getUpdateTag(registries))
+        return container.createUpdatePacket(super::getUpdateTag)
             .map(ClientboundBlockEntityDataPacket.class::cast)
             .orElseGet(super::getUpdatePacket);
     }

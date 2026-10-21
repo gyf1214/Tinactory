@@ -29,6 +29,7 @@ public final class CreateMeta extends MetaConsumer {
 
     @Override
     protected void doAcceptMeta(ResourceLocation loc, JsonObject jo) {
+        var id = loc.getPath();
         var type = GsonHelper.getAsString(jo, "type");
         var machines = new HashMap<Voltage, IEntry<? extends Block>>();
         for (var entry : ComponentMeta.parseVoltageConfig(jo, "voltages")) {
@@ -38,26 +39,22 @@ public final class CreateMeta extends MetaConsumer {
             var rpm = GsonHelper.getAsInt(config, "rpm");
             var power = GsonHelper.getAsDouble(config, "power");
             var machine = switch (type) {
-                case "electric_motor" -> buildMotor(voltage, stress, rpm, power);
-                case "kinetic_generator" -> buildGenerator(voltage, stress, rpm, power);
+                case "electric_motor" -> buildMotor(id, voltage, stress, rpm, power);
+                case "kinetic_generator" -> buildGenerator(id, voltage, stress, rpm, power);
                 default -> throw new JsonSyntaxException("Unknown Create machine type: " + type);
             };
             machines.put(voltage, machine);
         }
 
         var set = new MachineSet(Layout.EMPTY_SET, machines);
-        var setId = "create/" + type;
+        var setId = "create/" + id;
         AllBlockEntities.MACHINE_SETS.put(setId, set);
-        switch (type) {
-            case "electric_motor" -> CreateIntegration.MOTORS = set;
-            case "kinetic_generator" -> CreateIntegration.GENERATORS = set;
-            default -> throw new JsonSyntaxException("Unknown Create machine type: " + type);
-        }
     }
 
-    private static IEntry<? extends Block> buildMotor(Voltage voltage, float stress, int rpm, double power) {
-        var id = "create/" + voltage.id + "/electric_motor";
-        return BlockEntityBuilder.builder(id, CreateMachineBlock.factory(voltage))
+    private static IEntry<? extends Block> buildMotor(String id, Voltage voltage,
+        float stress, int rpm, double power) {
+        var machineId = "create/" + voltage.id + "/" + id;
+        return BlockEntityBuilder.builder(machineId, CreateMachineBlock.factory(voltage))
             .blockEntity()
             .transform(CreateElectricMotorBlockEntity.factory(stress, rpm, power))
             .end()
@@ -68,9 +65,10 @@ public final class CreateMeta extends MetaConsumer {
             .buildObject();
     }
 
-    private static IEntry<? extends Block> buildGenerator(Voltage voltage, float stress, int rpm, double power) {
-        var id = "create/" + voltage.id + "/kinetic_generator";
-        return BlockEntityBuilder.builder(id, CreateMachineBlock.factory(voltage))
+    private static IEntry<? extends Block> buildGenerator(String id, Voltage voltage,
+        float stress, int rpm, double power) {
+        var machineId = "create/" + voltage.id + "/" + id;
+        return BlockEntityBuilder.builder(machineId, CreateMachineBlock.factory(voltage))
             .blockEntity()
             .transform(CreateKineticGeneratorBlockEntity.factory(stress, rpm, power))
             .end()

@@ -3,7 +3,6 @@ package org.shsts.tinactory.gametest.create;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.content.kinetics.base.IRotate;
-import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -20,11 +19,9 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.shsts.tinactory.AllBlockEntities;
 import org.shsts.tinactory.AllItems;
 import org.shsts.tinactory.api.TinactoryKeys;
 import org.shsts.tinactory.compat.create.CreateElectricMotorBlockEntity;
-import org.shsts.tinactory.compat.create.CreateIntegration;
 import org.shsts.tinactory.compat.create.CreateKineticGeneratorBlockEntity;
 import org.shsts.tinactory.content.electric.BatteryBoxMode;
 import org.shsts.tinactory.content.tool.PoweredItem;
@@ -34,7 +31,9 @@ import org.shsts.tinactory.integration.network.CableBlock;
 import org.shsts.tinactory.integration.network.MachineBlock;
 
 import java.util.List;
+import java.util.Objects;
 
+import static org.shsts.tinactory.AllBlockEntities.getMachine;
 import static org.shsts.tinactory.AllCapabilities.ELECTRIC_MACHINE;
 import static org.shsts.tinactory.AllCapabilities.EVENT_MANAGER;
 import static org.shsts.tinactory.AllCapabilities.MACHINE;
@@ -51,15 +50,15 @@ public final class CreateIntegrationGameTest {
 
     private CreateIntegrationGameTest() {}
 
-    @GameTest(template = "empty_16x8x8", templateNamespace = TinactoryKeys.ID, timeoutTicks = 100)
+    @GameTest(template = "empty_16x8x8", templateNamespace = TinactoryKeys.ID)
     public static void testSixConverterRegistrationsAndContainers(GameTestHelper helper) {
         var voltages = List.of(Voltage.ULV, Voltage.MV, Voltage.EV);
         for (var i = 0; i < voltages.size(); i++) {
             var voltage = voltages.get(i);
             var motorPos = new BlockPos(1 + i, 2, 2);
             var generatorPos = new BlockPos(5 + i, 2, 2);
-            var motorBlock = CreateIntegration.MOTORS.block(voltage);
-            var generatorBlock = CreateIntegration.GENERATORS.block(voltage);
+            var motorBlock = getMachine("electric_motor").block(voltage);
+            var generatorBlock = getMachine("kinetic_generator").block(voltage);
             if (!(motorBlock instanceof IRotate) || !(generatorBlock instanceof IRotate)) {
                 helper.fail("A converter block does not expose Create shaft geometry", motorPos);
                 return;
@@ -70,10 +69,12 @@ public final class CreateIntegrationGameTest {
             var generator = helper.getBlockEntity(generatorPos);
             if (!(motor instanceof CreateElectricMotorBlockEntity) ||
                 !(generator instanceof CreateKineticGeneratorBlockEntity) ||
-                !(motor instanceof KineticBlockEntity) || !(generator instanceof KineticBlockEntity) ||
-                EVENT_MANAGER.tryGet(motor).isEmpty() || EVENT_MANAGER.tryGet(generator).isEmpty() ||
-                MACHINE.tryGet(motor).isEmpty() || MACHINE.tryGet(generator).isEmpty() ||
-                ELECTRIC_MACHINE.tryGet(motor).isEmpty() || ELECTRIC_MACHINE.tryGet(generator).isEmpty()) {
+                EVENT_MANAGER.tryGet(motor).isEmpty() ||
+                EVENT_MANAGER.tryGet(generator).isEmpty() ||
+                MACHINE.tryGet(motor).isEmpty() ||
+                MACHINE.tryGet(generator).isEmpty() ||
+                ELECTRIC_MACHINE.tryGet(motor).isEmpty() ||
+                ELECTRIC_MACHINE.tryGet(generator).isEmpty()) {
                 helper.fail("A converter tier did not register its Create entity and Tinactory containers", motorPos);
                 return;
             }
@@ -114,7 +115,7 @@ public final class CreateIntegrationGameTest {
         });
     }
 
-    @GameTest(template = "empty_8x8x8", templateNamespace = TinactoryKeys.ID, timeoutTicks = 100)
+    @GameTest(template = "empty_8x8x8", templateNamespace = TinactoryKeys.ID)
     public static void testUnpoweredMotorStopsButRetainsFixedDemand(GameTestHelper helper) {
         var motorPos = new BlockPos(2, 2, 2);
         var cablePos = motorPos.south();
@@ -151,7 +152,7 @@ public final class CreateIntegrationGameTest {
             var motor = motor(helper, motorPos);
             var demandBeforeLoad = ELECTRIC_MACHINE.get(helper.getBlockEntity(motorPos)).getPowerCons();
             helper.setBlock(motorPos.east(2),
-                CreateIntegration.GENERATORS.block(Voltage.ULV).defaultBlockState()
+                getMachine("kinetic_generator").block(Voltage.ULV).defaultBlockState()
                     .setValue(MachineBlock.FACING, Direction.WEST));
             helper.runAfterDelay(16, () -> {
                 var generator = helper.getBlockEntity(motorPos.east(2));
@@ -175,7 +176,7 @@ public final class CreateIntegrationGameTest {
         var generatorPos = sourcePos.east();
         helper.setBlock(sourcePos, AllBlocks.CREATIVE_MOTOR.get().defaultBlockState()
             .setValue(DirectionalKineticBlock.FACING, Direction.EAST));
-        helper.setBlock(generatorPos, CreateIntegration.GENERATORS.block(Voltage.ULV).defaultBlockState()
+        helper.setBlock(generatorPos, getMachine("kinetic_generator").block(Voltage.ULV).defaultBlockState()
             .setValue(MachineBlock.FACING, Direction.WEST));
         var source = (CreativeMotorBlockEntity) helper.getBlockEntity(sourcePos);
         var generator = generator(helper, generatorPos);
@@ -225,12 +226,14 @@ public final class CreateIntegrationGameTest {
             var capacity = network.calculateCapacity();
             var firstCapacity = network.getActualCapacityOf(first);
             var secondCapacity = network.getActualCapacityOf(second);
-            if (Math.abs(first.getSpeed()) != 32f || Math.abs(second.getSpeed()) != 32f ||
-                first.network != second.network || Math.abs(capacity - firstCapacity - secondCapacity) > 2f ||
+            if (Math.abs(first.getSpeed()) != 32f ||
+                Math.abs(second.getSpeed()) != 32f ||
+                !Objects.equals(first.network, second.network) ||
+                Math.abs(capacity - firstCapacity - secondCapacity) > 2f ||
                 network.sources.size() != 2) {
                 helper.fail("Create capacity pooling mismatch: speed=" + first.getSpeed() + "/" + second.getSpeed() +
                     ", capacity=" + capacity + ", sourceCapacities=" + firstCapacity + "/" + secondCapacity +
-                    ", sharedNetwork=" + (first.network == second.network) + ", sourceCount=" +
+                    ", sharedNetwork=" + Objects.equals(first.network, second.network) + ", sourceCount=" +
                     network.sources.size(), shaftPos);
                 return;
             }
@@ -247,7 +250,7 @@ public final class CreateIntegrationGameTest {
         var voltage = Voltage.MV;
         helper.setBlock(motorPos, motorState(voltage, Direction.EAST, Direction.SOUTH));
         helper.setBlock(motorPos.east(), shaftState());
-        helper.setBlock(generatorPos, CreateIntegration.GENERATORS.block(Voltage.EV).defaultBlockState()
+        helper.setBlock(generatorPos, getMachine("kinetic_generator").block(Voltage.EV).defaultBlockState()
             .setValue(MachineBlock.FACING, Direction.WEST));
         helper.setBlock(cablePos, cableState(voltage, true, true, false, false));
         helper.setBlock(batteryPos, machineState("battery_box", voltage, Direction.NORTH));
@@ -343,13 +346,13 @@ public final class CreateIntegrationGameTest {
     }
 
     private static BlockState motorState(Voltage voltage, Direction facing, Direction ioFacing) {
-        return CreateIntegration.MOTORS.block(voltage).defaultBlockState()
+        return getMachine("electric_motor").block(voltage).defaultBlockState()
             .setValue(MachineBlock.FACING, facing)
             .setValue(MachineBlock.IO_FACING, ioFacing);
     }
 
     private static BlockState machineState(String id, Voltage voltage, Direction ioFacing) {
-        return AllBlockEntities.getMachine(id).block(voltage).defaultBlockState()
+        return getMachine(id).block(voltage).defaultBlockState()
             .setValue(MachineBlock.IO_FACING, ioFacing);
     }
 
@@ -371,11 +374,11 @@ public final class CreateIntegrationGameTest {
     }
 
     private static CreateElectricMotorBlockEntity motor(GameTestHelper helper, BlockPos pos) {
-        return (CreateElectricMotorBlockEntity) helper.getBlockEntity(pos);
+        return helper.getBlockEntity(pos);
     }
 
     private static CreateKineticGeneratorBlockEntity generator(GameTestHelper helper, BlockPos pos) {
-        return (CreateKineticGeneratorBlockEntity) helper.getBlockEntity(pos);
+        return helper.getBlockEntity(pos);
     }
 
     private static void useWithMockPlayer(GameTestHelper helper, BlockPos pos) {
